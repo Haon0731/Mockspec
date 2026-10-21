@@ -20,6 +20,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--case-id", required=True)
     parser.add_argument("--model", default=os.environ.get("MOCKSPEC_MODEL"))
     parser.add_argument("--timeout", type=float, default=120.0)
+    parser.add_argument("--agent-version", choices=("v0.1", "v0.2"), default="v0.1")
+    parser.add_argument("--max-turns", type=int, default=6, help="V0.2 only.")
+    parser.add_argument("--max-tool-calls", type=int, default=8, help="V0.2 only.")
     parser.add_argument(
         "--response-json", type=Path,
         help="Validate a synthetic response offline; never reported as live inference.",
@@ -40,6 +43,18 @@ def main(argv: list[str] | None = None) -> int:
 
     from .inference import InferenceError, PROMPT_VERSION, infer_scenario
 
+    inference_kwargs = {}
+    if args.agent_version == "v0.2":
+        from .inference_v02 import InferenceBudget, PROMPT_VERSION, infer_scenario
+        try:
+            inference_kwargs["budget"] = InferenceBudget(
+                max_turns=args.max_turns, max_tool_calls=args.max_tool_calls,
+            )
+        except InferenceError as exc:
+            print(f"configuration error: {exc}", file=sys.stderr)
+            return 2
+        inference_kwargs["tool_trace"] = []
+
     try:
         if args.response_json is not None:
             # This file is a host-side testing input, never sent to the model.
@@ -47,6 +62,7 @@ def main(argv: list[str] | None = None) -> int:
         else:
             contract = asyncio.run(infer_scenario(
                 task, model=args.model, timeout_seconds=args.timeout,
+                **inference_kwargs,
             ))
     except InferenceError as exc:
         print(f"inference error: {exc}", file=sys.stderr)
