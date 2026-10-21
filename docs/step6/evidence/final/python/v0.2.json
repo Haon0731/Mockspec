@@ -1,0 +1,1177 @@
+{
+  "mode": "offline_scripted_sdk_with_real_tools",
+  "autonomous_tool_choice_verified": false,
+  "model_quality_comparison_possible": false,
+  "contract_origin": "preexisting_host_synthetic_fixture_not_model_inference",
+  "agent_version": "v0.2",
+  "model": "scripted-offline",
+  "case_id": "flask_308",
+  "language": "python",
+  "prompt_version": "scenario-inference/v0.2",
+  "prompt_sha256": "e75d443dc6c26b127aa40c759179f56fdd146a701827e917f9f1a86cb1674874",
+  "task_sha256": "b96241ec8ad153aa3c370b8aa8534e66c7b284979281d0e39545350a0d0579ae",
+  "input_equal_to_baseline": true,
+  "duration_seconds": 0.24324112758040428,
+  "scripted_model_calls": 4,
+  "provider_requests": 0,
+  "provider_token_usage": null,
+  "provider_cost_usd": "0",
+  "cost_basis": "no_provider_client_or_request",
+  "usage_warning": "raw_responses usage is scripted placeholder data, not measured tokens",
+  "budget_test_ledger": {
+    "requests_started": 4,
+    "requests_completed": 4,
+    "input_tokens": 4,
+    "output_tokens": 4,
+    "total_tokens": 8,
+    "usage_complete": true,
+    "known_usage_subtotal": {
+      "input_tokens": 4,
+      "output_tokens": 4,
+      "total_tokens": 8
+    },
+    "rate_estimated_cost_usd": null,
+    "pricing": {
+      "input_cost_per_million": null,
+      "output_cost_per_million": null,
+      "basis": "unknown"
+    },
+    "estimates": [
+      {
+        "sequence": 1,
+        "method": "known_request_utf8_bytes_divided_by_4",
+        "known_request_bytes": 17631,
+        "estimated_input_tokens": 4408,
+        "reserved_output_tokens": 4096,
+        "projected_total_tokens": 8504,
+        "projected_cost_usd": null,
+        "limitations": "Provider protocol overhead and exact tokenizer behavior are unavailable; the estimate is not a strict token or cost upper bound."
+      },
+      {
+        "sequence": 2,
+        "method": "known_request_utf8_bytes_divided_by_4",
+        "known_request_bytes": 18835,
+        "estimated_input_tokens": 4709,
+        "reserved_output_tokens": 4096,
+        "projected_total_tokens": 8807,
+        "projected_cost_usd": null,
+        "limitations": "Provider protocol overhead and exact tokenizer behavior are unavailable; the estimate is not a strict token or cost upper bound."
+      },
+      {
+        "sequence": 3,
+        "method": "known_request_utf8_bytes_divided_by_4",
+        "known_request_bytes": 25185,
+        "estimated_input_tokens": 6297,
+        "reserved_output_tokens": 4096,
+        "projected_total_tokens": 10397,
+        "projected_cost_usd": null,
+        "limitations": "Provider protocol overhead and exact tokenizer behavior are unavailable; the estimate is not a strict token or cost upper bound."
+      },
+      {
+        "sequence": 4,
+        "method": "known_request_utf8_bytes_divided_by_4",
+        "known_request_bytes": 31115,
+        "estimated_input_tokens": 7779,
+        "reserved_output_tokens": 4096,
+        "projected_total_tokens": 11881,
+        "projected_cost_usd": null,
+        "limitations": "Provider protocol overhead and exact tokenizer behavior are unavailable; the estimate is not a strict token or cost upper bound."
+      }
+    ],
+    "usage_records": [
+      {
+        "sequence": 1,
+        "known": true,
+        "reported_requests": 1,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2,
+        "cost_usd": null,
+        "raw_usage_available": false
+      },
+      {
+        "sequence": 2,
+        "known": true,
+        "reported_requests": 1,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2,
+        "cost_usd": null,
+        "raw_usage_available": false
+      },
+      {
+        "sequence": 3,
+        "known": true,
+        "reported_requests": 1,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2,
+        "cost_usd": null,
+        "raw_usage_available": false
+      },
+      {
+        "sequence": 4,
+        "known": true,
+        "reported_requests": 1,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2,
+        "cost_usd": null,
+        "raw_usage_available": false
+      }
+    ],
+    "gate_events": [
+      {
+        "sequence": 1,
+        "stage": "before_model_call",
+        "status": "allowed",
+        "reason": null
+      },
+      {
+        "sequence": 2,
+        "stage": "before_model_call",
+        "status": "allowed",
+        "reason": null
+      },
+      {
+        "sequence": 3,
+        "stage": "before_model_call",
+        "status": "allowed",
+        "reason": null
+      },
+      {
+        "sequence": 4,
+        "stage": "before_model_call",
+        "status": "allowed",
+        "reason": null
+      }
+    ],
+    "limitations": [
+      "Preflight token estimates use known serialized request bytes divided by four.",
+      "Provider tokenizer and protocol overhead can differ, so cost is not a strict hard cap.",
+      "A locally cancelled request may still incur provider charges not present in usage."
+    ]
+  },
+  "tool_trace": [
+    {
+      "sequence": 1,
+      "tool": "inspect_source",
+      "arguments": {
+        "source_id": "mut",
+        "start_line": 265,
+        "end_line": 285
+      },
+      "status": "ok",
+      "result": {
+        "status": "ok",
+        "backend": "source_store",
+        "source_id": "mut",
+        "start_line": 265,
+        "end_line": 285,
+        "text": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:\n    \"\"\"Raise an :exc:`~werkzeug.exceptions.HTTPException` for the given\n    status code.\n\n    If :data:`~flask.current_app` is available, it will call its\n    :attr:`~flask.Flask.aborter` object, otherwise it will use\n    :func:`werkzeug.exceptions.abort`.\n\n    :param code: The status code for the exception, which must be\n        registered in ``app.aborter``.\n    :param args: Passed to the exception.\n    :param kwargs: Passed to the exception.\n\n    .. versionadded:: 2.2\n        Calls ``current_app.aborter`` if available instead of always\n        using Werkzeug's default ``abort``.\n    \"\"\"\n    if (ctx := _cv_app.get(None)) is not None:\n        ctx.app.aborter(code, *args, **kwargs)\n\n    _wz_abort(code, *args, **kwargs)",
+        "limitations": []
+      },
+      "duration_seconds": 2.6647932827472687e-05
+    },
+    {
+      "sequence": 2,
+      "tool": "inspect_program_structure",
+      "arguments": {
+        "source_id": "mut"
+      },
+      "status": "ok",
+      "result": {
+        "status": "ok",
+        "backend": "cpython_ast",
+        "source_id": "mut",
+        "facts": [
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 265,
+            "end_line": 265,
+            "quote": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:",
+            "lexical_guards": [],
+            "name": "int",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 265,
+            "end_line": 265,
+            "quote": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:",
+            "lexical_guards": [],
+            "name": "BaseResponse",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 265,
+            "end_line": 265,
+            "quote": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:",
+            "lexical_guards": [],
+            "name": "t",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 265,
+            "end_line": 265,
+            "quote": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:",
+            "lexical_guards": [],
+            "name": "t",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "condition",
+            "source_id": "mut",
+            "start_line": 282,
+            "end_line": 282,
+            "quote": "    if (ctx := _cv_app.get(None)) is not None:",
+            "lexical_guards": [],
+            "construct": "if",
+            "expression": "(ctx := _cv_app.get(None)) is not None"
+          },
+          {
+            "kind": "named_expression",
+            "source_id": "mut",
+            "start_line": 282,
+            "end_line": 282,
+            "quote": "    if (ctx := _cv_app.get(None)) is not None:",
+            "lexical_guards": [],
+            "target": "ctx",
+            "value": "_cv_app.get(None)",
+            "relation": "same_expression_assignment"
+          },
+          {
+            "kind": "call",
+            "source_id": "mut",
+            "start_line": 282,
+            "end_line": 282,
+            "quote": "    if (ctx := _cv_app.get(None)) is not None:",
+            "lexical_guards": [],
+            "callee": "_cv_app.get",
+            "positional_argument_count": 1,
+            "keyword_arguments": [],
+            "resolution_status": "unresolved",
+            "syntax_context": {
+              "kind": "assignment_rhs",
+              "targets": [
+                "ctx"
+              ],
+              "relation": "syntactic_containment"
+            }
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 282,
+            "end_line": 282,
+            "quote": "    if (ctx := _cv_app.get(None)) is not None:",
+            "lexical_guards": [],
+            "name": "_cv_app",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "branch",
+            "source_id": "mut",
+            "start_line": 282,
+            "end_line": 283,
+            "quote": "    if (ctx := _cv_app.get(None)) is not None:\n        ctx.app.aborter(code, *args, **kwargs)",
+            "lexical_guards": [],
+            "construct": "if",
+            "branch": "true",
+            "polarity": true,
+            "body_statement_count": 1
+          },
+          {
+            "kind": "call",
+            "source_id": "mut",
+            "start_line": 283,
+            "end_line": 283,
+            "quote": "        ctx.app.aborter(code, *args, **kwargs)",
+            "lexical_guards": [
+              {
+                "kind": "if",
+                "line": 282,
+                "branch": "true",
+                "polarity": true
+              }
+            ],
+            "callee": "ctx.app.aborter",
+            "positional_argument_count": 2,
+            "keyword_arguments": [
+              null
+            ],
+            "resolution_status": "unresolved",
+            "syntax_context": {
+              "kind": "expression",
+              "relation": "syntactic_containment"
+            }
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 283,
+            "end_line": 283,
+            "quote": "        ctx.app.aborter(code, *args, **kwargs)",
+            "lexical_guards": [
+              {
+                "kind": "if",
+                "line": 282,
+                "branch": "true",
+                "polarity": true
+              }
+            ],
+            "name": "ctx",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 283,
+            "end_line": 283,
+            "quote": "        ctx.app.aborter(code, *args, **kwargs)",
+            "lexical_guards": [
+              {
+                "kind": "if",
+                "line": 282,
+                "branch": "true",
+                "polarity": true
+              }
+            ],
+            "name": "code",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 283,
+            "end_line": 283,
+            "quote": "        ctx.app.aborter(code, *args, **kwargs)",
+            "lexical_guards": [
+              {
+                "kind": "if",
+                "line": 282,
+                "branch": "true",
+                "polarity": true
+              }
+            ],
+            "name": "args",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 283,
+            "end_line": 283,
+            "quote": "        ctx.app.aborter(code, *args, **kwargs)",
+            "lexical_guards": [
+              {
+                "kind": "if",
+                "line": 282,
+                "branch": "true",
+                "polarity": true
+              }
+            ],
+            "name": "kwargs",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "call",
+            "source_id": "mut",
+            "start_line": 285,
+            "end_line": 285,
+            "quote": "    _wz_abort(code, *args, **kwargs)",
+            "lexical_guards": [],
+            "callee": "_wz_abort",
+            "positional_argument_count": 2,
+            "keyword_arguments": [
+              null
+            ],
+            "resolution_status": "unresolved",
+            "syntax_context": {
+              "kind": "expression",
+              "relation": "syntactic_containment"
+            }
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 285,
+            "end_line": 285,
+            "quote": "    _wz_abort(code, *args, **kwargs)",
+            "lexical_guards": [],
+            "name": "_wz_abort",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 285,
+            "end_line": 285,
+            "quote": "    _wz_abort(code, *args, **kwargs)",
+            "lexical_guards": [],
+            "name": "code",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 285,
+            "end_line": 285,
+            "quote": "    _wz_abort(code, *args, **kwargs)",
+            "lexical_guards": [],
+            "name": "args",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 285,
+            "end_line": 285,
+            "quote": "    _wz_abort(code, *args, **kwargs)",
+            "lexical_guards": [],
+            "name": "kwargs",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 265,
+            "end_line": 265,
+            "quote": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:",
+            "lexical_guards": [],
+            "name": "t",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          }
+        ],
+        "diagnostics": [],
+        "limitations": [
+          "Syntax and lexical-containment facts only; no CFG or path-feasibility proof.",
+          "Calls, aliases, and cross-statement def-use relationships are unresolved.",
+          "Exception syntax does not prove exception propagation or handler reachability."
+        ]
+      },
+      "duration_seconds": 0.10291928285732865
+    },
+    {
+      "sequence": 3,
+      "tool": "inspect_dependency_usage",
+      "arguments": {
+        "source_id": "mut"
+      },
+      "status": "ok",
+      "result": {
+        "status": "ok",
+        "backend": "cpython_ast",
+        "source_id": "mut",
+        "facts": [
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 265,
+            "end_line": 265,
+            "quote": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:",
+            "lexical_guards": [],
+            "name": "int",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 265,
+            "end_line": 265,
+            "quote": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:",
+            "lexical_guards": [],
+            "name": "BaseResponse",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 265,
+            "end_line": 265,
+            "quote": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:",
+            "lexical_guards": [],
+            "name": "t",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 265,
+            "end_line": 265,
+            "quote": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:",
+            "lexical_guards": [],
+            "name": "t",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "named_expression",
+            "source_id": "mut",
+            "start_line": 282,
+            "end_line": 282,
+            "quote": "    if (ctx := _cv_app.get(None)) is not None:",
+            "lexical_guards": [],
+            "target": "ctx",
+            "value": "_cv_app.get(None)",
+            "relation": "same_expression_assignment"
+          },
+          {
+            "kind": "call",
+            "source_id": "mut",
+            "start_line": 282,
+            "end_line": 282,
+            "quote": "    if (ctx := _cv_app.get(None)) is not None:",
+            "lexical_guards": [],
+            "callee": "_cv_app.get",
+            "positional_argument_count": 1,
+            "keyword_arguments": [],
+            "resolution_status": "unresolved",
+            "syntax_context": {
+              "kind": "assignment_rhs",
+              "targets": [
+                "ctx"
+              ],
+              "relation": "syntactic_containment"
+            }
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 282,
+            "end_line": 282,
+            "quote": "    if (ctx := _cv_app.get(None)) is not None:",
+            "lexical_guards": [],
+            "name": "_cv_app",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "call",
+            "source_id": "mut",
+            "start_line": 283,
+            "end_line": 283,
+            "quote": "        ctx.app.aborter(code, *args, **kwargs)",
+            "lexical_guards": [
+              {
+                "kind": "if",
+                "line": 282,
+                "branch": "true",
+                "polarity": true
+              }
+            ],
+            "callee": "ctx.app.aborter",
+            "positional_argument_count": 2,
+            "keyword_arguments": [
+              null
+            ],
+            "resolution_status": "unresolved",
+            "syntax_context": {
+              "kind": "expression",
+              "relation": "syntactic_containment"
+            }
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 283,
+            "end_line": 283,
+            "quote": "        ctx.app.aborter(code, *args, **kwargs)",
+            "lexical_guards": [
+              {
+                "kind": "if",
+                "line": 282,
+                "branch": "true",
+                "polarity": true
+              }
+            ],
+            "name": "ctx",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 283,
+            "end_line": 283,
+            "quote": "        ctx.app.aborter(code, *args, **kwargs)",
+            "lexical_guards": [
+              {
+                "kind": "if",
+                "line": 282,
+                "branch": "true",
+                "polarity": true
+              }
+            ],
+            "name": "code",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 283,
+            "end_line": 283,
+            "quote": "        ctx.app.aborter(code, *args, **kwargs)",
+            "lexical_guards": [
+              {
+                "kind": "if",
+                "line": 282,
+                "branch": "true",
+                "polarity": true
+              }
+            ],
+            "name": "args",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 283,
+            "end_line": 283,
+            "quote": "        ctx.app.aborter(code, *args, **kwargs)",
+            "lexical_guards": [
+              {
+                "kind": "if",
+                "line": 282,
+                "branch": "true",
+                "polarity": true
+              }
+            ],
+            "name": "kwargs",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "call",
+            "source_id": "mut",
+            "start_line": 285,
+            "end_line": 285,
+            "quote": "    _wz_abort(code, *args, **kwargs)",
+            "lexical_guards": [],
+            "callee": "_wz_abort",
+            "positional_argument_count": 2,
+            "keyword_arguments": [
+              null
+            ],
+            "resolution_status": "unresolved",
+            "syntax_context": {
+              "kind": "expression",
+              "relation": "syntactic_containment"
+            }
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 285,
+            "end_line": 285,
+            "quote": "    _wz_abort(code, *args, **kwargs)",
+            "lexical_guards": [],
+            "name": "_wz_abort",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 285,
+            "end_line": 285,
+            "quote": "    _wz_abort(code, *args, **kwargs)",
+            "lexical_guards": [],
+            "name": "code",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 285,
+            "end_line": 285,
+            "quote": "    _wz_abort(code, *args, **kwargs)",
+            "lexical_guards": [],
+            "name": "args",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 285,
+            "end_line": 285,
+            "quote": "    _wz_abort(code, *args, **kwargs)",
+            "lexical_guards": [],
+            "name": "kwargs",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          },
+          {
+            "kind": "local_reference",
+            "source_id": "mut",
+            "start_line": 265,
+            "end_line": 265,
+            "quote": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:",
+            "lexical_guards": [],
+            "name": "t",
+            "resolution_status": "unresolved",
+            "relation": "lexical_name_read"
+          }
+        ],
+        "diagnostics": [],
+        "limitations": [
+          "Syntax and lexical-containment facts only; no CFG or path-feasibility proof.",
+          "Calls, aliases, and cross-statement def-use relationships are unresolved.",
+          "Exception syntax does not prove exception propagation or handler reachability.",
+          "Dependency usage is syntax-local; call targets, aliases, and reaching definitions may be unresolved."
+        ]
+      },
+      "duration_seconds": 0.10201687691733241
+    }
+  ],
+  "raw_responses": [
+    {
+      "output": [
+        {
+          "arguments": "{\"source_id\": \"mut\", \"start_line\": 265, \"end_line\": 285}",
+          "call_id": "offline-0",
+          "name": "inspect_source",
+          "type": "function_call",
+          "id": null,
+          "async_": null,
+          "caller": null,
+          "namespace": null,
+          "status": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 1,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "arguments": "{\"source_id\": \"mut\"}",
+          "call_id": "offline-1",
+          "name": "inspect_program_structure",
+          "type": "function_call",
+          "id": null,
+          "async_": null,
+          "caller": null,
+          "namespace": null,
+          "status": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 1,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "arguments": "{\"source_id\": \"mut\"}",
+          "call_id": "offline-2",
+          "name": "inspect_dependency_usage",
+          "type": "function_call",
+          "id": null,
+          "async_": null,
+          "caller": null,
+          "namespace": null,
+          "status": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 1,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "id": "offline-final",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"mock-spec.scenario/v0.1\", \"case_id\": \"flask_308\", \"language\": \"python\", \"test_objectives\": [{\"statement\": \"Each visible parameterized case expects abort(code, *args, **kwargs) to raise an exception.\", \"status\": \"required\", \"scenario_ids\": [\"python-no-context\", \"python-context-aborter-raises\", \"python-context-aborter-returns\"], \"condition\": \"For every visible parameterized case in the selected test.\", \"evidence_ids\": [\"python-test-call\"]}, {\"statement\": \"App-context cases expect an exception message containing 'Aborted with {code}', while no-context cases expect one containing 'Werkzeug abort {code}'.\", \"status\": \"required\", \"scenario_ids\": [\"python-no-context\", \"python-context-aborter-raises\", \"python-context-aborter-returns\"], \"condition\": \"According to the has_app_context branch of the selected visible test.\", \"evidence_ids\": [\"python-test-message-app\", \"python-test-message-werkzeug\"]}], \"scenario_hypotheses\": [{\"id\": \"python-no-context\", \"description\": \"The context lookup returns None, so Flask delegates directly to Werkzeug's abort function with the original arguments.\", \"condition\": \"has_app_context is false and _cv_app.get(None) returns None.\", \"status\": \"candidate\", \"evidence_ids\": [\"python-mut-branches\", \"python-test-parameters\", \"python-test-message-werkzeug\"]}, {\"id\": \"python-context-aborter-raises\", \"description\": \"The context lookup returns an object whose app aborter raises the exception expected by app-context cases, preventing Werkzeug abort from being reached.\", \"condition\": \"has_app_context is true and ctx.app.aborter raises.\", \"status\": \"candidate\", \"evidence_ids\": [\"python-test-context-wiring\", \"python-mut-branches\", \"python-test-message-app\"]}, {\"id\": \"python-context-aborter-returns\", \"description\": \"If the app aborter returns normally, execution continues to Werkzeug abort because there is no return after the app-aborter call.\", \"condition\": \"_cv_app.get(None) returns a context and ctx.app.aborter returns normally.\", \"status\": \"candidate\", \"evidence_ids\": [\"python-mut-branches\"]}], \"dependency_constraints\": [{\"statement\": \"_cv_app.get(None) must return None for the no-context scenario.\", \"status\": \"candidate\", \"scenario_ids\": [\"python-no-context\"], \"condition\": \"Only for cases intended to exercise the no-app-context path.\", \"evidence_ids\": [\"python-mut-branches\", \"python-test-parameters\"]}, {\"statement\": \"_wz_abort must receive code, args, and kwargs and raise an exception whose message contains 'Werkzeug abort {code}'.\", \"status\": \"required\", \"scenario_ids\": [\"python-no-context\"], \"condition\": \"For the selected no-app-context test cases.\", \"evidence_ids\": [\"python-mut-branches\", \"python-test-call\", \"python-test-message-werkzeug\"]}, {\"statement\": \"_cv_app.get(None) must return a context whose app is the visible mock_app for the app-context scenario.\", \"status\": \"candidate\", \"scenario_ids\": [\"python-context-aborter-raises\", \"python-context-aborter-returns\"], \"condition\": \"Only for cases intended to exercise an app context; the masked setup determining the lookup result is not visible.\", \"evidence_ids\": [\"python-test-context-wiring\", \"python-mut-branches\"]}, {\"statement\": \"ctx.app.aborter must raise an exception whose message contains 'Aborted with {code}'.\", \"status\": \"candidate\", \"scenario_ids\": [\"python-context-aborter-raises\"], \"condition\": \"Only for the hypothesis where the app aborter supplies the visible app-context exception and stops execution.\", \"evidence_ids\": [\"python-test-context-wiring\", \"python-mut-branches\", \"python-test-message-app\"]}, {\"statement\": \"_wz_abort must raise an exception whose message contains 'Aborted with {code}' after the app aborter returns normally.\", \"status\": \"candidate\", \"scenario_ids\": [\"python-context-aborter-returns\"], \"condition\": \"Only when an app context exists and ctx.app.aborter returns normally.\", \"evidence_ids\": [\"python-mut-branches\", \"python-test-call\", \"python-test-message-app\"]}], \"expected_interactions\": [{\"statement\": \"_cv_app.get(None) is called to obtain an optional app context.\", \"status\": \"required\", \"scenario_ids\": [\"python-no-context\", \"python-context-aborter-raises\", \"python-context-aborter-returns\"], \"condition\": \"Whenever abort executes far enough to evaluate its context branch.\", \"evidence_ids\": [\"python-mut-branches\"], \"assertion_policy\": \"not_implied\"}, {\"statement\": \"ctx.app.aborter(code, *args, **kwargs) is called.\", \"status\": \"candidate\", \"scenario_ids\": [\"python-context-aborter-raises\", \"python-context-aborter-returns\"], \"condition\": \"Only when _cv_app.get(None) returns a context.\", \"evidence_ids\": [\"python-mut-branches\"], \"assertion_policy\": \"not_implied\"}, {\"statement\": \"_wz_abort(code, *args, **kwargs) is called.\", \"status\": \"candidate\", \"scenario_ids\": [\"python-no-context\", \"python-context-aborter-returns\"], \"condition\": \"When there is no context, or when the app aborter returns normally.\", \"evidence_ids\": [\"python-mut-branches\"], \"assertion_policy\": \"not_implied\"}], \"verification_candidates\": [{\"statement\": \"Consider verifying the app aborter received code, args, and kwargs in app-context cases.\", \"status\": \"candidate\", \"scenario_ids\": [\"python-context-aborter-raises\", \"python-context-aborter-returns\"], \"condition\": \"Only if the chosen scenario uses an app context and the interaction is material beyond the exception assertion.\", \"evidence_ids\": [\"python-mut-branches\", \"python-test-context-wiring\"]}, {\"statement\": \"Consider verifying Werkzeug abort received code, args, and kwargs in no-context cases.\", \"status\": \"candidate\", \"scenario_ids\": [\"python-no-context\"], \"condition\": \"Only for the no-context scenario and only if interaction verification adds value.\", \"evidence_ids\": [\"python-mut-branches\", \"python-test-message-werkzeug\"]}], \"evidence\": [{\"id\": \"python-test-parameters\", \"source_id\": \"test\", \"start_line\": 11, \"end_line\": 47, \"quote\": \"@pytest.mark.parametrize(\\\"scenario,has_app_context,code,args,kwargs\\\", [\\n    (\\n        \\\"app_context_exists_404\\\",\\n        True,\\n        404,\\n        (),\\n        {}\\n    ),\\n    (\\n        \\\"app_context_exists_500_with_message\\\",\\n        True,\\n        500,\\n        (\\\"Internal Server Error\\\",),\\n        {}\\n    ),\\n    (\\n        \\\"no_app_context_403\\\",\\n        False,\\n        403,\\n        (),\\n        {}\\n    ),\\n    (\\n        \\\"no_app_context_with_args_kwargs\\\",\\n        False,\\n        400,\\n        (\\\"Bad Request\\\",),\\n        {\\\"description\\\": \\\"Invalid input\\\"}\\n    ),\\n    (\\n        \\\"app_context_custom_code\\\",\\n        True,\\n        418,\\n        (),\\n        {\\\"description\\\": \\\"I'm a teapot\\\"}\\n    ),\\n])\", \"rationale\": \"The visible test explicitly varies app-context presence, code, positional arguments, and keyword arguments.\"}, {\"id\": \"python-test-context-wiring\", \"source_id\": \"test\", \"start_line\": 86, \"end_line\": 89, \"quote\": \"    if has_app_context:\\n                       \\n        mock_ctx.app = mock_app\\n        mock_app.aborter = mock_aborter\", \"rationale\": \"The visible setup maps the context's app to mock_app and mock_app.aborter to mock_aborter when an app context is requested.\"}, {\"id\": \"python-test-call\", \"source_id\": \"test\", \"start_line\": 102, \"end_line\": 103, \"quote\": \"    with pytest.raises(Exception) as exc_info:\\n        abort(code, *args, **kwargs)\", \"rationale\": \"The only visible exception-type requirement is the broad Exception base class; exact exception types are not asserted.\"}, {\"id\": \"python-test-message-app\", \"source_id\": \"test\", \"start_line\": 120, \"end_line\": 120, \"quote\": \"        assert f\\\"Aborted with {code}\\\" in str(exc_info.value)\", \"rationale\": \"The app-context branch visibly requires this message fragment.\"}, {\"id\": \"python-test-message-werkzeug\", \"source_id\": \"test\", \"start_line\": 126, \"end_line\": 126, \"quote\": \"        assert f\\\"Werkzeug abort {code}\\\" in str(exc_info.value)\", \"rationale\": \"The no-context branch visibly requires this message fragment.\"}, {\"id\": \"python-mut-branches\", \"source_id\": \"mut\", \"start_line\": 282, \"end_line\": 285, \"quote\": \"    if (ctx := _cv_app.get(None)) is not None:\\n        ctx.app.aborter(code, *args, **kwargs)\\n\\n    _wz_abort(code, *args, **kwargs)\", \"rationale\": \"The app aborter runs only with a context; Werkzeug abort always remains reachable if the app aborter returns normally.\"}], \"uncertainty\": [{\"statement\": \"The masked slots do not reveal how _cv_app.get(None), mock_ctx, mock_app, mock_aborter, or _wz_abort are stubbed.\", \"status\": \"unknown\", \"scenario_ids\": [\"python-no-context\", \"python-context-aborter-raises\", \"python-context-aborter-returns\"], \"condition\": \"Until a legal masked setup is supplied.\", \"evidence_ids\": [\"python-test-context-wiring\", \"python-test-call\"]}, {\"statement\": \"The visible test requires only Exception and message fragments, so an exact exception class cannot be inferred.\", \"status\": \"unknown\", \"scenario_ids\": [\"python-no-context\", \"python-context-aborter-raises\", \"python-context-aborter-returns\"], \"condition\": \"For all visible parameterized cases.\", \"evidence_ids\": [\"python-test-call\", \"python-test-message-app\", \"python-test-message-werkzeug\"]}]}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 1,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    }
+  ],
+  "validation": "schema_and_evidence_locations_passed",
+  "semantic_correctness_verified": false,
+  "contract": {
+    "schema_version": "mock-spec.scenario/v0.1",
+    "case_id": "flask_308",
+    "language": "python",
+    "test_objectives": [
+      {
+        "statement": "Each visible parameterized case expects abort(code, *args, **kwargs) to raise an exception.",
+        "status": "required",
+        "scenario_ids": [
+          "python-no-context",
+          "python-context-aborter-raises",
+          "python-context-aborter-returns"
+        ],
+        "condition": "For every visible parameterized case in the selected test.",
+        "evidence_ids": [
+          "python-test-call"
+        ]
+      },
+      {
+        "statement": "App-context cases expect an exception message containing 'Aborted with {code}', while no-context cases expect one containing 'Werkzeug abort {code}'.",
+        "status": "required",
+        "scenario_ids": [
+          "python-no-context",
+          "python-context-aborter-raises",
+          "python-context-aborter-returns"
+        ],
+        "condition": "According to the has_app_context branch of the selected visible test.",
+        "evidence_ids": [
+          "python-test-message-app",
+          "python-test-message-werkzeug"
+        ]
+      }
+    ],
+    "scenario_hypotheses": [
+      {
+        "id": "python-no-context",
+        "description": "The context lookup returns None, so Flask delegates directly to Werkzeug's abort function with the original arguments.",
+        "condition": "has_app_context is false and _cv_app.get(None) returns None.",
+        "status": "candidate",
+        "evidence_ids": [
+          "python-mut-branches",
+          "python-test-parameters",
+          "python-test-message-werkzeug"
+        ]
+      },
+      {
+        "id": "python-context-aborter-raises",
+        "description": "The context lookup returns an object whose app aborter raises the exception expected by app-context cases, preventing Werkzeug abort from being reached.",
+        "condition": "has_app_context is true and ctx.app.aborter raises.",
+        "status": "candidate",
+        "evidence_ids": [
+          "python-test-context-wiring",
+          "python-mut-branches",
+          "python-test-message-app"
+        ]
+      },
+      {
+        "id": "python-context-aborter-returns",
+        "description": "If the app aborter returns normally, execution continues to Werkzeug abort because there is no return after the app-aborter call.",
+        "condition": "_cv_app.get(None) returns a context and ctx.app.aborter returns normally.",
+        "status": "candidate",
+        "evidence_ids": [
+          "python-mut-branches"
+        ]
+      }
+    ],
+    "dependency_constraints": [
+      {
+        "statement": "_cv_app.get(None) must return None for the no-context scenario.",
+        "status": "candidate",
+        "scenario_ids": [
+          "python-no-context"
+        ],
+        "condition": "Only for cases intended to exercise the no-app-context path.",
+        "evidence_ids": [
+          "python-mut-branches",
+          "python-test-parameters"
+        ]
+      },
+      {
+        "statement": "_wz_abort must receive code, args, and kwargs and raise an exception whose message contains 'Werkzeug abort {code}'.",
+        "status": "required",
+        "scenario_ids": [
+          "python-no-context"
+        ],
+        "condition": "For the selected no-app-context test cases.",
+        "evidence_ids": [
+          "python-mut-branches",
+          "python-test-call",
+          "python-test-message-werkzeug"
+        ]
+      },
+      {
+        "statement": "_cv_app.get(None) must return a context whose app is the visible mock_app for the app-context scenario.",
+        "status": "candidate",
+        "scenario_ids": [
+          "python-context-aborter-raises",
+          "python-context-aborter-returns"
+        ],
+        "condition": "Only for cases intended to exercise an app context; the masked setup determining the lookup result is not visible.",
+        "evidence_ids": [
+          "python-test-context-wiring",
+          "python-mut-branches"
+        ]
+      },
+      {
+        "statement": "ctx.app.aborter must raise an exception whose message contains 'Aborted with {code}'.",
+        "status": "candidate",
+        "scenario_ids": [
+          "python-context-aborter-raises"
+        ],
+        "condition": "Only for the hypothesis where the app aborter supplies the visible app-context exception and stops execution.",
+        "evidence_ids": [
+          "python-test-context-wiring",
+          "python-mut-branches",
+          "python-test-message-app"
+        ]
+      },
+      {
+        "statement": "_wz_abort must raise an exception whose message contains 'Aborted with {code}' after the app aborter returns normally.",
+        "status": "candidate",
+        "scenario_ids": [
+          "python-context-aborter-returns"
+        ],
+        "condition": "Only when an app context exists and ctx.app.aborter returns normally.",
+        "evidence_ids": [
+          "python-mut-branches",
+          "python-test-call",
+          "python-test-message-app"
+        ]
+      }
+    ],
+    "expected_interactions": [
+      {
+        "statement": "_cv_app.get(None) is called to obtain an optional app context.",
+        "status": "required",
+        "scenario_ids": [
+          "python-no-context",
+          "python-context-aborter-raises",
+          "python-context-aborter-returns"
+        ],
+        "condition": "Whenever abort executes far enough to evaluate its context branch.",
+        "evidence_ids": [
+          "python-mut-branches"
+        ],
+        "assertion_policy": "not_implied"
+      },
+      {
+        "statement": "ctx.app.aborter(code, *args, **kwargs) is called.",
+        "status": "candidate",
+        "scenario_ids": [
+          "python-context-aborter-raises",
+          "python-context-aborter-returns"
+        ],
+        "condition": "Only when _cv_app.get(None) returns a context.",
+        "evidence_ids": [
+          "python-mut-branches"
+        ],
+        "assertion_policy": "not_implied"
+      },
+      {
+        "statement": "_wz_abort(code, *args, **kwargs) is called.",
+        "status": "candidate",
+        "scenario_ids": [
+          "python-no-context",
+          "python-context-aborter-returns"
+        ],
+        "condition": "When there is no context, or when the app aborter returns normally.",
+        "evidence_ids": [
+          "python-mut-branches"
+        ],
+        "assertion_policy": "not_implied"
+      }
+    ],
+    "verification_candidates": [
+      {
+        "statement": "Consider verifying the app aborter received code, args, and kwargs in app-context cases.",
+        "status": "candidate",
+        "scenario_ids": [
+          "python-context-aborter-raises",
+          "python-context-aborter-returns"
+        ],
+        "condition": "Only if the chosen scenario uses an app context and the interaction is material beyond the exception assertion.",
+        "evidence_ids": [
+          "python-mut-branches",
+          "python-test-context-wiring"
+        ]
+      },
+      {
+        "statement": "Consider verifying Werkzeug abort received code, args, and kwargs in no-context cases.",
+        "status": "candidate",
+        "scenario_ids": [
+          "python-no-context"
+        ],
+        "condition": "Only for the no-context scenario and only if interaction verification adds value.",
+        "evidence_ids": [
+          "python-mut-branches",
+          "python-test-message-werkzeug"
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "id": "python-test-parameters",
+        "source_id": "test",
+        "start_line": 11,
+        "end_line": 47,
+        "quote": "@pytest.mark.parametrize(\"scenario,has_app_context,code,args,kwargs\", [\n    (\n        \"app_context_exists_404\",\n        True,\n        404,\n        (),\n        {}\n    ),\n    (\n        \"app_context_exists_500_with_message\",\n        True,\n        500,\n        (\"Internal Server Error\",),\n        {}\n    ),\n    (\n        \"no_app_context_403\",\n        False,\n        403,\n        (),\n        {}\n    ),\n    (\n        \"no_app_context_with_args_kwargs\",\n        False,\n        400,\n        (\"Bad Request\",),\n        {\"description\": \"Invalid input\"}\n    ),\n    (\n        \"app_context_custom_code\",\n        True,\n        418,\n        (),\n        {\"description\": \"I'm a teapot\"}\n    ),\n])",
+        "rationale": "The visible test explicitly varies app-context presence, code, positional arguments, and keyword arguments."
+      },
+      {
+        "id": "python-test-context-wiring",
+        "source_id": "test",
+        "start_line": 86,
+        "end_line": 89,
+        "quote": "    if has_app_context:\n                       \n        mock_ctx.app = mock_app\n        mock_app.aborter = mock_aborter",
+        "rationale": "The visible setup maps the context's app to mock_app and mock_app.aborter to mock_aborter when an app context is requested."
+      },
+      {
+        "id": "python-test-call",
+        "source_id": "test",
+        "start_line": 102,
+        "end_line": 103,
+        "quote": "    with pytest.raises(Exception) as exc_info:\n        abort(code, *args, **kwargs)",
+        "rationale": "The only visible exception-type requirement is the broad Exception base class; exact exception types are not asserted."
+      },
+      {
+        "id": "python-test-message-app",
+        "source_id": "test",
+        "start_line": 120,
+        "end_line": 120,
+        "quote": "        assert f\"Aborted with {code}\" in str(exc_info.value)",
+        "rationale": "The app-context branch visibly requires this message fragment."
+      },
+      {
+        "id": "python-test-message-werkzeug",
+        "source_id": "test",
+        "start_line": 126,
+        "end_line": 126,
+        "quote": "        assert f\"Werkzeug abort {code}\" in str(exc_info.value)",
+        "rationale": "The no-context branch visibly requires this message fragment."
+      },
+      {
+        "id": "python-mut-branches",
+        "source_id": "mut",
+        "start_line": 282,
+        "end_line": 285,
+        "quote": "    if (ctx := _cv_app.get(None)) is not None:\n        ctx.app.aborter(code, *args, **kwargs)\n\n    _wz_abort(code, *args, **kwargs)",
+        "rationale": "The app aborter runs only with a context; Werkzeug abort always remains reachable if the app aborter returns normally."
+      }
+    ],
+    "uncertainty": [
+      {
+        "statement": "The masked slots do not reveal how _cv_app.get(None), mock_ctx, mock_app, mock_aborter, or _wz_abort are stubbed.",
+        "status": "unknown",
+        "scenario_ids": [
+          "python-no-context",
+          "python-context-aborter-raises",
+          "python-context-aborter-returns"
+        ],
+        "condition": "Until a legal masked setup is supplied.",
+        "evidence_ids": [
+          "python-test-context-wiring",
+          "python-test-call"
+        ]
+      },
+      {
+        "statement": "The visible test requires only Exception and message fragments, so an exact exception class cannot be inferred.",
+        "status": "unknown",
+        "scenario_ids": [
+          "python-no-context",
+          "python-context-aborter-raises",
+          "python-context-aborter-returns"
+        ],
+        "condition": "For all visible parameterized cases.",
+        "evidence_ids": [
+          "python-test-call",
+          "python-test-message-app",
+          "python-test-message-werkzeug"
+        ]
+      }
+    ]
+  }
+}

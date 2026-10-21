@@ -1,0 +1,1990 @@
+{
+  "mode": "offline_scripted_sdk_with_real_tools",
+  "autonomous_tool_choice_verified": false,
+  "model_quality_comparison_possible": false,
+  "contract_origin": "preexisting_host_synthetic_fixture_not_model_inference",
+  "agent_version": "v0.2",
+  "model": "scripted-offline",
+  "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+  "language": "java",
+  "prompt_version": "scenario-inference/v0.2",
+  "prompt_sha256": "e75d443dc6c26b127aa40c759179f56fdd146a701827e917f9f1a86cb1674874",
+  "task_sha256": "019c5f510d547a22836c0a0d34a34f4d8b44c4e3de284d1f11db7acf872571fd",
+  "input_equal_to_baseline": true,
+  "duration_seconds": 4.592960553709418,
+  "scripted_model_calls": 4,
+  "provider_requests": 0,
+  "provider_token_usage": null,
+  "provider_cost_usd": "0",
+  "cost_basis": "no_provider_client_or_request",
+  "usage_warning": "raw_responses usage is scripted placeholder data, not measured tokens",
+  "budget_test_ledger": {
+    "requests_started": 4,
+    "requests_completed": 4,
+    "input_tokens": 4,
+    "output_tokens": 4,
+    "total_tokens": 8,
+    "usage_complete": true,
+    "known_usage_subtotal": {
+      "input_tokens": 4,
+      "output_tokens": 4,
+      "total_tokens": 8
+    },
+    "rate_estimated_cost_usd": null,
+    "pricing": {
+      "input_cost_per_million": null,
+      "output_cost_per_million": null,
+      "basis": "unknown"
+    },
+    "estimates": [
+      {
+        "sequence": 1,
+        "method": "known_request_utf8_bytes_divided_by_4",
+        "known_request_bytes": 25142,
+        "estimated_input_tokens": 6286,
+        "reserved_output_tokens": 4096,
+        "projected_total_tokens": 10382,
+        "projected_cost_usd": null,
+        "limitations": "Provider protocol overhead and exact tokenizer behavior are unavailable; the estimate is not a strict token or cost upper bound."
+      },
+      {
+        "sequence": 2,
+        "method": "known_request_utf8_bytes_divided_by_4",
+        "known_request_bytes": 29675,
+        "estimated_input_tokens": 7419,
+        "reserved_output_tokens": 4096,
+        "projected_total_tokens": 11517,
+        "projected_cost_usd": null,
+        "limitations": "Provider protocol overhead and exact tokenizer behavior are unavailable; the estimate is not a strict token or cost upper bound."
+      },
+      {
+        "sequence": 3,
+        "method": "known_request_utf8_bytes_divided_by_4",
+        "known_request_bytes": 45691,
+        "estimated_input_tokens": 11423,
+        "reserved_output_tokens": 4096,
+        "projected_total_tokens": 15523,
+        "projected_cost_usd": null,
+        "limitations": "Provider protocol overhead and exact tokenizer behavior are unavailable; the estimate is not a strict token or cost upper bound."
+      },
+      {
+        "sequence": 4,
+        "method": "known_request_utf8_bytes_divided_by_4",
+        "known_request_bytes": 61369,
+        "estimated_input_tokens": 15343,
+        "reserved_output_tokens": 4096,
+        "projected_total_tokens": 19445,
+        "projected_cost_usd": null,
+        "limitations": "Provider protocol overhead and exact tokenizer behavior are unavailable; the estimate is not a strict token or cost upper bound."
+      }
+    ],
+    "usage_records": [
+      {
+        "sequence": 1,
+        "known": true,
+        "reported_requests": 1,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2,
+        "cost_usd": null,
+        "raw_usage_available": false
+      },
+      {
+        "sequence": 2,
+        "known": true,
+        "reported_requests": 1,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2,
+        "cost_usd": null,
+        "raw_usage_available": false
+      },
+      {
+        "sequence": 3,
+        "known": true,
+        "reported_requests": 1,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2,
+        "cost_usd": null,
+        "raw_usage_available": false
+      },
+      {
+        "sequence": 4,
+        "known": true,
+        "reported_requests": 1,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2,
+        "cost_usd": null,
+        "raw_usage_available": false
+      }
+    ],
+    "gate_events": [
+      {
+        "sequence": 1,
+        "stage": "before_model_call",
+        "status": "allowed",
+        "reason": null
+      },
+      {
+        "sequence": 2,
+        "stage": "before_model_call",
+        "status": "allowed",
+        "reason": null
+      },
+      {
+        "sequence": 3,
+        "stage": "before_model_call",
+        "status": "allowed",
+        "reason": null
+      },
+      {
+        "sequence": 4,
+        "stage": "before_model_call",
+        "status": "allowed",
+        "reason": null
+      }
+    ],
+    "limitations": [
+      "Preflight token estimates use known serialized request bytes divided by four.",
+      "Provider tokenizer and protocol overhead can differ, so cost is not a strict hard cap.",
+      "A locally cancelled request may still incur provider charges not present in usage."
+    ]
+  },
+  "tool_trace": [
+    {
+      "sequence": 1,
+      "tool": "inspect_source",
+      "arguments": {
+        "source_id": "mut",
+        "start_line": 1,
+        "end_line": 95
+      },
+      "status": "ok",
+      "result": {
+        "status": "ok",
+        "backend": "source_store",
+        "source_id": "mut",
+        "start_line": 1,
+        "end_line": 95,
+        "text": "/*\n * Copyright 2020 Google LLC.\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\"); you may not\n * use this file except in compliance with the License. You may obtain a copy of\n * the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS, WITHOUT\n * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the\n * License for the specific language governing permissions and limitations under\n * the License.\n */\n\npackage com.google.cloud.tools.jib.cli.jar;\n\nimport com.google.cloud.tools.jib.api.InvalidImageReferenceException;\nimport com.google.cloud.tools.jib.api.Jib;\nimport com.google.cloud.tools.jib.api.JibContainerBuilder;\nimport com.google.cloud.tools.jib.api.buildplan.FileEntriesLayer;\nimport com.google.cloud.tools.jib.cli.ArtifactProcessor;\nimport com.google.cloud.tools.jib.cli.CommonCliOptions;\nimport com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions;\nimport com.google.cloud.tools.jib.cli.ContainerBuilders;\nimport com.google.cloud.tools.jib.cli.Jar;\nimport com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger;\nimport java.io.IOException;\nimport java.util.Collections;\nimport java.util.List;\n\n/** Class to build a container representation from the contents of a jar file. */\npublic class JarFiles {\n\n  /**\n   * Generates a {@link JibContainerBuilder} from contents of a jar file.\n   *\n   * @param processor jar processor\n   * @param jarOptions jar cli options\n   * @param commonCliOptions common cli options\n   * @param commonContainerConfigCliOptions common command line options shared between jar and war\n   *     command\n   * @param logger console logger\n   * @return JibContainerBuilder\n   * @throws IOException if I/O error occurs when opening the jar file or if temporary directory\n   *     provided doesn't exist\n   * @throws InvalidImageReferenceException if the base image reference is invalid\n   */\n  public static JibContainerBuilder toJibContainerBuilder(\n      ArtifactProcessor processor,\n      Jar jarOptions,\n      CommonCliOptions commonCliOptions,\n      CommonContainerConfigCliOptions commonContainerConfigCliOptions,\n      ConsoleLogger logger)\n      throws IOException, InvalidImageReferenceException {\n\n    // Use AdoptOpenJDK image as the default base image.\n    JibContainerBuilder containerBuilder;\n    if (commonContainerConfigCliOptions.getFrom().isPresent()) {\n      containerBuilder =\n          ContainerBuilders.create(\n              commonContainerConfigCliOptions.getFrom().get(),\n              Collections.emptySet(),\n              commonCliOptions,\n              logger);\n    } else {\n      containerBuilder =\n          (processor.getJavaVersion() <= 8)\n              ? Jib.from(\"adoptopenjdk:8-jre\")\n              : Jib.from(\"adoptopenjdk:11-jre\");\n    }\n\n    List<FileEntriesLayer> layers = processor.createLayers();\n    List<String> customEntrypoint = commonContainerConfigCliOptions.getEntrypoint();\n    List<String> entrypoint =\n        customEntrypoint.isEmpty()\n            ? processor.computeEntrypoint(jarOptions.getJvmFlags())\n            : customEntrypoint;\n\n    containerBuilder\n        .setEntrypoint(entrypoint)\n        .setFileEntriesLayers(layers)\n        .setExposedPorts(commonContainerConfigCliOptions.getExposedPorts())\n        .setVolumes(commonContainerConfigCliOptions.getVolumes())\n        .setEnvironment(commonContainerConfigCliOptions.getEnvironment())\n        .setLabels(commonContainerConfigCliOptions.getLabels())\n        .setProgramArguments(commonContainerConfigCliOptions.getProgramArguments());\n    commonContainerConfigCliOptions.getUser().ifPresent(containerBuilder::setUser);\n    commonContainerConfigCliOptions.getFormat().ifPresent(containerBuilder::setFormat);\n    commonContainerConfigCliOptions.getCreationTime().ifPresent(containerBuilder::setCreationTime);\n\n    return containerBuilder;\n  }\n}",
+        "limitations": []
+      },
+      "duration_seconds": 5.998415872454643e-05
+    },
+    {
+      "sequence": 2,
+      "tool": "inspect_program_structure",
+      "arguments": {
+        "source_id": "mut"
+      },
+      "status": "incomplete",
+      "result": {
+        "status": "incomplete",
+        "backend": "spoon",
+        "source_id": "mut",
+        "error_code": "output_limit",
+        "facts": [
+          {
+            "source_id": "mut",
+            "start_line": 50,
+            "end_line": 94,
+            "kind": "method",
+            "name": "toJibContainerBuilder",
+            "signature": "toJibContainerBuilder(com.google.cloud.tools.jib.cli.ArtifactProcessor,com.google.cloud.tools.jib.cli.Jar,com.google.cloud.tools.jib.cli.CommonCliOptions,com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions,com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger)"
+          },
+          {
+            "source_id": "mut",
+            "start_line": 60,
+            "end_line": 60,
+            "kind": "call",
+            "quote": "    if (commonContainerConfigCliOptions.getFrom().isPresent()) {",
+            "name": "getFrom",
+            "signature": "getFrom()",
+            "target": "commonContainerConfigCliOptions",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "condition",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 60,
+            "end_line": 60,
+            "kind": "call",
+            "quote": "    if (commonContainerConfigCliOptions.getFrom().isPresent()) {",
+            "name": "isPresent",
+            "signature": "isPresent()",
+            "target": "commonContainerConfigCliOptions.getFrom()",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "condition",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 60,
+            "end_line": 72,
+            "kind": "if",
+            "condition": "commonContainerConfigCliOptions.getFrom().isPresent()",
+            "then_branch": {
+              "source_id": "mut",
+              "start_line": 60,
+              "end_line": 67
+            },
+            "else_branch": {
+              "source_id": "mut",
+              "start_line": 67,
+              "end_line": 72
+            },
+            "lexical_guards": []
+          },
+          {
+            "source_id": "mut",
+            "start_line": 60,
+            "end_line": 60,
+            "kind": "variable_read",
+            "quote": "    if (commonContainerConfigCliOptions.getFrom().isPresent()) {",
+            "name": "commonContainerConfigCliOptions",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "condition",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 54,
+              "end_line": 54
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 62,
+            "end_line": 66,
+            "kind": "call",
+            "quote": "          ContainerBuilders.create(\n              commonContainerConfigCliOptions.getFrom().get(),\n              Collections.emptySet(),\n              commonCliOptions,\n              logger);",
+            "name": "create",
+            "signature": "create(java.util.Set,com.google.cloud.tools.jib.cli.CommonCliOptions,com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger)",
+            "target": "com.google.cloud.tools.jib.cli.ContainerBuilders",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "true",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 63,
+            "end_line": 63,
+            "kind": "call",
+            "quote": "              commonContainerConfigCliOptions.getFrom().get(),",
+            "name": "get",
+            "signature": "get()",
+            "target": "commonContainerConfigCliOptions.getFrom()",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "true",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 63,
+            "end_line": 63,
+            "kind": "call",
+            "quote": "              commonContainerConfigCliOptions.getFrom().get(),",
+            "name": "getFrom",
+            "signature": "getFrom()",
+            "target": "commonContainerConfigCliOptions",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "true",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 63,
+            "end_line": 63,
+            "kind": "variable_read",
+            "quote": "              commonContainerConfigCliOptions.getFrom().get(),",
+            "name": "commonContainerConfigCliOptions",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "true",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 54,
+              "end_line": 54
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 64,
+            "end_line": 64,
+            "kind": "call",
+            "quote": "              Collections.emptySet(),",
+            "name": "emptySet",
+            "signature": "emptySet()",
+            "target": "java.util.Collections",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "true",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 65,
+            "end_line": 65,
+            "kind": "variable_read",
+            "quote": "              commonCliOptions,",
+            "name": "commonCliOptions",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "true",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 53,
+              "end_line": 53
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 66,
+            "end_line": 66,
+            "kind": "variable_read",
+            "quote": "              logger);",
+            "name": "logger",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "true",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 55,
+              "end_line": 55
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 69,
+            "end_line": 69,
+            "kind": "call",
+            "quote": "          (processor.getJavaVersion() <= 8)",
+            "name": "getJavaVersion",
+            "signature": "getJavaVersion()",
+            "target": "processor",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "false",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              },
+              {
+                "source_id": "mut",
+                "start_line": 69,
+                "end_line": 71,
+                "kind": "conditional",
+                "branch": "condition",
+                "condition": "processor.getJavaVersion() <= 8"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 69,
+            "end_line": 71,
+            "kind": "conditional",
+            "quote": "          (processor.getJavaVersion() <= 8)\n              ? Jib.from(\"adoptopenjdk:8-jre\")\n              : Jib.from(\"adoptopenjdk:11-jre\");",
+            "condition": "processor.getJavaVersion() <= 8",
+            "then_expression": "com.google.cloud.tools.jib.api.Jib.from(\"adoptopenjdk:8-jre\")",
+            "else_expression": "com.google.cloud.tools.jib.api.Jib.from(\"adoptopenjdk:11-jre\")",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "false",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ]
+          },
+          {
+            "source_id": "mut",
+            "start_line": 69,
+            "end_line": 69,
+            "kind": "variable_read",
+            "quote": "          (processor.getJavaVersion() <= 8)",
+            "name": "processor",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "false",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              },
+              {
+                "source_id": "mut",
+                "start_line": 69,
+                "end_line": 71,
+                "kind": "conditional",
+                "branch": "condition",
+                "condition": "processor.getJavaVersion() <= 8"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 51,
+              "end_line": 51
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 70,
+            "end_line": 70,
+            "kind": "call",
+            "quote": "              ? Jib.from(\"adoptopenjdk:8-jre\")",
+            "name": "from",
+            "signature": "from(java.lang.String)",
+            "target": "com.google.cloud.tools.jib.api.Jib",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "false",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              },
+              {
+                "source_id": "mut",
+                "start_line": 69,
+                "end_line": 71,
+                "kind": "conditional",
+                "branch": "true",
+                "condition": "processor.getJavaVersion() <= 8"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 71,
+            "end_line": 71,
+            "kind": "call",
+            "quote": "              : Jib.from(\"adoptopenjdk:11-jre\");",
+            "name": "from",
+            "signature": "from(java.lang.String)",
+            "target": "com.google.cloud.tools.jib.api.Jib",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "false",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              },
+              {
+                "source_id": "mut",
+                "start_line": 69,
+                "end_line": 71,
+                "kind": "conditional",
+                "branch": "false",
+                "condition": "processor.getJavaVersion() <= 8"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 74,
+            "end_line": 74,
+            "kind": "call",
+            "quote": "    List<FileEntriesLayer> layers = processor.createLayers();",
+            "name": "createLayers",
+            "signature": "createLayers()",
+            "target": "processor",
+            "lexical_guards": [],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 74,
+            "end_line": 74,
+            "kind": "variable_read",
+            "quote": "    List<FileEntriesLayer> layers = processor.createLayers();",
+            "name": "processor",
+            "lexical_guards": [],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 51,
+              "end_line": 51
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 75,
+            "end_line": 75,
+            "kind": "call",
+            "quote": "    List<String> customEntrypoint = commonContainerConfigCliOptions.getEntrypoint();",
+            "name": "getEntrypoint",
+            "signature": "getEntrypoint()",
+            "target": "commonContainerConfigCliOptions",
+            "lexical_guards": [],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 75,
+            "end_line": 75,
+            "kind": "variable_read",
+            "quote": "    List<String> customEntrypoint = commonContainerConfigCliOptions.getEntrypoint();",
+            "name": "commonContainerConfigCliOptions",
+            "lexical_guards": [],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 54,
+              "end_line": 54
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 77,
+            "end_line": 77,
+            "kind": "call",
+            "quote": "        customEntrypoint.isEmpty()",
+            "name": "isEmpty",
+            "signature": "isEmpty()",
+            "target": "customEntrypoint",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 77,
+                "end_line": 79,
+                "kind": "conditional",
+                "branch": "condition",
+                "condition": "customEntrypoint.isEmpty()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 77,
+            "end_line": 79,
+            "kind": "conditional",
+            "quote": "        customEntrypoint.isEmpty()\n            ? processor.computeEntrypoint(jarOptions.getJvmFlags())\n            : customEntrypoint;",
+            "condition": "customEntrypoint.isEmpty()",
+            "then_expression": "processor.computeEntrypoint(jarOptions.getJvmFlags())",
+            "else_expression": "customEntrypoint",
+            "lexical_guards": []
+          },
+          {
+            "source_id": "mut",
+            "start_line": 77,
+            "end_line": 77,
+            "kind": "variable_read",
+            "quote": "        customEntrypoint.isEmpty()",
+            "name": "customEntrypoint",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 77,
+                "end_line": 79,
+                "kind": "conditional",
+                "branch": "condition",
+                "condition": "customEntrypoint.isEmpty()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 75,
+              "end_line": 75
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 78,
+            "end_line": 78,
+            "kind": "call",
+            "quote": "            ? processor.computeEntrypoint(jarOptions.getJvmFlags())",
+            "name": "computeEntrypoint",
+            "signature": "computeEntrypoint()",
+            "target": "processor",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 77,
+                "end_line": 79,
+                "kind": "conditional",
+                "branch": "true",
+                "condition": "customEntrypoint.isEmpty()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 78,
+            "end_line": 78,
+            "kind": "call",
+            "quote": "            ? processor.computeEntrypoint(jarOptions.getJvmFlags())",
+            "name": "getJvmFlags",
+            "signature": "getJvmFlags()",
+            "target": "jarOptions",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 77,
+                "end_line": 79,
+                "kind": "conditional",
+                "branch": "true",
+                "condition": "customEntrypoint.isEmpty()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 78,
+            "end_line": 78,
+            "kind": "variable_read",
+            "quote": "            ? processor.computeEntrypoint(jarOptions.getJvmFlags())",
+            "name": "jarOptions",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 77,
+                "end_line": 79,
+                "kind": "conditional",
+                "branch": "true",
+                "condition": "customEntrypoint.isEmpty()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 52,
+              "end_line": 52
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 78,
+            "end_line": 78,
+            "kind": "variable_read",
+            "quote": "            ? processor.computeEntrypoint(jarOptions.getJvmFlags())",
+            "name": "processor",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 77,
+                "end_line": 79,
+                "kind": "conditional",
+                "branch": "true",
+                "condition": "customEntrypoint.isEmpty()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 51,
+              "end_line": 51
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 79,
+            "end_line": 79,
+            "kind": "variable_read",
+            "quote": "            : customEntrypoint;",
+            "name": "customEntrypoint",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 77,
+                "end_line": 79,
+                "kind": "conditional",
+                "branch": "false",
+                "condition": "customEntrypoint.isEmpty()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 75,
+              "end_line": 75
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 81,
+            "end_line": 82,
+            "kind": "call",
+            "quote": "    containerBuilder\n        .setEntrypoint(entrypoint)",
+            "name": "setEntrypoint",
+            "signature": "setEntrypoint(java.util.List)",
+            "target": "containerBuilder",
+            "lexical_guards": [],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 81,
+            "end_line": 86,
+            "kind": "call",
+            "quote": "    containerBuilder\n        .setEntrypoint(entrypoint)\n        .setFileEntriesLayers(layers)\n        .setExposedPorts(commonContainerConfigCliOptions.getExposedPorts())\n        .setVolumes(commonContainerConfigCliOptions.getVolumes())\n        .setEnvironment(commonContainerConfigCliOptions.getEnvironment())",
+            "name": "setEnvironment",
+            "signature": "setEnvironment()",
+            "target": "containerBuilder.setEntrypoint(entrypoint).setFileEntriesLayers(layers).setExposedPorts(commonContainerConfigCliOptions.getExposedPorts()).setVolumes(commonContainerConfigCliOptions.getVolumes())",
+            "lexical_guards": [],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 81,
+            "end_line": 84,
+            "kind": "call",
+            "quote": "    containerBuilder\n        .setEntrypoint(entrypoint)\n        .setFileEntriesLayers(layers)\n        .setExposedPorts(commonContainerConfigCliOptions.getExposedPorts())",
+            "name": "setExposedPorts",
+            "signature": "setExposedPorts()",
+            "target": "containerBuilder.setEntrypoint(entrypoint).setFileEntriesLayers(layers)",
+            "lexical_guards": [],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 81,
+            "end_line": 83,
+            "kind": "call",
+            "quote": "    containerBuilder\n        .setEntrypoint(entrypoint)\n        .setFileEntriesLayers(layers)",
+            "name": "setFileEntriesLayers",
+            "signature": "setFileEntriesLayers(java.util.List)",
+            "target": "containerBuilder.setEntrypoint(entrypoint)",
+            "lexical_guards": [],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          }
+        ],
+        "diagnostics": [
+          "Result exceeds the configured output limit."
+        ],
+        "limitations": [
+          "Syntax only, not data flow or feasible paths; omitted evidence does not prove absence."
+        ],
+        "returned_fact_count": 33,
+        "total_fact_count": 63
+      },
+      "duration_seconds": 2.237713622394949
+    },
+    {
+      "sequence": 3,
+      "tool": "inspect_dependency_usage",
+      "arguments": {
+        "source_id": "mut"
+      },
+      "status": "incomplete",
+      "result": {
+        "status": "incomplete",
+        "backend": "spoon",
+        "source_id": "mut",
+        "error_code": "output_limit",
+        "facts": [
+          {
+            "source_id": "mut",
+            "start_line": 60,
+            "end_line": 60,
+            "kind": "call",
+            "quote": "    if (commonContainerConfigCliOptions.getFrom().isPresent()) {",
+            "name": "getFrom",
+            "signature": "getFrom()",
+            "target": "commonContainerConfigCliOptions",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "condition",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 60,
+            "end_line": 60,
+            "kind": "call",
+            "quote": "    if (commonContainerConfigCliOptions.getFrom().isPresent()) {",
+            "name": "isPresent",
+            "signature": "isPresent()",
+            "target": "commonContainerConfigCliOptions.getFrom()",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "condition",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 60,
+            "end_line": 60,
+            "kind": "variable_read",
+            "quote": "    if (commonContainerConfigCliOptions.getFrom().isPresent()) {",
+            "name": "commonContainerConfigCliOptions",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "condition",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 54,
+              "end_line": 54
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 62,
+            "end_line": 66,
+            "kind": "call",
+            "quote": "          ContainerBuilders.create(\n              commonContainerConfigCliOptions.getFrom().get(),\n              Collections.emptySet(),\n              commonCliOptions,\n              logger);",
+            "name": "create",
+            "signature": "create(java.util.Set,com.google.cloud.tools.jib.cli.CommonCliOptions,com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger)",
+            "target": "com.google.cloud.tools.jib.cli.ContainerBuilders",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "true",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 63,
+            "end_line": 63,
+            "kind": "call",
+            "quote": "              commonContainerConfigCliOptions.getFrom().get(),",
+            "name": "get",
+            "signature": "get()",
+            "target": "commonContainerConfigCliOptions.getFrom()",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "true",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 63,
+            "end_line": 63,
+            "kind": "call",
+            "quote": "              commonContainerConfigCliOptions.getFrom().get(),",
+            "name": "getFrom",
+            "signature": "getFrom()",
+            "target": "commonContainerConfigCliOptions",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "true",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 63,
+            "end_line": 63,
+            "kind": "variable_read",
+            "quote": "              commonContainerConfigCliOptions.getFrom().get(),",
+            "name": "commonContainerConfigCliOptions",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "true",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 54,
+              "end_line": 54
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 64,
+            "end_line": 64,
+            "kind": "call",
+            "quote": "              Collections.emptySet(),",
+            "name": "emptySet",
+            "signature": "emptySet()",
+            "target": "java.util.Collections",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "true",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 65,
+            "end_line": 65,
+            "kind": "variable_read",
+            "quote": "              commonCliOptions,",
+            "name": "commonCliOptions",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "true",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 53,
+              "end_line": 53
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 66,
+            "end_line": 66,
+            "kind": "variable_read",
+            "quote": "              logger);",
+            "name": "logger",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "true",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 55,
+              "end_line": 55
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 69,
+            "end_line": 69,
+            "kind": "call",
+            "quote": "          (processor.getJavaVersion() <= 8)",
+            "name": "getJavaVersion",
+            "signature": "getJavaVersion()",
+            "target": "processor",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "false",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              },
+              {
+                "source_id": "mut",
+                "start_line": 69,
+                "end_line": 71,
+                "kind": "conditional",
+                "branch": "condition",
+                "condition": "processor.getJavaVersion() <= 8"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 69,
+            "end_line": 69,
+            "kind": "variable_read",
+            "quote": "          (processor.getJavaVersion() <= 8)",
+            "name": "processor",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "false",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              },
+              {
+                "source_id": "mut",
+                "start_line": 69,
+                "end_line": 71,
+                "kind": "conditional",
+                "branch": "condition",
+                "condition": "processor.getJavaVersion() <= 8"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 51,
+              "end_line": 51
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 70,
+            "end_line": 70,
+            "kind": "call",
+            "quote": "              ? Jib.from(\"adoptopenjdk:8-jre\")",
+            "name": "from",
+            "signature": "from(java.lang.String)",
+            "target": "com.google.cloud.tools.jib.api.Jib",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "false",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              },
+              {
+                "source_id": "mut",
+                "start_line": 69,
+                "end_line": 71,
+                "kind": "conditional",
+                "branch": "true",
+                "condition": "processor.getJavaVersion() <= 8"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 71,
+            "end_line": 71,
+            "kind": "call",
+            "quote": "              : Jib.from(\"adoptopenjdk:11-jre\");",
+            "name": "from",
+            "signature": "from(java.lang.String)",
+            "target": "com.google.cloud.tools.jib.api.Jib",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 60,
+                "end_line": 72,
+                "kind": "if",
+                "branch": "false",
+                "condition": "commonContainerConfigCliOptions.getFrom().isPresent()"
+              },
+              {
+                "source_id": "mut",
+                "start_line": 69,
+                "end_line": 71,
+                "kind": "conditional",
+                "branch": "false",
+                "condition": "processor.getJavaVersion() <= 8"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 74,
+            "end_line": 74,
+            "kind": "call",
+            "quote": "    List<FileEntriesLayer> layers = processor.createLayers();",
+            "name": "createLayers",
+            "signature": "createLayers()",
+            "target": "processor",
+            "lexical_guards": [],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 74,
+            "end_line": 74,
+            "kind": "variable_read",
+            "quote": "    List<FileEntriesLayer> layers = processor.createLayers();",
+            "name": "processor",
+            "lexical_guards": [],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 51,
+              "end_line": 51
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 75,
+            "end_line": 75,
+            "kind": "call",
+            "quote": "    List<String> customEntrypoint = commonContainerConfigCliOptions.getEntrypoint();",
+            "name": "getEntrypoint",
+            "signature": "getEntrypoint()",
+            "target": "commonContainerConfigCliOptions",
+            "lexical_guards": [],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 75,
+            "end_line": 75,
+            "kind": "variable_read",
+            "quote": "    List<String> customEntrypoint = commonContainerConfigCliOptions.getEntrypoint();",
+            "name": "commonContainerConfigCliOptions",
+            "lexical_guards": [],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 54,
+              "end_line": 54
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 77,
+            "end_line": 77,
+            "kind": "call",
+            "quote": "        customEntrypoint.isEmpty()",
+            "name": "isEmpty",
+            "signature": "isEmpty()",
+            "target": "customEntrypoint",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 77,
+                "end_line": 79,
+                "kind": "conditional",
+                "branch": "condition",
+                "condition": "customEntrypoint.isEmpty()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 77,
+            "end_line": 77,
+            "kind": "variable_read",
+            "quote": "        customEntrypoint.isEmpty()",
+            "name": "customEntrypoint",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 77,
+                "end_line": 79,
+                "kind": "conditional",
+                "branch": "condition",
+                "condition": "customEntrypoint.isEmpty()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 75,
+              "end_line": 75
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 78,
+            "end_line": 78,
+            "kind": "call",
+            "quote": "            ? processor.computeEntrypoint(jarOptions.getJvmFlags())",
+            "name": "computeEntrypoint",
+            "signature": "computeEntrypoint()",
+            "target": "processor",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 77,
+                "end_line": 79,
+                "kind": "conditional",
+                "branch": "true",
+                "condition": "customEntrypoint.isEmpty()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 78,
+            "end_line": 78,
+            "kind": "call",
+            "quote": "            ? processor.computeEntrypoint(jarOptions.getJvmFlags())",
+            "name": "getJvmFlags",
+            "signature": "getJvmFlags()",
+            "target": "jarOptions",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 77,
+                "end_line": 79,
+                "kind": "conditional",
+                "branch": "true",
+                "condition": "customEntrypoint.isEmpty()"
+              }
+            ],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 78,
+            "end_line": 78,
+            "kind": "variable_read",
+            "quote": "            ? processor.computeEntrypoint(jarOptions.getJvmFlags())",
+            "name": "jarOptions",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 77,
+                "end_line": 79,
+                "kind": "conditional",
+                "branch": "true",
+                "condition": "customEntrypoint.isEmpty()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 52,
+              "end_line": 52
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 78,
+            "end_line": 78,
+            "kind": "variable_read",
+            "quote": "            ? processor.computeEntrypoint(jarOptions.getJvmFlags())",
+            "name": "processor",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 77,
+                "end_line": 79,
+                "kind": "conditional",
+                "branch": "true",
+                "condition": "customEntrypoint.isEmpty()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 51,
+              "end_line": 51
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 79,
+            "end_line": 79,
+            "kind": "variable_read",
+            "quote": "            : customEntrypoint;",
+            "name": "customEntrypoint",
+            "lexical_guards": [
+              {
+                "source_id": "mut",
+                "start_line": 77,
+                "end_line": 79,
+                "kind": "conditional",
+                "branch": "false",
+                "condition": "customEntrypoint.isEmpty()"
+              }
+            ],
+            "declaration_status": "resolved_local",
+            "declared_at": {
+              "source_id": "mut",
+              "start_line": 75,
+              "end_line": 75
+            }
+          },
+          {
+            "source_id": "mut",
+            "start_line": 81,
+            "end_line": 82,
+            "kind": "call",
+            "quote": "    containerBuilder\n        .setEntrypoint(entrypoint)",
+            "name": "setEntrypoint",
+            "signature": "setEntrypoint(java.util.List)",
+            "target": "containerBuilder",
+            "lexical_guards": [],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 81,
+            "end_line": 86,
+            "kind": "call",
+            "quote": "    containerBuilder\n        .setEntrypoint(entrypoint)\n        .setFileEntriesLayers(layers)\n        .setExposedPorts(commonContainerConfigCliOptions.getExposedPorts())\n        .setVolumes(commonContainerConfigCliOptions.getVolumes())\n        .setEnvironment(commonContainerConfigCliOptions.getEnvironment())",
+            "name": "setEnvironment",
+            "signature": "setEnvironment()",
+            "target": "containerBuilder.setEntrypoint(entrypoint).setFileEntriesLayers(layers).setExposedPorts(commonContainerConfigCliOptions.getExposedPorts()).setVolumes(commonContainerConfigCliOptions.getVolumes())",
+            "lexical_guards": [],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 81,
+            "end_line": 84,
+            "kind": "call",
+            "quote": "    containerBuilder\n        .setEntrypoint(entrypoint)\n        .setFileEntriesLayers(layers)\n        .setExposedPorts(commonContainerConfigCliOptions.getExposedPorts())",
+            "name": "setExposedPorts",
+            "signature": "setExposedPorts()",
+            "target": "containerBuilder.setEntrypoint(entrypoint).setFileEntriesLayers(layers)",
+            "lexical_guards": [],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 81,
+            "end_line": 83,
+            "kind": "call",
+            "quote": "    containerBuilder\n        .setEntrypoint(entrypoint)\n        .setFileEntriesLayers(layers)",
+            "name": "setFileEntriesLayers",
+            "signature": "setFileEntriesLayers(java.util.List)",
+            "target": "containerBuilder.setEntrypoint(entrypoint)",
+            "lexical_guards": [],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 81,
+            "end_line": 87,
+            "kind": "call",
+            "quote": "    containerBuilder\n        .setEntrypoint(entrypoint)\n        .setFileEntriesLayers(layers)\n        .setExposedPorts(commonContainerConfigCliOptions.getExposedPorts())\n        .setVolumes(commonContainerConfigCliOptions.getVolumes())\n        .setEnvironment(commonContainerConfigCliOptions.getEnvironment())\n        .setLabels(commonContainerConfigCliOptions.getLabels())",
+            "name": "setLabels",
+            "signature": "setLabels()",
+            "target": "containerBuilder.setEntrypoint(entrypoint).setFileEntriesLayers(layers).setExposedPorts(commonContainerConfigCliOptions.getExposedPorts()).setVolumes(commonContainerConfigCliOptions.getVolumes()).setEnvironment(commonContainerConfigCliOptions.getEnvironment())",
+            "lexical_guards": [],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          },
+          {
+            "source_id": "mut",
+            "start_line": 81,
+            "end_line": 88,
+            "kind": "call",
+            "name": "setProgramArguments",
+            "signature": "setProgramArguments()",
+            "target": "containerBuilder.setEntrypoint(entrypoint).setFileEntriesLayers(layers).setExposedPorts(commonContainerConfigCliOptions.getExposedPorts()).setVolumes(commonContainerConfigCliOptions.getVolumes()).setEnvironment(commonContainerConfigCliOptions.getEnvironment()).setLabels(commonContainerConfigCliOptions.getLabels())",
+            "lexical_guards": [],
+            "declaration_status": "unresolved",
+            "declared_at": null
+          }
+        ],
+        "diagnostics": [
+          "Result exceeds the configured output limit."
+        ],
+        "limitations": [
+          "Syntax only, not data flow or feasible paths; omitted evidence does not prove absence."
+        ],
+        "returned_fact_count": 31,
+        "total_fact_count": 58
+      },
+      "duration_seconds": 2.305809386074543
+    }
+  ],
+  "raw_responses": [
+    {
+      "output": [
+        {
+          "arguments": "{\"source_id\": \"mut\", \"start_line\": 1, \"end_line\": 95}",
+          "call_id": "offline-0",
+          "name": "inspect_source",
+          "type": "function_call",
+          "id": null,
+          "async_": null,
+          "caller": null,
+          "namespace": null,
+          "status": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 1,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "arguments": "{\"source_id\": \"mut\"}",
+          "call_id": "offline-1",
+          "name": "inspect_program_structure",
+          "type": "function_call",
+          "id": null,
+          "async_": null,
+          "caller": null,
+          "namespace": null,
+          "status": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 1,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "arguments": "{\"source_id\": \"mut\"}",
+          "call_id": "offline-2",
+          "name": "inspect_dependency_usage",
+          "type": "function_call",
+          "id": null,
+          "async_": null,
+          "caller": null,
+          "namespace": null,
+          "status": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 1,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "id": "offline-final",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"mock-spec.scenario/v0.1\", \"case_id\": \"com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df\", \"language\": \"java\", \"test_objectives\": [{\"statement\": \"The selected test expects the resulting build plan to use base image adoptopenjdk:8-jre, the linux/amd64 platform, and epoch creation time.\", \"status\": \"required\", \"scenario_ids\": [\"java-default-image\", \"java-explicit-image\", \"java-custom-entrypoint\"], \"condition\": \"For the selected visible test case.\", \"evidence_ids\": [\"java-test-base-plan\"]}, {\"statement\": \"The selected test expects a four-element Java entrypoint and one classes layer containing the visible class file entry.\", \"status\": \"required\", \"scenario_ids\": [\"java-default-image\", \"java-explicit-image\", \"java-custom-entrypoint\"], \"condition\": \"For the selected visible test case.\", \"evidence_ids\": [\"java-test-entrypoint-layer\"]}, {\"statement\": \"The selected test expects Docker format, empty environment, labels, volumes, and exposed ports, plus null user and working directory.\", \"status\": \"required\", \"scenario_ids\": [\"java-default-image\", \"java-explicit-image\", \"java-custom-entrypoint\"], \"condition\": \"For the selected visible test case.\", \"evidence_ids\": [\"java-test-empty-configuration\"]}], \"scenario_hypotheses\": [{\"id\": \"java-default-image\", \"description\": \"No explicit base image is configured; the processor reports a Java version at most 8; its visible layer and computed entrypoint feed the returned builder.\", \"condition\": \"getFrom() is absent, getJavaVersion() is <= 8, and getEntrypoint() is empty.\", \"status\": \"candidate\", \"evidence_ids\": [\"java-mut-base-branch\", \"java-mut-layer-entrypoint\", \"java-test-base-plan\", \"java-test-entrypoint-layer\"]}, {\"id\": \"java-explicit-image\", \"description\": \"An explicitly configured base image may also lead to the visible expected plan if ContainerBuilders.create returns a compatible builder.\", \"condition\": \"getFrom() is present and the hidden ContainerBuilders implementation produces the expected base image and plan defaults.\", \"status\": \"unknown\", \"evidence_ids\": [\"java-mut-base-branch\", \"java-test-base-plan\"]}, {\"id\": \"java-custom-entrypoint\", \"description\": \"A configured custom entrypoint can satisfy the visible entrypoint assertions without calling processor.computeEntrypoint.\", \"condition\": \"getEntrypoint() returns the four visible expected values.\", \"status\": \"candidate\", \"evidence_ids\": [\"java-mut-layer-entrypoint\", \"java-test-entrypoint-layer\"]}], \"dependency_constraints\": [{\"statement\": \"processor.getJavaVersion() must return a value <= 8 for the default-image branch to select adoptopenjdk:8-jre.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-default-image\"], \"condition\": \"Only when getFrom() is absent and the default-image branch is used.\", \"evidence_ids\": [\"java-mut-base-branch\", \"java-test-base-plan\"]}, {\"statement\": \"processor.createLayers() must supply the single visible classes layer and file entry expected by the test.\", \"status\": \"required\", \"scenario_ids\": [\"java-default-image\", \"java-explicit-image\", \"java-custom-entrypoint\"], \"condition\": \"For any successful scenario reaching layer installation in this selected test.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\", \"java-test-entrypoint-layer\"]}, {\"statement\": \"processor.computeEntrypoint() must return the four visible expected entrypoint values.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-default-image\"], \"condition\": \"Only when the configured custom entrypoint is empty.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\", \"java-test-entrypoint-layer\"]}, {\"statement\": \"The configured custom entrypoint itself must equal the four visible expected values.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-custom-entrypoint\"], \"condition\": \"Only when the configured custom entrypoint is non-empty.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\", \"java-test-entrypoint-layer\"]}, {\"statement\": \"ContainerBuilders.create must return a builder whose plan has the expected base image and defaults.\", \"status\": \"unknown\", \"scenario_ids\": [\"java-explicit-image\"], \"condition\": \"Only when an explicit base image is configured; its implementation is not visible in the reviewed input.\", \"evidence_ids\": [\"java-mut-base-branch\", \"java-test-base-plan\"]}], \"expected_interactions\": [{\"statement\": \"processor.createLayers() is called and its result is installed on the builder.\", \"status\": \"required\", \"scenario_ids\": [\"java-default-image\", \"java-explicit-image\", \"java-custom-entrypoint\"], \"condition\": \"For any successful scenario reaching plan configuration.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\", \"java-mut-builder-configuration\"], \"assertion_policy\": \"not_implied\"}, {\"statement\": \"processor.getJavaVersion() is called to select a default base image.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-default-image\"], \"condition\": \"Only when getFrom() is absent.\", \"evidence_ids\": [\"java-mut-base-branch\"], \"assertion_policy\": \"not_implied\"}, {\"statement\": \"processor.computeEntrypoint(jarOptions.getJvmFlags()) is called.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-default-image\"], \"condition\": \"Only when getEntrypoint() is empty.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\"], \"assertion_policy\": \"not_implied\"}, {\"statement\": \"ContainerBuilders.create is called with the configured image, an empty platform set, common CLI options, and logger.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-explicit-image\"], \"condition\": \"Only when getFrom() is present.\", \"evidence_ids\": [\"java-mut-base-branch\"], \"assertion_policy\": \"not_implied\"}], \"verification_candidates\": [{\"statement\": \"Consider verifying createLayers() was called once if that interaction distinguishes the intended scenario.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-default-image\", \"java-explicit-image\", \"java-custom-entrypoint\"], \"condition\": \"Only if interaction verification adds value beyond the visible build-plan assertions.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\", \"java-test-entrypoint-layer\"]}, {\"statement\": \"Consider verifying computeEntrypoint() only for the empty-custom-entrypoint scenario.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-default-image\"], \"condition\": \"Only if the chosen scenario explicitly requires an empty configured entrypoint.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\"]}], \"evidence\": [{\"id\": \"java-test-base-plan\", \"source_id\": \"test\", \"start_line\": 71, \"end_line\": 73, \"quote\": \"    assertEquals(\\\"adoptopenjdk:8-jre\\\", buildPlan.getBaseImage());\\n    assertEquals(ImmutableSet.of(new Platform(\\\"amd64\\\", \\\"linux\\\")), buildPlan.getPlatforms());\\n    assertEquals(Instant.EPOCH, buildPlan.getCreationTime());\", \"rationale\": \"These are the visible base-image, platform, and creation-time assertions for the selected test.\"}, {\"id\": \"java-test-empty-configuration\", \"source_id\": \"test\", \"start_line\": 74, \"end_line\": 80, \"quote\": \"    assertEquals(ImageFormat.Docker, buildPlan.getFormat());\\n    assertEquals(0, buildPlan.getEnvironment().size());\\n    assertEquals(0, buildPlan.getLabels().size());\\n    assertEquals(0, buildPlan.getVolumes().size());\\n    assertEquals(0, buildPlan.getExposedPorts().size());\\n    assertNull(buildPlan.getUser());\\n    assertNull(buildPlan.getWorkingDirectory());\", \"rationale\": \"These are the visible format and empty or unset configuration assertions.\"}, {\"id\": \"java-test-entrypoint-layer\", \"source_id\": \"test\", \"start_line\": 81, \"end_line\": 99, \"quote\": \"    assertEquals(4, buildPlan.getEntrypoint().size());\\n    assertEquals(\\\"java\\\", buildPlan.getEntrypoint().get(0));\\n    assertEquals(\\\"-cp\\\", buildPlan.getEntrypoint().get(1));\\n    assertEquals(\\\"/app/explodedJar:/app/dependencies/*\\\", buildPlan.getEntrypoint().get(2));\\n    assertEquals(\\\"HelloWorld\\\", buildPlan.getEntrypoint().get(3));\\n    assertEquals(1, buildPlan.getLayers().size());\\n    assertEquals(\\\"classes\\\", buildPlan.getLayers().get(0).getName());\\n    assertArrayEquals(\\n        FileEntriesLayer.builder()\\n            .addEntry(\\n                Paths.get(\\\"path/to/tempDirectory/class1.class\\\"),\\n                AbsoluteUnixPath.get(\\\"/app/explodedJar/class1.class\\\"))\\n            .build()\\n            .getEntries()\\n            .toArray(new Object[0]),\\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().toArray(new Object[0]));\\n    assertEquals(\\n        AbsoluteUnixPath.get(\\\"/app/explodedJar/class1.class\\\"),\\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().get(0).getExtractionPath());\", \"rationale\": \"These assertions expose the required entrypoint and the single classes layer, including its exact visible file entry and extraction path.\"}, {\"id\": \"java-mut-base-branch\", \"source_id\": \"mut\", \"start_line\": 60, \"end_line\": 71, \"quote\": \"    if (commonContainerConfigCliOptions.getFrom().isPresent()) {\\n      containerBuilder =\\n          ContainerBuilders.create(\\n              commonContainerConfigCliOptions.getFrom().get(),\\n              Collections.emptySet(),\\n              commonCliOptions,\\n              logger);\\n    } else {\\n      containerBuilder =\\n          (processor.getJavaVersion() <= 8)\\n              ? Jib.from(\\\"adoptopenjdk:8-jre\\\")\\n              : Jib.from(\\\"adoptopenjdk:11-jre\\\");\", \"rationale\": \"The code has distinct explicit-image and default-image paths; the Java-version constraint applies only to the latter.\"}, {\"id\": \"java-mut-layer-entrypoint\", \"source_id\": \"mut\", \"start_line\": 74, \"end_line\": 79, \"quote\": \"    List<FileEntriesLayer> layers = processor.createLayers();\\n    List<String> customEntrypoint = commonContainerConfigCliOptions.getEntrypoint();\\n    List<String> entrypoint =\\n        customEntrypoint.isEmpty()\\n            ? processor.computeEntrypoint(jarOptions.getJvmFlags())\\n            : customEntrypoint;\", \"rationale\": \"This establishes the unconditional layer call and the conditional choice between computed and custom entrypoints.\"}, {\"id\": \"java-mut-builder-configuration\", \"source_id\": \"mut\", \"start_line\": 81, \"end_line\": 88, \"quote\": \"    containerBuilder\\n        .setEntrypoint(entrypoint)\\n        .setFileEntriesLayers(layers)\\n        .setExposedPorts(commonContainerConfigCliOptions.getExposedPorts())\\n        .setVolumes(commonContainerConfigCliOptions.getVolumes())\\n        .setEnvironment(commonContainerConfigCliOptions.getEnvironment())\\n        .setLabels(commonContainerConfigCliOptions.getLabels())\\n        .setProgramArguments(commonContainerConfigCliOptions.getProgramArguments());\", \"rationale\": \"The inferred entrypoint and layers are forwarded into the builder together with visible configuration values.\"}], \"uncertainty\": [{\"statement\": \"The reviewed input does not show ContainerBuilders.create, so the explicit-image path cannot be ruled in or out as another way to obtain the visible expected plan.\", \"status\": \"unknown\", \"scenario_ids\": [\"java-explicit-image\"], \"condition\": \"When getFrom() is present.\", \"evidence_ids\": [\"java-mut-base-branch\", \"java-test-base-plan\"]}, {\"statement\": \"The visible test does not reveal whether the entrypoint came from computeEntrypoint() or from an identical configured custom entrypoint.\", \"status\": \"unknown\", \"scenario_ids\": [\"java-default-image\", \"java-custom-entrypoint\"], \"condition\": \"Until getEntrypoint() behavior is supplied by the masked setup.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\", \"java-test-entrypoint-layer\"]}]}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 1,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    }
+  ],
+  "validation": "schema_and_evidence_locations_passed",
+  "semantic_correctness_verified": false,
+  "contract": {
+    "schema_version": "mock-spec.scenario/v0.1",
+    "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+    "language": "java",
+    "test_objectives": [
+      {
+        "statement": "The selected test expects the resulting build plan to use base image adoptopenjdk:8-jre, the linux/amd64 platform, and epoch creation time.",
+        "status": "required",
+        "scenario_ids": [
+          "java-default-image",
+          "java-explicit-image",
+          "java-custom-entrypoint"
+        ],
+        "condition": "For the selected visible test case.",
+        "evidence_ids": [
+          "java-test-base-plan"
+        ]
+      },
+      {
+        "statement": "The selected test expects a four-element Java entrypoint and one classes layer containing the visible class file entry.",
+        "status": "required",
+        "scenario_ids": [
+          "java-default-image",
+          "java-explicit-image",
+          "java-custom-entrypoint"
+        ],
+        "condition": "For the selected visible test case.",
+        "evidence_ids": [
+          "java-test-entrypoint-layer"
+        ]
+      },
+      {
+        "statement": "The selected test expects Docker format, empty environment, labels, volumes, and exposed ports, plus null user and working directory.",
+        "status": "required",
+        "scenario_ids": [
+          "java-default-image",
+          "java-explicit-image",
+          "java-custom-entrypoint"
+        ],
+        "condition": "For the selected visible test case.",
+        "evidence_ids": [
+          "java-test-empty-configuration"
+        ]
+      }
+    ],
+    "scenario_hypotheses": [
+      {
+        "id": "java-default-image",
+        "description": "No explicit base image is configured; the processor reports a Java version at most 8; its visible layer and computed entrypoint feed the returned builder.",
+        "condition": "getFrom() is absent, getJavaVersion() is <= 8, and getEntrypoint() is empty.",
+        "status": "candidate",
+        "evidence_ids": [
+          "java-mut-base-branch",
+          "java-mut-layer-entrypoint",
+          "java-test-base-plan",
+          "java-test-entrypoint-layer"
+        ]
+      },
+      {
+        "id": "java-explicit-image",
+        "description": "An explicitly configured base image may also lead to the visible expected plan if ContainerBuilders.create returns a compatible builder.",
+        "condition": "getFrom() is present and the hidden ContainerBuilders implementation produces the expected base image and plan defaults.",
+        "status": "unknown",
+        "evidence_ids": [
+          "java-mut-base-branch",
+          "java-test-base-plan"
+        ]
+      },
+      {
+        "id": "java-custom-entrypoint",
+        "description": "A configured custom entrypoint can satisfy the visible entrypoint assertions without calling processor.computeEntrypoint.",
+        "condition": "getEntrypoint() returns the four visible expected values.",
+        "status": "candidate",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint",
+          "java-test-entrypoint-layer"
+        ]
+      }
+    ],
+    "dependency_constraints": [
+      {
+        "statement": "processor.getJavaVersion() must return a value <= 8 for the default-image branch to select adoptopenjdk:8-jre.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-default-image"
+        ],
+        "condition": "Only when getFrom() is absent and the default-image branch is used.",
+        "evidence_ids": [
+          "java-mut-base-branch",
+          "java-test-base-plan"
+        ]
+      },
+      {
+        "statement": "processor.createLayers() must supply the single visible classes layer and file entry expected by the test.",
+        "status": "required",
+        "scenario_ids": [
+          "java-default-image",
+          "java-explicit-image",
+          "java-custom-entrypoint"
+        ],
+        "condition": "For any successful scenario reaching layer installation in this selected test.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint",
+          "java-test-entrypoint-layer"
+        ]
+      },
+      {
+        "statement": "processor.computeEntrypoint() must return the four visible expected entrypoint values.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-default-image"
+        ],
+        "condition": "Only when the configured custom entrypoint is empty.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint",
+          "java-test-entrypoint-layer"
+        ]
+      },
+      {
+        "statement": "The configured custom entrypoint itself must equal the four visible expected values.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-custom-entrypoint"
+        ],
+        "condition": "Only when the configured custom entrypoint is non-empty.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint",
+          "java-test-entrypoint-layer"
+        ]
+      },
+      {
+        "statement": "ContainerBuilders.create must return a builder whose plan has the expected base image and defaults.",
+        "status": "unknown",
+        "scenario_ids": [
+          "java-explicit-image"
+        ],
+        "condition": "Only when an explicit base image is configured; its implementation is not visible in the reviewed input.",
+        "evidence_ids": [
+          "java-mut-base-branch",
+          "java-test-base-plan"
+        ]
+      }
+    ],
+    "expected_interactions": [
+      {
+        "statement": "processor.createLayers() is called and its result is installed on the builder.",
+        "status": "required",
+        "scenario_ids": [
+          "java-default-image",
+          "java-explicit-image",
+          "java-custom-entrypoint"
+        ],
+        "condition": "For any successful scenario reaching plan configuration.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint",
+          "java-mut-builder-configuration"
+        ],
+        "assertion_policy": "not_implied"
+      },
+      {
+        "statement": "processor.getJavaVersion() is called to select a default base image.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-default-image"
+        ],
+        "condition": "Only when getFrom() is absent.",
+        "evidence_ids": [
+          "java-mut-base-branch"
+        ],
+        "assertion_policy": "not_implied"
+      },
+      {
+        "statement": "processor.computeEntrypoint(jarOptions.getJvmFlags()) is called.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-default-image"
+        ],
+        "condition": "Only when getEntrypoint() is empty.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint"
+        ],
+        "assertion_policy": "not_implied"
+      },
+      {
+        "statement": "ContainerBuilders.create is called with the configured image, an empty platform set, common CLI options, and logger.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-explicit-image"
+        ],
+        "condition": "Only when getFrom() is present.",
+        "evidence_ids": [
+          "java-mut-base-branch"
+        ],
+        "assertion_policy": "not_implied"
+      }
+    ],
+    "verification_candidates": [
+      {
+        "statement": "Consider verifying createLayers() was called once if that interaction distinguishes the intended scenario.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-default-image",
+          "java-explicit-image",
+          "java-custom-entrypoint"
+        ],
+        "condition": "Only if interaction verification adds value beyond the visible build-plan assertions.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint",
+          "java-test-entrypoint-layer"
+        ]
+      },
+      {
+        "statement": "Consider verifying computeEntrypoint() only for the empty-custom-entrypoint scenario.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-default-image"
+        ],
+        "condition": "Only if the chosen scenario explicitly requires an empty configured entrypoint.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint"
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "id": "java-test-base-plan",
+        "source_id": "test",
+        "start_line": 71,
+        "end_line": 73,
+        "quote": "    assertEquals(\"adoptopenjdk:8-jre\", buildPlan.getBaseImage());\n    assertEquals(ImmutableSet.of(new Platform(\"amd64\", \"linux\")), buildPlan.getPlatforms());\n    assertEquals(Instant.EPOCH, buildPlan.getCreationTime());",
+        "rationale": "These are the visible base-image, platform, and creation-time assertions for the selected test."
+      },
+      {
+        "id": "java-test-empty-configuration",
+        "source_id": "test",
+        "start_line": 74,
+        "end_line": 80,
+        "quote": "    assertEquals(ImageFormat.Docker, buildPlan.getFormat());\n    assertEquals(0, buildPlan.getEnvironment().size());\n    assertEquals(0, buildPlan.getLabels().size());\n    assertEquals(0, buildPlan.getVolumes().size());\n    assertEquals(0, buildPlan.getExposedPorts().size());\n    assertNull(buildPlan.getUser());\n    assertNull(buildPlan.getWorkingDirectory());",
+        "rationale": "These are the visible format and empty or unset configuration assertions."
+      },
+      {
+        "id": "java-test-entrypoint-layer",
+        "source_id": "test",
+        "start_line": 81,
+        "end_line": 99,
+        "quote": "    assertEquals(4, buildPlan.getEntrypoint().size());\n    assertEquals(\"java\", buildPlan.getEntrypoint().get(0));\n    assertEquals(\"-cp\", buildPlan.getEntrypoint().get(1));\n    assertEquals(\"/app/explodedJar:/app/dependencies/*\", buildPlan.getEntrypoint().get(2));\n    assertEquals(\"HelloWorld\", buildPlan.getEntrypoint().get(3));\n    assertEquals(1, buildPlan.getLayers().size());\n    assertEquals(\"classes\", buildPlan.getLayers().get(0).getName());\n    assertArrayEquals(\n        FileEntriesLayer.builder()\n            .addEntry(\n                Paths.get(\"path/to/tempDirectory/class1.class\"),\n                AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"))\n            .build()\n            .getEntries()\n            .toArray(new Object[0]),\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().toArray(new Object[0]));\n    assertEquals(\n        AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"),\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().get(0).getExtractionPath());",
+        "rationale": "These assertions expose the required entrypoint and the single classes layer, including its exact visible file entry and extraction path."
+      },
+      {
+        "id": "java-mut-base-branch",
+        "source_id": "mut",
+        "start_line": 60,
+        "end_line": 71,
+        "quote": "    if (commonContainerConfigCliOptions.getFrom().isPresent()) {\n      containerBuilder =\n          ContainerBuilders.create(\n              commonContainerConfigCliOptions.getFrom().get(),\n              Collections.emptySet(),\n              commonCliOptions,\n              logger);\n    } else {\n      containerBuilder =\n          (processor.getJavaVersion() <= 8)\n              ? Jib.from(\"adoptopenjdk:8-jre\")\n              : Jib.from(\"adoptopenjdk:11-jre\");",
+        "rationale": "The code has distinct explicit-image and default-image paths; the Java-version constraint applies only to the latter."
+      },
+      {
+        "id": "java-mut-layer-entrypoint",
+        "source_id": "mut",
+        "start_line": 74,
+        "end_line": 79,
+        "quote": "    List<FileEntriesLayer> layers = processor.createLayers();\n    List<String> customEntrypoint = commonContainerConfigCliOptions.getEntrypoint();\n    List<String> entrypoint =\n        customEntrypoint.isEmpty()\n            ? processor.computeEntrypoint(jarOptions.getJvmFlags())\n            : customEntrypoint;",
+        "rationale": "This establishes the unconditional layer call and the conditional choice between computed and custom entrypoints."
+      },
+      {
+        "id": "java-mut-builder-configuration",
+        "source_id": "mut",
+        "start_line": 81,
+        "end_line": 88,
+        "quote": "    containerBuilder\n        .setEntrypoint(entrypoint)\n        .setFileEntriesLayers(layers)\n        .setExposedPorts(commonContainerConfigCliOptions.getExposedPorts())\n        .setVolumes(commonContainerConfigCliOptions.getVolumes())\n        .setEnvironment(commonContainerConfigCliOptions.getEnvironment())\n        .setLabels(commonContainerConfigCliOptions.getLabels())\n        .setProgramArguments(commonContainerConfigCliOptions.getProgramArguments());",
+        "rationale": "The inferred entrypoint and layers are forwarded into the builder together with visible configuration values."
+      }
+    ],
+    "uncertainty": [
+      {
+        "statement": "The reviewed input does not show ContainerBuilders.create, so the explicit-image path cannot be ruled in or out as another way to obtain the visible expected plan.",
+        "status": "unknown",
+        "scenario_ids": [
+          "java-explicit-image"
+        ],
+        "condition": "When getFrom() is present.",
+        "evidence_ids": [
+          "java-mut-base-branch",
+          "java-test-base-plan"
+        ]
+      },
+      {
+        "statement": "The visible test does not reveal whether the entrypoint came from computeEntrypoint() or from an identical configured custom entrypoint.",
+        "status": "unknown",
+        "scenario_ids": [
+          "java-default-image",
+          "java-custom-entrypoint"
+        ],
+        "condition": "Until getEntrypoint() behavior is supplied by the masked setup.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint",
+          "java-test-entrypoint-layer"
+        ]
+      }
+    ]
+  }
+}

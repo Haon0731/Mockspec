@@ -1,0 +1,363 @@
+{
+  "mode": "offline_scripted_sdk_with_real_tools",
+  "autonomous_tool_choice_verified": false,
+  "model_quality_comparison_possible": false,
+  "contract_origin": "preexisting_host_synthetic_fixture_not_model_inference",
+  "agent_version": "v0.1",
+  "model": "scripted-offline",
+  "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+  "language": "java",
+  "prompt_version": "scenario-inference/v0.1",
+  "prompt_sha256": "e7bf55a8bb78b52701ab20bbee894513931642b772bc1a08bda8a79a5cb61e6d",
+  "task_sha256": "019c5f510d547a22836c0a0d34a34f4d8b44c4e3de284d1f11db7acf872571fd",
+  "input_equal_to_baseline": true,
+  "duration_seconds": 0.032906042877584696,
+  "scripted_model_calls": 1,
+  "provider_requests": 0,
+  "provider_token_usage": null,
+  "provider_cost_usd": "0",
+  "cost_basis": "no_provider_client_or_request",
+  "usage_warning": "raw_responses usage is scripted placeholder data, not measured tokens",
+  "budget_test_ledger": null,
+  "tool_trace": [],
+  "raw_responses": [
+    {
+      "output": [
+        {
+          "id": "offline-final",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"mock-spec.scenario/v0.1\", \"case_id\": \"com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df\", \"language\": \"java\", \"test_objectives\": [{\"statement\": \"The selected test expects the resulting build plan to use base image adoptopenjdk:8-jre, the linux/amd64 platform, and epoch creation time.\", \"status\": \"required\", \"scenario_ids\": [\"java-default-image\", \"java-explicit-image\", \"java-custom-entrypoint\"], \"condition\": \"For the selected visible test case.\", \"evidence_ids\": [\"java-test-base-plan\"]}, {\"statement\": \"The selected test expects a four-element Java entrypoint and one classes layer containing the visible class file entry.\", \"status\": \"required\", \"scenario_ids\": [\"java-default-image\", \"java-explicit-image\", \"java-custom-entrypoint\"], \"condition\": \"For the selected visible test case.\", \"evidence_ids\": [\"java-test-entrypoint-layer\"]}, {\"statement\": \"The selected test expects Docker format, empty environment, labels, volumes, and exposed ports, plus null user and working directory.\", \"status\": \"required\", \"scenario_ids\": [\"java-default-image\", \"java-explicit-image\", \"java-custom-entrypoint\"], \"condition\": \"For the selected visible test case.\", \"evidence_ids\": [\"java-test-empty-configuration\"]}], \"scenario_hypotheses\": [{\"id\": \"java-default-image\", \"description\": \"No explicit base image is configured; the processor reports a Java version at most 8; its visible layer and computed entrypoint feed the returned builder.\", \"condition\": \"getFrom() is absent, getJavaVersion() is <= 8, and getEntrypoint() is empty.\", \"status\": \"candidate\", \"evidence_ids\": [\"java-mut-base-branch\", \"java-mut-layer-entrypoint\", \"java-test-base-plan\", \"java-test-entrypoint-layer\"]}, {\"id\": \"java-explicit-image\", \"description\": \"An explicitly configured base image may also lead to the visible expected plan if ContainerBuilders.create returns a compatible builder.\", \"condition\": \"getFrom() is present and the hidden ContainerBuilders implementation produces the expected base image and plan defaults.\", \"status\": \"unknown\", \"evidence_ids\": [\"java-mut-base-branch\", \"java-test-base-plan\"]}, {\"id\": \"java-custom-entrypoint\", \"description\": \"A configured custom entrypoint can satisfy the visible entrypoint assertions without calling processor.computeEntrypoint.\", \"condition\": \"getEntrypoint() returns the four visible expected values.\", \"status\": \"candidate\", \"evidence_ids\": [\"java-mut-layer-entrypoint\", \"java-test-entrypoint-layer\"]}], \"dependency_constraints\": [{\"statement\": \"processor.getJavaVersion() must return a value <= 8 for the default-image branch to select adoptopenjdk:8-jre.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-default-image\"], \"condition\": \"Only when getFrom() is absent and the default-image branch is used.\", \"evidence_ids\": [\"java-mut-base-branch\", \"java-test-base-plan\"]}, {\"statement\": \"processor.createLayers() must supply the single visible classes layer and file entry expected by the test.\", \"status\": \"required\", \"scenario_ids\": [\"java-default-image\", \"java-explicit-image\", \"java-custom-entrypoint\"], \"condition\": \"For any successful scenario reaching layer installation in this selected test.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\", \"java-test-entrypoint-layer\"]}, {\"statement\": \"processor.computeEntrypoint() must return the four visible expected entrypoint values.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-default-image\"], \"condition\": \"Only when the configured custom entrypoint is empty.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\", \"java-test-entrypoint-layer\"]}, {\"statement\": \"The configured custom entrypoint itself must equal the four visible expected values.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-custom-entrypoint\"], \"condition\": \"Only when the configured custom entrypoint is non-empty.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\", \"java-test-entrypoint-layer\"]}, {\"statement\": \"ContainerBuilders.create must return a builder whose plan has the expected base image and defaults.\", \"status\": \"unknown\", \"scenario_ids\": [\"java-explicit-image\"], \"condition\": \"Only when an explicit base image is configured; its implementation is not visible in the reviewed input.\", \"evidence_ids\": [\"java-mut-base-branch\", \"java-test-base-plan\"]}], \"expected_interactions\": [{\"statement\": \"processor.createLayers() is called and its result is installed on the builder.\", \"status\": \"required\", \"scenario_ids\": [\"java-default-image\", \"java-explicit-image\", \"java-custom-entrypoint\"], \"condition\": \"For any successful scenario reaching plan configuration.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\", \"java-mut-builder-configuration\"], \"assertion_policy\": \"not_implied\"}, {\"statement\": \"processor.getJavaVersion() is called to select a default base image.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-default-image\"], \"condition\": \"Only when getFrom() is absent.\", \"evidence_ids\": [\"java-mut-base-branch\"], \"assertion_policy\": \"not_implied\"}, {\"statement\": \"processor.computeEntrypoint(jarOptions.getJvmFlags()) is called.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-default-image\"], \"condition\": \"Only when getEntrypoint() is empty.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\"], \"assertion_policy\": \"not_implied\"}, {\"statement\": \"ContainerBuilders.create is called with the configured image, an empty platform set, common CLI options, and logger.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-explicit-image\"], \"condition\": \"Only when getFrom() is present.\", \"evidence_ids\": [\"java-mut-base-branch\"], \"assertion_policy\": \"not_implied\"}], \"verification_candidates\": [{\"statement\": \"Consider verifying createLayers() was called once if that interaction distinguishes the intended scenario.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-default-image\", \"java-explicit-image\", \"java-custom-entrypoint\"], \"condition\": \"Only if interaction verification adds value beyond the visible build-plan assertions.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\", \"java-test-entrypoint-layer\"]}, {\"statement\": \"Consider verifying computeEntrypoint() only for the empty-custom-entrypoint scenario.\", \"status\": \"candidate\", \"scenario_ids\": [\"java-default-image\"], \"condition\": \"Only if the chosen scenario explicitly requires an empty configured entrypoint.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\"]}], \"evidence\": [{\"id\": \"java-test-base-plan\", \"source_id\": \"test\", \"start_line\": 71, \"end_line\": 73, \"quote\": \"    assertEquals(\\\"adoptopenjdk:8-jre\\\", buildPlan.getBaseImage());\\n    assertEquals(ImmutableSet.of(new Platform(\\\"amd64\\\", \\\"linux\\\")), buildPlan.getPlatforms());\\n    assertEquals(Instant.EPOCH, buildPlan.getCreationTime());\", \"rationale\": \"These are the visible base-image, platform, and creation-time assertions for the selected test.\"}, {\"id\": \"java-test-empty-configuration\", \"source_id\": \"test\", \"start_line\": 74, \"end_line\": 80, \"quote\": \"    assertEquals(ImageFormat.Docker, buildPlan.getFormat());\\n    assertEquals(0, buildPlan.getEnvironment().size());\\n    assertEquals(0, buildPlan.getLabels().size());\\n    assertEquals(0, buildPlan.getVolumes().size());\\n    assertEquals(0, buildPlan.getExposedPorts().size());\\n    assertNull(buildPlan.getUser());\\n    assertNull(buildPlan.getWorkingDirectory());\", \"rationale\": \"These are the visible format and empty or unset configuration assertions.\"}, {\"id\": \"java-test-entrypoint-layer\", \"source_id\": \"test\", \"start_line\": 81, \"end_line\": 99, \"quote\": \"    assertEquals(4, buildPlan.getEntrypoint().size());\\n    assertEquals(\\\"java\\\", buildPlan.getEntrypoint().get(0));\\n    assertEquals(\\\"-cp\\\", buildPlan.getEntrypoint().get(1));\\n    assertEquals(\\\"/app/explodedJar:/app/dependencies/*\\\", buildPlan.getEntrypoint().get(2));\\n    assertEquals(\\\"HelloWorld\\\", buildPlan.getEntrypoint().get(3));\\n    assertEquals(1, buildPlan.getLayers().size());\\n    assertEquals(\\\"classes\\\", buildPlan.getLayers().get(0).getName());\\n    assertArrayEquals(\\n        FileEntriesLayer.builder()\\n            .addEntry(\\n                Paths.get(\\\"path/to/tempDirectory/class1.class\\\"),\\n                AbsoluteUnixPath.get(\\\"/app/explodedJar/class1.class\\\"))\\n            .build()\\n            .getEntries()\\n            .toArray(new Object[0]),\\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().toArray(new Object[0]));\\n    assertEquals(\\n        AbsoluteUnixPath.get(\\\"/app/explodedJar/class1.class\\\"),\\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().get(0).getExtractionPath());\", \"rationale\": \"These assertions expose the required entrypoint and the single classes layer, including its exact visible file entry and extraction path.\"}, {\"id\": \"java-mut-base-branch\", \"source_id\": \"mut\", \"start_line\": 60, \"end_line\": 71, \"quote\": \"    if (commonContainerConfigCliOptions.getFrom().isPresent()) {\\n      containerBuilder =\\n          ContainerBuilders.create(\\n              commonContainerConfigCliOptions.getFrom().get(),\\n              Collections.emptySet(),\\n              commonCliOptions,\\n              logger);\\n    } else {\\n      containerBuilder =\\n          (processor.getJavaVersion() <= 8)\\n              ? Jib.from(\\\"adoptopenjdk:8-jre\\\")\\n              : Jib.from(\\\"adoptopenjdk:11-jre\\\");\", \"rationale\": \"The code has distinct explicit-image and default-image paths; the Java-version constraint applies only to the latter.\"}, {\"id\": \"java-mut-layer-entrypoint\", \"source_id\": \"mut\", \"start_line\": 74, \"end_line\": 79, \"quote\": \"    List<FileEntriesLayer> layers = processor.createLayers();\\n    List<String> customEntrypoint = commonContainerConfigCliOptions.getEntrypoint();\\n    List<String> entrypoint =\\n        customEntrypoint.isEmpty()\\n            ? processor.computeEntrypoint(jarOptions.getJvmFlags())\\n            : customEntrypoint;\", \"rationale\": \"This establishes the unconditional layer call and the conditional choice between computed and custom entrypoints.\"}, {\"id\": \"java-mut-builder-configuration\", \"source_id\": \"mut\", \"start_line\": 81, \"end_line\": 88, \"quote\": \"    containerBuilder\\n        .setEntrypoint(entrypoint)\\n        .setFileEntriesLayers(layers)\\n        .setExposedPorts(commonContainerConfigCliOptions.getExposedPorts())\\n        .setVolumes(commonContainerConfigCliOptions.getVolumes())\\n        .setEnvironment(commonContainerConfigCliOptions.getEnvironment())\\n        .setLabels(commonContainerConfigCliOptions.getLabels())\\n        .setProgramArguments(commonContainerConfigCliOptions.getProgramArguments());\", \"rationale\": \"The inferred entrypoint and layers are forwarded into the builder together with visible configuration values.\"}], \"uncertainty\": [{\"statement\": \"The reviewed input does not show ContainerBuilders.create, so the explicit-image path cannot be ruled in or out as another way to obtain the visible expected plan.\", \"status\": \"unknown\", \"scenario_ids\": [\"java-explicit-image\"], \"condition\": \"When getFrom() is present.\", \"evidence_ids\": [\"java-mut-base-branch\", \"java-test-base-plan\"]}, {\"statement\": \"The visible test does not reveal whether the entrypoint came from computeEntrypoint() or from an identical configured custom entrypoint.\", \"status\": \"unknown\", \"scenario_ids\": [\"java-default-image\", \"java-custom-entrypoint\"], \"condition\": \"Until getEntrypoint() behavior is supplied by the masked setup.\", \"evidence_ids\": [\"java-mut-layer-entrypoint\", \"java-test-entrypoint-layer\"]}]}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 1,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2,
+        "request_usage_entries": []
+      },
+      "response_id": null,
+      "resolved_model_version": null
+    }
+  ],
+  "validation": "schema_and_evidence_locations_passed",
+  "semantic_correctness_verified": false,
+  "contract": {
+    "schema_version": "mock-spec.scenario/v0.1",
+    "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+    "language": "java",
+    "test_objectives": [
+      {
+        "statement": "The selected test expects the resulting build plan to use base image adoptopenjdk:8-jre, the linux/amd64 platform, and epoch creation time.",
+        "status": "required",
+        "scenario_ids": [
+          "java-default-image",
+          "java-explicit-image",
+          "java-custom-entrypoint"
+        ],
+        "condition": "For the selected visible test case.",
+        "evidence_ids": [
+          "java-test-base-plan"
+        ]
+      },
+      {
+        "statement": "The selected test expects a four-element Java entrypoint and one classes layer containing the visible class file entry.",
+        "status": "required",
+        "scenario_ids": [
+          "java-default-image",
+          "java-explicit-image",
+          "java-custom-entrypoint"
+        ],
+        "condition": "For the selected visible test case.",
+        "evidence_ids": [
+          "java-test-entrypoint-layer"
+        ]
+      },
+      {
+        "statement": "The selected test expects Docker format, empty environment, labels, volumes, and exposed ports, plus null user and working directory.",
+        "status": "required",
+        "scenario_ids": [
+          "java-default-image",
+          "java-explicit-image",
+          "java-custom-entrypoint"
+        ],
+        "condition": "For the selected visible test case.",
+        "evidence_ids": [
+          "java-test-empty-configuration"
+        ]
+      }
+    ],
+    "scenario_hypotheses": [
+      {
+        "id": "java-default-image",
+        "description": "No explicit base image is configured; the processor reports a Java version at most 8; its visible layer and computed entrypoint feed the returned builder.",
+        "condition": "getFrom() is absent, getJavaVersion() is <= 8, and getEntrypoint() is empty.",
+        "status": "candidate",
+        "evidence_ids": [
+          "java-mut-base-branch",
+          "java-mut-layer-entrypoint",
+          "java-test-base-plan",
+          "java-test-entrypoint-layer"
+        ]
+      },
+      {
+        "id": "java-explicit-image",
+        "description": "An explicitly configured base image may also lead to the visible expected plan if ContainerBuilders.create returns a compatible builder.",
+        "condition": "getFrom() is present and the hidden ContainerBuilders implementation produces the expected base image and plan defaults.",
+        "status": "unknown",
+        "evidence_ids": [
+          "java-mut-base-branch",
+          "java-test-base-plan"
+        ]
+      },
+      {
+        "id": "java-custom-entrypoint",
+        "description": "A configured custom entrypoint can satisfy the visible entrypoint assertions without calling processor.computeEntrypoint.",
+        "condition": "getEntrypoint() returns the four visible expected values.",
+        "status": "candidate",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint",
+          "java-test-entrypoint-layer"
+        ]
+      }
+    ],
+    "dependency_constraints": [
+      {
+        "statement": "processor.getJavaVersion() must return a value <= 8 for the default-image branch to select adoptopenjdk:8-jre.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-default-image"
+        ],
+        "condition": "Only when getFrom() is absent and the default-image branch is used.",
+        "evidence_ids": [
+          "java-mut-base-branch",
+          "java-test-base-plan"
+        ]
+      },
+      {
+        "statement": "processor.createLayers() must supply the single visible classes layer and file entry expected by the test.",
+        "status": "required",
+        "scenario_ids": [
+          "java-default-image",
+          "java-explicit-image",
+          "java-custom-entrypoint"
+        ],
+        "condition": "For any successful scenario reaching layer installation in this selected test.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint",
+          "java-test-entrypoint-layer"
+        ]
+      },
+      {
+        "statement": "processor.computeEntrypoint() must return the four visible expected entrypoint values.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-default-image"
+        ],
+        "condition": "Only when the configured custom entrypoint is empty.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint",
+          "java-test-entrypoint-layer"
+        ]
+      },
+      {
+        "statement": "The configured custom entrypoint itself must equal the four visible expected values.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-custom-entrypoint"
+        ],
+        "condition": "Only when the configured custom entrypoint is non-empty.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint",
+          "java-test-entrypoint-layer"
+        ]
+      },
+      {
+        "statement": "ContainerBuilders.create must return a builder whose plan has the expected base image and defaults.",
+        "status": "unknown",
+        "scenario_ids": [
+          "java-explicit-image"
+        ],
+        "condition": "Only when an explicit base image is configured; its implementation is not visible in the reviewed input.",
+        "evidence_ids": [
+          "java-mut-base-branch",
+          "java-test-base-plan"
+        ]
+      }
+    ],
+    "expected_interactions": [
+      {
+        "statement": "processor.createLayers() is called and its result is installed on the builder.",
+        "status": "required",
+        "scenario_ids": [
+          "java-default-image",
+          "java-explicit-image",
+          "java-custom-entrypoint"
+        ],
+        "condition": "For any successful scenario reaching plan configuration.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint",
+          "java-mut-builder-configuration"
+        ],
+        "assertion_policy": "not_implied"
+      },
+      {
+        "statement": "processor.getJavaVersion() is called to select a default base image.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-default-image"
+        ],
+        "condition": "Only when getFrom() is absent.",
+        "evidence_ids": [
+          "java-mut-base-branch"
+        ],
+        "assertion_policy": "not_implied"
+      },
+      {
+        "statement": "processor.computeEntrypoint(jarOptions.getJvmFlags()) is called.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-default-image"
+        ],
+        "condition": "Only when getEntrypoint() is empty.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint"
+        ],
+        "assertion_policy": "not_implied"
+      },
+      {
+        "statement": "ContainerBuilders.create is called with the configured image, an empty platform set, common CLI options, and logger.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-explicit-image"
+        ],
+        "condition": "Only when getFrom() is present.",
+        "evidence_ids": [
+          "java-mut-base-branch"
+        ],
+        "assertion_policy": "not_implied"
+      }
+    ],
+    "verification_candidates": [
+      {
+        "statement": "Consider verifying createLayers() was called once if that interaction distinguishes the intended scenario.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-default-image",
+          "java-explicit-image",
+          "java-custom-entrypoint"
+        ],
+        "condition": "Only if interaction verification adds value beyond the visible build-plan assertions.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint",
+          "java-test-entrypoint-layer"
+        ]
+      },
+      {
+        "statement": "Consider verifying computeEntrypoint() only for the empty-custom-entrypoint scenario.",
+        "status": "candidate",
+        "scenario_ids": [
+          "java-default-image"
+        ],
+        "condition": "Only if the chosen scenario explicitly requires an empty configured entrypoint.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint"
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "id": "java-test-base-plan",
+        "source_id": "test",
+        "start_line": 71,
+        "end_line": 73,
+        "quote": "    assertEquals(\"adoptopenjdk:8-jre\", buildPlan.getBaseImage());\n    assertEquals(ImmutableSet.of(new Platform(\"amd64\", \"linux\")), buildPlan.getPlatforms());\n    assertEquals(Instant.EPOCH, buildPlan.getCreationTime());",
+        "rationale": "These are the visible base-image, platform, and creation-time assertions for the selected test."
+      },
+      {
+        "id": "java-test-empty-configuration",
+        "source_id": "test",
+        "start_line": 74,
+        "end_line": 80,
+        "quote": "    assertEquals(ImageFormat.Docker, buildPlan.getFormat());\n    assertEquals(0, buildPlan.getEnvironment().size());\n    assertEquals(0, buildPlan.getLabels().size());\n    assertEquals(0, buildPlan.getVolumes().size());\n    assertEquals(0, buildPlan.getExposedPorts().size());\n    assertNull(buildPlan.getUser());\n    assertNull(buildPlan.getWorkingDirectory());",
+        "rationale": "These are the visible format and empty or unset configuration assertions."
+      },
+      {
+        "id": "java-test-entrypoint-layer",
+        "source_id": "test",
+        "start_line": 81,
+        "end_line": 99,
+        "quote": "    assertEquals(4, buildPlan.getEntrypoint().size());\n    assertEquals(\"java\", buildPlan.getEntrypoint().get(0));\n    assertEquals(\"-cp\", buildPlan.getEntrypoint().get(1));\n    assertEquals(\"/app/explodedJar:/app/dependencies/*\", buildPlan.getEntrypoint().get(2));\n    assertEquals(\"HelloWorld\", buildPlan.getEntrypoint().get(3));\n    assertEquals(1, buildPlan.getLayers().size());\n    assertEquals(\"classes\", buildPlan.getLayers().get(0).getName());\n    assertArrayEquals(\n        FileEntriesLayer.builder()\n            .addEntry(\n                Paths.get(\"path/to/tempDirectory/class1.class\"),\n                AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"))\n            .build()\n            .getEntries()\n            .toArray(new Object[0]),\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().toArray(new Object[0]));\n    assertEquals(\n        AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"),\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().get(0).getExtractionPath());",
+        "rationale": "These assertions expose the required entrypoint and the single classes layer, including its exact visible file entry and extraction path."
+      },
+      {
+        "id": "java-mut-base-branch",
+        "source_id": "mut",
+        "start_line": 60,
+        "end_line": 71,
+        "quote": "    if (commonContainerConfigCliOptions.getFrom().isPresent()) {\n      containerBuilder =\n          ContainerBuilders.create(\n              commonContainerConfigCliOptions.getFrom().get(),\n              Collections.emptySet(),\n              commonCliOptions,\n              logger);\n    } else {\n      containerBuilder =\n          (processor.getJavaVersion() <= 8)\n              ? Jib.from(\"adoptopenjdk:8-jre\")\n              : Jib.from(\"adoptopenjdk:11-jre\");",
+        "rationale": "The code has distinct explicit-image and default-image paths; the Java-version constraint applies only to the latter."
+      },
+      {
+        "id": "java-mut-layer-entrypoint",
+        "source_id": "mut",
+        "start_line": 74,
+        "end_line": 79,
+        "quote": "    List<FileEntriesLayer> layers = processor.createLayers();\n    List<String> customEntrypoint = commonContainerConfigCliOptions.getEntrypoint();\n    List<String> entrypoint =\n        customEntrypoint.isEmpty()\n            ? processor.computeEntrypoint(jarOptions.getJvmFlags())\n            : customEntrypoint;",
+        "rationale": "This establishes the unconditional layer call and the conditional choice between computed and custom entrypoints."
+      },
+      {
+        "id": "java-mut-builder-configuration",
+        "source_id": "mut",
+        "start_line": 81,
+        "end_line": 88,
+        "quote": "    containerBuilder\n        .setEntrypoint(entrypoint)\n        .setFileEntriesLayers(layers)\n        .setExposedPorts(commonContainerConfigCliOptions.getExposedPorts())\n        .setVolumes(commonContainerConfigCliOptions.getVolumes())\n        .setEnvironment(commonContainerConfigCliOptions.getEnvironment())\n        .setLabels(commonContainerConfigCliOptions.getLabels())\n        .setProgramArguments(commonContainerConfigCliOptions.getProgramArguments());",
+        "rationale": "The inferred entrypoint and layers are forwarded into the builder together with visible configuration values."
+      }
+    ],
+    "uncertainty": [
+      {
+        "statement": "The reviewed input does not show ContainerBuilders.create, so the explicit-image path cannot be ruled in or out as another way to obtain the visible expected plan.",
+        "status": "unknown",
+        "scenario_ids": [
+          "java-explicit-image"
+        ],
+        "condition": "When getFrom() is present.",
+        "evidence_ids": [
+          "java-mut-base-branch",
+          "java-test-base-plan"
+        ]
+      },
+      {
+        "statement": "The visible test does not reveal whether the entrypoint came from computeEntrypoint() or from an identical configured custom entrypoint.",
+        "status": "unknown",
+        "scenario_ids": [
+          "java-default-image",
+          "java-custom-entrypoint"
+        ],
+        "condition": "Until getEntrypoint() behavior is supplied by the masked setup.",
+        "evidence_ids": [
+          "java-mut-layer-entrypoint",
+          "java-test-entrypoint-layer"
+        ]
+      }
+    ]
+  }
+}
