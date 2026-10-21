@@ -42,12 +42,14 @@ def _message(data: dict) -> ModelResponse:
     )
 
 
-def _tool_call(call_id: str, **arguments) -> ModelResponse:
+def _tool_call(
+    call_id: str, *, tool_name: str = "inspect_source", **arguments
+) -> ModelResponse:
     return ModelResponse(
         output=[ResponseFunctionToolCall(
             arguments=json.dumps(arguments),
             call_id=call_id,
-            name="inspect_source",
+            name=tool_name,
             type="function_call",
             status="completed",
         )],
@@ -64,7 +66,11 @@ class ScriptedModel(Model):
 
     async def get_response(self, *args, **kwargs):
         self.inputs.append(kwargs["input"])
-        assert [tool.name for tool in kwargs["tools"]] == ["inspect_source"]
+        assert [tool.name for tool in kwargs["tools"]] == [
+            "inspect_source",
+            "inspect_program_structure",
+            "inspect_dependency_usage",
+        ]
         assert kwargs["handoffs"] == []
         assert kwargs["output_schema"].is_strict_json_schema()
         response = self.responses[self.calls]
@@ -114,9 +120,15 @@ def test_build_agent_is_task_scoped_and_tool_augmented() -> None:
 
     assert agent.model == "test-model"
     assert agent.output_type is ScenarioContract
-    assert [tool.name for tool in agent.tools] == ["inspect_source"]
+    assert [tool.name for tool in agent.tools] == [
+        "inspect_source",
+        "inspect_program_structure",
+        "inspect_dependency_usage",
+    ]
     assert agent.handoffs == []
     assert agent.model_settings.store is False
+    assert agent.model_settings.max_tokens == 4_096
+    assert agent.model_settings.retry.max_retries == 0
     assert inference_v02.PROMPT_VERSION in agent.instructions
     assert "zero tool calls is valid" in agent.instructions
     assert "not data flow or path feasibility" in agent.instructions
@@ -174,6 +186,43 @@ def test_sdk_runner_allows_zero_tool_calls(monkeypatch) -> None:
     assert contract.case_id == task.case_id
     assert trace == []
     assert model.calls == 1
+
+
+def test_sdk_runner_can_use_all_three_tools(monkeypatch) -> None:
+    task = _task()
+
+    async def structure(self, source_id):
+        return {"status": "ok", "backend": "synthetic-structure", "facts": []}
+
+    async def dependencies(self, source_id):
+        return {"status": "ok", "backend": "synthetic-dependency", "facts": []}
+
+    monkeypatch.setattr(inference_v02.ProgramTools, "inspect_program_structure", structure)
+    monkeypatch.setattr(inference_v02.ProgramTools, "inspect_dependency_usage", dependencies)
+    model = ScriptedModel(
+        _tool_call("source", source_id="mut:0", start_line=10, end_line=10),
+        _tool_call(
+            "structure", tool_name="inspect_program_structure", source_id="mut:0"
+        ),
+        _tool_call(
+            "dependencies", tool_name="inspect_dependency_usage", source_id="mut:0"
+        ),
+        _message(contract_data()),
+    )
+    trace = []
+    _install_model(monkeypatch, task, model, tool_trace=trace)
+
+    result = asyncio.run(inference_v02.infer_scenario(
+        task, model="offline-model", tool_trace=trace
+    ))
+
+    assert result.case_id == task.case_id
+    assert [item["tool"] for item in trace] == [
+        "inspect_source",
+        "inspect_program_structure",
+        "inspect_dependency_usage",
+    ]
+    assert [item["sequence"] for item in trace] == [1, 2, 3]
 
 
 @pytest.mark.real_data

@@ -80,6 +80,8 @@ def main(argv: list[str] | None = None) -> int:
         "semantic_correctness_verified": False,
         "contract": contract.model_dump(),
     }
+    if args.agent_version == "v0.2":
+        artifact["tool_trace"] = inference_kwargs["tool_trace"]
     text = json.dumps(artifact, ensure_ascii=False, indent=2) + "\n"
     try:
         if args.output is None:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 
 from .schemas import UnifiedTask
 from .validation import SourceStore, InputValidationError
@@ -11,23 +12,68 @@ from .validation import SourceStore, InputValidationError
 class ProgramTools:
     """Analyze only text already admitted by the host Adapter, never model paths."""
 
-    def __init__(self, task: UnifiedTask, *, max_output_chars: int = 16000):
+    def __init__(
+        self,
+        task: UnifiedTask,
+        *,
+        max_output_chars: int = 16000,
+        analysis_timeout_seconds: float = 15,
+    ):
         if type(max_output_chars) is not int or max_output_chars < 512:
             raise ValueError("max_output_chars must be an integer >= 512")
+        if (not isinstance(analysis_timeout_seconds, (int, float))
+                or isinstance(analysis_timeout_seconds, bool)
+                or not math.isfinite(analysis_timeout_seconds)
+                or analysis_timeout_seconds <= 0):
+            raise ValueError("analysis_timeout_seconds must be positive")
         self.store = SourceStore(task)
         self.language = task.language
         self.max_output_chars = max_output_chars
+        self.analysis_timeout_seconds = float(analysis_timeout_seconds)
 
     def bounded(self, result: dict) -> dict:
         """Never truncate serialized JSON or silently return partial evidence."""
         if len(json.dumps(result, ensure_ascii=False)) <= self.max_output_chars:
             return result
-        return {
-            "status": "incomplete", "backend": result.get("backend"),
-            "error_code": "output_limit", "facts": [],
-            "diagnostics": ["Result exceeds output limit; request a smaller range."],
-            "limitations": ["Omitted evidence does not establish absence of behavior."],
+        if result.get("backend") == "source_store":
+            omitted = {
+                "status": "incomplete", "backend": "source_store",
+                "source_id": result["source_id"], "start_line": result["start_line"],
+                "end_line": result["end_line"], "error_code": "output_limit",
+                "diagnostics": ["Requested source text omitted; request a smaller range."],
+                "limitations": ["Omission does not establish absence of behavior."],
+            }
+            if len(json.dumps(omitted, ensure_ascii=False)) > self.max_output_chars:
+                omitted.pop("source_id")
+            return omitted
+        limitations = ["Syntax only, not data flow or feasible paths; omitted evidence does not prove absence."]
+        bounded = {
+            "status": "incomplete",
+            "backend": result.get("backend"),
+            "source_id": result.get("source_id"),
+            "error_code": "output_limit",
+            "facts": [],
+            "diagnostics": ["Result exceeds the configured output limit."],
+            "limitations": limitations,
+            "returned_fact_count": 0,
+            "total_fact_count": len(result.get("facts", [])),
         }
+        for fact in result.get("facts", []):
+            candidate = {**bounded, "facts": [*bounded["facts"], fact]}
+            candidate["returned_fact_count"] = len(candidate["facts"])
+            if len(json.dumps(candidate, ensure_ascii=False)) > self.max_output_chars:
+                break
+            bounded = candidate
+        if len(json.dumps(bounded, ensure_ascii=False)) > self.max_output_chars:
+            bounded = {
+                "status": "incomplete",
+                "backend": result.get("backend"),
+                "error_code": "output_limit",
+                "facts": [],
+                "diagnostics": ["Result exceeds the output limit."],
+                "limitations": ["Syntax only; omitted evidence does not prove absence."],
+            }
+        return bounded
 
     async def inspect_source(self, source_id: str, start_line: int, end_line: int) -> dict:
         """Return exact complete lines in the source's original coordinate system."""
@@ -46,3 +92,124 @@ class ProgramTools:
             "text": "\n".join(lines[start_line-source.start_line:end_line-source.start_line+1]),
             "limitations": [],
         })
+
+    async def inspect_program_structure(self, source_id: str) -> dict:
+        """Return syntax structure for one visible source, never a flow proof."""
+        result = await self._analyze(source_id)
+        return self.bounded(result)
+
+    async def inspect_dependency_usage(self, source_id: str) -> dict:
+        """Return calls and reliable syntax-local use relationships."""
+        result = await self._analyze(source_id)
+        if result.get("status") == "error":
+            return self.bounded(result)
+        allowed_kinds = {"call", "named_expression", "local_reference", "variable_read"}
+        facts = [
+            fact for fact in result.get("facts", [])
+            if fact.get("kind") in allowed_kinds
+        ]
+        filtered = {**result, "facts": facts}
+        if not facts and result.get("status") != "incomplete":
+            filtered["status"] = "unresolved"
+            filtered["diagnostics"] = [
+                *result.get("diagnostics", []),
+                "No supported dependency-usage facts were present in the visible source.",
+            ]
+        filtered["limitations"] = [
+            *result.get("limitations", []),
+            "Dependency usage is syntax-local; call targets, aliases, and reaching definitions may be unresolved.",
+        ]
+        return self.bounded(filtered)
+
+    async def _analyze(self, source_id: str) -> dict:
+        try:
+            source = self.store.get(source_id)
+        except (InputValidationError, TypeError):
+            return {
+                "status": "error",
+                "backend": None,
+                "source_id": None,
+                "error_code": "invalid_source",
+                "facts": [],
+                "diagnostics": ["Use a visible source_id from the supplied UnifiedTask."],
+                "limitations": ["No source was analyzed."],
+            }
+
+        if self.language == "python":
+            from .python_analysis import analyze_source
+
+            try:
+                return self._normalize(analyze_source(source), source_id)
+            except Exception as exc:
+                return {
+                    "status": "error",
+                    "backend": "cpython_ast",
+                    "source_id": source_id,
+                    "error_code": "analysis_error",
+                    "facts": [],
+                    "diagnostics": [f"Python analysis failed: {type(exc).__name__}"],
+                    "limitations": ["Analysis failure does not establish absence of behavior."],
+                }
+        if self.language == "java":
+            try:
+                from .java_analysis import analyze_source
+
+                result = await analyze_source(
+                    source,
+                    timeout_seconds=self.analysis_timeout_seconds,
+                )
+                return self._normalize(result, source_id)
+            except Exception as exc:
+                return {
+                    "status": "error",
+                    "backend": "spoon",
+                    "source_id": source_id,
+                    "error_code": "analysis_error",
+                    "facts": [],
+                    "diagnostics": [f"Java analysis failed: {type(exc).__name__}"],
+                    "limitations": ["Analysis failure does not establish absence of behavior."],
+                }
+        return {
+            "status": "error",
+            "backend": None,
+            "source_id": source_id,
+            "error_code": "unsupported",
+            "facts": [],
+            "diagnostics": ["The task language has no configured analysis backend."],
+            "limitations": ["Unsupported analysis does not establish absence of behavior."],
+        }
+
+    @staticmethod
+    def _normalize(result: object, source_id: str) -> dict:
+        if not isinstance(result, dict):
+            return {
+                "status": "error",
+                "backend": None,
+                "source_id": source_id,
+                "error_code": "analysis_error",
+                "facts": [],
+                "diagnostics": ["Analysis backend returned an invalid result."],
+                "limitations": ["Analysis failure does not establish absence of behavior."],
+            }
+        normalized = dict(result)
+        normalized.setdefault("status", "error")
+        normalized.setdefault("backend", None)
+        normalized["source_id"] = source_id
+        normalized.setdefault("facts", [])
+        normalized.setdefault("diagnostics", [])
+        normalized.setdefault("limitations", [])
+        if normalized["status"] not in {"ok", "incomplete", "unresolved", "error"}:
+            normalized.update(
+                status="error",
+                error_code="analysis_error",
+                facts=[],
+                diagnostics=["Analysis backend returned an invalid status."],
+            )
+        if not isinstance(normalized["facts"], list):
+            normalized.update(
+                status="error",
+                error_code="analysis_error",
+                facts=[],
+                diagnostics=["Analysis backend returned invalid facts."],
+            )
+        return normalized

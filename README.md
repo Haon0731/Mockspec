@@ -1,7 +1,7 @@
 # Mock Spec
 
 独立的 MockBench 场景分析项目。提供严格 Task Schema、两个只读 Adapter、
-基于 `source_id` 的内存访问接口，以及共享的 Scenario Inference Agent V0.1。
+基于 `source_id` 的内存访问接口，以及 Scenario Inference Agent V0.1/V0.2。
 Agent 只分析依赖行为约束，不生成 Mock、不执行目标测试、不评分。
 
 ## 安装与测试
@@ -100,15 +100,15 @@ agent_payload = task.to_dict()
    site-packages、依赖树，也不执行 Stub-Tester 的 loader、injector 或其他脚本。
 3. **Masking 检查**要求 Java 双区域为空、Python slot 集合和顺序一致且内容仅为 `pass`，
    同时拒绝本策略下的残留 mock 配置与验证。文件身份检查覆盖区域外的上下文。
-4. **Agent 边界**仅传递 `task.to_dict()`；验证器只调用内存 `SourceStore.get(source_id)`。
+4. **Agent 边界**初始仅传递 `task.to_dict()`；验证器和 V0.2 工具只访问当前任务的内存 `SourceStore.get(source_id)`。
    Store 不持有物理根目录或文件读取函数，不能以路径访问旧仓库。
 
 Schema 合法不等于 masking 已审核。不能用 `UnifiedTask.from_dict()` 自行组装任意源码，
 再宣称它通过 Adapter 审核。内容检查也不是通用泄漏检测器：准入依据是已审查的固定
 输入身份加内容检查，而不是正则或文件名。
 
-Agent 在宿主 SDK 中创建，模型只接收序列化任务，没有 tools、handoffs、MCP、文件读取
-或执行能力，不接收 Adapter、宿主 review 配置或旧数据目录。关闭 SDK tracing，
+Agent 在宿主 SDK 中创建。V0.1 没有工具；V0.2 仅有三个受限的源码/语法分析工具，
+没有任意路径读取、目标程序执行、handoffs 或 MCP，不接收 Adapter、宿主 review 配置或旧数据目录。关闭 SDK tracing，
 模型请求设置 `store=False`。这不是 OS sandbox，也不是对服务方数据保留政策的保证。
 调用 Python API 的宿主仍须先通过 Adapter 审核输入；手工构造 UnifiedTask 不获得准入。
 
@@ -141,6 +141,36 @@ PYTHONPATH=src .venv/bin/python -m mock_spec.cli \
 `--output-dir` 指定不存在的目录，保留 SDK 原始输出项、Token 用量、版本身份和
 结构/证据验证失败类型。它不修改 V0.1 Prompt，也不自动重试修正回答。
 两例验证配置与命令见 [Step 4 固定协议](docs/step4/protocol.md)。
+
+## Scenario Inference V0.2
+
+默认仍为 V0.1。使用 `mock-spec-scenario --agent-version v0.2` 显式选择 V0.2，
+其独立 Prompt 和 SDK Agent 可自主调用 `inspect_source`、
+`inspect_program_structure`、`inspect_dependency_usage`，也可以零次调用。
+初始输入仍是完整可见 UnifiedTask；工具分析不增加源码可见范围。
+
+Python 使用标准库 AST；Java 使用已固定的 Spoon 11.2.1 工具 JAR 和 Java 17+
+工具链（含 javac）。宿主可配置 `MOCKSPEC_SPOON_JAR` 和 `MOCKSPEC_JAVA`；
+默认查找本机 Step 5B 的独立 `/tmp/mockspec-step5b-tools`，不自动下载。
+JAR 必须符合 Step 5B 已记录身份。javac 只编译随包提供的可信 helper，不编译或执行目标源码。
+工具不可用、分析失败、unsupported、unresolved 和输出截断均显式记录。
+语法嵌套、词法分支和局部声明引用不是数据流或可执行路径证明。
+
+默认 V0.2 上限为 6 轮、8 次工具调用、每次最多 4096 输出 Token、
+估算及累计 24000 Token、16000 字符工具结果、120 秒总超时。
+Python 分析受源码/节点规模限制，为同步操作；时间取消不构成 OS 级强制 CPU 限制。
+Token/费用门禁采用请求前估算和响应后累计，不能保证远端费用硬上限。
+
+完整留证入口为 `python -m mock_spec.live_v02`（同时支持两个版本）。
+正式对照要求共用 `--experiment-ledger`，并提供 `--attempt-id`、`--run-key`、
+`--max-cost-usd` 和宿主核实的输入/输出每百万 Token 价格。
+账本限制四个首轮运行、最多两次技术故障重试和全轮 US$5 目标；未知费用或未完成尝试
+阻止后续运行。单独诊断必须显式选择 `--standalone`，不冒充正式对照。
+V0.1 核心未改，原有 Token 上限与传输重试差异会在产物中注明。
+
+两版本均不自动按质量重试。结果目录必须不存在；失败保存轨迹与可得用量，
+不伪造 Contract。详情见 [Step 6 规格](docs/step6/spec.md) 和
+[任务依赖](docs/step6/issues.md)。
 
 ## flask_308 与归档模板
 

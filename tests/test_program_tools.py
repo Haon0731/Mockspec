@@ -33,6 +33,31 @@ def test_output_limit_explicitly_omits_evidence():
     assert "text" not in result
 
 
+def test_source_output_limit_preserves_requested_range():
+    data = valid_task_data()
+    data["mut_source"]["text"] = "def target(value):\n    return " + repr("x" * 600)
+    tools = ProgramTools(UnifiedTask.from_dict(data), max_output_chars=512)
+    result = asyncio.run(tools.inspect_source("mut:0", 10, 11))
+    assert result["status"] == "incomplete"
+    assert result["source_id"] == "mut:0"
+    assert result["start_line"] == 10 and result["end_line"] == 11
+    assert "text" not in result and "facts" not in result
+    assert "smaller range" in result["diagnostics"][0]
+
+
+def test_incomplete_backend_remains_incomplete_after_dependency_filter(monkeypatch):
+    tools = ProgramTools(UnifiedTask.from_dict(valid_task_data()))
+
+    async def incomplete(source_id):
+        return {"status": "incomplete", "facts": [{"kind": "condition"}],
+                "diagnostics": ["truncated"], "limitations": []}
+
+    monkeypatch.setattr(tools, "_analyze", incomplete)
+    result = asyncio.run(tools.inspect_dependency_usage("mut:0"))
+    assert result["status"] == "incomplete"
+    assert result["diagnostics"] == ["truncated"]
+
+
 @pytest.mark.real_data
 def test_both_reviewed_tasks_source_access():
     from test_real_data import REVIEWS, load_java, load_python, snapshot
