@@ -1,0 +1,107 @@
+{
+  "schema_validation": "passed",
+  "case_id_matches": true,
+  "evidence_checks": [
+    {
+      "id": "EV_MUT_BRANCH",
+      "source_id": "mut",
+      "start_line": 282,
+      "end_line": 285,
+      "quote_matches": true,
+      "actual_source_quote": "    if (ctx := _cv_app.get(None)) is not None:\n        ctx.app.aborter(code, *args, **kwargs)\n\n    _wz_abort(code, *args, **kwargs)",
+      "model_quote": "    if (ctx := _cv_app.get(None)) is not None:\n        ctx.app.aborter(code, *args, **kwargs)\n\n    _wz_abort(code, *args, **kwargs)"
+    },
+    {
+      "id": "EV_IMPORTS",
+      "source_id": "imports",
+      "start_line": 12,
+      "end_line": 16,
+      "quote_matches": true,
+      "actual_source_quote": "from werkzeug.exceptions import abort as _wz_abort\nfrom werkzeug.utils import redirect as _wz_redirect\nfrom werkzeug.wrappers import Response as BaseResponse\n\nfrom .globals import _cv_app",
+      "model_quote": "from werkzeug.exceptions import abort as _wz_abort\nfrom werkzeug.utils import redirect as _wz_redirect\nfrom werkzeug.wrappers import Response as BaseResponse\n\nfrom .globals import _cv_app"
+    },
+    {
+      "id": "EV_PARAMS",
+      "source_id": "test",
+      "start_line": 11,
+      "end_line": 47,
+      "quote_matches": true,
+      "actual_source_quote": "@pytest.mark.parametrize(\"scenario,has_app_context,code,args,kwargs\", [\n    (\n        \"app_context_exists_404\",\n        True,\n        404,\n        (),\n        {}\n    ),\n    (\n        \"app_context_exists_500_with_message\",\n        True,\n        500,\n        (\"Internal Server Error\",),\n        {}\n    ),\n    (\n        \"no_app_context_403\",\n        False,\n        403,\n        (),\n        {}\n    ),\n    (\n        \"no_app_context_with_args_kwargs\",\n        False,\n        400,\n        (\"Bad Request\",),\n        {\"description\": \"Invalid input\"}\n    ),\n    (\n        \"app_context_custom_code\",\n        True,\n        418,\n        (),\n        {\"description\": \"I'm a teapot\"}\n    ),\n])",
+      "model_quote": "@pytest.mark.parametrize(\"scenario,has_app_context,code,args,kwargs\", [\n    (\n        \"app_context_exists_404\",\n        True,\n        404,\n        (),\n        {}\n    ),\n    (\n        \"app_context_exists_500_with_message\",\n        True,\n        500,\n        (\"Internal Server Error\",),\n        {}\n    ),\n    (\n        \"no_app_context_403\",\n        False,\n        403,\n        (),\n        {}\n    ),\n    (\n        \"no_app_context_with_args_kwargs\",\n        False,\n        400,\n        (\"Bad Request\",),\n        {\"description\": \"Invalid input\"}\n    ),\n    (\n        \"app_context_custom_code\",\n        True,\n        418,\n        (),\n        {\"description\": \"I'm a teapot\"}\n    ),\n])"
+    },
+    {
+      "id": "EV_MOCK_ASSIGN",
+      "source_id": "test",
+      "start_line": 88,
+      "end_line": 89,
+      "quote_matches": true,
+      "actual_source_quote": "        mock_ctx.app = mock_app\n        mock_app.aborter = mock_aborter",
+      "model_quote": "        mock_ctx.app = mock_app\n        mock_app.aborter = mock_aborter"
+    },
+    {
+      "id": "EV_RAISE_CALL",
+      "source_id": "test",
+      "start_line": 102,
+      "end_line": 103,
+      "quote_matches": true,
+      "actual_source_quote": "    with pytest.raises(Exception) as exc_info:\n        abort(code, *args, **kwargs)",
+      "model_quote": "    with pytest.raises(Exception) as exc_info:\n        abort(code, *args, **kwargs)"
+    },
+    {
+      "id": "EV_IF_APP",
+      "source_id": "test",
+      "start_line": 111,
+      "end_line": 111,
+      "quote_matches": true,
+      "actual_source_quote": "    if has_app_context:",
+      "model_quote": "    if has_app_context:"
+    },
+    {
+      "id": "EV_ASSERT_APP",
+      "source_id": "test",
+      "start_line": 120,
+      "end_line": 120,
+      "quote_matches": true,
+      "actual_source_quote": "        assert f\"Aborted with {code}\" in str(exc_info.value)",
+      "model_quote": "        assert f\"Aborted with {code}\" in str(exc_info.value)"
+    },
+    {
+      "id": "EV_ELSE",
+      "source_id": "test",
+      "start_line": 121,
+      "end_line": 121,
+      "quote_matches": true,
+      "actual_source_quote": "    else:",
+      "model_quote": "    else:"
+    },
+    {
+      "id": "EV_ASSERT_NOCTX",
+      "source_id": "test",
+      "start_line": 126,
+      "end_line": 126,
+      "quote_matches": true,
+      "actual_source_quote": "        assert f\"Werkzeug abort {code}\" in str(exc_info.value)",
+      "model_quote": "        assert f\"Werkzeug abort {code}\" in str(exc_info.value)"
+    },
+    {
+      "id": "EV_MOCK_SLOT",
+      "source_id": "test",
+      "start_line": 61,
+      "end_line": 63,
+      "quote_matches": false,
+      "actual_source_quote": "                                     \n                                    \n       ",
+      "model_quote": "    # === PY-SLOT-START:mock_stub_001 ===\n    pass\n    # === PY-SLOT-END:mock_stub_001 ==="
+    },
+    {
+      "id": "EV_VERIFY_SLOT",
+      "source_id": "test",
+      "start_line": 106,
+      "end_line": 108,
+      "quote_matches": true,
+      "actual_source_quote": "    # === PY-SLOT-START:verify_001 ===\n    pass\n    # === PY-SLOT-END:verify_001 ===",
+      "model_quote": "    # === PY-SLOT-START:verify_001 ===\n    pass\n    # === PY-SLOT-END:verify_001 ==="
+    }
+  ],
+  "validator_result": "failed",
+  "validator_error": "evidence quote does not match source range"
+}

@@ -1,0 +1,83 @@
+"""Single reviewed case to an explicitly labelled scenario artifact."""
+
+from __future__ import annotations
+
+import argparse
+import asyncio
+import json
+import os
+from pathlib import Path
+import sys
+
+from .adapters import java, python
+from .scenario import validate_contract
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--language", choices=("java", "python"), required=True)
+    parser.add_argument("--snapshot", type=Path, required=True)
+    parser.add_argument("--case-id", required=True)
+    parser.add_argument("--model", default=os.environ.get("MOCKSPEC_MODEL"))
+    parser.add_argument("--timeout", type=float, default=120.0)
+    parser.add_argument(
+        "--response-json", type=Path,
+        help="Validate a synthetic response offline; never reported as live inference.",
+    )
+    parser.add_argument("--output", type=Path, help="Default: JSON on stdout.")
+    args = parser.parse_args(argv)
+
+    if args.response_json is None and not args.model:
+        print("configuration error: set MOCKSPEC_MODEL or --model", file=sys.stderr)
+        return 2
+
+    loader = java.load_task if args.language == "java" else python.load_task
+    try:
+        task = loader(args.snapshot, case_id=args.case_id)
+    except (ValueError, OSError):
+        print("input error: reviewed snapshot/case validation failed", file=sys.stderr)
+        return 2
+
+    from .inference import InferenceError, PROMPT_VERSION, infer_scenario
+
+    try:
+        if args.response_json is not None:
+            # This file is a host-side testing input, never sent to the model.
+            contract = validate_contract(args.response_json.read_text(encoding="utf-8"), task)
+        else:
+            contract = asyncio.run(infer_scenario(
+                task, model=args.model, timeout_seconds=args.timeout,
+            ))
+    except InferenceError as exc:
+        print(f"inference error: {exc}", file=sys.stderr)
+        return 2
+    except (ValueError, OSError):
+        print("invalid contract: response structure or allowed evidence check failed",
+              file=sys.stderr)
+        return 2
+
+    artifact = {
+        "mode": "synthetic_replay" if args.response_json is not None else "live_inference",
+        "model": None if args.response_json is not None else args.model,
+        "prompt_version": PROMPT_VERSION,
+        "validation": "schema_and_evidence_locations_passed",
+        "semantic_correctness_verified": False,
+        "contract": contract.model_dump(),
+    }
+    text = json.dumps(artifact, ensure_ascii=False, indent=2) + "\n"
+    try:
+        if args.output is None:
+            sys.stdout.write(text)
+        else:
+            # Refuse to overwrite previous evidence or a source file.
+            with args.output.open("x", encoding="utf-8") as stream:
+                stream.write(text)
+    except OSError:
+        print("output error: cannot create output file (existing files are preserved)",
+              file=sys.stderr)
+        return 2
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

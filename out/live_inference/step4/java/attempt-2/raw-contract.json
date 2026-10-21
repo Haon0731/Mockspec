@@ -1,0 +1,509 @@
+{
+  "schema_version": "mock-spec.scenario/v0.1",
+  "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+  "language": "java",
+  "test_objectives": [
+    {
+      "statement": "The visible test requires the produced build plan's base image to be \"adoptopenjdk:8-jre\".",
+      "status": "required",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "The default-base branch is used: getFrom() is empty and processor.getJavaVersion() returns <= 8.",
+      "evidence_ids": [
+        "E3",
+        "E8"
+      ]
+    },
+    {
+      "statement": "The visible test requires the produced build plan to have the amd64/linux platform set, creation time Instant.EPOCH, Docker format, empty environment/labels/volumes/exposed ports, and null user/working directory.",
+      "status": "required",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "toJibContainerBuilder returns successfully and toContainerBuildPlan() is called.",
+      "evidence_ids": [
+        "E2",
+        "E3"
+      ]
+    },
+    {
+      "statement": "The visible test requires the entrypoint to be exactly [\"java\", \"-cp\", \"/app/explodedJar:/app/dependencies/*\", \"HelloWorld\"].",
+      "status": "required",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "The entrypoint is supplied either by processor.computeEntrypoint (S1) or by an equivalent custom entrypoint list (S2).",
+      "evidence_ids": [
+        "E4",
+        "E9"
+      ]
+    },
+    {
+      "statement": "The visible test requires exactly one layer named \"classes\", with entries matching the test-constructed layer and the expected extraction path for class1.class.",
+      "status": "required",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "processor.createLayers() returns a layer list containing the test-constructed classes layer.",
+      "evidence_ids": [
+        "E1",
+        "E4",
+        "E5",
+        "E9"
+      ]
+    }
+  ],
+  "scenario_hypotheses": [
+    {
+      "id": "S1-computed-default",
+      "description": "Default-base, computed-entrypoint path: getFrom() is empty, processor Java version is <= 8, getEntrypoint() is empty, processor.createLayers() supplies the expected classes layer, and processor.computeEntrypoint(...) supplies the asserted four-element entrypoint.",
+      "condition": "commonContainerConfigCliOptions.getFrom() is empty; getEntrypoint() is empty; processor.getJavaVersion() <= 8; createLayers returns the expected layer; computeEntrypoint returns the asserted entrypoint.",
+      "status": "candidate",
+      "evidence_ids": [
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5",
+        "E8",
+        "E9"
+      ]
+    },
+    {
+      "id": "S2-custom-equivalent-entrypoint",
+      "description": "Alternative path where commonContainerConfigCliOptions.getEntrypoint() already returns the same four-element list, so processor.computeEntrypoint need not be invoked while the visible entrypoint assertions still pass.",
+      "condition": "getFrom() is empty; processor.getJavaVersion() <= 8; getEntrypoint() returns the asserted four strings.",
+      "status": "candidate",
+      "evidence_ids": [
+        "E4",
+        "E6",
+        "E9"
+      ]
+    },
+    {
+      "id": "S3-configured-from",
+      "description": "Alternative configured-from path: getFrom() is present, causing ContainerBuilders.create(...) and potentially commonCliOptions/logger use instead of the default AdoptOpenJDK selection.",
+      "condition": "commonContainerConfigCliOptions.getFrom() is present.",
+      "status": "candidate",
+      "evidence_ids": [
+        "E8"
+      ]
+    },
+    {
+      "id": "S4-java11-default",
+      "description": "Alternative default-base path where getFrom() is empty but processor.getJavaVersion() is greater than 8, selecting \"adoptopenjdk:11-jre\".",
+      "condition": "getFrom() is empty and processor.getJavaVersion() > 8.",
+      "status": "candidate",
+      "evidence_ids": [
+        "E8"
+      ]
+    },
+    {
+      "id": "S5-hidden-stub-values-unknown",
+      "description": "The exact mock/stub setup and dependency return values are hidden in the masked region, so the visible source alone does not determine which concrete stubbing produced the asserted build plan.",
+      "condition": "Relying only on visible source outside the masked MOCK-STUB and VERIFY regions.",
+      "status": "unknown",
+      "evidence_ids": [
+        "E6",
+        "E7"
+      ]
+    }
+  ],
+  "dependency_constraints": [
+    {
+      "statement": "In S1 and S2, commonContainerConfigCliOptions.getFrom() must be an empty Optional to select the default-base branch asserted by the test.",
+      "status": "required",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "Base-image selection executes at line 60.",
+      "evidence_ids": [
+        "E8"
+      ]
+    },
+    {
+      "statement": "In S1 and S2, processor.getJavaVersion() must return <= 8 to select Jib.from(\"adoptopenjdk:8-jre\") when getFrom() is empty.",
+      "status": "required",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "getFrom() is empty and the default-base branch is taken.",
+      "evidence_ids": [
+        "E3",
+        "E8"
+      ]
+    },
+    {
+      "statement": "In S1, commonContainerConfigCliOptions.getEntrypoint() must return an empty list to invoke processor.computeEntrypoint(jarOptions.getJvmFlags()).",
+      "status": "required",
+      "scenario_ids": [
+        "S1-computed-default"
+      ],
+      "condition": "The computed-entrypoint hypothesis S1 is selected.",
+      "evidence_ids": [
+        "E9"
+      ]
+    },
+    {
+      "statement": "For S1 and S2, processor.createLayers() should return a list containing exactly the layer constructed in the test so that layer count, name, entries, and extraction path match.",
+      "status": "candidate",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "The hidden mock stubbing is assumed to satisfy the visible layer assertions.",
+      "evidence_ids": [
+        "E1",
+        "E4",
+        "E5",
+        "E9"
+      ]
+    },
+    {
+      "statement": "For S1, processor.computeEntrypoint(jarOptions.getJvmFlags()) should return the asserted four-element entrypoint list.",
+      "status": "candidate",
+      "scenario_ids": [
+        "S1-computed-default"
+      ],
+      "condition": "The computed-entrypoint path is used and the hidden stub satisfies the visible entrypoint assertion.",
+      "evidence_ids": [
+        "E4",
+        "E9",
+        "E12"
+      ]
+    },
+    {
+      "statement": "For S1 and S2, the configuration getters must yield values consistent with the asserted empty collections, Docker format, EPOCH creation time, and absent user if those values are not defaults supplied by Jib.",
+      "status": "candidate",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "The hidden stubs or framework defaults produce the asserted build-plan metadata.",
+      "evidence_ids": [
+        "E3",
+        "E10"
+      ]
+    },
+    {
+      "statement": "For S2, commonContainerConfigCliOptions.getEntrypoint() should return the exact asserted four-element list if the custom-entrypoint alternative is the explanation for the visible entrypoint assertions.",
+      "status": "candidate",
+      "scenario_ids": [
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "S2 is the custom-equivalent-entrypoint path.",
+      "evidence_ids": [
+        "E4",
+        "E9"
+      ]
+    }
+  ],
+  "expected_interactions": [
+    {
+      "statement": "On S1 and S2, when toJibContainerBuilder executes base-image selection, commonContainerConfigCliOptions.getFrom() is invoked.",
+      "status": "required",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "Execution reaches the base-image selection conditional.",
+      "evidence_ids": [
+        "E8"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "On S1 and S2, if getFrom() is empty, processor.getJavaVersion() is invoked to choose the default AdoptOpenJDK image.",
+      "status": "required",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "getFrom() is empty and no earlier exception occurs.",
+      "evidence_ids": [
+        "E8",
+        "E12"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "On S1 and S2, processor.createLayers() is invoked after the container builder is selected.",
+      "status": "required",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "Execution reaches layer creation.",
+      "evidence_ids": [
+        "E9",
+        "E12"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "On S1 and S2, commonContainerConfigCliOptions.getEntrypoint() is invoked to decide between a custom entrypoint and a computed entrypoint.",
+      "status": "required",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "Layer creation completes without throwing.",
+      "evidence_ids": [
+        "E9"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "On S1, when getEntrypoint() is empty, jarOptions.getJvmFlags() and processor.computeEntrypoint(jvmFlags) are invoked.",
+      "status": "required",
+      "scenario_ids": [
+        "S1-computed-default"
+      ],
+      "condition": "S1 uses the computed-entrypoint path with an empty custom entrypoint.",
+      "evidence_ids": [
+        "E9",
+        "E12"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "On S2, because getEntrypoint() is non-empty, processor.computeEntrypoint(...) is not invoked.",
+      "status": "candidate",
+      "scenario_ids": [
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "S2 is the custom-equivalent-entrypoint path.",
+      "evidence_ids": [
+        "E9"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "On S1 and S2, after entrypoint selection, commonContainerConfigCliOptions.getExposedPorts(), getVolumes(), getEnvironment(), getLabels(), and getProgramArguments() are invoked while configuring the builder.",
+      "status": "required",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "Execution reaches the builder configuration chain.",
+      "evidence_ids": [
+        "E10"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "On S1 and S2, commonContainerConfigCliOptions.getUser(), getFormat(), and getCreationTime() are invoked for optional builder configuration.",
+      "status": "required",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "Execution reaches the optional configuration section.",
+      "evidence_ids": [
+        "E10"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "On S3, if getFrom() is present, ContainerBuilders.create(...) is invoked instead of processor.getJavaVersion().",
+      "status": "candidate",
+      "scenario_ids": [
+        "S3-configured-from"
+      ],
+      "condition": "S3 is selected because getFrom() is present.",
+      "evidence_ids": [
+        "E8"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "On S4, if getFrom() is empty and processor.getJavaVersion() is greater than 8, Jib.from(\"adoptopenjdk:11-jre\") is invoked.",
+      "status": "candidate",
+      "scenario_ids": [
+        "S4-java11-default"
+      ],
+      "condition": "S4 is selected because getJavaVersion() returns > 8.",
+      "evidence_ids": [
+        "E8"
+      ],
+      "assertion_policy": "not_implied"
+    }
+  ],
+  "verification_candidates": [
+    {
+      "statement": "A candidate is to verify that processor.computeEntrypoint(...) was called with the list returned by jarOptions.getJvmFlags() on the computed-entrypoint path, but the masked VERIFY region does not make this a test requirement.",
+      "status": "candidate",
+      "scenario_ids": [
+        "S1-computed-default"
+      ],
+      "condition": "S1 uses the computed-entrypoint path.",
+      "evidence_ids": [
+        "E7",
+        "E9"
+      ]
+    },
+    {
+      "statement": "A candidate is to verify that processor.getJavaVersion() was called when getFrom() is empty, but the visible test does not explicitly require that invocation verification.",
+      "status": "candidate",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "The default-base branch is selected.",
+      "evidence_ids": [
+        "E7",
+        "E8"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E1",
+      "source_id": "test",
+      "start_line": 52,
+      "end_line": 58,
+      "quote": "    FileEntriesLayer layer =\n        FileEntriesLayer.builder()\n            .setName(\"classes\")\n            .addEntry(\n                Paths.get(\"path/to/tempDirectory/class1.class\"),\n                AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"))\n            .build();",
+      "rationale": "Defines the expected layer name and entry that later assertions require in the build plan."
+    },
+    {
+      "id": "E2",
+      "source_id": "test",
+      "start_line": 62,
+      "end_line": 69,
+      "quote": "    JibContainerBuilder containerBuilder =\n        JarFiles.toJibContainerBuilder(\n            mockStandardExplodedProcessor,\n            mockJarCommand,\n            mockCommonCliOptions,\n            mockCommonContainerConfigCliOptions,\n            mockLogger);\n    ContainerBuildPlan buildPlan = containerBuilder.toContainerBuildPlan();",
+      "rationale": "Shows the tested invocation and that the returned builder is converted into a ContainerBuildPlan for the assertions."
+    },
+    {
+      "id": "E3",
+      "source_id": "test",
+      "start_line": 71,
+      "end_line": 80,
+      "quote": "    assertEquals(\"adoptopenjdk:8-jre\", buildPlan.getBaseImage());\n    assertEquals(ImmutableSet.of(new Platform(\"amd64\", \"linux\")), buildPlan.getPlatforms());\n    assertEquals(Instant.EPOCH, buildPlan.getCreationTime());\n    assertEquals(ImageFormat.Docker, buildPlan.getFormat());\n    assertEquals(0, buildPlan.getEnvironment().size());\n    assertEquals(0, buildPlan.getLabels().size());\n    assertEquals(0, buildPlan.getVolumes().size());\n    assertEquals(0, buildPlan.getExposedPorts().size());\n    assertNull(buildPlan.getUser());\n    assertNull(buildPlan.getWorkingDirectory());",
+      "rationale": "Lists the visible base-image, platform, metadata, collection, user, and working-directory expectations."
+    },
+    {
+      "id": "E4",
+      "source_id": "test",
+      "start_line": 81,
+      "end_line": 87,
+      "quote": "    assertEquals(4, buildPlan.getEntrypoint().size());\n    assertEquals(\"java\", buildPlan.getEntrypoint().get(0));\n    assertEquals(\"-cp\", buildPlan.getEntrypoint().get(1));\n    assertEquals(\"/app/explodedJar:/app/dependencies/*\", buildPlan.getEntrypoint().get(2));\n    assertEquals(\"HelloWorld\", buildPlan.getEntrypoint().get(3));\n    assertEquals(1, buildPlan.getLayers().size());\n    assertEquals(\"classes\", buildPlan.getLayers().get(0).getName());",
+      "rationale": "States the exact four-element entrypoint expectation and the single layer/name expectation."
+    },
+    {
+      "id": "E5",
+      "source_id": "test",
+      "start_line": 88,
+      "end_line": 99,
+      "quote": "    assertArrayEquals(\n        FileEntriesLayer.builder()\n            .addEntry(\n                Paths.get(\"path/to/tempDirectory/class1.class\"),\n                AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"))\n            .build()\n            .getEntries()\n            .toArray(new Object[0]),\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().toArray(new Object[0]));\n    assertEquals(\n        AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"),\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().get(0).getExtractionPath());",
+      "rationale": "Supports the required layer-entry contents and extraction path expectations."
+    },
+    {
+      "id": "E6",
+      "source_id": "test",
+      "start_line": 59,
+      "end_line": 60,
+      "quote": "    // === MOCK-STUB-START ===\n    // === MOCK-STUB-END ===",
+      "rationale": "Marks the masked mock-stubbing region, so exact mock objects and stub return values are not visible."
+    },
+    {
+      "id": "E7",
+      "source_id": "test",
+      "start_line": 100,
+      "end_line": 101,
+      "quote": "    // === VERIFY-START ===\n    // === VERIFY-END ===",
+      "rationale": "Marks the masked verification region, so no call-verification requirement is visible."
+    },
+    {
+      "id": "E8",
+      "source_id": "mut",
+      "start_line": 60,
+      "end_line": 72,
+      "quote": "    if (commonContainerConfigCliOptions.getFrom().isPresent()) {\n      containerBuilder =\n          ContainerBuilders.create(\n              commonContainerConfigCliOptions.getFrom().get(),\n              Collections.emptySet(),\n              commonCliOptions,\n              logger);\n    } else {\n      containerBuilder =\n          (processor.getJavaVersion() <= 8)\n              ? Jib.from(\"adoptopenjdk:8-jre\")\n              : Jib.from(\"adoptopenjdk:11-jre\");\n    }",
+      "rationale": "Supports the base-image branch, the required getFrom()/getJavaVersion() conditions, and the configured-from and Java-11 alternative scenarios."
+    },
+    {
+      "id": "E9",
+      "source_id": "mut",
+      "start_line": 74,
+      "end_line": 79,
+      "quote": "    List<FileEntriesLayer> layers = processor.createLayers();\n    List<String> customEntrypoint = commonContainerConfigCliOptions.getEntrypoint();\n    List<String> entrypoint =\n        customEntrypoint.isEmpty()\n            ? processor.computeEntrypoint(jarOptions.getJvmFlags())\n            : customEntrypoint;",
+      "rationale": "Shows layer creation, the entrypoint-selection branch, and the calls to createLayers, getEntrypoint, getJvmFlags, and computeEntrypoint."
+    },
+    {
+      "id": "E10",
+      "source_id": "mut",
+      "start_line": 81,
+      "end_line": 91,
+      "quote": "    containerBuilder\n        .setEntrypoint(entrypoint)\n        .setFileEntriesLayers(layers)\n        .setExposedPorts(commonContainerConfigCliOptions.getExposedPorts())\n        .setVolumes(commonContainerConfigCliOptions.getVolumes())\n        .setEnvironment(commonContainerConfigCliOptions.getEnvironment())\n        .setLabels(commonContainerConfigCliOptions.getLabels())\n        .setProgramArguments(commonContainerConfigCliOptions.getProgramArguments());\n    commonContainerConfigCliOptions.getUser().ifPresent(containerBuilder::setUser);\n    commonContainerConfigCliOptions.getFormat().ifPresent(containerBuilder::setFormat);\n    commonContainerConfigCliOptions.getCreationTime().ifPresent(containerBuilder::setCreationTime);",
+      "rationale": "Supports the expected configuration-getter calls and the source of the build-plan values when stubs or defaults satisfy the assertions."
+    },
+    {
+      "id": "E12",
+      "source_id": "processor",
+      "start_line": 54,
+      "end_line": 60,
+      "quote": "  public List<FileEntriesLayer> createLayers() throws IOException { throw new UnsupportedOperationException(); }\n\n  @Override\n  public ImmutableList<String> computeEntrypoint(List<String> jvmFlags) throws IOException { throw new UnsupportedOperationException(); }\n\n  @Override\n  public Integer getJavaVersion() { throw new UnsupportedOperationException(); }",
+      "rationale": "Identifies the relevant dependency method signatures used in the inferred interactions; the visible implementation bodies also show that successful execution of these methods would require the hidden mock/stubbing rather than direct use of this supporting implementation."
+    }
+  ],
+  "uncertainty": [
+    {
+      "statement": "The exact mock objects, stubbing calls, and dependency return values are hidden by the masked MOCK-STUB region.",
+      "status": "unknown",
+      "scenario_ids": [
+        "S5-hidden-stub-values-unknown"
+      ],
+      "condition": "Only visible source outside the masked region is considered.",
+      "evidence_ids": [
+        "E6"
+      ]
+    },
+    {
+      "statement": "The visible test does not determine whether the asserted entrypoint came from an empty custom entrypoint plus processor.computeEntrypoint(...) or from a non-empty custom entrypoint list with the same values.",
+      "status": "unknown",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "The entrypoint assertion alone is considered without the hidden stubs.",
+      "evidence_ids": [
+        "E4",
+        "E6",
+        "E9"
+      ]
+    },
+    {
+      "statement": "The visible test does not show whether the asserted metadata values such as Docker format, EPOCH creation time, and empty collections come from Jib defaults, explicit optional configuration, or hidden mock stubs.",
+      "status": "unknown",
+      "scenario_ids": [
+        "S1-computed-default",
+        "S2-custom-equivalent-entrypoint"
+      ],
+      "condition": "The hidden MOCK-STUB region and framework defaults are not visible.",
+      "evidence_ids": [
+        "E3",
+        "E6",
+        "E10"
+      ]
+    },
+    {
+      "statement": "The supplied supporting implementation shows the relevant methods throwing UnsupportedOperationException, so the successful asserted behavior must depend on hidden mocking/stubbing if this implementation is otherwise the dependency; the exact mechanism is not visible.",
+      "status": "unknown",
+      "scenario_ids": [
+        "S5-hidden-stub-values-unknown"
+      ],
+      "condition": "The visible supporting implementation is compared with the hidden test setup.",
+      "evidence_ids": [
+        "E6",
+        "E12"
+      ]
+    }
+  ]
+}

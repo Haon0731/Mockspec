@@ -1,0 +1,374 @@
+{
+  "$defs": {
+    "Claim": {
+      "additionalProperties": false,
+      "properties": {
+        "statement": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Statement",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "required",
+            "candidate",
+            "unknown"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "scenario_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Scenario Ids",
+          "type": "array"
+        },
+        "condition": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Condition"
+        },
+        "evidence_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "statement",
+        "status",
+        "scenario_ids",
+        "condition",
+        "evidence_ids"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Id",
+          "type": "string"
+        },
+        "source_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "start_line": {
+          "minimum": 1,
+          "title": "Start Line",
+          "type": "integer"
+        },
+        "end_line": {
+          "minimum": 1,
+          "title": "End Line",
+          "type": "integer"
+        },
+        "quote": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Quote",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "source_id",
+        "start_line",
+        "end_line",
+        "quote",
+        "rationale"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "Hypothesis": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Id",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Description",
+          "type": "string"
+        },
+        "condition": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Condition",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "candidate",
+            "unknown"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "description",
+        "condition",
+        "status",
+        "evidence_ids"
+      ],
+      "title": "Hypothesis",
+      "type": "object"
+    },
+    "Interaction": {
+      "additionalProperties": false,
+      "properties": {
+        "statement": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Statement",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "required",
+            "candidate",
+            "unknown"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "scenario_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Scenario Ids",
+          "type": "array"
+        },
+        "condition": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Condition"
+        },
+        "evidence_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "assertion_policy": {
+          "const": "not_implied",
+          "title": "Assertion Policy",
+          "type": "string"
+        }
+      },
+      "required": [
+        "statement",
+        "status",
+        "scenario_ids",
+        "condition",
+        "evidence_ids",
+        "assertion_policy"
+      ],
+      "title": "Interaction",
+      "type": "object"
+    },
+    "VerificationCandidate": {
+      "additionalProperties": false,
+      "properties": {
+        "statement": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Statement",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "candidate",
+            "unknown"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "scenario_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Scenario Ids",
+          "type": "array"
+        },
+        "condition": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Condition"
+        },
+        "evidence_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "statement",
+        "status",
+        "scenario_ids",
+        "condition",
+        "evidence_ids"
+      ],
+      "title": "VerificationCandidate",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "mock-spec.scenario/v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "case_id": {
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Case Id",
+      "type": "string"
+    },
+    "language": {
+      "enum": [
+        "java",
+        "python"
+      ],
+      "title": "Language",
+      "type": "string"
+    },
+    "test_objectives": {
+      "items": {
+        "$ref": "#/$defs/Claim"
+      },
+      "minItems": 1,
+      "title": "Test Objectives",
+      "type": "array"
+    },
+    "scenario_hypotheses": {
+      "items": {
+        "$ref": "#/$defs/Hypothesis"
+      },
+      "minItems": 1,
+      "title": "Scenario Hypotheses",
+      "type": "array"
+    },
+    "dependency_constraints": {
+      "items": {
+        "$ref": "#/$defs/Claim"
+      },
+      "title": "Dependency Constraints",
+      "type": "array"
+    },
+    "expected_interactions": {
+      "items": {
+        "$ref": "#/$defs/Interaction"
+      },
+      "title": "Expected Interactions",
+      "type": "array"
+    },
+    "verification_candidates": {
+      "items": {
+        "$ref": "#/$defs/VerificationCandidate"
+      },
+      "title": "Verification Candidates",
+      "type": "array"
+    },
+    "evidence": {
+      "items": {
+        "$ref": "#/$defs/Evidence"
+      },
+      "title": "Evidence",
+      "type": "array"
+    },
+    "uncertainty": {
+      "items": {
+        "$ref": "#/$defs/Claim"
+      },
+      "title": "Uncertainty",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "case_id",
+    "language",
+    "test_objectives",
+    "scenario_hypotheses",
+    "dependency_constraints",
+    "expected_interactions",
+    "verification_candidates",
+    "evidence",
+    "uncertainty"
+  ],
+  "title": "ScenarioContract",
+  "type": "object"
+}

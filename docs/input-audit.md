@@ -1,0 +1,94 @@
+# Step 2 输入审查记录
+
+审查日期：2026-10-20。来源主机：home-ts；旧仓库：
+`/home/haon/projects/Stub-Tester`。只读审查，无实验、注入或依赖扫描。
+
+## 冻结输入身份
+
+| 项目 | Java | Python |
+| --- | --- | --- |
+| Dataset | `java-bechmark-strong` | `python-benchmark-new` |
+| Case ID | `com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df` | `flask_308` |
+| Registry（相对旧仓库） | `.omx/developer-realistic-registry-max` | `.omx/developer-realistic-registry-max-fix23` |
+| Snapshot ID | `5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4` | `241ef457f8d071c23e6acd658b684b11b54f13fa955e097d6bebe35dc755f47d` |
+| Mask SHA256（已有 ref） | `19e800bf8967238ef3b7772278e476186e509051e5021067b1f7234de0f68ed0` | `e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5` |
+| Runtime lock | `openjdk-javac 11.0.31` | `cpython 3.10` |
+
+完整根目录为 `<旧仓库>/<registry>/formal-snapshots/<dataset>/<snapshot_id>/`。
+以上身份已与对应 run 的 `workspace_snapshot_refs` 核对。
+
+两个 ref 均为 `state=frozen`、`protocol_version=developer_realistic_workspace_v1`。
+选择的 run 不是 fair-v1 primary。具体文件白名单见包内 `reviewed_inputs.json`；
+其中已有源码和 injector 哈希来自冻结 tree manifest，并对实际选中文件做有界校验。
+没有重新计算任何 JAR、site-packages 或依赖树哈希。
+
+## Java
+
+目标：`tree/repo/src/test/java/com/google/cloud/tools/jib/cli/jar/JarFilesTest.java`。
+完整保留 104 行：`MOCK-STUB` 和 `VERIFY` 两区域为空，普通 setup、目标调用和断言保留。
+
+MUT 为同一 tree 中的 `repo/src/main/java/com/google/cloud/tools/jib/cli/jar/JarFiles.java`。
+额外允许 `StandardExplodedProcessor.java`：它的三个方法在冻结输入中已经是
+`UnsupportedOperationException` 方法体。保持这个既有可见性，不恢复原始实现；
+接口只摘录源码中的方法声明，不提供 mock 响应值。
+
+Java 使用 `java-dual-region-v1` injector 约定，ref 的 `slot_contract_digest` 为 null；
+其 `apply_regions.py` 文件身份纳入只读检查，但不执行脚本。
+
+## Python flask_308
+
+目标：`tree/repo/tests/test_308abort.py`，完整保留 126 行。
+共有六个 `mock_stub_001..006` 和四个 `verify_001..004` slot，内容均只有 `pass`。
+原参数化数据、普通异常断言和非 slot 支持语句原位保留。
+
+`apply_regions.py` 的 `MOCK_EXPECTED` 和 `VERIFY_EXPECTED` 明确给出这些 slot ID；
+冻结 ref 的 slot contract digest 为
+`81dc375315690c163892b9ad71dc0f011b92cd67815e179e115d52f97ad75b2b`。
+准备代码 `scripts/test_support_metadata/developer_realistic/preparation_adapters.py`
+以 `python-slot-v1` injector 和 slots 生成 contract；当前准备路径要求
+FORMAL_V3 artifact manifest。新项目固定审核后的 ref/injector 身份与 slot 集合，
+不读取 private semantic IR，也不重新生成 gold 或 masking。
+
+MUT：同一 tree 的 `repo/src/src/flask/helpers.py` 第 265–285 行。
+支持上下文：该文件第 1–24 行导入。依赖动态 API 的完整签名尚未核实；
+本阶段不构造推测性接口条目。
+
+## 为什么归档 masked_templates 不可用于加载
+
+归档 run 根：
+
+```text
+/home/haon/data/experiment-registry/rq234-repeat/runs/
+  java-bechmark-strong/agent_opencode__developer_realistic_workspace_v1/
+    deepseek-v4-pro/budget_300s/run_3/
+  python-benchmark-new/agent_claudecode__developer_realistic_workspace_v1/
+    deepseek-v4-pro/budget_300s/run_1_full_106/
+```
+
+Python 对照文件：
+`raw/oneshot/feedback_repo_claudecode__developer_realistic_workspace_v1/masked_templates/flask_308.py`。
+第 78 行包含 `return_value`，第 85/88 行包含 `side_effect`，第 96–107 行包含调用验证。
+其文件身份不匹配上述冻结 mask。Java 对照文件位于
+`raw/masked_templates/feedback_repo_opencode__developer_realistic_workspace_v1/`，
+文件名为
+`com.google.cloud.tools.jib.cli.jar.JarFilesTest_testToJibContainerBuilder_explodedStandard_basicInfo_69ae66df_e89a13fb5a.java`；
+其生成区域非空，同样不匹配冻结 mask。
+
+代码链路解释了这种差异：
+
+- `developer_realistic/formal.py` 的 `run_formal_snapshot_generation()` 先从冻结 tree
+  clone Agent workspace，再调用 Agent。
+- `python/feedback_repo_workflow.py` 在生成完成后从 `generated.agent_workspace` 的目标文件
+  读取 `masked_text`，再写入归档 `masked_template`。
+- Java `candidate_runner.py` 使用相同的生成后归档方式。
+
+因此这些归档文件和运行结束后的 `raw/workspaces/.../agent/` 都不是不可变的初始输入。
+本记录把它们认定为不适合新任务输入的生成后产物；没有据此宣称历史 Agent 初始输入
+泄漏 reference，也没有对其每一行与 gold 做归因。
+
+## 可证明范围
+
+当前验证的是两个已审查、固定身份的输入及少量允许源码，不是全量数据集的自动脱敏。
+结构检查不证明任意文本没有泄漏；所有新案例仍须做源内容与协议审查。
+单测验证私有控制字段不会进入序列化结果、输入变化或 masking 未核验时拒绝加载。
+真实集成测试还比较所读取文件的内容、大小与 mtime，确认加载前后不变。

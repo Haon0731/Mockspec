@@ -1,0 +1,106 @@
+{
+  "schema_validation": "passed",
+  "case_id_matches": true,
+  "evidence_checks": [
+    {
+      "id": "E1",
+      "source_id": "test",
+      "start_line": 52,
+      "end_line": 58,
+      "quote_matches": true,
+      "actual_source_quote": "    FileEntriesLayer layer =\n        FileEntriesLayer.builder()\n            .setName(\"classes\")\n            .addEntry(\n                Paths.get(\"path/to/tempDirectory/class1.class\"),\n                AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"))\n            .build();",
+      "model_quote": "    FileEntriesLayer layer =\n        FileEntriesLayer.builder()\n            .setName(\"classes\")\n            .addEntry(\n                Paths.get(\"path/to/tempDirectory/class1.class\"),\n                AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"))\n            .build();"
+    },
+    {
+      "id": "E2",
+      "source_id": "test",
+      "start_line": 62,
+      "end_line": 69,
+      "quote_matches": true,
+      "actual_source_quote": "    JibContainerBuilder containerBuilder =\n        JarFiles.toJibContainerBuilder(\n            mockStandardExplodedProcessor,\n            mockJarCommand,\n            mockCommonCliOptions,\n            mockCommonContainerConfigCliOptions,\n            mockLogger);\n    ContainerBuildPlan buildPlan = containerBuilder.toContainerBuildPlan();",
+      "model_quote": "    JibContainerBuilder containerBuilder =\n        JarFiles.toJibContainerBuilder(\n            mockStandardExplodedProcessor,\n            mockJarCommand,\n            mockCommonCliOptions,\n            mockCommonContainerConfigCliOptions,\n            mockLogger);\n    ContainerBuildPlan buildPlan = containerBuilder.toContainerBuildPlan();"
+    },
+    {
+      "id": "E3",
+      "source_id": "test",
+      "start_line": 71,
+      "end_line": 80,
+      "quote_matches": true,
+      "actual_source_quote": "    assertEquals(\"adoptopenjdk:8-jre\", buildPlan.getBaseImage());\n    assertEquals(ImmutableSet.of(new Platform(\"amd64\", \"linux\")), buildPlan.getPlatforms());\n    assertEquals(Instant.EPOCH, buildPlan.getCreationTime());\n    assertEquals(ImageFormat.Docker, buildPlan.getFormat());\n    assertEquals(0, buildPlan.getEnvironment().size());\n    assertEquals(0, buildPlan.getLabels().size());\n    assertEquals(0, buildPlan.getVolumes().size());\n    assertEquals(0, buildPlan.getExposedPorts().size());\n    assertNull(buildPlan.getUser());\n    assertNull(buildPlan.getWorkingDirectory());",
+      "model_quote": "    assertEquals(\"adoptopenjdk:8-jre\", buildPlan.getBaseImage());\n    assertEquals(ImmutableSet.of(new Platform(\"amd64\", \"linux\")), buildPlan.getPlatforms());\n    assertEquals(Instant.EPOCH, buildPlan.getCreationTime());\n    assertEquals(ImageFormat.Docker, buildPlan.getFormat());\n    assertEquals(0, buildPlan.getEnvironment().size());\n    assertEquals(0, buildPlan.getLabels().size());\n    assertEquals(0, buildPlan.getVolumes().size());\n    assertEquals(0, buildPlan.getExposedPorts().size());\n    assertNull(buildPlan.getUser());\n    assertNull(buildPlan.getWorkingDirectory());"
+    },
+    {
+      "id": "E4",
+      "source_id": "test",
+      "start_line": 81,
+      "end_line": 87,
+      "quote_matches": true,
+      "actual_source_quote": "    assertEquals(4, buildPlan.getEntrypoint().size());\n    assertEquals(\"java\", buildPlan.getEntrypoint().get(0));\n    assertEquals(\"-cp\", buildPlan.getEntrypoint().get(1));\n    assertEquals(\"/app/explodedJar:/app/dependencies/*\", buildPlan.getEntrypoint().get(2));\n    assertEquals(\"HelloWorld\", buildPlan.getEntrypoint().get(3));\n    assertEquals(1, buildPlan.getLayers().size());\n    assertEquals(\"classes\", buildPlan.getLayers().get(0).getName());",
+      "model_quote": "    assertEquals(4, buildPlan.getEntrypoint().size());\n    assertEquals(\"java\", buildPlan.getEntrypoint().get(0));\n    assertEquals(\"-cp\", buildPlan.getEntrypoint().get(1));\n    assertEquals(\"/app/explodedJar:/app/dependencies/*\", buildPlan.getEntrypoint().get(2));\n    assertEquals(\"HelloWorld\", buildPlan.getEntrypoint().get(3));\n    assertEquals(1, buildPlan.getLayers().size());\n    assertEquals(\"classes\", buildPlan.getLayers().get(0).getName());"
+    },
+    {
+      "id": "E5",
+      "source_id": "test",
+      "start_line": 88,
+      "end_line": 99,
+      "quote_matches": true,
+      "actual_source_quote": "    assertArrayEquals(\n        FileEntriesLayer.builder()\n            .addEntry(\n                Paths.get(\"path/to/tempDirectory/class1.class\"),\n                AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"))\n            .build()\n            .getEntries()\n            .toArray(new Object[0]),\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().toArray(new Object[0]));\n    assertEquals(\n        AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"),\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().get(0).getExtractionPath());",
+      "model_quote": "    assertArrayEquals(\n        FileEntriesLayer.builder()\n            .addEntry(\n                Paths.get(\"path/to/tempDirectory/class1.class\"),\n                AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"))\n            .build()\n            .getEntries()\n            .toArray(new Object[0]),\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().toArray(new Object[0]));\n    assertEquals(\n        AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"),\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().get(0).getExtractionPath());"
+    },
+    {
+      "id": "E6",
+      "source_id": "test",
+      "start_line": 59,
+      "end_line": 60,
+      "quote_matches": true,
+      "actual_source_quote": "    // === MOCK-STUB-START ===\n    // === MOCK-STUB-END ===",
+      "model_quote": "    // === MOCK-STUB-START ===\n    // === MOCK-STUB-END ==="
+    },
+    {
+      "id": "E7",
+      "source_id": "test",
+      "start_line": 100,
+      "end_line": 101,
+      "quote_matches": true,
+      "actual_source_quote": "    // === VERIFY-START ===\n    // === VERIFY-END ===",
+      "model_quote": "    // === VERIFY-START ===\n    // === VERIFY-END ==="
+    },
+    {
+      "id": "E8",
+      "source_id": "mut",
+      "start_line": 60,
+      "end_line": 72,
+      "quote_matches": true,
+      "actual_source_quote": "    if (commonContainerConfigCliOptions.getFrom().isPresent()) {\n      containerBuilder =\n          ContainerBuilders.create(\n              commonContainerConfigCliOptions.getFrom().get(),\n              Collections.emptySet(),\n              commonCliOptions,\n              logger);\n    } else {\n      containerBuilder =\n          (processor.getJavaVersion() <= 8)\n              ? Jib.from(\"adoptopenjdk:8-jre\")\n              : Jib.from(\"adoptopenjdk:11-jre\");\n    }",
+      "model_quote": "    if (commonContainerConfigCliOptions.getFrom().isPresent()) {\n      containerBuilder =\n          ContainerBuilders.create(\n              commonContainerConfigCliOptions.getFrom().get(),\n              Collections.emptySet(),\n              commonCliOptions,\n              logger);\n    } else {\n      containerBuilder =\n          (processor.getJavaVersion() <= 8)\n              ? Jib.from(\"adoptopenjdk:8-jre\")\n              : Jib.from(\"adoptopenjdk:11-jre\");\n    }"
+    },
+    {
+      "id": "E9",
+      "source_id": "mut",
+      "start_line": 74,
+      "end_line": 79,
+      "quote_matches": true,
+      "actual_source_quote": "    List<FileEntriesLayer> layers = processor.createLayers();\n    List<String> customEntrypoint = commonContainerConfigCliOptions.getEntrypoint();\n    List<String> entrypoint =\n        customEntrypoint.isEmpty()\n            ? processor.computeEntrypoint(jarOptions.getJvmFlags())\n            : customEntrypoint;",
+      "model_quote": "    List<FileEntriesLayer> layers = processor.createLayers();\n    List<String> customEntrypoint = commonContainerConfigCliOptions.getEntrypoint();\n    List<String> entrypoint =\n        customEntrypoint.isEmpty()\n            ? processor.computeEntrypoint(jarOptions.getJvmFlags())\n            : customEntrypoint;"
+    },
+    {
+      "id": "E10",
+      "source_id": "mut",
+      "start_line": 81,
+      "end_line": 91,
+      "quote_matches": true,
+      "actual_source_quote": "    containerBuilder\n        .setEntrypoint(entrypoint)\n        .setFileEntriesLayers(layers)\n        .setExposedPorts(commonContainerConfigCliOptions.getExposedPorts())\n        .setVolumes(commonContainerConfigCliOptions.getVolumes())\n        .setEnvironment(commonContainerConfigCliOptions.getEnvironment())\n        .setLabels(commonContainerConfigCliOptions.getLabels())\n        .setProgramArguments(commonContainerConfigCliOptions.getProgramArguments());\n    commonContainerConfigCliOptions.getUser().ifPresent(containerBuilder::setUser);\n    commonContainerConfigCliOptions.getFormat().ifPresent(containerBuilder::setFormat);\n    commonContainerConfigCliOptions.getCreationTime().ifPresent(containerBuilder::setCreationTime);",
+      "model_quote": "    containerBuilder\n        .setEntrypoint(entrypoint)\n        .setFileEntriesLayers(layers)\n        .setExposedPorts(commonContainerConfigCliOptions.getExposedPorts())\n        .setVolumes(commonContainerConfigCliOptions.getVolumes())\n        .setEnvironment(commonContainerConfigCliOptions.getEnvironment())\n        .setLabels(commonContainerConfigCliOptions.getLabels())\n        .setProgramArguments(commonContainerConfigCliOptions.getProgramArguments());\n    commonContainerConfigCliOptions.getUser().ifPresent(containerBuilder::setUser);\n    commonContainerConfigCliOptions.getFormat().ifPresent(containerBuilder::setFormat);\n    commonContainerConfigCliOptions.getCreationTime().ifPresent(containerBuilder::setCreationTime);"
+    },
+    {
+      "id": "E12",
+      "source_id": "processor",
+      "start_line": 54,
+      "end_line": 60,
+      "quote_matches": true,
+      "actual_source_quote": "  public List<FileEntriesLayer> createLayers() throws IOException { throw new UnsupportedOperationException(); }\n\n  @Override\n  public ImmutableList<String> computeEntrypoint(List<String> jvmFlags) throws IOException { throw new UnsupportedOperationException(); }\n\n  @Override\n  public Integer getJavaVersion() { throw new UnsupportedOperationException(); }",
+      "model_quote": "  public List<FileEntriesLayer> createLayers() throws IOException { throw new UnsupportedOperationException(); }\n\n  @Override\n  public ImmutableList<String> computeEntrypoint(List<String> jvmFlags) throws IOException { throw new UnsupportedOperationException(); }\n\n  @Override\n  public Integer getJavaVersion() { throw new UnsupportedOperationException(); }"
+    }
+  ],
+  "validator_result": "passed"
+}
