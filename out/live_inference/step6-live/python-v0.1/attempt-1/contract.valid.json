@@ -1,0 +1,415 @@
+{
+  "schema_version": "mock-spec.scenario/v0.1",
+  "case_id": "flask_308",
+  "language": "python",
+  "test_objectives": [
+    {
+      "statement": "Under the app-context 404 scenario, calling abort(404) is expected to raise an Exception whose string contains \"Aborted with 404\".",
+      "status": "required",
+      "scenario_ids": [
+        "S1"
+      ],
+      "condition": "S1: has_app_context is True, code=404, args=(), kwargs={}.",
+      "evidence_ids": [
+        "ev_test_param_404",
+        "ev_test_abort_call",
+        "ev_test_if_app_ctx",
+        "ev_test_assert_aborted"
+      ]
+    },
+    {
+      "statement": "Under the app-context 500 scenario with a message argument, calling abort(500, \"Internal Server Error\") is expected to raise an Exception whose string contains \"Aborted with 500\".",
+      "status": "required",
+      "scenario_ids": [
+        "S2"
+      ],
+      "condition": "S2: has_app_context is True, code=500, args=(\"Internal Server Error\",), kwargs={}.",
+      "evidence_ids": [
+        "ev_test_param_500",
+        "ev_test_abort_call",
+        "ev_test_if_app_ctx",
+        "ev_test_assert_aborted"
+      ]
+    },
+    {
+      "statement": "Under the no-app-context 403 scenario, calling abort(403) is expected to raise an Exception whose string contains \"Werkzeug abort 403\".",
+      "status": "required",
+      "scenario_ids": [
+        "S3"
+      ],
+      "condition": "S3: has_app_context is False, code=403, args=(), kwargs={}.",
+      "evidence_ids": [
+        "ev_test_param_403",
+        "ev_test_abort_call",
+        "ev_test_else",
+        "ev_test_assert_werkzeug"
+      ]
+    },
+    {
+      "statement": "Under the no-app-context 400 scenario with args and kwargs, calling abort(400, \"Bad Request\", description=\"Invalid input\") is expected to raise an Exception whose string contains \"Werkzeug abort 400\".",
+      "status": "required",
+      "scenario_ids": [
+        "S4"
+      ],
+      "condition": "S4: has_app_context is False, code=400, args=(\"Bad Request\",), kwargs={\"description\": \"Invalid input\"}.",
+      "evidence_ids": [
+        "ev_test_param_400",
+        "ev_test_abort_call",
+        "ev_test_else",
+        "ev_test_assert_werkzeug"
+      ]
+    },
+    {
+      "statement": "Under the app-context custom-code scenario, calling abort(418, description=\"I'm a teapot\") is expected to raise an Exception whose string contains \"Aborted with 418\".",
+      "status": "required",
+      "scenario_ids": [
+        "S5"
+      ],
+      "condition": "S5: has_app_context is True, code=418, args=(), kwargs={\"description\": \"I'm a teapot\"}.",
+      "evidence_ids": [
+        "ev_test_param_418",
+        "ev_test_abort_call",
+        "ev_test_if_app_ctx",
+        "ev_test_assert_aborted"
+      ]
+    }
+  ],
+  "scenario_hypotheses": [
+    {
+      "id": "S1",
+      "description": "The app-context 404 scenario may make _cv_app.get(None) return a context so that abort takes the ctx.app.aborter path, with the final exception message containing \"Aborted with 404\".",
+      "condition": "has_app_context is True, code=404, args=(), kwargs={}, and the masked setup provides a non-None app context.",
+      "status": "candidate",
+      "evidence_ids": [
+        "ev_test_param_404",
+        "ev_mut_abort_branch",
+        "ev_test_if_app_ctx",
+        "ev_test_assert_aborted"
+      ]
+    },
+    {
+      "id": "S2",
+      "description": "The app-context 500 scenario may make _cv_app.get(None) return a context and pass \"Internal Server Error\" through to ctx.app.aborter, with the final exception message containing \"Aborted with 500\".",
+      "condition": "has_app_context is True, code=500, args=(\"Internal Server Error\",), kwargs={}, and the masked setup provides a non-None app context.",
+      "status": "candidate",
+      "evidence_ids": [
+        "ev_test_param_500",
+        "ev_mut_abort_branch",
+        "ev_test_if_app_ctx",
+        "ev_test_assert_aborted"
+      ]
+    },
+    {
+      "id": "S3",
+      "description": "The no-app-context 403 scenario may make _cv_app.get(None) return None so that execution reaches _wz_abort(403), whose exception message contains \"Werkzeug abort 403\".",
+      "condition": "has_app_context is False, code=403, args=(), kwargs={}, and _cv_app.get(None) returns None.",
+      "status": "candidate",
+      "evidence_ids": [
+        "ev_test_param_403",
+        "ev_mut_abort_branch",
+        "ev_test_else",
+        "ev_test_assert_werkzeug"
+      ]
+    },
+    {
+      "id": "S4",
+      "description": "The no-app-context 400 scenario may make _cv_app.get(None) return None and pass \"Bad Request\" plus the description kwarg to _wz_abort, whose exception message contains \"Werkzeug abort 400\".",
+      "condition": "has_app_context is False, code=400, args=(\"Bad Request\",), kwargs={\"description\": \"Invalid input\"}, and _cv_app.get(None) returns None.",
+      "status": "candidate",
+      "evidence_ids": [
+        "ev_test_param_400",
+        "ev_mut_abort_branch",
+        "ev_test_else",
+        "ev_test_assert_werkzeug"
+      ]
+    },
+    {
+      "id": "S5",
+      "description": "The app-context custom-code scenario may make _cv_app.get(None) return a context and pass the description kwarg through to ctx.app.aborter, with the final exception message containing \"Aborted with 418\".",
+      "condition": "has_app_context is True, code=418, args=(), kwargs={\"description\": \"I'm a teapot\"}, and the masked setup provides a non-None app context.",
+      "status": "candidate",
+      "evidence_ids": [
+        "ev_test_param_418",
+        "ev_mut_abort_branch",
+        "ev_test_if_app_ctx",
+        "ev_test_assert_aborted"
+      ]
+    }
+  ],
+  "dependency_constraints": [
+    {
+      "statement": "When _cv_app.get(None) returns a non-None context, flask.helpers.abort calls ctx.app.aborter(code, *args, **kwargs).",
+      "status": "required",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S5"
+      ],
+      "condition": "The _cv_app.get(None) dependency returns a non-None context object.",
+      "evidence_ids": [
+        "ev_mut_abort_branch",
+        "ev_import_cv_app"
+      ]
+    },
+    {
+      "statement": "When _cv_app.get(None) returns None, execution reaches the imported _wz_abort(code, *args, **kwargs) call.",
+      "status": "required",
+      "scenario_ids": [
+        "S3",
+        "S4"
+      ],
+      "condition": "The _cv_app.get(None) dependency returns None.",
+      "evidence_ids": [
+        "ev_mut_abort_branch",
+        "ev_import_wz_abort"
+      ]
+    }
+  ],
+  "expected_interactions": [
+    {
+      "statement": "On app-context scenarios, when _cv_app.get(None) returns a non-None context, the target calls ctx.app.aborter with the provided code and packaged args/kwargs.",
+      "status": "required",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S5"
+      ],
+      "condition": "_cv_app.get(None) returns a non-None context.",
+      "evidence_ids": [
+        "ev_mut_abort_branch"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "On no-app-context scenarios, when _cv_app.get(None) returns None, the target calls _wz_abort with the provided code and packaged args/kwargs.",
+      "status": "required",
+      "scenario_ids": [
+        "S3",
+        "S4"
+      ],
+      "condition": "_cv_app.get(None) returns None.",
+      "evidence_ids": [
+        "ev_mut_abort_branch",
+        "ev_import_wz_abort"
+      ],
+      "assertion_policy": "not_implied"
+    }
+  ],
+  "verification_candidates": [
+    {
+      "statement": "A hidden verification slot may check that mock_aborter is called with the scenario's code and packaged args/kwargs in app-context scenarios.",
+      "status": "candidate",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S5"
+      ],
+      "condition": "The hidden setup assigns mock_aborter to ctx.app.aborter and abort reaches the ctx.app.aborter call.",
+      "evidence_ids": [
+        "ev_test_aborter_setup",
+        "ev_test_mask_verify",
+        "ev_mut_abort_branch"
+      ]
+    },
+    {
+      "statement": "A hidden verification slot may check that the Werkzeug abort dependency is used in no-app-context scenarios.",
+      "status": "candidate",
+      "scenario_ids": [
+        "S3",
+        "S4"
+      ],
+      "condition": "The hidden setup makes _cv_app.get(None) return None and the target reaches _wz_abort.",
+      "evidence_ids": [
+        "ev_test_mask_verify_no_ctx",
+        "ev_import_wz_abort",
+        "ev_mut_abort_branch"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev_test_param_404",
+      "source_id": "test",
+      "start_line": 12,
+      "end_line": 18,
+      "quote": "    (\n        \"app_context_exists_404\",\n        True,\n        404,\n        (),\n        {}\n    ),",
+      "rationale": "This parametrization entry defines the S1 app-context 404 inputs."
+    },
+    {
+      "id": "ev_test_param_500",
+      "source_id": "test",
+      "start_line": 19,
+      "end_line": 25,
+      "quote": "    (\n        \"app_context_exists_500_with_message\",\n        True,\n        500,\n        (\"Internal Server Error\",),\n        {}\n    ),",
+      "rationale": "This parametrization entry defines the S2 app-context 500 inputs and message argument."
+    },
+    {
+      "id": "ev_test_param_403",
+      "source_id": "test",
+      "start_line": 26,
+      "end_line": 32,
+      "quote": "    (\n        \"no_app_context_403\",\n        False,\n        403,\n        (),\n        {}\n    ),",
+      "rationale": "This parametrization entry defines the S3 no-app-context 403 inputs."
+    },
+    {
+      "id": "ev_test_param_400",
+      "source_id": "test",
+      "start_line": 33,
+      "end_line": 39,
+      "quote": "    (\n        \"no_app_context_with_args_kwargs\",\n        False,\n        400,\n        (\"Bad Request\",),\n        {\"description\": \"Invalid input\"}\n    ),",
+      "rationale": "This parametrization entry defines the S4 no-app-context 400 inputs with args and kwargs."
+    },
+    {
+      "id": "ev_test_param_418",
+      "source_id": "test",
+      "start_line": 40,
+      "end_line": 46,
+      "quote": "    (\n        \"app_context_custom_code\",\n        True,\n        418,\n        (),\n        {\"description\": \"I'm a teapot\"}\n    ),",
+      "rationale": "This parametrization entry defines the S5 app-context custom-code inputs with a description kwarg."
+    },
+    {
+      "id": "ev_test_if_app_ctx",
+      "source_id": "test",
+      "start_line": 111,
+      "end_line": 111,
+      "quote": "    if has_app_context:",
+      "rationale": "This branch condition shows which visible assertion path applies when an app context is present."
+    },
+    {
+      "id": "ev_test_assert_aborted",
+      "source_id": "test",
+      "start_line": 120,
+      "end_line": 120,
+      "quote": "        assert f\"Aborted with {code}\" in str(exc_info.value)",
+      "rationale": "This is the visible app-context assertion requiring the raised exception message to contain the Aborted text and code."
+    },
+    {
+      "id": "ev_test_else",
+      "source_id": "test",
+      "start_line": 121,
+      "end_line": 121,
+      "quote": "    else:",
+      "rationale": "This branch condition shows which visible assertion path applies when no app context is present."
+    },
+    {
+      "id": "ev_test_assert_werkzeug",
+      "source_id": "test",
+      "start_line": 126,
+      "end_line": 126,
+      "quote": "        assert f\"Werkzeug abort {code}\" in str(exc_info.value)",
+      "rationale": "This is the visible no-app-context assertion requiring the raised exception message to contain the Werkzeug abort text and code."
+    },
+    {
+      "id": "ev_test_abort_call",
+      "source_id": "test",
+      "start_line": 102,
+      "end_line": 103,
+      "quote": "    with pytest.raises(Exception) as exc_info:\n        abort(code, *args, **kwargs)",
+      "rationale": "This shows the target abort call is expected to raise an Exception that is inspected by later assertions."
+    },
+    {
+      "id": "ev_test_aborter_setup",
+      "source_id": "test",
+      "start_line": 88,
+      "end_line": 89,
+      "quote": "        mock_ctx.app = mock_app\n        mock_app.aborter = mock_aborter",
+      "rationale": "This visible setup shows mock_aborter may be configured as the app aborter in app-context scenarios."
+    },
+    {
+      "id": "ev_test_mask_setup",
+      "source_id": "test",
+      "start_line": 91,
+      "end_line": 93,
+      "quote": "        # === PY-SLOT-START:mock_stub_005 ===\n        pass\n        # === PY-SLOT-END:mock_stub_005 ===",
+      "rationale": "This masked slot shows the exact app-context setup or patching is hidden from the visible test."
+    },
+    {
+      "id": "ev_test_mask_verify",
+      "source_id": "test",
+      "start_line": 113,
+      "end_line": 115,
+      "quote": "        # === PY-SLOT-START:verify_002 ===\n        pass\n        # === PY-SLOT-END:verify_002 ===",
+      "rationale": "This masked app-context verification slot makes a possible aborter-call verification candidate, but not a visible requirement."
+    },
+    {
+      "id": "ev_test_mask_verify_no_ctx",
+      "source_id": "test",
+      "start_line": 123,
+      "end_line": 125,
+      "quote": "        # === PY-SLOT-START:verify_004 ===\n        pass\n        # === PY-SLOT-END:verify_004 ===",
+      "rationale": "This masked no-app-context verification slot makes a possible Werkzeug abort verification candidate, but not a visible requirement."
+    },
+    {
+      "id": "ev_mut_abort_branch",
+      "source_id": "mut",
+      "start_line": 282,
+      "end_line": 285,
+      "quote": "    if (ctx := _cv_app.get(None)) is not None:\n        ctx.app.aborter(code, *args, **kwargs)\n\n    _wz_abort(code, *args, **kwargs)",
+      "rationale": "This implementation branch shows the app-context aborter call and the fall-through Werkzeug abort call."
+    },
+    {
+      "id": "ev_import_wz_abort",
+      "source_id": "imports",
+      "start_line": 12,
+      "end_line": 12,
+      "quote": "from werkzeug.exceptions import abort as _wz_abort",
+      "rationale": "This import establishes _wz_abort as the Werkzeug abort dependency used by the implementation."
+    },
+    {
+      "id": "ev_import_cv_app",
+      "source_id": "imports",
+      "start_line": 16,
+      "end_line": 16,
+      "quote": "from .globals import _cv_app",
+      "rationale": "This import establishes _cv_app as the context variable dependency queried by the implementation."
+    }
+  ],
+  "uncertainty": [
+    {
+      "statement": "The exact masking or patching that makes has_app_context true and causes _cv_app.get(None) to return mock_ctx is hidden, so visible input does not determine the exact app-context setup.",
+      "status": "unknown",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S5"
+      ],
+      "condition": "App-context scenarios S1, S2, and S5.",
+      "evidence_ids": [
+        "ev_test_mask_setup",
+        "ev_test_mask_verify"
+      ]
+    },
+    {
+      "statement": "Whether the app-context exception originates directly from mock_aborter or after some other interaction is not fully shown; the visible test only asserts the final exception message.",
+      "status": "unknown",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S5"
+      ],
+      "condition": "App-context scenarios S1, S2, and S5.",
+      "evidence_ids": [
+        "ev_test_assert_aborted",
+        "ev_test_aborter_setup",
+        "ev_mut_abort_branch"
+      ]
+    },
+    {
+      "statement": "The exact exception class is not determined by the visible test, which only catches Exception and checks string content.",
+      "status": "unknown",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5"
+      ],
+      "condition": "All listed scenarios.",
+      "evidence_ids": [
+        "ev_test_abort_call",
+        "ev_test_assert_aborted",
+        "ev_test_assert_werkzeug"
+      ]
+    }
+  ]
+}

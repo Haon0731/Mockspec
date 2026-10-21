@@ -1,0 +1,478 @@
+{
+  "schema_version": "mock-spec.scenario/v0.1",
+  "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+  "language": "java",
+  "test_objectives": [
+    {
+      "statement": "The generated ContainerBuildPlan has base image \"adoptopenjdk:8-jre\", platforms ImmutableSet.of(new Platform(\"amd64\", \"linux\")), creation time Instant.EPOCH, and format ImageFormat.Docker.",
+      "status": "required",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": "When the supplied scenario reproduces the visible test's masked dependency setup and the asserted plan is produced.",
+      "evidence_ids": [
+        "ev-test-base",
+        "ev-mut-base"
+      ]
+    },
+    {
+      "statement": "The generated plan has zero environment entries, zero labels, zero volumes, zero exposed ports, a null user, and a null working directory.",
+      "status": "required",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": "When the supplied scenario reproduces the visible test's masked dependency setup and the asserted plan is produced.",
+      "evidence_ids": [
+        "ev-test-empty",
+        "ev-mut-options"
+      ]
+    },
+    {
+      "statement": "The generated plan entrypoint is a four-element list exactly [\"java\", \"-cp\", \"/app/explodedJar:/app/dependencies/*\", \"HelloWorld\"].",
+      "status": "required",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": "When the supplied scenario reproduces the visible test's masked dependency setup and the asserted plan is produced.",
+      "evidence_ids": [
+        "ev-test-entrypoint",
+        "ev-mut-layers-entrypoint"
+      ]
+    },
+    {
+      "statement": "The generated plan has exactly one layer named \"classes\" whose entries match the class1.class entry built in the test, and whose first entry extraction path is /app/explodedJar/class1.class.",
+      "status": "required",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": "When the supplied scenario reproduces the visible test's masked dependency setup and the asserted plan is produced.",
+      "evidence_ids": [
+        "ev-test-layers",
+        "ev-mut-layers-entrypoint",
+        "ev-test-local-layer"
+      ]
+    }
+  ],
+  "scenario_hypotheses": [
+    {
+      "id": "S1",
+      "description": "Primary candidate: the test uses the default-base branch with an empty getFrom Optional, a Java version at most 8, an empty custom entrypoint, processor stubs returning the expected entrypoint and classes layer, empty collection options, and absent/default-equivalent optional setters.",
+      "condition": "getFrom() is empty; getJavaVersion() returns <= 8; getEntrypoint().isEmpty(); computeEntrypoint() returns the asserted four-element list; createLayers() returns the asserted layer; collection getters yield empty inputs.",
+      "status": "candidate",
+      "evidence_ids": [
+        "ev-mut-base",
+        "ev-mut-layers-entrypoint",
+        "ev-mut-options",
+        "ev-test-stub-mask",
+        "ev-test-entrypoint",
+        "ev-test-layers"
+      ]
+    },
+    {
+      "id": "S2",
+      "description": "Alternative explicit-from candidate: getFrom() is present, so ContainerBuilders.create builds the builder; provided it returns the same base image and compatible builder defaults, the visible plan can match without calling processor.getJavaVersion().",
+      "condition": "getFrom() is present and ContainerBuilders.create produces the asserted base image and a builder whose defaults satisfy the visible assertions.",
+      "status": "candidate",
+      "evidence_ids": [
+        "ev-mut-base",
+        "ev-test-base"
+      ]
+    },
+    {
+      "id": "S3",
+      "description": "Alternative custom-entrypoint candidate: getFrom() is empty and Java <= 8, but getEntrypoint() returns the asserted four-element list directly; processor.computeEntrypoint() is not called.",
+      "condition": "getFrom() is empty; getJavaVersion() returns <= 8; getEntrypoint() is non-empty and exactly the asserted entrypoint.",
+      "status": "candidate",
+      "evidence_ids": [
+        "ev-mut-base",
+        "ev-mut-layers-entrypoint",
+        "ev-test-entrypoint"
+      ]
+    }
+  ],
+  "dependency_constraints": [
+    {
+      "statement": "When getFrom() is absent, the base image branch selects adoptopenjdk:8-jre only if getJavaVersion() is <= 8; a value greater than 8 selects adoptopenjdk:11-jre and cannot satisfy the visible base-image assertion.",
+      "status": "required",
+      "scenario_ids": [
+        "S1"
+      ],
+      "condition": "commonContainerConfigCliOptions.getFrom() is empty.",
+      "evidence_ids": [
+        "ev-mut-base",
+        "ev-test-base"
+      ]
+    },
+    {
+      "statement": "processor.createLayers() is called unconditionally, and its returned list is passed unchanged to setFileEntriesLayers; therefore the final plan's layer data originates from createLayers().",
+      "status": "required",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": "toJibContainerBuilder executes normally and reaches the layer assignment.",
+      "evidence_ids": [
+        "ev-mut-layers-entrypoint",
+        "ev-test-layers"
+      ]
+    },
+    {
+      "statement": "If getEntrypoint() is empty, the entrypoint is computed by processor.computeEntrypoint(jarOptions.getJvmFlags()); otherwise the custom list is used directly.",
+      "status": "required",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": "toJibContainerBuilder reaches entrypoint selection.",
+      "evidence_ids": [
+        "ev-mut-layers-entrypoint"
+      ]
+    },
+    {
+      "statement": "The values from getExposedPorts(), getVolumes(), getEnvironment(), and getLabels() are passed to the corresponding builder setters; non-empty values would appear in the asserted plan collections.",
+      "status": "required",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": "toJibContainerBuilder executes normally and the plan collections remain empty.",
+      "evidence_ids": [
+        "ev-mut-options",
+        "ev-test-empty"
+      ]
+    },
+    {
+      "statement": "getUser(), getFormat(), and getCreationTime() are applied only when their Optional is present; a null user requires getUser() to be empty, while format Docker and creation time EPOCH may come from absent values or present default-equivalent values.",
+      "status": "candidate",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": "The masked option setup is not visible.",
+      "evidence_ids": [
+        "ev-mut-options",
+        "ev-test-base",
+        "ev-test-empty"
+      ]
+    },
+    {
+      "statement": "processor.getJavaVersion() is evaluated only on the absent-getFrom branch; the explicit-from branch uses ContainerBuilders.create instead.",
+      "status": "required",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": "The branch selected by getFrom() follows the source control flow.",
+      "evidence_ids": [
+        "ev-mut-base"
+      ]
+    }
+  ],
+  "expected_interactions": [
+    {
+      "statement": "On S1, commonContainerConfigCliOptions.getFrom() is checked, and because it is empty, processor.getJavaVersion() is evaluated to choose the base image.",
+      "status": "required",
+      "scenario_ids": [
+        "S1"
+      ],
+      "condition": "getFrom() returns an empty Optional.",
+      "evidence_ids": [
+        "ev-mut-base"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "processor.createLayers() is invoked, and its result is supplied to containerBuilder.setFileEntriesLayers(...).",
+      "status": "required",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": "toJibContainerBuilder executes normally.",
+      "evidence_ids": [
+        "ev-mut-layers-entrypoint"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "commonContainerConfigCliOptions.getEntrypoint() is invoked; when it is empty, jarOptions.getJvmFlags() is evaluated and passed to processor.computeEntrypoint(...).",
+      "status": "required",
+      "scenario_ids": [
+        "S1"
+      ],
+      "condition": "getEntrypoint() returns an empty list.",
+      "evidence_ids": [
+        "ev-mut-layers-entrypoint"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "On the custom-entrypoint alternative, processor.computeEntrypoint(...) is not called and the custom entrypoint list is used directly.",
+      "status": "candidate",
+      "scenario_ids": [
+        "S3"
+      ],
+      "condition": "getEntrypoint() returns a non-empty list.",
+      "evidence_ids": [
+        "ev-mut-layers-entrypoint"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "commonContainerConfigCliOptions.getExposedPorts(), getVolumes(), getEnvironment(), getLabels(), and getProgramArguments() are invoked and passed to the corresponding builder setters.",
+      "status": "required",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": "toJibContainerBuilder executes normally.",
+      "evidence_ids": [
+        "ev-mut-options"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "commonContainerConfigCliOptions.getUser(), getFormat(), and getCreationTime() are invoked, and their setters are applied only if the returned Optional is present.",
+      "status": "required",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": "toJibContainerBuilder executes normally.",
+      "evidence_ids": [
+        "ev-mut-options"
+      ],
+      "assertion_policy": "not_implied"
+    }
+  ],
+  "verification_candidates": [],
+  "evidence": [
+    {
+      "id": "ev-test-call",
+      "source_id": "test",
+      "start_line": 62,
+      "end_line": 69,
+      "quote": "    JibContainerBuilder containerBuilder =\n        JarFiles.toJibContainerBuilder(\n            mockStandardExplodedProcessor,\n            mockJarCommand,\n            mockCommonCliOptions,\n            mockCommonContainerConfigCliOptions,\n            mockLogger);\n    ContainerBuildPlan buildPlan = containerBuilder.toContainerBuildPlan();",
+      "rationale": "Shows the method under test is called with five mocks and the resulting builder is converted to a ContainerBuildPlan for the assertions."
+    },
+    {
+      "id": "ev-test-base",
+      "source_id": "test",
+      "start_line": 71,
+      "end_line": 74,
+      "quote": "    assertEquals(\"adoptopenjdk:8-jre\", buildPlan.getBaseImage());\n    assertEquals(ImmutableSet.of(new Platform(\"amd64\", \"linux\")), buildPlan.getPlatforms());\n    assertEquals(Instant.EPOCH, buildPlan.getCreationTime());\n    assertEquals(ImageFormat.Docker, buildPlan.getFormat());",
+      "rationale": "Directly states the visible assertions for base image, platforms, creation time, and format."
+    },
+    {
+      "id": "ev-test-empty",
+      "source_id": "test",
+      "start_line": 75,
+      "end_line": 80,
+      "quote": "    assertEquals(0, buildPlan.getEnvironment().size());\n    assertEquals(0, buildPlan.getLabels().size());\n    assertEquals(0, buildPlan.getVolumes().size());\n    assertEquals(0, buildPlan.getExposedPorts().size());\n    assertNull(buildPlan.getUser());\n    assertNull(buildPlan.getWorkingDirectory());",
+      "rationale": "Directly states the visible assertions for empty collections, null user, and null working directory."
+    },
+    {
+      "id": "ev-test-entrypoint",
+      "source_id": "test",
+      "start_line": 81,
+      "end_line": 85,
+      "quote": "    assertEquals(4, buildPlan.getEntrypoint().size());\n    assertEquals(\"java\", buildPlan.getEntrypoint().get(0));\n    assertEquals(\"-cp\", buildPlan.getEntrypoint().get(1));\n    assertEquals(\"/app/explodedJar:/app/dependencies/*\", buildPlan.getEntrypoint().get(2));\n    assertEquals(\"HelloWorld\", buildPlan.getEntrypoint().get(3));",
+      "rationale": "Directly states the visible entrypoint size and contents."
+    },
+    {
+      "id": "ev-test-layers",
+      "source_id": "test",
+      "start_line": 86,
+      "end_line": 99,
+      "quote": "    assertEquals(1, buildPlan.getLayers().size());\n    assertEquals(\"classes\", buildPlan.getLayers().get(0).getName());\n    assertArrayEquals(\n        FileEntriesLayer.builder()\n            .addEntry(\n                Paths.get(\"path/to/tempDirectory/class1.class\"),\n                AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"))\n            .build()\n            .getEntries()\n            .toArray(new Object[0]),\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().toArray(new Object[0]));\n    assertEquals(\n        AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"),\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().get(0).getExtractionPath());",
+      "rationale": "Directly states the visible assertions for the single classes layer, its entries, and the entry extraction path."
+    },
+    {
+      "id": "ev-test-local-layer",
+      "source_id": "test",
+      "start_line": 52,
+      "end_line": 58,
+      "quote": "    FileEntriesLayer layer =\n        FileEntriesLayer.builder()\n            .setName(\"classes\")\n            .addEntry(\n                Paths.get(\"path/to/tempDirectory/class1.class\"),\n                AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"))\n            .build();",
+      "rationale": "Shows a local layer named classes with the class1.class entry, a plausible value for the masked createLayers stub."
+    },
+    {
+      "id": "ev-test-stub-mask",
+      "source_id": "test",
+      "start_line": 59,
+      "end_line": 60,
+      "quote": "    // === MOCK-STUB-START ===\n    // === MOCK-STUB-END ===",
+      "rationale": "Shows the mock setup region is masked, so exact stubbed dependency behavior is not visible."
+    },
+    {
+      "id": "ev-test-verify-mask",
+      "source_id": "test",
+      "start_line": 100,
+      "end_line": 101,
+      "quote": "    // === VERIFY-START ===\n    // === VERIFY-END ===",
+      "rationale": "Shows the verification region is masked and empty, so no visible call verification is stated."
+    },
+    {
+      "id": "ev-mut-base",
+      "source_id": "mut",
+      "start_line": 58,
+      "end_line": 72,
+      "quote": "    // Use AdoptOpenJDK image as the default base image.\n    JibContainerBuilder containerBuilder;\n    if (commonContainerConfigCliOptions.getFrom().isPresent()) {\n      containerBuilder =\n          ContainerBuilders.create(\n              commonContainerConfigCliOptions.getFrom().get(),\n              Collections.emptySet(),\n              commonCliOptions,\n              logger);\n    } else {\n      containerBuilder =\n          (processor.getJavaVersion() <= 8)\n              ? Jib.from(\"adoptopenjdk:8-jre\")\n              : Jib.from(\"adoptopenjdk:11-jre\");\n    }",
+      "rationale": "Shows the explicit-from branch versus the default branch, including the getJavaVersion() <= 8 condition selecting adoptopenjdk:8-jre."
+    },
+    {
+      "id": "ev-mut-layers-entrypoint",
+      "source_id": "mut",
+      "start_line": 74,
+      "end_line": 83,
+      "quote": "    List<FileEntriesLayer> layers = processor.createLayers();\n    List<String> customEntrypoint = commonContainerConfigCliOptions.getEntrypoint();\n    List<String> entrypoint =\n        customEntrypoint.isEmpty()\n            ? processor.computeEntrypoint(jarOptions.getJvmFlags())\n            : customEntrypoint;\n\n    containerBuilder\n        .setEntrypoint(entrypoint)\n        .setFileEntriesLayers(layers)",
+      "rationale": "Shows createLayers() is passed to setFileEntriesLayers and shows entrypoint selection from either computeEntrypoint(...) or a non-empty custom entrypoint."
+    },
+    {
+      "id": "ev-mut-options",
+      "source_id": "mut",
+      "start_line": 84,
+      "end_line": 91,
+      "quote": "        .setExposedPorts(commonContainerConfigCliOptions.getExposedPorts())\n        .setVolumes(commonContainerConfigCliOptions.getVolumes())\n        .setEnvironment(commonContainerConfigCliOptions.getEnvironment())\n        .setLabels(commonContainerConfigCliOptions.getLabels())\n        .setProgramArguments(commonContainerConfigCliOptions.getProgramArguments());\n    commonContainerConfigCliOptions.getUser().ifPresent(containerBuilder::setUser);\n    commonContainerConfigCliOptions.getFormat().ifPresent(containerBuilder::setFormat);\n    commonContainerConfigCliOptions.getCreationTime().ifPresent(containerBuilder::setCreationTime);",
+      "rationale": "Shows collection options are passed to builder setters and user, format, and creation time are applied only when their Optionals are present."
+    },
+    {
+      "id": "ev-processor-methods",
+      "source_id": "processor",
+      "start_line": 53,
+      "end_line": 60,
+      "quote": "  @Override\n  public List<FileEntriesLayer> createLayers() throws IOException { throw new UnsupportedOperationException(); }\n\n  @Override\n  public ImmutableList<String> computeEntrypoint(List<String> jvmFlags) throws IOException { throw new UnsupportedOperationException(); }\n\n  @Override\n  public Integer getJavaVersion() { throw new UnsupportedOperationException(); }",
+      "rationale": "Shows the permitted processor method signatures in the supporting source throw in their bodies, so the test's actual dependency returns must come from masked mocks rather than these method bodies."
+    }
+  ],
+  "uncertainty": [
+    {
+      "statement": "The exact mock stubbing in the MOCK-STUB region is not visible, so the configured dependency return values cannot be confirmed from supplied text.",
+      "status": "unknown",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "ev-test-stub-mask"
+      ]
+    },
+    {
+      "statement": "The adoptopenjdk:8-jre base could come either from an absent getFrom() with getJavaVersion() <= 8 or from a present getFrom() whose ContainerBuilders.create result is the same base image.",
+      "status": "unknown",
+      "scenario_ids": [
+        "S1",
+        "S2"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "ev-mut-base",
+        "ev-test-base"
+      ]
+    },
+    {
+      "statement": "The four-element entrypoint could come either from processor.computeEntrypoint(...) when the custom entrypoint is empty or directly from a non-empty getEntrypoint() list; the masked setup does not reveal which.",
+      "status": "unknown",
+      "scenario_ids": [
+        "S1",
+        "S3"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "ev-mut-layers-entrypoint",
+        "ev-test-entrypoint",
+        "ev-test-stub-mask"
+      ]
+    },
+    {
+      "statement": "How platforms amd64/linux and the null working directory are established is not shown in the JarFiles source; they may be builder defaults from Jib or ContainerBuilders.create, but the supplied target source does not determine that.",
+      "status": "unknown",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "ev-test-base",
+        "ev-test-empty",
+        "ev-mut-base",
+        "ev-mut-options"
+      ]
+    },
+    {
+      "statement": "Whether getUser(), getFormat(), and getCreationTime() return empty Optionals or present default-equivalent values is hidden; either can be consistent with the visible null user, Docker format, and EPOCH creation time.",
+      "status": "unknown",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "ev-mut-options",
+        "ev-test-base",
+        "ev-test-empty"
+      ]
+    },
+    {
+      "statement": "The exact return value of createLayers() is not visible; it could be the local layer variable shown before the masked stub or another equivalent layer list, as long as the visible assertions match.",
+      "status": "unknown",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "ev-test-local-layer",
+        "ev-test-layers",
+        "ev-test-stub-mask"
+      ]
+    },
+    {
+      "statement": "The supporting StandardExplodedProcessor source contains method bodies that throw UnsupportedOperationException; because the test passes a mock processor, these bodies do not determine the stubbed return values.",
+      "status": "unknown",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "ev-processor-methods",
+        "ev-test-call"
+      ]
+    },
+    {
+      "statement": "No visible verification assertions are present in the masked VERIFY-START/END region, so any verification candidate would lack visible textual support.",
+      "status": "unknown",
+      "scenario_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "ev-test-verify-mask"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,457 @@
+{
+  "schema_version": "mock-spec.scenario/v0.1",
+  "case_id": "flask_308",
+  "language": "python",
+  "test_objectives": [
+    {
+      "statement": "abort(code, *args, **kwargs) must raise an Exception for every parametrized case, since each case body is wrapped in pytest.raises(Exception).",
+      "status": "required",
+      "scenario_ids": [
+        "s1_app_context",
+        "s2_no_app_context"
+      ],
+      "condition": "for all five parametrized (scenario, has_app_context, code, args, kwargs) tuples",
+      "evidence_ids": [
+        "E1",
+        "E2",
+        "E6"
+      ]
+    },
+    {
+      "statement": "When an app context is present (has_app_context True: 404, 500 with message, 418 with kwargs), the raised exception's string must contain f\"Aborted with {code}\".",
+      "status": "required",
+      "scenario_ids": [
+        "s1_app_context"
+      ],
+      "condition": "has_app_context is True and _cv_app.get(None) yields a non-None context",
+      "evidence_ids": [
+        "E1",
+        "E2",
+        "E4",
+        "E7",
+        "E10"
+      ]
+    },
+    {
+      "statement": "When no app context is present (has_app_context False: 403, and 400 with positional and keyword arguments), the raised exception's string must contain f\"Werkzeug abort {code}\".",
+      "status": "required",
+      "scenario_ids": [
+        "s2_no_app_context"
+      ],
+      "condition": "has_app_context is False and _cv_app.get(None) returns None",
+      "evidence_ids": [
+        "E2",
+        "E8",
+        "E9",
+        "E11"
+      ]
+    }
+  ],
+  "scenario_hypotheses": [
+    {
+      "id": "s1_app_context",
+      "description": "The mocked context makes _cv_app.get(None) return the wired mock_ctx (mock_ctx.app = mock_app, mock_app.aborter = mock_aborter), so abort takes the true branch and invokes ctx.app.aborter(code, *args, **kwargs); the aborter raises the exception whose message contains 'Aborted with {code}'. Applies to the 404, 500-with-message and 418-with-kwargs parametrized cases.",
+      "condition": "has_app_context is True and the context returned by _cv_app.get(None) is non-None",
+      "status": "candidate",
+      "evidence_ids": [
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E6",
+        "E7",
+        "E10"
+      ]
+    },
+    {
+      "id": "s2_no_app_context",
+      "description": "No app context is installed (or the patched _cv_app.get returns None), so abort skips the aborter branch and reaches the unconditional _wz_abort(code, *args, **kwargs), which raises the exception whose message contains 'Werkzeug abort {code}'. Applies to the 403 and 400-with-args/kwargs cases.",
+      "condition": "has_app_context is False and _cv_app.get(None) evaluates to None",
+      "status": "candidate",
+      "evidence_ids": [
+        "E2",
+        "E6",
+        "E8",
+        "E9",
+        "E11",
+        "E12",
+        "E13"
+      ]
+    },
+    {
+      "id": "s3_aborter_returns_normally",
+      "description": "Alternative app-context path in which the context exists but ctx.app.aborter returns without raising; abort would then fall through to _wz_abort, so the exception reported by exc_info would originate from the Werkzeug abort call rather than from the aborter, which would conflict with the visible 'Aborted with {code}' assertion. Preserved as an alternative rather than a requirement.",
+      "condition": "has_app_context is True and the mock aborter does not raise",
+      "status": "candidate",
+      "evidence_ids": [
+        "E10",
+        "E11",
+        "E7"
+      ]
+    }
+  ],
+  "dependency_constraints": [
+    {
+      "statement": "The context object's app attribute must expose a callable aborter; the test wires mock_ctx.app = mock_app and mock_app.aborter = mock_aborter before calling abort.",
+      "status": "candidate",
+      "scenario_ids": [
+        "s1_app_context"
+      ],
+      "condition": "has_app_context is True",
+      "evidence_ids": [
+        "E3",
+        "E4",
+        "E10"
+      ]
+    },
+    {
+      "statement": "On the context branch abort forwards code plus all *args and **kwargs unchanged to ctx.app.aborter; the forwarded values are the parameterized code, args and kwargs of each case.",
+      "status": "required",
+      "scenario_ids": [
+        "s1_app_context"
+      ],
+      "condition": "ctx from _cv_app.get(None) is not None",
+      "evidence_ids": [
+        "E10",
+        "E1",
+        "E2"
+      ]
+    },
+    {
+      "statement": "_wz_abort is the module-level name bound by 'from werkzeug.exceptions import abort as _wz_abort' and is what abort calls after the optional context branch; the test may therefore patch it to control the no-context exception.",
+      "status": "required",
+      "scenario_ids": [
+        "s2_no_app_context",
+        "s1_app_context"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "E11",
+        "E12"
+      ]
+    },
+    {
+      "statement": "The context lookup goes through the module-level context variable _cv_app imported from .globals, so a mock of that variable's get method (masked setup) is a plausible way to supply the context.",
+      "status": "candidate",
+      "scenario_ids": [
+        "s1_app_context",
+        "s2_no_app_context"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "E10",
+        "E13"
+      ]
+    },
+    {
+      "statement": "abort is annotated to return t.NoReturn and its docstring states it raises an HTTPException, so both paths are expected to terminate in a raised exception rather than a return value.",
+      "status": "candidate",
+      "scenario_ids": [
+        "s1_app_context",
+        "s2_no_app_context"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "E14"
+      ]
+    }
+  ],
+  "expected_interactions": [
+    {
+      "statement": "abort performs a single context lookup via _cv_app.get(None) at entry.",
+      "status": "required",
+      "scenario_ids": [
+        "s1_app_context",
+        "s2_no_app_context"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "E10"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "On the context path, ctx.app.aborter is invoked once with the case's code, *args and **kwargs (e.g. (404), (500, 'Internal Server Error'), (418, description=\"I'm a teapot\")).",
+      "status": "required",
+      "scenario_ids": [
+        "s1_app_context"
+      ],
+      "condition": "_cv_app.get(None) returns a non-None context",
+      "evidence_ids": [
+        "E10",
+        "E4",
+        "E1",
+        "E2"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "On the no-context path, _wz_abort is invoked once with the case's code, *args and **kwargs (e.g. (403), (400, 'Bad Request', description='Invalid input')).",
+      "status": "required",
+      "scenario_ids": [
+        "s2_no_app_context"
+      ],
+      "condition": "_cv_app.get(None) returns None",
+      "evidence_ids": [
+        "E11",
+        "E12",
+        "E2"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "On the context path _wz_abort is expected not to be reached, because the aborter call raises first and the call to _wz_abort follows it as an unconditional statement.",
+      "status": "candidate",
+      "scenario_ids": [
+        "s1_app_context"
+      ],
+      "condition": "ctx.app.aborter raises",
+      "evidence_ids": [
+        "E10",
+        "E11",
+        "E7"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "If the context-path aborter returned normally, _wz_abort would also be invoked with the same code, *args and **kwargs.",
+      "status": "candidate",
+      "scenario_ids": [
+        "s3_aborter_returns_normally"
+      ],
+      "condition": "has_app_context is True and the aborter does not raise",
+      "evidence_ids": [
+        "E10",
+        "E11"
+      ],
+      "assertion_policy": "not_implied"
+    }
+  ],
+  "verification_candidates": [
+    {
+      "statement": "Consider verifying that mock_aborter was called once with the parameterized code, *args and **kwargs on app-context cases (masked slot verify_002).",
+      "status": "candidate",
+      "scenario_ids": [
+        "s1_app_context"
+      ],
+      "condition": "has_app_context is True",
+      "evidence_ids": [
+        "E4",
+        "E10"
+      ]
+    },
+    {
+      "statement": "Consider verifying that the Werkzeug abort mock was called once with the parameterized code, *args and **kwargs on no-context cases (masked slot verify_004).",
+      "status": "candidate",
+      "scenario_ids": [
+        "s2_no_app_context"
+      ],
+      "condition": "has_app_context is False",
+      "evidence_ids": [
+        "E11",
+        "E12",
+        "E5"
+      ]
+    },
+    {
+      "statement": "Consider verifying that the Werkzeug abort mock was not called on app-context cases (masked slot verify_003).",
+      "status": "candidate",
+      "scenario_ids": [
+        "s1_app_context"
+      ],
+      "condition": "has_app_context is True and the aborter raises",
+      "evidence_ids": [
+        "E11",
+        "E7"
+      ]
+    },
+    {
+      "statement": "The rationale/type expectation attached to the captured exception (masked slot verify_001) is not visible; only the two message substring assertions and the generic pytest.raises(Exception) wrapper can be read.",
+      "status": "unknown",
+      "scenario_ids": [
+        "s1_app_context",
+        "s2_no_app_context"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "E6",
+        "E7",
+        "E8"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E1",
+      "source_id": "test",
+      "start_line": 11,
+      "end_line": 18,
+      "quote": "@pytest.mark.parametrize(\"scenario,has_app_context,code,args,kwargs\", [\n    (\n        \"app_context_exists_404\",\n        True,\n        404,\n        (),\n        {}\n    ),",
+      "rationale": "Shows the parametrization signature and the first app-context case (404, no args, no kwargs), establishing that has_app_context selects separate target paths."
+    },
+    {
+      "id": "E2",
+      "source_id": "test",
+      "start_line": 26,
+      "end_line": 47,
+      "quote": "    (\n        \"no_app_context_403\",\n        False,\n        403,\n        (),\n        {}\n    ),\n    (\n        \"no_app_context_with_args_kwargs\",\n        False,\n        400,\n        (\"Bad Request\",),\n        {\"description\": \"Invalid input\"}\n    ),\n    (\n        \"app_context_custom_code\",\n        True,\n        418,\n        (),\n        {\"description\": \"I'm a teapot\"}\n    ),\n])",
+      "rationale": "Shows the no-context cases (403; 400 with an extra positional arg and a keyword arg) and a further app-context case with kwargs, fixing the concrete code/args/kwargs values to be forwarded."
+    },
+    {
+      "id": "E3",
+      "source_id": "test",
+      "start_line": 86,
+      "end_line": 86,
+      "quote": "    if has_app_context:",
+      "rationale": "Marks the branch in which the mock app/aborter wiring is installed, separating app-context scenarios from no-context ones."
+    },
+    {
+      "id": "E4",
+      "source_id": "test",
+      "start_line": 88,
+      "end_line": 89,
+      "quote": "        mock_ctx.app = mock_app\n        mock_app.aborter = mock_aborter",
+      "rationale": "Shows the visible object wiring: the context's app attribute exposes an aborter mock, which is the dependency the target function calls."
+    },
+    {
+      "id": "E5",
+      "source_id": "test",
+      "start_line": 96,
+      "end_line": 98,
+      "quote": "    # === PY-SLOT-START:mock_stub_006 ===\n    pass\n    # === PY-SLOT-END:mock_stub_006 ===",
+      "rationale": "Marks an unconditional masked setup slot placed after the context wiring and before the abort call, consistent with patching the module-level werkzeug abort used on the no-context path; content is not visible."
+    },
+    {
+      "id": "E6",
+      "source_id": "test",
+      "start_line": 102,
+      "end_line": 103,
+      "quote": "    with pytest.raises(Exception) as exc_info:\n        abort(code, *args, **kwargs)",
+      "rationale": "Establishes the core test objective: abort is called with the parametrized code, *args and **kwargs and must raise an Exception, whose value is captured for later assertions."
+    },
+    {
+      "id": "E7",
+      "source_id": "test",
+      "start_line": 120,
+      "end_line": 120,
+      "quote": "        assert f\"Aborted with {code}\" in str(exc_info.value)",
+      "rationale": "Visible expected assertion for the app-context branch: the propagated exception message must contain 'Aborted with {code}'."
+    },
+    {
+      "id": "E8",
+      "source_id": "test",
+      "start_line": 126,
+      "end_line": 126,
+      "quote": "        assert f\"Werkzeug abort {code}\" in str(exc_info.value)",
+      "rationale": "Visible expected assertion for the no-context branch: the propagated exception message must contain 'Werkzeug abort {code}'."
+    },
+    {
+      "id": "E9",
+      "source_id": "test",
+      "start_line": 121,
+      "end_line": 121,
+      "quote": "    else:",
+      "rationale": "Confirms the message assertions are split by has_app_context, i.e. two mutually exclusive expected exception sources."
+    },
+    {
+      "id": "E10",
+      "source_id": "mut",
+      "start_line": 282,
+      "end_line": 283,
+      "quote": "    if (ctx := _cv_app.get(None)) is not None:\n        ctx.app.aborter(code, *args, **kwargs)",
+      "rationale": "Target branch under test: the context lookup call and the conditional aborter invocation that forwards code, *args and **kwargs; also shows the aborter call is not returned or raised from explicitly."
+    },
+    {
+      "id": "E11",
+      "source_id": "mut",
+      "start_line": 285,
+      "end_line": 285,
+      "quote": "    _wz_abort(code, *args, **kwargs)",
+      "rationale": "Shows the unconditional fall-through call to the imported Werkzeug abort, reached only when the context branch does not raise."
+    },
+    {
+      "id": "E12",
+      "source_id": "imports",
+      "start_line": 12,
+      "end_line": 12,
+      "quote": "from werkzeug.exceptions import abort as _wz_abort",
+      "rationale": "Identifies the module-level name _wz_abort as werkzeug.exceptions.abort, the dependency invoked on the no-context path and the plausible patch target."
+    },
+    {
+      "id": "E13",
+      "source_id": "imports",
+      "start_line": 16,
+      "end_line": 16,
+      "quote": "from .globals import _cv_app",
+      "rationale": "Shows _cv_app is a module-level import from flask.globals, i.e. the object whose get method supplies the context, matching the masked mocking of a context provider."
+    },
+    {
+      "id": "E14",
+      "source_id": "mut",
+      "start_line": 265,
+      "end_line": 265,
+      "quote": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:",
+      "rationale": "Signature shows the function accepts a status code (or response) plus arbitrary args/kwargs and is annotated NoReturn, supporting the expectation that every path raises rather than returns."
+    }
+  ],
+  "uncertainty": [
+    {
+      "statement": "The bodies of masked slots mock_stub_001..mock_stub_006 and verify_001..verify_004 are not visible, so the exact mocks created (context provider, aborter, werkzeug abort), their side effects, and any call assertions cannot be determined.",
+      "status": "unknown",
+      "scenario_ids": [
+        "s1_app_context",
+        "s2_no_app_context"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "E3",
+        "E4",
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "statement": "How the app context is simulated is undetermined: it could be a patch of flask.helpers._cv_app.get returning mock_ctx, or a real app context pushed onto the context stack; both would make the true branch feasible without appearing in the visible text.",
+      "status": "unknown",
+      "scenario_ids": [
+        "s1_app_context",
+        "s2_no_app_context"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "E4",
+        "E5",
+        "E10",
+        "E13"
+      ]
+    },
+    {
+      "statement": "Whether the app-context aborter mock raises or returns normally is not visible; if it returned normally, abort would continue into _wz_abort and the 'Aborted with {code}' assertion would need the Werkzeug path to produce that message.",
+      "status": "unknown",
+      "scenario_ids": [
+        "s1_app_context",
+        "s3_aborter_returns_normally"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "E10",
+        "E11",
+        "E7"
+      ]
+    },
+    {
+      "statement": "The concrete exception types raised on either path are not determined by the visible text; only that they are subclasses of Exception and their message substrings are asserted.",
+      "status": "unknown",
+      "scenario_ids": [
+        "s1_app_context",
+        "s2_no_app_context"
+      ],
+      "condition": null,
+      "evidence_ids": [
+        "E6",
+        "E7",
+        "E8"
+      ]
+    }
+  ]
+}
