@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 
 from agents.usage import Usage
 
@@ -47,6 +48,17 @@ def test_v02_audit_artifact_uses_sdk_and_refuses_overwrite(tmp_path, monkeypatch
     assert isinstance(artifact["git_dirty"], bool)
     assert "budget.py" in artifact["code_files_sha256"]
     assert "program_tools.py" in artifact["code_files_sha256"]
+    assert "inference.py" in artifact["code_files_sha256"]
+    assert "scenario.py" in artifact["code_files_sha256"]
+    assert "schemas.py" in artifact["code_files_sha256"]
+    assert "validation.py" in artifact["code_files_sha256"]
+    assert "adapters/_frozen.py" in artifact["code_files_sha256"]
+    assert "reviewed_inputs.json" in artifact["code_files_sha256"]
+    assert "analysis_process.py" in artifact["code_files_sha256"]
+    assert "python_analysis_runner.py" in artifact["code_files_sha256"]
+    assert artifact["runtime_identity"]["python"]["implementation"]
+    assert artifact["runtime_identity"]["python"]["executable_sha256"]
+    assert artifact["runtime_identity"]["spoon_toolchain"]["spoon_version"] == "11.2.1"
     assert len(artifact["raw_responses"]) == 1
     assert artifact["tool_trace"] == []
     assert len(artifact["prompt_sha256"]) == len(artifact["task_sha256"]) == 64
@@ -129,6 +141,7 @@ def test_experiment_ledger_is_completed_by_audited_run(tmp_path, monkeypatch) ->
 
     assert live_v02.main(args) == 0
     state = json.loads(ledger.read_text())
+    artifact = json.loads((tmp_path / "run-v0.2/result.json").read_text())
 
     assert state["attempts"][0]["status"] == "completed"
     assert state["attempts"][0]["valid_contract"] is True
@@ -137,7 +150,8 @@ def test_experiment_ledger_is_completed_by_audited_run(tmp_path, monkeypatch) ->
     assert set(state["configuration"]["prompt_sha256"]) == {"v0.1", "v0.2"}
     assert state["configuration"]["configured_limits"]["max_total_tokens"] == 24_000
     assert "budget.py" in state["configuration"]["code_files_sha256"]
-    artifact = json.loads((tmp_path / "run-v0.2/result.json").read_text())
+    assert state["configuration"]["anchored_git_commit"] == artifact["git_commit"]
+    assert state["configuration"]["runtime_identity"] == artifact["runtime_identity"]
     assert artifact["experiment"]["configuration_sha256"] == state["configuration_sha256"]
     assert state["run_key_task_identities"]["python-v0.2"] == artifact["task_sha256"]
 
@@ -210,3 +224,46 @@ def test_artifact_is_prepared_before_ledger_completion(tmp_path, monkeypatch) ->
     assert artifact["contract"] is None
     assert state["attempts"][0]["status"] == "reserved"
     assert not (tmp_path / "run-v0.2/result.pending.json").exists()
+
+
+def test_git_identity_is_anchored_when_cwd_is_an_unrelated_repo(
+    tmp_path, monkeypatch
+) -> None:
+    expected_identity = live_v02._git_identity()
+    expected_dirty = live_v02._git_dirty()
+    unrelated = tmp_path / "unrelated"
+    unrelated.mkdir()
+    subprocess.run(
+        ["git", "init", "-q", str(unrelated)], check=True, capture_output=True
+    )
+    monkeypatch.chdir(unrelated)
+
+    assert live_v02._git_identity() == expected_identity
+    assert live_v02._git_dirty() == expected_dirty
+
+
+def test_installed_source_outside_project_checkout_has_no_git_identity(
+    tmp_path, monkeypatch
+) -> None:
+    installed = tmp_path / "site-packages/mock_spec/live_v02.py"
+    installed.parent.mkdir(parents=True)
+    installed.write_text("# installed wheel\n")
+    monkeypatch.setattr(live_v02, "__file__", str(installed))
+
+    assert live_v02._project_git_root() is None
+    assert live_v02._git_identity() is None
+    assert live_v02._git_dirty() is None
+
+
+def test_runtime_identity_marks_unavailable_spoon_toolchain(monkeypatch) -> None:
+    from mock_spec import java_analysis
+
+    monkeypatch.setattr(java_analysis, "_backend_paths", lambda: None)
+
+    identity = live_v02._runtime_identity()
+
+    assert identity["python"]["implementation"]
+    assert identity["python"]["version_detail"]
+    assert identity["spoon_toolchain"]["available"] is False
+    assert identity["spoon_toolchain"]["java"] is None
+    assert identity["spoon_toolchain"]["limitations"]

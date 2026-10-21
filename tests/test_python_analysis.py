@@ -1,9 +1,11 @@
 import asyncio
+from pathlib import Path
 
 import pytest
 
+import mock_spec.analysis_process as analysis_process
 from mock_spec.program_tools import ProgramTools
-from mock_spec.python_analysis import analyze_source
+from mock_spec.python_analysis import analyze_source, analyze_source_isolated
 from mock_spec.schemas import Source, UnifiedTask
 from test_schemas import valid_task_data
 
@@ -203,6 +205,119 @@ def test_parse_failure_is_analysis_error_not_empty_success() -> None:
     assert result["error_code"] == "analysis_error"
     assert result["facts"] == []
     assert "visible line 90" in result["diagnostics"][0]
+
+
+class _HangingProcess:
+    def __init__(self) -> None:
+        self.returncode = None
+        self.killed = False
+        self._done = asyncio.Event()
+
+    async def wait(self) -> int:
+        await self._done.wait()
+        assert self.returncode is not None
+        return self.returncode
+
+    def kill(self) -> None:
+        self.killed = True
+        self.returncode = -9
+        self._done.set()
+
+
+def test_isolated_analysis_timeout_kills_reaps_and_scrubs_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    process = _HangingProcess()
+    captured = {}
+
+    async def fake_exec(*args, **kwargs):
+        captured["args"] = args
+        captured["kwargs"] = kwargs
+        return process
+
+    monkeypatch.setattr(analysis_process.asyncio, "create_subprocess_exec", fake_exec)
+    monkeypatch.setenv("OPENAI_API_KEY", "must-not-reach-python-analysis")
+
+    result = asyncio.run(analyze_source_isolated(
+        _source("def target():\n    return dependency()"),
+        timeout_seconds=0.01,
+    ))
+
+    assert result["status"] == "error"
+    assert result["error_code"] == "timeout"
+    assert process.killed and process.returncode == -9
+    assert captured["kwargs"]["env"] == {"LANG": "C.UTF-8", "LC_ALL": "C.UTF-8"}
+    command = captured["args"]
+    assert command[0] != "dependency"
+    assert "-I" in command
+    assert all("must-not-reach-python-analysis" not in str(item) for item in command)
+
+
+def test_isolated_analysis_cancellation_kills_and_reaps(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    process = _HangingProcess()
+
+    async def fake_exec(*args, **kwargs):
+        return process
+
+    monkeypatch.setattr(analysis_process.asyncio, "create_subprocess_exec", fake_exec)
+
+    async def cancel() -> None:
+        task = asyncio.create_task(analyze_source_isolated(
+            _source("def target():\n    return dependency()"),
+            timeout_seconds=5,
+        ))
+        await asyncio.sleep(0)
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await task
+
+    asyncio.run(cancel())
+    assert process.killed and process.returncode == -9
+
+
+def test_isolated_analysis_never_executes_visible_source(tmp_path: Path) -> None:
+    marker = tmp_path / "must-not-exist"
+    source = _source(
+        "def target():\n"
+        f"    __import__('pathlib').Path({str(marker)!r}).write_text('executed')\n"
+        "    return dependency()"
+    )
+
+    result = asyncio.run(analyze_source_isolated(source))
+
+    assert result["status"] == "ok"
+    assert not marker.exists()
+    assert any(fact["kind"] == "call" for fact in result["facts"])
+
+
+def test_program_tools_passes_configured_python_analysis_timeout(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import mock_spec.python_analysis as python_analysis
+
+    seen = {}
+
+    async def timeout(source, *, timeout_seconds):
+        seen["source_id"] = source.source_id
+        seen["timeout_seconds"] = timeout_seconds
+        return {
+            "status": "error", "backend": "cpython_ast",
+            "source_id": source.source_id, "error_code": "timeout", "facts": [],
+            "diagnostics": ["timed out"], "limitations": ["absence unsafe"],
+        }
+
+    monkeypatch.setattr(python_analysis, "analyze_source_isolated", timeout)
+    tools = ProgramTools(
+        _task("def target():\n    return dependency()"),
+        analysis_timeout_seconds=0.25,
+    )
+
+    result = asyncio.run(tools.inspect_program_structure("mut:0"))
+
+    assert result["error_code"] == "timeout"
+    assert seen == {"source_id": "mut:0", "timeout_seconds": 0.25}
 
 
 def test_program_analysis_rejects_path_like_source_id() -> None:

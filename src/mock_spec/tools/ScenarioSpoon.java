@@ -12,7 +12,10 @@ import spoon.reflect.code.CtCatch;
 import spoon.reflect.code.CtConditional;
 import spoon.reflect.code.CtIf;
 import spoon.reflect.code.CtInvocation;
+import spoon.reflect.code.CtLambda;
+import spoon.reflect.code.CtLoop;
 import spoon.reflect.code.CtReturn;
+import spoon.reflect.code.CtSwitch;
 import spoon.reflect.code.CtThrow;
 import spoon.reflect.code.CtTry;
 import spoon.reflect.code.CtTryWithResource;
@@ -38,6 +41,7 @@ public final class ScenarioSpoon {
     private int sourceStartLine;
     private int sourceLineCount;
     private boolean truncated;
+    private boolean unsupportedEncountered;
     private final List<Map<String, Object>> facts = new ArrayList<>();
     private final List<Map<String, Object>> diagnostics = new ArrayList<>();
 
@@ -98,10 +102,13 @@ public final class ScenarioSpoon {
             .comparingInt((Map<String, Object> fact) -> (Integer) fact.get("start_line"))
             .thenComparing(fact -> String.valueOf(fact.get("kind")))
             .thenComparing(fact -> String.valueOf(fact.getOrDefault("name", ""))));
-        return result(truncated ? "incomplete" : "ok");
+        return result(truncated || unsupportedEncountered ? "incomplete" : "ok");
     }
 
     private void extract(CtModel model) {
+        noteUnsupported(model, CtLoop.class, "loop");
+        noteUnsupported(model, CtSwitch.class, "switch");
+        noteUnsupported(model, CtLambda.class, "lambda");
         for (CtMethod<?> element : model.getElements(new TypeFilter<>(CtMethod.class))) {
             Map<String, Object> fact = located("method", element);
             if (fact == null) continue;
@@ -181,6 +188,19 @@ public final class ScenarioSpoon {
             fact.put("lexical_guards", lexicalGuards(element));
             add(fact);
         }
+    }
+
+    private <T extends CtElement> void noteUnsupported(
+        CtModel model, Class<T> type, String name
+    ) {
+        int count = model.getElements(new TypeFilter<T>(type)).size();
+        if (count == 0) return;
+        unsupportedEncountered = true;
+        diagnostics.add(diagnostic(
+            "unsupported",
+            "unsupported_" + name,
+            "Encountered " + count + " " + name
+                + " syntax node(s); lexical semantics for this construct were not modeled."));
     }
 
     private void add(Map<String, Object> fact) {

@@ -122,12 +122,14 @@ def test_cumulative_usage_blocks_next_call_without_closing_call(monkeypatch) -> 
     assert ledger.gate_events[-1]["reason"] == "projected_token_limit"
 
 
-def test_unknown_usage_is_not_zero_and_blocks_next_call(monkeypatch) -> None:
+@pytest.mark.parametrize("raw_usage,total", [(None, 0), ({"metadata": "only"}, 0), (None, 100)])
+def test_unknown_usage_is_not_zero_and_blocks_next_call(monkeypatch, raw_usage, total) -> None:
     task = _task()
     first = _tool_call(
         "call-1", source_id="mut:0", start_line=10, end_line=10
     )
-    first.usage = Usage()
+    first.usage = Usage(total_tokens=total)
+    first.raw_usage = raw_usage
     model = ScriptedModel(first, _message(contract_data()))
     budget = inference_v02.InferenceBudget()
     ledger = UsageLedger(budget)
@@ -143,7 +145,7 @@ def test_unknown_usage_is_not_zero_and_blocks_next_call(monkeypatch) -> None:
     assert model.calls == 1
     assert audit["usage_complete"] is False
     assert audit["total_tokens"] is None
-    assert audit["known_usage_subtotal"]["total_tokens"] == 0
+    assert audit["known_usage_subtotal"]["total_tokens"] == total
     assert audit["rate_estimated_cost_usd"] is None
     assert ledger.gate_events[-1]["reason"] == "prior_usage_unknown"
 
@@ -176,3 +178,14 @@ def test_started_but_cancelled_request_marks_accounting_incomplete() -> None:
 
     assert audit["usage_complete"] is False
     assert audit["total_tokens"] is None
+
+
+def test_zero_requests_with_prices_has_known_zero_cost() -> None:
+    ledger = UsageLedger(inference_v02.InferenceBudget(
+        input_cost_per_million=Decimal("2"),
+        output_cost_per_million=Decimal("4"),
+    ))
+    assert ledger.to_dict()["rate_estimated_cost_usd"] == "0"
+    ledger.requests_started = 1
+    ledger.rate_estimated_cost_usd = Decimal("0.01")
+    assert ledger.to_dict()["rate_estimated_cost_usd"] is None

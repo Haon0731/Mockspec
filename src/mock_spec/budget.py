@@ -169,12 +169,10 @@ class UsageLedger:
 
     def after_model_call(self, response) -> None:
         usage: Usage = response.usage
-        known = bool(
-            response.raw_usage is not None
-            or usage.input_tokens
-            or usage.output_tokens
-            or usage.total_tokens
-        )
+        # Raw provider metadata and a total alone do not establish the input /
+        # output split needed for pricing. SDK defaults of zero are not evidence
+        # that a completed request was free.
+        known = bool(usage.input_tokens or usage.output_tokens)
         total = usage.total_tokens or (usage.input_tokens + usage.output_tokens)
         reported_requests = usage.requests or 1
         self.requests_completed += 1
@@ -225,6 +223,9 @@ class UsageLedger:
         accounting_complete = (
             self.usage_complete and self.requests_started == self.requests_completed
         )
+        cost = self.rate_estimated_cost_usd
+        if accounting_complete and self.requests_started == 0 and self.prices_configured:
+            cost = Decimal(0)
         return {
             "requests_started": self.requests_started,
             "requests_completed": self.requests_completed,
@@ -238,8 +239,7 @@ class UsageLedger:
                 "total_tokens": self.total_tokens,
             },
             "rate_estimated_cost_usd": (
-                None if self.rate_estimated_cost_usd is None
-                else str(self.rate_estimated_cost_usd)
+                None if not accounting_complete or cost is None else str(cost)
             ),
             "pricing": {
                 "input_cost_per_million": (

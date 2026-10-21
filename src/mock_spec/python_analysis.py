@@ -7,16 +7,25 @@ or path feasibility.
 
 from __future__ import annotations
 
+import asyncio
 import ast
+import json
+import math
+from pathlib import Path
+import sys
+import tempfile
 import textwrap
 from typing import Any
 
+from .analysis_process import communicate as _communicate
 from .schemas import Source
+from .validation import decode_json
 
 
 BACKEND = "cpython_ast"
 _MAX_SOURCE_CHARS = 1_000_000
 _MAX_AST_NODES = 100_000
+_MAX_PROCESS_OUTPUT = 1_000_000
 _LIMITATIONS = [
     "Syntax and lexical-containment facts only; no CFG or path-feasibility proof.",
     "Calls, aliases, and cross-statement def-use relationships are unresolved.",
@@ -395,4 +404,88 @@ def analyze_source(source: Source) -> dict[str, Any]:
     }
 
 
-__all__ = ["BACKEND", "analyze_source"]
+def _failure(source_id: str | None, code: str, message: str) -> dict[str, Any]:
+    return {
+        "status": "error",
+        "backend": BACKEND,
+        "source_id": source_id,
+        "error_code": code,
+        "facts": [],
+        "diagnostics": [message],
+        "limitations": [
+            *_LIMITATIONS,
+            "Analysis failure does not establish absence of behavior.",
+        ],
+    }
+
+
+async def analyze_source_isolated(
+    source: Source, *, timeout_seconds: float = 15
+) -> dict[str, Any]:
+    """Analyze one visible source in a cancellable, credential-free subprocess."""
+
+    if not isinstance(source, Source):
+        raise TypeError("source must be a Source")
+    if (type(timeout_seconds) not in {int, float}
+            or not math.isfinite(timeout_seconds) or timeout_seconds <= 0):
+        raise ValueError("timeout_seconds must be positive and finite")
+    request = json.dumps(
+        source.to_dict(), ensure_ascii=False, separators=(",", ":")
+    ).encode("utf-8")
+    runner = Path(__file__).with_name("python_analysis_runner.py").resolve()
+    try:
+        with tempfile.TemporaryDirectory(prefix="mockspec-python-ast-") as work:
+            code, stdout, stderr = await _communicate(
+                [sys.executable, "-I", str(runner)],
+                input_bytes=request,
+                timeout_seconds=float(timeout_seconds),
+                cwd=work,
+                max_output_bytes=_MAX_PROCESS_OUTPUT,
+            )
+    except asyncio.TimeoutError:
+        return _failure(source.source_id, "timeout", "Python AST analysis timed out.")
+    except asyncio.CancelledError:
+        raise
+    except OverflowError:
+        return _failure(
+            source.source_id,
+            "analysis_error",
+            "Python AST process output exceeded the host limit.",
+        )
+    except OSError:
+        return _failure(
+            source.source_id, "analysis_error", "Python AST process launch failed."
+        )
+    if code != 0 or stderr:
+        return _failure(source.source_id, "analysis_error", "Python AST analysis failed.")
+    try:
+        result = decode_json(stdout.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        return _failure(
+            source.source_id, "analysis_error", "Python AST analysis returned invalid JSON."
+        )
+    if not isinstance(result, dict) or result.get("source_id") != source.source_id:
+        return _failure(
+            source.source_id, "analysis_error", "Python AST analysis returned invalid identity."
+        )
+    return result
+
+
+def _subprocess_main() -> int:
+    """Fixed module entry point; stdin is data and never a path or executable."""
+
+    try:
+        payload = decode_json(sys.stdin.read())
+        source = Source.from_dict(payload)
+        result = analyze_source(source)
+    except Exception:
+        result = _failure(None, "analysis_error", "Python AST request was invalid.")
+    sys.stdout.write(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
+    return 0
+
+
+__all__ = ["BACKEND", "analyze_source", "analyze_source_isolated"]
+
+
+if __name__ == "__main__":
+    raise SystemExit(_subprocess_main())

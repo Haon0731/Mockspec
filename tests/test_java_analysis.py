@@ -25,6 +25,20 @@ JAVA_TEXT = """class Sample {
   int helper(int value) { return value; }
 }"""
 
+UNSUPPORTED_TEXT = """class Unsupported {
+  void inspect(int value) {
+    Runnable action = () -> helper();
+    for (int index = 0; index < value; index++) {
+      helper();
+    }
+    switch (value) {
+      case 1: helper(); break;
+      default: break;
+    }
+  }
+  void helper() {}
+}"""
+
 
 def source(text: str = JAVA_TEXT) -> Source:
     return Source(
@@ -87,6 +101,20 @@ def test_missing_or_unpinned_backend_is_explicit(monkeypatch: pytest.MonkeyPatch
     assert result["error_code"] == "backend_unavailable"
     assert result["facts"] == []
     assert result["diagnostics"][0]["category"] == "unsupported"
+
+
+def test_unsupported_constructs_retain_facts_but_mark_result_incomplete() -> None:
+    if java_analysis._backend_paths() is None:
+        pytest.skip("pinned Spoon backend is unavailable")
+
+    result = asyncio.run(analyze_source(source(UNSUPPORTED_TEXT)))
+
+    assert result["status"] == "incomplete"
+    codes = {diagnostic["code"] for diagnostic in result["diagnostics"]}
+    assert {"unsupported_loop", "unsupported_switch", "unsupported_lambda"} <= codes
+    calls = [fact for fact in result["facts"] if fact["kind"] == "call"]
+    assert len([fact for fact in calls if fact["name"] == "helper"]) == 3
+    assert all(fact["source_id"] == "mut:sample" for fact in calls)
 
 
 @pytest.mark.parametrize("timeout", [0, -1, float("nan"), float("inf"), True])

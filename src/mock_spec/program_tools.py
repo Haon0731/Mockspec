@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import math
 
@@ -136,10 +137,16 @@ class ProgramTools:
             }
 
         if self.language == "python":
-            from .python_analysis import analyze_source
+            from .python_analysis import analyze_source_isolated
 
             try:
-                return self._normalize(analyze_source(source), source_id)
+                result = await analyze_source_isolated(
+                    source,
+                    timeout_seconds=self.analysis_timeout_seconds,
+                )
+                return self._normalize(result, source_id)
+            except asyncio.CancelledError:
+                raise
             except Exception as exc:
                 return {
                     "status": "error",

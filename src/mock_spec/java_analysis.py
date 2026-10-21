@@ -12,6 +12,7 @@ from pathlib import Path
 import tempfile
 from typing import Any
 
+from .analysis_process import communicate
 from .schemas import Source
 
 
@@ -55,45 +56,13 @@ def _backend_paths() -> tuple[Path, Path, Path] | None:
 async def _communicate(
     command: list[str], *, input_bytes: bytes | None, timeout_seconds: float, cwd: str
 ) -> tuple[int, bytes, bytes]:
-    with (
-        tempfile.TemporaryFile(dir=cwd) as stdin_file,
-        tempfile.TemporaryFile(dir=cwd) as stdout_file,
-        tempfile.TemporaryFile(dir=cwd) as stderr_file,
-    ):
-        if input_bytes is not None:
-            stdin_file.write(input_bytes)
-            stdin_file.seek(0)
-        process = await asyncio.create_subprocess_exec(
-            *command,
-            stdin=stdin_file if input_bytes is not None else asyncio.subprocess.DEVNULL,
-            stdout=stdout_file,
-            stderr=stderr_file,
-            cwd=cwd,
-            env={"LANG": "C.UTF-8", "LC_ALL": "C.UTF-8"},
-        )
-        deadline = asyncio.get_running_loop().time() + timeout_seconds
-        try:
-            while process.returncode is None:
-                remaining = deadline - asyncio.get_running_loop().time()
-                if remaining <= 0:
-                    raise asyncio.TimeoutError
-                try:
-                    await asyncio.wait_for(process.wait(), timeout=min(0.05, remaining))
-                except asyncio.TimeoutError:
-                    if (os.fstat(stdout_file.fileno()).st_size > _MAX_PROCESS_OUTPUT
-                            or os.fstat(stderr_file.fileno()).st_size > _MAX_PROCESS_OUTPUT):
-                        raise OverflowError("Spoon process output exceeded the host limit")
-            if (os.fstat(stdout_file.fileno()).st_size > _MAX_PROCESS_OUTPUT
-                    or os.fstat(stderr_file.fileno()).st_size > _MAX_PROCESS_OUTPUT):
-                raise OverflowError("Spoon process output exceeded the host limit")
-        except BaseException:
-            if process.returncode is None:
-                process.kill()
-            await process.wait()
-            raise
-        stdout_file.seek(0)
-        stderr_file.seek(0)
-        return process.returncode, stdout_file.read(), stderr_file.read()
+    return await communicate(
+        command,
+        input_bytes=input_bytes,
+        timeout_seconds=timeout_seconds,
+        cwd=cwd,
+        max_output_bytes=_MAX_PROCESS_OUTPUT,
+    )
 
 
 def _stderr_is_benign(stderr: bytes) -> bool:
