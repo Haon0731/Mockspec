@@ -1,0 +1,3198 @@
+[
+  {
+    "run": "help-1",
+    "execution": {
+      "stage": "help",
+      "attempt": "1",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/bin/sh",
+        "/probes/help.sh"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_succeeded",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1867490,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T03:58:46.024555162Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 0,
+      "host_wall_seconds": 15.303,
+      "files": {
+        "stdout.txt": 11600,
+        "stderr.txt": 315,
+        "metrics.json": 1022
+      }
+    },
+    "metrics": {
+      "command_exit": 0,
+      "start_ns": 1792555126647067982,
+      "end_ns": 1792555137531843179,
+      "duration_ns": 10884775197,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 107204,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 212459520,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 8439708,
+        "user_usec": 6519472,
+        "system_usec": 1920236,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 114,
+        "nr_throttled": 7,
+        "throttled_usec": 264597,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nPicked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nPicked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nPicked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nPicked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 11600,
+        "sha256": "e535112094215df852a79e20726a2a0c29be302757af41db6db157ea6317515f"
+      },
+      "stderr.txt": {
+        "bytes": 315,
+        "sha256": "0e4280233dd9bda9f536b66f9ce76830d7f11734c7bb735da6c14f1754a083be"
+      },
+      "metrics.json": {
+        "bytes": 1022,
+        "sha256": "70f3ce7f3ec2484e79b5adb4361ddf987232dedf93420dc9ddd554076494caad"
+      }
+    },
+    "assessment": "command_succeeded"
+  },
+  {
+    "run": "java-build-1",
+    "execution": {
+      "stage": "java-build",
+      "attempt": "1",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/tools/joern/joern-parse",
+        "/input",
+        "--language",
+        "JAVASRC",
+        "--output",
+        "/work/cpg.bin",
+        "--frontend-args",
+        "--jdk-path",
+        "/tools/jdk",
+        "--delombok-mode",
+        "no-delombok"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_failed",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/input",
+            "read_only": true
+          },
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1870593,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:00:26.078532144Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 1,
+      "host_wall_seconds": 16.282,
+      "files": {
+        "stdout.txt": 704,
+        "stderr.txt": 10111,
+        "metrics.json": 1026,
+        "cpg.bin": 0
+      }
+    },
+    "metrics": {
+      "command_exit": 1,
+      "start_ns": 1792555226462777802,
+      "end_ns": 1792555240466737249,
+      "duration_ns": 14003959447,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 308560,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 354783232,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 15669128,
+        "user_usec": 13937588,
+        "system_usec": 1731539,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 142,
+        "nr_throttled": 23,
+        "throttled_usec": 1381735,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\n2026-10-21 04:00:40.379 ERROR ExternalCommand$          Process exited with code 1.\nList(/tools/joern/javasrc2cpg, -J-Xmx2048m, --jdk-path, /tools/jdk, --delombok-mode, no-delombok, /input, --output, /work/cpg.bin)\nInput: cmd: `/tools/joern/javasrc2cpg -J-Xmx2048m --jdk-path /tools/jdk --delombok-mode no-delombok /input --output /work/cpg.bin`, workingDir: /work/., extraEnv: Map()\nOutput: Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\n2026-10-21 04:00:39.635 WARN  ZstdWrapper$              the configured temp directory (/tmp) is mounted with `noexec` flag - this will likely lead to an error when trying to invoke zstd. Please either remount it without `noexec` or configure a different tmp directory, e.g. via java system property `-Djava.io.tmpdir=/path/to/tmp`\nflatgraph.storage.ZstdWrapper$JniInvocationException: Error while trying to invoke zstd, i.e. cannot compress or decompress, which is required for flatgraph's storage\n\tat flatgraph.storage.ZstdWrapper$.apply(ZstdWrapper.scala:100)\n\tat flatgraph.storage.ZstdWrapper$ZstdCtx.compress(ZstdWrapper.scala:57)\n\tat flatgraph.storage.WriterContext.compressItem(Serialization.scala:130)\n\tat flatgraph.storage.WriterContext.encodeAny$$anonfun$4(Serialization.scala:82)\n\tat flatgraph.storage.WriterContext.submitCompress$$anonfun$1(Serialization.scala:29)\n\tat java.base/java.util.concurrent.ForkJoinTask$AdaptedCallable.exec(ForkJoinTask.java:1456)\n\tat java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387)\n\tat java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312)\n\tat java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843)\n\tat java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808)\n\tat java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188)\nCaused by: java.lang.UnsatisfiedLinkError: /tmp/libzstd-jni-1.5.7-1118416693432608594125.so: /tmp/libzstd-jni-1.5.7-1118416693432608594125.so: failed to map segment from shared object\nno zstd-jni-1.5.7-11 in java.library.path: /usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib\nUnsuppor",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 704,
+        "sha256": "cf1bb1db29210202e306a0de3e3f45bc9bf36c165d3b9ed2e7b76e9a4c0359bc"
+      },
+      "stderr.txt": {
+        "bytes": 10111,
+        "sha256": "69c879486e29b5e23cf43eed7a9a8888564fe456e34ad2869f68442e80010958"
+      },
+      "metrics.json": {
+        "bytes": 1026,
+        "sha256": "25b95b751a42b5a2209e9f4a31bd195dd0cabca205ff9330b0ae649b17f76af0"
+      },
+      "cpg.bin": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "assessment": "command_failed"
+  },
+  {
+    "run": "java-build-2",
+    "execution": {
+      "stage": "java-build",
+      "attempt": "2",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/tools/joern/joern-parse",
+        "/input",
+        "--language",
+        "JAVASRC",
+        "--output",
+        "/work/cpg.bin",
+        "--frontend-args",
+        "--jdk-path",
+        "/tools/jdk",
+        "--delombok-mode",
+        "no-delombok"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_succeeded",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          },
+          {
+            "destination": "/tools",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1875439,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:02:17.282869972Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 0,
+      "host_wall_seconds": 20.666,
+      "files": {
+        "stdout.txt": 823,
+        "stderr.txt": 63,
+        "metrics.json": 1026,
+        "cpg.bin": 114348
+      }
+    },
+    "metrics": {
+      "command_exit": 0,
+      "start_ns": 1792555337604964258,
+      "end_ns": 1792555355834433369,
+      "duration_ns": 18229469111,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 301724,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 357720064,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 19694773,
+        "user_usec": 17259673,
+        "system_usec": 2435099,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 185,
+        "nr_throttled": 28,
+        "throttled_usec": 1295963,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 823,
+        "sha256": "84059a1e2e74c0b6ec44ad198c239eb8fe403bd0b07622d92153cb8d8b146106"
+      },
+      "stderr.txt": {
+        "bytes": 63,
+        "sha256": "70651266b67efbc4654d79b2dbb62635d3974d24ffdf3116b85e81923ee51a4a"
+      },
+      "metrics.json": {
+        "bytes": 1026,
+        "sha256": "a55299f4d6b27373b94cb15de3ba837927d90f6a4af416b0f7f3aef33031ea0c"
+      },
+      "cpg.bin": {
+        "bytes": 114348,
+        "sha256": "8d733bd1e3ecbc7c6cafd6cb6e3d14e6abbe658206121c3998437168de9a955f"
+      }
+    },
+    "assessment": "incomplete: default frontend exclusion omitted masked test"
+  },
+  {
+    "run": "java-build-3",
+    "execution": {
+      "stage": "java-build",
+      "attempt": "3",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/tools/joern/joern-parse",
+        "/input",
+        "--language",
+        "JAVASRC",
+        "--output",
+        "/work/cpg.bin",
+        "--frontend-args",
+        "--no-default-exclude",
+        "--jdk-path",
+        "/tools/jdk",
+        "--delombok-mode",
+        "no-delombok"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_failed",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1920359,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:10:32.744074056Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 1,
+      "host_wall_seconds": 31.756,
+      "files": {
+        "stdout.txt": 755,
+        "stderr.txt": 15572,
+        "metrics.json": 1026,
+        "cpg.bin": 75448
+      }
+    },
+    "metrics": {
+      "command_exit": 1,
+      "start_ns": 1792555833101954055,
+      "end_ns": 1792555861876749066,
+      "duration_ns": 28774795011,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 306712,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 388816896,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 28318808,
+        "user_usec": 24895733,
+        "system_usec": 3423075,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 290,
+        "nr_throttled": 46,
+        "throttled_usec": 2881378,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\n2026-10-21 04:11:01.845 ERROR ReachingDefPass           Pass io.joern.dataflowengineoss.passes.reachingdef.ReachingDefPass failed\njava.util.NoSuchElementException: java.util.NoSuchElementException: next on empty iterator\n\tat jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance(DirectConstructorHandleAccessor.java:62) ~[?:?]\n\tat java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:502) ~[?:?]\n\tat java.lang.reflect.Constructor.newInstance(Constructor.java:486) ~[?:?]\n\tat java.util.concurrent.ForkJoinTask.getThrowableException(ForkJoinTask.java:540) ~[?:?]\n\tat java.util.concurrent.ForkJoinTask.reportException(ForkJoinTask.java:567) ~[?:?]\n\tat java.util.concurrent.ForkJoinTask.invoke(ForkJoinTask.java:670) ~[?:?]\n\tat java.util.stream.ReduceOps$ReduceOp.evaluateParallel(ReduceOps.java:927) ~[?:?]\n\tat java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:233) ~[?:?]\n\tat java.util.stream.ReferencePipeline.collect(ReferencePipeline.java:693) ~[?:?]\n\tat io.shiftleft.passes.ForkJoinParallelCpgPassWithAccumulator.runWithBuilder(CpgPass.scala:217) ~[io.shiftleft.codepropertygraph_3-1.7.78.jar:1.7.78]\n\tat io.shiftleft.passes.ForkJoinParallelCpgPassWithAccumulator.createAndApply(CpgPass.scala:169) ~[io.shiftleft.codepropertygraph_3-1.7.78.jar:1.7.78]\n\tat io.joern.dataflowengineoss.layers.dataflows.OssDataFlow.create(OssDataFlow.scala:24) ~[io.joern.dataflowengineoss-4.0.658.jar:4.0.658]\n\tat io.shiftleft.semanticcpg.layers.LayerCreator.run(LayerCreator.scala:29) ~[io.joern.semanticcpg-4.0.658.jar:4.0.658]\n\tat io.joern.joerncli.DefaultOverlays$.create(DefaultOverlays.scala:23) ~[io.joern.joern-cli-4.0.658.jar:4.0.658]\n\tat io.joern.joerncli.JoernParse$.applyDefaultOverlays$$anonfun$1(JoernParse.scala:159) ~[io.joern.joern-cli-4.0.658.jar:4.0.658]\n\tat scala.util.Try$.apply(Try.scala:195) ~[org.scala-lang.scala-library-3.8.3.jar:3.8.3]\n\tat io.joern.joerncli.JoernParse$.applyDefaultOverlays(JoernParse.scala:178) ~[io.joern.joern-cli-4.0.658.jar:4.0.658]\n\tat io.joern.joerncli.JoernParse$.run$$anonfun$2$$anonfun$1$$anonfun$1(JoernParse.scala:91) ~[io.joern.joern-cli-4.0.658.jar:4.0.6",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 755,
+        "sha256": "972600ed53662d4600942c51993e2e5002274cb43883bbeb95afdc01d1e26efd"
+      },
+      "stderr.txt": {
+        "bytes": 15572,
+        "sha256": "6ed1d45ec01c710834a116a1c83d6818fc6b16deda489b68be2af9570005d90b"
+      },
+      "metrics.json": {
+        "bytes": 1026,
+        "sha256": "cebc94fd0c276ff1945f5146ef7641845fa665c8148ecf3ae3ba26e458be0c84"
+      },
+      "cpg.bin": {
+        "bytes": 75448,
+        "sha256": "8a8b1509f3164ab0cb9d6d897c7da975cc8f4b71033b2cff382c6fd6c4c1e99d"
+      }
+    },
+    "assessment": "command_failed"
+  },
+  {
+    "run": "java-export-1",
+    "execution": {
+      "stage": "java-export",
+      "attempt": "1",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/tools/joern/joern-export",
+        "/artifacts/cpg.bin",
+        "--repr",
+        "all",
+        "--format",
+        "graphml",
+        "--out",
+        "/work/export"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_succeeded",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          },
+          {
+            "destination": "/artifacts",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1894481,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:07:12.183277199Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 0,
+      "host_wall_seconds": 5.671,
+      "files": {
+        "stdout.txt": 139,
+        "stderr.txt": 63,
+        "metrics.json": 1021,
+        "export/export.xml": 603596
+      }
+    },
+    "metrics": {
+      "command_exit": 0,
+      "start_ns": 1792555632441231897,
+      "end_ns": 1792555635129818306,
+      "duration_ns": 2688586409,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 179560,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 148578304,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 5316760,
+        "user_usec": 4826492,
+        "system_usec": 490268,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 30,
+        "nr_throttled": 22,
+        "throttled_usec": 1148219,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 139,
+        "sha256": "f07605eec5485e780f1b051cc34946cf3a216a38d44d2e7e89f7b849da2e67af"
+      },
+      "stderr.txt": {
+        "bytes": 63,
+        "sha256": "70651266b67efbc4654d79b2dbb62635d3974d24ffdf3116b85e81923ee51a4a"
+      },
+      "edge-facts.json": {
+        "bytes": 226207,
+        "sha256": "ca7d9c3835893da7e8a681c36d1be65098073e7cf3f4b36b80039d242c7da189"
+      },
+      "metrics.json": {
+        "bytes": 1021,
+        "sha256": "613e967a42982e23a0506a119b3bd42f5fce671dcf2310f47c03b3b4a25693a1"
+      },
+      "export/export.xml": {
+        "bytes": 603596,
+        "sha256": "fb1372c28e65538e6ace574a661522297c9768d06c814a80c09cdcb52688bbc4"
+      }
+    },
+    "assessment": "command_succeeded",
+    "coverage": "production subset only; no test coverage; build-2"
+  },
+  {
+    "run": "java-query-1",
+    "execution": {
+      "stage": "java-query",
+      "attempt": "1",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/tools/joern/joern",
+        "--script",
+        "/probes/facts.sc",
+        "--param",
+        "cpgFile=/artifacts/cpg.bin"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_failed",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          },
+          {
+            "destination": "/artifacts",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1881294,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:03:35.965184907Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 1,
+      "host_wall_seconds": 19.336,
+      "files": {
+        "stdout.txt": 110,
+        "stderr.txt": 994,
+        "metrics.json": 1026
+      }
+    },
+    "metrics": {
+      "command_exit": 1,
+      "start_ns": 1792555416395993828,
+      "end_ns": 1792555430996980574,
+      "duration_ns": 14600986746,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 539224,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 511193088,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 25547403,
+        "user_usec": 23577585,
+        "system_usec": 1969818,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 149,
+        "nr_throttled": 99,
+        "throttled_usec": 6158994,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nPicked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nexecuting /probes/facts.sc with params=Map(cpgFile -> /artifacts/cpg.bin)\n\u001b[31m\u001b[31m-- [E008] Not Found Error: /tmp/wrapped-script2861692781952615873.sc:9:69 ------\u001b[0m\u001b[0m\n\u001b[31m  9 |\u001b[0m    ujson.\u001b[33mObj\u001b[0m(\u001b[32m\"id\"\u001b[0m -> n.id.toString, \u001b[32m\"label\"\u001b[0m -> n.label, \u001b[32m\"file\"\u001b[0m -> n.method.filename,\n\u001b[31m\u001b[31m    |\u001b[0m                                                                   ^^^^^^^^\u001b[0m\n\u001b[31m    |\u001b[0mvalue method is not a member of io.shiftleft.codepropertygraph.generated.nodes.AstNode\n1 error found\nException in thread \"main\" replpp.scripting.NonForkingScriptRunner$$anon$1: error during script execution: Error during compilation: Errors encountered during compilation - try `--verbose` for more output\nPlease check error output above!\nFor given input files: /tmp/wrapped-script2861692781952615873.sc\nRe-run with `--verbose` for more details\n\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 110,
+        "sha256": "c2d3cc76d51b7837bfb7166c32c55782a1d8dbb8675a680b80f04016362620f6"
+      },
+      "stderr.txt": {
+        "bytes": 994,
+        "sha256": "94eda4c6476cf7f0f3751faa36d2bf8f3ee36c8a1f7d6f5ce5d524d6418f9700"
+      },
+      "metrics.json": {
+        "bytes": 1026,
+        "sha256": "2a10c1894d4c8e6cf127a75078228a1491297233409e3293ecef920d7d86fdfc"
+      }
+    },
+    "assessment": "command_failed"
+  },
+  {
+    "run": "java-query-2",
+    "execution": {
+      "stage": "java-query",
+      "attempt": "2",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/tools/joern/joern",
+        "--script",
+        "/probes/facts.sc",
+        "--param",
+        "cpgFile=/artifacts/cpg.bin"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_succeeded",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/artifacts",
+            "read_only": true
+          },
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1886934,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:04:34.265108068Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 0,
+      "host_wall_seconds": 18.99,
+      "files": {
+        "stdout.txt": 0,
+        "stderr.txt": 959,
+        "metrics.json": 1027,
+        "facts.json": 54869
+      }
+    },
+    "metrics": {
+      "command_exit": 0,
+      "start_ns": 1792555475724813501,
+      "end_ns": 1792555490542767943,
+      "duration_ns": 14817954442,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 507856,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 461746176,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 29457173,
+        "user_usec": 27326889,
+        "system_usec": 2130284,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 151,
+        "nr_throttled": 131,
+        "throttled_usec": 9851301,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nPicked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nexecuting /probes/facts.sc with params=Map(cpgFile -> /artifacts/cpg.bin)\nCreating project `cpg.bin` for CPG at `/artifacts/cpg.bin`\nCreating working copy of CPG to be safe\nLoading base CPG from: /work/workspace/cpg.bin/cpg.bin.tmp\nOverlay dataflowOss already exists - skipping\nThe graph has been modified. You may want to use the `save` command to persist changes to disk.  All changes will also be saved collectively on exit\nOverlay dataflowOss already exists - skipping\nThe graph has been modified. You may want to use the `save` command to persist changes to disk.  All changes will also be saved collectively on exit\nSaving graphs on disk. This may take a while.\nclosing/saving project `cpg.bin`\nCreating working copy of CPG to be safe\nLoading base CPG from: /work/workspace/cpg.bin/cpg.bin.tmp\nclosing/saving project `cpg.bin`\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr.txt": {
+        "bytes": 959,
+        "sha256": "ef7f000514bf504ada87682de04808d022f0254f033b1db2e7de82dadd4dc9c3"
+      },
+      "metrics.json": {
+        "bytes": 1027,
+        "sha256": "2027bbb2aefce97cb4112ab0e87a5025086e9abb1f6a2a6f0c8197882956b5c2"
+      },
+      "facts.json": {
+        "bytes": 54869,
+        "sha256": "a1db47522a251e4c8f6d82a60c17cddfae3d8838d93eca85e60e93d0b1c2f09a"
+      }
+    },
+    "assessment": "command_succeeded",
+    "coverage": "production subset only; no test coverage; build-2"
+  },
+  {
+    "run": "java-slice-1",
+    "execution": {
+      "stage": "java-slice",
+      "attempt": "1",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/tools/joern/joern-slice",
+        "data-flow",
+        "/artifacts/cpg.bin",
+        "-o",
+        "/work/slice.json",
+        "--slice-depth",
+        "20",
+        "--parallelism",
+        "2"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_failed",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          },
+          {
+            "destination": "/artifacts",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1892256,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:05:38.790598782Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 1,
+      "host_wall_seconds": 3.83,
+      "files": {
+        "stdout.txt": 0,
+        "stderr.txt": 834,
+        "metrics.json": 1016
+      }
+    },
+    "metrics": {
+      "command_exit": 1,
+      "start_ns": 1792555539142957033,
+      "end_ns": 1792555540137611115,
+      "duration_ns": 994654082,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 98820,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 77549568,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 1974964,
+        "user_usec": 1725474,
+        "system_usec": 249490,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 12,
+        "nr_throttled": 7,
+        "throttled_usec": 185909,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nException in thread \"main\" java.io.FileNotFoundException: given input file /work/cpg.bin does not exist\n\tat io.shiftleft.codepropertygraph.cpgloading.CpgLoader$.load(CpgLoader.scala:36)\n\tat io.shiftleft.codepropertygraph.cpgloading.CpgLoader$.load(CpgLoader.scala:16)\n\tat io.joern.joerncli.CpgBasedTool$.loadFromFile(CpgBasedTool.scala:17)\n\tat io.joern.joerncli.JoernSlice$.processCpg(JoernSlice.scala:136)\n\tat io.joern.joerncli.JoernSlice$.main$$anonfun$1(JoernSlice.scala:129)\n\tat scala.runtime.function.JProcedure1.apply(JProcedure1.java:15)\n\tat scala.runtime.function.JProcedure1.apply(JProcedure1.java:10)\n\tat scala.Option.foreach(Option.scala:439)\n\tat io.joern.joerncli.JoernSlice$.main(JoernSlice.scala:114)\n\tat io.joern.joerncli.JoernSlice.main(JoernSlice.scala)\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr.txt": {
+        "bytes": 834,
+        "sha256": "8d14752731c9b4f9834f4caff6d65154f15aa868e22ffe0a2dcab03852535ab8"
+      },
+      "metrics.json": {
+        "bytes": 1016,
+        "sha256": "284d4bffcc1671ef03a9d42b533fa22e02cc8cfad755ab5051033a58c1999b30"
+      }
+    },
+    "assessment": "failed: no slice artifact (exit zero is not success)"
+  },
+  {
+    "run": "java-slice-2",
+    "execution": {
+      "stage": "java-slice",
+      "attempt": "2",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/bin/sh",
+        "-c",
+        "cp /artifacts/cpg.bin /work/cpg.bin && /tools/joern/joern-slice --out /work/slice --parallelism 2 --method-name-filter .* data-flow --slice-depth 4"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_succeeded",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/artifacts",
+            "read_only": true
+          },
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1932279,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:14:59.982048545Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 0,
+      "host_wall_seconds": 4.832,
+      "files": {
+        "stdout.txt": 0,
+        "stderr.txt": 196,
+        "metrics.json": 1011,
+        "cpg.bin": 114348
+      },
+      "cleanup_exit": 0
+    },
+    "metrics": {
+      "command_exit": 0,
+      "start_ns": 1792556100352929496,
+      "end_ns": 1792556102963751526,
+      "duration_ns": 2610822030,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 70224,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 67223552,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 1405999,
+        "user_usec": 922943,
+        "system_usec": 483055,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 30,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nError: Unknown argument 'data-flow'\nError: Unknown option --slice-depth\nError: Unknown argument '4'\nTry --help for more information.\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr.txt": {
+        "bytes": 196,
+        "sha256": "3030ae8fd4af87371206f89c4d0a16f87a212cc61901c0c08b120524cce65275"
+      },
+      "metrics.json": {
+        "bytes": 1011,
+        "sha256": "e73a88361ad44a1abcc936171b912263d9269bc754d251ebb7070e6f5b8e8e2a"
+      },
+      "cpg.bin": {
+        "bytes": 114348,
+        "sha256": "8d733bd1e3ecbc7c6cafd6cb6e3d14e6abbe658206121c3998437168de9a955f"
+      }
+    },
+    "assessment": "failed: no slice artifact (exit zero is not success)"
+  },
+  {
+    "run": "java-slice-3",
+    "execution": {
+      "stage": "java-slice",
+      "attempt": "3",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/bin/sh",
+        "-c",
+        "cp /artifacts/cpg.bin /work/cpg.bin && /tools/joern/joern-slice data-flow --out /work/slice --parallelism 2 --method-name-filter .* --slice-depth 4"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_succeeded",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          },
+          {
+            "destination": "/artifacts",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1934480,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:16:09.282607752Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 0,
+      "host_wall_seconds": 13.298,
+      "files": {
+        "stdout.txt": 67,
+        "slices.json": 77053,
+        "stderr.txt": 63,
+        "metrics.json": 1027,
+        "cpg.bin": 114348
+      },
+      "cleanup_exit": 0
+    },
+    "metrics": {
+      "command_exit": 0,
+      "start_ns": 1792556169534072843,
+      "end_ns": 1792556180613451934,
+      "duration_ns": 11079379091,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 782064,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 779939840,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 19891979,
+        "user_usec": 17907858,
+        "system_usec": 1984120,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 113,
+        "nr_throttled": 90,
+        "throttled_usec": 13840039,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 67,
+        "sha256": "e6e56199f89931da7084da68654927ad37c7d43327cbdbb881ca71db1d904441"
+      },
+      "slices.json": {
+        "bytes": 77053,
+        "sha256": "001f3d0f3c736d5127f9be5e858494cdedd1a3b0567f54bac7780279053f9a84"
+      },
+      "stderr.txt": {
+        "bytes": 63,
+        "sha256": "70651266b67efbc4654d79b2dbb62635d3974d24ffdf3116b85e81923ee51a4a"
+      },
+      "metrics.json": {
+        "bytes": 1027,
+        "sha256": "723cef55be41eb64d79ee5887beee3ed7abed76d25466de38d50c615592326dd"
+      },
+      "cpg.bin": {
+        "bytes": 114348,
+        "sha256": "8d733bd1e3ecbc7c6cafd6cb6e3d14e6abbe658206121c3998437168de9a955f"
+      }
+    },
+    "assessment": "command_succeeded",
+    "coverage": "production subset only; no test coverage; build-2"
+  },
+  {
+    "run": "preflight-1",
+    "execution": {
+      "stage": "preflight",
+      "attempt": "1",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/bin/sh",
+        "/probes/preflight.sh"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "finished",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          }
+        ]
+      },
+      "missing_required_outputs": [
+        "stdout.txt",
+        "stderr.txt",
+        "metrics.json"
+      ],
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1852066,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T03:31:25.839831041Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "host_wall_seconds": 4.72,
+      "files": {}
+    },
+    "diagnostic_excerpt": "",
+    "artifacts": {},
+    "assessment": "finished"
+  },
+  {
+    "run": "preflight-2",
+    "execution": {
+      "stage": "preflight",
+      "attempt": "2",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/bin/sh",
+        "/probes/preflight.sh"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_succeeded",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/input",
+            "read_only": true
+          },
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1853574,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T03:33:58.192004143Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 0,
+      "host_wall_seconds": 5.833,
+      "files": {
+        "stdout.txt": 349,
+        "stderr.txt": 331,
+        "metrics.json": 1007
+      }
+    },
+    "metrics": {
+      "command_exit": 0,
+      "start_ns": 1792553638717763513,
+      "end_ns": 1792553638864451142,
+      "duration_ns": 146687629,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 54760,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 31989760,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 317078,
+        "user_usec": 250162,
+        "system_usec": 66915,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 3,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nopenjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\nPicked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 349,
+        "sha256": "bbc7570c92ebd0f803225871e7b9b9441add73430d36846549825b79e9ebd1f0"
+      },
+      "stderr.txt": {
+        "bytes": 331,
+        "sha256": "a13b7070b4187d7277cfe7f1882828fd82939dc34379a01f764be0b1d4d56151"
+      },
+      "metrics.json": {
+        "bytes": 1007,
+        "sha256": "f4fd8e7182dc8ba84fc2868fa61f304aaa2c32378540efc9d69b5921fe61494a"
+      }
+    },
+    "assessment": "command_succeeded"
+  },
+  {
+    "run": "python-ast-1",
+    "execution": {
+      "stage": "python-ast",
+      "attempt": "1",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/tools/python/bin/python3.12",
+        "-I",
+        "-B",
+        "/probes/python_ast.py"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_succeeded",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/input",
+            "read_only": true
+          },
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1908357,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:09:18.008932487Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 0,
+      "host_wall_seconds": 2.753,
+      "files": {
+        "stdout.txt": 4704,
+        "stderr.txt": 0,
+        "metrics.json": 1005
+      }
+    },
+    "metrics": {
+      "command_exit": 0,
+      "start_ns": 1792555758483837750,
+      "end_ns": 1792555758671875710,
+      "duration_ns": 188037960,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 20628,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 9519104,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 154111,
+        "user_usec": 95155,
+        "system_usec": 58955,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 6,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 4704,
+        "sha256": "14f49b3b2f5d65acc4d4744276172c4badd1fffbdf5773d14a89be1c9c68e1ed"
+      },
+      "stderr.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "metrics.json": {
+        "bytes": 1005,
+        "sha256": "e0ff119bba60a8e3f90cb25063d3bd9ddb4b3eaf46eaf53eece2244e2d329f93"
+      }
+    },
+    "assessment": "command_succeeded"
+  },
+  {
+    "run": "python-build-1",
+    "execution": {
+      "stage": "python-build",
+      "attempt": "1",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/tools/joern/joern-parse",
+        "/input",
+        "--language",
+        "PYTHONSRC",
+        "--output",
+        "/work/cpg.bin"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_failed",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1873377,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:01:16.180739314Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 1,
+      "host_wall_seconds": 9.409,
+      "files": {
+        "stdout.txt": 648,
+        "stderr.txt": 11317,
+        "metrics.json": 1021,
+        "cpg.bin": 0
+      }
+    },
+    "metrics": {
+      "command_exit": 1,
+      "start_ns": 1792555276591740223,
+      "end_ns": 1792555284046139580,
+      "duration_ns": 7454399357,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 253332,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 246554624,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 6766038,
+        "user_usec": 5486656,
+        "system_usec": 1279381,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 79,
+        "nr_throttled": 10,
+        "throttled_usec": 777718,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\n2026-10-21 04:01:24.021 ERROR ExternalCommand$          Process exited with code 1.\nList(/tools/joern/pysrc2cpg, -J-Xmx2048m, /input, -o, /work/cpg.bin)\nInput: cmd: `/tools/joern/pysrc2cpg -J-Xmx2048m /input -o /work/cpg.bin`, workingDir: /work/., extraEnv: Map()\nOutput: Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\n2026-10-21 04:01:23.961 WARN  ZstdWrapper$              the configured temp directory (/tmp) is mounted with `noexec` flag - this will likely lead to an error when trying to invoke zstd. Please either remount it without `noexec` or configure a different tmp directory, e.g. via java system property `-Djava.io.tmpdir=/path/to/tmp`\n2026-10-21 04:01:23.993 WARN  ZstdWrapper$              the configured temp directory (/tmp) is mounted with `noexec` flag - this will likely lead to an error when trying to invoke zstd. Please either remount it without `noexec` or configure a different tmp directory, e.g. via java system property `-Djava.io.tmpdir=/path/to/tmp`\nflatgraph.storage.ZstdWrapper$JniInvocationException: Error while trying to invoke zstd, i.e. cannot compress or decompress, which is required for flatgraph's storage\n\tat flatgraph.storage.ZstdWrapper$.apply(ZstdWrapper.scala:100)\n\tat flatgraph.storage.ZstdWrapper$ZstdCtx.compress(ZstdWrapper.scala:57)\n\tat flatgraph.storage.WriterContext.compressItem(Serialization.scala:130)\n\tat flatgraph.storage.WriterContext.encodeAny$$anonfun$4(Serialization.scala:82)\n\tat flatgraph.storage.WriterContext.submitCompress$$anonfun$1(Serialization.scala:29)\n\tat java.base/java.util.concurrent.ForkJoinTask$AdaptedCallable.exec(ForkJoinTask.java:1456)\n\tat java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387)\n\tat java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312)\n\tat java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843)\n\tat java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808)\n\tat java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188)\nCaused by: java.lang.UnsatisfiedLinkError: /tmp/libzstd-jni-1.5.7-1187105434862",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 648,
+        "sha256": "729b13b952c59958bf71a185a3a46fa2558f5ece63244a2c0740072bbc59687b"
+      },
+      "stderr.txt": {
+        "bytes": 11317,
+        "sha256": "8dcc053f820989edba491b133ceb2d1fc32c502b2fcf7ca7eaae15585a6afae4"
+      },
+      "metrics.json": {
+        "bytes": 1021,
+        "sha256": "b7323685e3b90a3154ce2b5478025e6f3f561f23521d596fe1ef8b72bfaf9369"
+      },
+      "cpg.bin": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "assessment": "command_failed"
+  },
+  {
+    "run": "python-build-2",
+    "execution": {
+      "stage": "python-build",
+      "attempt": "2",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/tools/joern/joern-parse",
+        "/input",
+        "--language",
+        "PYTHONSRC",
+        "--output",
+        "/work/cpg.bin"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_succeeded",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1878772,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:02:55.756520786Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 0,
+      "host_wall_seconds": 13.821,
+      "files": {
+        "stdout.txt": 767,
+        "stderr.txt": 169,
+        "metrics.json": 1025,
+        "cpg.bin": 131974
+      }
+    },
+    "metrics": {
+      "command_exit": 0,
+      "start_ns": 1792555376186618484,
+      "end_ns": 1792555386341852858,
+      "duration_ns": 10155234374,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 256524,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 252702720,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 11160161,
+        "user_usec": 9417014,
+        "system_usec": 1743147,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 106,
+        "nr_throttled": 29,
+        "throttled_usec": 2095081,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\n2026-10-21 04:03:04.724 WARN  CfgCreator$               Using order fallback for try statement catch body\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 767,
+        "sha256": "8455ecd461702eb5b51b0aa359d58c398cb5893308dc62a838d7ee123abbbe4f"
+      },
+      "stderr.txt": {
+        "bytes": 169,
+        "sha256": "47e30b98a73374a7d2ae4cb3e79fd717c2d1bbdb5923f92d3d9470714e7b62f3"
+      },
+      "metrics.json": {
+        "bytes": 1025,
+        "sha256": "987fb4476deb4d7e4c5ed6858ec70368a2e907601cbb718983081721d45c2233"
+      },
+      "cpg.bin": {
+        "bytes": 131974,
+        "sha256": "8175a5613a734922a765873837f5a257c959a5808590c99cff7c99c7d182562f"
+      }
+    },
+    "assessment": "command_succeeded"
+  },
+  {
+    "run": "python-export-1",
+    "execution": {
+      "stage": "python-export",
+      "attempt": "1",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/tools/joern/joern-export",
+        "/artifacts/cpg.bin",
+        "--repr",
+        "all",
+        "--format",
+        "graphml",
+        "--out",
+        "/work/export"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_succeeded",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/artifacts",
+            "read_only": true
+          },
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1894269,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:07:11.492399614Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 0,
+      "host_wall_seconds": 5.61,
+      "files": {
+        "stdout.txt": 140,
+        "stderr.txt": 63,
+        "metrics.json": 1020,
+        "export/export.xml": 865262
+      }
+    },
+    "metrics": {
+      "command_exit": 0,
+      "start_ns": 1792555631943284777,
+      "end_ns": 1792555634955808322,
+      "duration_ns": 3012523545,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 201824,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 182714368,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 5807138,
+        "user_usec": 5286291,
+        "system_usec": 520846,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 33,
+        "nr_throttled": 24,
+        "throttled_usec": 960855,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 140,
+        "sha256": "7fd3c6f1e2c79d55220e87e6f4085badc47e0b0ae3cf271759a26fa8e97d613a"
+      },
+      "stderr.txt": {
+        "bytes": 63,
+        "sha256": "70651266b67efbc4654d79b2dbb62635d3974d24ffdf3116b85e81923ee51a4a"
+      },
+      "edge-facts.json": {
+        "bytes": 78472,
+        "sha256": "f54b6432598029379360078cc2c1eda5986263f69f01113a60642517b357c9dd"
+      },
+      "metrics.json": {
+        "bytes": 1020,
+        "sha256": "55b8804f35a091b63c7d63827f44ceeb03515efa0bbe5931e2c50b74680b2ac6"
+      },
+      "export/export.xml": {
+        "bytes": 865262,
+        "sha256": "05010a98dbd052db6d1fe14e88def2ca3fa1fbea7b2e79ea614c94844968ee27"
+      }
+    },
+    "assessment": "command_succeeded"
+  },
+  {
+    "run": "python-export-2",
+    "execution": {
+      "stage": "python-export",
+      "attempt": "2",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/tools/joern/joern-export",
+        "/artifacts/cpg.bin",
+        "--repr",
+        "all",
+        "--format",
+        "graphml",
+        "--out",
+        "/work/export"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_succeeded",
+      "diagnostic_java_subset": false,
+      "build_provenance": {
+        "build_run": "python-build-2",
+        "cpg_sha256": "8175a5613a734922a765873837f5a257c959a5808590c99cff7c99c7d182562f",
+        "diagnostic_only": false
+      },
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/artifacts",
+            "read_only": true
+          },
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1943114,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:23:20.826895659Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 0,
+      "host_wall_seconds": 6.292,
+      "files": {
+        "stdout.txt": 140,
+        "stderr.txt": 63,
+        "metrics.json": 1021,
+        "export/export.xml": 865262
+      },
+      "cleanup_exit": 0
+    },
+    "metrics": {
+      "command_exit": 0,
+      "start_ns": 1792556601130300524,
+      "end_ns": 1792556604016163970,
+      "duration_ns": 2885863446,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 191760,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 172466176,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 5454204,
+        "user_usec": 4854071,
+        "system_usec": 600132,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 31,
+        "nr_throttled": 23,
+        "throttled_usec": 1518957,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 140,
+        "sha256": "7fd3c6f1e2c79d55220e87e6f4085badc47e0b0ae3cf271759a26fa8e97d613a"
+      },
+      "stderr.txt": {
+        "bytes": 63,
+        "sha256": "70651266b67efbc4654d79b2dbb62635d3974d24ffdf3116b85e81923ee51a4a"
+      },
+      "metrics.json": {
+        "bytes": 1021,
+        "sha256": "39fea2b67739ea181abfa725427306d2a9d36a3dac8f0c6c88e2bea9c272b334"
+      },
+      "export/export.xml": {
+        "bytes": 865262,
+        "sha256": "05010a98dbd052db6d1fe14e88def2ca3fa1fbea7b2e79ea614c94844968ee27"
+      }
+    },
+    "assessment": "command_succeeded"
+  },
+  {
+    "run": "python-query-1",
+    "execution": {
+      "stage": "python-query",
+      "attempt": "1",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/tools/joern/joern",
+        "--script",
+        "/probes/facts.sc",
+        "--param",
+        "cpgFile=/artifacts/cpg.bin"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_failed",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          },
+          {
+            "destination": "/artifacts",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1881333,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:03:36.179069399Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 1,
+      "host_wall_seconds": 18.852,
+      "files": {
+        "stdout.txt": 110,
+        "stderr.txt": 995,
+        "metrics.json": 1026
+      }
+    },
+    "metrics": {
+      "command_exit": 1,
+      "start_ns": 1792555416664310493,
+      "end_ns": 1792555431070761398,
+      "duration_ns": 14406450905,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 461720,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 460042240,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 25485701,
+        "user_usec": 23610147,
+        "system_usec": 1875553,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 146,
+        "nr_throttled": 99,
+        "throttled_usec": 6730941,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nPicked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nexecuting /probes/facts.sc with params=Map(cpgFile -> /artifacts/cpg.bin)\n\u001b[31m\u001b[31m-- [E008] Not Found Error: /tmp/wrapped-script12866897156037931027.sc:9:69 -----\u001b[0m\u001b[0m\n\u001b[31m  9 |\u001b[0m    ujson.\u001b[33mObj\u001b[0m(\u001b[32m\"id\"\u001b[0m -> n.id.toString, \u001b[32m\"label\"\u001b[0m -> n.label, \u001b[32m\"file\"\u001b[0m -> n.method.filename,\n\u001b[31m\u001b[31m    |\u001b[0m                                                                   ^^^^^^^^\u001b[0m\n\u001b[31m    |\u001b[0mvalue method is not a member of io.shiftleft.codepropertygraph.generated.nodes.AstNode\n1 error found\nException in thread \"main\" replpp.scripting.NonForkingScriptRunner$$anon$1: error during script execution: Error during compilation: Errors encountered during compilation - try `--verbose` for more output\nPlease check error output above!\nFor given input files: /tmp/wrapped-script12866897156037931027.sc\nRe-run with `--verbose` for more details\n\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 110,
+        "sha256": "c2d3cc76d51b7837bfb7166c32c55782a1d8dbb8675a680b80f04016362620f6"
+      },
+      "stderr.txt": {
+        "bytes": 995,
+        "sha256": "0bdd4ca1d7706e68d9eac2804227b6a43a7f4bc1f714770ea2e436df9c70facd"
+      },
+      "metrics.json": {
+        "bytes": 1026,
+        "sha256": "6ec44f2d236ded69819d90d15fa9c53e67c9f56730c392c6b52b3df5aa9f8b79"
+      }
+    },
+    "assessment": "command_failed"
+  },
+  {
+    "run": "python-query-2",
+    "execution": {
+      "stage": "python-query",
+      "attempt": "2",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/tools/joern/joern",
+        "--script",
+        "/probes/facts.sc",
+        "--param",
+        "cpgFile=/artifacts/cpg.bin"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_succeeded",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          },
+          {
+            "destination": "/artifacts",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1886831,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:04:33.844868693Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 0,
+      "host_wall_seconds": 18.005,
+      "files": {
+        "stdout.txt": 0,
+        "stderr.txt": 959,
+        "metrics.json": 1028,
+        "facts.json": 51259
+      }
+    },
+    "metrics": {
+      "command_exit": 0,
+      "start_ns": 1792555474276962858,
+      "end_ns": 1792555489288007536,
+      "duration_ns": 15011044678,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 507936,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 460890112,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 29559775,
+        "user_usec": 27464074,
+        "system_usec": 2095700,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 153,
+        "nr_throttled": 137,
+        "throttled_usec": 10650733,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nPicked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nexecuting /probes/facts.sc with params=Map(cpgFile -> /artifacts/cpg.bin)\nCreating project `cpg.bin` for CPG at `/artifacts/cpg.bin`\nCreating working copy of CPG to be safe\nLoading base CPG from: /work/workspace/cpg.bin/cpg.bin.tmp\nOverlay dataflowOss already exists - skipping\nThe graph has been modified. You may want to use the `save` command to persist changes to disk.  All changes will also be saved collectively on exit\nOverlay dataflowOss already exists - skipping\nThe graph has been modified. You may want to use the `save` command to persist changes to disk.  All changes will also be saved collectively on exit\nSaving graphs on disk. This may take a while.\nclosing/saving project `cpg.bin`\nCreating working copy of CPG to be safe\nLoading base CPG from: /work/workspace/cpg.bin/cpg.bin.tmp\nclosing/saving project `cpg.bin`\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr.txt": {
+        "bytes": 959,
+        "sha256": "ef7f000514bf504ada87682de04808d022f0254f033b1db2e7de82dadd4dc9c3"
+      },
+      "metrics.json": {
+        "bytes": 1028,
+        "sha256": "7ed129dbd0acb9b492d372f94dc60a93aba1c649eef225629522f60c56dd75c7"
+      },
+      "facts.json": {
+        "bytes": 51259,
+        "sha256": "18220ad14282a55ab206cbd54bf89bdedd74316ff328123bf270935add9e2047"
+      }
+    },
+    "assessment": "command_succeeded"
+  },
+  {
+    "run": "python-slice-1",
+    "execution": {
+      "stage": "python-slice",
+      "attempt": "1",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/tools/joern/joern-slice",
+        "data-flow",
+        "/artifacts/cpg.bin",
+        "-o",
+        "/work/slice.json",
+        "--slice-depth",
+        "20",
+        "--parallelism",
+        "2"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_failed",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          },
+          {
+            "destination": "/artifacts",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1892171,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:05:38.337099236Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 1,
+      "host_wall_seconds": 4.016,
+      "files": {
+        "stdout.txt": 0,
+        "stderr.txt": 834,
+        "metrics.json": 1018
+      }
+    },
+    "metrics": {
+      "command_exit": 1,
+      "start_ns": 1792555538782129257,
+      "end_ns": 1792555539785589866,
+      "duration_ns": 1003460609,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 104696,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 77287424,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 1925725,
+        "user_usec": 1726168,
+        "system_usec": 199557,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 13,
+        "nr_throttled": 7,
+        "throttled_usec": 222574,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nException in thread \"main\" java.io.FileNotFoundException: given input file /work/cpg.bin does not exist\n\tat io.shiftleft.codepropertygraph.cpgloading.CpgLoader$.load(CpgLoader.scala:36)\n\tat io.shiftleft.codepropertygraph.cpgloading.CpgLoader$.load(CpgLoader.scala:16)\n\tat io.joern.joerncli.CpgBasedTool$.loadFromFile(CpgBasedTool.scala:17)\n\tat io.joern.joerncli.JoernSlice$.processCpg(JoernSlice.scala:136)\n\tat io.joern.joerncli.JoernSlice$.main$$anonfun$1(JoernSlice.scala:129)\n\tat scala.runtime.function.JProcedure1.apply(JProcedure1.java:15)\n\tat scala.runtime.function.JProcedure1.apply(JProcedure1.java:10)\n\tat scala.Option.foreach(Option.scala:439)\n\tat io.joern.joerncli.JoernSlice$.main(JoernSlice.scala:114)\n\tat io.joern.joerncli.JoernSlice.main(JoernSlice.scala)\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr.txt": {
+        "bytes": 834,
+        "sha256": "8d14752731c9b4f9834f4caff6d65154f15aa868e22ffe0a2dcab03852535ab8"
+      },
+      "metrics.json": {
+        "bytes": 1018,
+        "sha256": "6047edd9b10ff09070570c332ab332b6c972951a292a4b2330ea97cf71218523"
+      }
+    },
+    "assessment": "failed: no slice artifact (exit zero is not success)"
+  },
+  {
+    "run": "python-slice-2",
+    "execution": {
+      "stage": "python-slice",
+      "attempt": "2",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/bin/sh",
+        "-c",
+        "cp /artifacts/cpg.bin /work/cpg.bin && /tools/joern/joern-slice data-flow -o /work/slice --slice-depth 20 --parallelism 2"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_failed",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/input",
+            "read_only": true
+          },
+          {
+            "destination": "/artifacts",
+            "read_only": true
+          },
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1896578,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:08:00.830226497Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 124,
+      "host_wall_seconds": 184.28,
+      "files": {
+        "stdout.txt": 0,
+        "stderr.txt": 63,
+        "metrics.json": 1036,
+        "cpg.bin": 131974
+      }
+    },
+    "metrics": {
+      "command_exit": 124,
+      "start_ns": 1792555681082291899,
+      "end_ns": 1792555861109259143,
+      "duration_ns": 180026967244,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 756036,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 739520512,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 359918995,
+        "user_usec": 344455718,
+        "system_usec": 15463276,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 1803,
+        "nr_throttled": 1795,
+        "throttled_usec": 39377322,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr.txt": {
+        "bytes": 63,
+        "sha256": "70651266b67efbc4654d79b2dbb62635d3974d24ffdf3116b85e81923ee51a4a"
+      },
+      "metrics.json": {
+        "bytes": 1036,
+        "sha256": "55213959cb2f88fb26f26d7c74cb14a4eb3603ef05cfa773c67eb04a6b0b5740"
+      },
+      "cpg.bin": {
+        "bytes": 131974,
+        "sha256": "8175a5613a734922a765873837f5a257c959a5808590c99cff7c99c7d182562f"
+      }
+    },
+    "assessment": "failed: no slice artifact (exit zero is not success)"
+  },
+  {
+    "run": "python-slice-3",
+    "execution": {
+      "stage": "python-slice",
+      "attempt": "3",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/bin/sh",
+        "-c",
+        "cp /artifacts/cpg.bin /work/cpg.bin && /tools/joern/joern-slice --out /work/slice --parallelism 2 --method-name-filter abort data-flow --slice-depth 4"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_succeeded",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          },
+          {
+            "destination": "/artifacts",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1933175,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:15:04.568430096Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 0,
+      "host_wall_seconds": 4.971,
+      "files": {
+        "stdout.txt": 0,
+        "stderr.txt": 246,
+        "metrics.json": 1012,
+        "cpg.bin": 131974
+      },
+      "cleanup_exit": 0
+    },
+    "metrics": {
+      "command_exit": 0,
+      "start_ns": 1792556106783034543,
+      "end_ns": 1792556107104607988,
+      "duration_ns": 321573445,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 75744,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 43577344,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 638534,
+        "user_usec": 516908,
+        "system_usec": 121625,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 7,
+        "nr_throttled": 1,
+        "throttled_usec": 31467,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nError: File at 'data-flow' not found or not regular, e.g. a directory or source file.\nError: Unknown option --slice-depth\nError: Unknown argument '4'\nTry --help for more information.\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr.txt": {
+        "bytes": 246,
+        "sha256": "7605ab0666742f0d3e74406f54fbfa6a855fc2311d3511b6135d6297997cc242"
+      },
+      "metrics.json": {
+        "bytes": 1012,
+        "sha256": "28ff087c5b5bf328448482713602fb2568412b8ab28e3f33e6f19ff285f2e872"
+      },
+      "cpg.bin": {
+        "bytes": 131974,
+        "sha256": "8175a5613a734922a765873837f5a257c959a5808590c99cff7c99c7d182562f"
+      }
+    },
+    "assessment": "failed: no slice artifact (exit zero is not success)"
+  },
+  {
+    "run": "python-slice-4",
+    "execution": {
+      "stage": "python-slice",
+      "attempt": "4",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/bin/sh",
+        "-c",
+        "cp /artifacts/cpg.bin /work/cpg.bin && /tools/joern/joern-slice data-flow --out /work/slice --parallelism 2 --method-name-filter abort --slice-depth 4"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_succeeded",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          },
+          {
+            "destination": "/artifacts",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1936486,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T04:16:34.757771937Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 0,
+      "host_wall_seconds": 13.492,
+      "files": {
+        "stdout.txt": 67,
+        "slices.json": 95145,
+        "stderr.txt": 63,
+        "metrics.json": 1026,
+        "cpg.bin": 131974
+      },
+      "cleanup_exit": 0
+    },
+    "metrics": {
+      "command_exit": 0,
+      "start_ns": 1792556195341264389,
+      "end_ns": 1792556205069618181,
+      "duration_ns": 9728353792,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 573944,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 552566784,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 19487625,
+        "user_usec": 17775361,
+        "system_usec": 1712264,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 100,
+        "nr_throttled": 94,
+        "throttled_usec": 14335451,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 67,
+        "sha256": "e6e56199f89931da7084da68654927ad37c7d43327cbdbb881ca71db1d904441"
+      },
+      "slices.json": {
+        "bytes": 95145,
+        "sha256": "b71fd050b6217157f93bf529369730cf85ce004dc73f788264d44526a07dbcc4"
+      },
+      "stderr.txt": {
+        "bytes": 63,
+        "sha256": "70651266b67efbc4654d79b2dbb62635d3974d24ffdf3116b85e81923ee51a4a"
+      },
+      "metrics.json": {
+        "bytes": 1026,
+        "sha256": "4c6a50c3e45f12c0c86dce90720694fe698dcb47464b2b573cccaa85b56a6840"
+      },
+      "cpg.bin": {
+        "bytes": 131974,
+        "sha256": "8175a5613a734922a765873837f5a257c959a5808590c99cff7c99c7d182562f"
+      }
+    },
+    "assessment": "command_succeeded"
+  },
+  {
+    "run": "spoon-1",
+    "execution": {
+      "stage": "spoon",
+      "attempt": "1",
+      "image": "sha256:9ef2baf83b26485e2a4c36afefd01d8ebe59f9c48c8486f522c20d76c522bcc3",
+      "command": [
+        "/bin/sh",
+        "-c",
+        "mkdir -p /work/classes && /tools/jdk/bin/javac -cp /tools/spoon.jar -d /work/classes /probes/SpoonProbe.java && /tools/jdk/bin/java -cp /work/classes:/tools/spoon.jar SpoonProbe"
+      ],
+      "limits": {
+        "memory_bytes": 4294967296,
+        "cpu_cores": 2,
+        "pids": 256,
+        "wall_seconds": 240,
+        "work_tmpfs_bytes": 1073741824,
+        "tmp_tmpfs_bytes": 268435456,
+        "individual_output_bytes": 8388608
+      },
+      "status": "command_succeeded",
+      "security_verified": {
+        "network_mode": "none",
+        "read_only_root": true,
+        "user": "1000:1000",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges"
+        ],
+        "bind_mounts": [
+          {
+            "destination": "/tools",
+            "read_only": true
+          },
+          {
+            "destination": "/probes",
+            "read_only": true
+          },
+          {
+            "destination": "/input",
+            "read_only": true
+          }
+        ]
+      },
+      "container_logs": "",
+      "container_state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1861264,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-21T03:51:13.22501546Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "command_exit": 0,
+      "host_wall_seconds": 32.01,
+      "files": {
+        "stdout.txt": 142593,
+        "stderr.txt": 312,
+        "metrics.json": 1024
+      }
+    },
+    "metrics": {
+      "command_exit": 0,
+      "start_ns": 1792554674487415124,
+      "end_ns": 1792554692782324282,
+      "duration_ns": 18294909158,
+      "inner_timeout_seconds": 180,
+      "stdout_stderr_file_limit": {
+        "value": 16384,
+        "unit": "POSIX 512-byte blocks",
+        "bytes_per_file": 8388608
+      },
+      "peak_process_tree_rss_kib": 170356,
+      "rss_sampling": {
+        "interval_seconds": 0.05,
+        "scope": "all visible container processes",
+        "exclusions": "wrapper PID and ps/awk/sleep helpers; sampler shell may be included"
+      },
+      "cgroup_memory_peak_bytes": 273207296,
+      "cgroup_memory_peak_scope": "since cgroup creation for the whole stage container; includes wrapper and non-RSS memory such as page cache",
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "cgroup_cpu_stat": {
+        "usage_usec": 9595634,
+        "user_usec": 7245231,
+        "system_usec": 2350402,
+        "nice_usec": 0,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 192,
+        "nr_throttled": 16,
+        "throttled_usec": 1195842,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "diagnostic_excerpt": "Picked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nPicked up JAVA_TOOL_OPTIONS: -Xmx2g -XX:ActiveProcessorCount=2\nSLF4J(W): No SLF4J providers were found.\nSLF4J(W): Defaulting to no-operation (NOP) logger implementation\nSLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.\n",
+    "artifacts": {
+      "stdout.txt": {
+        "bytes": 142593,
+        "sha256": "3ae7dfddfbc949ec5d852bbb4ed281f57eb8364b1103f58fd4bd5d464ea208a5"
+      },
+      "stderr.txt": {
+        "bytes": 312,
+        "sha256": "468e39b635e4bab5ce05aadadbfd74d2f5c58622803688686e355c1e37011389"
+      },
+      "metrics.json": {
+        "bytes": 1024,
+        "sha256": "97dbf11f1be5733e473f2d47b5c02603199eccd4386023583240e466d0ce1e29"
+      }
+    },
+    "assessment": "command_succeeded"
+  }
+]
