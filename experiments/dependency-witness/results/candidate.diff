@@ -1,0 +1,11 @@
+--- witness/mock_stub.txt
++++ diagnostic/mock_stub.txt
+@@ -1,7 +1,7 @@
+ # === PY-SLOT-START:mock_stub_001 ===
+ mock_query = mocker.patch("flask.helpers._cv_app")
+ mock_query.get.return_value = None
+-mock_fallback = mocker.patch("flask.helpers._wz_abort", side_effect=RuntimeError(f"Werkzeug abort {code}"))
++mock_fallback = mocker.patch("flask.helpers._wz_abort", return_value=None)
+ # === PY-SLOT-END:mock_stub_001 ===
+ 
+ # === PY-SLOT-START:mock_stub_002 ===

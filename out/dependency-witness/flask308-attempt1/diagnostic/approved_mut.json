@@ -1,0 +1,10 @@
+{
+  "source_id": "mut",
+  "logical_path": "src/src/flask/helpers.py",
+  "text": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:\n    \"\"\"Raise an :exc:`~werkzeug.exceptions.HTTPException` for the given\n    status code.\n\n    If :data:`~flask.current_app` is available, it will call its\n    :attr:`~flask.Flask.aborter` object, otherwise it will use\n    :func:`werkzeug.exceptions.abort`.\n\n    :param code: The status code for the exception, which must be\n        registered in ``app.aborter``.\n    :param args: Passed to the exception.\n    :param kwargs: Passed to the exception.\n\n    .. versionadded:: 2.2\n        Calls ``current_app.aborter`` if available instead of always\n        using Werkzeug's default ``abort``.\n    \"\"\"\n    if (ctx := _cv_app.get(None)) is not None:\n        ctx.app.aborter(code, *args, **kwargs)\n\n    _wz_abort(code, *args, **kwargs)\n",
+  "symbol": "flask.helpers.abort",
+  "start_line": 265,
+  "end_line": 285,
+  "resolution_status": "resolved",
+  "target_precision": "function"
+}

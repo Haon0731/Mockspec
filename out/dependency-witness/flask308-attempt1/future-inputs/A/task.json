@@ -1,0 +1,67 @@
+{
+  "schema_version": "mock-spec.task/v1",
+  "language": "python",
+  "case_id": "flask_308",
+  "mut_source": {
+    "source_id": "mut",
+    "logical_path": "src/src/flask/helpers.py",
+    "text": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:\n    \"\"\"Raise an :exc:`~werkzeug.exceptions.HTTPException` for the given\n    status code.\n\n    If :data:`~flask.current_app` is available, it will call its\n    :attr:`~flask.Flask.aborter` object, otherwise it will use\n    :func:`werkzeug.exceptions.abort`.\n\n    :param code: The status code for the exception, which must be\n        registered in ``app.aborter``.\n    :param args: Passed to the exception.\n    :param kwargs: Passed to the exception.\n\n    .. versionadded:: 2.2\n        Calls ``current_app.aborter`` if available instead of always\n        using Werkzeug's default ``abort``.\n    \"\"\"\n    if (ctx := _cv_app.get(None)) is not None:\n        ctx.app.aborter(code, *args, **kwargs)\n\n    _wz_abort(code, *args, **kwargs)\n",
+    "symbol": "flask.helpers.abort",
+    "start_line": 265,
+    "end_line": 285,
+    "resolution_status": "resolved",
+    "target_precision": "function"
+  },
+  "masked_test": {
+    "source_id": "test",
+    "logical_path": "tests/test_308abort.py",
+    "text": "   \n               \n        \n                          \n        \n   \nimport pytest\nfrom flask.helpers import abort\n\n\n@pytest.mark.parametrize(\"scenario,has_app_context,code,args,kwargs\", [\n    (\n        \"app_context_exists_404\",\n        True,\n        404,\n        (),\n        {}\n    ),\n    (\n        \"app_context_exists_500_with_message\",\n        True,\n        500,\n        (\"Internal Server Error\",),\n        {}\n    ),\n    (\n        \"no_app_context_403\",\n        False,\n        403,\n        (),\n        {}\n    ),\n    (\n        \"no_app_context_with_args_kwargs\",\n        False,\n        400,\n        (\"Bad Request\",),\n        {\"description\": \"Invalid input\"}\n    ),\n    (\n        \"app_context_custom_code\",\n        True,\n        418,\n        (),\n        {\"description\": \"I'm a teapot\"}\n    ),\n])\ndef test_abort_scenarios(mocker, scenario, has_app_context, code, args, kwargs):\n       \n                    \n\n       \n                                              \n                                                             \n                                          \n                                                       \n                                                \n\n         \n                          \n                                     \n                                    \n       \n                                 \n                      \n    # === PY-SLOT-START:mock_stub_001 ===\n    pass\n    # === PY-SLOT-END:mock_stub_001 ===\n\n                            \n    # === PY-SLOT-START:mock_stub_002 ===\n    pass\n    # === PY-SLOT-END:mock_stub_002 ===\n\n                                   \n    # === PY-SLOT-START:mock_stub_003 ===\n    pass\n    # === PY-SLOT-END:mock_stub_003 ===\n\n                        \n                         \n    # === PY-SLOT-START:mock_stub_004 ===\n    pass\n    # === PY-SLOT-END:mock_stub_004 ===\n\n    if has_app_context:\n                       \n        mock_ctx.app = mock_app\n        mock_app.aborter = mock_aborter\n                                \n        # === PY-SLOT-START:mock_stub_005 ===\n        pass\n        # === PY-SLOT-END:mock_stub_005 ===\n\n                            \n    # === PY-SLOT-START:mock_stub_006 ===\n    pass\n    # === PY-SLOT-END:mock_stub_006 ===\n                      \n\n                                 \n    with pytest.raises(Exception) as exc_info:\n        abort(code, *args, **kwargs)\n\n                        \n    # === PY-SLOT-START:verify_001 ===\n    pass\n    # === PY-SLOT-END:verify_001 ===\n\n                       \n    if has_app_context:\n                          \n        # === PY-SLOT-START:verify_002 ===\n        pass\n        # === PY-SLOT-END:verify_002 ===\n                                                 \n        # === PY-SLOT-START:verify_003 ===\n        pass\n        # === PY-SLOT-END:verify_003 ===\n        assert f\"Aborted with {code}\" in str(exc_info.value)\n    else:\n                             \n        # === PY-SLOT-START:verify_004 ===\n        pass\n        # === PY-SLOT-END:verify_004 ===\n        assert f\"Werkzeug abort {code}\" in str(exc_info.value)\n",
+    "symbol": "tests/test_308abort.py::test_abort_scenarios",
+    "start_line": 1,
+    "end_line": 126,
+    "resolution_status": "resolved",
+    "target_precision": "function"
+  },
+  "permitted_interfaces": [],
+  "supporting_sources": [
+    {
+      "source_id": "imports",
+      "logical_path": "src/src/flask/helpers.py",
+      "text": "from __future__ import annotations\n\nimport importlib.util\nimport os\nimport sys\nimport typing as t\nfrom datetime import datetime\nfrom functools import cache\nfrom functools import update_wrapper\n\nimport werkzeug.utils\nfrom werkzeug.exceptions import abort as _wz_abort\nfrom werkzeug.utils import redirect as _wz_redirect\nfrom werkzeug.wrappers import Response as BaseResponse\n\nfrom .globals import _cv_app\nfrom .globals import app_ctx\nfrom .globals import current_app\nfrom .globals import request\nfrom .globals import session\nfrom .signals import message_flashed\n\nif t.TYPE_CHECKING:  # pragma: no cover\n    from .wrappers import Response\n",
+      "symbol": null,
+      "start_line": 1,
+      "end_line": 24,
+      "resolution_status": "resolved",
+      "target_precision": "file"
+    }
+  ],
+  "execution_context": {
+    "runtime_name": "cpython",
+    "runtime_version": "3.10",
+    "test_framework": "pytest",
+    "test_framework_version": null
+  },
+  "input_policy": {
+    "policy_id": "mock-spec-reviewed-frozen/v1",
+    "protocol_version": "developer_realistic_workspace_v1",
+    "masking_contract": "python-mask-contract/v3",
+    "visibility": "reviewed_frozen_sources"
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_308abort.py",
+      "role": "masked_test"
+    },
+    {
+      "source_id": "mut",
+      "logical_path": "src/src/flask/helpers.py",
+      "role": "mut"
+    },
+    {
+      "source_id": "imports",
+      "logical_path": "src/src/flask/helpers.py",
+      "role": "supporting"
+    }
+  ]
+}
