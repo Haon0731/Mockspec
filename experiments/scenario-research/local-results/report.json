@@ -1,0 +1,1488 @@
+{
+  "scope": "source-bound normal-return local branch predicates",
+  "whole_test_verified": false,
+  "automatic_agent_inference": false,
+  "cases": {
+    "java": {
+      "catalog": {
+        "input": {
+          "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+          "language": "java",
+          "task_sha256": "83d8e54e03f822735014c7755514256b9e812b6fb5fd277e3a401961ec033719",
+          "source_sha256": {
+            "mut": "ff8ee22a4aa1bce7d61024a2d06fcb7983abc3e92751683cee598a92a0020140",
+            "test": "19e800bf8967238ef3b7772278e476186e509051e5021067b1f7234de0f68ed0",
+            "processor": "6dc801606c0e36dffa9ad447324524430cb3e676dde044320900f08eb61e50e5"
+          },
+          "input_policy": {
+            "policy_id": "mock-spec-reviewed-frozen/v1",
+            "protocol_version": "developer_realistic_workspace_v1",
+            "masking_contract": "java-dual-region-v1",
+            "visibility": "reviewed_frozen_sources"
+          },
+          "admission": "reviewed_adapter"
+        },
+        "extraction": {
+          "status": "incomplete",
+          "source_id": "mut",
+          "parser_backend": "spoon",
+          "parser_status": "ok",
+          "error_code": null,
+          "patterns": [
+            {
+              "pattern_id": "local-pattern:f32f249a9a20c0881ad0",
+              "support_status": "unresolved",
+              "source_id": "mut",
+              "source_sha256": "ff8ee22a4aa1bce7d61024a2d06fcb7983abc3e92751683cee598a92a0020140",
+              "dependency_call": {
+                "callee": "processor.getJavaVersion",
+                "receiver": "processor",
+                "method": "getJavaVersion",
+                "location": {
+                  "source_id": "mut",
+                  "start_line": 69,
+                  "end_line": 69,
+                  "quote": "          (processor.getJavaVersion() <= 8)"
+                },
+                "target_resolution": "unresolved",
+                "type_evidence": null
+              },
+              "binding": {
+                "kind": "direct_call_result",
+                "name": null,
+                "resolution_status": "unresolved",
+                "receiver_declaration": {
+                  "source_id": "mut",
+                  "start_line": 51,
+                  "end_line": 51
+                }
+              },
+              "condition": {
+                "construct": "conditional",
+                "location": {
+                  "source_id": "mut",
+                  "start_line": 69,
+                  "end_line": 71,
+                  "quote": "          (processor.getJavaVersion() <= 8)\n              ? Jib.from(\"adoptopenjdk:8-jre\")\n              : Jib.from(\"adoptopenjdk:11-jre\");"
+                },
+                "expression": "processor.getJavaVersion() <= 8",
+                "operator": "le",
+                "literal": 8
+              },
+              "term": null,
+              "normal_return_assumption": "The call returns normally and comparison evaluation completes; nullable Integer null and exceptions are outside this fragment.",
+              "controllability": "unresolved",
+              "control_caveats": [
+                "No unique reviewed numeric interface compatible with the receiver type.",
+                "Only the local comparison predicate is modeled; surrounding guards and branch effects are not solver claims."
+              ]
+            }
+          ],
+          "diagnostics": [
+            {
+              "category": "unsupported",
+              "code": "unsupported_java_condition",
+              "message": "Call-bearing if condition at line 60 is outside the simple integer-comparison grammar."
+            },
+            {
+              "category": "unsupported",
+              "code": "unsupported_java_condition",
+              "message": "Call-bearing conditional condition at line 77 is outside the simple integer-comparison grammar."
+            }
+          ]
+        }
+      },
+      "checks": [],
+      "status": "no_supported_fragment"
+    },
+    "python": {
+      "catalog": {
+        "input": {
+          "case_id": "flask_308",
+          "language": "python",
+          "task_sha256": "1ad98f488c35f70e0bd08f7d64b90d6adc811cf6ac507234de23681dc98d0f69",
+          "source_sha256": {
+            "mut": "c321b5b524e2b5e1938742f9063d47913119ebf5339a4cf37e53fafa34be4644",
+            "test": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+            "imports": "6f619d03f9c27647f328f5ab8b68f2c2c6abb51248a6ccc70c7f4ebb640702d6"
+          },
+          "input_policy": {
+            "policy_id": "mock-spec-reviewed-frozen/v1",
+            "protocol_version": "developer_realistic_workspace_v1",
+            "masking_contract": "python-mask-contract/v3",
+            "visibility": "reviewed_frozen_sources"
+          },
+          "admission": "reviewed_adapter"
+        },
+        "extraction": {
+          "status": "ok",
+          "source_id": "mut",
+          "parser_backend": "cpython_ast",
+          "parser_status": "ok",
+          "error_code": null,
+          "patterns": [
+            {
+              "pattern_id": "local-pattern:f1e2f8818be18e9563f1",
+              "support_status": "supported",
+              "source_id": "mut",
+              "source_sha256": "c321b5b524e2b5e1938742f9063d47913119ebf5339a4cf37e53fafa34be4644",
+              "dependency_call": {
+                "callee": "_cv_app.get",
+                "receiver": "_cv_app",
+                "method": "get",
+                "location": {
+                  "source_id": "mut",
+                  "start_line": 282,
+                  "end_line": 282,
+                  "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                },
+                "target_resolution": "unresolved",
+                "type_evidence": {
+                  "declared_return_type": "unknown_nullable_object",
+                  "resolution_status": "unresolved"
+                }
+              },
+              "binding": {
+                "kind": "same_expression_named_binding",
+                "name": "ctx",
+                "resolution_status": "resolved_local",
+                "receiver_declaration": {
+                  "source_id": "mut",
+                  "start_line": 282,
+                  "end_line": 282,
+                  "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                }
+              },
+              "condition": {
+                "construct": "if",
+                "location": {
+                  "source_id": "mut",
+                  "start_line": 282,
+                  "end_line": 282,
+                  "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                },
+                "expression": "(ctx := _cv_app.get(None)) is not None",
+                "operator": "is_not_none",
+                "literal": null
+              },
+              "term": {
+                "sort": "Bool",
+                "operator": "is_not_none",
+                "literal": null,
+                "bounds": null
+              },
+              "normal_return_assumption": "The call returns normally; raised exceptions and external call semantics are outside this fragment.",
+              "controllability": "unresolved",
+              "control_caveats": [
+                "The local returned-value predicate is formalized, but the dynamic call target is unresolved and is not approved for mock configuration.",
+                "Only the selected if condition is modeled; later calls and exception propagation are not solver claims."
+              ]
+            }
+          ],
+          "diagnostics": []
+        }
+      },
+      "checks": [
+        {
+          "contract": {
+            "model_id": "c35e8e029f68c2c3515b9dbf9f34659edfd9e2e754ee9753d35333c019bda944",
+            "formulas": {
+              "background": [],
+              "candidate": "(not response)",
+              "declarations": [
+                "(declare-fun response () Bool)"
+              ],
+              "goal": "(not response)"
+            },
+            "formula_identity": "2326abcd8c49fde7caa6bc29aa41a507015e8feabe6ac4c7432771a57323b557"
+          },
+          "check": {
+            "model_id": "c35e8e029f68c2c3515b9dbf9f34659edfd9e2e754ee9753d35333c019bda944",
+            "model": {
+              "input": {
+                "case_id": "flask_308",
+                "language": "python",
+                "task_sha256": "1ad98f488c35f70e0bd08f7d64b90d6adc811cf6ac507234de23681dc98d0f69",
+                "source_sha256": {
+                  "mut": "c321b5b524e2b5e1938742f9063d47913119ebf5339a4cf37e53fafa34be4644",
+                  "test": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+                  "imports": "6f619d03f9c27647f328f5ab8b68f2c2c6abb51248a6ccc70c7f4ebb640702d6"
+                },
+                "input_policy": {
+                  "policy_id": "mock-spec-reviewed-frozen/v1",
+                  "protocol_version": "developer_realistic_workspace_v1",
+                  "masking_contract": "python-mask-contract/v3",
+                  "visibility": "reviewed_frozen_sources"
+                },
+                "admission": "reviewed_adapter"
+              },
+              "source_id": "mut",
+              "pattern": {
+                "pattern_id": "local-pattern:f1e2f8818be18e9563f1",
+                "support_status": "supported",
+                "source_id": "mut",
+                "source_sha256": "c321b5b524e2b5e1938742f9063d47913119ebf5339a4cf37e53fafa34be4644",
+                "dependency_call": {
+                  "callee": "_cv_app.get",
+                  "receiver": "_cv_app",
+                  "method": "get",
+                  "location": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  },
+                  "target_resolution": "unresolved",
+                  "type_evidence": {
+                    "declared_return_type": "unknown_nullable_object",
+                    "resolution_status": "unresolved"
+                  }
+                },
+                "binding": {
+                  "kind": "same_expression_named_binding",
+                  "name": "ctx",
+                  "resolution_status": "resolved_local",
+                  "receiver_declaration": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  }
+                },
+                "condition": {
+                  "construct": "if",
+                  "location": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  },
+                  "expression": "(ctx := _cv_app.get(None)) is not None",
+                  "operator": "is_not_none",
+                  "literal": null
+                },
+                "term": {
+                  "sort": "Bool",
+                  "operator": "is_not_none",
+                  "literal": null,
+                  "bounds": null
+                },
+                "normal_return_assumption": "The call returns normally; raised exceptions and external call semantics are outside this fragment.",
+                "controllability": "unresolved",
+                "control_caveats": [
+                  "The local returned-value predicate is formalized, but the dynamic call target is unresolved and is not approved for mock configuration.",
+                  "Only the selected if condition is modeled; later calls and exception propagation are not solver claims."
+                ]
+              },
+              "term": {
+                "sort": "Bool",
+                "operator": "is_not_none",
+                "literal": null,
+                "bounds": null
+              },
+              "scenario": "condition reached; dependency invocation returned normally",
+              "goal": {
+                "condition_branch": true
+              },
+              "symbol": {
+                "name": "response",
+                "sort": "Bool",
+                "meaning": "return_is_none",
+                "origin": {
+                  "callee": "_cv_app.get",
+                  "receiver": "_cv_app",
+                  "method": "get",
+                  "location": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  },
+                  "target_resolution": "unresolved",
+                  "type_evidence": {
+                    "declared_return_type": "unknown_nullable_object",
+                    "resolution_status": "unresolved"
+                  }
+                },
+                "controllability": "unresolved",
+                "allowed_use": "local observation constraint only; no mock configuration"
+              },
+              "assumptions": [
+                "The call returns normally; raised exceptions and external call semantics are outside this fragment.",
+                "local condition is reached; enclosing paths are not proved"
+              ],
+              "not_formalized": [
+                "exception propagation",
+                "test oracle",
+                "MUT final output",
+                "external library behavior",
+                "global necessity",
+                "mock realization"
+              ]
+            },
+            "proposal": {
+              "source_id": "mut",
+              "pattern_id": "local-pattern:f1e2f8818be18e9563f1",
+              "question": "check_local_branch",
+              "goal_branch": true,
+              "candidate": [
+                {
+                  "kind": "condition",
+                  "value": true
+                }
+              ]
+            },
+            "solver": {
+              "consistency": {
+                "assertions": [
+                  "(not response)"
+                ],
+                "assertions_identity": "f0a5b380228889eb59e4f7987a03c53d6a3c803f942bb630a9e96307f31ac95e",
+                "duration_ms": 0.415,
+                "raw_result": "sat",
+                "status": "sat"
+              },
+              "counterexample": {
+                "assertions": [
+                  "(not response)",
+                  "(not (not response))"
+                ],
+                "assertions_identity": "f02c1f0484ed917de8ccb4adf3429b1fe9fb63ef9583b792ce9166278eb3934c",
+                "duration_ms": 0.164,
+                "raw_result": "unsat",
+                "status": "unsat"
+              },
+              "formula_identity": "2326abcd8c49fde7caa6bc29aa41a507015e8feabe6ac4c7432771a57323b557",
+              "formulas": {
+                "background": [],
+                "candidate": "(not response)",
+                "declarations": [
+                  "(declare-fun response () Bool)"
+                ],
+                "goal": "(not response)"
+              },
+              "goal_reachability": {
+                "assertions": [
+                  "(not response)",
+                  "(not response)"
+                ],
+                "assertions_identity": "445f6d3b417cac90b1baac38f9a53eae2d094ebb653533fd0ed5159223b730b1",
+                "duration_ms": 0.314,
+                "raw_result": "sat",
+                "status": "sat"
+              },
+              "locally_sufficient": true,
+              "queries": {
+                "consistency": {
+                  "assertions": [
+                    "(not response)"
+                  ],
+                  "assertions_identity": "f0a5b380228889eb59e4f7987a03c53d6a3c803f942bb630a9e96307f31ac95e",
+                  "duration_ms": 0.415,
+                  "raw_result": "sat",
+                  "status": "sat"
+                },
+                "counterexample": {
+                  "assertions": [
+                    "(not response)",
+                    "(not (not response))"
+                  ],
+                  "assertions_identity": "f02c1f0484ed917de8ccb4adf3429b1fe9fb63ef9583b792ce9166278eb3934c",
+                  "duration_ms": 0.164,
+                  "raw_result": "unsat",
+                  "status": "unsat"
+                },
+                "goal_reachability": {
+                  "assertions": [
+                    "(not response)",
+                    "(not response)"
+                  ],
+                  "assertions_identity": "445f6d3b417cac90b1baac38f9a53eae2d094ebb653533fd0ed5159223b730b1",
+                  "duration_ms": 0.314,
+                  "raw_result": "sat",
+                  "status": "sat"
+                }
+              },
+              "resource_limits": {
+                "address_space_bytes": 536870912,
+                "core_bytes": 0,
+                "cpu_seconds": 4,
+                "file_bytes": 1048576
+              },
+              "round_trip": {
+                "commands": [
+                  "set-logic",
+                  "declare-fun",
+                  "assert",
+                  "assert",
+                  "check-sat"
+                ],
+                "matches": true,
+                "result": "unsat",
+                "source_identity": "92119e68902e780df1a91e46c628d10f2b4e260a05d4687d42ea96266d6676e8",
+                "status": "unsat"
+              },
+              "semantics": {
+                "bool_symbol": "true means the dependency response is None",
+                "exceptions": "not modeled",
+                "scope": "normal return value and one local branch condition only"
+              },
+              "solver": {
+                "cvc5": "1.3.1",
+                "version": "1.3.1-modified"
+              },
+              "status": "unsat",
+              "symbol": {
+                "name": "response",
+                "sort": "Bool"
+              },
+              "whole_test_verified": false
+            },
+            "whole_test_verified": false,
+            "check_id": "00b526994d852de4b5f0a3cc93c7e154aaf691bad2e6ba270e73a12b25704907"
+          },
+          "binding": "exact_host_model_and_solver_terms",
+          "query_exports": {
+            "consistency": {
+              "file": "00b526994d852de4b5f0a3cc93c7e154aaf691bad2e6ba270e73a12b25704907.consistency.smt2",
+              "sha256": "f81a83c3e0d6d72fc5a539a5f58f8e5d66e6b3443dea73558f6f9a47b3fbe9f8"
+            },
+            "counterexample": {
+              "file": "00b526994d852de4b5f0a3cc93c7e154aaf691bad2e6ba270e73a12b25704907.counterexample.smt2",
+              "sha256": "92119e68902e780df1a91e46c628d10f2b4e260a05d4687d42ea96266d6676e8"
+            },
+            "goal_reachability": {
+              "file": "00b526994d852de4b5f0a3cc93c7e154aaf691bad2e6ba270e73a12b25704907.goal_reachability.smt2",
+              "sha256": "75c74cb8c9fa6e91b15e27ec8d1a677a4f9b1fe169d55d32c88426b738e89386"
+            }
+          }
+        },
+        {
+          "contract": {
+            "model_id": "c35e8e029f68c2c3515b9dbf9f34659edfd9e2e754ee9753d35333c019bda944",
+            "formulas": {
+              "background": [],
+              "candidate": "(not response)",
+              "declarations": [
+                "(declare-fun response () Bool)"
+              ],
+              "goal": "(not response)",
+              "inference": {
+                "api": "getAbduct",
+                "background": [],
+                "goal": "(not response)",
+                "grammar_atoms": [
+                  "(not response)",
+                  "(not (not response))",
+                  "true",
+                  "false"
+                ],
+                "invocation_identity": "a289cc230b02d1b68f865b6f7a1dcb6ff816645ed4619dacaf800aff154e26c3",
+                "returned_candidate": "(not response)"
+              }
+            },
+            "formula_identity": "a577ccceb6185005d6678e197d1fe377ae0df5c9384dfba0a7cd2e877193ffd3"
+          },
+          "check": {
+            "model_id": "c35e8e029f68c2c3515b9dbf9f34659edfd9e2e754ee9753d35333c019bda944",
+            "model": {
+              "input": {
+                "case_id": "flask_308",
+                "language": "python",
+                "task_sha256": "1ad98f488c35f70e0bd08f7d64b90d6adc811cf6ac507234de23681dc98d0f69",
+                "source_sha256": {
+                  "mut": "c321b5b524e2b5e1938742f9063d47913119ebf5339a4cf37e53fafa34be4644",
+                  "test": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+                  "imports": "6f619d03f9c27647f328f5ab8b68f2c2c6abb51248a6ccc70c7f4ebb640702d6"
+                },
+                "input_policy": {
+                  "policy_id": "mock-spec-reviewed-frozen/v1",
+                  "protocol_version": "developer_realistic_workspace_v1",
+                  "masking_contract": "python-mask-contract/v3",
+                  "visibility": "reviewed_frozen_sources"
+                },
+                "admission": "reviewed_adapter"
+              },
+              "source_id": "mut",
+              "pattern": {
+                "pattern_id": "local-pattern:f1e2f8818be18e9563f1",
+                "support_status": "supported",
+                "source_id": "mut",
+                "source_sha256": "c321b5b524e2b5e1938742f9063d47913119ebf5339a4cf37e53fafa34be4644",
+                "dependency_call": {
+                  "callee": "_cv_app.get",
+                  "receiver": "_cv_app",
+                  "method": "get",
+                  "location": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  },
+                  "target_resolution": "unresolved",
+                  "type_evidence": {
+                    "declared_return_type": "unknown_nullable_object",
+                    "resolution_status": "unresolved"
+                  }
+                },
+                "binding": {
+                  "kind": "same_expression_named_binding",
+                  "name": "ctx",
+                  "resolution_status": "resolved_local",
+                  "receiver_declaration": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  }
+                },
+                "condition": {
+                  "construct": "if",
+                  "location": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  },
+                  "expression": "(ctx := _cv_app.get(None)) is not None",
+                  "operator": "is_not_none",
+                  "literal": null
+                },
+                "term": {
+                  "sort": "Bool",
+                  "operator": "is_not_none",
+                  "literal": null,
+                  "bounds": null
+                },
+                "normal_return_assumption": "The call returns normally; raised exceptions and external call semantics are outside this fragment.",
+                "controllability": "unresolved",
+                "control_caveats": [
+                  "The local returned-value predicate is formalized, but the dynamic call target is unresolved and is not approved for mock configuration.",
+                  "Only the selected if condition is modeled; later calls and exception propagation are not solver claims."
+                ]
+              },
+              "term": {
+                "sort": "Bool",
+                "operator": "is_not_none",
+                "literal": null,
+                "bounds": null
+              },
+              "scenario": "condition reached; dependency invocation returned normally",
+              "goal": {
+                "condition_branch": true
+              },
+              "symbol": {
+                "name": "response",
+                "sort": "Bool",
+                "meaning": "return_is_none",
+                "origin": {
+                  "callee": "_cv_app.get",
+                  "receiver": "_cv_app",
+                  "method": "get",
+                  "location": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  },
+                  "target_resolution": "unresolved",
+                  "type_evidence": {
+                    "declared_return_type": "unknown_nullable_object",
+                    "resolution_status": "unresolved"
+                  }
+                },
+                "controllability": "unresolved",
+                "allowed_use": "local observation constraint only; no mock configuration"
+              },
+              "assumptions": [
+                "The call returns normally; raised exceptions and external call semantics are outside this fragment.",
+                "local condition is reached; enclosing paths are not proved"
+              ],
+              "not_formalized": [
+                "exception propagation",
+                "test oracle",
+                "MUT final output",
+                "external library behavior",
+                "global necessity",
+                "mock realization"
+              ]
+            },
+            "proposal": {
+              "source_id": "mut",
+              "pattern_id": "local-pattern:f1e2f8818be18e9563f1",
+              "question": "infer_local_branch",
+              "goal_branch": true,
+              "candidate": []
+            },
+            "solver": {
+              "consistency": {
+                "assertions": [
+                  "(not response)"
+                ],
+                "assertions_identity": "f0a5b380228889eb59e4f7987a03c53d6a3c803f942bb630a9e96307f31ac95e",
+                "duration_ms": 0.386,
+                "raw_result": "sat",
+                "status": "sat"
+              },
+              "counterexample": {
+                "assertions": [
+                  "(not response)",
+                  "(not (not response))"
+                ],
+                "assertions_identity": "f02c1f0484ed917de8ccb4adf3429b1fe9fb63ef9583b792ce9166278eb3934c",
+                "duration_ms": 0.159,
+                "raw_result": "unsat",
+                "status": "unsat"
+              },
+              "formula_identity": "a577ccceb6185005d6678e197d1fe377ae0df5c9384dfba0a7cd2e877193ffd3",
+              "formulas": {
+                "background": [],
+                "candidate": "(not response)",
+                "declarations": [
+                  "(declare-fun response () Bool)"
+                ],
+                "goal": "(not response)",
+                "inference": {
+                  "api": "getAbduct",
+                  "background": [],
+                  "goal": "(not response)",
+                  "grammar_atoms": [
+                    "(not response)",
+                    "(not (not response))",
+                    "true",
+                    "false"
+                  ],
+                  "invocation_identity": "a289cc230b02d1b68f865b6f7a1dcb6ff816645ed4619dacaf800aff154e26c3",
+                  "returned_candidate": "(not response)"
+                }
+              },
+              "goal_reachability": {
+                "assertions": [
+                  "(not response)",
+                  "(not response)"
+                ],
+                "assertions_identity": "445f6d3b417cac90b1baac38f9a53eae2d094ebb653533fd0ed5159223b730b1",
+                "duration_ms": 0.238,
+                "raw_result": "sat",
+                "status": "sat"
+              },
+              "inference": {
+                "candidate": "(not response)",
+                "candidate_identity": "da089c41e73a38df7d5c7f04f758ff252a419ee60e326ab343b321f17f8d186f",
+                "consistency": {
+                  "assertions": [
+                    "(not response)"
+                  ],
+                  "assertions_identity": "f0a5b380228889eb59e4f7987a03c53d6a3c803f942bb630a9e96307f31ac95e",
+                  "duration_ms": 0.386,
+                  "raw_result": "sat",
+                  "status": "sat"
+                },
+                "counterexample": {
+                  "assertions": [
+                    "(not response)",
+                    "(not (not response))"
+                  ],
+                  "assertions_identity": "f02c1f0484ed917de8ccb4adf3429b1fe9fb63ef9583b792ce9166278eb3934c",
+                  "duration_ms": 0.159,
+                  "raw_result": "unsat",
+                  "status": "unsat"
+                },
+                "formula_identity": "a577ccceb6185005d6678e197d1fe377ae0df5c9384dfba0a7cd2e877193ffd3",
+                "formulas": {
+                  "background": [],
+                  "candidate": "(not response)",
+                  "declarations": [
+                    "(declare-fun response () Bool)"
+                  ],
+                  "goal": "(not response)",
+                  "inference": {
+                    "api": "getAbduct",
+                    "background": [],
+                    "goal": "(not response)",
+                    "grammar_atoms": [
+                      "(not response)",
+                      "(not (not response))",
+                      "true",
+                      "false"
+                    ],
+                    "invocation_identity": "a289cc230b02d1b68f865b6f7a1dcb6ff816645ed4619dacaf800aff154e26c3",
+                    "returned_candidate": "(not response)"
+                  }
+                },
+                "goal_reachability": {
+                  "assertions": [
+                    "(not response)",
+                    "(not response)"
+                  ],
+                  "assertions_identity": "445f6d3b417cac90b1baac38f9a53eae2d094ebb653533fd0ed5159223b730b1",
+                  "duration_ms": 0.238,
+                  "raw_result": "sat",
+                  "status": "sat"
+                },
+                "grammar_atoms": [
+                  "(not response)",
+                  "(not (not response))",
+                  "true",
+                  "false"
+                ],
+                "invocation": {
+                  "api": "getAbduct",
+                  "background": [],
+                  "goal": "(not response)",
+                  "grammar_atoms": [
+                    "(not response)",
+                    "(not (not response))",
+                    "true",
+                    "false"
+                  ],
+                  "returned_candidate": "(not response)"
+                },
+                "invocation_identity": "a289cc230b02d1b68f865b6f7a1dcb6ff816645ed4619dacaf800aff154e26c3",
+                "locally_sufficient": true,
+                "status": "candidate_found"
+              },
+              "locally_sufficient": true,
+              "queries": {
+                "consistency": {
+                  "assertions": [
+                    "(not response)"
+                  ],
+                  "assertions_identity": "f0a5b380228889eb59e4f7987a03c53d6a3c803f942bb630a9e96307f31ac95e",
+                  "duration_ms": 0.386,
+                  "raw_result": "sat",
+                  "status": "sat"
+                },
+                "counterexample": {
+                  "assertions": [
+                    "(not response)",
+                    "(not (not response))"
+                  ],
+                  "assertions_identity": "f02c1f0484ed917de8ccb4adf3429b1fe9fb63ef9583b792ce9166278eb3934c",
+                  "duration_ms": 0.159,
+                  "raw_result": "unsat",
+                  "status": "unsat"
+                },
+                "goal_reachability": {
+                  "assertions": [
+                    "(not response)",
+                    "(not response)"
+                  ],
+                  "assertions_identity": "445f6d3b417cac90b1baac38f9a53eae2d094ebb653533fd0ed5159223b730b1",
+                  "duration_ms": 0.238,
+                  "raw_result": "sat",
+                  "status": "sat"
+                }
+              },
+              "resource_limits": {
+                "address_space_bytes": 536870912,
+                "core_bytes": 0,
+                "cpu_seconds": 4,
+                "file_bytes": 1048576
+              },
+              "round_trip": {
+                "commands": [
+                  "set-logic",
+                  "declare-fun",
+                  "assert",
+                  "assert",
+                  "check-sat"
+                ],
+                "matches": true,
+                "result": "unsat",
+                "source_identity": "92119e68902e780df1a91e46c628d10f2b4e260a05d4687d42ea96266d6676e8",
+                "status": "unsat"
+              },
+              "semantics": {
+                "bool_symbol": "true means the dependency response is None",
+                "exceptions": "not modeled",
+                "scope": "normal return value and one local branch condition only"
+              },
+              "solver": {
+                "cvc5": "1.3.1",
+                "version": "1.3.1-modified"
+              },
+              "status": "unsat",
+              "symbol": {
+                "name": "response",
+                "sort": "Bool"
+              },
+              "whole_test_verified": false
+            },
+            "whole_test_verified": false,
+            "check_id": "171a23b3178c68a97bf028d3165fa16886b1f9c764c99e61c594247e480bda9e"
+          },
+          "binding": "exact_host_model_and_solver_terms",
+          "query_exports": {
+            "consistency": {
+              "file": "171a23b3178c68a97bf028d3165fa16886b1f9c764c99e61c594247e480bda9e.consistency.smt2",
+              "sha256": "f81a83c3e0d6d72fc5a539a5f58f8e5d66e6b3443dea73558f6f9a47b3fbe9f8"
+            },
+            "counterexample": {
+              "file": "171a23b3178c68a97bf028d3165fa16886b1f9c764c99e61c594247e480bda9e.counterexample.smt2",
+              "sha256": "92119e68902e780df1a91e46c628d10f2b4e260a05d4687d42ea96266d6676e8"
+            },
+            "goal_reachability": {
+              "file": "171a23b3178c68a97bf028d3165fa16886b1f9c764c99e61c594247e480bda9e.goal_reachability.smt2",
+              "sha256": "75c74cb8c9fa6e91b15e27ec8d1a677a4f9b1fe169d55d32c88426b738e89386"
+            }
+          }
+        },
+        {
+          "contract": {
+            "model_id": "c0a564b928fd9b17fa161c7c29dbe52edbf30438888c421ea778accbdb3e53af",
+            "formulas": {
+              "background": [],
+              "candidate": "response",
+              "declarations": [
+                "(declare-fun response () Bool)"
+              ],
+              "goal": "(not (not response))"
+            },
+            "formula_identity": "fb065ec88aea27443c9617f971ec492928d0720724a951d490362cb973b7800f"
+          },
+          "check": {
+            "model_id": "c0a564b928fd9b17fa161c7c29dbe52edbf30438888c421ea778accbdb3e53af",
+            "model": {
+              "input": {
+                "case_id": "flask_308",
+                "language": "python",
+                "task_sha256": "1ad98f488c35f70e0bd08f7d64b90d6adc811cf6ac507234de23681dc98d0f69",
+                "source_sha256": {
+                  "mut": "c321b5b524e2b5e1938742f9063d47913119ebf5339a4cf37e53fafa34be4644",
+                  "test": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+                  "imports": "6f619d03f9c27647f328f5ab8b68f2c2c6abb51248a6ccc70c7f4ebb640702d6"
+                },
+                "input_policy": {
+                  "policy_id": "mock-spec-reviewed-frozen/v1",
+                  "protocol_version": "developer_realistic_workspace_v1",
+                  "masking_contract": "python-mask-contract/v3",
+                  "visibility": "reviewed_frozen_sources"
+                },
+                "admission": "reviewed_adapter"
+              },
+              "source_id": "mut",
+              "pattern": {
+                "pattern_id": "local-pattern:f1e2f8818be18e9563f1",
+                "support_status": "supported",
+                "source_id": "mut",
+                "source_sha256": "c321b5b524e2b5e1938742f9063d47913119ebf5339a4cf37e53fafa34be4644",
+                "dependency_call": {
+                  "callee": "_cv_app.get",
+                  "receiver": "_cv_app",
+                  "method": "get",
+                  "location": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  },
+                  "target_resolution": "unresolved",
+                  "type_evidence": {
+                    "declared_return_type": "unknown_nullable_object",
+                    "resolution_status": "unresolved"
+                  }
+                },
+                "binding": {
+                  "kind": "same_expression_named_binding",
+                  "name": "ctx",
+                  "resolution_status": "resolved_local",
+                  "receiver_declaration": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  }
+                },
+                "condition": {
+                  "construct": "if",
+                  "location": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  },
+                  "expression": "(ctx := _cv_app.get(None)) is not None",
+                  "operator": "is_not_none",
+                  "literal": null
+                },
+                "term": {
+                  "sort": "Bool",
+                  "operator": "is_not_none",
+                  "literal": null,
+                  "bounds": null
+                },
+                "normal_return_assumption": "The call returns normally; raised exceptions and external call semantics are outside this fragment.",
+                "controllability": "unresolved",
+                "control_caveats": [
+                  "The local returned-value predicate is formalized, but the dynamic call target is unresolved and is not approved for mock configuration.",
+                  "Only the selected if condition is modeled; later calls and exception propagation are not solver claims."
+                ]
+              },
+              "term": {
+                "sort": "Bool",
+                "operator": "is_not_none",
+                "literal": null,
+                "bounds": null
+              },
+              "scenario": "condition reached; dependency invocation returned normally",
+              "goal": {
+                "condition_branch": false
+              },
+              "symbol": {
+                "name": "response",
+                "sort": "Bool",
+                "meaning": "return_is_none",
+                "origin": {
+                  "callee": "_cv_app.get",
+                  "receiver": "_cv_app",
+                  "method": "get",
+                  "location": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  },
+                  "target_resolution": "unresolved",
+                  "type_evidence": {
+                    "declared_return_type": "unknown_nullable_object",
+                    "resolution_status": "unresolved"
+                  }
+                },
+                "controllability": "unresolved",
+                "allowed_use": "local observation constraint only; no mock configuration"
+              },
+              "assumptions": [
+                "The call returns normally; raised exceptions and external call semantics are outside this fragment.",
+                "local condition is reached; enclosing paths are not proved"
+              ],
+              "not_formalized": [
+                "exception propagation",
+                "test oracle",
+                "MUT final output",
+                "external library behavior",
+                "global necessity",
+                "mock realization"
+              ]
+            },
+            "proposal": {
+              "source_id": "mut",
+              "pattern_id": "local-pattern:f1e2f8818be18e9563f1",
+              "question": "check_local_branch",
+              "goal_branch": false,
+              "candidate": [
+                {
+                  "kind": "condition",
+                  "value": false
+                }
+              ]
+            },
+            "solver": {
+              "consistency": {
+                "assertions": [
+                  "response"
+                ],
+                "assertions_identity": "d26d4f55806083f067207948ce977e0ae3d5e84df796d58441909de2c247c170",
+                "duration_ms": 0.285,
+                "raw_result": "sat",
+                "status": "sat"
+              },
+              "counterexample": {
+                "assertions": [
+                  "response",
+                  "(not (not (not response)))"
+                ],
+                "assertions_identity": "1341086fedd62a2301e54be605bfc20f3b5fe9098eda9ee1a59aef785c9cb575",
+                "duration_ms": 0.165,
+                "raw_result": "unsat",
+                "status": "unsat"
+              },
+              "formula_identity": "fb065ec88aea27443c9617f971ec492928d0720724a951d490362cb973b7800f",
+              "formulas": {
+                "background": [],
+                "candidate": "response",
+                "declarations": [
+                  "(declare-fun response () Bool)"
+                ],
+                "goal": "(not (not response))"
+              },
+              "goal_reachability": {
+                "assertions": [
+                  "response",
+                  "(not (not response))"
+                ],
+                "assertions_identity": "aa2262cc67c717205f7100b78f723be3ee6409df6b49bf2eee274853d03fb425",
+                "duration_ms": 0.333,
+                "raw_result": "sat",
+                "status": "sat"
+              },
+              "locally_sufficient": true,
+              "queries": {
+                "consistency": {
+                  "assertions": [
+                    "response"
+                  ],
+                  "assertions_identity": "d26d4f55806083f067207948ce977e0ae3d5e84df796d58441909de2c247c170",
+                  "duration_ms": 0.285,
+                  "raw_result": "sat",
+                  "status": "sat"
+                },
+                "counterexample": {
+                  "assertions": [
+                    "response",
+                    "(not (not (not response)))"
+                  ],
+                  "assertions_identity": "1341086fedd62a2301e54be605bfc20f3b5fe9098eda9ee1a59aef785c9cb575",
+                  "duration_ms": 0.165,
+                  "raw_result": "unsat",
+                  "status": "unsat"
+                },
+                "goal_reachability": {
+                  "assertions": [
+                    "response",
+                    "(not (not response))"
+                  ],
+                  "assertions_identity": "aa2262cc67c717205f7100b78f723be3ee6409df6b49bf2eee274853d03fb425",
+                  "duration_ms": 0.333,
+                  "raw_result": "sat",
+                  "status": "sat"
+                }
+              },
+              "resource_limits": {
+                "address_space_bytes": 536870912,
+                "core_bytes": 0,
+                "cpu_seconds": 4,
+                "file_bytes": 1048576
+              },
+              "round_trip": {
+                "commands": [
+                  "set-logic",
+                  "declare-fun",
+                  "assert",
+                  "assert",
+                  "check-sat"
+                ],
+                "matches": true,
+                "result": "unsat",
+                "source_identity": "2bb8820b61e36857a64405b596e2a25e44837c8e832ea0771ed6cc9d23b8edb4",
+                "status": "unsat"
+              },
+              "semantics": {
+                "bool_symbol": "true means the dependency response is None",
+                "exceptions": "not modeled",
+                "scope": "normal return value and one local branch condition only"
+              },
+              "solver": {
+                "cvc5": "1.3.1",
+                "version": "1.3.1-modified"
+              },
+              "status": "unsat",
+              "symbol": {
+                "name": "response",
+                "sort": "Bool"
+              },
+              "whole_test_verified": false
+            },
+            "whole_test_verified": false,
+            "check_id": "73844aebf11075324fd0e2e42d48d1a7fc5d8eeadb4eb2ab6486ef6161e5ec69"
+          },
+          "binding": "exact_host_model_and_solver_terms",
+          "query_exports": {
+            "consistency": {
+              "file": "73844aebf11075324fd0e2e42d48d1a7fc5d8eeadb4eb2ab6486ef6161e5ec69.consistency.smt2",
+              "sha256": "2073577cdc8e234905809944ac2bb446c1e61daa1115b3a682386b3b6ae783f7"
+            },
+            "counterexample": {
+              "file": "73844aebf11075324fd0e2e42d48d1a7fc5d8eeadb4eb2ab6486ef6161e5ec69.counterexample.smt2",
+              "sha256": "2bb8820b61e36857a64405b596e2a25e44837c8e832ea0771ed6cc9d23b8edb4"
+            },
+            "goal_reachability": {
+              "file": "73844aebf11075324fd0e2e42d48d1a7fc5d8eeadb4eb2ab6486ef6161e5ec69.goal_reachability.smt2",
+              "sha256": "7d23584ca2b7ec2e960f89c8366a934052c0da5e383a90263988e4c60c3c6358"
+            }
+          }
+        },
+        {
+          "contract": {
+            "model_id": "c0a564b928fd9b17fa161c7c29dbe52edbf30438888c421ea778accbdb3e53af",
+            "formulas": {
+              "background": [],
+              "candidate": "(not (not response))",
+              "declarations": [
+                "(declare-fun response () Bool)"
+              ],
+              "goal": "(not (not response))",
+              "inference": {
+                "api": "getAbduct",
+                "background": [],
+                "goal": "(not (not response))",
+                "grammar_atoms": [
+                  "(not (not response))",
+                  "(not (not (not response)))",
+                  "true",
+                  "false"
+                ],
+                "invocation_identity": "17e701107e99b0bc4fd8d2eca4df7efafef47a7940c55b3da2c16f8bfcb33f53",
+                "returned_candidate": "(not (not response))"
+              }
+            },
+            "formula_identity": "87d8cb79d71d44f3c361d4215eca221756b4cffc198b22ac220ef538344bfdcd"
+          },
+          "check": {
+            "model_id": "c0a564b928fd9b17fa161c7c29dbe52edbf30438888c421ea778accbdb3e53af",
+            "model": {
+              "input": {
+                "case_id": "flask_308",
+                "language": "python",
+                "task_sha256": "1ad98f488c35f70e0bd08f7d64b90d6adc811cf6ac507234de23681dc98d0f69",
+                "source_sha256": {
+                  "mut": "c321b5b524e2b5e1938742f9063d47913119ebf5339a4cf37e53fafa34be4644",
+                  "test": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+                  "imports": "6f619d03f9c27647f328f5ab8b68f2c2c6abb51248a6ccc70c7f4ebb640702d6"
+                },
+                "input_policy": {
+                  "policy_id": "mock-spec-reviewed-frozen/v1",
+                  "protocol_version": "developer_realistic_workspace_v1",
+                  "masking_contract": "python-mask-contract/v3",
+                  "visibility": "reviewed_frozen_sources"
+                },
+                "admission": "reviewed_adapter"
+              },
+              "source_id": "mut",
+              "pattern": {
+                "pattern_id": "local-pattern:f1e2f8818be18e9563f1",
+                "support_status": "supported",
+                "source_id": "mut",
+                "source_sha256": "c321b5b524e2b5e1938742f9063d47913119ebf5339a4cf37e53fafa34be4644",
+                "dependency_call": {
+                  "callee": "_cv_app.get",
+                  "receiver": "_cv_app",
+                  "method": "get",
+                  "location": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  },
+                  "target_resolution": "unresolved",
+                  "type_evidence": {
+                    "declared_return_type": "unknown_nullable_object",
+                    "resolution_status": "unresolved"
+                  }
+                },
+                "binding": {
+                  "kind": "same_expression_named_binding",
+                  "name": "ctx",
+                  "resolution_status": "resolved_local",
+                  "receiver_declaration": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  }
+                },
+                "condition": {
+                  "construct": "if",
+                  "location": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  },
+                  "expression": "(ctx := _cv_app.get(None)) is not None",
+                  "operator": "is_not_none",
+                  "literal": null
+                },
+                "term": {
+                  "sort": "Bool",
+                  "operator": "is_not_none",
+                  "literal": null,
+                  "bounds": null
+                },
+                "normal_return_assumption": "The call returns normally; raised exceptions and external call semantics are outside this fragment.",
+                "controllability": "unresolved",
+                "control_caveats": [
+                  "The local returned-value predicate is formalized, but the dynamic call target is unresolved and is not approved for mock configuration.",
+                  "Only the selected if condition is modeled; later calls and exception propagation are not solver claims."
+                ]
+              },
+              "term": {
+                "sort": "Bool",
+                "operator": "is_not_none",
+                "literal": null,
+                "bounds": null
+              },
+              "scenario": "condition reached; dependency invocation returned normally",
+              "goal": {
+                "condition_branch": false
+              },
+              "symbol": {
+                "name": "response",
+                "sort": "Bool",
+                "meaning": "return_is_none",
+                "origin": {
+                  "callee": "_cv_app.get",
+                  "receiver": "_cv_app",
+                  "method": "get",
+                  "location": {
+                    "source_id": "mut",
+                    "start_line": 282,
+                    "end_line": 282,
+                    "quote": "    if (ctx := _cv_app.get(None)) is not None:"
+                  },
+                  "target_resolution": "unresolved",
+                  "type_evidence": {
+                    "declared_return_type": "unknown_nullable_object",
+                    "resolution_status": "unresolved"
+                  }
+                },
+                "controllability": "unresolved",
+                "allowed_use": "local observation constraint only; no mock configuration"
+              },
+              "assumptions": [
+                "The call returns normally; raised exceptions and external call semantics are outside this fragment.",
+                "local condition is reached; enclosing paths are not proved"
+              ],
+              "not_formalized": [
+                "exception propagation",
+                "test oracle",
+                "MUT final output",
+                "external library behavior",
+                "global necessity",
+                "mock realization"
+              ]
+            },
+            "proposal": {
+              "source_id": "mut",
+              "pattern_id": "local-pattern:f1e2f8818be18e9563f1",
+              "question": "infer_local_branch",
+              "goal_branch": false,
+              "candidate": []
+            },
+            "solver": {
+              "consistency": {
+                "assertions": [
+                  "(not (not response))"
+                ],
+                "assertions_identity": "24a831c144403754ad8695ff2694ad938abcc494c3c920c171e3b4cfbf173612",
+                "duration_ms": 0.37,
+                "raw_result": "sat",
+                "status": "sat"
+              },
+              "counterexample": {
+                "assertions": [
+                  "(not (not response))",
+                  "(not (not (not response)))"
+                ],
+                "assertions_identity": "12120abb9e602ca63c55857b6f5575f03b0ffd191215581c4421c7edcc48df2a",
+                "duration_ms": 0.168,
+                "raw_result": "unsat",
+                "status": "unsat"
+              },
+              "formula_identity": "87d8cb79d71d44f3c361d4215eca221756b4cffc198b22ac220ef538344bfdcd",
+              "formulas": {
+                "background": [],
+                "candidate": "(not (not response))",
+                "declarations": [
+                  "(declare-fun response () Bool)"
+                ],
+                "goal": "(not (not response))",
+                "inference": {
+                  "api": "getAbduct",
+                  "background": [],
+                  "goal": "(not (not response))",
+                  "grammar_atoms": [
+                    "(not (not response))",
+                    "(not (not (not response)))",
+                    "true",
+                    "false"
+                  ],
+                  "invocation_identity": "17e701107e99b0bc4fd8d2eca4df7efafef47a7940c55b3da2c16f8bfcb33f53",
+                  "returned_candidate": "(not (not response))"
+                }
+              },
+              "goal_reachability": {
+                "assertions": [
+                  "(not (not response))",
+                  "(not (not response))"
+                ],
+                "assertions_identity": "7b175341f2310b06d89c9cb127f6b62e00c579a22ce4b539adf9aa96b077455a",
+                "duration_ms": 0.312,
+                "raw_result": "sat",
+                "status": "sat"
+              },
+              "inference": {
+                "candidate": "(not (not response))",
+                "candidate_identity": "a5b68c601e0b301242c0456256e82f9d21f5adf2625522a174bf658c17a1422f",
+                "consistency": {
+                  "assertions": [
+                    "(not (not response))"
+                  ],
+                  "assertions_identity": "24a831c144403754ad8695ff2694ad938abcc494c3c920c171e3b4cfbf173612",
+                  "duration_ms": 0.37,
+                  "raw_result": "sat",
+                  "status": "sat"
+                },
+                "counterexample": {
+                  "assertions": [
+                    "(not (not response))",
+                    "(not (not (not response)))"
+                  ],
+                  "assertions_identity": "12120abb9e602ca63c55857b6f5575f03b0ffd191215581c4421c7edcc48df2a",
+                  "duration_ms": 0.168,
+                  "raw_result": "unsat",
+                  "status": "unsat"
+                },
+                "formula_identity": "87d8cb79d71d44f3c361d4215eca221756b4cffc198b22ac220ef538344bfdcd",
+                "formulas": {
+                  "background": [],
+                  "candidate": "(not (not response))",
+                  "declarations": [
+                    "(declare-fun response () Bool)"
+                  ],
+                  "goal": "(not (not response))",
+                  "inference": {
+                    "api": "getAbduct",
+                    "background": [],
+                    "goal": "(not (not response))",
+                    "grammar_atoms": [
+                      "(not (not response))",
+                      "(not (not (not response)))",
+                      "true",
+                      "false"
+                    ],
+                    "invocation_identity": "17e701107e99b0bc4fd8d2eca4df7efafef47a7940c55b3da2c16f8bfcb33f53",
+                    "returned_candidate": "(not (not response))"
+                  }
+                },
+                "goal_reachability": {
+                  "assertions": [
+                    "(not (not response))",
+                    "(not (not response))"
+                  ],
+                  "assertions_identity": "7b175341f2310b06d89c9cb127f6b62e00c579a22ce4b539adf9aa96b077455a",
+                  "duration_ms": 0.312,
+                  "raw_result": "sat",
+                  "status": "sat"
+                },
+                "grammar_atoms": [
+                  "(not (not response))",
+                  "(not (not (not response)))",
+                  "true",
+                  "false"
+                ],
+                "invocation": {
+                  "api": "getAbduct",
+                  "background": [],
+                  "goal": "(not (not response))",
+                  "grammar_atoms": [
+                    "(not (not response))",
+                    "(not (not (not response)))",
+                    "true",
+                    "false"
+                  ],
+                  "returned_candidate": "(not (not response))"
+                },
+                "invocation_identity": "17e701107e99b0bc4fd8d2eca4df7efafef47a7940c55b3da2c16f8bfcb33f53",
+                "locally_sufficient": true,
+                "status": "candidate_found"
+              },
+              "locally_sufficient": true,
+              "queries": {
+                "consistency": {
+                  "assertions": [
+                    "(not (not response))"
+                  ],
+                  "assertions_identity": "24a831c144403754ad8695ff2694ad938abcc494c3c920c171e3b4cfbf173612",
+                  "duration_ms": 0.37,
+                  "raw_result": "sat",
+                  "status": "sat"
+                },
+                "counterexample": {
+                  "assertions": [
+                    "(not (not response))",
+                    "(not (not (not response)))"
+                  ],
+                  "assertions_identity": "12120abb9e602ca63c55857b6f5575f03b0ffd191215581c4421c7edcc48df2a",
+                  "duration_ms": 0.168,
+                  "raw_result": "unsat",
+                  "status": "unsat"
+                },
+                "goal_reachability": {
+                  "assertions": [
+                    "(not (not response))",
+                    "(not (not response))"
+                  ],
+                  "assertions_identity": "7b175341f2310b06d89c9cb127f6b62e00c579a22ce4b539adf9aa96b077455a",
+                  "duration_ms": 0.312,
+                  "raw_result": "sat",
+                  "status": "sat"
+                }
+              },
+              "resource_limits": {
+                "address_space_bytes": 536870912,
+                "core_bytes": 0,
+                "cpu_seconds": 4,
+                "file_bytes": 1048576
+              },
+              "round_trip": {
+                "commands": [
+                  "set-logic",
+                  "declare-fun",
+                  "assert",
+                  "assert",
+                  "check-sat"
+                ],
+                "matches": true,
+                "result": "unsat",
+                "source_identity": "9e4d1e46c820df464213ffdb70d16817e6851e81f967e7caecab0fed326c68b1",
+                "status": "unsat"
+              },
+              "semantics": {
+                "bool_symbol": "true means the dependency response is None",
+                "exceptions": "not modeled",
+                "scope": "normal return value and one local branch condition only"
+              },
+              "solver": {
+                "cvc5": "1.3.1",
+                "version": "1.3.1-modified"
+              },
+              "status": "unsat",
+              "symbol": {
+                "name": "response",
+                "sort": "Bool"
+              },
+              "whole_test_verified": false
+            },
+            "whole_test_verified": false,
+            "check_id": "41b6800c5d92eaaa4d57c0aa521e00e3657c4fd5aadb86acdc291c2c3b4496f1"
+          },
+          "binding": "exact_host_model_and_solver_terms",
+          "query_exports": {
+            "consistency": {
+              "file": "41b6800c5d92eaaa4d57c0aa521e00e3657c4fd5aadb86acdc291c2c3b4496f1.consistency.smt2",
+              "sha256": "a38c92c52df24fba55fd08c934c847ed51c0031d45fc97b100a643e33b6735f7"
+            },
+            "counterexample": {
+              "file": "41b6800c5d92eaaa4d57c0aa521e00e3657c4fd5aadb86acdc291c2c3b4496f1.counterexample.smt2",
+              "sha256": "9e4d1e46c820df464213ffdb70d16817e6851e81f967e7caecab0fed326c68b1"
+            },
+            "goal_reachability": {
+              "file": "41b6800c5d92eaaa4d57c0aa521e00e3657c4fd5aadb86acdc291c2c3b4496f1.goal_reachability.smt2",
+              "sha256": "dc6625cd4e4bc19774f718e89bbc8b95cc146046481da81300d4ca6201272c56"
+            }
+          }
+        }
+      ],
+      "status": "checked_local_fragments"
+    }
+  },
+  "implementation_sha256": {
+    "local_host.py": "c029fabcf79cee57cda08367e2e1c6773334c5e4446ab98c5da9a166a8f64b82",
+    "local_patterns.py": "aa47f2d5dbe272383b870fc2c39306b80237727b9d1dfdc98e32eb94153a78f1",
+    "local_solver.py": "571f58d197164e428ec5efddacd435ca8b84642a9ea8ac0396ab2bfc4856def3",
+    "local_solver_worker.py": "1f393a55b27d9c1cf55f27bcfd7c68195df5bda967a27f6eb5377b4e718f55f6",
+    "run_local.py": "aa818a7d9ad56303303dde38a98ac7d231b941bf4b1a1562c72d28f29e5c44c8",
+    "probe_local_isolation.py": "d760c9fdaa967a13bbb80a75811b8259bcbb58d2552ca3224165546fadce935f"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "reference_commit": "cacef46f2f57931e3893bb11ebcb785bb9c939a6",
+  "research_tests": {
+    "command": "PYTHONPATH=src /tmp/mockspec-contract-cvc5/bin/python -B -m pytest -q -p no:cacheprovider experiments/scenario-research/tests",
+    "passed": 89,
+    "exit_code": 0
+  },
+  "project_regression": {
+    "command": "PYTHONPATH=src .venv/bin/python -B -m pytest -q -p no:cacheprovider tests --ignore=tests/test_real_data.py",
+    "passed": 191,
+    "exit_code": 0,
+    "excluded": [
+      "tests/test_real_data.py"
+    ]
+  },
+  "auxiliary_run_disclosure": "An earlier helper run included the four read-only test_real_data tests (194 passed before the new shared-process regression); final applicable regression excludes them. No archived values were used for source inference.",
+  "compileall": "passed",
+  "diff_check": "passed",
+  "configured_lint_typecheck": false,
+  "artifact_checks": "implementation digests, formula digests, exact contract/formula equality and all 12 SMT export hashes verified",
+  "preserved_reference_files": {
+    "experiments/scenario-research/results/parser-error.json": true,
+    "experiments/scenario-research/models.py": true,
+    "experiments/scenario-research/build_examples.py": true,
+    "src/mock_spec/schemas.py": true,
+    "src/mock_spec/prompts/scenario_v0.1.txt": true,
+    "src/mock_spec/prompts/scenario_v0.2.txt": true
+  },
+  "shared_process_sha256": "ed8186c9a6c2869c2a49309aa6a0eb8a9fff5bc9408c685775088f072fee14ac",
+  "scope": {
+    "java_real": "unresolved; not sent to solver",
+    "python_real": "four exact-bound local checks",
+    "synthetic": "mechanism only; not MockBench effect evaluation"
+  },
+  "paid_model_calls": 0,
+  "target_test_execution": false
+}

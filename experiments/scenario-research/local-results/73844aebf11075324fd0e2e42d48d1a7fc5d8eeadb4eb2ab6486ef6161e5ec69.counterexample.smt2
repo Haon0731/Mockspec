@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-fun response () Bool)
+(assert response)
+(assert (not (not (not response))))
+(check-sat)
