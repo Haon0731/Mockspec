@@ -4,14 +4,16 @@ from __future__ import annotations
 
 import json
 import subprocess
+from pathlib import Path
 
+import pytest
 from agents.usage import Usage
-
-from mock_spec import inference, inference_v02, live_v02
-from mock_spec.inference import InferenceError
-from mock_spec.scenario import validate_contract
 from test_inference_v02 import ScriptedModel, _install_model, _message, _task
 from test_scenario import contract_data
+
+from mock_spec import inference, inference_v02, live_v02, run_evidence
+from mock_spec.inference import InferenceError
+from mock_spec.scenario import validate_contract
 
 
 def _args(tmp_path, version="v0.2"):
@@ -47,6 +49,7 @@ def test_v02_audit_artifact_uses_sdk_and_refuses_overwrite(tmp_path, monkeypatch
     assert artifact["parameters"]["max_cost_usd"] is None
     assert isinstance(artifact["git_dirty"], bool)
     assert "budget.py" in artifact["code_files_sha256"]
+    assert "run_evidence.py" in artifact["code_files_sha256"]
     assert "program_tools.py" in artifact["code_files_sha256"]
     assert "inference.py" in artifact["code_files_sha256"]
     assert "scenario.py" in artifact["code_files_sha256"]
@@ -196,7 +199,10 @@ def test_runner_requires_explicit_standalone_or_formal_ledger(tmp_path, monkeypa
     assert not (tmp_path / "run-v0.2").exists()
 
 
-def test_artifact_is_prepared_before_ledger_completion(tmp_path, monkeypatch) -> None:
+@pytest.mark.parametrize("error_type", [InferenceError, OSError])
+def test_artifact_is_prepared_before_ledger_completion(
+    tmp_path, monkeypatch, error_type
+) -> None:
     task = _task()
     monkeypatch.setattr(live_v02.python, "load_task", lambda *args, **kwargs: task)
     model = ScriptedModel(_message(contract_data()))
@@ -213,9 +219,20 @@ def test_artifact_is_prepared_before_ledger_completion(tmp_path, monkeypatch) ->
     args.remove("--standalone")
 
     def fail_completion(*args, **kwargs):
-        raise InferenceError("ledger unavailable")
+        pending = tmp_path / "run-v0.2/result.pending.json"
+        assert json.loads(pending.read_text())["contract"] == contract_data()
+        raise error_type("ledger unavailable")
 
-    monkeypatch.setattr(live_v02, "complete_attempt", fail_completion)
+    monkeypatch.setattr(run_evidence, "complete_attempt", fail_completion)
+
+    if error_type is OSError:
+        with pytest.raises(OSError, match="ledger unavailable"):
+            live_v02.main(args)
+        assert (tmp_path / "run-v0.2/result.pending.json").exists()
+        assert not (tmp_path / "run-v0.2/result.json").exists()
+        state = json.loads(ledger.read_text())
+        assert state["attempts"][0]["status"] == "reserved"
+        return
 
     assert live_v02.main(args) == 2
     artifact = json.loads((tmp_path / "run-v0.2/result.json").read_text())
@@ -267,3 +284,103 @@ def test_runtime_identity_marks_unavailable_spoon_toolchain(monkeypatch) -> None
     assert identity["spoon_toolchain"]["available"] is False
     assert identity["spoon_toolchain"]["java"] is None
     assert identity["spoon_toolchain"]["limitations"]
+
+
+def _formal_args(tmp_path):
+    args = _args(tmp_path) + [
+        "--max-cost-usd", "1",
+        "--input-cost-per-million", "2",
+        "--output-cost-per-million", "4",
+        "--experiment-ledger", str(tmp_path / "experiment.json"),
+        "--attempt-id", "python-v02-a1",
+        "--run-key", "python-v0.2",
+    ]
+    args.remove("--standalone")
+    return args
+
+
+@pytest.mark.parametrize("stage", ["pending_write", "publish"])
+def test_evidence_io_failure_preserves_ledger_and_available_artifact(
+    tmp_path, monkeypatch, capsys, stage
+) -> None:
+    task = _task()
+    monkeypatch.setattr(live_v02.python, "load_task", lambda *args, **kwargs: task)
+    model = ScriptedModel(_message(contract_data()))
+    _install_model(monkeypatch, task, model)
+    output_dir = tmp_path / "run-v0.2"
+    pending = output_dir / "result.pending.json"
+    original_open = Path.open
+    original_rename = Path.rename
+
+    def open_file(path, *args, **kwargs):
+        if path == pending and args and args[0] == "x":
+            raise OSError("injected pending write failure")
+        return original_open(path, *args, **kwargs)
+
+    def rename_file(path, target):
+        if path == pending:
+            raise OSError("injected publication failure")
+        return original_rename(path, target)
+
+    if stage == "pending_write":
+        monkeypatch.setattr(Path, "open", open_file)
+    else:
+        monkeypatch.setattr(Path, "rename", rename_file)
+
+    assert live_v02.main(_formal_args(tmp_path)) == 2
+    state = json.loads((tmp_path / "experiment.json").read_text())
+    assert not (output_dir / "result.json").exists()
+    assert model.calls == 1
+    if stage == "pending_write":
+        assert state["attempts"][0]["status"] == "reserved"
+        assert not pending.exists()
+        assert "could not persist pending run evidence" in capsys.readouterr().err
+    else:
+        assert state["attempts"][0]["status"] == "completed"
+        artifact = json.loads(pending.read_text())
+        assert artifact["status"] == "completed"
+        assert artifact["contract"] == contract_data()
+        assert artifact["usage"]["total_tokens"] == 30
+        assert "could not finalize run evidence" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("interrupted", [False, True])
+def test_failed_run_finishes_evidence_and_closes_unknown_accounting(
+    tmp_path, monkeypatch, interrupted
+) -> None:
+    from mock_spec.experiment_ledger import reserve_attempt
+
+    task = _task()
+    monkeypatch.setattr(live_v02.python, "load_task", lambda *args, **kwargs: task)
+    monkeypatch.setenv("OPENAI_API_KEY", "offline-key")
+
+    async def failure(task, **kwargs):
+        kwargs["tool_trace"].append({"status": "error", "sequence": 1})
+        # A dispatched request without a response has unknown provider charges.
+        kwargs["usage_ledger"].requests_started += 1
+        if interrupted:
+            raise KeyboardInterrupt
+        raise InferenceError("scenario inference timed out", "model_call_failure")
+
+    monkeypatch.setattr(inference_v02, "infer_scenario", failure)
+    assert live_v02.main(_formal_args(tmp_path)) == (130 if interrupted else 2)
+    ledger = tmp_path / "experiment.json"
+    state = json.loads(ledger.read_text())
+    artifact = json.loads((tmp_path / "run-v0.2/result.json").read_text())
+    assert artifact["status"] == ("interrupted" if interrupted else "model_call_failure")
+    assert artifact["contract"] is None
+    assert artifact["tool_trace"] == [{"status": "error", "sequence": 1}]
+    assert artifact["usage"]["usage_complete"] is False
+    assert artifact["usage"]["rate_estimated_cost_usd"] is None
+    assert not (tmp_path / "run-v0.2/result.pending.json").exists()
+    assert state["attempts"][0]["status"] == "completed"
+    assert state["attempts"][0]["outcome_status"] == (
+        "interrupted" if interrupted else "technical_timeout"
+    )
+    assert state["accounting_complete"] is False
+    with pytest.raises(InferenceError, match="unknown prior charges"):
+        reserve_attempt(
+            ledger, attempt_id="next-attempt", run_key="java-v0.2",
+            max_cost_usd="1", configuration=state["configuration"],
+            task_identity="another-task",
+        )

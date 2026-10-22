@@ -4,23 +4,24 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-from datetime import datetime, timezone
-from decimal import Decimal, InvalidOperation
 import hashlib
-from importlib.metadata import version
 import json
 import math
 import os
-from pathlib import Path
 import platform
 import subprocess
 import sys
+from datetime import datetime, timezone
+from decimal import Decimal, InvalidOperation
+from importlib.metadata import version
+from pathlib import Path
 
 from .adapters import java, python
 from .budget import UsageLedger
-from .experiment_ledger import complete_attempt, reserve_attempt
+from .experiment_ledger import reserve_attempt
 from .inference import InferenceError
 from .inference_v02 import InferenceBudget
+from .run_evidence import finish_run, write_artifact
 
 
 def _decimal(value: str) -> Decimal:
@@ -105,6 +106,7 @@ def _code_hashes() -> dict[str, str]:
         package / "validation.py",
         package / "experiment_ledger.py",
         package / "live_v02.py",
+        package / "run_evidence.py",
         package / "reviewed_inputs.json",
     ]
     paths.extend(sorted((package / "adapters").glob("*.py")))
@@ -158,8 +160,10 @@ def _runtime_identity() -> dict[str, object]:
         "executable_sha256": executable_sha256,
         "limitations": (
             [] if executable_sha256 is not None else [
-                "The active Python executable could not be hashed; version metadata is "
-                "available but the runtime binary identity is incomplete."
+                (
+                    "The active Python executable could not be hashed; version metadata is "
+                    "available but the runtime binary identity is incomplete."
+                )
             ]
         ),
     }
@@ -172,8 +176,10 @@ def _runtime_identity() -> dict[str, object]:
             "java": None,
             "javac": None,
             "limitations": [
-                "The pinned Spoon JAR or configured Java/Javac toolchain is unavailable; "
-                "no executable Java runtime identity could be captured."
+                (
+                    "The pinned Spoon JAR or configured Java/Javac toolchain is unavailable; "
+                    "no executable Java runtime identity could be captured."
+                )
             ],
         }
     else:
@@ -189,8 +195,10 @@ def _runtime_identity() -> dict[str, object]:
             **_tool_version(javac),
         }
         limitations = [
-            "Version output and launcher hashes identify the configured toolchain; "
-            "they do not hash every JDK runtime library."
+            (
+                "Version output and launcher hashes identify the configured toolchain; "
+                "they do not hash every JDK runtime library."
+            )
         ]
         if java_identity["status"] != "ok" or javac_identity["status"] != "ok":
             limitations.append(
@@ -275,38 +283,6 @@ def _baseline_usage(responses: list, budget: InferenceBudget, *, failed: bool) -
             "A locally cancelled request may incur charges absent from captured usage.",
         ],
     }
-
-
-def _write_artifact(output_dir: Path, artifact: dict) -> bool:
-    try:
-        text = json.dumps(artifact, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
-        with (output_dir / "result.json").open("x", encoding="utf-8") as stream:
-            stream.write(text)
-    except (OSError, TypeError, ValueError):
-        return False
-    return True
-
-
-def _write_pending_artifact(output_dir: Path, artifact: dict) -> Path | None:
-    pending = output_dir / "result.pending.json"
-    try:
-        text = json.dumps(artifact, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
-        with pending.open("x", encoding="utf-8") as stream:
-            stream.write(text)
-    except (OSError, TypeError, ValueError):
-        return None
-    return pending
-
-
-def _finalize_pending_artifact(pending: Path, artifact: dict | None = None) -> bool:
-    try:
-        if artifact is not None:
-            text = json.dumps(artifact, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
-            pending.write_text(text, encoding="utf-8")
-        pending.rename(pending.with_name("result.json"))
-    except (OSError, TypeError, ValueError):
-        return False
-    return True
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -538,7 +514,7 @@ def main(argv: list[str] | None = None) -> int:
             artifact["status"] = exc.category
             artifact["diagnostic_type"] = "ExperimentLedger"
             artifact["finished_at"] = datetime.now(timezone.utc).isoformat()
-            if not _write_artifact(args.output_dir, artifact):
+            if not write_artifact(args.output_dir, artifact):
                 print("output error: could not persist run evidence", file=sys.stderr)
             return 2
 
@@ -583,38 +559,7 @@ def main(argv: list[str] | None = None) -> int:
     artifact["usage"] = usage
     artifact["finished_at"] = datetime.now(timezone.utc).isoformat()
 
-    pending_artifact = None
-    if args.experiment_ledger is not None:
-        pending_artifact = _write_pending_artifact(args.output_dir, artifact)
-        if pending_artifact is None:
-            print("output error: could not persist pending run evidence", file=sys.stderr)
-            return 2
-        outcome = artifact["status"]
-        if failure is not None and str(failure) == "scenario inference timed out":
-            outcome = "technical_timeout"
-        try:
-            complete_attempt(
-                args.experiment_ledger,
-                attempt_id=args.attempt_id,
-                outcome_status=outcome,
-                valid_contract=artifact["contract"] is not None,
-                usage_complete=usage["usage_complete"],
-                rate_estimated_cost_usd=usage["rate_estimated_cost_usd"],
-                diagnostic_type=artifact.get("diagnostic_type"),
-            )
-        except InferenceError:
-            artifact["status"] = "ledger_error"
-            artifact["contract"] = None
-            code = 2
-        if not _finalize_pending_artifact(
-            pending_artifact, artifact if artifact["status"] == "ledger_error" else None
-        ):
-            print("output error: could not finalize run evidence", file=sys.stderr)
-            return 2
-    elif not _write_artifact(args.output_dir, artifact):
-        print("output error: could not persist run evidence", file=sys.stderr)
-        return 2
-    return code
+    return finish_run(args.output_dir, artifact, exit_code=code, failure=failure)
 
 
 if __name__ == "__main__":
