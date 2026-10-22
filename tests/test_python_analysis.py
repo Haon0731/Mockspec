@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 import mock_spec.analysis_process as analysis_process
-from mock_spec.program_tools import ProgramTools
+from mock_spec.source_analysis import SourceAnalysis
 from mock_spec.python_analysis import analyze_source, analyze_source_isolated
 from mock_spec.schemas import Source, UnifiedTask
 from test_schemas import valid_task_data
@@ -93,7 +93,7 @@ def test_dependency_usage_reports_only_same_expression_assignment_context() -> N
         "        result = 'shadowed'\n"
         "    return result"
     )
-    tools = ProgramTools(_task(text))
+    tools = SourceAnalysis(_task(text))
 
     result = asyncio.run(tools.inspect_dependency_usage("mut:0"))
 
@@ -113,7 +113,7 @@ def test_dependency_usage_reports_only_same_expression_assignment_context() -> N
 
 
 def test_named_expression_is_a_same_expression_relation() -> None:
-    tools = ProgramTools(_task(
+    tools = SourceAnalysis(_task(
         "def target(dep):\n"
         "    if (value := dep.read()) is not None:\n"
         "        return value"
@@ -129,7 +129,7 @@ def test_named_expression_is_a_same_expression_relation() -> None:
 
 
 def test_with_body_and_nested_callee_contexts_are_precise() -> None:
-    tools = ProgramTools(_task(
+    tools = SourceAnalysis(_task(
         "def target(manager, factory):\n"
         "    with manager.open() as item:\n"
         "        return (factory())(item)"
@@ -292,7 +292,7 @@ def test_isolated_analysis_never_executes_visible_source(tmp_path: Path) -> None
     assert any(fact["kind"] == "call" for fact in result["facts"])
 
 
-def test_program_tools_passes_configured_python_analysis_timeout(
+def test_source_analysis_passes_configured_python_analysis_timeout(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import mock_spec.python_analysis as python_analysis
@@ -309,7 +309,7 @@ def test_program_tools_passes_configured_python_analysis_timeout(
         }
 
     monkeypatch.setattr(python_analysis, "analyze_source_isolated", timeout)
-    tools = ProgramTools(
+    tools = SourceAnalysis(
         _task("def target():\n    return dependency()"),
         analysis_timeout_seconds=0.25,
     )
@@ -321,7 +321,7 @@ def test_program_tools_passes_configured_python_analysis_timeout(
 
 
 def test_program_analysis_rejects_path_like_source_id() -> None:
-    tools = ProgramTools(_task("def target():\n    return dep()"))
+    tools = SourceAnalysis(_task("def target():\n    return dep()"))
 
     for method in (tools.inspect_program_structure, tools.inspect_dependency_usage):
         result = asyncio.run(method("../private/ground_truth.py"))
@@ -332,7 +332,7 @@ def test_program_analysis_rejects_path_like_source_id() -> None:
 
 def test_analysis_output_limit_returns_explicit_useful_prefix() -> None:
     calls = "\n".join(f"    dep_{index}()" for index in range(30))
-    tools = ProgramTools(_task(f"def target():\n{calls}"), max_output_chars=1000)
+    tools = SourceAnalysis(_task(f"def target():\n{calls}"), max_output_chars=1000)
 
     result = asyncio.run(tools.inspect_program_structure("mut:0"))
 
@@ -349,7 +349,7 @@ def test_flask_308_ast_uses_reviewed_visible_text_and_original_lines() -> None:
 
     review = next(item for item in REVIEWS if item["case_id"] == "flask_308")
     task = load_python(snapshot(review), case_id=review["case_id"])
-    tools = ProgramTools(task)
+    tools = SourceAnalysis(task)
 
     result = asyncio.run(tools.inspect_program_structure("mut"))
 

@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 
 import pytest
+from agents import RunConfig, Runner
 from agents.models.interface import Model, ModelResponse
 from agents.usage import Usage
 from openai.types.responses import (
@@ -18,6 +19,7 @@ from openai.types.responses import (
 
 import mock_spec.inference_v02 as inference_v02
 from mock_spec.inference import InferenceError
+from mock_spec.source_analysis import SourceAnalysis
 from mock_spec.scenario import ScenarioContract
 from mock_spec.schemas import UnifiedTask
 from test_scenario import contract_data
@@ -197,8 +199,8 @@ def test_sdk_runner_can_use_all_three_tools(monkeypatch) -> None:
     async def dependencies(self, source_id):
         return {"status": "ok", "backend": "synthetic-dependency", "facts": []}
 
-    monkeypatch.setattr(inference_v02.ProgramTools, "inspect_program_structure", structure)
-    monkeypatch.setattr(inference_v02.ProgramTools, "inspect_dependency_usage", dependencies)
+    monkeypatch.setattr(SourceAnalysis, "inspect_program_structure", structure)
+    monkeypatch.setattr(SourceAnalysis, "inspect_dependency_usage", dependencies)
     model = ScriptedModel(
         _tool_call("source", source_id="mut:0", start_line=10, end_line=10),
         _tool_call(
@@ -343,6 +345,80 @@ def test_timeout_stops_the_active_sdk_run(monkeypatch) -> None:
     assert model.calls == 1
 
 
+def test_separate_agents_keep_source_scope_call_limits_and_traces_independent() -> None:
+    first_task = _task()
+    second_data = first_task.to_dict()
+    second_data["case_id"] = "example_2"
+    second_data["mut_source"]["text"] = "def target(value):\n    return other(value)"
+    second_task = UnifiedTask.from_dict(second_data)
+    traces = [[], []]
+    agents = []
+    for task, trace in zip((first_task, second_task), traces):
+        agent = inference_v02.build_agent(
+            "offline-model", task,
+            budget=inference_v02.InferenceBudget(max_tool_calls=1), tool_trace=trace,
+        )
+        agent.model = ScriptedModel(
+            _tool_call("source", source_id="mut:0", start_line=11, end_line=11),
+            _message(contract_data()),
+        )
+        agents.append(agent)
+
+    async def run_both():
+        # Exercise task-scoped tool dispatch through the SDK, without a provider.
+        await asyncio.gather(*(
+            Runner.run(agent, input="inspect the source",
+                       run_config=RunConfig(tracing_disabled=True), max_turns=2)
+            for agent in agents
+        ))
+
+    asyncio.run(run_both())
+    assert [len(trace) for trace in traces] == [1, 1]
+    assert [trace[0]["sequence"] for trace in traces] == [1, 1]
+    assert [trace[0]["status"] for trace in traces] == ["ok", "ok"]
+    assert [trace[0]["result"]["text"] for trace in traces] == [
+        "    return dependency(value)", "    return other(value)",
+    ]
+
+
+def test_cancelling_active_tool_keeps_cancelled_trace(monkeypatch) -> None:
+    async def exercise():
+        started = asyncio.Event()
+        stopped = asyncio.Event()
+
+        async def wait_for_cancellation(self, **arguments):
+            started.set()
+            try:
+                await asyncio.Future()
+            finally:
+                stopped.set()
+
+        monkeypatch.setattr(SourceAnalysis, "inspect_source", wait_for_cancellation)
+        task = _task()
+        model = ScriptedModel(
+            _tool_call("source", source_id="mut:0", start_line=10, end_line=11),
+        )
+        trace = []
+        _install_model(monkeypatch, task, model, tool_trace=trace)
+        running = asyncio.create_task(inference_v02.infer_scenario(
+            task, model="offline-model", tool_trace=trace,
+        ))
+        try:
+            await asyncio.wait_for(started.wait(), timeout=2)
+        finally:
+            running.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await running
+        assert stopped.is_set()
+        assert model.calls == 1
+        assert len(trace) == 1
+        assert trace[0]["status"] == "cancelled"
+        assert trace[0]["result"] is None
+        assert trace[0]["duration_seconds"] >= 0
+
+    asyncio.run(exercise())
+
+
 @pytest.mark.parametrize("field", ["max_turns", "max_tool_calls", "max_tool_output_chars"])
 def test_budget_requires_positive_integer(field: str) -> None:
     values = {"max_turns": 6, "max_tool_calls": 8, "max_tool_output_chars": 16_000}
@@ -351,6 +427,6 @@ def test_budget_requires_positive_integer(field: str) -> None:
         inference_v02.InferenceBudget(**values)
 
 
-def test_tool_output_budget_matches_program_tools_minimum() -> None:
+def test_tool_output_budget_matches_source_analysis_minimum() -> None:
     with pytest.raises(InferenceError, match="max_tool_output_chars"):
         inference_v02.InferenceBudget(max_tool_output_chars=511)

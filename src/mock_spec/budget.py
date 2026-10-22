@@ -1,18 +1,82 @@
-"""Auditable token and cost accounting for V0.2 model calls."""
+"""Limits and auditable token/cost accounting for V0.2 inference."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 import json
 import math
-from typing import Any
 
 from agents import RunHooks
 from agents.usage import Usage
 from pydantic import TypeAdapter
 
 from .inference import InferenceError
+
+
+@dataclass(frozen=True)
+class InferenceBudget:
+    """Host-configured limits for one V0.2 inference run."""
+
+    max_turns: int = 6
+    max_tool_calls: int = 8
+    max_output_tokens: int = 4_096
+    max_total_tokens: int = 24_000
+    max_tool_output_chars: int = 16_000
+    analysis_timeout_seconds: float = 15
+    max_cost_usd: Decimal | None = None
+    input_cost_per_million: Decimal | None = None
+    output_cost_per_million: Decimal | None = None
+
+    def __post_init__(self) -> None:
+        for name in ("max_turns", "max_tool_calls", "max_output_tokens", "max_total_tokens"):
+            value = getattr(self, name)
+            if type(value) is not int or value < 1:
+                raise InferenceError(f"scenario inference {name} must be a positive integer")
+        if self.max_output_tokens > self.max_total_tokens:
+            raise InferenceError(
+                "scenario inference max_output_tokens cannot exceed max_total_tokens"
+            )
+        if type(self.max_tool_output_chars) is not int or self.max_tool_output_chars < 512:
+            raise InferenceError(
+                "scenario inference max_tool_output_chars must be an integer >= 512"
+            )
+        if (
+            not isinstance(self.analysis_timeout_seconds, (int, float))
+            or isinstance(self.analysis_timeout_seconds, bool)
+            or not math.isfinite(self.analysis_timeout_seconds)
+            or self.analysis_timeout_seconds <= 0
+        ):
+            raise InferenceError(
+                "scenario inference analysis_timeout_seconds must be positive"
+            )
+        decimal_fields = (
+            "max_cost_usd", "input_cost_per_million", "output_cost_per_million"
+        )
+        for name in decimal_fields:
+            value = getattr(self, name)
+            if value is None:
+                continue
+            if isinstance(value, bool):
+                raise InferenceError(f"scenario inference {name} must be positive")
+            try:
+                parsed = Decimal(str(value))
+            except (InvalidOperation, ValueError):
+                raise InferenceError(
+                    f"scenario inference {name} must be positive"
+                ) from None
+            if not parsed.is_finite() or parsed <= 0:
+                raise InferenceError(f"scenario inference {name} must be positive")
+            object.__setattr__(self, name, parsed)
+        prices = (self.input_cost_per_million, self.output_cost_per_million)
+        if (prices[0] is None) != (prices[1] is None):
+            raise InferenceError(
+                "scenario inference input and output prices must be configured together"
+            )
+        if self.max_cost_usd is not None and prices[0] is None:
+            raise InferenceError(
+                "scenario inference cost limit requires explicit input and output prices"
+            )
 
 
 _MILLION = Decimal(1_000_000)
@@ -71,7 +135,7 @@ def estimate_known_request_tokens(
 class UsageLedger:
     """Per-run model request estimates, provider usage, and cost state."""
 
-    budget: Any
+    budget: InferenceBudget
     requests_started: int = 0
     requests_completed: int = 0
     input_tokens: int = 0
@@ -91,11 +155,13 @@ class UsageLedger:
         )
 
     def _cost(self, input_tokens: int, output_tokens: int) -> Decimal | None:
-        if not self.prices_configured:
+        input_rate = self.budget.input_cost_per_million
+        output_rate = self.budget.output_cost_per_million
+        if input_rate is None or output_rate is None:
             return None
         return (
-            Decimal(input_tokens) * self.budget.input_cost_per_million
-            + Decimal(output_tokens) * self.budget.output_cost_per_million
+            Decimal(input_tokens) * input_rate
+            + Decimal(output_tokens) * output_rate
         ) / _MILLION
 
     def before_model_call(self, *, system_prompt: str | None, input_items: list, agent) -> None:
@@ -291,4 +357,4 @@ class BudgetHooks(RunHooks):
         self.ledger.after_model_call(response)
 
 
-__all__ = ["BudgetHooks", "UsageLedger", "estimate_known_request_tokens"]
+__all__ = ["InferenceBudget", "BudgetHooks", "UsageLedger", "estimate_known_request_tokens"]

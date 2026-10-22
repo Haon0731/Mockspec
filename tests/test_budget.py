@@ -9,7 +9,7 @@ import pytest
 from agents.usage import Usage
 
 import mock_spec.inference_v02 as inference_v02
-from mock_spec.budget import UsageLedger
+from mock_spec.budget import InferenceBudget, UsageLedger
 from mock_spec.inference import InferenceError
 from test_inference_v02 import (
     ScriptedModel,
@@ -19,6 +19,10 @@ from test_inference_v02 import (
     _tool_call,
 )
 from test_scenario import contract_data
+
+
+def test_budget_remains_available_from_existing_inference_import() -> None:
+    assert inference_v02.InferenceBudget is InferenceBudget
 
 
 def test_budget_requires_complete_explicit_prices_for_cost_limit() -> None:

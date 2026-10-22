@@ -2,13 +2,13 @@ import asyncio
 
 import pytest
 
-from mock_spec.program_tools import ProgramTools
+from mock_spec.source_analysis import SourceAnalysis
 from mock_spec.schemas import UnifiedTask
 from test_schemas import valid_task_data
 
 
 def test_exact_slice_coordinates():
-    tools = ProgramTools(UnifiedTask.from_dict(valid_task_data()))
+    tools = SourceAnalysis(UnifiedTask.from_dict(valid_task_data()))
     result = asyncio.run(tools.inspect_source("mut:0", 11, 11))
     assert result["text"] == "    return dependency(value)"
     assert result["start_line"] == result["end_line"] == 11
@@ -20,14 +20,14 @@ def test_exact_slice_coordinates():
     ("mut:0", True, 11), ("mut:0", 10, 11.0),
 ])
 def test_reject_invisible_input(source_id, start, end):
-    tools = ProgramTools(UnifiedTask.from_dict(valid_task_data()))
+    tools = SourceAnalysis(UnifiedTask.from_dict(valid_task_data()))
     result = asyncio.run(tools.inspect_source(source_id, start, end))
     assert result["status"] == "error"
     assert "text" not in result
 
 
 def test_output_limit_explicitly_omits_evidence():
-    tools = ProgramTools(UnifiedTask.from_dict(valid_task_data()), max_output_chars=512)
+    tools = SourceAnalysis(UnifiedTask.from_dict(valid_task_data()), max_output_chars=512)
     result = tools.bounded({"status": "ok", "text": "x" * 600})
     assert result["status"] == "incomplete"
     assert "text" not in result
@@ -36,7 +36,7 @@ def test_output_limit_explicitly_omits_evidence():
 def test_source_output_limit_preserves_requested_range():
     data = valid_task_data()
     data["mut_source"]["text"] = "def target(value):\n    return " + repr("x" * 600)
-    tools = ProgramTools(UnifiedTask.from_dict(data), max_output_chars=512)
+    tools = SourceAnalysis(UnifiedTask.from_dict(data), max_output_chars=512)
     result = asyncio.run(tools.inspect_source("mut:0", 10, 11))
     assert result["status"] == "incomplete"
     assert result["source_id"] == "mut:0"
@@ -46,7 +46,7 @@ def test_source_output_limit_preserves_requested_range():
 
 
 def test_incomplete_backend_remains_incomplete_after_dependency_filter(monkeypatch):
-    tools = ProgramTools(UnifiedTask.from_dict(valid_task_data()))
+    tools = SourceAnalysis(UnifiedTask.from_dict(valid_task_data()))
 
     async def incomplete(source_id):
         return {"status": "incomplete", "facts": [{"kind": "condition"}],
@@ -64,7 +64,7 @@ def test_both_reviewed_tasks_source_access():
     for review in REVIEWS:
         loader = load_java if review["language"] == "java" else load_python
         task = loader(snapshot(review), case_id=review["case_id"])
-        tools = ProgramTools(task)
+        tools = SourceAnalysis(task)
         for sid in tools.store.ids():
             source = tools.store.get(sid)
             result = asyncio.run(tools.inspect_source(sid, source.start_line, source.end_line))

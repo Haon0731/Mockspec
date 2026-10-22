@@ -10,7 +10,7 @@ from .schemas import UnifiedTask
 from .validation import SourceStore, InputValidationError
 
 
-class ProgramTools:
+class SourceAnalysis:
     """Analyze only text already admitted by the host Adapter, never model paths."""
 
     def __init__(
@@ -48,7 +48,7 @@ class ProgramTools:
                 omitted.pop("source_id")
             return omitted
         limitations = ["Syntax only, not data flow or feasible paths; omitted evidence does not prove absence."]
-        bounded = {
+        bounded: dict = {
             "status": "incomplete",
             "backend": result.get("backend"),
             "source_id": result.get("source_id"),

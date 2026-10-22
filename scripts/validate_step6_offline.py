@@ -19,7 +19,7 @@ from openai.types.responses import ResponseFunctionToolCall, ResponseOutputMessa
 from mock_spec import inference, inference_v02
 from mock_spec.adapters import java, python
 from mock_spec.budget import UsageLedger
-from mock_spec.live_v02 import _code_hashes, _git_identity, _git_dirty, _runtime_identity
+from mock_spec.execution_metadata import collect_execution_metadata
 from mock_spec.scenario import validate_contract
 
 
@@ -141,15 +141,16 @@ def main() -> None:
         with (args.output_dir / f"{version_id}.json").open("x") as stream:
             json.dump(artifact, stream, ensure_ascii=False, indent=2, allow_nan=False)
             stream.write("\n")
+    metadata = collect_execution_metadata()
     summary = {
         "created_at": datetime.now(timezone.utc).isoformat(),
         "mode": "offline_validation_only", "case_id": task.case_id,
         "snapshot_id": args.snapshot.name,
         "packages": {p: version(p) for p in ("openai-agents", "openai", "pydantic")},
-        "code_commit": _git_identity(),
-        "code_dirty": _git_dirty(),
-        "code_sha256": _code_hashes(),
-        "runtime_identity": _runtime_identity(),
+        "code_commit": metadata.code_commit,
+        "code_dirty": metadata.code_dirty,
+        "code_sha256": metadata.code_files_sha256,
+        "runtime_identity": metadata.runtime_identity,
         "same_initial_payload": artifacts[0]["task_sha256"] == artifacts[1]["task_sha256"],
         "same_synthetic_contract": artifacts[0]["contract"] == artifacts[1]["contract"],
         "real_tool_calls": len(artifacts[1]["tool_trace"]),

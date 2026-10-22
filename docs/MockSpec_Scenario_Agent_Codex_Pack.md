@@ -1,3 +1,6 @@
+> 历史研究任务包：以下“本轮”指原 Scenario Contract Research 阶段，不是当前待执行任务。
+> 阶段结论见 [研究决策](scenario-research/decision.md)；后续进展和当前指南见 [文档目录](README.md)。
+
 # Mock Spec：Scenario Agent 与 Scenario Contract 基础材料及执行任务包
 
 **用途：** 将本文整体交给 Codex，完成一次“方法设计收敛＋开源能力复用 PoC”，而不是继续扩建 Agent 框架。

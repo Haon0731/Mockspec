@@ -45,7 +45,8 @@ def main(argv: list[str] | None = None) -> int:
 
     inference_kwargs = {}
     if args.agent_version == "v0.2":
-        from .inference_v02 import InferenceBudget, PROMPT_VERSION, infer_scenario
+        from .budget import InferenceBudget
+        from .inference_v02 import PROMPT_VERSION, infer_scenario
         try:
             inference_kwargs["budget"] = InferenceBudget(
                 max_turns=args.max_turns, max_tool_calls=args.max_tool_calls,

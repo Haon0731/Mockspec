@@ -1,11 +1,14 @@
-# Scenario Inference Agent V0.1
+# Scenario Contract
 
-本轮新增能力是从允许的测试和源码推导场景契约。没有实现 Mock 生成、反馈、评分、
-目标程序执行、AST 或符号执行。两个冻结案例的准入记录和原 Adapter 保持不变。
+[架构导读](architecture.md) · [运行与开发](usage.md)
+
+这是 V0.1 和 V0.2 Agent 共用的当前输出说明；两版均输出
+`mock-spec.scenario/v0.1`。Agent 版本与契约 Schema 版本独立。
+初次交付的环境状态和验收计数属于历史记录，见 [整理前版本](https://github.com/Haon0731/Mockspec/blob/bc72f6bcbc0d349a4ceecc6e42b30595725799ef/docs/scenario-inference.md)。
 
 ## 输出模型
 
-实现位于 `src/mock_spec/scenario.py`；机器可读结构见
+实现位于 [scenario.py](../src/mock_spec/scenario.py)；机器可读结构见
 [scenario-contract.schema.json](scenario-contract.schema.json)。
 
 | 字段 | 含义 |
@@ -32,21 +35,16 @@ Pydantic JSON Schema 描述字段结构；Python 验证器额外实施跨字段�
 引用存在性、任务身份、行范围和原文一致性检查。仅使用导出的 JSON Schema，
 不能替代完整 `validate_contract()`。
 
-## 推理和访问边界
+## 谁生成，谁验证
 
-System Prompt 单独版本化为 `src/mock_spec/prompts/scenario_v0.1.txt`，
-版本为 `scenario-inference/v0.1`。依次要求识别预期、追踪依赖、推导场景、检查证据、
-生成契约；只输出结论和可核查的简短依据。
+模型按版本化 Prompt 提出场景、依赖约束、证据和未知项。
+`inference.py` / `inference_v02.py` 解析模型输出，调用
+`scenario.validate_contract()`；运行入口随后序列化契约并标记验证状态。
+V0.2 的源码工具只补充已有可见输入的事实，不写验证成功状态。
 
-宿主 CLI 只调用现有 Adapter。SDK Agent 只获得 `task.to_dict()` 的 JSON：
-没有源码路径读取工具、命令执行、检索、handoff 或其他 Agent。
-System Prompt 将源码和注释视为数据，不能授权越界读取。SDK tracing 关闭，
-请求设置 `store=False`，每次任务不使用先前会话。
-
-采用官方 [Agent 结构化输出接口](https://developers.openai.com/api/docs/guides/agents/define-agents)
-和 [tracing 控制](https://developers.openai.com/api/docs/guides/agents/integrations-observability)。
-本次安装验证版本：OpenAI Agents SDK 0.24.0、Pydantic 2.14.1、Python 3.12.13。
-SDK 由宿主运行，不是能访问宿主文件系统的代码执行 Agent；这也不是 OS 级隔离。
+当前 `dependency_constraints` 是带条件、状态和引用的文字 Claim，
+并不是每一条都自动翻译成 SMT。局部 cvc5 检查记录位于独立研究路径，
+尚未绑定到生产 ScenarioContract；参见 [研究路径](architecture.md#研究路径)。
 
 ## 能证明和不能证明的事项
 
@@ -60,42 +58,3 @@ SDK 由宿主运行，不是能访问宿主文件系统的代码执行 Agent；�
 Prompt、条件字段、证据引用和明确的 candidate/unknown 可以约束输出并帮助人工审查，
 不是语义正确性的证明。空 VERIFY 区域、导入的 Mockito 函数、测试名字都不能单独
 构成调用次数或禁止额外调用的要求。
-
-## 本轮运行状态
-
-环境没有 `OPENAI_API_KEY` 或 `MOCKSPEC_MODEL`，因此没有发起真实模型请求。
-`examples/scenarios/*.synthetic.json` 是基于允许输入人工编写的合成响应；
-相应 `*.replay.json` 是 CLI 对真实冻结输入校验后产生的实际回放输出。
-这些文件不是模型推理结果，也不证明模型质量。不能据此宣称真实推理已验证。
-
-测试分别覆盖 SDK 结构化输出、仅传入 UnifiedTask、超时/调用失败/无效输出、
-非法证据、条件缺失、未知行为以及原有输入隔离行为。示例中的关键歧义和运行命令见
-[示例说明](../examples/scenarios/README.md)。
-
-2026-10-20 本机验证：
-
-- `.venv/bin/python -B -m pytest -q -p no:cacheprovider`：**92 passed**，
-  原有 54 项全部保留通过，新增 38 项，无跳过。
-- 两个真实输入通过实际 SDK Runner + SyntheticModel 的离线集成测试。
-- 构建 wheel、安装到项目 `.venv`，确认 Prompt 与严格输出 Schema 可加载。
-- 通过已安装的 `mock-spec-scenario` 分别回放 Java/Python，退出码均为 0，
-  共 12 条证据引用的 source_id、行号、原文通过验证。
-- `compileall` 和 `git diff --check` 通过。项目未配置独立 lint/typecheck 工具；
-  未将语法检查宣称为静态类型检查。
-
-## 本轮文件
-
-新增：
-
-- `src/mock_spec/scenario.py`：Pydantic 契约和完整验证器。
-- `src/mock_spec/inference.py`：共享 SDK Agent。
-- `src/mock_spec/prompts/scenario_v0.1.txt`：版本化 System Prompt。
-- `src/mock_spec/cli.py`：单案例入口和带来源标记的输出。
-- `tests/test_scenario.py`、`tests/test_inference.py`、
-  `tests/test_scenario_cli.py`、`tests/test_scenario_real.py`。
-- 本文、`docs/scenario-contract.schema.json`。
-- `examples/scenarios/README.md`、两个 `*.synthetic.json` 和两个 `*.replay.json`。
-
-修改：`pyproject.toml`（依赖、CLI、Prompt 打包）、`README.md`（新能力与使用方法）。
-未修改旧 Stub-Tester、已审核输入记录、原 Adapter 或原有测试。已有未提交文件
-保持原状；本轮没有创建提交或发布远端任务。
