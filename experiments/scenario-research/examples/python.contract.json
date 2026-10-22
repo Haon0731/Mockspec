@@ -1,0 +1,2476 @@
+{
+  "schema_version": "mock-spec.scenario-contract-research/v0",
+  "identity": {
+    "case_id": "flask_308",
+    "language": "python",
+    "authoring_mode": "handcrafted_from_visible_input",
+    "input_policy_id": "mock-spec-reviewed-frozen/v1",
+    "source_hash_algorithm": "sha256-utf8-visible-slice"
+  },
+  "coverage": {
+    "scope": "All five visible parameter rows and exact exception-message substring oracles; finite normal-lookup path abstraction only.",
+    "formalized_oracle_refs": [
+      "O_PY_ROW_APP_404",
+      "O_PY_ROW_APP_500",
+      "O_PY_ROW_NONE_403",
+      "O_PY_ROW_NONE_400",
+      "O_PY_ROW_APP_418"
+    ],
+    "unformalized_oracle_refs": [],
+    "whole_test_verified": false
+  },
+  "sources": [
+    {
+      "id": "mut",
+      "logical_path": "src/src/flask/helpers.py",
+      "start_line": 265,
+      "end_line": 285,
+      "sha256": "c321b5b524e2b5e1938742f9063d47913119ebf5339a4cf37e53fafa34be4644"
+    },
+    {
+      "id": "test",
+      "logical_path": "tests/test_308abort.py",
+      "start_line": 1,
+      "end_line": 126,
+      "sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5"
+    },
+    {
+      "id": "imports",
+      "logical_path": "src/src/flask/helpers.py",
+      "start_line": 1,
+      "end_line": 24,
+      "sha256": "6f619d03f9c27647f328f5ab8b68f2c2c6abb51248a6ccc70c7f4ebb640702d6"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E_PY_MUT_BRANCH",
+      "source_id": "mut",
+      "start_line": 282,
+      "end_line": 285,
+      "quote": "    if (ctx := _cv_app.get(None)) is not None:\n        ctx.app.aborter(code, *args, **kwargs)\n\n    _wz_abort(code, *args, **kwargs)",
+      "supports": "A non-None context invokes app.aborter, then normal return falls through to _wz_abort.",
+      "semantic_limit": "Normal lookup, accessible attributes, call return/throw behavior, and external abort semantics remain assumptions or unknowns."
+    },
+    {
+      "id": "E_PY_IMPORTS",
+      "source_id": "imports",
+      "start_line": 11,
+      "end_line": 16,
+      "quote": "import werkzeug.utils\nfrom werkzeug.exceptions import abort as _wz_abort\nfrom werkzeug.utils import redirect as _wz_redirect\nfrom werkzeug.wrappers import Response as BaseResponse\n\nfrom .globals import _cv_app",
+      "supports": "_wz_abort and _cv_app are dependency names used by the MUT.",
+      "semantic_limit": "Imports identify bindings, not runtime behavior."
+    },
+    {
+      "id": "E_PY_PARAM_HEADER",
+      "source_id": "test",
+      "start_line": 11,
+      "end_line": 11,
+      "quote": "@pytest.mark.parametrize(\"scenario,has_app_context,code,args,kwargs\", [",
+      "supports": "The visible parameter dimensions are scenario, has_app_context, code, args, and kwargs.",
+      "semantic_limit": "Parameter names do not reveal hidden patch implementation."
+    },
+    {
+      "id": "E_PY_RAISES",
+      "source_id": "test",
+      "start_line": 101,
+      "end_line": 103,
+      "quote": "                                 \n    with pytest.raises(Exception) as exc_info:\n        abort(code, *args, **kwargs)",
+      "supports": "Every parameter row requires some Exception from abort(code, *args, **kwargs).",
+      "semantic_limit": "The broad type does not identify which dependency threw."
+    },
+    {
+      "id": "E_PY_APP_MESSAGE",
+      "source_id": "test",
+      "start_line": 111,
+      "end_line": 120,
+      "quote": "    if has_app_context:\n                          \n        # === PY-SLOT-START:verify_002 ===\n        pass\n        # === PY-SLOT-END:verify_002 ===\n                                                 \n        # === PY-SLOT-START:verify_003 ===\n        pass\n        # === PY-SLOT-END:verify_003 ===\n        assert f\"Aborted with {code}\" in str(exc_info.value)",
+      "supports": "Rows with has_app_context require an 'Aborted with {code}' substring.",
+      "semantic_limit": "The message alone does not prove app.aborter was the exception source."
+    },
+    {
+      "id": "E_PY_NONE_MESSAGE",
+      "source_id": "test",
+      "start_line": 121,
+      "end_line": 126,
+      "quote": "    else:\n                             \n        # === PY-SLOT-START:verify_004 ===\n        pass\n        # === PY-SLOT-END:verify_004 ===\n        assert f\"Werkzeug abort {code}\" in str(exc_info.value)",
+      "supports": "Rows without app context require a 'Werkzeug abort {code}' substring.",
+      "semantic_limit": "The message alone does not establish complete external Werkzeug semantics."
+    },
+    {
+      "id": "E_PY_ROW_APP_404",
+      "source_id": "test",
+      "start_line": 12,
+      "end_line": 18,
+      "quote": "    (\n        \"app_context_exists_404\",\n        True,\n        404,\n        (),\n        {}\n    ),",
+      "supports": "Visible parameter row app_context_exists_404 with exact code, positional args, and keyword args.",
+      "semantic_limit": "The row does not reveal hidden Mock responses or verification calls."
+    },
+    {
+      "id": "E_PY_ROW_APP_500",
+      "source_id": "test",
+      "start_line": 19,
+      "end_line": 25,
+      "quote": "    (\n        \"app_context_exists_500_with_message\",\n        True,\n        500,\n        (\"Internal Server Error\",),\n        {}\n    ),",
+      "supports": "Visible parameter row app_context_exists_500_with_message with exact code, positional args, and keyword args.",
+      "semantic_limit": "The row does not reveal hidden Mock responses or verification calls."
+    },
+    {
+      "id": "E_PY_ROW_NONE_403",
+      "source_id": "test",
+      "start_line": 26,
+      "end_line": 32,
+      "quote": "    (\n        \"no_app_context_403\",\n        False,\n        403,\n        (),\n        {}\n    ),",
+      "supports": "Visible parameter row no_app_context_403 with exact code, positional args, and keyword args.",
+      "semantic_limit": "The row does not reveal hidden Mock responses or verification calls."
+    },
+    {
+      "id": "E_PY_ROW_NONE_400",
+      "source_id": "test",
+      "start_line": 33,
+      "end_line": 39,
+      "quote": "    (\n        \"no_app_context_with_args_kwargs\",\n        False,\n        400,\n        (\"Bad Request\",),\n        {\"description\": \"Invalid input\"}\n    ),",
+      "supports": "Visible parameter row no_app_context_with_args_kwargs with exact code, positional args, and keyword args.",
+      "semantic_limit": "The row does not reveal hidden Mock responses or verification calls."
+    },
+    {
+      "id": "E_PY_ROW_APP_418",
+      "source_id": "test",
+      "start_line": 40,
+      "end_line": 46,
+      "quote": "    (\n        \"app_context_custom_code\",\n        True,\n        418,\n        (),\n        {\"description\": \"I'm a teapot\"}\n    ),",
+      "supports": "Visible parameter row app_context_custom_code with exact code, positional args, and keyword args.",
+      "semantic_limit": "The row does not reveal hidden Mock responses or verification calls."
+    }
+  ],
+  "oracles": [
+    {
+      "id": "O_PY_ROW_APP_404",
+      "parameter_row": "PY_ROW_APP_404",
+      "observation": "abort(404, *(), **{}) raises Exception and str(exc_info.value) contains the row-specific substring",
+      "expected": "Exception with message substring exactly 'Aborted with 404'",
+      "evidence_refs": [
+        "E_PY_ROW_APP_404",
+        "E_PY_RAISES",
+        "E_PY_APP_MESSAGE"
+      ],
+      "formalization_status": "formalized"
+    },
+    {
+      "id": "O_PY_ROW_APP_500",
+      "parameter_row": "PY_ROW_APP_500",
+      "observation": "abort(500, *(\"Internal Server Error\",), **{}) raises Exception and str(exc_info.value) contains the row-specific substring",
+      "expected": "Exception with message substring exactly 'Aborted with 500'",
+      "evidence_refs": [
+        "E_PY_ROW_APP_500",
+        "E_PY_RAISES",
+        "E_PY_APP_MESSAGE"
+      ],
+      "formalization_status": "formalized"
+    },
+    {
+      "id": "O_PY_ROW_NONE_403",
+      "parameter_row": "PY_ROW_NONE_403",
+      "observation": "abort(403, *(), **{}) raises Exception and str(exc_info.value) contains the row-specific substring",
+      "expected": "Exception with message substring exactly 'Werkzeug abort 403'",
+      "evidence_refs": [
+        "E_PY_ROW_NONE_403",
+        "E_PY_RAISES",
+        "E_PY_NONE_MESSAGE"
+      ],
+      "formalization_status": "formalized"
+    },
+    {
+      "id": "O_PY_ROW_NONE_400",
+      "parameter_row": "PY_ROW_NONE_400",
+      "observation": "abort(400, *(\"Bad Request\",), **{\"description\": \"Invalid input\"}) raises Exception and str(exc_info.value) contains the row-specific substring",
+      "expected": "Exception with message substring exactly 'Werkzeug abort 400'",
+      "evidence_refs": [
+        "E_PY_ROW_NONE_400",
+        "E_PY_RAISES",
+        "E_PY_NONE_MESSAGE"
+      ],
+      "formalization_status": "formalized"
+    },
+    {
+      "id": "O_PY_ROW_APP_418",
+      "parameter_row": "PY_ROW_APP_418",
+      "observation": "abort(418, *(), **{\"description\": \"I'm a teapot\"}) raises Exception and str(exc_info.value) contains the row-specific substring",
+      "expected": "Exception with message substring exactly 'Aborted with 418'",
+      "evidence_refs": [
+        "E_PY_ROW_APP_418",
+        "E_PY_RAISES",
+        "E_PY_APP_MESSAGE"
+      ],
+      "formalization_status": "formalized"
+    }
+  ],
+  "symbols": [
+    {
+      "id": "S_PY_ROW_APP_404_LOOKUP_NONE",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_APP_404_LOOKUP",
+      "model_symbol": "ctx_none",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_404_ABORTER_THROWS",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_APP_404_ABORTER",
+      "model_symbol": "abort_throws",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_404_ABORT_MESSAGE_MATCHES",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_APP_404_ABORTER",
+      "model_symbol": "abort_message_matches",
+      "evidence_refs": [
+        "E_PY_APP_MESSAGE"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_404_FALLBACK_THROWS",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_APP_404_FALLBACK",
+      "model_symbol": "fallback_throws",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_404_FALLBACK_MESSAGE_MATCHES",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_APP_404_FALLBACK",
+      "model_symbol": "fallback_message_matches",
+      "evidence_refs": [
+        "E_PY_NONE_MESSAGE"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_404_ABORT_CALLED",
+      "sort": "Bool",
+      "role": "execution_state",
+      "controllable": false,
+      "binding_ref": "C_PY_ROW_APP_404_ABORTER",
+      "model_symbol": "abort_called",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_404_FALLBACK_REACHED",
+      "sort": "Bool",
+      "role": "execution_state",
+      "controllable": false,
+      "binding_ref": "C_PY_ROW_APP_404_FALLBACK",
+      "model_symbol": "fallback_called",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_404_EXCEPTION_OBSERVED",
+      "sort": "Bool",
+      "role": "oracle_observation",
+      "controllable": false,
+      "binding_ref": null,
+      "model_symbol": "exception_observed",
+      "evidence_refs": [
+        "E_PY_RAISES"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_404_MESSAGE_OK",
+      "sort": "Bool",
+      "role": "oracle_observation",
+      "controllable": false,
+      "binding_ref": null,
+      "model_symbol": "message_observed_matches",
+      "evidence_refs": [
+        "E_PY_APP_MESSAGE"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_500_LOOKUP_NONE",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_APP_500_LOOKUP",
+      "model_symbol": "ctx_none",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_500_ABORTER_THROWS",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_APP_500_ABORTER",
+      "model_symbol": "abort_throws",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_500_ABORT_MESSAGE_MATCHES",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_APP_500_ABORTER",
+      "model_symbol": "abort_message_matches",
+      "evidence_refs": [
+        "E_PY_APP_MESSAGE"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_500_FALLBACK_THROWS",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_APP_500_FALLBACK",
+      "model_symbol": "fallback_throws",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_500_FALLBACK_MESSAGE_MATCHES",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_APP_500_FALLBACK",
+      "model_symbol": "fallback_message_matches",
+      "evidence_refs": [
+        "E_PY_NONE_MESSAGE"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_500_ABORT_CALLED",
+      "sort": "Bool",
+      "role": "execution_state",
+      "controllable": false,
+      "binding_ref": "C_PY_ROW_APP_500_ABORTER",
+      "model_symbol": "abort_called",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_500_FALLBACK_REACHED",
+      "sort": "Bool",
+      "role": "execution_state",
+      "controllable": false,
+      "binding_ref": "C_PY_ROW_APP_500_FALLBACK",
+      "model_symbol": "fallback_called",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_500_EXCEPTION_OBSERVED",
+      "sort": "Bool",
+      "role": "oracle_observation",
+      "controllable": false,
+      "binding_ref": null,
+      "model_symbol": "exception_observed",
+      "evidence_refs": [
+        "E_PY_RAISES"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_500_MESSAGE_OK",
+      "sort": "Bool",
+      "role": "oracle_observation",
+      "controllable": false,
+      "binding_ref": null,
+      "model_symbol": "message_observed_matches",
+      "evidence_refs": [
+        "E_PY_APP_MESSAGE"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_403_LOOKUP_NONE",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_NONE_403_LOOKUP",
+      "model_symbol": "ctx_none",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_403_ABORTER_THROWS",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_NONE_403_ABORTER",
+      "model_symbol": "abort_throws",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_403_ABORT_MESSAGE_MATCHES",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_NONE_403_ABORTER",
+      "model_symbol": "abort_message_matches",
+      "evidence_refs": [
+        "E_PY_APP_MESSAGE"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_403_FALLBACK_THROWS",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_NONE_403_FALLBACK",
+      "model_symbol": "fallback_throws",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_403_FALLBACK_MESSAGE_MATCHES",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_NONE_403_FALLBACK",
+      "model_symbol": "fallback_message_matches",
+      "evidence_refs": [
+        "E_PY_NONE_MESSAGE"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_403_ABORT_CALLED",
+      "sort": "Bool",
+      "role": "execution_state",
+      "controllable": false,
+      "binding_ref": "C_PY_ROW_NONE_403_ABORTER",
+      "model_symbol": "abort_called",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_403_FALLBACK_REACHED",
+      "sort": "Bool",
+      "role": "execution_state",
+      "controllable": false,
+      "binding_ref": "C_PY_ROW_NONE_403_FALLBACK",
+      "model_symbol": "fallback_called",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_403_EXCEPTION_OBSERVED",
+      "sort": "Bool",
+      "role": "oracle_observation",
+      "controllable": false,
+      "binding_ref": null,
+      "model_symbol": "exception_observed",
+      "evidence_refs": [
+        "E_PY_RAISES"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_403_MESSAGE_OK",
+      "sort": "Bool",
+      "role": "oracle_observation",
+      "controllable": false,
+      "binding_ref": null,
+      "model_symbol": "message_observed_matches",
+      "evidence_refs": [
+        "E_PY_NONE_MESSAGE"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_400_LOOKUP_NONE",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_NONE_400_LOOKUP",
+      "model_symbol": "ctx_none",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_400_ABORTER_THROWS",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_NONE_400_ABORTER",
+      "model_symbol": "abort_throws",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_400_ABORT_MESSAGE_MATCHES",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_NONE_400_ABORTER",
+      "model_symbol": "abort_message_matches",
+      "evidence_refs": [
+        "E_PY_APP_MESSAGE"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_400_FALLBACK_THROWS",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_NONE_400_FALLBACK",
+      "model_symbol": "fallback_throws",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_400_FALLBACK_MESSAGE_MATCHES",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_NONE_400_FALLBACK",
+      "model_symbol": "fallback_message_matches",
+      "evidence_refs": [
+        "E_PY_NONE_MESSAGE"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_400_ABORT_CALLED",
+      "sort": "Bool",
+      "role": "execution_state",
+      "controllable": false,
+      "binding_ref": "C_PY_ROW_NONE_400_ABORTER",
+      "model_symbol": "abort_called",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_400_FALLBACK_REACHED",
+      "sort": "Bool",
+      "role": "execution_state",
+      "controllable": false,
+      "binding_ref": "C_PY_ROW_NONE_400_FALLBACK",
+      "model_symbol": "fallback_called",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_400_EXCEPTION_OBSERVED",
+      "sort": "Bool",
+      "role": "oracle_observation",
+      "controllable": false,
+      "binding_ref": null,
+      "model_symbol": "exception_observed",
+      "evidence_refs": [
+        "E_PY_RAISES"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_NONE_400_MESSAGE_OK",
+      "sort": "Bool",
+      "role": "oracle_observation",
+      "controllable": false,
+      "binding_ref": null,
+      "model_symbol": "message_observed_matches",
+      "evidence_refs": [
+        "E_PY_NONE_MESSAGE"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_418_LOOKUP_NONE",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_APP_418_LOOKUP",
+      "model_symbol": "ctx_none",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_418_ABORTER_THROWS",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_APP_418_ABORTER",
+      "model_symbol": "abort_throws",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_418_ABORT_MESSAGE_MATCHES",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_APP_418_ABORTER",
+      "model_symbol": "abort_message_matches",
+      "evidence_refs": [
+        "E_PY_APP_MESSAGE"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_418_FALLBACK_THROWS",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_APP_418_FALLBACK",
+      "model_symbol": "fallback_throws",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_418_FALLBACK_MESSAGE_MATCHES",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_PY_ROW_APP_418_FALLBACK",
+      "model_symbol": "fallback_message_matches",
+      "evidence_refs": [
+        "E_PY_NONE_MESSAGE"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_418_ABORT_CALLED",
+      "sort": "Bool",
+      "role": "execution_state",
+      "controllable": false,
+      "binding_ref": "C_PY_ROW_APP_418_ABORTER",
+      "model_symbol": "abort_called",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_418_FALLBACK_REACHED",
+      "sort": "Bool",
+      "role": "execution_state",
+      "controllable": false,
+      "binding_ref": "C_PY_ROW_APP_418_FALLBACK",
+      "model_symbol": "fallback_called",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_418_EXCEPTION_OBSERVED",
+      "sort": "Bool",
+      "role": "oracle_observation",
+      "controllable": false,
+      "binding_ref": null,
+      "model_symbol": "exception_observed",
+      "evidence_refs": [
+        "E_PY_RAISES"
+      ]
+    },
+    {
+      "id": "S_PY_ROW_APP_418_MESSAGE_OK",
+      "sort": "Bool",
+      "role": "oracle_observation",
+      "controllable": false,
+      "binding_ref": null,
+      "model_symbol": "message_observed_matches",
+      "evidence_refs": [
+        "E_PY_APP_MESSAGE"
+      ]
+    }
+  ],
+  "bindings": [
+    {
+      "id": "C_PY_ROW_APP_404_LOOKUP",
+      "receiver": "_cv_app",
+      "method": "get",
+      "arguments": [
+        "None"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 282,
+      "end_line": 282,
+      "resolution_status": "resolved"
+    },
+    {
+      "id": "C_PY_ROW_APP_404_ABORTER",
+      "receiver": "ctx.app",
+      "method": "aborter.__call__",
+      "arguments": [
+        "404",
+        "*()",
+        "**{}"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 283,
+      "end_line": 283,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_PY_ROW_APP_404_FALLBACK",
+      "receiver": "werkzeug.exceptions",
+      "method": "abort",
+      "arguments": [
+        "404",
+        "*()",
+        "**{}"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 285,
+      "end_line": 285,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_PY_ROW_APP_500_LOOKUP",
+      "receiver": "_cv_app",
+      "method": "get",
+      "arguments": [
+        "None"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 282,
+      "end_line": 282,
+      "resolution_status": "resolved"
+    },
+    {
+      "id": "C_PY_ROW_APP_500_ABORTER",
+      "receiver": "ctx.app",
+      "method": "aborter.__call__",
+      "arguments": [
+        "500",
+        "*(\"Internal Server Error\",)",
+        "**{}"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 283,
+      "end_line": 283,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_PY_ROW_APP_500_FALLBACK",
+      "receiver": "werkzeug.exceptions",
+      "method": "abort",
+      "arguments": [
+        "500",
+        "*(\"Internal Server Error\",)",
+        "**{}"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 285,
+      "end_line": 285,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_PY_ROW_NONE_403_LOOKUP",
+      "receiver": "_cv_app",
+      "method": "get",
+      "arguments": [
+        "None"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 282,
+      "end_line": 282,
+      "resolution_status": "resolved"
+    },
+    {
+      "id": "C_PY_ROW_NONE_403_ABORTER",
+      "receiver": "ctx.app",
+      "method": "aborter.__call__",
+      "arguments": [
+        "403",
+        "*()",
+        "**{}"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 283,
+      "end_line": 283,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_PY_ROW_NONE_403_FALLBACK",
+      "receiver": "werkzeug.exceptions",
+      "method": "abort",
+      "arguments": [
+        "403",
+        "*()",
+        "**{}"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 285,
+      "end_line": 285,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_PY_ROW_NONE_400_LOOKUP",
+      "receiver": "_cv_app",
+      "method": "get",
+      "arguments": [
+        "None"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 282,
+      "end_line": 282,
+      "resolution_status": "resolved"
+    },
+    {
+      "id": "C_PY_ROW_NONE_400_ABORTER",
+      "receiver": "ctx.app",
+      "method": "aborter.__call__",
+      "arguments": [
+        "400",
+        "*(\"Bad Request\",)",
+        "**{\"description\": \"Invalid input\"}"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 283,
+      "end_line": 283,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_PY_ROW_NONE_400_FALLBACK",
+      "receiver": "werkzeug.exceptions",
+      "method": "abort",
+      "arguments": [
+        "400",
+        "*(\"Bad Request\",)",
+        "**{\"description\": \"Invalid input\"}"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 285,
+      "end_line": 285,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_PY_ROW_APP_418_LOOKUP",
+      "receiver": "_cv_app",
+      "method": "get",
+      "arguments": [
+        "None"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 282,
+      "end_line": 282,
+      "resolution_status": "resolved"
+    },
+    {
+      "id": "C_PY_ROW_APP_418_ABORTER",
+      "receiver": "ctx.app",
+      "method": "aborter.__call__",
+      "arguments": [
+        "418",
+        "*()",
+        "**{\"description\": \"I'm a teapot\"}"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 283,
+      "end_line": 283,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_PY_ROW_APP_418_FALLBACK",
+      "receiver": "werkzeug.exceptions",
+      "method": "abort",
+      "arguments": [
+        "418",
+        "*()",
+        "**{\"description\": \"I'm a teapot\"}"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 285,
+      "end_line": 285,
+      "resolution_status": "partial"
+    }
+  ],
+  "formulas": [
+    {
+      "id": "F_PY_ALL_ORACLES",
+      "format": "smtlib2",
+      "text": "(assert (and (and S_PY_ROW_APP_404_EXCEPTION_OBSERVED S_PY_ROW_APP_404_MESSAGE_OK) (and S_PY_ROW_APP_500_EXCEPTION_OBSERVED S_PY_ROW_APP_500_MESSAGE_OK) (and S_PY_ROW_NONE_403_EXCEPTION_OBSERVED S_PY_ROW_NONE_403_MESSAGE_OK) (and S_PY_ROW_NONE_400_EXCEPTION_OBSERVED S_PY_ROW_NONE_400_MESSAGE_OK) (and S_PY_ROW_APP_418_EXCEPTION_OBSERVED S_PY_ROW_APP_418_MESSAGE_OK)))",
+      "role": "oracle_target",
+      "symbol_refs": [
+        "S_PY_ROW_APP_404_EXCEPTION_OBSERVED",
+        "S_PY_ROW_APP_500_EXCEPTION_OBSERVED",
+        "S_PY_ROW_NONE_403_EXCEPTION_OBSERVED",
+        "S_PY_ROW_NONE_400_EXCEPTION_OBSERVED",
+        "S_PY_ROW_APP_418_EXCEPTION_OBSERVED",
+        "S_PY_ROW_APP_404_MESSAGE_OK",
+        "S_PY_ROW_APP_500_MESSAGE_OK",
+        "S_PY_ROW_NONE_403_MESSAGE_OK",
+        "S_PY_ROW_NONE_400_MESSAGE_OK",
+        "S_PY_ROW_APP_418_MESSAGE_OK"
+      ],
+      "evidence_refs": [
+        "E_PY_RAISES",
+        "E_PY_APP_MESSAGE",
+        "E_PY_NONE_MESSAGE"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_NONVACUOUS_OBSERVATION",
+      "format": "smtlib2",
+      "text": "(assert (and S_PY_ROW_APP_404_EXCEPTION_OBSERVED S_PY_ROW_APP_500_EXCEPTION_OBSERVED S_PY_ROW_NONE_403_EXCEPTION_OBSERVED S_PY_ROW_NONE_400_EXCEPTION_OBSERVED S_PY_ROW_APP_418_EXCEPTION_OBSERVED))",
+      "role": "non_vacuity",
+      "symbol_refs": [
+        "S_PY_ROW_APP_404_EXCEPTION_OBSERVED",
+        "S_PY_ROW_APP_500_EXCEPTION_OBSERVED",
+        "S_PY_ROW_NONE_403_EXCEPTION_OBSERVED",
+        "S_PY_ROW_NONE_400_EXCEPTION_OBSERVED",
+        "S_PY_ROW_APP_418_EXCEPTION_OBSERVED"
+      ],
+      "evidence_refs": [
+        "E_PY_RAISES"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_APP_404_ABORTER_THROW",
+      "format": "smtlib2",
+      "text": "(assert (and (not S_PY_ROW_APP_404_LOOKUP_NONE) S_PY_ROW_APP_404_ABORTER_THROWS))",
+      "role": "row_local_scenario_guard",
+      "symbol_refs": [
+        "S_PY_ROW_APP_404_LOOKUP_NONE",
+        "S_PY_ROW_APP_404_ABORTER_THROWS"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_404"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_APP_404_NO_FALLBACK_THROW",
+      "format": "smtlib2",
+      "text": "(assert (not S_PY_ROW_APP_404_FALLBACK_REACHED))",
+      "role": "row_local_runtime_relation",
+      "symbol_refs": [
+        "S_PY_ROW_APP_404_FALLBACK_REACHED"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_404"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_APP_404_ABORTER_RETURN",
+      "format": "smtlib2",
+      "text": "(assert (and (not S_PY_ROW_APP_404_LOOKUP_NONE) (not S_PY_ROW_APP_404_ABORTER_THROWS)))",
+      "role": "row_local_scenario_guard",
+      "symbol_refs": [
+        "S_PY_ROW_APP_404_LOOKUP_NONE",
+        "S_PY_ROW_APP_404_ABORTER_THROWS"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_404"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_APP_404_FALLBACK_AFTER_RETURN",
+      "format": "smtlib2",
+      "text": "(assert S_PY_ROW_APP_404_FALLBACK_REACHED)",
+      "role": "row_local_runtime_relation",
+      "symbol_refs": [
+        "S_PY_ROW_APP_404_FALLBACK_REACHED"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_404"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_APP_500_ABORTER_THROW",
+      "format": "smtlib2",
+      "text": "(assert (and (not S_PY_ROW_APP_500_LOOKUP_NONE) S_PY_ROW_APP_500_ABORTER_THROWS))",
+      "role": "row_local_scenario_guard",
+      "symbol_refs": [
+        "S_PY_ROW_APP_500_LOOKUP_NONE",
+        "S_PY_ROW_APP_500_ABORTER_THROWS"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_500"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_APP_500_NO_FALLBACK_THROW",
+      "format": "smtlib2",
+      "text": "(assert (not S_PY_ROW_APP_500_FALLBACK_REACHED))",
+      "role": "row_local_runtime_relation",
+      "symbol_refs": [
+        "S_PY_ROW_APP_500_FALLBACK_REACHED"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_500"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_APP_500_ABORTER_RETURN",
+      "format": "smtlib2",
+      "text": "(assert (and (not S_PY_ROW_APP_500_LOOKUP_NONE) (not S_PY_ROW_APP_500_ABORTER_THROWS)))",
+      "role": "row_local_scenario_guard",
+      "symbol_refs": [
+        "S_PY_ROW_APP_500_LOOKUP_NONE",
+        "S_PY_ROW_APP_500_ABORTER_THROWS"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_500"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_APP_500_FALLBACK_AFTER_RETURN",
+      "format": "smtlib2",
+      "text": "(assert S_PY_ROW_APP_500_FALLBACK_REACHED)",
+      "role": "row_local_runtime_relation",
+      "symbol_refs": [
+        "S_PY_ROW_APP_500_FALLBACK_REACHED"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_500"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_NONE_403_LOOKUP_NONE",
+      "format": "smtlib2",
+      "text": "(assert S_PY_ROW_NONE_403_LOOKUP_NONE)",
+      "role": "row_local_scenario_guard",
+      "symbol_refs": [
+        "S_PY_ROW_NONE_403_LOOKUP_NONE"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_NONE_403"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_NONE_403_FALLBACK_REACHED",
+      "format": "smtlib2",
+      "text": "(assert S_PY_ROW_NONE_403_FALLBACK_REACHED)",
+      "role": "row_local_runtime_relation",
+      "symbol_refs": [
+        "S_PY_ROW_NONE_403_FALLBACK_REACHED"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_NONE_403"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_NONE_400_LOOKUP_NONE",
+      "format": "smtlib2",
+      "text": "(assert S_PY_ROW_NONE_400_LOOKUP_NONE)",
+      "role": "row_local_scenario_guard",
+      "symbol_refs": [
+        "S_PY_ROW_NONE_400_LOOKUP_NONE"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_NONE_400"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_NONE_400_FALLBACK_REACHED",
+      "format": "smtlib2",
+      "text": "(assert S_PY_ROW_NONE_400_FALLBACK_REACHED)",
+      "role": "row_local_runtime_relation",
+      "symbol_refs": [
+        "S_PY_ROW_NONE_400_FALLBACK_REACHED"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_NONE_400"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_APP_418_ABORTER_THROW",
+      "format": "smtlib2",
+      "text": "(assert (and (not S_PY_ROW_APP_418_LOOKUP_NONE) S_PY_ROW_APP_418_ABORTER_THROWS))",
+      "role": "row_local_scenario_guard",
+      "symbol_refs": [
+        "S_PY_ROW_APP_418_LOOKUP_NONE",
+        "S_PY_ROW_APP_418_ABORTER_THROWS"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_418"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_APP_418_NO_FALLBACK_THROW",
+      "format": "smtlib2",
+      "text": "(assert (not S_PY_ROW_APP_418_FALLBACK_REACHED))",
+      "role": "row_local_runtime_relation",
+      "symbol_refs": [
+        "S_PY_ROW_APP_418_FALLBACK_REACHED"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_418"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_APP_418_ABORTER_RETURN",
+      "format": "smtlib2",
+      "text": "(assert (and (not S_PY_ROW_APP_418_LOOKUP_NONE) (not S_PY_ROW_APP_418_ABORTER_THROWS)))",
+      "role": "row_local_scenario_guard",
+      "symbol_refs": [
+        "S_PY_ROW_APP_418_LOOKUP_NONE",
+        "S_PY_ROW_APP_418_ABORTER_THROWS"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_418"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_PY_ROW_APP_418_FALLBACK_AFTER_RETURN",
+      "format": "smtlib2",
+      "text": "(assert S_PY_ROW_APP_418_FALLBACK_REACHED)",
+      "role": "row_local_runtime_relation",
+      "symbol_refs": [
+        "S_PY_ROW_APP_418_FALLBACK_REACHED"
+      ],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_418"
+      ],
+      "support_status": "modeled"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "SC_PY_ROW_APP_404_ABORTER_THROW",
+      "title": "app_context_exists_404: context aborter throws",
+      "alternative_group": "python_control_path_PY_ROW_APP_404",
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_404_ABORTER_THROW",
+        "unknown_ref": null
+      },
+      "oracle_refs": [
+        "O_PY_ROW_APP_404"
+      ],
+      "assumption_refs": [
+        "A_PY_NORMAL_LOOKUP",
+        "A_PY_ACCESSIBLE_ABORTER"
+      ],
+      "unknown_refs": [
+        "U_PY_DYNAMIC_FAILURES",
+        "U_PY_EXCEPTION_SOURCE"
+      ],
+      "status": "partial"
+    },
+    {
+      "id": "SC_PY_ROW_APP_404_ABORTER_RETURN",
+      "title": "app_context_exists_404: aborter returns and fallback throws",
+      "alternative_group": "python_control_path_PY_ROW_APP_404",
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_404_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "oracle_refs": [
+        "O_PY_ROW_APP_404"
+      ],
+      "assumption_refs": [
+        "A_PY_NORMAL_LOOKUP",
+        "A_PY_ACCESSIBLE_ABORTER"
+      ],
+      "unknown_refs": [
+        "U_PY_DYNAMIC_FAILURES",
+        "U_PY_FALLBACK_SEMANTICS",
+        "U_PY_EXCEPTION_SOURCE"
+      ],
+      "status": "partial"
+    },
+    {
+      "id": "SC_PY_ROW_APP_500_ABORTER_THROW",
+      "title": "app_context_exists_500_with_message: context aborter throws",
+      "alternative_group": "python_control_path_PY_ROW_APP_500",
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_500_ABORTER_THROW",
+        "unknown_ref": null
+      },
+      "oracle_refs": [
+        "O_PY_ROW_APP_500"
+      ],
+      "assumption_refs": [
+        "A_PY_NORMAL_LOOKUP",
+        "A_PY_ACCESSIBLE_ABORTER"
+      ],
+      "unknown_refs": [
+        "U_PY_DYNAMIC_FAILURES",
+        "U_PY_EXCEPTION_SOURCE"
+      ],
+      "status": "partial"
+    },
+    {
+      "id": "SC_PY_ROW_APP_500_ABORTER_RETURN",
+      "title": "app_context_exists_500_with_message: aborter returns and fallback throws",
+      "alternative_group": "python_control_path_PY_ROW_APP_500",
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_500_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "oracle_refs": [
+        "O_PY_ROW_APP_500"
+      ],
+      "assumption_refs": [
+        "A_PY_NORMAL_LOOKUP",
+        "A_PY_ACCESSIBLE_ABORTER"
+      ],
+      "unknown_refs": [
+        "U_PY_DYNAMIC_FAILURES",
+        "U_PY_FALLBACK_SEMANTICS",
+        "U_PY_EXCEPTION_SOURCE"
+      ],
+      "status": "partial"
+    },
+    {
+      "id": "SC_PY_ROW_NONE_403_LOOKUP_NONE",
+      "title": "no_app_context_403: lookup None and fallback throws",
+      "alternative_group": "python_control_path_PY_ROW_NONE_403",
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_NONE_403_LOOKUP_NONE",
+        "unknown_ref": null
+      },
+      "oracle_refs": [
+        "O_PY_ROW_NONE_403"
+      ],
+      "assumption_refs": [
+        "A_PY_NORMAL_LOOKUP"
+      ],
+      "unknown_refs": [
+        "U_PY_DYNAMIC_FAILURES",
+        "U_PY_FALLBACK_SEMANTICS"
+      ],
+      "status": "partial"
+    },
+    {
+      "id": "SC_PY_ROW_NONE_400_LOOKUP_NONE",
+      "title": "no_app_context_with_args_kwargs: lookup None and fallback throws",
+      "alternative_group": "python_control_path_PY_ROW_NONE_400",
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_NONE_400_LOOKUP_NONE",
+        "unknown_ref": null
+      },
+      "oracle_refs": [
+        "O_PY_ROW_NONE_400"
+      ],
+      "assumption_refs": [
+        "A_PY_NORMAL_LOOKUP"
+      ],
+      "unknown_refs": [
+        "U_PY_DYNAMIC_FAILURES",
+        "U_PY_FALLBACK_SEMANTICS"
+      ],
+      "status": "partial"
+    },
+    {
+      "id": "SC_PY_ROW_APP_418_ABORTER_THROW",
+      "title": "app_context_custom_code: context aborter throws",
+      "alternative_group": "python_control_path_PY_ROW_APP_418",
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_418_ABORTER_THROW",
+        "unknown_ref": null
+      },
+      "oracle_refs": [
+        "O_PY_ROW_APP_418"
+      ],
+      "assumption_refs": [
+        "A_PY_NORMAL_LOOKUP",
+        "A_PY_ACCESSIBLE_ABORTER"
+      ],
+      "unknown_refs": [
+        "U_PY_DYNAMIC_FAILURES",
+        "U_PY_EXCEPTION_SOURCE"
+      ],
+      "status": "partial"
+    },
+    {
+      "id": "SC_PY_ROW_APP_418_ABORTER_RETURN",
+      "title": "app_context_custom_code: aborter returns and fallback throws",
+      "alternative_group": "python_control_path_PY_ROW_APP_418",
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_418_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "oracle_refs": [
+        "O_PY_ROW_APP_418"
+      ],
+      "assumption_refs": [
+        "A_PY_NORMAL_LOOKUP",
+        "A_PY_ACCESSIBLE_ABORTER"
+      ],
+      "unknown_refs": [
+        "U_PY_DYNAMIC_FAILURES",
+        "U_PY_FALLBACK_SEMANTICS",
+        "U_PY_EXCEPTION_SOURCE"
+      ],
+      "status": "partial"
+    }
+  ],
+  "response_rules": [
+    {
+      "id": "R_PY_ROW_APP_404_LOOKUP_CONTEXT_THROW",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_404_ABORTER_THROW"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_404_ABORTER_THROW",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_APP_404_LOOKUP",
+      "reaction": {
+        "kind": "return",
+        "value": "non-None context",
+        "constraint_refs": []
+      },
+      "logical_role": "scenario_local_obligation",
+      "oracle_refs": [
+        "O_PY_ROW_APP_404"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_APP_404_ABORTER_THROW"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_APP_404_ABORTER_THROW",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_404_ABORTER_THROW"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_404_ABORTER_THROW",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_APP_404_ABORTER",
+      "reaction": {
+        "kind": "throw",
+        "value": "Exception containing 'Aborted with 404'",
+        "constraint_refs": []
+      },
+      "logical_role": "implementation_choice",
+      "oracle_refs": [
+        "O_PY_ROW_APP_404"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_APP_404_ABORTER_THROW"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_APP_404_LOOKUP_CONTEXT_RETURN",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_404_ABORTER_RETURN"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_404_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_APP_404_LOOKUP",
+      "reaction": {
+        "kind": "return",
+        "value": "non-None context",
+        "constraint_refs": []
+      },
+      "logical_role": "scenario_local_obligation",
+      "oracle_refs": [
+        "O_PY_ROW_APP_404"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_APP_404_ABORTER_RETURN"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_APP_404_ABORTER_RETURN",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_404_ABORTER_RETURN"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_404_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_APP_404_ABORTER",
+      "reaction": {
+        "kind": "return",
+        "value": "normal return",
+        "constraint_refs": []
+      },
+      "logical_role": "implementation_choice",
+      "oracle_refs": [
+        "O_PY_ROW_APP_404"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_APP_404_ABORTER_RETURN"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_APP_404_FALLBACK_AFTER_RETURN",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_404_ABORTER_RETURN"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_404_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_APP_404_FALLBACK",
+      "reaction": {
+        "kind": "throw",
+        "value": "Exception containing 'Aborted with 404'",
+        "constraint_refs": []
+      },
+      "logical_role": "implementation_choice",
+      "oracle_refs": [
+        "O_PY_ROW_APP_404"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_APP_404_ABORTER_RETURN"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_APP_500_LOOKUP_CONTEXT_THROW",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_500_ABORTER_THROW"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_500_ABORTER_THROW",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_APP_500_LOOKUP",
+      "reaction": {
+        "kind": "return",
+        "value": "non-None context",
+        "constraint_refs": []
+      },
+      "logical_role": "scenario_local_obligation",
+      "oracle_refs": [
+        "O_PY_ROW_APP_500"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_APP_500_ABORTER_THROW"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_APP_500_ABORTER_THROW",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_500_ABORTER_THROW"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_500_ABORTER_THROW",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_APP_500_ABORTER",
+      "reaction": {
+        "kind": "throw",
+        "value": "Exception containing 'Aborted with 500'",
+        "constraint_refs": []
+      },
+      "logical_role": "implementation_choice",
+      "oracle_refs": [
+        "O_PY_ROW_APP_500"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_APP_500_ABORTER_THROW"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_APP_500_LOOKUP_CONTEXT_RETURN",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_500_ABORTER_RETURN"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_500_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_APP_500_LOOKUP",
+      "reaction": {
+        "kind": "return",
+        "value": "non-None context",
+        "constraint_refs": []
+      },
+      "logical_role": "scenario_local_obligation",
+      "oracle_refs": [
+        "O_PY_ROW_APP_500"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_APP_500_ABORTER_RETURN"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_APP_500_ABORTER_RETURN",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_500_ABORTER_RETURN"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_500_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_APP_500_ABORTER",
+      "reaction": {
+        "kind": "return",
+        "value": "normal return",
+        "constraint_refs": []
+      },
+      "logical_role": "implementation_choice",
+      "oracle_refs": [
+        "O_PY_ROW_APP_500"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_APP_500_ABORTER_RETURN"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_APP_500_FALLBACK_AFTER_RETURN",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_500_ABORTER_RETURN"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_500_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_APP_500_FALLBACK",
+      "reaction": {
+        "kind": "throw",
+        "value": "Exception containing 'Aborted with 500'",
+        "constraint_refs": []
+      },
+      "logical_role": "implementation_choice",
+      "oracle_refs": [
+        "O_PY_ROW_APP_500"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_APP_500_ABORTER_RETURN"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_NONE_403_LOOKUP_NONE",
+      "scenario_refs": [
+        "SC_PY_ROW_NONE_403_LOOKUP_NONE"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_NONE_403_LOOKUP_NONE",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_NONE_403_LOOKUP",
+      "reaction": {
+        "kind": "return",
+        "value": "None",
+        "constraint_refs": []
+      },
+      "logical_role": "scenario_local_obligation",
+      "oracle_refs": [
+        "O_PY_ROW_NONE_403"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_NONE_403_LOOKUP_NONE"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_NONE_403_FALLBACK_THROW",
+      "scenario_refs": [
+        "SC_PY_ROW_NONE_403_LOOKUP_NONE"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_NONE_403_LOOKUP_NONE",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_NONE_403_FALLBACK",
+      "reaction": {
+        "kind": "throw",
+        "value": "Exception containing 'Werkzeug abort 403'",
+        "constraint_refs": []
+      },
+      "logical_role": "implementation_choice",
+      "oracle_refs": [
+        "O_PY_ROW_NONE_403"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_NONE_403_LOOKUP_NONE"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_NONE_400_LOOKUP_NONE",
+      "scenario_refs": [
+        "SC_PY_ROW_NONE_400_LOOKUP_NONE"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_NONE_400_LOOKUP_NONE",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_NONE_400_LOOKUP",
+      "reaction": {
+        "kind": "return",
+        "value": "None",
+        "constraint_refs": []
+      },
+      "logical_role": "scenario_local_obligation",
+      "oracle_refs": [
+        "O_PY_ROW_NONE_400"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_NONE_400_LOOKUP_NONE"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_NONE_400_FALLBACK_THROW",
+      "scenario_refs": [
+        "SC_PY_ROW_NONE_400_LOOKUP_NONE"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_NONE_400_LOOKUP_NONE",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_NONE_400_FALLBACK",
+      "reaction": {
+        "kind": "throw",
+        "value": "Exception containing 'Werkzeug abort 400'",
+        "constraint_refs": []
+      },
+      "logical_role": "implementation_choice",
+      "oracle_refs": [
+        "O_PY_ROW_NONE_400"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_NONE_400_LOOKUP_NONE"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_APP_418_LOOKUP_CONTEXT_THROW",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_418_ABORTER_THROW"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_418_ABORTER_THROW",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_APP_418_LOOKUP",
+      "reaction": {
+        "kind": "return",
+        "value": "non-None context",
+        "constraint_refs": []
+      },
+      "logical_role": "scenario_local_obligation",
+      "oracle_refs": [
+        "O_PY_ROW_APP_418"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_APP_418_ABORTER_THROW"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_APP_418_ABORTER_THROW",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_418_ABORTER_THROW"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_418_ABORTER_THROW",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_APP_418_ABORTER",
+      "reaction": {
+        "kind": "throw",
+        "value": "Exception containing 'Aborted with 418'",
+        "constraint_refs": []
+      },
+      "logical_role": "implementation_choice",
+      "oracle_refs": [
+        "O_PY_ROW_APP_418"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_APP_418_ABORTER_THROW"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_APP_418_LOOKUP_CONTEXT_RETURN",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_418_ABORTER_RETURN"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_418_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_APP_418_LOOKUP",
+      "reaction": {
+        "kind": "return",
+        "value": "non-None context",
+        "constraint_refs": []
+      },
+      "logical_role": "scenario_local_obligation",
+      "oracle_refs": [
+        "O_PY_ROW_APP_418"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_APP_418_ABORTER_RETURN"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_APP_418_ABORTER_RETURN",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_418_ABORTER_RETURN"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_418_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_APP_418_ABORTER",
+      "reaction": {
+        "kind": "return",
+        "value": "normal return",
+        "constraint_refs": []
+      },
+      "logical_role": "implementation_choice",
+      "oracle_refs": [
+        "O_PY_ROW_APP_418"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_APP_418_ABORTER_RETURN"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_PY_ROW_APP_418_FALLBACK_AFTER_RETURN",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_418_ABORTER_RETURN"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_418_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "call_binding": "C_PY_ROW_APP_418_FALLBACK",
+      "reaction": {
+        "kind": "throw",
+        "value": "Exception containing 'Aborted with 418'",
+        "constraint_refs": []
+      },
+      "logical_role": "implementation_choice",
+      "oracle_refs": [
+        "O_PY_ROW_APP_418"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "check_refs": [
+        "K_PY_ROW_APP_418_ABORTER_RETURN"
+      ],
+      "whole_test_verified": false
+    }
+  ],
+  "runtime_expectations": [
+    {
+      "id": "X_PY_ROW_APP_404_ABORTER_THROW",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_404_ABORTER_THROW"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_404_ABORTER_THROW",
+        "unknown_ref": null
+      },
+      "binding_ref": "C_PY_ROW_APP_404_ABORTER",
+      "expectation": "called with positional [404, *()] and keyword {}; throws before fallback",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_404"
+      ],
+      "logical_role": "runtime_expectation"
+    },
+    {
+      "id": "X_PY_ROW_APP_404_FALLBACK_RETURN",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_404_ABORTER_RETURN"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_404_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "binding_ref": "C_PY_ROW_APP_404_FALLBACK",
+      "expectation": "called with positional [404, *()] and keyword {} after aborter returns",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_404"
+      ],
+      "logical_role": "runtime_expectation"
+    },
+    {
+      "id": "X_PY_ROW_APP_500_ABORTER_THROW",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_500_ABORTER_THROW"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_500_ABORTER_THROW",
+        "unknown_ref": null
+      },
+      "binding_ref": "C_PY_ROW_APP_500_ABORTER",
+      "expectation": "called with positional [500, *(\"Internal Server Error\",)] and keyword {}; throws before fallback",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_500"
+      ],
+      "logical_role": "runtime_expectation"
+    },
+    {
+      "id": "X_PY_ROW_APP_500_FALLBACK_RETURN",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_500_ABORTER_RETURN"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_500_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "binding_ref": "C_PY_ROW_APP_500_FALLBACK",
+      "expectation": "called with positional [500, *(\"Internal Server Error\",)] and keyword {} after aborter returns",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_500"
+      ],
+      "logical_role": "runtime_expectation"
+    },
+    {
+      "id": "X_PY_ROW_NONE_403_FALLBACK_NONE",
+      "scenario_refs": [
+        "SC_PY_ROW_NONE_403_LOOKUP_NONE"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_NONE_403_LOOKUP_NONE",
+        "unknown_ref": null
+      },
+      "binding_ref": "C_PY_ROW_NONE_403_FALLBACK",
+      "expectation": "called with positional [403, *()] and keyword {} after lookup returns None",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_NONE_403"
+      ],
+      "logical_role": "runtime_expectation"
+    },
+    {
+      "id": "X_PY_ROW_NONE_400_FALLBACK_NONE",
+      "scenario_refs": [
+        "SC_PY_ROW_NONE_400_LOOKUP_NONE"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_NONE_400_LOOKUP_NONE",
+        "unknown_ref": null
+      },
+      "binding_ref": "C_PY_ROW_NONE_400_FALLBACK",
+      "expectation": "called with positional [400, *(\"Bad Request\",)] and keyword {\"description\": \"Invalid input\"} after lookup returns None",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_NONE_400"
+      ],
+      "logical_role": "runtime_expectation"
+    },
+    {
+      "id": "X_PY_ROW_APP_418_ABORTER_THROW",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_418_ABORTER_THROW"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_418_ABORTER_THROW",
+        "unknown_ref": null
+      },
+      "binding_ref": "C_PY_ROW_APP_418_ABORTER",
+      "expectation": "called with positional [418, *()] and keyword {\"description\": \"I'm a teapot\"}; throws before fallback",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_418"
+      ],
+      "logical_role": "runtime_expectation"
+    },
+    {
+      "id": "X_PY_ROW_APP_418_FALLBACK_RETURN",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_418_ABORTER_RETURN"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_418_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "binding_ref": "C_PY_ROW_APP_418_FALLBACK",
+      "expectation": "called with positional [418, *()] and keyword {\"description\": \"I'm a teapot\"} after aborter returns",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_418"
+      ],
+      "logical_role": "runtime_expectation"
+    }
+  ],
+  "verification_candidates": [
+    {
+      "id": "V_PY_ROW_APP_404_ABORTER_THROW",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_404_ABORTER_THROW"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_404_ABORTER_THROW",
+        "unknown_ref": null
+      },
+      "expectation_ref": "X_PY_ROW_APP_404_ABORTER_THROW",
+      "proposal": "Consider verifying only for the selected path: called with positional [404, *()] and keyword {}; throws before fallback",
+      "behavior_protected": "Would distinguish which external abort path handled the parameter row, but the visible message oracle alone does not require this verification.",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_404"
+      ],
+      "status": "candidate_only",
+      "whole_test_verified": false
+    },
+    {
+      "id": "V_PY_ROW_APP_404_FALLBACK_RETURN",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_404_ABORTER_RETURN"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_404_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "expectation_ref": "X_PY_ROW_APP_404_FALLBACK_RETURN",
+      "proposal": "Consider verifying only for the selected path: called with positional [404, *()] and keyword {} after aborter returns",
+      "behavior_protected": "Would distinguish which external abort path handled the parameter row, but the visible message oracle alone does not require this verification.",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_404"
+      ],
+      "status": "candidate_only",
+      "whole_test_verified": false
+    },
+    {
+      "id": "V_PY_ROW_APP_500_ABORTER_THROW",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_500_ABORTER_THROW"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_500_ABORTER_THROW",
+        "unknown_ref": null
+      },
+      "expectation_ref": "X_PY_ROW_APP_500_ABORTER_THROW",
+      "proposal": "Consider verifying only for the selected path: called with positional [500, *(\"Internal Server Error\",)] and keyword {}; throws before fallback",
+      "behavior_protected": "Would distinguish which external abort path handled the parameter row, but the visible message oracle alone does not require this verification.",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_500"
+      ],
+      "status": "candidate_only",
+      "whole_test_verified": false
+    },
+    {
+      "id": "V_PY_ROW_APP_500_FALLBACK_RETURN",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_500_ABORTER_RETURN"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_500_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "expectation_ref": "X_PY_ROW_APP_500_FALLBACK_RETURN",
+      "proposal": "Consider verifying only for the selected path: called with positional [500, *(\"Internal Server Error\",)] and keyword {} after aborter returns",
+      "behavior_protected": "Would distinguish which external abort path handled the parameter row, but the visible message oracle alone does not require this verification.",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_500"
+      ],
+      "status": "candidate_only",
+      "whole_test_verified": false
+    },
+    {
+      "id": "V_PY_ROW_NONE_403_FALLBACK_NONE",
+      "scenario_refs": [
+        "SC_PY_ROW_NONE_403_LOOKUP_NONE"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_NONE_403_LOOKUP_NONE",
+        "unknown_ref": null
+      },
+      "expectation_ref": "X_PY_ROW_NONE_403_FALLBACK_NONE",
+      "proposal": "Consider verifying only for the selected path: called with positional [403, *()] and keyword {} after lookup returns None",
+      "behavior_protected": "Would distinguish which external abort path handled the parameter row, but the visible message oracle alone does not require this verification.",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_NONE_403"
+      ],
+      "status": "candidate_only",
+      "whole_test_verified": false
+    },
+    {
+      "id": "V_PY_ROW_NONE_400_FALLBACK_NONE",
+      "scenario_refs": [
+        "SC_PY_ROW_NONE_400_LOOKUP_NONE"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_NONE_400_LOOKUP_NONE",
+        "unknown_ref": null
+      },
+      "expectation_ref": "X_PY_ROW_NONE_400_FALLBACK_NONE",
+      "proposal": "Consider verifying only for the selected path: called with positional [400, *(\"Bad Request\",)] and keyword {\"description\": \"Invalid input\"} after lookup returns None",
+      "behavior_protected": "Would distinguish which external abort path handled the parameter row, but the visible message oracle alone does not require this verification.",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_NONE_400"
+      ],
+      "status": "candidate_only",
+      "whole_test_verified": false
+    },
+    {
+      "id": "V_PY_ROW_APP_418_ABORTER_THROW",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_418_ABORTER_THROW"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_418_ABORTER_THROW",
+        "unknown_ref": null
+      },
+      "expectation_ref": "X_PY_ROW_APP_418_ABORTER_THROW",
+      "proposal": "Consider verifying only for the selected path: called with positional [418, *()] and keyword {\"description\": \"I'm a teapot\"}; throws before fallback",
+      "behavior_protected": "Would distinguish which external abort path handled the parameter row, but the visible message oracle alone does not require this verification.",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_418"
+      ],
+      "status": "candidate_only",
+      "whole_test_verified": false
+    },
+    {
+      "id": "V_PY_ROW_APP_418_FALLBACK_RETURN",
+      "scenario_refs": [
+        "SC_PY_ROW_APP_418_ABORTER_RETURN"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_PY_ROW_APP_418_ABORTER_RETURN",
+        "unknown_ref": null
+      },
+      "expectation_ref": "X_PY_ROW_APP_418_FALLBACK_RETURN",
+      "proposal": "Consider verifying only for the selected path: called with positional [418, *()] and keyword {\"description\": \"I'm a teapot\"} after aborter returns",
+      "behavior_protected": "Would distinguish which external abort path handled the parameter row, but the visible message oracle alone does not require this verification.",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_ROW_APP_418"
+      ],
+      "status": "candidate_only",
+      "whole_test_verified": false
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A_PY_NORMAL_LOOKUP",
+      "statement": "_cv_app.get(None) returns normally for the modeled paths.",
+      "scope": "all row-local Python scenarios",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "blocks_semantic_proof": true
+    },
+    {
+      "id": "A_PY_ACCESSIBLE_ABORTER",
+      "statement": "For a non-None context, ctx.app.aborter attribute lookup succeeds.",
+      "scope": "row-local ABORTER_THROW and ABORTER_RETURN scenarios",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH"
+      ],
+      "blocks_semantic_proof": true
+    }
+  ],
+  "unknowns": [
+    {
+      "id": "U_PY_DYNAMIC_FAILURES",
+      "statement": "Lookup and dynamic attribute access can have exceptions or behavior outside the modeled row-local paths.",
+      "impact": "The scenario set is not a complete enumeration of Python runtime behavior and blocks automatic consumption.",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_IMPORTS"
+      ],
+      "blocks_consumption": true
+    },
+    {
+      "id": "U_PY_FALLBACK_SEMANTICS",
+      "statement": "The reviewed source exposes only the imported _wz_abort binding, not its implementation behavior.",
+      "impact": "Fallback exception/message rules are explicit implementation choices and require human review before consumption.",
+      "evidence_refs": [
+        "E_PY_IMPORTS",
+        "E_PY_NONE_MESSAGE"
+      ],
+      "blocks_consumption": true
+    },
+    {
+      "id": "U_PY_EXCEPTION_SOURCE",
+      "statement": "The app-context message can arise from app.aborter or from fallback after normal aborter return.",
+      "impact": "The visible oracle does not select one of the two app-context scenarios.",
+      "evidence_refs": [
+        "E_PY_MUT_BRANCH",
+        "E_PY_APP_MESSAGE"
+      ],
+      "blocks_consumption": false
+    },
+    {
+      "id": "U_PY_HIDDEN_VERIFY_INTENT",
+      "statement": "Masked verification slots reveal no required call-count or no-call assertions.",
+      "impact": "Interaction assertions remain candidates only.",
+      "evidence_refs": [
+        "E_PY_RAISES",
+        "E_PY_APP_MESSAGE",
+        "E_PY_NONE_MESSAGE"
+      ],
+      "blocks_consumption": false
+    }
+  ],
+  "checks": [
+    {
+      "id": "K_PY_ROW_APP_404_ABORTER_THROW",
+      "kind": "candidate_checking",
+      "formula_refs": [
+        "F_PY_ROW_APP_404_ABORTER_THROW",
+        "F_PY_ROW_APP_404_NO_FALLBACK_THROW"
+      ],
+      "scenario_refs": [
+        "SC_PY_ROW_APP_404_ABORTER_THROW"
+      ],
+      "result": "not_run",
+      "performed_by": "not_run",
+      "details": "Proposed row-local check only; actual evidence belongs to the host PoC sidecar.",
+      "semantic_claim": false
+    },
+    {
+      "id": "K_PY_ROW_APP_404_ABORTER_RETURN",
+      "kind": "candidate_checking",
+      "formula_refs": [
+        "F_PY_ROW_APP_404_ABORTER_RETURN",
+        "F_PY_ROW_APP_404_FALLBACK_AFTER_RETURN"
+      ],
+      "scenario_refs": [
+        "SC_PY_ROW_APP_404_ABORTER_RETURN"
+      ],
+      "result": "not_run",
+      "performed_by": "not_run",
+      "details": "Proposed row-local check only; actual evidence belongs to the host PoC sidecar.",
+      "semantic_claim": false
+    },
+    {
+      "id": "K_PY_ROW_APP_500_ABORTER_THROW",
+      "kind": "candidate_checking",
+      "formula_refs": [
+        "F_PY_ROW_APP_500_ABORTER_THROW",
+        "F_PY_ROW_APP_500_NO_FALLBACK_THROW"
+      ],
+      "scenario_refs": [
+        "SC_PY_ROW_APP_500_ABORTER_THROW"
+      ],
+      "result": "not_run",
+      "performed_by": "not_run",
+      "details": "Proposed row-local check only; actual evidence belongs to the host PoC sidecar.",
+      "semantic_claim": false
+    },
+    {
+      "id": "K_PY_ROW_APP_500_ABORTER_RETURN",
+      "kind": "candidate_checking",
+      "formula_refs": [
+        "F_PY_ROW_APP_500_ABORTER_RETURN",
+        "F_PY_ROW_APP_500_FALLBACK_AFTER_RETURN"
+      ],
+      "scenario_refs": [
+        "SC_PY_ROW_APP_500_ABORTER_RETURN"
+      ],
+      "result": "not_run",
+      "performed_by": "not_run",
+      "details": "Proposed row-local check only; actual evidence belongs to the host PoC sidecar.",
+      "semantic_claim": false
+    },
+    {
+      "id": "K_PY_ROW_NONE_403_LOOKUP_NONE",
+      "kind": "candidate_checking",
+      "formula_refs": [
+        "F_PY_ROW_NONE_403_LOOKUP_NONE",
+        "F_PY_ROW_NONE_403_FALLBACK_REACHED"
+      ],
+      "scenario_refs": [
+        "SC_PY_ROW_NONE_403_LOOKUP_NONE"
+      ],
+      "result": "not_run",
+      "performed_by": "not_run",
+      "details": "Proposed row-local check only; actual evidence belongs to the host PoC sidecar.",
+      "semantic_claim": false
+    },
+    {
+      "id": "K_PY_ROW_NONE_400_LOOKUP_NONE",
+      "kind": "candidate_checking",
+      "formula_refs": [
+        "F_PY_ROW_NONE_400_LOOKUP_NONE",
+        "F_PY_ROW_NONE_400_FALLBACK_REACHED"
+      ],
+      "scenario_refs": [
+        "SC_PY_ROW_NONE_400_LOOKUP_NONE"
+      ],
+      "result": "not_run",
+      "performed_by": "not_run",
+      "details": "Proposed row-local check only; actual evidence belongs to the host PoC sidecar.",
+      "semantic_claim": false
+    },
+    {
+      "id": "K_PY_ROW_APP_418_ABORTER_THROW",
+      "kind": "candidate_checking",
+      "formula_refs": [
+        "F_PY_ROW_APP_418_ABORTER_THROW",
+        "F_PY_ROW_APP_418_NO_FALLBACK_THROW"
+      ],
+      "scenario_refs": [
+        "SC_PY_ROW_APP_418_ABORTER_THROW"
+      ],
+      "result": "not_run",
+      "performed_by": "not_run",
+      "details": "Proposed row-local check only; actual evidence belongs to the host PoC sidecar.",
+      "semantic_claim": false
+    },
+    {
+      "id": "K_PY_ROW_APP_418_ABORTER_RETURN",
+      "kind": "candidate_checking",
+      "formula_refs": [
+        "F_PY_ROW_APP_418_ABORTER_RETURN",
+        "F_PY_ROW_APP_418_FALLBACK_AFTER_RETURN"
+      ],
+      "scenario_refs": [
+        "SC_PY_ROW_APP_418_ABORTER_RETURN"
+      ],
+      "result": "not_run",
+      "performed_by": "not_run",
+      "details": "Proposed row-local check only; actual evidence belongs to the host PoC sidecar.",
+      "semantic_claim": false
+    }
+  ],
+  "consumption": {
+    "selection_mode": "human_review_only",
+    "selectable_scenarios": [
+      "SC_PY_ROW_APP_404_ABORTER_THROW",
+      "SC_PY_ROW_APP_404_ABORTER_RETURN",
+      "SC_PY_ROW_APP_500_ABORTER_THROW",
+      "SC_PY_ROW_APP_500_ABORTER_RETURN",
+      "SC_PY_ROW_NONE_403_LOOKUP_NONE",
+      "SC_PY_ROW_NONE_400_LOOKUP_NONE",
+      "SC_PY_ROW_APP_418_ABORTER_THROW",
+      "SC_PY_ROW_APP_418_ABORTER_RETURN"
+    ],
+    "mutual_exclusion_groups": {
+      "python_control_path_PY_ROW_APP_404": [
+        "SC_PY_ROW_APP_404_ABORTER_THROW",
+        "SC_PY_ROW_APP_404_ABORTER_RETURN"
+      ],
+      "python_control_path_PY_ROW_APP_500": [
+        "SC_PY_ROW_APP_500_ABORTER_THROW",
+        "SC_PY_ROW_APP_500_ABORTER_RETURN"
+      ],
+      "python_control_path_PY_ROW_NONE_403": [
+        "SC_PY_ROW_NONE_403_LOOKUP_NONE"
+      ],
+      "python_control_path_PY_ROW_NONE_400": [
+        "SC_PY_ROW_NONE_400_LOOKUP_NONE"
+      ],
+      "python_control_path_PY_ROW_APP_418": [
+        "SC_PY_ROW_APP_418_ABORTER_THROW",
+        "SC_PY_ROW_APP_418_ABORTER_RETURN"
+      ]
+    },
+    "stub_guidance": [
+      "For has_app_context=False rows choose lookup None and a fallback throw carrying the exact row-specific message substring.",
+      "For has_app_context=True rows retain both alternatives: aborter throws, or aborter returns normally and fallback throws the same required substring.",
+      "Preserve every row's code, *args, and **kwargs binding; do not merge rows into an untraceable generic call.",
+      "The branch test is identity against None; non-None falsey objects still enter the app-context branch."
+    ],
+    "runtime_vs_verification": [
+      "Path-specific calls are runtime expectations.",
+      "Call verification remains candidate_only because the visible oracle does not require a particular exception source."
+    ],
+    "blocking_unknown_refs": [
+      "U_PY_DYNAMIC_FAILURES",
+      "U_PY_FALLBACK_SEMANTICS"
+    ],
+    "partial_unknown_refs": [
+      "U_PY_EXCEPTION_SOURCE",
+      "U_PY_HIDDEN_VERIFY_INTENT"
+    ],
+    "notes": [
+      "Machine consumption is disabled; scenarios are selectable for human review only.",
+      "No exact exception class is introduced beyond pytest.raises(Exception).",
+      "No hidden slot content, reference Mock, archive candidate, or score is used."
+    ]
+  }
+}

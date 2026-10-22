@@ -1,0 +1,1767 @@
+{
+  "schema_version": "mock-spec.scenario-contract-research/v0",
+  "identity": {
+    "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+    "language": "java",
+    "authoring_mode": "handcrafted_from_visible_input",
+    "input_policy_id": "mock-spec-reviewed-frozen/v1",
+    "source_hash_algorithm": "sha256-utf8-visible-slice"
+  },
+  "coverage": {
+    "scope": "Local image-selection and pre-builder entrypoint alternatives for one visible test; every final ContainerBuildPlan assertion is retained but not formalized.",
+    "formalized_oracle_refs": [],
+    "unformalized_oracle_refs": [
+      "O_J_BASE_IMAGE",
+      "O_J_PLATFORMS",
+      "O_J_CREATION_TIME",
+      "O_J_FORMAT",
+      "O_J_ENV_EMPTY",
+      "O_J_LABELS_EMPTY",
+      "O_J_VOLUMES_EMPTY",
+      "O_J_PORTS_EMPTY",
+      "O_J_USER_NULL",
+      "O_J_WORKDIR_NULL",
+      "O_J_ENTRY_SIZE",
+      "O_J_ENTRY_0",
+      "O_J_ENTRY_1",
+      "O_J_ENTRY_2",
+      "O_J_ENTRY_3",
+      "O_J_LAYER_SIZE",
+      "O_J_LAYER_NAME",
+      "O_J_LAYER_ENTRIES",
+      "O_J_EXTRACTION_PATH"
+    ],
+    "whole_test_verified": false
+  },
+  "sources": [
+    {
+      "id": "mut",
+      "logical_path": "src/main/java/com/google/cloud/tools/jib/cli/jar/JarFiles.java",
+      "start_line": 1,
+      "end_line": 95,
+      "sha256": "ff8ee22a4aa1bce7d61024a2d06fcb7983abc3e92751683cee598a92a0020140"
+    },
+    {
+      "id": "test",
+      "logical_path": "src/test/java/com/google/cloud/tools/jib/cli/jar/JarFilesTest.java",
+      "start_line": 1,
+      "end_line": 104,
+      "sha256": "19e800bf8967238ef3b7772278e476186e509051e5021067b1f7234de0f68ed0"
+    },
+    {
+      "id": "processor",
+      "logical_path": "src/main/java/com/google/cloud/tools/jib/cli/jar/StandardExplodedProcessor.java",
+      "start_line": 1,
+      "end_line": 61,
+      "sha256": "6dc801606c0e36dffa9ad447324524430cb3e676dde044320900f08eb61e50e5"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E_J_FROM_BRANCH",
+      "source_id": "mut",
+      "start_line": 60,
+      "end_line": 71,
+      "quote": "    if (commonContainerConfigCliOptions.getFrom().isPresent()) {\n      containerBuilder =\n          ContainerBuilders.create(\n              commonContainerConfigCliOptions.getFrom().get(),\n              Collections.emptySet(),\n              commonCliOptions,\n              logger);\n    } else {\n      containerBuilder =\n          (processor.getJavaVersion() <= 8)\n              ? Jib.from(\"adoptopenjdk:8-jre\")\n              : Jib.from(\"adoptopenjdk:11-jre\");",
+      "supports": "Two getFrom calls select an explicit-from builder or a version-based default image.",
+      "semantic_limit": "Visible control structure does not reveal ContainerBuilders.create semantics or guarantee repeated-call stability."
+    },
+    {
+      "id": "E_J_LAYERS_ENTRY",
+      "source_id": "mut",
+      "start_line": 74,
+      "end_line": 79,
+      "quote": "    List<FileEntriesLayer> layers = processor.createLayers();\n    List<String> customEntrypoint = commonContainerConfigCliOptions.getEntrypoint();\n    List<String> entrypoint =\n        customEntrypoint.isEmpty()\n            ? processor.computeEntrypoint(jarOptions.getJvmFlags())\n            : customEntrypoint;",
+      "supports": "createLayers and empty/non-empty entrypoint alternatives feed the builder.",
+      "semantic_limit": "This syntax does not prove dependency return values or absence of exceptions."
+    },
+    {
+      "id": "E_J_BUILDER_WRITES",
+      "source_id": "mut",
+      "start_line": 81,
+      "end_line": 91,
+      "quote": "    containerBuilder\n        .setEntrypoint(entrypoint)\n        .setFileEntriesLayers(layers)\n        .setExposedPorts(commonContainerConfigCliOptions.getExposedPorts())\n        .setVolumes(commonContainerConfigCliOptions.getVolumes())\n        .setEnvironment(commonContainerConfigCliOptions.getEnvironment())\n        .setLabels(commonContainerConfigCliOptions.getLabels())\n        .setProgramArguments(commonContainerConfigCliOptions.getProgramArguments());\n    commonContainerConfigCliOptions.getUser().ifPresent(containerBuilder::setUser);\n    commonContainerConfigCliOptions.getFormat().ifPresent(containerBuilder::setFormat);\n    commonContainerConfigCliOptions.getCreationTime().ifPresent(containerBuilder::setCreationTime);",
+      "supports": "The chosen entrypoint, layers, and configuration getters are passed to builder methods.",
+      "semantic_limit": "External builder semantics and defaults remain outside the reviewed source."
+    },
+    {
+      "id": "E_J_ASSERT_BASE",
+      "source_id": "test",
+      "start_line": 71,
+      "end_line": 71,
+      "quote": "    assertEquals(\"adoptopenjdk:8-jre\", buildPlan.getBaseImage());",
+      "supports": "Visible base-image oracle.",
+      "semantic_limit": "The assertion alone does not make getFrom empty globally necessary."
+    },
+    {
+      "id": "E_J_ASSERT_PLATFORMS",
+      "source_id": "test",
+      "start_line": 72,
+      "end_line": 72,
+      "quote": "    assertEquals(ImmutableSet.of(new Platform(\"amd64\", \"linux\")), buildPlan.getPlatforms());",
+      "supports": "Visible platform oracle.",
+      "semantic_limit": "Not formalized in the local SMT fragment."
+    },
+    {
+      "id": "E_J_ASSERT_CREATION",
+      "source_id": "test",
+      "start_line": 73,
+      "end_line": 73,
+      "quote": "    assertEquals(Instant.EPOCH, buildPlan.getCreationTime());",
+      "supports": "Visible creation-time oracle.",
+      "semantic_limit": "Not formalized in the local SMT fragment."
+    },
+    {
+      "id": "E_J_ASSERT_FORMAT",
+      "source_id": "test",
+      "start_line": 74,
+      "end_line": 74,
+      "quote": "    assertEquals(ImageFormat.Docker, buildPlan.getFormat());",
+      "supports": "Visible image-format oracle.",
+      "semantic_limit": "Not formalized in the local SMT fragment."
+    },
+    {
+      "id": "E_J_ASSERT_ENV",
+      "source_id": "test",
+      "start_line": 75,
+      "end_line": 75,
+      "quote": "    assertEquals(0, buildPlan.getEnvironment().size());",
+      "supports": "Visible empty-environment oracle.",
+      "semantic_limit": "Not formalized in the local SMT fragment."
+    },
+    {
+      "id": "E_J_ASSERT_LABELS",
+      "source_id": "test",
+      "start_line": 76,
+      "end_line": 76,
+      "quote": "    assertEquals(0, buildPlan.getLabels().size());",
+      "supports": "Visible empty-labels oracle.",
+      "semantic_limit": "Not formalized in the local SMT fragment."
+    },
+    {
+      "id": "E_J_ASSERT_VOLUMES",
+      "source_id": "test",
+      "start_line": 77,
+      "end_line": 77,
+      "quote": "    assertEquals(0, buildPlan.getVolumes().size());",
+      "supports": "Visible empty-volumes oracle.",
+      "semantic_limit": "Not formalized in the local SMT fragment."
+    },
+    {
+      "id": "E_J_ASSERT_PORTS",
+      "source_id": "test",
+      "start_line": 78,
+      "end_line": 78,
+      "quote": "    assertEquals(0, buildPlan.getExposedPorts().size());",
+      "supports": "Visible empty-ports oracle.",
+      "semantic_limit": "Not formalized in the local SMT fragment."
+    },
+    {
+      "id": "E_J_ASSERT_USER",
+      "source_id": "test",
+      "start_line": 79,
+      "end_line": 79,
+      "quote": "    assertNull(buildPlan.getUser());",
+      "supports": "Visible null-user oracle.",
+      "semantic_limit": "Not formalized in the local SMT fragment."
+    },
+    {
+      "id": "E_J_ASSERT_WORKDIR",
+      "source_id": "test",
+      "start_line": 80,
+      "end_line": 80,
+      "quote": "    assertNull(buildPlan.getWorkingDirectory());",
+      "supports": "Visible null-working-directory oracle.",
+      "semantic_limit": "Not formalized in the local SMT fragment."
+    },
+    {
+      "id": "E_J_ASSERT_ENTRY_SIZE",
+      "source_id": "test",
+      "start_line": 81,
+      "end_line": 81,
+      "quote": "    assertEquals(4, buildPlan.getEntrypoint().size());",
+      "supports": "Visible entrypoint length oracle.",
+      "semantic_limit": "Formalization covers only the abstract entrypoint value."
+    },
+    {
+      "id": "E_J_ASSERT_ENTRY_0",
+      "source_id": "test",
+      "start_line": 82,
+      "end_line": 82,
+      "quote": "    assertEquals(\"java\", buildPlan.getEntrypoint().get(0));",
+      "supports": "Visible entrypoint element 0 oracle.",
+      "semantic_limit": "Formalization covers only the abstract entrypoint value."
+    },
+    {
+      "id": "E_J_ASSERT_ENTRY_1",
+      "source_id": "test",
+      "start_line": 83,
+      "end_line": 83,
+      "quote": "    assertEquals(\"-cp\", buildPlan.getEntrypoint().get(1));",
+      "supports": "Visible entrypoint element 1 oracle.",
+      "semantic_limit": "Formalization covers only the abstract entrypoint value."
+    },
+    {
+      "id": "E_J_ASSERT_ENTRY_2",
+      "source_id": "test",
+      "start_line": 84,
+      "end_line": 84,
+      "quote": "    assertEquals(\"/app/explodedJar:/app/dependencies/*\", buildPlan.getEntrypoint().get(2));",
+      "supports": "Visible entrypoint element 2 oracle.",
+      "semantic_limit": "Formalization covers only the abstract entrypoint value."
+    },
+    {
+      "id": "E_J_ASSERT_ENTRY_3",
+      "source_id": "test",
+      "start_line": 85,
+      "end_line": 85,
+      "quote": "    assertEquals(\"HelloWorld\", buildPlan.getEntrypoint().get(3));",
+      "supports": "Visible entrypoint element 3 oracle.",
+      "semantic_limit": "Formalization covers only the abstract entrypoint value."
+    },
+    {
+      "id": "E_J_ASSERT_LAYER_SIZE",
+      "source_id": "test",
+      "start_line": 86,
+      "end_line": 86,
+      "quote": "    assertEquals(1, buildPlan.getLayers().size());",
+      "supports": "Visible layer-count oracle.",
+      "semantic_limit": "Not formalized in the local SMT fragment."
+    },
+    {
+      "id": "E_J_ASSERT_LAYER_NAME",
+      "source_id": "test",
+      "start_line": 87,
+      "end_line": 87,
+      "quote": "    assertEquals(\"classes\", buildPlan.getLayers().get(0).getName());",
+      "supports": "Visible first-layer name oracle.",
+      "semantic_limit": "Not formalized in the local SMT fragment."
+    },
+    {
+      "id": "E_J_ASSERT_LAYER_ENTRIES",
+      "source_id": "test",
+      "start_line": 88,
+      "end_line": 96,
+      "quote": "    assertArrayEquals(\n        FileEntriesLayer.builder()\n            .addEntry(\n                Paths.get(\"path/to/tempDirectory/class1.class\"),\n                AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"))\n            .build()\n            .getEntries()\n            .toArray(new Object[0]),\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().toArray(new Object[0]));",
+      "supports": "Visible layer-entry array oracle.",
+      "semantic_limit": "Not formalized in the local SMT fragment."
+    },
+    {
+      "id": "E_J_ASSERT_EXTRACTION",
+      "source_id": "test",
+      "start_line": 97,
+      "end_line": 99,
+      "quote": "    assertEquals(\n        AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"),\n        ((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().get(0).getExtractionPath());",
+      "supports": "Visible extraction-path oracle.",
+      "semantic_limit": "Not formalized in the local SMT fragment."
+    },
+    {
+      "id": "E_J_PROCESSOR_INTERFACES",
+      "source_id": "processor",
+      "start_line": 53,
+      "end_line": 60,
+      "quote": "  @Override\n  public List<FileEntriesLayer> createLayers() throws IOException { throw new UnsupportedOperationException(); }\n\n  @Override\n  public ImmutableList<String> computeEntrypoint(List<String> jvmFlags) throws IOException { throw new UnsupportedOperationException(); }\n\n  @Override\n  public Integer getJavaVersion() { throw new UnsupportedOperationException(); }",
+      "supports": "Reviewed processor declarations identify three controllable dependency calls.",
+      "semantic_limit": "The visible UnsupportedOperationException bodies are masking placeholders, not dependency semantics."
+    }
+  ],
+  "oracles": [
+    {
+      "id": "O_J_BASE_IMAGE",
+      "parameter_row": null,
+      "observation": "buildPlan.getBaseImage()",
+      "expected": "equals \"adoptopenjdk:8-jre\"",
+      "evidence_refs": [
+        "E_J_ASSERT_BASE"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_PLATFORMS",
+      "parameter_row": null,
+      "observation": "buildPlan.getPlatforms()",
+      "expected": "equals {Platform(\"amd64\", \"linux\")}",
+      "evidence_refs": [
+        "E_J_ASSERT_PLATFORMS"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_CREATION_TIME",
+      "parameter_row": null,
+      "observation": "buildPlan.getCreationTime()",
+      "expected": "equals Instant.EPOCH",
+      "evidence_refs": [
+        "E_J_ASSERT_CREATION"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_FORMAT",
+      "parameter_row": null,
+      "observation": "buildPlan.getFormat()",
+      "expected": "equals ImageFormat.Docker",
+      "evidence_refs": [
+        "E_J_ASSERT_FORMAT"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_ENV_EMPTY",
+      "parameter_row": null,
+      "observation": "buildPlan.getEnvironment().size()",
+      "expected": "equals 0",
+      "evidence_refs": [
+        "E_J_ASSERT_ENV"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_LABELS_EMPTY",
+      "parameter_row": null,
+      "observation": "buildPlan.getLabels().size()",
+      "expected": "equals 0",
+      "evidence_refs": [
+        "E_J_ASSERT_LABELS"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_VOLUMES_EMPTY",
+      "parameter_row": null,
+      "observation": "buildPlan.getVolumes().size()",
+      "expected": "equals 0",
+      "evidence_refs": [
+        "E_J_ASSERT_VOLUMES"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_PORTS_EMPTY",
+      "parameter_row": null,
+      "observation": "buildPlan.getExposedPorts().size()",
+      "expected": "equals 0",
+      "evidence_refs": [
+        "E_J_ASSERT_PORTS"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_USER_NULL",
+      "parameter_row": null,
+      "observation": "buildPlan.getUser()",
+      "expected": "is null",
+      "evidence_refs": [
+        "E_J_ASSERT_USER"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_WORKDIR_NULL",
+      "parameter_row": null,
+      "observation": "buildPlan.getWorkingDirectory()",
+      "expected": "is null",
+      "evidence_refs": [
+        "E_J_ASSERT_WORKDIR"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_ENTRY_SIZE",
+      "parameter_row": null,
+      "observation": "buildPlan.getEntrypoint().size()",
+      "expected": "equals 4",
+      "evidence_refs": [
+        "E_J_ASSERT_ENTRY_SIZE"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_ENTRY_0",
+      "parameter_row": null,
+      "observation": "buildPlan.getEntrypoint().get(0)",
+      "expected": "equals \"java\"",
+      "evidence_refs": [
+        "E_J_ASSERT_ENTRY_0"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_ENTRY_1",
+      "parameter_row": null,
+      "observation": "buildPlan.getEntrypoint().get(1)",
+      "expected": "equals \"-cp\"",
+      "evidence_refs": [
+        "E_J_ASSERT_ENTRY_1"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_ENTRY_2",
+      "parameter_row": null,
+      "observation": "buildPlan.getEntrypoint().get(2)",
+      "expected": "equals \"/app/explodedJar:/app/dependencies/*\"",
+      "evidence_refs": [
+        "E_J_ASSERT_ENTRY_2"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_ENTRY_3",
+      "parameter_row": null,
+      "observation": "buildPlan.getEntrypoint().get(3)",
+      "expected": "equals \"HelloWorld\"",
+      "evidence_refs": [
+        "E_J_ASSERT_ENTRY_3"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_LAYER_SIZE",
+      "parameter_row": null,
+      "observation": "buildPlan.getLayers().size()",
+      "expected": "equals 1",
+      "evidence_refs": [
+        "E_J_ASSERT_LAYER_SIZE"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_LAYER_NAME",
+      "parameter_row": null,
+      "observation": "buildPlan.getLayers().get(0).getName()",
+      "expected": "equals \"classes\"",
+      "evidence_refs": [
+        "E_J_ASSERT_LAYER_NAME"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_LAYER_ENTRIES",
+      "parameter_row": null,
+      "observation": "buildPlan.getLayers().get(0).getEntries()",
+      "expected": "array equals the expected single FileEntry",
+      "evidence_refs": [
+        "E_J_ASSERT_LAYER_ENTRIES"
+      ],
+      "formalization_status": "not_formalized"
+    },
+    {
+      "id": "O_J_EXTRACTION_PATH",
+      "parameter_row": null,
+      "observation": "buildPlan.getLayers().get(0).getEntries().get(0).getExtractionPath()",
+      "expected": "equals AbsoluteUnixPath(\"/app/explodedJar/class1.class\")",
+      "evidence_refs": [
+        "E_J_ASSERT_EXTRACTION"
+      ],
+      "formalization_status": "not_formalized"
+    }
+  ],
+  "symbols": [
+    {
+      "id": "S_J_FROM1_PRESENT",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_J_GET_FROM_1",
+      "model_symbol": "from1_present",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ]
+    },
+    {
+      "id": "S_J_FROM2_PRESENT",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_J_GET_FROM_2",
+      "model_symbol": "from2_present",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ]
+    },
+    {
+      "id": "S_J_FROM_VALUE",
+      "sort": "String",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_J_GET_FROM_2",
+      "model_symbol": null,
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ]
+    },
+    {
+      "id": "S_J_VERSION_IS_NULL",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_J_GET_JAVA_VERSION",
+      "model_symbol": "version_null",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ]
+    },
+    {
+      "id": "S_J_VERSION_THROWS",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_J_GET_JAVA_VERSION",
+      "model_symbol": "version_throws",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ]
+    },
+    {
+      "id": "S_J_VERSION",
+      "sort": "Int",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_J_GET_JAVA_VERSION",
+      "model_symbol": "version",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ]
+    },
+    {
+      "id": "S_J_VERSION_CALLED",
+      "sort": "Bool",
+      "role": "execution_state",
+      "controllable": false,
+      "binding_ref": "C_J_GET_JAVA_VERSION",
+      "model_symbol": "version_called",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ]
+    },
+    {
+      "id": "S_J_ENTRY_CUSTOM_EMPTY",
+      "sort": "Bool",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_J_GET_ENTRYPOINT",
+      "model_symbol": "custom_empty",
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ]
+    },
+    {
+      "id": "S_J_ENTRY_VALUE",
+      "sort": "String",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_J_GET_ENTRYPOINT",
+      "model_symbol": null,
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ]
+    },
+    {
+      "id": "S_J_COMPUTED_ENTRY",
+      "sort": "String",
+      "role": "dependency_response",
+      "controllable": true,
+      "binding_ref": "C_J_COMPUTE_ENTRYPOINT",
+      "model_symbol": null,
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ]
+    },
+    {
+      "id": "S_J_CUSTOM_MATCHES",
+      "sort": "Bool",
+      "role": "handcrafted_abstract_equality_to_four_item_expected_list",
+      "controllable": true,
+      "binding_ref": "C_J_GET_ENTRYPOINT",
+      "model_symbol": "custom_matches",
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ]
+    },
+    {
+      "id": "S_J_COMPUTED_MATCHES",
+      "sort": "Bool",
+      "role": "handcrafted_abstract_equality_to_four_item_expected_list",
+      "controllable": true,
+      "binding_ref": "C_J_COMPUTE_ENTRYPOINT",
+      "model_symbol": "computed_matches",
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ]
+    },
+    {
+      "id": "S_J_JAVA8_SELECTED",
+      "sort": "Bool",
+      "role": "local_observation",
+      "controllable": false,
+      "binding_ref": "C_J_JIB_FROM_8",
+      "model_symbol": "java8_selected",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ]
+    },
+    {
+      "id": "S_J_EXTERNAL_IMAGE_MATCHES",
+      "sort": "Bool",
+      "role": "unknown_external_relation",
+      "controllable": false,
+      "binding_ref": "C_J_CREATE_EXPLICIT",
+      "model_symbol": "external_image_matches",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ]
+    },
+    {
+      "id": "S_J_ENTRYPOINT_MATCHES",
+      "sort": "Bool",
+      "role": "local_observation",
+      "controllable": false,
+      "binding_ref": null,
+      "model_symbol": "entrypoint_matches",
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ]
+    },
+    {
+      "id": "S_J_ENTRY_OBSERVATION_REACHED",
+      "sort": "Bool",
+      "role": "execution_state",
+      "controllable": false,
+      "binding_ref": null,
+      "model_symbol": "entrypoint_observation_reached",
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ]
+    },
+    {
+      "id": "S_J_IMAGE_OBSERVATION_REACHED",
+      "sort": "Bool",
+      "role": "execution_state",
+      "controllable": false,
+      "binding_ref": null,
+      "model_symbol": "image_observation_reached",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ]
+    },
+    {
+      "id": "S_J_ASSERT_REACHED",
+      "sort": "Bool",
+      "role": "execution_state",
+      "controllable": false,
+      "binding_ref": null,
+      "model_symbol": null,
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ]
+    },
+    {
+      "id": "S_J_NORMAL_EXIT",
+      "sort": "Bool",
+      "role": "execution_state",
+      "controllable": false,
+      "binding_ref": null,
+      "model_symbol": null,
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ]
+    }
+  ],
+  "bindings": [
+    {
+      "id": "C_J_GET_FROM_1",
+      "receiver": "mockCommonContainerConfigCliOptions",
+      "method": "getFrom",
+      "arguments": [],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 60,
+      "end_line": 60,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_GET_FROM_2",
+      "receiver": "mockCommonContainerConfigCliOptions",
+      "method": "getFrom",
+      "arguments": [],
+      "call_ordinal": 2,
+      "source_id": "mut",
+      "start_line": 63,
+      "end_line": 63,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_CREATE_EXPLICIT",
+      "receiver": "ContainerBuilders",
+      "method": "create",
+      "arguments": [
+        "getFrom#2.value",
+        "emptySet",
+        "mockCommonCliOptions",
+        "mockLogger"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 62,
+      "end_line": 62,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_GET_JAVA_VERSION",
+      "receiver": "mockStandardExplodedProcessor",
+      "method": "getJavaVersion",
+      "arguments": [],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 69,
+      "end_line": 69,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_JIB_FROM_8",
+      "receiver": "Jib",
+      "method": "from",
+      "arguments": [
+        "\"adoptopenjdk:8-jre\""
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 70,
+      "end_line": 70,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_JIB_FROM_11",
+      "receiver": "Jib",
+      "method": "from",
+      "arguments": [
+        "\"adoptopenjdk:11-jre\""
+      ],
+      "call_ordinal": 2,
+      "source_id": "mut",
+      "start_line": 71,
+      "end_line": 71,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_CREATE_LAYERS",
+      "receiver": "mockStandardExplodedProcessor",
+      "method": "createLayers",
+      "arguments": [],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 74,
+      "end_line": 74,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_GET_ENTRYPOINT",
+      "receiver": "mockCommonContainerConfigCliOptions",
+      "method": "getEntrypoint",
+      "arguments": [],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 75,
+      "end_line": 75,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_GET_JVM_FLAGS",
+      "receiver": "mockJarCommand",
+      "method": "getJvmFlags",
+      "arguments": [],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 78,
+      "end_line": 78,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_COMPUTE_ENTRYPOINT",
+      "receiver": "mockStandardExplodedProcessor",
+      "method": "computeEntrypoint",
+      "arguments": [
+        "getJvmFlags#1.return"
+      ],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 78,
+      "end_line": 78,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_GET_PORTS",
+      "receiver": "mockCommonContainerConfigCliOptions",
+      "method": "getExposedPorts",
+      "arguments": [],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 84,
+      "end_line": 84,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_GET_VOLUMES",
+      "receiver": "mockCommonContainerConfigCliOptions",
+      "method": "getVolumes",
+      "arguments": [],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 85,
+      "end_line": 85,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_GET_ENV",
+      "receiver": "mockCommonContainerConfigCliOptions",
+      "method": "getEnvironment",
+      "arguments": [],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 86,
+      "end_line": 86,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_GET_LABELS",
+      "receiver": "mockCommonContainerConfigCliOptions",
+      "method": "getLabels",
+      "arguments": [],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 87,
+      "end_line": 87,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_GET_ARGS",
+      "receiver": "mockCommonContainerConfigCliOptions",
+      "method": "getProgramArguments",
+      "arguments": [],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 88,
+      "end_line": 88,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_GET_USER",
+      "receiver": "mockCommonContainerConfigCliOptions",
+      "method": "getUser",
+      "arguments": [],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 89,
+      "end_line": 89,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_GET_FORMAT",
+      "receiver": "mockCommonContainerConfigCliOptions",
+      "method": "getFormat",
+      "arguments": [],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 90,
+      "end_line": 90,
+      "resolution_status": "partial"
+    },
+    {
+      "id": "C_J_GET_CREATION",
+      "receiver": "mockCommonContainerConfigCliOptions",
+      "method": "getCreationTime",
+      "arguments": [],
+      "call_ordinal": 1,
+      "source_id": "mut",
+      "start_line": 91,
+      "end_line": 91,
+      "resolution_status": "partial"
+    }
+  ],
+  "formulas": [
+    {
+      "id": "F_J_DEFAULT_IMAGE_GUARD",
+      "format": "smtlib2",
+      "text": "(assert (not S_J_FROM1_PRESENT))",
+      "role": "scenario_guard",
+      "symbol_refs": [
+        "S_J_FROM1_PRESENT"
+      ],
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_J_EXPLICIT_IMAGE_GUARD",
+      "format": "smtlib2",
+      "text": "(assert S_J_FROM1_PRESENT)",
+      "role": "scenario_guard",
+      "symbol_refs": [
+        "S_J_FROM1_PRESENT"
+      ],
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_J_EMPTY_ENTRY_GUARD",
+      "format": "smtlib2",
+      "text": "(assert S_J_ENTRY_CUSTOM_EMPTY)",
+      "role": "scenario_guard",
+      "symbol_refs": [
+        "S_J_ENTRY_CUSTOM_EMPTY"
+      ],
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_J_CUSTOM_ENTRY_GUARD",
+      "format": "smtlib2",
+      "text": "(assert (not S_J_ENTRY_CUSTOM_EMPTY))",
+      "role": "scenario_guard",
+      "symbol_refs": [
+        "S_J_ENTRY_CUSTOM_EMPTY"
+      ],
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_J_VERSION_JAVA8",
+      "format": "smtlib2",
+      "text": "(assert (and (not S_J_VERSION_IS_NULL) (not S_J_VERSION_THROWS) (<= S_J_VERSION 8)))",
+      "role": "scenario_local_obligation",
+      "symbol_refs": [
+        "S_J_VERSION_IS_NULL",
+        "S_J_VERSION_THROWS",
+        "S_J_VERSION"
+      ],
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_J_VERSION_WITNESS_8",
+      "format": "smtlib2",
+      "text": "(assert (= S_J_VERSION 8))",
+      "role": "implementation_choice",
+      "symbol_refs": [
+        "S_J_VERSION"
+      ],
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_J_FROM_STABLE",
+      "format": "smtlib2",
+      "text": "(assert (= S_J_FROM1_PRESENT S_J_FROM2_PRESENT))",
+      "role": "explicit_model_assumption",
+      "symbol_refs": [
+        "S_J_FROM1_PRESENT",
+        "S_J_FROM2_PRESENT"
+      ],
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_J_DEFAULT_BASE_TARGET",
+      "format": "smtlib2",
+      "text": "(assert S_J_JAVA8_SELECTED)",
+      "role": "intermediate_program_target",
+      "symbol_refs": [
+        "S_J_JAVA8_SELECTED"
+      ],
+      "evidence_refs": [
+        "E_J_FROM_BRANCH",
+        "E_J_ASSERT_BASE"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_J_ENTRY_TARGET",
+      "format": "smtlib2",
+      "text": "(assert S_J_ENTRYPOINT_MATCHES)",
+      "role": "intermediate_program_target",
+      "symbol_refs": [
+        "S_J_ENTRYPOINT_MATCHES"
+      ],
+      "evidence_refs": [
+        "E_J_ASSERT_ENTRY_SIZE",
+        "E_J_ASSERT_ENTRY_0",
+        "E_J_ASSERT_ENTRY_1",
+        "E_J_ASSERT_ENTRY_2",
+        "E_J_ASSERT_ENTRY_3"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_J_CUSTOM_ENTRY_EQUALS_TARGET",
+      "format": "smtlib2",
+      "text": "(assert S_J_CUSTOM_MATCHES)",
+      "role": "handcrafted_abstract_list_equality",
+      "symbol_refs": [
+        "S_J_CUSTOM_MATCHES"
+      ],
+      "evidence_refs": [
+        "E_J_ASSERT_ENTRY_SIZE",
+        "E_J_ASSERT_ENTRY_0",
+        "E_J_ASSERT_ENTRY_1",
+        "E_J_ASSERT_ENTRY_2",
+        "E_J_ASSERT_ENTRY_3"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_J_COMPUTED_ENTRY_EQUALS_TARGET",
+      "format": "smtlib2",
+      "text": "(assert S_J_COMPUTED_MATCHES)",
+      "role": "handcrafted_abstract_list_equality",
+      "symbol_refs": [
+        "S_J_COMPUTED_MATCHES"
+      ],
+      "evidence_refs": [
+        "E_J_ASSERT_ENTRY_SIZE",
+        "E_J_ASSERT_ENTRY_0",
+        "E_J_ASSERT_ENTRY_1",
+        "E_J_ASSERT_ENTRY_2",
+        "E_J_ASSERT_ENTRY_3"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_J_SUCCESS_REACHED",
+      "format": "smtlib2",
+      "text": "(assert (and S_J_NORMAL_EXIT S_J_ASSERT_REACHED))",
+      "role": "non_vacuity",
+      "symbol_refs": [
+        "S_J_NORMAL_EXIT",
+        "S_J_ASSERT_REACHED"
+      ],
+      "evidence_refs": [
+        "E_J_ASSERT_BASE"
+      ],
+      "support_status": "modeled"
+    },
+    {
+      "id": "F_J_EXPLICIT_BUILDER_SEMANTICS",
+      "format": "smtlib2",
+      "text": "; unsupported: external_image_matches relates ContainerBuilders.create to the final base-image oracle and is forbidden from H",
+      "role": "external_relation",
+      "symbol_refs": [
+        "S_J_FROM_VALUE",
+        "S_J_EXTERNAL_IMAGE_MATCHES"
+      ],
+      "evidence_refs": [
+        "E_J_FROM_BRANCH",
+        "E_J_ASSERT_BASE"
+      ],
+      "support_status": "descriptive_unsupported"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "SC_J_IMAGE_DEFAULT",
+      "title": "Default image selected by Java version",
+      "alternative_group": "java_image",
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_DEFAULT_IMAGE_GUARD",
+        "unknown_ref": null
+      },
+      "oracle_refs": [
+        "O_J_BASE_IMAGE"
+      ],
+      "assumption_refs": [],
+      "unknown_refs": [
+        "U_J_VERSION_NULL_OR_THROW",
+        "U_J_UNFORMALIZED_ASSERTIONS"
+      ],
+      "status": "partial"
+    },
+    {
+      "id": "SC_J_IMAGE_EXPLICIT",
+      "title": "Explicit from value selects ContainerBuilders.create",
+      "alternative_group": "java_image",
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_EXPLICIT_IMAGE_GUARD",
+        "unknown_ref": null
+      },
+      "oracle_refs": [
+        "O_J_BASE_IMAGE"
+      ],
+      "assumption_refs": [
+        "A_J_STABLE_FROM"
+      ],
+      "unknown_refs": [
+        "U_J_EXPLICIT_BUILDER"
+      ],
+      "status": "partial"
+    },
+    {
+      "id": "SC_J_ENTRY_COMPUTED",
+      "title": "Empty custom entrypoint triggers computation",
+      "alternative_group": "java_entrypoint",
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_EMPTY_ENTRY_GUARD",
+        "unknown_ref": null
+      },
+      "oracle_refs": [
+        "O_J_ENTRY_SIZE",
+        "O_J_ENTRY_0",
+        "O_J_ENTRY_1",
+        "O_J_ENTRY_2",
+        "O_J_ENTRY_3"
+      ],
+      "assumption_refs": [],
+      "unknown_refs": [
+        "U_J_DEPENDENCY_EXCEPTIONS",
+        "U_J_UNFORMALIZED_ASSERTIONS"
+      ],
+      "status": "partial"
+    },
+    {
+      "id": "SC_J_ENTRY_CUSTOM",
+      "title": "Non-empty custom entrypoint already equals the oracle",
+      "alternative_group": "java_entrypoint",
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_CUSTOM_ENTRY_GUARD",
+        "unknown_ref": null
+      },
+      "oracle_refs": [
+        "O_J_ENTRY_SIZE",
+        "O_J_ENTRY_0",
+        "O_J_ENTRY_1",
+        "O_J_ENTRY_2",
+        "O_J_ENTRY_3"
+      ],
+      "assumption_refs": [],
+      "unknown_refs": [
+        "U_J_DEPENDENCY_EXCEPTIONS",
+        "U_J_UNFORMALIZED_ASSERTIONS"
+      ],
+      "status": "partial"
+    }
+  ],
+  "response_rules": [
+    {
+      "id": "R_J_FROM_DEFAULT",
+      "scenario_refs": [
+        "SC_J_IMAGE_DEFAULT"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_DEFAULT_IMAGE_GUARD",
+        "unknown_ref": null
+      },
+      "call_binding": "C_J_GET_FROM_1",
+      "reaction": {
+        "kind": "return",
+        "value": "Optional.empty()",
+        "constraint_refs": [
+          "F_J_DEFAULT_IMAGE_GUARD"
+        ]
+      },
+      "logical_role": "scenario_local_obligation",
+      "oracle_refs": [
+        "O_J_BASE_IMAGE"
+      ],
+      "formula_refs": [
+        "F_J_DEFAULT_IMAGE_GUARD"
+      ],
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "check_refs": [
+        "K_J_LOCAL_CONSISTENCY"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_J_VERSION_JAVA8",
+      "scenario_refs": [
+        "SC_J_IMAGE_DEFAULT"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_DEFAULT_IMAGE_GUARD",
+        "unknown_ref": null
+      },
+      "call_binding": "C_J_GET_JAVA_VERSION",
+      "reaction": {
+        "kind": "return",
+        "value": "any non-null Integer <= 8",
+        "constraint_refs": [
+          "F_J_VERSION_JAVA8"
+        ]
+      },
+      "logical_role": "scenario_local_obligation",
+      "oracle_refs": [
+        "O_J_BASE_IMAGE"
+      ],
+      "formula_refs": [
+        "F_J_VERSION_JAVA8"
+      ],
+      "evidence_refs": [
+        "E_J_FROM_BRANCH",
+        "E_J_ASSERT_BASE"
+      ],
+      "check_refs": [
+        "K_J_LOCAL_CONSISTENCY"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_J_VERSION_WITNESS",
+      "scenario_refs": [
+        "SC_J_IMAGE_DEFAULT"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_DEFAULT_IMAGE_GUARD",
+        "unknown_ref": null
+      },
+      "call_binding": "C_J_GET_JAVA_VERSION",
+      "reaction": {
+        "kind": "return",
+        "value": "8",
+        "constraint_refs": [
+          "F_J_VERSION_WITNESS_8"
+        ]
+      },
+      "logical_role": "implementation_choice",
+      "oracle_refs": [
+        "O_J_BASE_IMAGE"
+      ],
+      "formula_refs": [
+        "F_J_VERSION_WITNESS_8"
+      ],
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "check_refs": [
+        "K_J_LOCAL_CONSISTENCY"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_J_FROM_EXPLICIT_FIRST",
+      "scenario_refs": [
+        "SC_J_IMAGE_EXPLICIT"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_EXPLICIT_IMAGE_GUARD",
+        "unknown_ref": null
+      },
+      "call_binding": "C_J_GET_FROM_1",
+      "reaction": {
+        "kind": "return",
+        "value": "Optional.of(fromValue)",
+        "constraint_refs": []
+      },
+      "logical_role": "implementation_choice",
+      "oracle_refs": [
+        "O_J_BASE_IMAGE"
+      ],
+      "formula_refs": [],
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "check_refs": [
+        "K_J_EXPLICIT_SEMANTICS"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_J_FROM_EXPLICIT_SECOND",
+      "scenario_refs": [
+        "SC_J_IMAGE_EXPLICIT"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_EXPLICIT_IMAGE_GUARD",
+        "unknown_ref": null
+      },
+      "call_binding": "C_J_GET_FROM_2",
+      "reaction": {
+        "kind": "return",
+        "value": "Optional.of(same fromValue)",
+        "constraint_refs": [
+          "F_J_FROM_STABLE"
+        ]
+      },
+      "logical_role": "implementation_choice",
+      "oracle_refs": [
+        "O_J_BASE_IMAGE"
+      ],
+      "formula_refs": [
+        "F_J_FROM_STABLE"
+      ],
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "check_refs": [
+        "K_J_EXPLICIT_SEMANTICS"
+      ],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_J_ENTRY_EMPTY",
+      "scenario_refs": [
+        "SC_J_ENTRY_COMPUTED"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_EMPTY_ENTRY_GUARD",
+        "unknown_ref": null
+      },
+      "call_binding": "C_J_GET_ENTRYPOINT",
+      "reaction": {
+        "kind": "return",
+        "value": "empty list",
+        "constraint_refs": [
+          "F_J_EMPTY_ENTRY_GUARD"
+        ]
+      },
+      "logical_role": "scenario_local_obligation",
+      "oracle_refs": [
+        "O_J_ENTRY_SIZE"
+      ],
+      "formula_refs": [
+        "F_J_EMPTY_ENTRY_GUARD"
+      ],
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ],
+      "check_refs": [],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_J_ENTRY_COMPUTED",
+      "scenario_refs": [
+        "SC_J_ENTRY_COMPUTED"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_EMPTY_ENTRY_GUARD",
+        "unknown_ref": null
+      },
+      "call_binding": "C_J_COMPUTE_ENTRYPOINT",
+      "reaction": {
+        "kind": "return",
+        "value": "[java, -cp, /app/explodedJar:/app/dependencies/*, HelloWorld]",
+        "constraint_refs": [
+          "F_J_COMPUTED_ENTRY_EQUALS_TARGET"
+        ]
+      },
+      "logical_role": "scenario_local_obligation",
+      "oracle_refs": [
+        "O_J_ENTRY_SIZE",
+        "O_J_ENTRY_0",
+        "O_J_ENTRY_1",
+        "O_J_ENTRY_2",
+        "O_J_ENTRY_3"
+      ],
+      "formula_refs": [
+        "F_J_COMPUTED_ENTRY_EQUALS_TARGET"
+      ],
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY",
+        "E_J_ASSERT_ENTRY_0"
+      ],
+      "check_refs": [],
+      "whole_test_verified": false
+    },
+    {
+      "id": "R_J_ENTRY_CUSTOM",
+      "scenario_refs": [
+        "SC_J_ENTRY_CUSTOM"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_CUSTOM_ENTRY_GUARD",
+        "unknown_ref": null
+      },
+      "call_binding": "C_J_GET_ENTRYPOINT",
+      "reaction": {
+        "kind": "return",
+        "value": "[java, -cp, /app/explodedJar:/app/dependencies/*, HelloWorld]",
+        "constraint_refs": [
+          "F_J_CUSTOM_ENTRY_EQUALS_TARGET"
+        ]
+      },
+      "logical_role": "scenario_local_obligation",
+      "oracle_refs": [
+        "O_J_ENTRY_SIZE",
+        "O_J_ENTRY_0",
+        "O_J_ENTRY_1",
+        "O_J_ENTRY_2",
+        "O_J_ENTRY_3"
+      ],
+      "formula_refs": [
+        "F_J_CUSTOM_ENTRY_EQUALS_TARGET"
+      ],
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY",
+        "E_J_ASSERT_ENTRY_0"
+      ],
+      "check_refs": [
+        "K_J_ENTRY_LOCAL"
+      ],
+      "whole_test_verified": false
+    }
+  ],
+  "runtime_expectations": [
+    {
+      "id": "X_J_GET_FROM_ONCE_DEFAULT",
+      "scenario_refs": [
+        "SC_J_IMAGE_DEFAULT"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_DEFAULT_IMAGE_GUARD",
+        "unknown_ref": null
+      },
+      "binding_ref": "C_J_GET_FROM_1",
+      "expectation": "called once; the second getFrom call is not reached",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "logical_role": "runtime_expectation"
+    },
+    {
+      "id": "X_J_GET_FROM_TWICE_EXPLICIT",
+      "scenario_refs": [
+        "SC_J_IMAGE_EXPLICIT"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_EXPLICIT_IMAGE_GUARD",
+        "unknown_ref": null
+      },
+      "binding_ref": "C_J_GET_FROM_2",
+      "expectation": "both distinct getFrom call sites are reached in order",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "logical_role": "runtime_expectation"
+    },
+    {
+      "id": "X_J_VERSION_DEFAULT_ONLY",
+      "scenario_refs": [
+        "SC_J_IMAGE_DEFAULT"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_DEFAULT_IMAGE_GUARD",
+        "unknown_ref": null
+      },
+      "binding_ref": "C_J_GET_JAVA_VERSION",
+      "expectation": "called once after the first getFrom reports empty",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "logical_role": "runtime_expectation"
+    },
+    {
+      "id": "X_J_COMPUTE_EMPTY_ONLY",
+      "scenario_refs": [
+        "SC_J_ENTRY_COMPUTED"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_EMPTY_ENTRY_GUARD",
+        "unknown_ref": null
+      },
+      "binding_ref": "C_J_COMPUTE_ENTRYPOINT",
+      "expectation": "called once with the value returned by getJvmFlags",
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ],
+      "logical_role": "runtime_expectation"
+    },
+    {
+      "id": "X_J_NO_COMPUTE_CUSTOM",
+      "scenario_refs": [
+        "SC_J_ENTRY_CUSTOM"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_CUSTOM_ENTRY_GUARD",
+        "unknown_ref": null
+      },
+      "binding_ref": "C_J_COMPUTE_ENTRYPOINT",
+      "expectation": "not called when the custom list is non-empty",
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ],
+      "logical_role": "runtime_expectation"
+    }
+  ],
+  "verification_candidates": [
+    {
+      "id": "V_J_GET_FROM_ONCE_DEFAULT",
+      "scenario_refs": [
+        "SC_J_IMAGE_DEFAULT"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_DEFAULT_IMAGE_GUARD",
+        "unknown_ref": null
+      },
+      "expectation_ref": "X_J_GET_FROM_ONCE_DEFAULT",
+      "proposal": "Consider verifying: called once; the second getFrom call is not reached",
+      "behavior_protected": "Detects a path-selection regression if interaction verification is desired by the downstream test author.",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "status": "candidate_only",
+      "whole_test_verified": false
+    },
+    {
+      "id": "V_J_GET_FROM_TWICE_EXPLICIT",
+      "scenario_refs": [
+        "SC_J_IMAGE_EXPLICIT"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_EXPLICIT_IMAGE_GUARD",
+        "unknown_ref": null
+      },
+      "expectation_ref": "X_J_GET_FROM_TWICE_EXPLICIT",
+      "proposal": "Consider verifying: both distinct getFrom call sites are reached in order",
+      "behavior_protected": "Detects a path-selection regression if interaction verification is desired by the downstream test author.",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "status": "candidate_only",
+      "whole_test_verified": false
+    },
+    {
+      "id": "V_J_VERSION_DEFAULT_ONLY",
+      "scenario_refs": [
+        "SC_J_IMAGE_DEFAULT"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_DEFAULT_IMAGE_GUARD",
+        "unknown_ref": null
+      },
+      "expectation_ref": "X_J_VERSION_DEFAULT_ONLY",
+      "proposal": "Consider verifying: called once after the first getFrom reports empty",
+      "behavior_protected": "Detects a path-selection regression if interaction verification is desired by the downstream test author.",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "status": "candidate_only",
+      "whole_test_verified": false
+    },
+    {
+      "id": "V_J_COMPUTE_EMPTY_ONLY",
+      "scenario_refs": [
+        "SC_J_ENTRY_COMPUTED"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_EMPTY_ENTRY_GUARD",
+        "unknown_ref": null
+      },
+      "expectation_ref": "X_J_COMPUTE_EMPTY_ONLY",
+      "proposal": "Consider verifying: called once with the value returned by getJvmFlags",
+      "behavior_protected": "Detects a path-selection regression if interaction verification is desired by the downstream test author.",
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ],
+      "status": "candidate_only",
+      "whole_test_verified": false
+    },
+    {
+      "id": "V_J_NO_COMPUTE_CUSTOM",
+      "scenario_refs": [
+        "SC_J_ENTRY_CUSTOM"
+      ],
+      "condition": {
+        "status": "scoped",
+        "formula_ref": "F_J_CUSTOM_ENTRY_GUARD",
+        "unknown_ref": null
+      },
+      "expectation_ref": "X_J_NO_COMPUTE_CUSTOM",
+      "proposal": "Consider verifying: not called when the custom list is non-empty",
+      "behavior_protected": "Detects a path-selection regression if interaction verification is desired by the downstream test author.",
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY"
+      ],
+      "status": "candidate_only",
+      "whole_test_verified": false
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A_J_STABLE_FROM",
+      "statement": "The two distinct getFrom calls return compatible values in the explicit-from scenario.",
+      "scope": "SC_J_IMAGE_EXPLICIT only",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH"
+      ],
+      "blocks_semantic_proof": true
+    },
+    {
+      "id": "A_J_MODELED_BUILDER",
+      "statement": "The local formula models only base-image and entrypoint observations; external builder setters preserve those abstract values.",
+      "scope": "all Java local checks",
+      "evidence_refs": [
+        "E_J_BUILDER_WRITES"
+      ],
+      "blocks_semantic_proof": true
+    }
+  ],
+  "unknowns": [
+    {
+      "id": "U_J_EXPLICIT_BUILDER",
+      "statement": "ContainerBuilders.create semantics and defaults are not visible, so an explicit from value cannot be proved to yield the base-image oracle.",
+      "impact": "The explicit-from scenario remains partial and cannot be consumed as verified.",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH",
+        "E_J_ASSERT_BASE"
+      ],
+      "blocks_consumption": true
+    },
+    {
+      "id": "U_J_VERSION_NULL_OR_THROW",
+      "statement": "getJavaVersion returns Integer; null unboxing or a thrown exception prevents normal assertion reachability.",
+      "impact": "Default-image consumption requires a normal, non-null return.",
+      "evidence_refs": [
+        "E_J_FROM_BRANCH",
+        "E_J_PROCESSOR_INTERFACES"
+      ],
+      "blocks_consumption": false
+    },
+    {
+      "id": "U_J_DEPENDENCY_EXCEPTIONS",
+      "statement": "createLayers, computeEntrypoint, configuration getters, and builder methods may throw or have unresolved semantics.",
+      "impact": "The path alternatives are not a whole-test proof.",
+      "evidence_refs": [
+        "E_J_LAYERS_ENTRY",
+        "E_J_BUILDER_WRITES",
+        "E_J_PROCESSOR_INTERFACES"
+      ],
+      "blocks_consumption": false
+    },
+    {
+      "id": "U_J_UNFORMALIZED_ASSERTIONS",
+      "statement": "Every visible assertion observes the final ContainerBuildPlan; propagation from the modeled image-selection and entrypoint values through external builder behavior is not formalized.",
+      "impact": "Local formulas can check intermediate choices only; no Java final oracle or whole test is verified.",
+      "evidence_refs": [
+        "E_J_ASSERT_BASE",
+        "E_J_ASSERT_ENTRY_0",
+        "E_J_ASSERT_PLATFORMS",
+        "E_J_ASSERT_LAYER_ENTRIES",
+        "E_J_ASSERT_EXTRACTION"
+      ],
+      "blocks_consumption": false
+    }
+  ],
+  "checks": [
+    {
+      "id": "K_J_LOCAL_CONSISTENCY",
+      "kind": "candidate_checking",
+      "formula_refs": [
+        "F_J_DEFAULT_IMAGE_GUARD",
+        "F_J_VERSION_JAVA8",
+        "F_J_DEFAULT_BASE_TARGET"
+      ],
+      "scenario_refs": [
+        "SC_J_IMAGE_DEFAULT"
+      ],
+      "result": "not_run",
+      "performed_by": "not_run",
+      "details": "Proposed check only; actual evidence belongs to the host PoC sidecar.",
+      "semantic_claim": false
+    },
+    {
+      "id": "K_J_ENTRY_LOCAL",
+      "kind": "candidate_checking",
+      "formula_refs": [
+        "F_J_CUSTOM_ENTRY_GUARD",
+        "F_J_CUSTOM_ENTRY_EQUALS_TARGET",
+        "F_J_ENTRY_TARGET"
+      ],
+      "scenario_refs": [
+        "SC_J_ENTRY_CUSTOM"
+      ],
+      "result": "not_run",
+      "performed_by": "not_run",
+      "details": "Proposed local custom-entry check only; actual evidence belongs to the host PoC sidecar.",
+      "semantic_claim": false
+    },
+    {
+      "id": "K_J_EXPLICIT_SEMANTICS",
+      "kind": "external_semantics",
+      "formula_refs": [
+        "F_J_EXPLICIT_BUILDER_SEMANTICS"
+      ],
+      "scenario_refs": [
+        "SC_J_IMAGE_EXPLICIT"
+      ],
+      "result": "not_run",
+      "performed_by": "not_run",
+      "details": "Proposed unsupported-semantics check; actual classification belongs to the host PoC sidecar.",
+      "semantic_claim": false
+    }
+  ],
+  "consumption": {
+    "selection_mode": "human_review_only",
+    "selectable_scenarios": [
+      "SC_J_IMAGE_DEFAULT",
+      "SC_J_IMAGE_EXPLICIT",
+      "SC_J_ENTRY_COMPUTED",
+      "SC_J_ENTRY_CUSTOM"
+    ],
+    "mutual_exclusion_groups": {
+      "java_image": [
+        "SC_J_IMAGE_DEFAULT",
+        "SC_J_IMAGE_EXPLICIT"
+      ],
+      "java_entrypoint": [
+        "SC_J_ENTRY_COMPUTED",
+        "SC_J_ENTRY_CUSTOM"
+      ]
+    },
+    "stub_guidance": [
+      "Choose exactly one image scenario and one entrypoint scenario; the Cartesian combinations are candidates, not all semantically verified.",
+      "For the default image, return a normal non-null Integer <= 8; 8 is one implementation witness, not the oracle requirement.",
+      "For a custom entrypoint, the non-empty list may equal the asserted list; source category does not imply a different value.",
+      "Treat getFrom call #1 and #2 separately; choosing stable responses opts into A_J_STABLE_FROM."
+    ],
+    "runtime_vs_verification": [
+      "runtime_expectations describe calls predicted under a selected path.",
+      "verification_candidates remain optional candidate_only proposals and are not hidden Mock Assertions."
+    ],
+    "blocking_unknown_refs": [
+      "U_J_EXPLICIT_BUILDER"
+    ],
+    "partial_unknown_refs": [
+      "U_J_VERSION_NULL_OR_THROW",
+      "U_J_DEPENDENCY_EXCEPTIONS",
+      "U_J_UNFORMALIZED_ASSERTIONS"
+    ],
+    "notes": [
+      "Do not use the visible implementation-hidden UnsupportedOperationException bodies as semantic axioms.",
+      "No production Mock, test edit, or whole-test result is generated."
+    ]
+  }
+}
