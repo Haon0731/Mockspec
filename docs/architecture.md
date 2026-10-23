@@ -83,6 +83,12 @@ flowchart TD
 有账本时先写 pending 证据，再完成账本，最后发布结果；失败时保留可得证据。
 这些是宿主的运行管理，不是模型的推断步骤。
 
+V0.2 用 `InferenceTimeoutError` 区分宿主总超时与其他预算耗尽；它仍继承共享
+`InferenceError`，保留原 `category` 与 `diagnostic`。`audited_run` 将超时事实交给
+`finish_run` 决定账本 outcome，结果 JSON 的原有字段不增加、不改义。
+V0.1 的冻结异常没有这个类型，历史文案识别只保留在审计入口的 V0.1 分支。
+留证 module 不再根据异常文字分类，也不依赖具体版本的推断实现。
+
 完整实现身份记录在 `code_files_sha256`，包含工具注册模块；`code_sha256` 仅标识所选推断入口文件。
 代码整理会改变正式运行的配置摘要，不能沿用旧账本伪装为同一实验，也不改写历史证据。
 
@@ -107,9 +113,12 @@ V0.1 无工具，V0.2 有三个只读工具；两版都使用正式 ScenarioCont
 
 当前 `source_tools.build_source_tools` 负责 SDK 工具注册、调用限额、轨迹与取消；
 `source_analysis.SourceAnalysis` 负责审核源码访问、解析后端选择与结果限长，不依赖 Agent SDK。
+两个解析 adapter 的共同结果在这里校验：状态、facts 及其 kind、诊断和限制说明必须具有合法形状，
+结果须能序列化为 JSON；任一共同字段畸形都整份返回 `analysis_error`，不保留部分 facts。
+语言特有字段和正常诊断内容保留；取消仍向上传播，语法 incomplete/unresolved 不转为成功。
 原 `agent_tools.py`、`program_tools.py` 的活动调用者已迁移，旧模块不再保留；
 历史报告中的路径和哈希仍描述当时版本，复现历史版本需使用其记录的提交。
-模型可见的三个 `inspect_*` 工具名称、参数与返回语义保持不变。
+模型可见的三个 `inspect_*` 工具名称和参数保持不变；畸形后端结果现在在两个分析查询中一致失败。
 
 尚保留一项跨版本耦合：V0.2、预算、SDK 工具和运行留证使用冻结
 `inference.py` 定义的 `InferenceError`，以保持同一个异常类型及捕获行为。

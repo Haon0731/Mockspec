@@ -14,6 +14,7 @@ mock-spec-scenario = "mock_spec.cli:main"
 
 [project.optional-dependencies]
 test = ["pytest>=7"]
+dev = ["pytest>=7", "ruff==0.17.1", "mypy==2.4.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -25,3 +26,10 @@ mock_spec = ["reviewed_inputs.json", "prompts/*.txt", "tools/*.java"]
 testpaths = ["tests"]
 pythonpath = ["src"]
 markers = ["real_data: read-only integration with externally stored MockBench snapshots"]
+
+[tool.ruff.lint]
+select = ["E9", "F63", "F7", "F82", "F401"]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src/mock_spec"]

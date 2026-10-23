@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import subprocess
 from pathlib import Path
 
 import pytest
@@ -253,14 +252,14 @@ def test_artifact_is_prepared_before_ledger_completion(
     assert not (tmp_path / "run-v0.2/result.pending.json").exists()
 
 
-def _formal_args(tmp_path):
-    args = _args(tmp_path) + [
+def _formal_args(tmp_path, version="v0.2"):
+    args = _args(tmp_path, version) + [
         "--max-cost-usd", "1",
         "--input-cost-per-million", "2",
         "--output-cost-per-million", "4",
         "--experiment-ledger", str(tmp_path / "experiment.json"),
         "--attempt-id", "python-v02-a1",
-        "--run-key", "python-v0.2",
+        "--run-key", f"python-{version}",
     ]
     args.remove("--standalone")
     return args
@@ -327,14 +326,14 @@ def test_failed_run_finishes_evidence_and_closes_unknown_accounting(
         kwargs["usage_ledger"].requests_started += 1
         if interrupted:
             raise KeyboardInterrupt
-        raise InferenceError("scenario inference timed out", "model_call_failure")
+        raise inference_v02.InferenceTimeoutError()
 
     monkeypatch.setattr(inference_v02, "infer_scenario", failure)
     assert audited_run.main(_formal_args(tmp_path)) == (130 if interrupted else 2)
     ledger = tmp_path / "experiment.json"
     state = json.loads(ledger.read_text())
     artifact = json.loads((tmp_path / "run-v0.2/result.json").read_text())
-    assert artifact["status"] == ("interrupted" if interrupted else "model_call_failure")
+    assert artifact["status"] == ("interrupted" if interrupted else "budget_exhausted")
     assert artifact["contract"] is None
     assert artifact["tool_trace"] == [{"status": "error", "sequence": 1}]
     assert artifact["usage"]["usage_complete"] is False
@@ -351,3 +350,66 @@ def test_failed_run_finishes_evidence_and_closes_unknown_accounting(
             max_cost_usd="1", configuration=state["configuration"],
             task_identity="another-task",
         )
+
+
+@pytest.mark.parametrize("version,kind", [
+    ("v0.1", "timeout"), ("v0.2", "timeout"),
+    ("v0.2", "model_call_failure"), ("v0.2", "budget_exhausted"),
+    ("v0.2", "turn_limit"), ("v0.2", "tool_limit"), ("v0.2", "cost_limit"),
+])
+def test_timeout_classification_preserves_artifacts_and_retry_policy(
+    tmp_path, monkeypatch, version, kind
+):
+    from mock_spec.experiment_ledger import reserve_attempt
+
+    task = _task()
+    monkeypatch.setattr(audited_run.python, "load_task", lambda *args, **kwargs: task)
+    monkeypatch.setenv("OPENAI_API_KEY", "offline-key")
+    category = "model_call_failure" if version == "v0.1" else "budget_exhausted"
+    if kind == "timeout":
+        error = (
+            InferenceError("scenario inference timed out", category)
+            if version == "v0.1"
+            else inference_v02.InferenceTimeoutError("a different timeout message")
+        )
+    else:
+        category = "model_call_failure" if kind == "model_call_failure" else "budget_exhausted"
+        # Matching the old timeout wording must not grant technical retry eligibility.
+        message = (
+            "scenario inference timed out"
+            if kind in {"model_call_failure", "budget_exhausted"}
+            else f"scenario inference {kind} exhausted"
+        )
+        error = InferenceError(message, category)
+
+    async def fail(task, **kwargs):
+        if version == "v0.1":
+            kwargs["responses"].append({"usage": {
+                "requests": 1, "input_tokens": 1, "output_tokens": 1, "total_tokens": 2,
+            }})
+        # V0.2 has zero dispatched requests, so its synthetic failure has known zero cost.
+        raise error
+
+    selected = inference if version == "v0.1" else inference_v02
+    monkeypatch.setattr(selected, "infer_scenario", fail)
+
+    assert audited_run.main(_formal_args(tmp_path, version)) == 2
+    artifact = json.loads((tmp_path / f"run-{version}/result.json").read_text())
+    ledger = tmp_path / "experiment.json"
+    state = json.loads(ledger.read_text())
+    assert artifact["status"] == category
+    assert artifact["diagnostic_type"] is None
+    assert artifact["contract"] is None
+    assert "technical_timeout" not in artifact
+    expected_outcome = "technical_timeout" if kind == "timeout" else category
+    assert state["attempts"][0]["outcome_status"] == expected_outcome
+    retry = dict(
+        attempt_id="retry", run_key=f"python-{version}", max_cost_usd="1",
+        configuration=state["configuration"], task_identity=artifact["task_sha256"],
+        retry_of="python-v02-a1",
+    )
+    if kind == "timeout":
+        assert reserve_attempt(ledger, **retry)["status"] == "reserved"
+    else:
+        with pytest.raises(InferenceError, match="retry is allowed only after a technical failure"):
+            reserve_attempt(ledger, **retry)

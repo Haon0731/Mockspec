@@ -52,13 +52,13 @@ def finish_run(
     artifact: dict,
     *,
     exit_code: int,
-    failure: InferenceError | None = None,
+    technical_timeout: bool = False,
 ) -> int:
     """Persist a live-run artifact, returning its exit code or 2 on handled failure.
 
-    The runner supplies its existing experiment and usage records. Ledger errors
-    update the artifact in place; inference status and timeout classification
-    otherwise retain their distinct meanings in the artifact and ledger.
+    The runner supplies its existing experiment and usage records and classifies
+    its version's host deadline. Ledger errors update the artifact in place;
+    inference status and ledger timeout classification retain distinct meanings.
     """
     experiment = artifact["experiment"]
     ledger_path = None if experiment["ledger"] is None else Path(experiment["ledger"])
@@ -69,7 +69,7 @@ def finish_run(
             print("output error: could not persist pending run evidence", file=sys.stderr)
             return 2
         outcome = artifact["status"]
-        if failure is not None and str(failure) == "scenario inference timed out":
+        if technical_timeout:
             outcome = "technical_timeout"
         try:
             complete_attempt(

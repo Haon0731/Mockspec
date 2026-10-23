@@ -107,7 +107,7 @@ def validate_java_mask(text: str) -> None:
 
 
 class SourceStore:
-    """In-memory view for future tools; holds no filesystem roots or reader."""
+    """Task-scoped source view for validation and tools; holds no filesystem reader."""
 
     def __init__(self, task: UnifiedTask) -> None:
         # Structural validation is not a new masking approval. Call after an adapter.

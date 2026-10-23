@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+  OPENAI_API_KEY: ""
+
+jobs:
+  offline-tests:
+    name: Offline tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install project test dependencies
+        run: |
+          python -m pip install -e '.[test]'
+          python --version
+          python -m pip list --format=freeze
+      - name: Run offline test suite
+        env:
+          MOCKSPEC_SPOON_JAR: ${{ runner.temp }}/mockspec-ci-missing-spoon.jar
+          MOCKSPEC_JAVA: ${{ runner.temp }}/mockspec-ci-missing-jdk/bin/java
+        run: |
+          test ! -e "$MOCKSPEC_SPOON_JAR"
+          test ! -e "$MOCKSPEC_JAVA"
+          python -B -m pytest -q -p no:cacheprovider -m 'not real_data' -rs
+
+  quality:
+    name: Static checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install project development dependencies
+        run: |
+          python -m pip install -e '.[dev]'
+          python --version
+          python -m pip list --format=freeze
+      - name: Run blocking correctness lint
+        run: python -m ruff check src tests scripts
+      - name: Run non-blocking type diagnostics
+        id: mypy
+        continue-on-error: true
+        run: python -m mypy
+      - name: Report type diagnostic status
+        if: always()
+        env:
+          MYPY_OUTCOME: ${{ steps.mypy.outcome }}
+        run: |
+          {
+            printf '### mypy diagnostics\n\n'
+            printf 'Outcome: `%s`\n' "$MYPY_OUTCOME"
+            printf 'This check is diagnostic and does not make the job pass or fail.\n'
+          } >> "$GITHUB_STEP_SUMMARY"

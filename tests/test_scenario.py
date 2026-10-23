@@ -1,9 +1,11 @@
+import json
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
 from mock_spec.schemas import UnifiedTask
-from mock_spec.scenario import validate_contract
+from mock_spec.scenario import ScenarioContract, validate_contract
 from test_schemas import valid_task_data
 
 
@@ -55,6 +57,16 @@ def test_conditional_contract_and_unknown_validate():
     assert contract.dependency_constraints[0].status == "required"
     assert contract.uncertainty[0].status == "unknown"
     assert contract.expected_interactions[0].assertion_policy == "not_implied"
+
+
+def test_documented_json_schema_matches_contract_model() -> None:
+    documented = json.loads(
+        (Path(__file__).parents[1] / "docs/scenario-contract.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert documented == ScenarioContract.model_json_schema()
 
 
 @pytest.mark.parametrize("mutation", [

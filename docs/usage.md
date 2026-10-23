@@ -7,13 +7,16 @@
 
 ## 安装与测试
 
-需要 Python 3.10+；运行依赖为 Pydantic 和 OpenAI Agents SDK，开发依赖为 pytest。
+需要 Python 3.10+；运行依赖为 Pydantic 和 OpenAI Agents SDK。
+`test` extra 提供 pytest；`dev` extra 另含固定版本的 Ruff 和 mypy。
 推荐在项目内 `.venv` 安装，避免修改系统 Python 或旧项目环境。
 
 ```bash
 uv venv .venv
-uv pip install --python .venv/bin/python -e '.[test]'
+uv pip install --python .venv/bin/python -e '.[dev]'
 .venv/bin/python -B -m pytest -q -p no:cacheprovider -m "not real_data"
+.venv/bin/python -m ruff check src tests scripts
+.venv/bin/python -m mypy
 ```
 
 离线且已有项目依赖时：
@@ -21,6 +24,16 @@ uv pip install --python .venv/bin/python -e '.[test]'
 ```bash
 PYTHONPATH=src .venv/bin/python -B -m pytest -q -p no:cacheprovider -m "not real_data"
 ```
+
+Ruff 使用 `pyproject.toml` 中的基础错误与未使用导入规则，不执行全仓格式化。
+mypy 按 Python 3.10 的声明下限检查生产包，目前仍有既有类型诊断，会返回非零退出码；
+它用于观察类型问题，不是当前合并门禁。修改代码时需核对诊断变化，不能将新增错误归入旧基线。
+契约测试同时检查 `docs/scenario-contract.schema.json` 与当前输出模型一致。
+
+[CI 配置](../.github/workflows/ci.yml) 在 Python 3.10 / 3.12 运行基础离线回归，
+明确使用不存在的 Spoon 路径并报告 skip，不依赖本机工具、模型凭据或外部 snapshot。
+静态检查单独运行，Ruff 必须通过；mypy 的实际结果保留在日志和 job summary 中。
+基础 CI 通过不代表真实 Spoon 验收通过；后者见下方工具准备说明。
 
 上面的命令排除 `real_data` 测试；Java 合成测试仍可能使用本机固定的 Spoon/JDK，缺失时按测试约定 skip。
 需要读取已审核冻结输入的集成测试时，应先阅读 [输入审核记录](input-audit.md)；
@@ -37,6 +50,9 @@ Adapter 接受 **snapshot 目录和原 Case ID**，不接受原始测试、gold 
 未审核案例报错；扩展案例需要人工/受信任代码审查后更新这份宿主侧白名单，
 不能由后续 Agent 填写一个 `verified=true` 来取得授权。
 
+以下 `/path/to/reviewed` 是已审核 snapshot 的存放根目录占位符，按实际位置替换；
+保留示例中的 dataset 目录名、snapshot ID 和 Case ID。示例不会下载或生成输入。
+
 Java：
 
 ```python
@@ -45,8 +61,7 @@ from mock_spec.adapters.java import load_task
 from mock_spec.validation import SourceStore
 
 root = Path(
-    "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/"
-    "formal-snapshots/java-bechmark-strong/"
+    "/path/to/reviewed/java-bechmark-strong/"
     "5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4"
 )
 task = load_task(
@@ -68,8 +83,7 @@ from pathlib import Path
 from mock_spec.adapters.python import load_task
 
 root = Path(
-    "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max-fix23/"
-    "formal-snapshots/python-benchmark-new/"
+    "/path/to/reviewed/python-benchmark-new/"
     "241ef457f8d071c23e6acd658b684b11b54f13fa955e097d6bebe35dc755f47d"
 )
 task = load_task(root, case_id="flask_308")
@@ -140,6 +154,27 @@ Python 使用标准库 AST；Java 使用已固定的 Spoon 11.2.1 工具 JAR 和
 JAR 必须符合 Step 5B 已记录身份。javac 只编译随包提供的可信 helper，不编译或执行目标源码。
 工具不可用、分析失败、unsupported、unresolved 和输出截断均显式记录。
 语法嵌套、词法分支和局部声明引用不是数据流或可执行路径证明。
+
+### Java 工具准备与单独验收
+
+项目包不分发 JAR，也没有自动获取它的安装步骤。已有的受信任工具环境可通过下列变量指定；
+`MOCKSPEC_JAVA` 指向 `java` 可执行文件，同目录必须有 `javac`。
+必须使用 [Step 5B 工具记录](step5b/environment-lock.json) 中已留证的同一 JAR，
+其 SHA256 为 `52ec4e8b874cb3f2b5a87a65ee7bf9da992a5175dcc66f539387dbb2c2053c7c`。
+任意同版本 Maven JAR 不因此获得兼容保证；分析入口会核对这个固定身份。
+
+```bash
+export MOCKSPEC_SPOON_JAR=/path/to/reviewed-tools/spoon.jar
+export MOCKSPEC_JAVA=/path/to/jdk/bin/java
+.venv/bin/python -B -m pytest -q -p no:cacheprovider tests/test_java_analysis.py -m "not real_data" -rs
+```
+
+检查结果中的真实 Spoon 解析用例必须实际运行，不能用 skip 宣称完整验收。
+工具缺失或身份不符时返回 `backend_unavailable`；基础开发回归可以继续，Java 真实解析覆盖则未完成。
+历史 `docs/step5b/poc/setup_tools.py` 同时准备 Joern 并从旧项目复制工具，
+不属于当前生产安装流程，不要为了运行基础测试执行整套历史实验准备命令。
+
+### 预算与运行证据
 
 默认 V0.2 上限为 6 轮、8 次工具调用、每次最多 4096 输出 Token、
 估算及累计 24000 Token、16000 字符工具结果、120 秒总超时。

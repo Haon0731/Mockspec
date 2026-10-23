@@ -32,7 +32,7 @@ def _decimal(value: str) -> Decimal:
     return parsed
 
 
-def _baseline_usage(responses: list, budget: InferenceBudget, *, failed: bool) -> dict:
+def _baseline_usage(responses: list, budget: InferenceBudget) -> dict:
     input_tokens = 0
     output_tokens = 0
     total_tokens = 0
@@ -334,8 +334,7 @@ def main(argv: list[str] | None = None) -> int:
                 print("output error: could not persist run evidence", file=sys.stderr)
             return 2
 
-    failure: InferenceError | None = None
-    interrupted = False
+    technical_timeout = False
     try:
         kwargs = {
             "model": args.model,
@@ -354,14 +353,18 @@ def main(argv: list[str] | None = None) -> int:
         artifact["status"] = "completed"
         code = 0
     except InferenceError as exc:
-        failure = exc
+        # Only the frozen V0.1 exception needs its historical wording adapter.
+        technical_timeout = (
+            str(exc) == "scenario inference timed out"
+            if args.agent_version == "v0.1"
+            else isinstance(exc, inference_v02.InferenceTimeoutError)
+        )
         artifact["status"] = exc.category
         artifact["diagnostic_type"] = exc.diagnostic
         if exc.category in ("structure_error", "evidence_error"):
             artifact["validation"] = exc.category
         code = 2
     except KeyboardInterrupt:
-        interrupted = True
         artifact["status"] = "interrupted"
         artifact["diagnostic_type"] = "KeyboardInterrupt"
         code = 130
@@ -369,13 +372,13 @@ def main(argv: list[str] | None = None) -> int:
     if usage_ledger is not None:
         usage = usage_ledger.to_dict()
     else:
-        usage = _baseline_usage(
-            raw_responses, budget, failed=failure is not None or interrupted
-        )
+        usage = _baseline_usage(raw_responses, budget)
     artifact["usage"] = usage
     artifact["finished_at"] = datetime.now(timezone.utc).isoformat()
 
-    return finish_run(args.output_dir, artifact, exit_code=code, failure=failure)
+    return finish_run(
+        args.output_dir, artifact, exit_code=code, technical_timeout=technical_timeout
+    )
 
 
 if __name__ == "__main__":

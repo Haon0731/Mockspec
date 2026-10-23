@@ -32,6 +32,13 @@ PROMPT_VERSION: Final = "scenario-inference/v0.2"
 _PROMPT_PATH: Final = Path(__file__).with_name("prompts") / "scenario_v0.2.txt"
 
 
+class InferenceTimeoutError(InferenceError):
+    """Identify the host deadline without changing serialized failure metadata."""
+
+    def __init__(self, message: str = "scenario inference timed out"):
+        super().__init__(message, "budget_exhausted")
+
+
 def _load_prompt() -> str:
     try:
         prompt = _PROMPT_PATH.read_text(encoding="utf-8")
@@ -138,7 +145,7 @@ async def infer_scenario(
             timeout=float(timeout_seconds),
         )
     except asyncio.TimeoutError:
-        raise InferenceError("scenario inference timed out", "budget_exhausted") from None
+        raise InferenceTimeoutError() from None
     except MaxTurnsExceeded:
         raise InferenceError(
             "scenario inference turn budget exhausted", "budget_exhausted"
@@ -180,6 +187,7 @@ async def infer_scenario(
 
 __all__ = [
     "InferenceBudget",
+    "InferenceTimeoutError",
     "PROMPT_VERSION",
     "build_agent",
     "infer_scenario",

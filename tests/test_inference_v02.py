@@ -342,6 +342,9 @@ def test_timeout_stops_the_active_sdk_run(monkeypatch) -> None:
         ))
 
     assert caught.value.category == "budget_exhausted"
+    assert isinstance(caught.value, inference_v02.InferenceTimeoutError)
+    assert caught.value.diagnostic is None
+    assert str(caught.value) == "scenario inference timed out"
     assert model.calls == 1
 
 

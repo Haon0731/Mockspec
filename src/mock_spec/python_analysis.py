@@ -31,6 +31,14 @@ _LIMITATIONS = [
     "Calls, aliases, and cross-statement def-use relationships are unresolved.",
     "Exception syntax does not prove exception propagation or handler reachability.",
 ]
+_DIRECT_DEADLINE_LIMITATION = (
+    "The direct parser has no independent wall-clock deadline; callers that need one "
+    "must run it in an isolated process."
+)
+_ISOLATED_DEADLINE_LIMITATION = (
+    "The host enforces the configured wall-clock deadline by terminating the isolated "
+    "analysis process."
+)
 
 
 def _render(node: ast.AST) -> str:
@@ -350,7 +358,7 @@ def analyze_source(source: Source) -> dict[str, Any]:
             "error_code": "analysis_error",
             "facts": [],
             "diagnostics": ["Python source exceeds the bounded analyzer input size."],
-            "limitations": [*_LIMITATIONS, "No hard Python AST wall-clock cancellation is provided."],
+            "limitations": [*_LIMITATIONS, _DIRECT_DEADLINE_LIMITATION],
         }
     try:
         tree = ast.parse(parsed_text)
@@ -376,7 +384,7 @@ def analyze_source(source: Source) -> dict[str, Any]:
             "error_code": "analysis_error",
             "facts": [],
             "diagnostics": ["Python AST exceeds the bounded analyzer node count."],
-            "limitations": [*_LIMITATIONS, "No hard Python AST wall-clock cancellation is provided."],
+            "limitations": [*_LIMITATIONS, _DIRECT_DEADLINE_LIMITATION],
         }
 
     collector = _FactCollector(source, parsed_text)
@@ -468,6 +476,13 @@ async def analyze_source_isolated(
         return _failure(
             source.source_id, "analysis_error", "Python AST analysis returned invalid identity."
         )
+    limitations = result.get("limitations")
+    if isinstance(limitations, list) and _DIRECT_DEADLINE_LIMITATION in limitations:
+        result["limitations"] = [
+            _ISOLATED_DEADLINE_LIMITATION
+            if item == _DIRECT_DEADLINE_LIMITATION else item
+            for item in limitations
+        ]
     return result
 
 

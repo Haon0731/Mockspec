@@ -34,8 +34,24 @@ class SourceAnalysis:
 
     def bounded(self, result: dict) -> dict:
         """Never truncate serialized JSON or silently return partial evidence."""
-        if len(json.dumps(result, ensure_ascii=False)) <= self.max_output_chars:
+        if len(json.dumps(result, ensure_ascii=False, allow_nan=False)) <= self.max_output_chars:
             return result
+        if result.get("status") == "error":
+            compact = {
+                "status": "error",
+                "backend": result.get("backend"),
+                "source_id": result.get("source_id"),
+                "error_code": result.get("error_code", "analysis_error"),
+                "facts": [],
+                "diagnostics": ["Analysis error details omitted to fit the output limit."],
+                "limitations": ["Analysis failure does not establish absence of behavior."],
+            }
+            if len(json.dumps(compact, ensure_ascii=False)) > self.max_output_chars:
+                compact.pop("source_id")
+            if len(json.dumps(compact, ensure_ascii=False)) > self.max_output_chars:
+                compact["backend"] = None
+                compact["error_code"] = "analysis_error"
+            return compact
         if result.get("backend") == "source_store":
             omitted = {
                 "status": "incomplete", "backend": "source_store",
@@ -188,16 +204,17 @@ class SourceAnalysis:
 
     @staticmethod
     def _normalize(result: object, source_id: str) -> dict:
+        malformed = {
+            "status": "error",
+            "backend": None,
+            "source_id": source_id,
+            "error_code": "analysis_error",
+            "facts": [],
+            "diagnostics": ["Analysis backend returned malformed common fields."],
+            "limitations": ["Analysis failure does not establish absence of behavior."],
+        }
         if not isinstance(result, dict):
-            return {
-                "status": "error",
-                "backend": None,
-                "source_id": source_id,
-                "error_code": "analysis_error",
-                "facts": [],
-                "diagnostics": ["Analysis backend returned an invalid result."],
-                "limitations": ["Analysis failure does not establish absence of behavior."],
-            }
+            return malformed
         normalized = dict(result)
         normalized.setdefault("status", "error")
         normalized.setdefault("backend", None)
@@ -205,18 +222,41 @@ class SourceAnalysis:
         normalized.setdefault("facts", [])
         normalized.setdefault("diagnostics", [])
         normalized.setdefault("limitations", [])
-        if normalized["status"] not in {"ok", "incomplete", "unresolved", "error"}:
-            normalized.update(
-                status="error",
-                error_code="analysis_error",
-                facts=[],
-                diagnostics=["Analysis backend returned an invalid status."],
+
+        status = normalized["status"]
+        backend = normalized["backend"]
+        facts = normalized["facts"]
+        diagnostics = normalized["diagnostics"]
+        limitations = normalized["limitations"]
+        error_code = normalized.get("error_code")
+        common_fields_valid = (
+            isinstance(status, str)
+            and status in {"ok", "incomplete", "unresolved", "error"}
+            and (
+                backend is None
+                or (isinstance(backend, str) and bool(backend.strip()))
             )
-        if not isinstance(normalized["facts"], list):
-            normalized.update(
-                status="error",
-                error_code="analysis_error",
-                facts=[],
-                diagnostics=["Analysis backend returned invalid facts."],
+            and (
+                error_code is None
+                or (isinstance(error_code, str) and bool(error_code.strip()))
             )
+            and (status != "error" or error_code is not None)
+            and isinstance(facts, list)
+            and all(
+                isinstance(fact, dict)
+                and isinstance(fact.get("kind"), str)
+                and bool(fact["kind"].strip())
+                for fact in facts
+            )
+            and isinstance(diagnostics, list)
+            and all(isinstance(item, (str, dict)) for item in diagnostics)
+            and isinstance(limitations, list)
+            and all(isinstance(item, str) for item in limitations)
+        )
+        if not common_fields_valid:
+            return malformed
+        try:
+            json.dumps(normalized, ensure_ascii=False, allow_nan=False)
+        except (TypeError, ValueError):
+            return malformed
         return normalized

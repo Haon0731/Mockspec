@@ -207,6 +207,29 @@ def test_parse_failure_is_analysis_error_not_empty_success() -> None:
     assert "visible line 90" in result["diagnostics"][0]
 
 
+def test_direct_size_limit_describes_direct_parser_deadline() -> None:
+    import mock_spec.python_analysis as python_analysis
+
+    result = analyze_source(_source("x" * (python_analysis._MAX_SOURCE_CHARS + 1)))
+
+    limitations = " ".join(result["limitations"])
+    assert "direct parser has no independent wall-clock deadline" in limitations
+    assert "isolated" in limitations
+
+
+def test_isolated_size_limit_reports_host_deadline() -> None:
+    import mock_spec.python_analysis as python_analysis
+
+    result = asyncio.run(analyze_source_isolated(
+        _source("x" * (python_analysis._MAX_SOURCE_CHARS + 1)),
+        timeout_seconds=5,
+    ))
+
+    limitations = " ".join(result["limitations"])
+    assert "host enforces the configured wall-clock deadline" in limitations
+    assert "direct parser has no independent wall-clock deadline" not in limitations
+
+
 class _HangingProcess:
     def __init__(self) -> None:
         self.returncode = None
