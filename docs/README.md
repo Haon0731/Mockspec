@@ -17,6 +17,7 @@
 
 | 材料 | 已验证的范围 | 复现入口 |
 | --- | --- | --- |
+| [M1-5 集成验收](../experiments/staged-inference/acceptance-report.md) | B/C 四状态、静态对照、有界修订修复、定向查询与共享预算；真实检查状态及需求映射见验收记录 | [运行说明](usage.md#分阶段研究回放m1-1--m1-4)；[架构边界](architecture.md#研究路径) |
 | [Scenario Contract Research](scenario-research/decision.md) | 人工契约及有限模型 PoC；Limited-Go | [复现说明](scenario-research/reproduce.md) |
 | [源码绑定局部检查](source-bound-local/report.md) | 可见源码的受支持局部返回值条件；未接入 Agent | [run_local.py](../experiments/scenario-research/run_local.py)；命令和限制见报告 |
 | [单案例人工见证](dependency-witness/report.md) | 固定参数行的人工候选及诊断对照；不是自动推断 | [run_witness.py](../experiments/dependency-witness/run_witness.py)；环境要求见报告 |

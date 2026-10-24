@@ -1,0 +1,482 @@
+{
+  "schema_version": "scenario-inference-record/v0.1",
+  "run_id": "20308944-727b-415d-b2ab-073c1dfccceb",
+  "requested_case_id": "synthetic_python_delegation",
+  "case_id": "synthetic_python_delegation",
+  "language": "python",
+  "input_hash": "ee8d2e3f11798a38b3d84daf077dda41938500862046dc4c1f9d7081e0a92d4a",
+  "result_status": "ERROR",
+  "stop_reason": "output_invalid",
+  "error_stage": "DELIVER",
+  "selected_scenario_id": null,
+  "selection_rationale": "Direct delegation and the ordinary assertion jointly constrain the result.",
+  "claim_basis": [
+    {
+      "claim": "objective",
+      "basis": "task_requirement"
+    },
+    {
+      "claim": "delegation",
+      "basis": "implementation_fact"
+    },
+    {
+      "claim": "selected_scenario",
+      "basis": "scenario_inference"
+    }
+  ],
+  "query_log": [],
+  "query_accounting": {
+    "observed_attempts": 0,
+    "budgeted_attempts": 0,
+    "limit": 6
+  },
+  "critical_behaviors": [
+    {
+      "behavior": "dependency(1) yields 2",
+      "observation": "target(1) returns 2 to the visible assertion",
+      "evidence_ids": [
+        "delegation",
+        "assertion"
+      ]
+    }
+  ],
+  "allowed_variations": [
+    "Internal dependency state and unrelated calls may vary when the returned value remains 2."
+  ],
+  "nonblocking_unknowns": [],
+  "degeneracy_contrast": {
+    "status": "disabled_by_variant",
+    "execution_status": "not_executed",
+    "alternative": null,
+    "bypass_behavior": null,
+    "evidence_ids": [],
+    "distinguishing_observation": null,
+    "revision_requested": false,
+    "revision_reason": null
+  },
+  "revision_log": [],
+  "format_repair_log": [],
+  "unresolved": [],
+  "stages": [
+    {
+      "stage": "EXTRACT",
+      "result": {
+        "schema_version": "staged-extract/v0.1",
+        "result_status": "CONTINUE",
+        "original_goals": [
+          {
+            "source_id": "test:0",
+            "start_line": 5,
+            "end_line": 5,
+            "quote": "    assert target(1) == 2"
+          }
+        ],
+        "candidates": [
+          {
+            "scenario_id": "dependency_returns_two",
+            "description": "Dependency returns the value observed by the ordinary oracle.",
+            "evidence": [
+              {
+                "source_id": "mut:0",
+                "start_line": 11,
+                "end_line": 11,
+                "quote": "    return dependency(value)"
+              },
+              {
+                "source_id": "test:0",
+                "start_line": 5,
+                "end_line": 5,
+                "quote": "    assert target(1) == 2"
+              }
+            ]
+          }
+        ],
+        "unresolved": []
+      }
+    },
+    {
+      "stage": "QUERY",
+      "result": {
+        "schema_version": "staged-query/v0.1",
+        "decision": "finish_queries",
+        "query_attempt": null,
+        "previous_receipt_assessment": null,
+        "impact": "Preserve the current candidate pending construction."
+      }
+    },
+    {
+      "stage": "CONSTRUCT",
+      "result": {
+        "schema_version": "staged-construct/v0.1",
+        "result_status": "SELECTED",
+        "selected_scenario_id": "dependency_returns_two",
+        "selection_rationale": "Direct delegation and the ordinary assertion jointly constrain the result.",
+        "claim_basis": [
+          {
+            "claim": "objective",
+            "basis": "task_requirement"
+          },
+          {
+            "claim": "delegation",
+            "basis": "implementation_fact"
+          },
+          {
+            "claim": "selected_scenario",
+            "basis": "scenario_inference"
+          }
+        ],
+        "critical_behaviors": [
+          {
+            "behavior": "dependency(1) yields 2",
+            "observation": "target(1) returns 2 to the visible assertion",
+            "evidence_ids": [
+              "delegation",
+              "assertion"
+            ]
+          }
+        ],
+        "allowed_variations": [
+          "Internal dependency state and unrelated calls may vary when the returned value remains 2."
+        ],
+        "unresolved": [],
+        "nonblocking_unknowns": [],
+        "contract": {
+          "schema_version": "mock-spec.scenario/v0.1",
+          "case_id": "synthetic_python_delegation",
+          "language": "python",
+          "test_objectives": [
+            {
+              "statement": "The visible test expects target(1) to equal 2.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "The visible test invokes target(1).",
+              "evidence_ids": [
+                "assertion"
+              ]
+            }
+          ],
+          "scenario_hypotheses": [
+            {
+              "id": "dependency_returns_two",
+              "description": "The dependency returns 2.",
+              "condition": "target receives value 1.",
+              "status": "candidate",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ]
+            }
+          ],
+          "dependency_constraints": [
+            {
+              "statement": "dependency(1) returns 2.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "target delegates value 1 and completes normally.",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ]
+            }
+          ],
+          "expected_interactions": [
+            {
+              "statement": "dependency is called with 1.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "target is called with 1.",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ],
+              "assertion_policy": "not_implied"
+            }
+          ],
+          "verification_candidates": [],
+          "evidence": [
+            {
+              "id": "delegation",
+              "source_id": "mut:0",
+              "start_line": 11,
+              "end_line": 11,
+              "quote": "    return dependency(value)",
+              "rationale": "The target directly returns the dependency result."
+            },
+            {
+              "id": "assertion",
+              "source_id": "test:0",
+              "start_line": 5,
+              "end_line": 5,
+              "quote": "    assert target(1) == 2",
+              "rationale": "The visible ordinary oracle checks the returned value."
+            }
+          ],
+          "uncertainty": [
+            {
+              "statement": "The dependency implementation is not visible.",
+              "status": "unknown",
+              "scenario_ids": [],
+              "condition": null,
+              "evidence_ids": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stage": "DELIVER",
+      "result": {
+        "schema_version": "staged-deliver/v0.1",
+        "result_status": "SELECTED",
+        "selected_scenario_id": "dependency_returns_two",
+        "contract": {
+          "schema_version": "mock-spec.scenario/v0.1",
+          "case_id": "forged_case_id",
+          "language": "python",
+          "test_objectives": [
+            {
+              "statement": "The visible test expects target(1) to equal 2.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "The visible test invokes target(1).",
+              "evidence_ids": [
+                "assertion"
+              ]
+            }
+          ],
+          "scenario_hypotheses": [
+            {
+              "id": "dependency_returns_two",
+              "description": "The dependency returns 2.",
+              "condition": "target receives value 1.",
+              "status": "candidate",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ]
+            }
+          ],
+          "dependency_constraints": [
+            {
+              "statement": "dependency(1) returns 2.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "target delegates value 1 and completes normally.",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ]
+            }
+          ],
+          "expected_interactions": [
+            {
+              "statement": "dependency is called with 1.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "target is called with 1.",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ],
+              "assertion_policy": "not_implied"
+            }
+          ],
+          "verification_candidates": [],
+          "evidence": [
+            {
+              "id": "delegation",
+              "source_id": "mut:0",
+              "start_line": 11,
+              "end_line": 11,
+              "quote": "    return dependency(value)",
+              "rationale": "The target directly returns the dependency result."
+            },
+            {
+              "id": "assertion",
+              "source_id": "test:0",
+              "start_line": 5,
+              "end_line": 5,
+              "quote": "    assert target(1) == 2",
+              "rationale": "The visible ordinary oracle checks the returned value."
+            }
+          ],
+          "uncertainty": [
+            {
+              "statement": "The dependency implementation is not visible.",
+              "status": "unknown",
+              "scenario_ids": [],
+              "condition": null,
+              "evidence_ids": []
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "model_responses": [
+    {
+      "output": [
+        {
+          "id": "scripted-message",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"staged-extract/v0.1\", \"original_goals\": [{\"source_id\": \"test:0\", \"start_line\": 5, \"end_line\": 5, \"quote\": \"    assert target(1) == 2\"}], \"candidates\": [{\"scenario_id\": \"dependency_returns_two\", \"description\": \"Dependency returns the value observed by the ordinary oracle.\", \"evidence\": [{\"source_id\": \"mut:0\", \"start_line\": 11, \"end_line\": 11, \"quote\": \"    return dependency(value)\"}, {\"source_id\": \"test:0\", \"start_line\": 5, \"end_line\": 5, \"quote\": \"    assert target(1) == 2\"}]}], \"unresolved\": []}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 100,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 200,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "id": "scripted-message",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"staged-query/v0.1\", \"decision\": \"finish_queries\", \"query_attempt\": null, \"previous_receipt_assessment\": null, \"impact\": \"Preserve the current candidate pending construction.\"}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 100,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 200,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "id": "scripted-message",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"staged-construct/v0.1\", \"result_status\": \"SELECTED\", \"selected_scenario_id\": \"dependency_returns_two\", \"selection_rationale\": \"Direct delegation and the ordinary assertion jointly constrain the result.\", \"claim_basis\": [{\"claim\": \"objective\", \"basis\": \"task_requirement\"}, {\"claim\": \"delegation\", \"basis\": \"implementation_fact\"}, {\"claim\": \"selected_scenario\", \"basis\": \"scenario_inference\"}], \"critical_behaviors\": [{\"behavior\": \"dependency(1) yields 2\", \"observation\": \"target(1) returns 2 to the visible assertion\", \"evidence_ids\": [\"delegation\", \"assertion\"]}], \"allowed_variations\": [\"Internal dependency state and unrelated calls may vary when the returned value remains 2.\"], \"unresolved\": [], \"contract\": {\"schema_version\": \"mock-spec.scenario/v0.1\", \"case_id\": \"synthetic_python_delegation\", \"language\": \"python\", \"test_objectives\": [{\"statement\": \"The visible test expects target(1) to equal 2.\", \"status\": \"required\", \"scenario_ids\": [\"dependency_returns_two\"], \"condition\": \"The visible test invokes target(1).\", \"evidence_ids\": [\"assertion\"]}], \"scenario_hypotheses\": [{\"id\": \"dependency_returns_two\", \"description\": \"The dependency returns 2.\", \"condition\": \"target receives value 1.\", \"status\": \"candidate\", \"evidence_ids\": [\"delegation\", \"assertion\"]}], \"dependency_constraints\": [{\"statement\": \"dependency(1) returns 2.\", \"status\": \"required\", \"scenario_ids\": [\"dependency_returns_two\"], \"condition\": \"target delegates value 1 and completes normally.\", \"evidence_ids\": [\"delegation\", \"assertion\"]}], \"expected_interactions\": [{\"statement\": \"dependency is called with 1.\", \"status\": \"required\", \"scenario_ids\": [\"dependency_returns_two\"], \"condition\": \"target is called with 1.\", \"evidence_ids\": [\"delegation\", \"assertion\"], \"assertion_policy\": \"not_implied\"}], \"verification_candidates\": [], \"evidence\": [{\"id\": \"delegation\", \"source_id\": \"mut:0\", \"start_line\": 11, \"end_line\": 11, \"quote\": \"    return dependency(value)\", \"rationale\": \"The target directly returns the dependency result.\"}, {\"id\": \"assertion\", \"source_id\": \"test:0\", \"start_line\": 5, \"end_line\": 5, \"quote\": \"    assert target(1) == 2\", \"rationale\": \"The visible ordinary oracle checks the returned value.\"}], \"uncertainty\": [{\"statement\": \"The dependency implementation is not visible.\", \"status\": \"unknown\", \"scenario_ids\": [], \"condition\": null, \"evidence_ids\": []}]}}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 100,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 200,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "id": "scripted-message",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"staged-deliver/v0.1\", \"result_status\": \"SELECTED\", \"selected_scenario_id\": \"dependency_returns_two\", \"contract\": {\"schema_version\": \"mock-spec.scenario/v0.1\", \"case_id\": \"forged_case_id\", \"language\": \"python\", \"test_objectives\": [{\"statement\": \"The visible test expects target(1) to equal 2.\", \"status\": \"required\", \"scenario_ids\": [\"dependency_returns_two\"], \"condition\": \"The visible test invokes target(1).\", \"evidence_ids\": [\"assertion\"]}], \"scenario_hypotheses\": [{\"id\": \"dependency_returns_two\", \"description\": \"The dependency returns 2.\", \"condition\": \"target receives value 1.\", \"status\": \"candidate\", \"evidence_ids\": [\"delegation\", \"assertion\"]}], \"dependency_constraints\": [{\"statement\": \"dependency(1) returns 2.\", \"status\": \"required\", \"scenario_ids\": [\"dependency_returns_two\"], \"condition\": \"target delegates value 1 and completes normally.\", \"evidence_ids\": [\"delegation\", \"assertion\"]}], \"expected_interactions\": [{\"statement\": \"dependency is called with 1.\", \"status\": \"required\", \"scenario_ids\": [\"dependency_returns_two\"], \"condition\": \"target is called with 1.\", \"evidence_ids\": [\"delegation\", \"assertion\"], \"assertion_policy\": \"not_implied\"}], \"verification_candidates\": [], \"evidence\": [{\"id\": \"delegation\", \"source_id\": \"mut:0\", \"start_line\": 11, \"end_line\": 11, \"quote\": \"    return dependency(value)\", \"rationale\": \"The target directly returns the dependency result.\"}, {\"id\": \"assertion\", \"source_id\": \"test:0\", \"start_line\": 5, \"end_line\": 5, \"quote\": \"    assert target(1) == 2\", \"rationale\": \"The visible ordinary oracle checks the returned value.\"}], \"uncertainty\": [{\"statement\": \"The dependency implementation is not visible.\", \"status\": \"unknown\", \"scenario_ids\": [], \"condition\": null, \"evidence_ids\": []}]}}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 100,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 200,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    }
+  ],
+  "error": {
+    "type": "ValueError",
+    "message": "DELIVER changed the constructed semantics"
+  }
+}

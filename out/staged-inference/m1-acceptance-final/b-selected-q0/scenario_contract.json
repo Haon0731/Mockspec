@@ -1,0 +1,87 @@
+{
+  "schema_version": "mock-spec.scenario/v0.1",
+  "case_id": "synthetic_python_delegation",
+  "language": "python",
+  "test_objectives": [
+    {
+      "statement": "The visible test expects target(1) to equal 2.",
+      "status": "required",
+      "scenario_ids": [
+        "dependency_returns_two"
+      ],
+      "condition": "The visible test invokes target(1).",
+      "evidence_ids": [
+        "assertion"
+      ]
+    }
+  ],
+  "scenario_hypotheses": [
+    {
+      "id": "dependency_returns_two",
+      "description": "The dependency returns 2.",
+      "condition": "target receives value 1.",
+      "status": "candidate",
+      "evidence_ids": [
+        "delegation",
+        "assertion"
+      ]
+    }
+  ],
+  "dependency_constraints": [
+    {
+      "statement": "dependency(1) returns 2.",
+      "status": "required",
+      "scenario_ids": [
+        "dependency_returns_two"
+      ],
+      "condition": "target delegates value 1 and completes normally.",
+      "evidence_ids": [
+        "delegation",
+        "assertion"
+      ]
+    }
+  ],
+  "expected_interactions": [
+    {
+      "statement": "dependency is called with 1.",
+      "status": "required",
+      "scenario_ids": [
+        "dependency_returns_two"
+      ],
+      "condition": "target is called with 1.",
+      "evidence_ids": [
+        "delegation",
+        "assertion"
+      ],
+      "assertion_policy": "not_implied"
+    }
+  ],
+  "verification_candidates": [],
+  "evidence": [
+    {
+      "id": "delegation",
+      "source_id": "mut:0",
+      "start_line": 11,
+      "end_line": 11,
+      "quote": "    return dependency(value)",
+      "rationale": "The target directly returns the dependency result."
+    },
+    {
+      "id": "assertion",
+      "source_id": "test:0",
+      "start_line": 5,
+      "end_line": 5,
+      "quote": "    assert target(1) == 2",
+      "rationale": "The visible ordinary oracle checks the returned value."
+    }
+  ],
+  "uncertainty": [
+    {
+      "statement": "The dependency implementation is not visible.",
+      "status": "unknown",
+      "scenario_ids": [],
+      "condition": null,
+      "evidence_ids": []
+    }
+  ]
+}

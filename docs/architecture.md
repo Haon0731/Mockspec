@@ -128,6 +128,41 @@ V0.1 无工具，V0.2 有三个只读工具；两版都使用正式 ScenarioCont
 
 ## 研究路径
 
+`experiments/staged-inference/` 承接 [M1-1 / #7](https://github.com/Haon0731/Mockspec/issues/7)
+、[M1-2 / #8](https://github.com/Haon0731/Mockspec/issues/8)
+、[M1-3 / #9](https://github.com/Haon0731/Mockspec/issues/9)
+及 [M1-4 / #10](https://github.com/Haon0731/Mockspec/issues/10) 的 B/C 变体离线回放：合成 Python `UnifiedTask` → 同一研究控制器的
+EXTRACT → QUERY（零至六次定向查询）→ CONSTRUCT → CONTRAST（仅 C）→
+REVISE（可选一次）→ DELIVER → FORMAT_REPAIR（可选一次）→ 契约、研究记录与运行清单。
+固定脚本模型仍经过 Agents SDK Runner；控制器复用生产 `UsageLedger`、
+`validate_contract`（含 `SourceStore` 原文校验）及运行身份采集组件。
+研究阶段协议、Prompt 与产物写入位于研究目录，生产包不反向依赖它。
+M1-5 的 `acceptance.py` 汇总同一入口的固定回放并复核产物；`run.py` 的
+`live_inference` 分支通过现有 Python Adapter 加载获准的 flask_308，再交给同一控制器。
+真实配置缺失时只记录预检缺口，不将固定模型或合成任务标为真实检查。
+`query.py` 的运行级 `QueryExecutor` 在参数解析前登记请求，再分派到既有
+`SourceAnalysis`；三种工具及失败、重试共用六次额度，第七次留拒绝回执且不执行分析。
+模型经 QUERY 结构化消息请求工具，SDK 阶段 Agent 不注册可绕过计数的工具。
+后续 QUERY 评估上一回执，CONSTRUCT/DELIVER 接收累计回执；未完成判断明确留证。
+阶段切换和 SDK 对象重建不重置账本、模型请求数、查询数或绝对截止时间。
+
+宿主在输入加载/校验前登记运行身份和独立输出目录，校验后保存确定性输入快照；
+请求前检查显式配置与整次运行的预算。输入拒绝保留请求身份，有效任务身份与哈希为 null。
+模型只接收完整可见任务及阶段上下文，宿主配置、物理输入目录和评价材料不进入初始输入。
+DELIVER 本地校验选择、引用及任务身份后，先写契约与记录，再写含实际文件哈希的清单；
+SELECTED 与 AMBIGUOUS 必须有有效契约；INCONCLUSIVE 可保留完整契约供诊断；
+ERROR 只保留阶段草案与错误，不发布最终契约。状态与停止原因分别保存；已有输出目录拒绝覆盖。
+正式 `ScenarioContract` 保持 v0.1 字段；研究选择状态、运行身份和对照状态由旁路记录承载。
+
+C 的静态对照与一次语义修订由控制器管理，前后快照留在研究记录；B 仅关闭对照。
+修订不能改原目标，候选上限为二，之后不能重开查询。最终格式修复与语义修订单独计数，
+先建立与已验证构造一致的完整语义快照，再允许一次共享预算请求；修复不得改变证据来源、
+范围或原文，不能建立快照或修复失败时不发布契约。
+
+这条路径验证 B/C 四状态流程、静态对照、修订修复、定向查询、共享预算及失败留证边界；
+合成任务不经过真实 Adapter 审核，不构成真实数据准入、目标测试执行或模型推断质量证据。
+M1-5 的入口验收与真实检查缺口见[验收记录](../experiments/staged-inference/acceptance-report.md)；用法及预算见[运行说明](usage.md#分阶段研究回放m1-1--m1-4)。
+
 ```text
 experiments/scenario-research/
   run_local.py → LocalResearchHost → local_patterns → 现有 AST/Spoon

@@ -1,0 +1,295 @@
+{
+  "schema_version": "scenario-inference-record/v0.1",
+  "run_id": "b790414f-6e0d-4053-9d9b-63d4f29934c8",
+  "requested_case_id": "synthetic_python_delegation",
+  "case_id": "synthetic_python_delegation",
+  "language": "python",
+  "input_hash": "ee8d2e3f11798a38b3d84daf077dda41938500862046dc4c1f9d7081e0a92d4a",
+  "result_status": "INCONCLUSIVE",
+  "stop_reason": "evidence_exhausted",
+  "error_stage": null,
+  "selected_scenario_id": null,
+  "selection_rationale": "The missing dependency binding prevents construction of a complete contract.",
+  "claim_basis": [
+    {
+      "claim": "objective",
+      "basis": "task_requirement"
+    },
+    {
+      "claim": "delegation",
+      "basis": "implementation_fact"
+    },
+    {
+      "claim": "selected_scenario",
+      "basis": "scenario_inference"
+    }
+  ],
+  "query_log": [],
+  "query_accounting": {
+    "observed_attempts": 0,
+    "budgeted_attempts": 0,
+    "limit": 6
+  },
+  "critical_behaviors": [],
+  "allowed_variations": [
+    "Internal dependency state and unrelated calls may vary when the returned value remains 2."
+  ],
+  "nonblocking_unknowns": [],
+  "degeneracy_contrast": {
+    "status": "disabled_by_variant",
+    "execution_status": "not_executed",
+    "alternative": null,
+    "bypass_behavior": null,
+    "evidence_ids": [],
+    "distinguishing_observation": null,
+    "revision_requested": false,
+    "revision_reason": null
+  },
+  "revision_log": [],
+  "format_repair_log": [],
+  "unresolved": [
+    "The dependency binding and return contract are missing, so no safe response constraint can be delivered to a generator."
+  ],
+  "stages": [
+    {
+      "stage": "EXTRACT",
+      "result": {
+        "schema_version": "staged-extract/v0.1",
+        "result_status": "CONTINUE",
+        "original_goals": [
+          {
+            "source_id": "test:0",
+            "start_line": 5,
+            "end_line": 5,
+            "quote": "    assert target(1) == 2"
+          }
+        ],
+        "candidates": [
+          {
+            "scenario_id": "dependency_returns_two",
+            "description": "Dependency returns the value observed by the ordinary oracle.",
+            "evidence": [
+              {
+                "source_id": "mut:0",
+                "start_line": 11,
+                "end_line": 11,
+                "quote": "    return dependency(value)"
+              },
+              {
+                "source_id": "test:0",
+                "start_line": 5,
+                "end_line": 5,
+                "quote": "    assert target(1) == 2"
+              }
+            ]
+          }
+        ],
+        "unresolved": [
+          "The dependency binding and return contract are missing, so no safe response constraint can be delivered to a generator."
+        ]
+      }
+    },
+    {
+      "stage": "QUERY",
+      "result": {
+        "schema_version": "staged-query/v0.1",
+        "decision": "finish_queries",
+        "query_attempt": null,
+        "previous_receipt_assessment": null,
+        "impact": "Preserve the current candidate pending construction."
+      }
+    },
+    {
+      "stage": "CONSTRUCT",
+      "result": {
+        "schema_version": "staged-construct/v0.1",
+        "result_status": "INCONCLUSIVE",
+        "selected_scenario_id": null,
+        "selection_rationale": "The missing dependency binding prevents construction of a complete contract.",
+        "claim_basis": [
+          {
+            "claim": "objective",
+            "basis": "task_requirement"
+          },
+          {
+            "claim": "delegation",
+            "basis": "implementation_fact"
+          },
+          {
+            "claim": "selected_scenario",
+            "basis": "scenario_inference"
+          }
+        ],
+        "critical_behaviors": [],
+        "allowed_variations": [
+          "Internal dependency state and unrelated calls may vary when the returned value remains 2."
+        ],
+        "unresolved": [
+          "The dependency binding and return contract are missing, so no safe response constraint can be delivered to a generator."
+        ],
+        "nonblocking_unknowns": [],
+        "contract": null
+      }
+    },
+    {
+      "stage": "DELIVER",
+      "result": {
+        "schema_version": "staged-deliver/v0.1",
+        "result_status": "INCONCLUSIVE",
+        "selected_scenario_id": null,
+        "contract": null
+      }
+    }
+  ],
+  "model_responses": [
+    {
+      "output": [
+        {
+          "id": "scripted-message",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"staged-extract/v0.1\", \"original_goals\": [{\"source_id\": \"test:0\", \"start_line\": 5, \"end_line\": 5, \"quote\": \"    assert target(1) == 2\"}], \"candidates\": [{\"scenario_id\": \"dependency_returns_two\", \"description\": \"Dependency returns the value observed by the ordinary oracle.\", \"evidence\": [{\"source_id\": \"mut:0\", \"start_line\": 11, \"end_line\": 11, \"quote\": \"    return dependency(value)\"}, {\"source_id\": \"test:0\", \"start_line\": 5, \"end_line\": 5, \"quote\": \"    assert target(1) == 2\"}]}], \"unresolved\": [\"The dependency binding and return contract are missing, so no safe response constraint can be delivered to a generator.\"]}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 100,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 200,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "id": "scripted-message",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"staged-query/v0.1\", \"decision\": \"finish_queries\", \"query_attempt\": null, \"previous_receipt_assessment\": null, \"impact\": \"Preserve the current candidate pending construction.\"}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 100,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 200,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "id": "scripted-message",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"staged-construct/v0.1\", \"result_status\": \"INCONCLUSIVE\", \"selected_scenario_id\": null, \"selection_rationale\": \"The missing dependency binding prevents construction of a complete contract.\", \"claim_basis\": [{\"claim\": \"objective\", \"basis\": \"task_requirement\"}, {\"claim\": \"delegation\", \"basis\": \"implementation_fact\"}, {\"claim\": \"selected_scenario\", \"basis\": \"scenario_inference\"}], \"critical_behaviors\": [], \"allowed_variations\": [\"Internal dependency state and unrelated calls may vary when the returned value remains 2.\"], \"unresolved\": [\"The dependency binding and return contract are missing, so no safe response constraint can be delivered to a generator.\"], \"contract\": null}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 100,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 200,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "id": "scripted-message",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"staged-deliver/v0.1\", \"result_status\": \"INCONCLUSIVE\", \"selected_scenario_id\": null, \"contract\": null}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 100,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 200,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    }
+  ],
+  "error": null
+}

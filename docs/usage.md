@@ -193,6 +193,124 @@ V0.1 核心保持冻结，原有 Token 上限与传输重试差异会在产物�
 不伪造 Contract。详情见 [Step 6 规格](step6/spec.md) 和
 [任务依赖](step6/issues.md)。实际验收与未覆盖项见 [交付报告](step6/report.md)。
 
+## 分阶段研究回放（M1-1 / M1-4）
+
+[任务 #7](https://github.com/Haon0731/Mockspec/issues/7) 与
+[任务 #8](https://github.com/Haon0731/Mockspec/issues/8)、
+[任务 #9](https://github.com/Haon0731/Mockspec/issues/9) 与
+[任务 #10](https://github.com/Haon0731/Mockspec/issues/10) 的独立研究入口使用
+Python 合成任务和固定脚本模型，经真实 SDK Runner 执行 B/C 变体。
+在仓库根目录运行，无需模型凭据、外部数据或真实测试执行：
+
+```bash
+PYTHONPATH=src .venv/bin/python experiments/staged-inference/run.py \
+  --mode synthetic_replay --variant B --output-dir /tmp/mockspec-m1-b-replay
+.venv/bin/python -B -m pytest -q -p no:cacheprovider tests/test_staged_inference.py tests/test_staged_cancellation.py tests/test_staged_contrast.py tests/test_staged_format_repair.py
+.venv/bin/python -m ruff check src tests scripts experiments/staged-inference
+MYPYPATH=src .venv/bin/python -m mypy --follow-untyped-imports \
+  experiments/staged-inference/controller.py experiments/staged-inference/run.py \
+  experiments/staged-inference/scripted.py experiments/staged-inference/query.py \
+  experiments/staged-inference/acceptance.py
+```
+
+研究代码类型检查显式使用本仓 `src`，避免误读环境中其他安装版本；
+它仍会报告所引用生产模块的既有诊断，应与上方生产基线比较。
+
+输出目录必须不存在。有效语义结果（SELECTED、AMBIGUOUS、INCONCLUSIVE）退出码为 0，
+ERROR 为 1，命令或无法完成的产物写入错误为 2；
+重复运行需指定新目录，不覆盖原证据。入口默认配置为工程回放参数，不是正式实验预算：
+最多 10 次模型请求，每次最多 4096 输出 Token，总计 60000 Token，
+总时限 120 秒、阶段时限 15 秒，工具结果上限配置为 16000 字符。
+所有阶段共享一个用量账本、模型计数、六次查询额度与绝对截止时间，关闭技术重试。
+阶段切换或重建 SDK 对象不会重置预算；SDK `max_turns=1` 仅约束单阶段请求。
+用 `--query-count 0|1|2|3|4|5|6|7` 选择固定查询回放（默认零次），六次轮流调用三个既有
+只读工具，第七次演示拒绝，产物区分 `observed_attempts=7` 与 `budgeted_attempts=6`。
+每次请求绑定疑问、候选和原始参数；畸形 JSON、缺字段、类型错误、未知工具/来源、
+越界和重复请求均先计数再校验。回执保留事实/诊断，后续模型评估支持、削弱或无新增信息，
+未完成判断保留 `assessment_status=incomplete`。三种工具只在 QUERY 分派。
+
+可显式配置 `--max-model-calls`、`--max-output-tokens`、`--max-total-tokens`、
+`--max-tool-output-chars`、`--timeout-seconds` 和 `--parsing-timeout-seconds`。
+配置与请求前估算的局限写入 manifest；Token 估算不是远端费用硬上限。
+未知用量保留 null/不完整并阻止继续请求；总时限到期后取消并回收解析进程，
+不额外请求模型收尾，仅执行本地验证和留证。
+这些 Token 用量来自脚本模型的固定回执，不是远端计费证据。
+
+目录包含以下文件：
+
+| 文件 | 内容 |
+| --- | --- |
+| `input_snapshot.json` | 完整可见任务的确定性 UTF-8 JSON；排序键、紧凑分隔，保持源码与普通 oracle 字符串 |
+| `scenario_contract.json` | 通过正式 v0.1 校验的契约；无效输出不发布此文件 |
+| `inference_record.json` | 阶段结果与可见模型响应、选择、关键行为、允许变化、错误；B 对照固定为 `disabled_by_variant/not_executed` |
+| `run_manifest.json` | 宿主身份、配置、版本、预算和用量、终态，以及前三份文件实际字节的 SHA256；最后写入且不哈希自身 |
+
+`controller.execute_staged_run` 是研究控制器及统一产物边界，`scripted.py` 提供可替换的
+合成输入和 SDK 模型，`run.py` 负责显式回放或受限真实检查的命令组装。契约不增加研究状态字段；
+记录与清单通过任务身份和契约文件哈希关联正式契约。失败尝试保留可得阶段、用量与错误，
+无法写入时以非零退出码和 stderr 报告，不声称成功留证。
+
+可用 `--replay-case selected|ambiguous|inconclusive|error` 分别复现四种结果，默认 selected。
+每次指定不同的输出目录；error 回放在 DELIVER 注入身份篡改，验证已完成草案留证但不发布最终契约。
+
+| 结果 | 最终契约与下游含义 |
+| --- | --- |
+| SELECTED | 必须有有效契约与当前候选 ID；1–3 项关键行为且无阻断性未决，可作为后续生成的输入依据 |
+| AMBIGUOUS | 必须有有效契约、恰好两个候选及分歧理由；选择 ID 为 null，不能自动择一生成 |
+| INCONCLUSIVE | 选择 ID 为 null，记录缺失绑定/材料及影响；完整有效契约仅供诊断，不可下发生成，无完整契约则不创建文件 |
+| ERROR | 不发布最终契约；记录错误阶段、分类及已完成阶段，中间草案只供诊断 |
+
+退出码 0 仅说明完成了有效结果交付，下游仍须读取 `result_status`。
+`stop_reason` 独立记录 completed、evidence_exhausted、budget_exhausted 等停止原因；
+预算耗尽时已有完整有效选择可以保留 SELECTED，否则按现有证据保留歧义或不足。
+协议违规为 output_invalid，模型运行失败为 model_error，不伪装成语义未知。
+`unresolved` 保存阻断性未决，`nonblocking_unknowns` 保存不妨碍 SELECTED 的非关键未知。
+可恢复的工具错误留在查询日志，模型可评估回执并继续；不会自动把工具失败当作无行为证据。
+
+C 与 B 复用输入、控制器、输出及总预算；B 仅关闭对照并记录
+`disabled_by_variant/not_executed`。C 的 SELECTED 和已有可比较候选的 AMBIGUOUS
+进行一次静态 CONTRAST；提前材料或预算不足记录 `unavailable`，完成尝试但无有据替代
+记录 `none_identified`。`proposed` 必须包含替代 Mock 方案、绕过行为、依据和最小区分观察。
+所有状态 `execution_status=not_executed`，不代表替代已执行或通过原测试。
+
+对照可请求一次 REVISE；`revision_log` 保留完整前后快照、准确修改字段和证据原因。
+合法替代可替换正式候选，但正式候选仍最多两个；原目标内容与证据不变，
+仅允许将被替换候选的绑定重指向新候选。修订后直接交付，不能重开查询。
+第二次语义修订请求返回 ERROR/output_invalid，不发布契约，保留中间记录。
+已要求修订但共享预算耗尽时返回 INCONCLUSIVE，未修订草案仅供诊断，不发布契约。
+原目标保持在 `test_objectives`；新增观察建议进入 `verification_candidates`，
+`expected_interactions.assertion_policy` 保持 `not_implied`。
+
+最终格式修复单独记录在 `format_repair_log`，最多一次且消耗同一预算。
+仅当损坏输出能建立完整语义快照且与已验证构造完全一致时才尝试；当前可修复
+版本/封装字段及十进制字符串行号。引用的来源、规范化范围、原文必须完全一致；
+不允许补造缺失语义、改变选择、条件、约束、关键行为或允许变化。
+无法建立快照、修复篡改语义/证据、修复仍无效或无修复预算均 ERROR/output_invalid。
+
+```bash
+PYTHONPATH=src .venv/bin/python experiments/staged-inference/run.py \
+  --mode synthetic_replay --variant C --replay-case cache_miss \
+  --output-dir /tmp/mockspec-m1-c-cache-miss
+```
+
+固定样例另有 `cache_unspecified`（移除任务说明，保留 AMBIGUOUS）、
+`legal_variation`（不锁定无关字段和构造形式，C 修订保留合法替代）和
+`second_revision`（拒绝第二次修订，预期退出码 1）。相同样例可选 `--variant B`，
+差异由关闭对照决定；B/C 不获额外预算。这些脚本只检验静态表示和控制流程，
+不证明模型会自主发现退化或接受合法变化。
+
+`--task-json` 仅支持显式合成回放输入，不能作为真实 Adapter 准入证明。
+宿主在加载和校验前登记 run_id 并创建独立目录；可用 `--requested-case-id` 标明请求身份。
+读取、JSON 解析或任务校验失败仍保存 record/manifest，有效 case_id/input_hash 为 null，
+保留请求身份和拒绝原因；缺失产物哈希为 null，已有文件按实际字节哈希。
+输出目录不可创建或写入失败时明确非成功退出，不保证存储故障下产物齐全。
+
+当前完成范围是 EXTRACT → QUERY（零至六次查询）→ CONSTRUCT →
+CONTRAST（仅 C）→ REVISE（可选一次）→ DELIVER → FORMAT_REPAIR（可选一次）
+的 B/C 四状态回放，不是整个 M1。synthetic_replay 分支不审核真实 Adapter 输入；
+live_inference 分支见下方 M1-5 说明。两者均不生成 Mock、不执行目标测试。
+脚本回放通过仅证明控制器和校验边界，不证明真实模型的场景选择或语义推导质量。
+
 ## flask_308 与归档模板
 
 已核实：冻结 snapshot 的 10 个 slot 为空；旧 run 中名为 `masked_templates` 的文件
@@ -203,3 +321,33 @@ V0.1 核心保持冻结，原有 Token 上限与传输重试差异会在产物�
 本项目保留选定输入的 masking 与上下文，不声称裁剪后的 Task 与旧完整 workspace
 在信息量上完全等价；没有改变旧实验数据、协议或评分。当前批准两个案例，
 不意味着全量 Java 59 / Python 106 已通过接入审查。
+
+## M1-5 集成验收
+
+[验收记录与需求映射](../experiments/staged-inference/acceptance-report.md)将工程回放、
+真实模型检查和研究效果分开报告。复现固定入口清单时使用新的输出目录：
+
+```bash
+PYTHONPATH=src .venv/bin/python experiments/staged-inference/acceptance.py \
+  --output-dir /tmp/mockspec-m1-acceptance
+```
+
+该命令使用合成任务和固定 SDK 模型，逐次保存输入、记录、有效契约与 manifest，
+再核对身份、版本、产物字节哈希、结果状态和停止原因。预期 ERROR 也必须保留；
+已有输出目录拒绝覆盖。汇总 `acceptance_report.json` 不是正式 A/B/C 实验账本。
+畸形参数、未知用量、修订修复等完整覆盖还需运行上方离线 pytest 回归，
+不能把这份固定清单视为整个 M1 或质量验收。
+
+真实检查仍使用同一个 `run.py`，显式选择 `--mode live_inference --variant C`，
+提供 `--snapshot`（已审核冻结 Python snapshot 根）、`--case-id flask_308` 与新输出目录。
+模型来自 `--model` 或 `MOCKSPEC_MODEL`，凭据来自 `OPENAI_API_KEY`；不在日志中保存凭据。
+该分支拒绝 `--task-json`，由现有 Python Adapter 核验输入，不能通过设置模式取得准入。
+运行前明确传入 `--max-model-calls`、`--max-output-tokens`、`--max-total-tokens`、
+`--timeout-seconds` 和 `--parsing-timeout-seconds`；实际配置及用量保存在 manifest。
+运行前必须同时提供 `--input-cost-per-million`、`--output-cost-per-million`，
+以及 `--max-cost-usd`；价格或费用预算缺失时不发起真实请求，记录为真实检查未完成。
+这些参数复用生产预算门禁，不是远端计费硬上限。技术重试与按质量重试均不开启。
+
+本次预检发现缺少显式模型和 API 凭据，未发起真实模型请求；具体证据见
+[预检记录](../out/staged-inference/m1-validation/live-preflight.json)。
+真实产物可读性、场景推导质量与自主工具使用仍未验收，#11 和整个 M1 未全部完成。
