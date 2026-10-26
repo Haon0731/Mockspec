@@ -8,7 +8,7 @@
 | [运行与开发](usage.md) | 安装、版本选择、回放、留证与测试命令 |
 | [Scenario Contract](scenario-inference.md) | 两版共用的约束字段和校验范围 |
 | [正式 JSON Schema](scenario-contract.schema.json) | 机器可读输出结构；不能替代宿主完整校验 |
-| [输入审核记录](input-audit.md) | 两个冻结案例的准入依据与允许源码 |
+| [输入审核记录](input-audit.md) | 三个冻结案例的准入依据与允许源码 |
 | [术语表](../GLOSSARY.md) | 工程验收、自主工具调用与场景推导质量 |
 
 ## 独立研究验证
@@ -18,7 +18,8 @@
 PRD 不作为当前能力或已通过验收的说明。
 后续执行使用该 PRD 第 9 节的 `M2-CITATION-1`：研究引用选择协议、案例适用性和真实验收门禁。
 引用协议与离线工程验证已交付；[工程与案例门禁记录](../out/staged-inference/issue17-citation-protocol-20261026/report.md)
-说明本次限定审查未建立合格案例，尚未启动新的真实模型验收。
+保留当时两例未通过适用性核对的结论；后续[案例寻找与准入记录](../out/staged-inference/issue17-case-search-20261026/report.md)
+新增合格 CloudFoundry 案例，G2 已通过，尚未启动新的真实模型验收。
 
 以下研究结果不等于生产 Agent 已具备对应能力；阅读案例分析也不能作为未来无指导生成的输入。
 

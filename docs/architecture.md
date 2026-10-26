@@ -67,6 +67,9 @@ flowchart TD
    经 Store 内部有界读取完整文件后复用 AST/Spoon。定义与使用位置按精度分类，名称匹配不等于目标解析。
    仓库模式分析不返回引用原文或登记 observed，需显式读取对应行后才能引用。
 4. **输出验证**：模型返回候选契约；宿主使用同一运行 Store 检查结构、任务身份、初始或实际观察引用、源码行范围和原文。引用存在不意味着结论成立。
+   宿主审核记录可用 `repository_excluded_paths` 排除精确文件或目录子树；该限制在搜索遍历、
+   直接读取和分析读取前执行并绑定分页身份，不进入 UnifiedTask。当前用于 CloudFoundry 案例的
+   准备材料、构建产物及依赖环境隔离，已有案例默认范围不变。
 5. **保存结果**：CLI 写简单 JSON；完整审计入口额外保存身份、原始响应、轨迹、用量和失败状态。
 
 ## 文件地图
@@ -211,6 +214,9 @@ experiments/dependency-witness/
 获得答案；人工见证不是 Agent 自动生成结果。历史分析试验位于 `docs/step5a/poc/`
 和 `docs/step5b/poc/`，只在相应复现流程中使用，不属于生产工具运行链路。
 研究协议、范围与结果从 [文档目录](README.md) 查阅。
+
+研究 live 的精确案例白名单由 `controller.REVIEWED_LIVE_CASES` 统一维护，CLI 复用。
+Python/Java 各走原审核 Adapter，不能以手工 task 或任意目录绕过准入；接通 Java 不改变五步推断协议。
 
 ## 验证能说明什么
 

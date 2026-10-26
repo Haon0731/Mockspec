@@ -47,6 +47,23 @@ MANIFEST_VERSION = "scenario-inference-manifest/v0.1"
 POLICY_VERSION = "staged-scenario-inference/v0.2"
 PROMPT_VERSION = "staged-scenario-inference-prompts/v0.2"
 CITATION_MODE = "source_locator_host_materialized_quote/v1"
+FLASK_ABORT_CASE_ID = "flask_308"
+CLOUDFOUNDRY_APPLICATION_URI_CASE_ID = (
+    "de.codecentric.boot.admin.client.registration."
+    "CloudFoundryApplicationFactoryTest#should_use_application_uri@d0085edf"
+)
+REVIEWED_LIVE_CASES: dict[str, Literal["python", "java"]] = {
+    FLASK_ABORT_CASE_ID: "python",
+    CLOUDFOUNDRY_APPLICATION_URI_CASE_ID: "java",
+}
+
+
+def reviewed_live_case_language(case_id: str | None) -> Literal["python", "java"]:
+    """Resolve one explicitly reviewed live case without opening generic input paths."""
+    try:
+        return REVIEWED_LIVE_CASES[case_id or ""]
+    except KeyError:
+        raise ValueError("live inference requires an explicitly reviewed case") from None
 
 
 class StageModel(BaseModel):
@@ -1367,6 +1384,7 @@ async def execute_staged_run(
     early_unresolved: list[str] = []
     current_stage = "INPUT"
     adapter_reviewed = False
+    reviewed_adapter_language: Literal["python", "java"] | None = None
     repository = None
     source_store: SourceStore | None = None
     model_call_limit = -1
@@ -1454,10 +1472,17 @@ async def execute_staged_run(
         ledger = UsageLedger(budget)
         current_stage = "INPUT"
         if config.run_mode == "live_inference":
-            from mock_spec.adapters.python import load_task, load_task_with_repository
-
             try:
                 assert reviewed_snapshot is not None
+                reviewed_adapter_language = reviewed_live_case_language(requested_case_id)
+                if reviewed_adapter_language == "python":
+                    from mock_spec.adapters.python import (
+                        load_task, load_task_with_repository,
+                    )
+                else:
+                    from mock_spec.adapters.java import (
+                        load_task, load_task_with_repository,
+                    )
                 if config.repository_read:
                     reviewed_task, repository = load_task_with_repository(
                         reviewed_snapshot, case_id=requested_case_id or ""
@@ -2062,7 +2087,7 @@ async def execute_staged_run(
             "synthetic_fixture"
             if valid_config is None or valid_config.run_mode == "synthetic_replay"
             else (
-                "reviewed_python_adapter" if adapter_reviewed
+                f"reviewed_{reviewed_adapter_language}_adapter" if adapter_reviewed
                 else "unvalidated_review_request"
             )
         ),

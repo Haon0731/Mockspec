@@ -88,7 +88,7 @@ Python 对照文件：
 
 ## 可证明范围
 
-当前验证的是两个已审查、固定身份的输入及少量允许源码，不是全量数据集的自动脱敏。
+本节记录时验证的是两个已审查、固定身份的输入及少量允许源码，不是全量数据集的自动脱敏。
 结构检查不证明任意文本没有泄漏；所有新案例仍须做源内容与协议审查。
 单测验证私有控制字段不会进入序列化结果、输入变化或 masking 未核验时拒绝加载。
 真实集成测试还比较所读取文件的内容、大小与 mtime，确认加载前后不变。
@@ -125,3 +125,29 @@ Adapter 仍先核对既有控制身份、选定文件及 masking，并确认逻�
 仅返回给模型的完整匹配行进入观察记录；路径结果、内部扫描文本及输出裁掉的行不能引用。
 单次资源上限、实际消耗、完整性及续页信息随回执留证。验证使用合成冻结树和脚本模型，
 不读取旧项目全量数据、不执行目标测试，也不将工程回放当作真实自主探索成功。
+
+## #17：CloudFoundry 新案例准入（2026-10-26）
+
+用户在原两例不满足适用性条件后明确要求寻找合格审核案例。本次新增一个准入项，
+原两项身份与范围不变。完整筛选、独立评阅与验证见
+[案例准入记录](../out/staged-inference/issue17-case-search-20261026/report.md)。
+
+- Dataset：`java-bechmark-strong`；registry：`.omx/developer-realistic-registry-max`。
+- Case ID：`de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri@d0085edf`。
+- Snapshot：`ff6812732f1e2779e09005d721f464cebed6b587925130e6a2555a154097214a`，状态 frozen，协议 `developer_realistic_workspace_v1`。
+- Mask SHA256：`54a6abf96890af556281a72ec3546e21e2eea4efd80f89cf4e891ed32b5dc0f4`。
+- Runtime：openjdk-javac 11.0.31；只核对已有控制身份，不重新扫描依赖。
+
+初始输入为完整 62 行 `CloudFoundryApplicationFactoryTest.java` 与完整 51 行
+`CloudFoundryApplicationFactory.java`；Java 双区域均为空，普通 setup、调用、断言保留，
+区域外无残留 mock 行为。测试实例化该类、调用继承方法，选择完整目标类并非人为裁剪上下文。
+不预置父类源码或接口答案；父类作为工具可发现的普通产品源码。
+
+本案例的宿主审核字段 `repository_excluded_paths` 明确排除 `out`、`libs`、
+`baseline_info.txt`、`info.yml`、`metadata.yml`，覆盖 repo 下除 src 外全部顶层对象。
+这些排除材料未读取。余下 17 个产品 Java 源文件（54,164 bytes）及 1 个 masked test
+已做独立内容与选定文件身份核对；未发现答案材料、残留 mock、宿主凭据或伪造空实现。
+这是有限案例审核，不是以重新计算哈希自动批准输入，也不是全量脱敏证明。
+
+搜索、直接读取、分析和分页均执行相同排除约束。宿主评阅问题、答案位置、排除配置和
+准备侧工具观察不进入模型初始输入或真实运行 Store。准入及适用性通过不等于真实 M2 通过。

@@ -9,7 +9,9 @@ import os
 from pathlib import Path
 import sys
 
-from controller import StagedRunConfig, execute_staged_run
+from controller import (
+    StagedRunConfig, execute_staged_run, reviewed_live_case_language,
+)
 from agents.models.interface import Model
 from mock_spec.validation import decode_json
 from scripted import FixedScriptModel, query_script, task_for_replay_case
@@ -79,8 +81,7 @@ def main(argv: list[str] | None = None) -> int:
                 raise ValueError("live inference does not accept --task-json")
             if args.snapshot is None or not args.case_id:
                 raise ValueError("live inference requires --snapshot and --case-id")
-            if args.case_id != "flask_308":
-                raise ValueError("live inference is limited to the reviewed Python case flask_308")
+            reviewed_live_case_language(args.case_id)
             if not (args.model or "").strip() or not os.environ.get("OPENAI_API_KEY", "").strip():
                 raise ValueError("live inference requires model and OPENAI_API_KEY")
             from agents.models.openai_responses import OpenAIResponsesModel

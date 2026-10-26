@@ -89,6 +89,13 @@ def _load_approved_with_repository(
     snapshot_root: Path, review: dict
 ) -> tuple[UnifiedTask, ReviewedRepository]:
     """Internal loader returning a task plus its non-serializable source capability."""
+    excluded_paths = review.get("repository_excluded_paths", [])
+    if not isinstance(excluded_paths, list) or any(
+        type(value) is not str for value in excluded_paths
+    ):
+        raise InputValidationError(
+            "excluded repository paths must be a list of strings"
+        )
     root = Path(snapshot_root).absolute()
     if root.name != review["snapshot_id"] or root.parent.name != review["dataset"]:
         raise InputValidationError("expected the exact reviewed frozen snapshot root")
@@ -190,6 +197,7 @@ def _load_approved_with_repository(
             files_by_logical_path=repository_files,
             task=task,
             discovery_root="tree/repo",
+            excluded_paths=tuple(excluded_paths),
         )
     finally:
         os.close(repository_root_fd)

@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from mock_spec.adapters import java, python
-from mock_spec.adapters._frozen import _load_approved
+from mock_spec.adapters._frozen import _load_approved, _load_approved_with_repository
 from mock_spec.validation import InputValidationError
 
 
@@ -201,6 +201,44 @@ def test_internal_approved_loader_accepts_reviewed_frozen_inputs(
     assert task.case_id == review["case_id"]
     assert task.input_policy.visibility == "reviewed_frozen_sources"
     assert task.masked_test.text == (root / "tree" / review["target_relpath"]).read_text()
+
+
+def test_adapter_passes_reviewed_repository_exclusions(tmp_path: Path) -> None:
+    root, review = _build_snapshot(tmp_path, "python")
+    review["repository_excluded_paths"] = ["out", "metadata.yml"]
+    (root / "tree/repo/out").mkdir()
+    (root / "tree/repo/out/build.txt").write_text("hidden\n", encoding="utf-8")
+    (root / "tree/repo/metadata.yml").write_text("private\n", encoding="utf-8")
+
+    task, repository = _load_approved_with_repository(root, review)
+    try:
+        assert task.case_id == review["case_id"]
+        assert repository.search(path_pattern="out/**")["error_code"] == "access_denied"
+        assert repository.search(path_pattern="metadata.yml")["error_code"] == "access_denied"
+    finally:
+        repository.close()
+
+
+@pytest.mark.parametrize(
+    "excluded_paths",
+    [["../outside"], [""], "out", [1]],
+)
+def test_adapter_rejects_invalid_repository_exclusions(
+    tmp_path: Path, excluded_paths: object
+) -> None:
+    root, review = _build_snapshot(tmp_path, "python")
+    review["repository_excluded_paths"] = excluded_paths
+
+    with pytest.raises(InputValidationError, match="excluded repository paths|relative path"):
+        _load_approved_with_repository(root, review)
+
+
+def test_adapter_rejects_exclusion_of_initial_reviewed_source(tmp_path: Path) -> None:
+    root, review = _build_snapshot(tmp_path, "python")
+    review["repository_excluded_paths"] = ["src"]
+
+    with pytest.raises(InputValidationError, match="reviewed source is excluded"):
+        _load_approved_with_repository(root, review)
 
 
 @pytest.mark.parametrize(

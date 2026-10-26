@@ -23,7 +23,7 @@ from mock_spec.source_analysis import SourceAnalysis
 from mock_spec.scenario import ScenarioContract
 from mock_spec.schemas import UnifiedTask
 from test_scenario import contract_data
-from test_real_data import REVIEWS, load_java, load_python, snapshot
+from test_real_data import EXAMPLE_REVIEWS, load_java, load_python, snapshot
 from test_schemas import valid_task_data
 
 
@@ -228,7 +228,7 @@ def test_sdk_runner_can_use_all_three_tools(monkeypatch) -> None:
 
 
 @pytest.mark.real_data
-@pytest.mark.parametrize("review", REVIEWS, ids=["java", "python"])
+@pytest.mark.parametrize("review", EXAMPLE_REVIEWS, ids=lambda review: review["case_id"])
 def test_reviewed_inputs_use_source_tool_through_sdk_runner(review, monkeypatch) -> None:
     loader = load_java if review["language"] == "java" else load_python
     task = loader(snapshot(review), case_id=review["case_id"])

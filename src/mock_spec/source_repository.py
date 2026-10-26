@@ -267,6 +267,7 @@ class ReviewedRepository:
         files_by_logical_path: Mapping[str, tuple[str, str]],
         task: UnifiedTask,
         discovery_root: str | None = None,
+        excluded_paths: tuple[str, ...] = (),
         search_limits: SearchLimits | None = None,
     ) -> None:
         self._root_fd: int | None = None
@@ -281,6 +282,18 @@ class ReviewedRepository:
         )
         if self._discovery_root is not None and _denied(PurePosixPath(self._discovery_root)):
             raise InputValidationError("discovery root is denied by repository policy")
+        if not isinstance(excluded_paths, tuple) or any(
+            type(value) is not str for value in excluded_paths
+        ):
+            raise InputValidationError("excluded repository paths must be a tuple of strings")
+        self._excluded_paths = tuple(sorted({
+            _relative_path(value).as_posix() for value in excluded_paths
+        }))
+        for logical_path in self._files:
+            if self._review_excludes(PurePosixPath(logical_path)):
+                raise InputValidationError(
+                    "reviewed source is excluded from repository binding"
+                )
         self._search_limits = search_limits or SearchLimits()
         self._scanned: dict[str, _DiscoveredFile] = {}
         self._discovered: dict[str, _DiscoveredFile] = {}
@@ -296,6 +309,7 @@ class ReviewedRepository:
         identity = json.dumps(
             {"snapshot_id": snapshot_id, "task": self._task_data,
              "discovery_root": self._discovery_root, "policy": _SEARCH_POLICY_ID,
+             "excluded_paths": self._excluded_paths,
              "limits": asdict(self._search_limits)},
             sort_keys=True, separators=(",", ":"), ensure_ascii=False,
         ).encode("utf-8")
@@ -381,7 +395,23 @@ class ReviewedRepository:
         identity = f"{self._snapshot_id}\0{logical_path}".encode("utf-8")
         return "repository:" + hashlib.sha256(identity).hexdigest()[:24]
 
+    def _review_excludes(self, path: PurePosixPath) -> bool:
+        return any(
+            path == PurePosixPath(excluded)
+            or PurePosixPath(excluded) in path.parents
+            for excluded in self._excluded_paths
+        )
+
     def _resolve_locator(self, locator: str) -> str:
+        if type(locator) is str:
+            try:
+                locator_path = _relative_path(locator)
+            except InputValidationError:
+                locator_path = None
+            if locator_path is not None and self._review_excludes(locator_path):
+                raise InputValidationError(
+                    "logical path is excluded from the reviewed repository binding"
+                )
         if locator in self._files or locator in self._discovered:
             return locator
         if locator.startswith("repository:"):
@@ -611,7 +641,7 @@ class ReviewedRepository:
                             limit_reason = "timeout"
                             break
                         # Apply policy before any type/stat operation.
-                        if _denied(relative):
+                        if _denied(relative) or self._review_excludes(relative):
                             excluded += 1
                             limit_reason = limit_reason or "access_denied"
                             continue
@@ -689,7 +719,7 @@ class ReviewedRepository:
                 pattern_path = _relative_path(path_pattern)
             except InputValidationError:
                 return self._invalid_search("path_violation", "Invalid relative path pattern.")
-            if _denied(pattern_path):
+            if _denied(pattern_path) or self._review_excludes(pattern_path):
                 return self._invalid_search("access_denied", "Path is denied by repository policy.")
         if text is not None and (type(text) is not str or not text):
             return self._invalid_search("invalid_request", "text must be non-empty literal text.")

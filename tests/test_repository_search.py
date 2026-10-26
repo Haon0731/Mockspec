@@ -15,7 +15,8 @@ from test_adapters import _build_snapshot
 
 
 def _repository(
-    tmp_path: Path, *, limits: SearchLimits | None = None
+    tmp_path: Path, *, limits: SearchLimits | None = None,
+    excluded_paths: tuple[str, ...] = (),
 ) -> tuple[ReviewedRepository, Path, UnifiedTask]:
     root, review = _build_snapshot(tmp_path, "python")
     task = UnifiedTask.from_dict(_load_approved(root, review).to_dict())
@@ -31,11 +32,78 @@ def _repository(
             files_by_logical_path=files,
             task=task,
             discovery_root="tree/repo",
+            excluded_paths=excluded_paths,
             search_limits=limits,
         )
     finally:
         os.close(root_fd)
     return repository, root, task
+
+
+def test_reviewed_exclusions_block_files_trees_and_cursor_discovery(
+    tmp_path: Path,
+) -> None:
+    repository, root, _ = _repository(
+        tmp_path,
+        limits=SearchLimits(max_matches=1),
+        excluded_paths=("out", "metadata.yml"),
+    )
+    (root / "tree/repo/out").mkdir()
+    (root / "tree/repo/out/build.txt").write_text("needle hidden\n", encoding="utf-8")
+    (root / "tree/repo/metadata.yml").write_text("needle private\n", encoding="utf-8")
+    (root / "tree/repo/nearby.txt").write_text(
+        "needle one\nneedle two\n", encoding="utf-8"
+    )
+    try:
+        direct_tree = repository.search(path_pattern="out/**", text="needle")
+        direct_file = repository.search(path_pattern="metadata.yml", text="needle")
+        assert direct_tree["error_code"] == "access_denied"
+        assert direct_file["error_code"] == "access_denied"
+
+        first = repository.search(text="needle", run_id="excluded-scope")
+        assert [match["logical_path"] for match in first["matches"]] == ["nearby.txt"]
+        assert first["usage"]["excluded"] >= 2
+        assert first["next_cursor"] is not None
+        second = repository.search(
+            text="needle", cursor=first["next_cursor"], run_id="excluded-scope"
+        )
+        assert [match["logical_path"] for match in second["matches"]] == ["nearby.txt"]
+        assert all(
+            match["logical_path"] not in {"out/build.txt", "metadata.yml"}
+            for match in [*first["matches"], *second["matches"]]
+        )
+
+        source = repository.read("nearby.txt", 1, 1)
+        assert source.text == "needle one"
+        with pytest.raises(InputValidationError, match="excluded"):
+            repository.read("out/build.txt", 1, 1)
+        with pytest.raises(InputValidationError, match="excluded"):
+            repository.read_for_analysis("metadata.yml")
+    finally:
+        repository.close()
+
+
+def test_default_review_scope_still_discovers_ordinary_out_directory(tmp_path: Path) -> None:
+    repository, root, _ = _repository(tmp_path)
+    (root / "tree/repo/out").mkdir()
+    (root / "tree/repo/out/source.txt").write_text("default visible\n", encoding="utf-8")
+    try:
+        result = repository.search(path_pattern="out/*.txt", text="default visible")
+        assert result["matches"][0]["logical_path"] == "out/source.txt"
+    finally:
+        repository.close()
+
+
+def test_reviewed_exclusions_are_part_of_repository_identity(tmp_path: Path) -> None:
+    default, _, _ = _repository(tmp_path / "default")
+    restricted, _, _ = _repository(
+        tmp_path / "restricted", excluded_paths=("out",)
+    )
+    try:
+        assert default._repository_identity != restricted._repository_identity
+    finally:
+        default.close()
+        restricted.close()
 
 
 def test_search_discovers_path_and_literal_line_then_reads_it(tmp_path: Path) -> None:

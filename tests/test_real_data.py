@@ -18,6 +18,12 @@ from mock_spec.validation import (
 OLD_ROOT = Path(os.environ.get("MOCKSPEC_STUB_TESTER", "/home/haon/projects/Stub-Tester"))
 CATALOG = Path(__file__).parents[1] / "src/mock_spec/reviewed_inputs.json"
 REVIEWS = json.loads(CATALOG.read_text())
+# Scripted scenario fixtures describe specific cases, not every case of a language.
+EXAMPLE_CASE_IDS = {
+    json.loads(path.read_text())["case_id"]
+    for path in (Path(__file__).parents[1] / "examples/scenarios").glob("*.synthetic.json")
+}
+EXAMPLE_REVIEWS = [review for review in REVIEWS if review["case_id"] in EXAMPLE_CASE_IDS]
 
 
 def snapshot(review):
@@ -37,7 +43,7 @@ def fingerprints(paths):
 
 
 @pytest.mark.real_data
-@pytest.mark.parametrize("review", REVIEWS, ids=["java", "python"])
+@pytest.mark.parametrize("review", REVIEWS, ids=lambda review: review["case_id"])
 def test_real_frozen_case_loads_without_changing_sources(review):
     root = snapshot(review)
     selected = {root / item["path"] for item in review["controls"].values()}

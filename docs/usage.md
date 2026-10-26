@@ -46,7 +46,7 @@ mypy 按 Python 3.10 的声明下限检查生产包，目前仍有既有类型�
 ## 数据接入
 
 Adapter 接受 **snapshot 目录和原 Case ID**，不接受原始测试、gold 目录、评分目录
-或任意源码文件。当前只批准 `src/mock_spec/reviewed_inputs.json` 中的两个案例。
+或任意源码文件。当前只批准 `src/mock_spec/reviewed_inputs.json` 中的三个案例。
 未审核案例报错；扩展案例需要人工/受信任代码审查后更新这份宿主侧白名单，
 不能由后续 Agent 填写一个 `verified=true` 来取得授权。
 
@@ -352,7 +352,7 @@ live_inference 分支见下方 M1-5 说明。两者均不生成 Mock、不执行
 [输入审查记录](input-audit.md)。
 
 本项目保留选定输入的 masking 与上下文，不声称裁剪后的 Task 与旧完整 workspace
-在信息量上完全等价；没有改变旧实验数据、协议或评分。当前批准两个案例，
+在信息量上完全等价；没有改变旧实验数据、协议或评分。当前批准三个案例，
 不意味着全量 Java 59 / Python 106 已通过接入审查。
 
 ## M1-5 集成验收
@@ -372,7 +372,8 @@ PYTHONPATH=src .venv/bin/python experiments/staged-inference/acceptance.py \
 不能把这份固定清单视为整个 M1 或质量验收。
 
 真实检查仍使用同一个 `run.py`，显式选择 `--mode live_inference --variant C`，
-提供 `--snapshot`（已审核冻结 Python snapshot 根）、`--case-id flask_308` 与新输出目录。
+提供 `--snapshot`（已审核冻结 snapshot 根）、精确 `--case-id` 与新输出目录。
+研究入口仅接受 `flask_308` 和下述独立审核的 CloudFoundry Java 案例。
 模型来自 `--model` 或 `MOCKSPEC_MODEL`，凭据来自 `OPENAI_API_KEY`；不在日志中保存凭据。
 本地配置可保存在 Git 忽略的 `.env.local` 中（权限 `0600`），运行前在同一 shell 加载：
 
@@ -384,7 +385,7 @@ source .env.local
 （例如以 `/v1` 结尾，不包含 `/chat/completions`）；服务与模型必须支持当前入口的
 Responses API。仅迁移配置不代表接口已验证，也不替代下面的价格和费用预算参数。
 本地配置使用 `OPENAI_AGENTS_DISABLE_TRACING=1` 关闭 SDK tracing。
-该分支拒绝 `--task-json`，由现有 Python Adapter 核验输入，不能通过设置模式取得准入。
+该分支拒绝 `--task-json`，由对应的现有 Python/Java Adapter 核验输入，不能通过设置模式取得准入。
 运行前明确传入 `--max-model-calls`、`--max-output-tokens`、`--max-total-tokens`、
 `--timeout-seconds` 和 `--parsing-timeout-seconds`；实际配置及用量保存在 manifest。
 运行前必须同时提供 `--input-cost-per-million`、`--output-cost-per-million`，
@@ -421,9 +422,15 @@ HTTP 400，已修复；逐调用诊断位于 `inference_record.json.model_calls`
 历史运行按对应提交复现，不能把旧失败送入新协议后改称成功。
 
 [M2-CITATION-1 工程与门禁记录](../out/staged-inference/issue17-citation-protocol-20261026/report.md)
-保留协议验证及现有两例的独立适用性核对。本次限定审查未建立合格探索验收案例，
-G2 标为 `blocked_no_suitable_reviewed_case`，因此没有发起新的真实请求。
-研究 live 入口仍只接受现有审核的 `flask_308`，未因案例缺口放宽准入。
+保留协议验证及当时两例的独立适用性核对；当时未建立合格案例，未发起新的真实请求。
+随后用户要求寻找新案例，[案例寻找与准入记录](../out/staged-inference/issue17-case-search-20261026/report.md)
+批准 CloudFoundry 案例，G2 已通过；G3 配置/预算预检和真实 M2 仍待执行。
+
+该案例精确 ID 为
+`de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri@d0085edf`，
+冻结根为 `/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/java-bechmark-strong/ff6812732f1e2779e09005d721f464cebed6b587925130e6a2555a154097214a`。
+运行仍使用上方同一入口及预算参数，并启用 `--repository-read`。输入完整保留 test 与目标类；
+宿主按审核记录排除准备/构建/依赖路径，不向模型注入评阅结论或预先观察。
 
 ## 冻结项目读取与搜索（#13 / #14）
 

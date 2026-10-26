@@ -11,7 +11,7 @@ from openai.types.responses import ResponseOutputMessage, ResponseOutputText
 
 from mock_spec import inference
 from mock_spec.scenario import validate_contract
-from test_real_data import REVIEWS, load_java, load_python, snapshot
+from test_real_data import EXAMPLE_REVIEWS, load_java, load_python, snapshot
 
 
 class SyntheticModel(Model):
@@ -40,7 +40,7 @@ class SyntheticModel(Model):
 
 
 @pytest.mark.real_data
-@pytest.mark.parametrize("review", REVIEWS, ids=["java", "python"])
+@pytest.mark.parametrize("review", EXAMPLE_REVIEWS, ids=lambda review: review["case_id"])
 def test_real_inputs_through_sdk_runner_with_synthetic_model(review, monkeypatch):
     loader = load_java if review["language"] == "java" else load_python
     task = loader(snapshot(review), case_id=review["case_id"])

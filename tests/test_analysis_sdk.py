@@ -12,11 +12,11 @@ from openai.types.responses import ResponseFunctionToolCall
 from mock_spec import inference_v02
 from mock_spec.scenario import validate_contract
 from test_inference_v02 import ScriptedModel, _install_model, _message
-from test_real_data import REVIEWS, load_java, load_python, snapshot
+from test_real_data import EXAMPLE_REVIEWS, load_java, load_python, snapshot
 
 
 @pytest.mark.real_data
-@pytest.mark.parametrize("review", REVIEWS, ids=["java", "python"])
+@pytest.mark.parametrize("review", EXAMPLE_REVIEWS, ids=lambda review: review["case_id"])
 def test_real_analysis_tools_through_sdk_to_validated_contract(review, monkeypatch):
     loader = load_java if review["language"] == "java" else load_python
     task = loader(snapshot(review), case_id=review["case_id"])
