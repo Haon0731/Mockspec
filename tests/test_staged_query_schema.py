@@ -30,6 +30,7 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
         "query_attempt": None,
         "previous_receipt_assessment": None,
         "impact": "The visible task is sufficient.",
+        "stop_explanation": None,
     }
 
     def untyped_union(value):

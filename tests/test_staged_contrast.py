@@ -50,6 +50,9 @@ def test_b_and_c_share_input_and_only_c_runs_static_contrast(tmp_path) -> None:
         ),
         "revision_requested": False,
         "revision_reason": None,
+        "support": "evidence",
+        "assumption_reason": None,
+        "semantic_role": "dependency_contract",
     }
     assert [stage["stage"] for stage in b["record"]["stages"]] == [
         "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER",
@@ -143,7 +146,8 @@ def test_revision_budget_exhaustion_does_not_publish_pre_revision_contract(tmp_p
 def test_budget_before_contrast_records_unavailable_without_extra_request(tmp_path) -> None:
     result = _run(tmp_path, "cache_miss", max_model_calls=3)
 
-    assert result["record"]["result_status"] == "SELECTED"
+    assert result["record"]["result_status"] == "INCONCLUSIVE"
+    assert result["contract"] is None
     assert result["record"]["stop_reason"] == "budget_exhausted"
     assert result["record"]["error_stage"] == "CONTRAST"
     assert result["record"]["degeneracy_contrast"]["status"] == "unavailable"

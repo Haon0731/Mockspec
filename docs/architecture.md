@@ -143,7 +143,7 @@ V0.1 无工具，V0.2 有三个只读工具；两版都使用正式 ScenarioCont
 、[M1-2 / #8](https://github.com/Haon0731/Mockspec/issues/8)
 、[M1-3 / #9](https://github.com/Haon0731/Mockspec/issues/9)
 及 [M1-4 / #10](https://github.com/Haon0731/Mockspec/issues/10) 的 B/C 变体离线回放：合成 Python `UnifiedTask` → 同一研究控制器的
-EXTRACT → QUERY（零至六次定向查询）→ CONSTRUCT → CONTRAST（仅 C）→
+EXTRACT → QUERY（片段模式最多六次；仓库模式按证据与资源终止）→ CONSTRUCT → CONTRAST（仅 C）→
 REVISE（可选一次）→ DELIVER → FORMAT_REPAIR（可选一次）→ 契约、研究记录与运行清单。
 固定脚本模型仍经过 Agents SDK Runner；控制器复用生产 `UsageLedger`、
 `validate_contract`（含 `SourceStore` 原文校验）及运行身份采集组件。
@@ -158,6 +158,12 @@ QueryExecutor 和各阶段契约检查共用本次 Store，观察记录随研究
 模型经 QUERY 结构化消息请求工具，SDK 阶段 Agent 不注册可绕过计数的工具。
 后续 QUERY 评估上一回执，CONSTRUCT/DELIVER 接收累计回执；未完成判断明确留证。
 阶段切换和 SDK 对象重建不重置账本、模型请求数、查询数或绝对截止时间。
+仓库模式的 QUERY 正常结束须提交 `stop_explanation`：停止理由、可校验原文引用、
+剩余未知及影响。控制器只验证协议和引用，不证明语义充分；有阻塞未知不能发布 SELECTED。
+`query.py` 比较规范化查询、位置/页游标和返回证据，持续无进展时保护终止；阈值按
+连续无进展计算，不是总探索次数。生产 SDK 入口同样记录并检测无进展循环。
+`termination` 区分 agent / controller / caller，超时、预算和重复终止均不发布最终契约。
+取消先保存此前请求、响应、观察与用量，再向调用者传播 `CancelledError`。
 
 宿主在输入加载/校验前登记运行身份和独立输出目录，校验后保存确定性输入快照；
 请求前检查显式配置与整次运行的预算。输入拒绝保留请求身份，有效任务身份与哈希为 null。

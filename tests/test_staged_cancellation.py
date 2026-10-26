@@ -96,7 +96,12 @@ def test_entry_cancellation_reaps_child_and_publishes_incomplete_assessment(
         ))
         await asyncio.wait_for(spawned.wait(), timeout=2)
         task.cancel()
-        return await task
+        with pytest.raises(asyncio.CancelledError):
+            await task
+        return {
+            "record": json.loads((output_dir / "inference_record.json").read_text()),
+            "manifest": json.loads((output_dir / "run_manifest.json").read_text()),
+        }
 
     result = asyncio.run(cancel_active_analysis())
 
@@ -110,7 +115,7 @@ def test_entry_cancellation_reaps_child_and_publishes_incomplete_assessment(
     assert receipt["assessment"] is None
     assert receipt["assessment_status"] == "incomplete"
     assert result["record"]["result_status"] == "INCONCLUSIVE"
-    assert result["manifest"]["stop_reason"] == "budget_exhausted"
+    assert result["manifest"]["stop_reason"] == "cancelled"
     assert result["manifest"]["error_stage"] == "QUERY"
     assert result["manifest"]["usage"]["requests_started"] == 2
     assert result["manifest"]["usage"]["requests_completed"] == 2

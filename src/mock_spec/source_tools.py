@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import asyncio
 from contextvars import ContextVar
+import hashlib
+import json
 from time import perf_counter
 
 from agents import FunctionTool, ModelBehaviorError, function_tool
@@ -20,6 +22,16 @@ from .source_analysis import (
 )
 from .schemas import UnifiedTask
 from .validation import SourceStore, decode_json
+
+
+def _fingerprint(value: object) -> str:
+    """Return a stable, content-only fingerprint for repetition accounting."""
+
+    encoded = json.dumps(
+        value, ensure_ascii=False, separators=(",", ":"), sort_keys=True,
+        default=repr,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def build_source_tools(
@@ -39,10 +51,14 @@ def build_source_tools(
     )
     trace = [] if tool_trace is None else tool_trace
     tool_call_count = 0
+    seen_queries: set[str] = set()
+    seen_results: set[str] = set()
+    seen_observations: set[str] = set()
+    consecutive_no_progress = 0
     response_id: ContextVar[str | None] = ContextVar("source_response_id", default=None)
 
     async def invoke_tool(name: str, arguments: str, context, call) -> dict:
-        nonlocal tool_call_count
+        nonlocal tool_call_count, consecutive_no_progress
         sequence = tool_call_count + 1
         tool_call_count = sequence
         started = perf_counter()
@@ -50,6 +66,7 @@ def build_source_tools(
             parsed_arguments = decode_json(arguments)
         except (ValueError, TypeError):
             parsed_arguments = None
+        normalized_arguments: object = parsed_arguments
         correlation = getattr(context, "tool_call_id", None) or f"tool-{sequence}"
         record = {
             "sequence": sequence,
@@ -78,7 +95,7 @@ def build_source_tools(
                           "diagnostics": ["Tool arguments must match the schema and use unique JSON keys."]}
             elif name == "inspect_source":
                 try:
-                    normalize_source_arguments(parsed_arguments)
+                    normalized_arguments = normalize_source_arguments(parsed_arguments)
                 except (TypeError, ValueError):
                     result = {
                         "status": "error",
@@ -91,7 +108,7 @@ def build_source_tools(
                     result = await call()
             else:
                 try:
-                    normalize_analysis_arguments(parsed_arguments)
+                    normalized_arguments = normalize_analysis_arguments(parsed_arguments)
                 except (TypeError, ValueError):
                     result = {"status": "error", "error_code": "invalid_arguments",
                               "diagnostics": ["Analysis requires source_id and an optional symbol."]}
@@ -122,12 +139,72 @@ def build_source_tools(
                 ],
             }
         finally:
-            record["observations"] = [
+            observations = [
                 item for item in analysis.store.observations()[observation_start:]
                 if item["response_id"] == correlation
             ]
+            record["observations"] = observations
             response_id.reset(token)
         status = result.get("status", "error") if isinstance(result, dict) else "error"
+        if analysis.store.repository is not None:
+            stable_result = (
+                {key: value for key, value in result.items() if key != "usage"}
+                if isinstance(result, dict) else result
+            )
+            result_digest = _fingerprint(stable_result)
+            observation_digests = {
+                _fingerprint({
+                    key: value for key, value in observation.items()
+                    if key != "response_id"
+                })
+                for observation in observations
+            }
+            result_is_new = result_digest not in seen_results
+            new_observations = observation_digests - seen_observations
+            seen_results.add(result_digest)
+            seen_observations.update(observation_digests)
+            query_digest = _fingerprint({
+                "tool": name,
+                "arguments": normalized_arguments,
+            })
+            query_is_new = query_digest not in seen_queries
+            seen_queries.add(query_digest)
+            no_progress = (
+                not query_is_new and not result_is_new and not new_observations
+            )
+            if no_progress:
+                consecutive_no_progress += 1
+            else:
+                consecutive_no_progress = 0
+            record["repetition_check"] = {
+                "policy": "normalized_query_result_and_observation_delta",
+                "query_digest": query_digest,
+                "result_digest": result_digest,
+                "new_query": query_is_new,
+                "new_result": result_is_new,
+                "new_observations": len(new_observations),
+                "consecutive_no_progress": consecutive_no_progress,
+                "threshold": budget.max_repeated_no_progress,
+                "triggered": (
+                    consecutive_no_progress >= budget.max_repeated_no_progress
+                ),
+                "termination_initiator": (
+                    "controller"
+                    if consecutive_no_progress >= budget.max_repeated_no_progress
+                    else None
+                ),
+            }
+            if consecutive_no_progress >= budget.max_repeated_no_progress:
+                record.update(
+                    status="repeated_exploration",
+                    result=result,
+                    duration_seconds=perf_counter() - started,
+                    termination_initiator="controller",
+                )
+                raise InferenceError(
+                    "scenario inference repeated exploration without progress",
+                    "repeated_exploration",
+                )
         record.update(
             status=status,
             result=result,

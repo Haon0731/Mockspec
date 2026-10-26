@@ -142,6 +142,117 @@ def test_repository_mode_reads_beyond_fragment_and_count_limits(
     assert repository.snapshot_id not in json.dumps(task.to_dict())
 
 
+@pytest.mark.parametrize(
+    "lines",
+    [
+        [3, 3, 3],
+        [3, 4, 3, 4],
+    ],
+    ids=["same-query", "alternating-queries"],
+)
+def test_repository_mode_stops_repeated_exploration_without_progress(
+    tmp_path, monkeypatch, lines
+) -> None:
+    task, _repository, store, logical_path = _repository_task(tmp_path)
+    budget = inference_v02.InferenceBudget(max_repeated_no_progress=2)
+    trace = []
+    model = ScriptedModel(*[
+        _tool_call(
+            f"read-{sequence}", source_id=logical_path,
+            start_line=line, end_line=line,
+        )
+        for sequence, line in enumerate(lines, start=1)
+    ])
+    _install_repository_model(
+        monkeypatch, task, store, model, budget=budget, trace=trace
+    )
+
+    with pytest.raises(InferenceError) as caught:
+        asyncio.run(inference_v02.infer_scenario(
+            task,
+            model="offline-model",
+            budget=budget,
+            tool_trace=trace,
+            source_store=store,
+        ))
+
+    assert caught.value.category == "repeated_exploration"
+    assert model.calls == len(lines)
+    assert trace[-1]["status"] == "repeated_exploration"
+    check = trace[-1]["repetition_check"]
+    assert check["policy"] == "normalized_query_result_and_observation_delta"
+    assert check["new_result"] is False
+    assert check["new_observations"] == 0
+    assert check["consecutive_no_progress"] == 2
+    assert check["threshold"] == 2
+    assert check["triggered"] is True
+    assert check["termination_initiator"] == "controller"
+    assert trace[-1]["termination_initiator"] == "controller"
+
+
+def test_repository_mode_allows_one_review_before_new_evidence(
+    tmp_path, monkeypatch
+) -> None:
+    task, repository, store, logical_path = _repository_task(tmp_path)
+    budget = inference_v02.InferenceBudget(max_repeated_no_progress=2)
+    trace = []
+    model = ScriptedModel(
+        _tool_call("read", source_id=logical_path, start_line=3, end_line=3),
+        _tool_call("review", source_id=logical_path, start_line=3, end_line=3),
+        _tool_call("advance", source_id=logical_path, start_line=11, end_line=11),
+        _message(_dynamic_contract(task, repository, logical_path)),
+    )
+    _install_repository_model(
+        monkeypatch, task, store, model, budget=budget, trace=trace
+    )
+
+    contract = asyncio.run(inference_v02.infer_scenario(
+        task,
+        model="offline-model",
+        budget=budget,
+        tool_trace=trace,
+        source_store=store,
+    ))
+
+    assert contract.evidence[1].quote == "DYNAMIC_EVIDENCE = dependency_contract()"
+    assert trace[1]["repetition_check"]["consecutive_no_progress"] == 1
+    assert trace[1]["repetition_check"]["triggered"] is False
+    assert trace[2]["repetition_check"]["new_observations"] == 1
+
+
+def test_repository_mode_progress_resets_repetition_window(
+    tmp_path, monkeypatch
+) -> None:
+    task, repository, store, logical_path = _repository_task(tmp_path)
+    budget = inference_v02.InferenceBudget(max_repeated_no_progress=2)
+    trace = []
+    model = ScriptedModel(
+        _tool_call("first", source_id=logical_path, start_line=3, end_line=3),
+        _tool_call("review-1", source_id=logical_path, start_line=3, end_line=3),
+        _tool_call("progress", source_id=logical_path, start_line=4, end_line=4),
+        _tool_call("review-2", source_id=logical_path, start_line=3, end_line=3),
+        _tool_call("evidence", source_id=logical_path, start_line=11, end_line=11),
+        _message(_dynamic_contract(task, repository, logical_path)),
+    )
+    _install_repository_model(
+        monkeypatch, task, store, model, budget=budget, trace=trace
+    )
+
+    contract = asyncio.run(inference_v02.infer_scenario(
+        task,
+        model="offline-model",
+        budget=budget,
+        tool_trace=trace,
+        source_store=store,
+    ))
+
+    assert contract.evidence[1].quote == "DYNAMIC_EVIDENCE = dependency_contract()"
+    assert [
+        item["repetition_check"]["consecutive_no_progress"] for item in trace
+    ] == [0, 1, 0, 1, 0]
+    assert all(not item["repetition_check"]["triggered"] for item in trace)
+
+
 def test_repository_mode_logs_malformed_and_wrong_typed_requests(
     tmp_path, monkeypatch
 ) -> None:

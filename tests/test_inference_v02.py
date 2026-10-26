@@ -422,9 +422,20 @@ def test_cancelling_active_tool_keeps_cancelled_trace(monkeypatch) -> None:
     asyncio.run(exercise())
 
 
-@pytest.mark.parametrize("field", ["max_turns", "max_tool_calls", "max_tool_output_chars"])
+@pytest.mark.parametrize(
+    "field",
+    [
+        "max_turns", "max_tool_calls", "max_repeated_no_progress",
+        "max_tool_output_chars",
+    ],
+)
 def test_budget_requires_positive_integer(field: str) -> None:
-    values = {"max_turns": 6, "max_tool_calls": 8, "max_tool_output_chars": 16_000}
+    values = {
+        "max_turns": 6,
+        "max_tool_calls": 8,
+        "max_repeated_no_progress": 2,
+        "max_tool_output_chars": 16_000,
+    }
     values[field] = 0
     with pytest.raises(InferenceError, match=field):
         inference_v02.InferenceBudget(**values)

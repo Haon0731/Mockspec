@@ -20,7 +20,8 @@ from mock_spec.schemas import UnifiedTask  # noqa: E402
 from mock_spec.source_repository import ReviewedRepository  # noqa: E402
 
 
-def _repository_run(tmp_path: Path, *, bad_quote: bool = False) -> dict:
+def _repository_run(tmp_path: Path, *, bad_quote: bool = False, transform=None,
+                    config=None, model_class=FixedScriptModel) -> dict:
     task = UnifiedTask.from_dict(synthetic_task())
     tree = tmp_path / "snapshot" / "tree" / "src"
     tree.mkdir(parents=True)
@@ -49,10 +50,10 @@ def _repository_run(tmp_path: Path, *, bad_quote: bool = False) -> dict:
         os.close(root_fd)
 
     outputs = query_script(7)
-    for output in outputs[1:8]:
+    for line_number, output in enumerate(outputs[1:8], start=1):
         output["query_attempt"]["tool"] = "inspect_source"
         output["query_attempt"]["arguments_json"] = json.dumps({
-            "source_id": "src/example.py", "start_line": 1, "end_line": 1,
+            "source_id": "src/example.py", "start_line": line_number, "end_line": line_number,
         })
     source_id = repository.source_id_for("src/example.py")
     dynamic = {
@@ -72,10 +73,12 @@ def _repository_run(tmp_path: Path, *, bad_quote: bool = False) -> dict:
     )
     deliver["contract"] = deepcopy(construct["contract"])
 
+    if transform is not None:
+        transform(outputs)
     return asyncio.run(execute_staged_run(
         output_dir=tmp_path / "run",
-        model=FixedScriptModel(outputs),
-        config=StagedRunConfig(),
+        model=model_class(outputs),
+        config=config or StagedRunConfig(),
         task_loader=lambda: (task, repository),
         requested_case_id=task.case_id,
     ))
@@ -164,7 +167,7 @@ def test_repository_mode_reads_more_than_six_times_and_strictly_cites_observatio
     assert result["manifest"]["controller_limits"] == {
         "model_calls": None,
         "query_attempts": None,
-        "termination": "shared_deadline_token_and_cost_budgets",
+        "termination": "shared_deadline_token_cost_and_repetition_protection",
     }
     assert result["record"]["query_accounting"] == {
         "observed_attempts": 7, "budgeted_attempts": 7, "limit": None,
@@ -175,8 +178,7 @@ def test_repository_mode_reads_more_than_six_times_and_strictly_cites_observatio
     assert [item["response_id"] for item in observations] == [
         f"query:{index}" for index in range(1, 8)
     ]
-    assert all(item["text"] == "DYNAMIC_CONTRACT = 'dependency result is 2'"
-               for item in observations)
+    assert [item["start_line"] for item in observations] == list(range(1, 8))
 
 
 def test_repository_observation_quote_mismatch_is_rejected(tmp_path: Path) -> None:

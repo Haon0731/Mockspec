@@ -86,6 +86,19 @@ class QueryAttempt(StageModel):
     arguments_json: Text
 
 
+class RemainingUnknown(StageModel):
+    question: Text
+    impact: Text
+    blocking: bool
+
+
+class ExplorationStop(StageModel):
+    reason: Literal["evidence_sufficient", "unknowns_nonblocking", "no_further_evidence"]
+    rationale: Text
+    evidence: list[SourceReference]
+    remaining_unknowns: list[RemainingUnknown]
+
+
 class QueryResult(StageModel):
     schema_version: Literal["staged-query/v0.1"]
     decision: Literal["request_query", "finish_queries"]
@@ -98,12 +111,19 @@ class QueryResult(StageModel):
         "anyOf": [QueryAssessment.model_json_schema(), {"type": "null"}],
     })] = None
     impact: Text
+    stop_explanation: ExplorationStop | None = None
 
 
 class CriticalBehavior(StageModel):
     behavior: Text
     observation: Text
-    evidence_ids: Annotated[list[Text], Field(min_length=1)]
+    evidence_ids: list[Text]
+    semantic_role: Literal[
+        "dependency_contract", "mut_path_condition", "test_objective"
+    ] | None = None
+    formal_claim_index: Annotated[int, Field(ge=0)] | None = None
+    support: Literal["evidence", "assumption"] | None = None
+    assumption_reason: Text | None = None
 
 
 class ConstructResult(StageModel):
@@ -122,6 +142,17 @@ class ConstructResult(StageModel):
 class ClaimBasis(StageModel):
     claim: Text
     basis: Literal["task_requirement", "implementation_fact", "scenario_inference"]
+    target: Literal[
+        "selection_rationale", "allowed_variation", "unresolved",
+        "nonblocking_unknown", "formal_claim"
+    ] | None = None
+    target_index: Annotated[int, Field(ge=0)] | None = None
+    semantic_role: Literal[
+        "dependency_contract", "mut_path_condition", "test_objective"
+    ] | None = None
+    evidence_ids: list[Text] = Field(default_factory=list)
+    support: Literal["evidence", "assumption"] | None = None
+    assumption_reason: Text | None = None
 
 
 class ContrastResult(StageModel):
@@ -134,6 +165,11 @@ class ContrastResult(StageModel):
     distinguishing_observation: Text | None
     revision_requested: bool
     revision_reason: Text | None
+    support: Literal["evidence", "assumption"] | None = None
+    assumption_reason: Text | None = None
+    semantic_role: Literal[
+        "dependency_contract", "mut_path_condition", "test_objective"
+    ] | None = None
 
 
 class RevisionResult(StageModel):
@@ -160,6 +196,7 @@ class StagedRunConfig:
     repository_read: bool = False
     max_model_calls: int = 10
     max_query_attempts: int = 6
+    repetition_threshold: int = 4
     max_output_tokens: int = 4_096
     max_total_tokens: int = 60_000
     max_tool_output_chars: int = 16_000
@@ -184,7 +221,7 @@ class StagedRunConfig:
             raise ValueError("synthetic replay requires the scripted-offline model profile")
         if self.run_mode == "live_inference" and self.model_name == "scripted-offline":
             raise ValueError("live inference requires an explicit provider model")
-        for name in ("max_model_calls", "max_query_attempts"):
+        for name in ("max_model_calls", "max_query_attempts", "repetition_threshold"):
             value = getattr(self, name)
             if type(value) is not int or value < 1:
                 raise ValueError(f"{name} must be a positive integer")
@@ -363,6 +400,10 @@ def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
             " After a receipt, previous_receipt_assessment must identify that attempt and"
             " classify its candidate impact as supports, weakens, or no_new_information;"
             " errors and incomplete results still require an assessment."
+            " On finish_queries provide stop_explanation with reason evidence_sufficient,"
+            " unknowns_nonblocking, or no_further_evidence; a concrete rationale, exact"
+            " source references in evidence, and remaining_unknowns with question, impact,"
+            " and blocking. Preserve unknowns rather than treating failed exploration as proof."
             f"{repository_protocol}"
         )
     elif stage == "CONSTRUCT":
@@ -375,6 +416,14 @@ def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
             " variations, or explicitly say none were identified without claiming uniqueness."
             " Keep expected_interactions assertion_policy as not_implied. A test name or an"
             " implementation branch alone does not make an interaction required."
+            " For every claim_basis and critical_behavior, classify semantic_role as"
+            " dependency_contract, mut_path_condition, or test_objective, and state whether"
+            " support is evidence or assumption. Evidence support requires formal evidence"
+            " IDs; assumption support requires an explicit reason and no evidence IDs. Each"
+            " critical behavior must point by zero-based formal_claim_index to the matching"
+            " dependency constraint, scenario hypothesis, or test objective for its role."
+            " Map every remaining blocking and nonblocking unknown through claim_basis target"
+            " unresolved or nonblocking_unknown and its zero-based index."
         )
     elif stage == "CONTRAST":
         stage_protocol = (
@@ -385,6 +434,10 @@ def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
             " contrasted without selecting either candidate. Request semantic revision only"
             " when the contrast establishes that a legal same-scenario alternative should"
             " replace or change the formal candidates."
+            " Mark the contrast as evidence-supported with evidence_ids, or as an explicit"
+            " assumption with an assumption_reason and no evidence IDs. It remains a static"
+            " prediction with execution_status not_executed."
+            " Classify its semantic_role using the same three-way distinction."
         )
     elif stage == "REVISE":
         stage_protocol = (
@@ -493,7 +546,7 @@ async def _call_stage(
             responses=responses, response_start=response_start,
         )
         raise StagedInferenceError(
-            "run deadline exhausted", stage=stage, stop_reason="budget_exhausted"
+            "run deadline exhausted", stage=stage, stop_reason="run_timeout"
         )
     timeout_seconds = min(remaining, config.parsing_timeout_seconds)
     event["timeout_seconds"] = timeout_seconds
@@ -528,7 +581,8 @@ async def _call_stage(
             responses=responses, response_start=response_start,
         )
         raise StagedInferenceError(
-            "stage timed out", stage=stage, stop_reason="budget_exhausted"
+            "stage timed out", stage=stage,
+            stop_reason="run_timeout" if remaining <= config.parsing_timeout_seconds else "timeout"
         ) from None
     except InferenceError as exc:
         event["status"] = "failed"
@@ -593,16 +647,25 @@ async def _call_stage(
 def _check_source_reference(
     reference: SourceReference, source_store: SourceStore
 ) -> None:
-    source = source_store.get(reference.source_id)
-    if not source.start_line <= reference.start_line <= reference.end_line <= source.end_line:
-        raise ValueError("source reference outside visible input")
-    lines = source.text.splitlines()
-    quote = "\n".join(lines[
-        reference.start_line - source.start_line:
-        reference.end_line - source.start_line + 1
-    ])
+    if reference.end_line < reference.start_line:
+        raise ValueError("source reference has a reversed range")
+    quote = source_store.quote(reference.source_id, reference.start_line, reference.end_line)
     if quote != reference.quote:
         raise ValueError("source reference quote mismatch")
+
+
+def _validate_exploration_stop(stop: ExplorationStop, store: SourceStore) -> None:
+    for reference in stop.evidence:
+        _check_source_reference(reference, store)
+    if stop.reason in {"evidence_sufficient", "unknowns_nonblocking"}:
+        if not stop.evidence:
+            raise ValueError("supported exploration stop requires evidence")
+        if any(item.blocking for item in stop.remaining_unknowns):
+            raise ValueError("evidence-sufficient stop cannot hide blocking unknowns")
+    if stop.reason == "unknowns_nonblocking" and not stop.remaining_unknowns:
+        raise ValueError("nonblocking stop must explain the remaining unknowns")
+    if stop.reason == "no_further_evidence" and not stop.remaining_unknowns:
+        raise ValueError("no-further-evidence stop must preserve unknowns and their impact")
 
 
 def _delivery_snapshot(raw: object) -> dict:
@@ -695,8 +758,10 @@ async def _deliver_with_repair(
                 model_calls=model_calls, deadline=deadline,
                 model_call_limit=model_call_limit,
             )
-        except StagedInferenceError:
+        except StagedInferenceError as exc:
             entry["status"] = "failed"
+            if exc.stop_reason in {"budget_exhausted", "run_timeout", "timeout"}:
+                raise
             raise StagedInferenceError(
                 "final format repair failed or its shared budget was exhausted",
                 stage="FORMAT_REPAIR", stop_reason="output_invalid",
@@ -720,7 +785,8 @@ async def _deliver_with_repair(
 
 
 def _validate_constructed(
-    constructed: ConstructResult, task: UnifiedTask, source_store: SourceStore
+    constructed: ConstructResult, task: UnifiedTask, source_store: SourceStore,
+    *, strict_mapping: bool = False,
 ) -> ScenarioContract | None:
     """Validate state-specific delivery rules and return a revalidated contract."""
     contract = (
@@ -773,11 +839,85 @@ def _validate_constructed(
             raise ValueError("critical behavior references unknown evidence")
     elif constructed.critical_behaviors:
         raise ValueError("critical behaviors require a complete contract")
+    if any(
+        not item.evidence_ids and not (
+            strict_mapping and item.support == "assumption"
+        )
+        for item in constructed.critical_behaviors
+    ):
+        raise ValueError("critical behavior requires evidence unless explicitly assumed")
+    if strict_mapping:
+        assert contract is not None or constructed.result_status == "INCONCLUSIVE"
+        known_evidence = set() if contract is None else {
+            item.id for item in contract.evidence
+        }
+        role_claims = {
+            "dependency_contract": [] if contract is None else contract.dependency_constraints,
+            "mut_path_condition": [] if contract is None else contract.scenario_hypotheses,
+            "test_objective": [] if contract is None else contract.test_objectives,
+        }
+
+        def check_support(
+            *, support: str | None, ids: list[str], reason: str | None, label: str
+        ) -> None:
+            if support == "evidence":
+                if not ids or reason is not None:
+                    raise ValueError(f"{label} evidence support requires only evidence IDs")
+                if not set(ids) <= known_evidence:
+                    raise ValueError(f"{label} references unknown evidence")
+            elif support == "assumption":
+                if ids or reason is None:
+                    raise ValueError(f"{label} assumption requires only an explicit reason")
+            else:
+                raise ValueError(f"{label} must declare evidence or assumption support")
+
+        for index, basis in enumerate(constructed.claim_basis):
+            if basis.semantic_role is None or basis.target is None:
+                raise ValueError("claim basis requires semantic role and target mapping")
+            check_support(
+                support=basis.support, ids=basis.evidence_ids,
+                reason=basis.assumption_reason, label=f"claim basis {index}",
+            )
+            collection_size = {
+                "selection_rationale": 1,
+                "allowed_variation": len(constructed.allowed_variations),
+                "unresolved": len(constructed.unresolved),
+                "nonblocking_unknown": len(constructed.nonblocking_unknowns),
+                "formal_claim": len(role_claims[basis.semantic_role]),
+            }[basis.target]
+            if basis.target_index is None or basis.target_index >= collection_size:
+                raise ValueError("claim basis target index is outside its mapped collection")
+
+        mapped = {(item.target, item.target_index) for item in constructed.claim_basis}
+        required_mappings = {("selection_rationale", 0)}
+        required_mappings.update(
+            ("allowed_variation", index)
+            for index in range(len(constructed.allowed_variations))
+        )
+        required_mappings.update(
+            ("unresolved", index) for index in range(len(constructed.unresolved))
+        )
+        required_mappings.update(
+            ("nonblocking_unknown", index)
+            for index in range(len(constructed.nonblocking_unknowns))
+        )
+        if not required_mappings <= mapped:
+            raise ValueError("important constructed judgments lack claim-basis mappings")
+
+        for index, behavior in enumerate(constructed.critical_behaviors):
+            if behavior.semantic_role is None or behavior.formal_claim_index is None:
+                raise ValueError("critical behavior requires a formal claim mapping")
+            if behavior.formal_claim_index >= len(role_claims[behavior.semantic_role]):
+                raise ValueError("critical behavior formal claim index is outside its role")
+            check_support(
+                support=behavior.support, ids=behavior.evidence_ids,
+                reason=behavior.assumption_reason, label=f"critical behavior {index}",
+            )
     return contract
 
 
 def _validate_contrast(
-    contrast: ContrastResult, contract: ScenarioContract
+    contrast: ContrastResult, contract: ScenarioContract, *, strict_mapping: bool = False,
 ) -> None:
     evidence_ids = {item.id for item in contract.evidence}
     if not set(contrast.evidence_ids) <= evidence_ids:
@@ -803,6 +943,17 @@ def _validate_contrast(
             raise ValueError("a revision request requires a proposed contrast and reason")
     elif contrast.revision_reason is not None:
         raise ValueError("revision reason requires a revision request")
+    if strict_mapping:
+        if contrast.semantic_role is None:
+            raise ValueError("contrast must declare its semantic role")
+        if contrast.support == "evidence":
+            if not contrast.evidence_ids or contrast.assumption_reason is not None:
+                raise ValueError("evidence-supported contrast requires only evidence IDs")
+        elif contrast.support == "assumption":
+            if contrast.evidence_ids or contrast.assumption_reason is None:
+                raise ValueError("assumption contrast requires only an explicit reason")
+        else:
+            raise ValueError("contrast must declare evidence or assumption support")
 
 
 def _changed_paths(before: object, after: object, prefix: str = "") -> set[str]:
@@ -865,6 +1016,8 @@ async def execute_staged_run(
     repository = None
     source_store: SourceStore | None = None
     model_call_limit = -1
+    exploration_stop: ExplorationStop | None = None
+    cancelled = False
 
     budget: InferenceBudget | None = None
     ledger: UsageLedger | None = None
@@ -935,6 +1088,7 @@ async def execute_staged_run(
         budget = InferenceBudget(
             max_turns=config.max_model_calls,
             max_tool_calls=config.max_query_attempts,
+            max_repeated_no_progress=config.repetition_threshold,
             max_output_tokens=config.max_output_tokens,
             max_total_tokens=config.max_total_tokens,
             max_tool_output_chars=config.max_tool_output_chars,
@@ -994,6 +1148,7 @@ async def execute_staged_run(
         input_bytes = canonical_json(canonical_task)
         input_hash = sha256_bytes(input_bytes)
         case_id, language = task.case_id, task.language
+        current_stage = "ARTIFACT"
         _write_json_exclusive(output_dir / "input_snapshot.json", canonical_task, canonical=True)
 
         current_stage = "EXTRACT"
@@ -1028,6 +1183,7 @@ async def execute_staged_run(
             task,
             source_store=source_store,
             max_attempts=(None if repository is not None else config.max_query_attempts),
+            max_no_progress_attempts=config.repetition_threshold,
             max_output_chars=config.max_tool_output_chars,
             analysis_timeout_seconds=config.parsing_timeout_seconds,
             deadline=deadline,
@@ -1145,11 +1301,25 @@ async def execute_staged_run(
                         diagnostic="finish_queries cannot include a query attempt.",
                     )
                     raise ValueError("finish_queries cannot include a query attempt")
+                exploration_stop = query.stop_explanation
+                if repository is not None and exploration_stop is None:
+                    raise ValueError("repository exploration requires an explicit stop explanation")
+                if exploration_stop is not None:
+                    source_store.validate_task(task)
+                    _validate_exploration_stop(exploration_stop, source_store)
                 break
+            if query.stop_explanation is not None:
+                raise ValueError("request_query cannot declare exploration finished")
             assert observed_attempt is not None
             pending_receipt = await query_executor.execute_registered(
                 observed_attempt, candidate_ids=candidate_ids
             )
+            category = pending_receipt.get("semantic_category")
+            if category in {"repeated_exploration", "content_changed", "identity_mismatch"}:
+                raise StagedInferenceError(
+                    "exploration stopped by controller protection",
+                    stage="QUERY", stop_reason=str(category),
+                )
             receipt_result = pending_receipt["result"]
             if (
                 isinstance(receipt_result, dict)
@@ -1158,7 +1328,7 @@ async def execute_staged_run(
                 raise StagedInferenceError(
                     "run deadline exhausted",
                     stage="QUERY",
-                    stop_reason="budget_exhausted",
+                    stop_reason="run_timeout",
                 )
 
         current_stage = "CONSTRUCT"
@@ -1173,7 +1343,12 @@ async def execute_staged_run(
             model_call_limit=model_call_limit,
         )
         stages.append({"stage": "CONSTRUCT", "result": constructed.model_dump(mode="json")})
-        constructed_contract = _validate_constructed(constructed, task, source_store)
+        constructed_contract = _validate_constructed(constructed, task, source_store,
+                                                    strict_mapping=repository is not None)
+        if exploration_stop is not None and any(
+            item.blocking for item in exploration_stop.remaining_unknowns
+        ) and constructed.result_status == "SELECTED":
+            raise ValueError("blocking exploration unknowns cannot become a selected result")
         if constructed_contract is not None:
             contract_ids = {
                 item.id for item in constructed_contract.scenario_hypotheses
@@ -1197,7 +1372,8 @@ async def execute_staged_run(
             stages.append({
                 "stage": "CONTRAST", "result": contrast.model_dump(mode="json")
             })
-            _validate_contrast(contrast, constructed_contract)
+            _validate_contrast(contrast, constructed_contract,
+                               strict_mapping=repository is not None)
             if contrast.revision_requested:
                 current_stage = "REVISE"
                 before_revision = constructed
@@ -1221,7 +1397,8 @@ async def execute_staged_run(
                 if not changed_objects:
                     raise ValueError("semantic revision must modify the constructed result")
                 revised_contract = _validate_constructed(
-                    revision.revised_construct, task, source_store
+                    revision.revised_construct, task, source_store,
+                    strict_mapping=repository is not None,
                 )
                 if revised_contract is None:
                     raise ValueError("semantic revision must preserve a complete contract")
@@ -1322,39 +1499,27 @@ async def execute_staged_run(
         result_status = "ERROR"
         error_stage = "INPUT" if task is None else current_stage
         stop_reason = "input_invalid" if task is None else "output_invalid"
-        error = {"type": type(exc).__name__, "message": str(exc)}
+        error = {"type": type(exc).__name__, "message": _safe_external_text(exc)}
     except StagedInferenceError as exc:
         error_stage, stop_reason = exc.stage, exc.stop_reason
-        error = {"type": type(exc).__name__, "message": str(exc)}
-        if exc.stop_reason == "budget_exhausted" and exc.stage == "REVISE":
-            contract = None
-            selected_scenario_id = None
-            result_status = "INCONCLUSIVE"
-            early_unresolved = [
-                "Contrast requested a semantic revision but the shared budget ended; "
-                "the unrevised draft is diagnostic only and downstream generation is blocked."
-            ]
-        elif exc.stop_reason == "budget_exhausted" and constructed is not None:
-            contract = constructed_contract
-            selected_scenario_id = constructed.selected_scenario_id
-            result_status = constructed.result_status
-        elif exc.stop_reason == "budget_exhausted":
-            contract = None
-            selected_scenario_id = None
-            result_status = "INCONCLUSIVE"
-            early_unresolved = [
-                "The shared budget ended before a complete contract could be "
-                "constructed; downstream generation is blocked."
-            ]
-        else:
-            contract = None
-            selected_scenario_id = None
-            result_status = "ERROR"
+        error = {"type": type(exc).__name__, "message": _safe_external_text(exc)}
+        contract = None
+        selected_scenario_id = None
+        result_status = (
+            "INCONCLUSIVE" if exc.stop_reason in {
+                "budget_exhausted", "run_timeout", "timeout", "repeated_exploration"
+            } else "ERROR"
+        )
+        early_unresolved = [
+            f"Controller stopped at {exc.stage}: {exc.stop_reason}; "
+            "prior drafts remain diagnostic and do not establish evidence sufficiency."
+        ]
     except asyncio.CancelledError:
         contract = None
         selected_scenario_id = None
         result_status = "INCONCLUSIVE"
-        error_stage, stop_reason = current_stage, "budget_exhausted"
+        cancelled = True
+        error_stage, stop_reason = current_stage, "cancelled"
         error = {
             "type": "CancelledError",
             "message": "The staged run was cancelled and active analysis was reclaimed.",
@@ -1366,7 +1531,9 @@ async def execute_staged_run(
         contract = None
         selected_scenario_id = None
         result_status = "ERROR"
-        error_stage, stop_reason = "ARTIFACT", "artifact_error"
+        error_stage, stop_reason = current_stage, (
+            "artifact_error" if current_stage == "ARTIFACT" else "backend_error"
+        )
         error = {"type": type(exc).__name__, "message": "unexpected staged run failure"}
 
     if isinstance(config, StagedRunConfig) and config.variant == "C":
@@ -1374,6 +1541,7 @@ async def execute_staged_run(
             {
                 "status": "unavailable",
                 "execution_status": "not_executed",
+                "support": None, "assumption_reason": None, "semantic_role": None,
                 "alternative": None,
                 "bypass_behavior": None,
                 "evidence_ids": [],
@@ -1388,6 +1556,7 @@ async def execute_staged_run(
         degeneracy_contrast = {
             "status": "disabled_by_variant",
             "execution_status": "not_executed",
+            "support": None, "assumption_reason": None, "semantic_role": None,
             "alternative": None,
             "bypass_behavior": None,
             "evidence_ids": [],
@@ -1411,6 +1580,17 @@ async def execute_staged_run(
         "claim_basis": [] if constructed is None else [
             item.model_dump(mode="json") for item in constructed.claim_basis
         ],
+        "exploration_stop": (
+            None if exploration_stop is None else exploration_stop.model_dump(mode="json")
+        ),
+        "termination": {
+            "initiator": "caller" if cancelled else (
+                "agent" if error is None else "controller"
+            ),
+            "reason": stop_reason,
+            "evidence_sufficiency_claimed": error is None and exploration_stop is not None
+            and exploration_stop.reason == "evidence_sufficient",
+        },
         "query_log": [] if query_executor is None else query_executor.attempts,
         "query_accounting": {
             "observed_attempts": 0 if query_executor is None else query_executor.observed_attempts,
@@ -1420,6 +1600,14 @@ async def execute_staged_run(
                 if repository is not None
                 else (config.max_query_attempts if isinstance(config, StagedRunConfig) else None)
             ),
+        },
+        "repetition_policy": {
+            "name": "normalized_query_and_returned_evidence",
+            "max_no_progress_attempts": (
+                config.repetition_threshold if isinstance(config, StagedRunConfig) else None
+            ),
+            "scope": "consecutive repeated operations without evidence increment",
+            "total_query_limit": False,
         },
         "source_observations": (
             [] if source_store is None else list(source_store.observations())
@@ -1508,7 +1696,7 @@ async def execute_staged_run(
                 else (None if valid_config is None else valid_config.max_query_attempts)
             ),
             "termination": (
-                "shared_deadline_token_and_cost_budgets"
+                "shared_deadline_token_cost_and_repetition_protection"
                 if repository is not None else "configured_call_limits_and_shared_budgets"
             ),
         },
@@ -1569,6 +1757,8 @@ async def execute_staged_run(
     _write_json_exclusive(output_dir / "run_manifest.json", manifest)
     if repository is not None:
         repository.close()
+    if cancelled:
+        raise asyncio.CancelledError
     return {"record": record, "contract": contract, "manifest": manifest}
 
 

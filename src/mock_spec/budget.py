@@ -20,6 +20,7 @@ class InferenceBudget:
 
     max_turns: int = 6
     max_tool_calls: int = 8
+    max_repeated_no_progress: int = 2
     max_output_tokens: int = 4_096
     max_total_tokens: int = 24_000
     max_tool_output_chars: int = 16_000
@@ -29,7 +30,10 @@ class InferenceBudget:
     output_cost_per_million: Decimal | None = None
 
     def __post_init__(self) -> None:
-        for name in ("max_turns", "max_tool_calls", "max_output_tokens", "max_total_tokens"):
+        for name in (
+            "max_turns", "max_tool_calls", "max_repeated_no_progress",
+            "max_output_tokens", "max_total_tokens",
+        ):
             value = getattr(self, name)
             if type(value) is not int or value < 1:
                 raise InferenceError(f"scenario inference {name} must be a positive integer")

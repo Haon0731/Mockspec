@@ -102,8 +102,8 @@ def test_shared_budget_does_not_publish_known_invalid_delivery(tmp_path):
         tmp_path, damage=lambda value: value.pop("schema_version"), max_calls=4,
     )
     assert model.calls == 4
-    assert result["record"]["result_status"] == "ERROR"
-    assert result["record"]["stop_reason"] == "output_invalid"
+    assert result["record"]["result_status"] == "INCONCLUSIVE"
+    assert result["record"]["stop_reason"] == "budget_exhausted"
     assert not (tmp_path / "run" / "scenario_contract.json").exists()
 
 
@@ -178,5 +178,6 @@ def test_actual_token_exhaustion_cannot_hide_invalid_final_response(tmp_path, in
         assert result["contract"] is None
         assert not (tmp_path / "run" / "scenario_contract.json").exists()
     else:
-        assert result["record"]["result_status"] == "SELECTED"
+        assert result["record"]["result_status"] == "INCONCLUSIVE"
         assert result["record"]["stop_reason"] == "budget_exhausted"
+        assert result["contract"] is None

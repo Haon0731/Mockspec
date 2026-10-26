@@ -327,15 +327,37 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
             "The explicit visible requirement selects the cache-miss fetch-and-refill scenario."
         ),
         "claim_basis": [
-            {"claim": "returned record", "basis": "task_requirement"},
-            {"claim": "cache branches", "basis": "implementation_fact"},
-            {"claim": "miss/refill scenario", "basis": "scenario_inference"},
+            {"claim": "returned record", "basis": "task_requirement",
+             "target": "formal_claim", "target_index": 0,
+             "semantic_role": "test_objective", "evidence_ids": ["assertion"],
+             "support": "evidence"},
+            {"claim": "cache branches", "basis": "implementation_fact",
+             "target": "formal_claim", "target_index": 0,
+             "semantic_role": "mut_path_condition", "evidence_ids": ["miss_branch"],
+             "support": "evidence"},
+            {"claim": "miss/refill scenario", "basis": "scenario_inference",
+             "target": "selection_rationale", "target_index": 0,
+             "semantic_role": "dependency_contract",
+             "evidence_ids": ["miss_requirement", "miss_branch"], "support": "evidence"},
+            {"claim": "allowed implementation variation", "basis": "scenario_inference",
+             "target": "allowed_variation", "target_index": 0,
+             "semantic_role": "dependency_contract", "evidence_ids": [],
+             "support": "assumption",
+             "assumption_reason": "The visible task does not constrain unrelated object details."},
+            *([{"claim": "hit versus miss remains unresolved", "basis": "scenario_inference",
+                "target": "unresolved", "target_index": 0,
+                "semantic_role": "test_objective", "evidence_ids": ["assertion"],
+                "support": "evidence"}] if ambiguous else []),
         ],
         "critical_behaviors": [] if ambiguous else [
             {"behavior": "A miss fetches using the requested key.",
-             "observation": "backend.fetch receives 'k'.", "evidence_ids": ["miss_requirement", "miss_branch"]},
+             "observation": "backend.fetch receives 'k'.", "evidence_ids": ["miss_requirement", "miss_branch"],
+             "semantic_role": "dependency_contract", "formal_claim_index": 1,
+             "support": "evidence"},
             {"behavior": "The fetched value is written back under the same key.",
-             "observation": "cache.set receives 'k' and the fetched value.", "evidence_ids": ["miss_requirement", "refill"]},
+             "observation": "cache.set receives 'k' and the fetched value.", "evidence_ids": ["miss_requirement", "refill"],
+             "semantic_role": "dependency_contract", "formal_claim_index": 2,
+             "support": "evidence"},
         ],
         "allowed_variations": [
             "Record construction form, unrelated fields on mock objects, and ignored cache.set return values may vary."
@@ -371,7 +393,29 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
         extract,
         {"schema_version": "staged-query/v0.1", "decision": "finish_queries",
          "query_attempt": None, "previous_receipt_assessment": None,
-         "impact": "The visible branches and task statement are sufficient for construction."},
+         "impact": "The visible branches and task statement are sufficient for construction.",
+         "stop_explanation": {
+             "reason": "no_further_evidence" if ambiguous else "evidence_sufficient",
+             "rationale": (
+                 "The return assertion supports both candidates; their distinction remains explicit."
+                 if ambiguous else
+                 "The visible miss requirement, branches, and assertion support construction."
+             ),
+             "evidence": [{
+                 "source_id": "test:0", "start_line": 5 if ambiguous else 6,
+                 "end_line": 5 if ambiguous else 6,
+                 "quote": "    assert load('k', cache, backend) == {'id': 1, 'name': 'Ada'}",
+             }],
+             "remaining_unknowns": ([{
+                 "question": "Was the intended scenario a cache hit or miss?",
+                 "impact": "Both remain candidates; the ambiguity blocks selection only.",
+                 "blocking": True,
+             }] if ambiguous else [{
+                 "question": "What concrete cache implementation is used?",
+                 "impact": "It does not change the selected conditional behavior.",
+                 "blocking": False,
+             }]),
+         }},
         construct,
     ]
     if variant == "C":
@@ -387,6 +431,8 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
                 "Preserve the observation while allowing equivalent record construction and unrelated mock state."
                 if replay_case in ("legal_variation", "second_revision") else None
             ),
+            "support": "evidence", "assumption_reason": None,
+            "semantic_role": "dependency_contract",
         }
         outputs.append(contrast)
         if contrast["revision_requested"]:
@@ -457,14 +503,34 @@ def scripted_outputs(
             "Direct delegation and the ordinary assertion jointly constrain the result."
         ),
         "claim_basis": [
-            {"claim": "objective", "basis": "task_requirement"},
-            {"claim": "delegation", "basis": "implementation_fact"},
-            {"claim": "selected_scenario", "basis": "scenario_inference"},
+            {"claim": "objective", "basis": "task_requirement",
+             "target": "formal_claim", "target_index": 0,
+             "semantic_role": "test_objective", "evidence_ids": ["assertion"],
+             "support": "evidence"},
+            {"claim": "delegation", "basis": "implementation_fact",
+             "target": "formal_claim", "target_index": 0,
+             "semantic_role": "mut_path_condition", "evidence_ids": ["delegation"],
+             "support": "evidence"},
+            {"claim": "selected_scenario", "basis": "scenario_inference",
+             "target": "selection_rationale", "target_index": 0,
+             "semantic_role": "dependency_contract",
+             "evidence_ids": ["delegation", "assertion"], "support": "evidence"},
+            {"claim": "allowed variation", "basis": "scenario_inference",
+             "target": "allowed_variation", "target_index": 0,
+             "semantic_role": "dependency_contract", "evidence_ids": [],
+             "support": "assumption",
+             "assumption_reason": "Unrelated dependency state is outside the visible objective."},
+            *([{"claim": "candidate distinction remains unresolved",
+                "basis": "scenario_inference", "target": "unresolved", "target_index": 0,
+                "semantic_role": "test_objective", "evidence_ids": ["assertion"],
+                "support": "evidence"}] if unresolved else []),
         ],
         "critical_behaviors": ([] if replay_case != "selected" and replay_case != "error" else [{
             "behavior": "dependency(1) yields 2",
             "observation": "target(1) returns 2 to the visible assertion",
             "evidence_ids": ["delegation", "assertion"],
+            "semantic_role": "dependency_contract", "formal_claim_index": 0,
+            "support": "evidence",
         }]),
         "allowed_variations": [
             "Internal dependency state and unrelated calls may vary when the returned value remains 2."
@@ -506,7 +572,33 @@ def scripted_outputs(
             "candidates": extract_candidates, "unresolved": unresolved,
         },
         {"schema_version": "staged-query/v0.1", "decision": "finish_queries",
-         "query_attempt": None, "previous_receipt_assessment": None, "impact": "The visible input is sufficient; no query is needed."},
+         "query_attempt": None, "previous_receipt_assessment": None,
+         "impact": "The visible input is sufficient; no query is needed.",
+         "stop_explanation": {
+             "reason": (
+                 "no_further_evidence" if replay_case == "inconclusive" else
+                 "no_further_evidence" if replay_case == "ambiguous" else
+                 "evidence_sufficient"
+             ),
+             "rationale": (
+                 "The missing dependency contract cannot be recovered from visible sources."
+                 if replay_case == "inconclusive" else
+                 "The equality evidence preserves both candidates without forcing a choice."
+                 if replay_case == "ambiguous" else
+                 "The visible delegation and assertion support the conditional scenario."
+             ),
+             "evidence": [{"source_id": "test:0", "start_line": 5, "end_line": 5,
+                           "quote": "    assert target(1) == 2"}],
+             "remaining_unknowns": [{
+                 "question": "What is the hidden dependency implementation?",
+                 "impact": (
+                     "No safe response constraint can be delivered."
+                     if replay_case == "inconclusive" else
+                     "It does not invalidate the explicit candidate or ambiguity."
+                 ),
+                 "blocking": replay_case == "inconclusive",
+             }],
+         }},
         construct,
     ]
     if variant == "C" and result_status in ("SELECTED", "AMBIGUOUS"):
@@ -516,6 +608,9 @@ def scripted_outputs(
             "bypass_behavior": None, "evidence_ids": [],
             "distinguishing_observation": None, "revision_requested": False,
             "revision_reason": None,
+            "support": "assumption",
+            "assumption_reason": "No evidence-backed static bypass was identified.",
+            "semantic_role": "dependency_contract",
         })
     outputs.append(deliver)
     return outputs
@@ -551,6 +646,17 @@ def query_script(
             "decision": "finish_queries" if attempt is None else "request_query",
             "query_attempt": attempt, "previous_receipt_assessment": assessment,
             "impact": "Preserve the current candidate pending construction.",
+            "stop_explanation": (None if attempt is not None else {
+                "reason": "evidence_sufficient",
+                "rationale": "The visible delegation and assertion support construction; repeated syntax reads add no material fact.",
+                "evidence": [{"source_id": "test:0", "start_line": 5,
+                              "end_line": 5, "quote": "    assert target(1) == 2"}],
+                "remaining_unknowns": [{
+                    "question": "What is the hidden dependency implementation?",
+                    "impact": "The conditional candidate remains explicit without that implementation.",
+                    "blocking": False,
+                }],
+            }),
         })
     return [outputs[0], *queries, *outputs[2:]]
 

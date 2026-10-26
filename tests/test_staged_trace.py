@@ -203,7 +203,7 @@ def test_timeout_and_cancellation_are_distinct_trace_outcomes() -> None:
             ledger=_ledger(timeout_config), responses=[], model_calls=timeout_calls,
             deadline=time.monotonic() + 5,
         ))
-    assert timed_out.value.stop_reason == "budget_exhausted"
+    assert timed_out.value.stop_reason == "timeout"
     assert timeout_calls[0]["status"] == "failed"
     assert timeout_calls[0]["exception"]["classification"] == "host_timeout"
 

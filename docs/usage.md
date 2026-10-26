@@ -235,13 +235,31 @@ ERROR 为 1，命令或无法完成的产物写入错误为 2；
 重复运行需指定新目录，不覆盖原证据。入口默认配置为工程回放参数，不是正式实验预算：
 最多 10 次模型请求，每次最多 4096 输出 Token，总计 60000 Token，
 总时限 120 秒、阶段时限 15 秒，工具结果上限配置为 16000 字符。
-所有阶段共享一个用量账本、模型计数、六次查询额度与绝对截止时间，关闭技术重试。
+所有阶段共享一个用量账本、模型计数与绝对截止时间，关闭技术重试。
+六次查询额度仅用于旧片段回放；仓库模式不按模型请求数、SDK turn 或工具总次数截断。
 阶段切换或重建 SDK 对象不会重置预算；SDK `max_turns=1` 仅约束单阶段请求。
 用 `--query-count 0|1|2|3|4|5|6|7` 选择固定查询回放（默认零次），六次轮流调用三个既有
 只读工具，第七次演示拒绝，产物区分 `observed_attempts=7` 与 `budgeted_attempts=6`。
 每次请求绑定疑问、候选和原始参数；畸形 JSON、缺字段、类型错误、未知工具/来源、
 越界和重复请求均先计数再校验。回执保留事实/诊断，后续模型评估支持、削弱或无新增信息，
 未完成判断保留 `assessment_status=incomplete`。三种工具只在 QUERY 分派。
+
+仓库模式正常停止必须提供 `stop_explanation`，理由为 `evidence_sufficient`、
+`unknowns_nonblocking` 或 `no_further_evidence`，附原文引用、明确依据、剩余未知及其影响。
+无更多有效证据不能当作证据充分；阻塞未知会阻止 SELECTED。
+`--repetition-threshold`（默认 4）配置连续重复且无进展的保护阈值；
+新分页、新位置或新增证据使探索继续，有目的复核可保留在问题和回执评估中。
+记录保存重复检测策略、触发依据、每次耗时与整次 Token 消耗；`termination.initiator`
+区分模型主动结束、控制器保护和调用者取消。生产 `InferenceBudget.max_repeated_no_progress`
+控制 SDK 的对应保护阈值。研究侧字段映射见[输出契约](scenario-inference.md#五步研究记录的字段映射)。
+
+查询回执的 `semantic_category` 统一父规格分类，原 `status/error_code/limit_reason` 保留：
+参数及游标错误为 invalid_request；路径/权限为 path_violation/access_denied；完整范围无结果为
+not_found；解析不支持/不确定为 unparseable/unresolved；单次限制为 timeout/scope_limit/output_limit；
+整次保护为 budget_exhausted/run_timeout/repeated_exploration；身份变化为
+content_changed/identity_mismatch；后端或畸形结果为 backend_error/analysis_error；取消为 cancelled。
+失败响应不证明行为不存在。身份变化立即终止，不发布契约。
+
 
 可显式配置 `--max-model-calls`、`--max-output-tokens`、`--max-total-tokens`、
 `--max-tool-output-chars`、`--timeout-seconds` 和 `--parsing-timeout-seconds`。
@@ -276,7 +294,8 @@ ERROR 为 1，命令或无法完成的产物写入错误为 2；
 
 退出码 0 仅说明完成了有效结果交付，下游仍须读取 `result_status`。
 `stop_reason` 独立记录 completed、evidence_exhausted、budget_exhausted 等停止原因；
-预算耗尽时已有完整有效选择可以保留 SELECTED，否则按现有证据保留歧义或不足。
+预算耗尽、run_timeout、timeout 或 repeated_exploration 均返回保护性 INCONCLUSIVE，
+已有构造仅保留为诊断，不发布最终契约。取消保存 `cancelled` 后向调用者传播。
 协议违规为 output_invalid，模型运行失败为 model_error，不伪装成语义未知。
 `unresolved` 保存阻断性未决，`nonblocking_unknowns` 保存不妨碍 SELECTED 的非关键未知。
 可恢复的工具错误留在查询日志，模型可评估回执并继续；不会自动把工具失败当作无行为证据。
@@ -319,7 +338,7 @@ PYTHONPATH=src .venv/bin/python experiments/staged-inference/run.py \
 保留请求身份和拒绝原因；缺失产物哈希为 null，已有文件按实际字节哈希。
 输出目录不可创建或写入失败时明确非成功退出，不保证存储故障下产物齐全。
 
-当前完成范围是 EXTRACT → QUERY（零至六次查询）→ CONSTRUCT →
+当前完成范围是 EXTRACT → QUERY（片段模式零至六次，仓库模式按证据与资源终止）→ CONSTRUCT →
 CONTRAST（仅 C）→ REVISE（可选一次）→ DELIVER → FORMAT_REPAIR（可选一次）
 的 B/C 四状态回放，不是整个 M1。synthetic_replay 分支不审核真实 Adapter 输入；
 live_inference 分支见下方 M1-5 说明。两者均不生成 Mock、不执行目标测试。

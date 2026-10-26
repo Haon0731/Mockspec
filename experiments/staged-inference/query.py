@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import json
 import time
 from typing import Any
 
@@ -32,7 +34,10 @@ class QueryExecutor:
         max_output_chars: int,
         analysis_timeout_seconds: float,
         deadline: float,
+        max_no_progress_attempts: int = 3,
     ) -> None:
+        if type(max_no_progress_attempts) is not int or max_no_progress_attempts < 1:
+            raise ValueError("max_no_progress_attempts must be a positive integer")
         self.analysis = SourceAnalysis(
             task,
             source_store=source_store,
@@ -41,8 +46,13 @@ class QueryExecutor:
         )
         self.max_attempts = max_attempts
         self.deadline = deadline
+        self.max_no_progress_attempts = max_no_progress_attempts
         self.analysis.store.limit_deadline(deadline)
         self.attempts: list[dict[str, Any]] = []
+        self._seen_operations: set[str] = set()
+        self._seen_evidence: set[str] = set()
+        self._operation_questions: dict[str, set[str]] = {}
+        self._consecutive_no_progress = 0
 
     @property
     def observed_attempts(self) -> int:
@@ -69,10 +79,12 @@ class QueryExecutor:
             "arguments_json": None,
             "raw_request": request,
             "status": "registered",
+            "semantic_category": None,
             "result": None,
             "assessment": None,
             "assessment_status": "incomplete",
             "duration_seconds": None,
+            "exploration_progress": None,
         }
         self.attempts.append(record)
         started = time.monotonic()
@@ -202,7 +214,168 @@ class QueryExecutor:
                 record, started, "backend_error",
                 self._error("malformed_result", "The analysis backend returned an invalid result."),
             )
-        return self._finish(record, started, status, result)
+        return self._finish(
+            record, started, status, result, normalized_arguments=validated,
+        )
+
+    @property
+    def repeated_exploration_triggered(self) -> bool:
+        """Whether the controller should stop this run as a protective termination."""
+        return any(
+            attempt.get("status") == "repeated_exploration"
+            for attempt in self.attempts
+        )
+
+    def _record_exploration_progress(
+        self,
+        record: dict[str, Any],
+        result: dict[str, Any],
+        *,
+        normalized_arguments: dict[str, Any] | None = None,
+    ) -> None:
+        """Detect sustained query loops without imposing a total query limit."""
+        arguments = (
+            normalized_arguments
+            if normalized_arguments is not None
+            else self._best_effort_arguments(record.get("arguments_json"))
+        )
+        operation = self._digest({
+            "scenario_id": record["scenario_id"],
+            "tool": record["tool"],
+            "arguments": arguments,
+        })
+        question = self._digest(self._normalize_question(record.get("question")))
+        evidence = self._digest(self._evidence_payload(result))
+        operation_is_new = operation not in self._seen_operations
+        evidence_is_new = evidence not in self._seen_evidence
+        prior_questions = self._operation_questions.setdefault(operation, set())
+        # One explicitly different question may justify reviewing the same location.
+        # Further paraphrases cannot keep an otherwise stagnant loop alive.
+        question_review_is_new = question not in prior_questions and len(prior_questions) < 2
+        made_progress = operation_is_new or evidence_is_new or question_review_is_new
+        self._seen_operations.add(operation)
+        self._seen_evidence.add(evidence)
+        prior_questions.add(question)
+        if made_progress:
+            self._consecutive_no_progress = 0
+        else:
+            self._consecutive_no_progress += 1
+
+        triggered = self._consecutive_no_progress >= self.max_no_progress_attempts
+        record["exploration_progress"] = {
+            "made_progress": made_progress,
+            "new_operation_or_position": operation_is_new,
+            "new_evidence": evidence_is_new,
+            "new_question_review": question_review_is_new,
+            "operation_digest": operation,
+            "evidence_digest": evidence,
+            "consecutive_no_progress": self._consecutive_no_progress,
+            "threshold": self.max_no_progress_attempts,
+            "triggered": triggered,
+            "termination_initiator": "controller" if triggered else None,
+            "termination_reason": "repeated_exploration" if triggered else None,
+        }
+        if triggered:
+            record["backend_status"] = record["status"]
+            record["backend_semantic_category"] = record["semantic_category"]
+            record["status"] = "repeated_exploration"
+            record["semantic_category"] = "repeated_exploration"
+
+    @staticmethod
+    def _normalize_question(question: object) -> str:
+        return (
+            " ".join(question.casefold().split())
+            if isinstance(question, str) else "<invalid-question>"
+        )
+
+    @staticmethod
+    def _best_effort_arguments(arguments_json: object) -> object:
+        if not isinstance(arguments_json, str):
+            return {"invalid_arguments_json_type": type(arguments_json).__name__}
+        try:
+            return decode_json(arguments_json)
+        except (ValueError, TypeError):
+            return {"malformed_arguments_json": arguments_json}
+
+    @classmethod
+    def _evidence_payload(cls, value: object) -> object:
+        """Remove accounting fields that do not represent new repository evidence."""
+        if isinstance(value, dict):
+            return {
+                key: cls._evidence_payload(item)
+                for key, item in sorted(value.items())
+                if key not in {"usage", "duration_seconds", "next_cursor"}
+            }
+        if isinstance(value, list):
+            return [cls._evidence_payload(item) for item in value]
+        return value
+
+    @staticmethod
+    def _digest(value: object) -> str:
+        encoded = json.dumps(
+            value, ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+            default=lambda item: f"<{type(item).__name__}>",
+        ).encode("utf-8")
+        return hashlib.sha256(encoded).hexdigest()
+
+    @staticmethod
+    def _semantic_category(status: str, result: dict[str, Any]) -> str:
+        code = result.get("error_code")
+        limit = result.get("limit_reason")
+        failure = result.get("failure_kind")
+        failure_categories = {
+            "parse_error": "unparseable", "input_limit": "scope_limit",
+            "invalid_request": "invalid_request", "timeout": "timeout",
+            "output_limit": "output_limit", "backend_failure": "backend_error",
+            "malformed_result": "analysis_error",
+        }
+        if failure in failure_categories:
+            return failure_categories[failure]
+        if code == "run_deadline_exhausted":
+            return "run_timeout"
+        if status == "budget_exhausted":
+            return "budget_exhausted"
+        if status == "cancelled" or code == "cancelled":
+            return "cancelled"
+        if status == "timeout" or code == "timeout" or limit == "timeout":
+            return "timeout"
+        if code in {"source_changed", "content_changed"}:
+            return "content_changed"
+        if code == "identity_mismatch":
+            return "identity_mismatch"
+        if code in {"path_violation", "access_denied", "not_found"}:
+            return code
+        if code == "output_limit" or limit == "output_limit":
+            return "output_limit"
+        if limit in {
+            "entry_limit", "match_limit", "byte_limit", "file_size_limit",
+            "content_unavailable",
+        }:
+            return "scope_limit"
+        if status == "incomplete":
+            diagnostics = result.get("diagnostics", [])
+            if any(isinstance(item, dict) and item.get("category") == "unsupported"
+                   for item in diagnostics):
+                return "unresolved"
+            return "scope_limit"
+        if status == "unresolved":
+            return "unresolved"
+        if code in {"unsupported", "unparseable"}:
+            return "unparseable"
+        if status in {"invalid_request", "protocol_error"} or code in {
+            "wrong_type", "invalid_request_fields", "missing_association",
+            "unknown_candidate", "unknown_tool", "malformed_json",
+            "invalid_arguments", "invalid_cursor", "invalid_request",
+            "invalid_source", "invalid_source_or_range",
+        }:
+            return "invalid_request"
+        if status == "backend_error" or code in {
+            "analysis_failure", "analysis_error", "malformed_result",
+        }:
+            return "analysis_error"
+        if code in {"backend_unavailable", "backend_error"} or status == "error":
+            return "backend_error"
+        return "success" if status == "ok" else status
 
     @staticmethod
     def _validate_arguments(tool: str, arguments: dict[str, object]) -> dict[str, Any]:
@@ -231,15 +404,24 @@ class QueryExecutor:
             "limitations": ["A failed query does not establish absence of behavior."],
         }
 
-    @staticmethod
     def _finish(
-        record: dict[str, Any], started: float, status: str, result: dict[str, Any]
+        self, record: dict[str, Any], started: float, status: str,
+        result: dict[str, Any], *,
+        normalized_arguments: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         record.update(
             status=status,
+            semantic_category=QueryExecutor._semantic_category(status, result),
             result=result,
             duration_seconds=time.monotonic() - started,
         )
+        if "raw_request" in record and record["semantic_category"] not in {
+            "budget_exhausted", "run_timeout", "cancelled", "content_changed",
+            "identity_mismatch",
+        }:
+            self._record_exploration_progress(
+                record, result, normalized_arguments=normalized_arguments,
+            )
         return record
 
 

@@ -179,7 +179,7 @@ def _run_cross_stage_deadline_case(output_dir: Path) -> dict[str, object]:
     case: dict[str, object] = {
         "name": "boundary-cross-stage-deadline",
         "variant": "B", "replay_case": "cross_stage_deadline", "query_count": 0,
-        "expected_status": "INCONCLUSIVE", "expected_stop_reason": "budget_exhausted",
+        "expected_status": "INCONCLUSIVE", "expected_stop_reason": "run_timeout",
     }
     original_monotonic = controller.time.monotonic
     try:

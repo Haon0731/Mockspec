@@ -57,6 +57,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--max-model-calls", type=int, default=10,
         help="legacy replay limit; repository exploration stops on shared resource budgets",
     )
+    parser.add_argument("--repetition-threshold", type=int, default=4,
+                        help="consecutive repeated queries without new evidence before protection")
     parser.add_argument("--max-output-tokens", type=int, default=4096)
     parser.add_argument("--max-total-tokens", type=int, default=60000)
     parser.add_argument("--max-tool-output-chars", type=int, default=16000)
@@ -119,6 +121,7 @@ def main(argv: list[str] | None = None) -> int:
                 max_output_tokens=args.max_output_tokens,
                 max_total_tokens=args.max_total_tokens,
                 max_tool_output_chars=args.max_tool_output_chars,
+                repetition_threshold=args.repetition_threshold,
                 timeout_seconds=args.timeout_seconds,
                 parsing_timeout_seconds=args.parsing_timeout_seconds,
                 max_cost_usd=args.max_cost_usd,

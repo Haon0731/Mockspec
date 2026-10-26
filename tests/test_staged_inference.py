@@ -89,6 +89,7 @@ def test_variant_b_replay_preserves_identity_stages_and_artifact_hashes(tmp_path
     assert record["degeneracy_contrast"] == {
         "status": "disabled_by_variant",
         "execution_status": "not_executed",
+        "support": None, "assumption_reason": None, "semantic_role": None,
         "alternative": None,
         "bypass_behavior": None,
         "evidence_ids": [],
@@ -309,11 +310,11 @@ def test_model_call_budget_is_shared_across_stages(tmp_path) -> None:
     ))
 
     assert model.calls == 3
-    assert result["contract"] is not None
-    assert result["manifest"]["result_status"] == "SELECTED"
+    assert result["contract"] is None
+    assert result["manifest"]["result_status"] == "INCONCLUSIVE"
     assert result["manifest"]["stop_reason"] == "budget_exhausted"
     assert result["manifest"]["usage"]["requests_started"] == 3
-    assert (output_dir / "scenario_contract.json").exists()
+    assert not (output_dir / "scenario_contract.json").exists()
 
 
 def test_total_token_gate_blocks_first_request_and_leaves_evidence(tmp_path) -> None:
@@ -535,7 +536,7 @@ def test_model_transport_failure_is_error_not_semantic_unknown(tmp_path) -> None
 
 
 @pytest.mark.parametrize("case", ["ambiguous", "inconclusive"])
-def test_budget_exhaustion_preserves_validated_semantic_result(tmp_path, case) -> None:
+def test_budget_exhaustion_keeps_draft_without_publishing_contract(tmp_path, case) -> None:
     output_dir = tmp_path / case
     result = asyncio.run(execute_staged_run(
         synthetic_task(), output_dir=output_dir,
@@ -543,10 +544,11 @@ def test_budget_exhaustion_preserves_validated_semantic_result(tmp_path, case) -
         config=StagedRunConfig(max_model_calls=3),
     ))
     record, manifest = _assert_artifacts(output_dir)
-    assert record["result_status"] == case.upper()
+    assert record["result_status"] == "INCONCLUSIVE"
     assert record["selected_scenario_id"] is None
     assert manifest["stop_reason"] == "budget_exhausted"
-    assert (result["contract"] is not None) == (case == "ambiguous")
+    assert result["contract"] is None
+    assert any(stage["stage"] == "CONSTRUCT" for stage in record["stages"])
 
 
 def test_missing_input_file_is_registered_before_read(tmp_path) -> None:
@@ -767,7 +769,7 @@ def test_model_timeout_has_incomplete_usage_and_no_finalization_request(tmp_path
     model = SlowModel()
     result, _ = _query_run(tmp_path, [], model=model, config=StagedRunConfig(timeout_seconds=0.05))
     assert model.cleaned
-    assert result["manifest"]["stop_reason"] == "budget_exhausted"
+    assert result["manifest"]["stop_reason"] == "run_timeout"
     assert result["manifest"]["usage"]["requests_started"] == 1
     assert result["manifest"]["usage"]["requests_completed"] == 0
     assert result["manifest"]["usage"]["total_tokens"] is None
@@ -786,7 +788,7 @@ def test_tool_run_deadline_cancels_and_preserves_receipt(tmp_path, monkeypatch):
     result, model = _query_run(tmp_path, query_script(1), config=StagedRunConfig(timeout_seconds=0.2))
     assert cleaned == [True]
     assert model.calls == 2
-    assert result["manifest"]["stop_reason"] == "budget_exhausted"
+    assert result["manifest"]["stop_reason"] == "run_timeout"
     assert result["record"]["query_log"][0]["status"] == "timeout"
     assert result["record"]["query_log"][0]["assessment"] is None
 
