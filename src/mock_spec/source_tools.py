@@ -15,7 +15,7 @@ from pydantic import StrictInt
 
 from .budget import InferenceBudget
 from .inference import InferenceError
-from .source_analysis import SourceAnalysis
+from .source_analysis import SourceAnalysis, normalize_source_arguments
 from .schemas import UnifiedTask
 from .validation import SourceStore, decode_json
 
@@ -71,9 +71,23 @@ def build_source_tools(
         observation_start = len(analysis.store.observations())
         token = response_id.set(correlation)
         try:
-            expected = ({"source_id", "start_line", "end_line"}
-                        if name == "inspect_source" else {"source_id"})
-            if not isinstance(parsed_arguments, dict) or set(parsed_arguments) != expected:
+            if not isinstance(parsed_arguments, dict):
+                result = {"status": "error", "error_code": "invalid_arguments",
+                          "diagnostics": ["Tool arguments must match the schema and use unique JSON keys."]}
+            elif name == "inspect_source":
+                try:
+                    normalize_source_arguments(parsed_arguments)
+                except (TypeError, ValueError):
+                    result = {
+                        "status": "error",
+                        "error_code": "invalid_arguments",
+                        "diagnostics": [
+                            "inspect_source arguments must describe one valid search or read."
+                        ],
+                    }
+                else:
+                    result = await call()
+            elif set(parsed_arguments) != {"source_id"}:
                 result = {"status": "error", "error_code": "invalid_arguments",
                           "diagnostics": ["Tool arguments must match the schema and use unique JSON keys."]}
             else:
@@ -118,18 +132,43 @@ def build_source_tools(
 
     @function_tool(failure_error_function=None)
     async def inspect_source(
-        source_id: str, start_line: StrictInt, end_line: StrictInt
+        operation: str = "read",
+        source_id: str | None = None,
+        path: str | None = None,
+        start_line: StrictInt | None = None,
+        end_line: StrictInt | None = None,
+        path_pattern: str | None = None,
+        text: str | None = None,
+        cursor: str | None = None,
     ) -> dict:
-        """Return an allowed source range with exact line numbers and original text.
+        """Search reviewed paths/text or read one exact allowed line range.
 
         Args:
-            source_id: A task source ID; with host repository binding, also an initial logical path.
-            start_line: First requested source line, inclusive.
-            end_line: Last requested source line, inclusive.
+            operation: Either "search" or "read"; omitted means the compatible read form.
+            source_id: For read, an initial or discovered source ID.
+            path: For read, a discovered relative path instead of source_id.
+            start_line: For read, first requested line inclusive.
+            end_line: For read, last requested line inclusive.
+            path_pattern: For search, an optional relative glob pattern.
+            text: For search, optional literal single-line text.
+            cursor: For search, the opaque continuation cursor from the same query.
         """
+        arguments = {
+            "operation": operation,
+            "source_id": source_id,
+            "path": path,
+            "start_line": start_line,
+            "end_line": end_line,
+            "path_pattern": path_pattern,
+            "text": text,
+            "cursor": cursor,
+        }
+        normalized = normalize_source_arguments({
+            key: value for key, value in arguments.items()
+            if value is not None and (key != "operation" or value != "read")
+        })
         return await analysis.inspect_source(
-            source_id=source_id, start_line=start_line, end_line=end_line,
-            response_id=response_id.get()
+            **normalized, response_id=response_id.get()
         )
 
     @function_tool(failure_error_function=None)

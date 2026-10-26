@@ -352,7 +352,7 @@ PYTHONPATH=src .venv/bin/python experiments/staged-inference/acceptance.py \
 [预检记录](../out/staged-inference/m1-validation/live-preflight.json)。
 真实产物可读性、场景推导质量与自主工具使用仍未验收，#11 和整个 M1 未全部完成。
 
-## 初始路径扩展读取（#13）
+## 冻结项目读取与搜索（#13 / #14）
 
 生产 V0.2 的普通 CLI 与完整留证入口均可显式添加 `--repository-read`：
 
@@ -373,7 +373,8 @@ V0.1 拒绝该选项；研究 synthetic_replay 的文件输入不能自行取得
 同一运行的工具与验证器必须共用该 Store；不同运行创建新 Store，用完关闭 repository。
 仅 `task.to_dict()` 进入初始模型输入，宿主绑定不会序列化。
 
-`inspect_source` 保持三个参数；`source_id` 可使用初始 ID、初始逻辑路径或本次返回的动态 ID。
+`inspect_source` 默认 `operation="read"`，原三个参数仍兼容；`source_id` 可使用初始 ID、
+初始逻辑路径或本次返回的动态 ID。显式 `path` 可读取本次发现路径，与 `source_id` 二选一。
 扩展读取返回动态 `source_id`，契约应使用回执中的 ID、行号与精确原文；相邻读取可合并引用，
 不能引用未返回的空洞。单次输出超限时返回省略回执，该片段不登记为已观察。
 两个语法工具仍分析可见片段或已观察且连续的文本，不隐式读取未返回源码。
@@ -382,4 +383,30 @@ V0.1 拒绝该选项；研究 synthetic_replay 的文件输入不能自行取得
 仍共享整次运行超时、Token/费用账本与每次输出上限；记录中的有效次数上限为 null。
 SDK 轨迹包含原始参数、解析错误、调用 ID 与观察；研究记录保存查询回执和累计观察。
 路径、身份或分页内容变化失败也保留，失败不构成“没有相关行为”的证据。
-目前仅开放初始逻辑路径对应的完整审核文件；搜索、发现其他文件属于后续议题。
+搜索操作通过同一个 `inspect_source` 请求（研究入口放在 `arguments_json` 内）：
+
+```json
+{"operation":"search","path_pattern":"src/*.py","text":"dependency","cursor":null}
+```
+
+`path_pattern` 与 `text` 至少提供一个；同时提供时取交集。路径匹配采用大小写敏感 glob，
+`*` 可匹配 `/`；文本为单行字面子串，不接受用户正则或 shell。仅路径匹配的结果不含原文。
+从 `matches` 取得 `logical_path` 与 `source_id` 后，可读取上下文：
+
+```json
+{"operation":"read","path":"src/dependency.py","start_line":1,"end_line":20}
+```
+
+SDK 的严格 Schema 将不适用字段填为 null；研究 JSON 可省略这些字段。
+每个匹配带完整行及行号；搜索响应带 `complete`、`limit_reason`、`next_cursor`、`usage` 与 `limits`。
+续页重复原查询并传回游标，是一次新的调用；不能改查询或跨运行复用游标。
+`incomplete` 不代表无匹配，`next_cursor=null` 也不单独证明搜索完成。
+输出不足以容纳整行时不返回半行，也不登记为可引用证据；可缩小查询或按发现路径读取。
+
+默认单次搜索最多遍历 2000 个条目、读取 2 MiB、单文件 256 KiB、50 个匹配、2 秒，
+输出使用运行配置 `max_tool_output_chars`（默认 16000 字符）。单个搜索条件最多 4096 字符，
+每个绑定最多保留 128 个游标，旧游标过期后明确返回 `invalid_cursor`。宿主可用
+`ReviewedRepository(..., search_limits=SearchLimits(...))` 配置搜索限制；模型不能提升上限。
+被策略跳过的条目也计入遍历消耗并记录排除数；遇到禁读对象、不可解码文本或扫描上限时
+保留不完整原因。遍历上限留下的未扫描范围不保证可由当前游标继续，不能作为不存在行为的证据。
+最终引用仅接受初始材料或当前 Store 实际返回的完整行，检测到内容变化后整个运行证据失效。

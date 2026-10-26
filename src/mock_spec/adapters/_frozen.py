@@ -172,6 +172,14 @@ def _load_approved_with_repository(
         if len(role_sources["mut"]) != 1 or len(role_sources["masked_test"]) != 1:
             raise InputValidationError("review must select exactly one MUT and one masked test")
         task = _build_task(review, runtime, role_sources, source_index)
+        # The frozen protocol places the prepared, masked project under tree/repo.
+        # Verify the mapping before granting discovery; control/injector siblings
+        # remain outside this capability. No new digest approves other inputs.
+        if any(
+            item["path"] != "repo/" + item["logical_path"]
+            for item in review["sources"]
+        ):
+            raise InputValidationError("reviewed sources do not share the frozen repository root")
         repository_root_fd = os.dup(root_fd)
     finally:
         os.close(root_fd)
@@ -181,6 +189,7 @@ def _load_approved_with_repository(
             snapshot_id=review["snapshot_id"],
             files_by_logical_path=repository_files,
             task=task,
+            discovery_root="tree/repo",
         )
     finally:
         os.close(repository_root_fd)

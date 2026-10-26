@@ -6,6 +6,7 @@ import asyncio
 import json
 import math
 import os
+import time
 from pathlib import Path
 from typing import Final
 
@@ -126,6 +127,8 @@ async def infer_scenario(
         raise InferenceError("OPENAI_API_KEY is required for scenario inference")
 
     source_store = source_store if source_store is not None else SourceStore(task)
+    run_deadline = time.monotonic() + float(timeout_seconds)
+    source_store.limit_deadline(run_deadline)
     source_store.validate_task(task)
     agent = build_agent(
         model, task, budget=budget, tool_trace=tool_trace, source_store=source_store
@@ -152,6 +155,8 @@ async def infer_scenario(
             ),
             timeout=float(timeout_seconds),
         )
+        if time.monotonic() >= run_deadline:
+            raise asyncio.TimeoutError
     except asyncio.TimeoutError:
         raise InferenceTimeoutError() from None
     except MaxTurnsExceeded:

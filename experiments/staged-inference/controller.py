@@ -335,19 +335,26 @@ def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
     stage_protocol = ""
     if stage == "QUERY":
         repository_protocol = (
-            " For inspect_source, source_id also accepts an initial logical_path locator;"
-            " a successful expanded read returns the stable source_id required for later"
-            " structure, dependency-usage, and final evidence references. Host paths are"
-            " forbidden. Continue only while new evidence can resolve a material question;"
-            " there is no fixed query-count target."
+            " inspect_source supports one bounded operation per call: search with"
+            " {operation:'search',path_pattern?:string,text?:string,cursor?:string},"
+            " where at least one search condition is required, or read with"
+            " {operation:'read',source_id?:string,path?:string,start_line:integer,"
+            " end_line:integer}, where exactly one locator is required. Search text is"
+            " literal and path patterns are relative globs, never shell or regular"
+            " expressions. Follow next_cursor with the identical query when incomplete."
+            " Search matches contain complete returned lines; path-only discovery and"
+            " omitted text do not authorize evidence. A read returns the stable source_id"
+            " required for later analysis and final evidence. Host paths are forbidden."
+            " Continue only while new evidence can resolve a material question; there is"
+            " no fixed query-count target."
             if config.repository_read else
             " inspect_source is limited to the supplied source IDs and visible ranges."
         )
         stage_protocol = (
             " You may finish with zero queries when the visible task already resolves the candidates."
             " Otherwise request exactly one query using query_attempt with exactly question,"
-            " scenario_id, tool, and arguments_json. Available tools are: inspect_source"
-            " {source_id:string,start_line:integer,end_line:integer};"
+            " scenario_id, tool, and arguments_json. The compatible inspect_source read"
+            " form is {source_id:string,start_line:integer,end_line:integer};"
             " inspect_program_structure {source_id:string}; inspect_dependency_usage"
             " {source_id:string}. arguments_json must encode the named argument object."
             " After a receipt, previous_receipt_assessment must identify that attempt and"

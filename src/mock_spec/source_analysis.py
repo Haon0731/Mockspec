@@ -10,6 +10,35 @@ from .schemas import UnifiedTask
 from .validation import SourceStore, InputValidationError
 
 
+def normalize_source_arguments(arguments: dict) -> dict:
+    """Validate the shared SDK/research read-search wire protocol without coercion."""
+    allowed = {"operation", "source_id", "path", "start_line", "end_line",
+               "path_pattern", "text", "cursor"}
+    if not isinstance(arguments, dict) or set(arguments) - allowed:
+        raise ValueError("Unknown source operation arguments")
+    values = {key: value for key, value in arguments.items() if value is not None}
+    operation = values.pop("operation", "read")
+    if operation == "read":
+        locator_keys = set(values) & {"source_id", "path"}
+        if len(locator_keys) != 1 or set(values) != locator_keys | {"start_line", "end_line"}:
+            raise ValueError("Read requires one locator and an inclusive line range")
+        locator = values[next(iter(locator_keys))]
+        if type(locator) is not str or not locator.strip():
+            raise ValueError("Read locator must be a non-empty string")
+        if any(type(values[key]) is not int for key in ("start_line", "end_line")):
+            raise ValueError("Line bounds must be integers")
+    elif operation == "search":
+        if set(values) - {"path_pattern", "text", "cursor"} or not (
+            set(values) & {"path_pattern", "text"}
+        ):
+            raise ValueError("Search requires a path pattern or literal text")
+        if any(type(value) is not str or not value for value in values.values()):
+            raise ValueError("Search arguments must be non-empty strings")
+    else:
+        raise ValueError("Unknown source operation")
+    return {"operation": operation, **values}
+
+
 class SourceAnalysis:
     """Analyze only text already admitted by the host Adapter, never model paths."""
 
@@ -59,6 +88,7 @@ class SourceAnalysis:
                 "status": "incomplete", "backend": "source_store",
                 "source_id": result["source_id"], "start_line": result["start_line"],
                 "end_line": result["end_line"], "error_code": "output_limit",
+                "usage": result.get("usage", {}),
                 "diagnostics": ["Requested source text omitted; request a smaller range."],
                 "limitations": ["Omission does not establish absence of behavior."],
             }
@@ -95,25 +125,52 @@ class SourceAnalysis:
         return bounded
 
     async def inspect_source(
-        self, source_id: str, start_line: int, end_line: int,
-        *, response_id: str | None = None,
+        self, source_id: str | None = None, start_line: int | None = None,
+        end_line: int | None = None, *, operation: str = "read",
+        path: str | None = None, path_pattern: str | None = None,
+        text: str | None = None, cursor: str | None = None,
+        response_id: str | None = None,
     ) -> dict:
         """Read initial IDs or bound logical paths, recording only returned lines."""
         try:
-            source = self.store.read(source_id, start_line, end_line)
+            arguments = normalize_source_arguments({
+                "operation": operation, "source_id": source_id, "path": path,
+                "start_line": start_line, "end_line": end_line,
+                "path_pattern": path_pattern, "text": text, "cursor": cursor,
+            })
+        except ValueError:
+            return {"status": "error", "error_code": "invalid_arguments",
+                    "diagnostics": ["Invalid source operation arguments."]}
+        try:
+            if arguments["operation"] == "search":
+                return self.store.search(
+                    path_pattern=path_pattern, text=text, cursor=cursor,
+                    max_output_chars=self.max_output_chars, response_id=response_id,
+                )
+            assert start_line is not None and end_line is not None
+            locator = source_id if source_id is not None else path
+            assert locator is not None
+            source = self.store.read(locator, start_line, end_line)
             result = self.bounded({
                 "status": "ok", "backend": "source_store", "source_id": source.source_id,
                 "logical_path": source.logical_path,
                 "start_line": start_line, "end_line": end_line,
                 "text": source.text, "limitations": [],
+                "usage": self.store.last_read_usage,
             })
             if result.get("status") == "ok" and "text" in result:
                 self.store.record_observation(source, response_id=response_id)
             return result
+        except TimeoutError:
+            return {"status": "error", "error_code": "timeout", "complete": False,
+                    "usage": self.store.last_read_usage,
+                    "diagnostics": ["The source operation deadline was exhausted."]}
         except (InputValidationError, ValueError, TypeError, OSError) as exc:
             code = ("source_changed" if "identity changed" in str(exc)
-                    or "content changed" in str(exc) else "invalid_source_or_range")
+                    or "content changed" in str(exc) or "evidence is invalid" in str(exc)
+                    else "invalid_source_or_range")
             return {"status": "error", "error_code": code,
+                    "usage": self.store.last_read_usage if operation == "read" else {},
                     "diagnostics": [
                         "Source unavailable: invalid range, denied path, or frozen identity changed."
                     ]}

@@ -7,6 +7,7 @@ import hashlib
 import io
 import json
 import re
+import uuid
 import tokenize
 from types import MappingProxyType
 from typing import TYPE_CHECKING
@@ -131,6 +132,13 @@ class SourceStore:
         self._observed_sources: dict[str, dict[int, str]] = {}
         self._observed_paths: dict[str, str] = {}
         self._repository_sources: dict[str, str] = {}
+        self._run_id = uuid.uuid4().hex
+        self.last_read_usage: dict = {"bytes": 0, "elapsed_seconds": 0.0}
+        self._deadline: float | None = None
+
+    def limit_deadline(self, deadline: float) -> None:
+        """Keep the earliest host deadline across tool reconstruction."""
+        self._deadline = deadline if self._deadline is None else min(self._deadline, deadline)
 
     @property
     def repository(self) -> ReviewedRepository | None:
@@ -140,6 +148,33 @@ class SourceStore:
         """Reject accidental reuse of a run-scoped store with a different task."""
         if not isinstance(task, UnifiedTask) or task.to_dict() != self._task_data:
             raise InputValidationError("source store task identity mismatch")
+        if self._repository is not None:
+            self._repository.assert_valid()
+
+    def search(
+        self, *, path_pattern: str | None = None, text: str | None = None,
+        cursor: str | None = None, max_output_chars: int = 16000,
+        response_id: str | None = None,
+    ) -> dict:
+        """Publish only complete returned match lines as observed evidence."""
+        if self._repository is None:
+            return {"status": "error", "error_code": "repository_search_unavailable",
+                    "complete": False, "matches": [], "next_cursor": None}
+        result = self._repository.search(
+            path_pattern=path_pattern, text=text, cursor=cursor,
+            max_output_chars=max_output_chars, run_id=self._run_id,
+            deadline=self._deadline,
+        )
+        for match in result["matches"]:
+            self._repository_sources[match["source_id"]] = match["logical_path"]
+            if match["text"] is not None:
+                self.record_observation(SourceSlice(
+                    source_id=match["source_id"], logical_path=match["logical_path"],
+                    start_line=match["start_line"], end_line=match["end_line"],
+                    text=match["text"], symbol=None, resolution_status="resolved",
+                    target_precision="file",
+                ), response_id=response_id)
+        return result
 
     def get(self, source_id: str) -> Source:
         if type(source_id) is not str:
@@ -170,6 +205,7 @@ class SourceStore:
 
     def read(self, locator: str, start_line: int, end_line: int) -> SourceSlice:
         """Read an initial fragment by ID or an allowed whole file by logical path."""
+        self.last_read_usage = {"bytes": 0, "elapsed_seconds": 0.0}
         if type(locator) is not str:
             raise InputValidationError("unknown source_id or logical path")
         if locator in self._sources:
@@ -191,7 +227,7 @@ class SourceStore:
                     target_precision=source.target_precision,
                 )
             if self._repository is not None:
-                repository_source = self._repository.read(
+                repository_source = self._read_repository(
                     source.logical_path, start_line, end_line
                 )
                 self._repository_sources[
@@ -200,16 +236,25 @@ class SourceStore:
                 return repository_source
             raise InputValidationError("invalid visible line range")
         if locator in self._repository_sources and self._repository is not None:
-            return self._repository.read(
+            return self._read_repository(
                 self._repository_sources[locator], start_line, end_line
             )
         if self._repository is None:
             raise InputValidationError("unknown source_id or logical path")
-        repository_slice = self._repository.read(locator, start_line, end_line)
+        repository_slice = self._read_repository(locator, start_line, end_line)
         self._repository_sources[
             repository_slice.source_id
         ] = repository_slice.logical_path
         return repository_slice
+
+    def _read_repository(self, locator: str, start_line: int, end_line: int) -> SourceSlice:
+        assert self._repository is not None
+        try:
+            return self._repository.read(
+                locator, start_line, end_line, run_id=self._run_id, deadline=self._deadline
+            )
+        finally:
+            self.last_read_usage = self._repository.last_read_usage
 
     def record_observation(
         self, source: Source | SourceSlice, *, response_id: str | None = None
@@ -229,9 +274,7 @@ class SourceStore:
         else:
             if self._repository is None:
                 raise InputValidationError("observation source identity mismatch")
-            expected = self._repository.read(
-                source.logical_path, source.start_line, source.end_line
-            )
+            expected = self._repository.authenticate_observation(source, run_id=self._run_id)
         if (
             expected.source_id != source.source_id
             or expected.logical_path != source.logical_path
@@ -252,6 +295,8 @@ class SourceStore:
                 raise InputValidationError("observed source content changed")
             observed[line_number] = line
         self._observations.append({
+            "run_id": self._run_id,
+            "case_id": self._task_data["case_id"],
             "snapshot_id": (
                 self._repository.snapshot_id if self._repository is not None else None
             ),

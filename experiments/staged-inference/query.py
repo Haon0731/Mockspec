@@ -6,7 +6,7 @@ import asyncio
 import time
 from typing import Any
 
-from mock_spec.source_analysis import SourceAnalysis
+from mock_spec.source_analysis import SourceAnalysis, normalize_source_arguments
 from mock_spec.schemas import UnifiedTask
 from mock_spec.validation import SourceStore, decode_json
 
@@ -39,6 +39,7 @@ class QueryExecutor:
         )
         self.max_attempts = max_attempts
         self.deadline = deadline
+        self.analysis.store.limit_deadline(deadline)
         self.attempts: list[dict[str, Any]] = []
 
     @property
@@ -203,22 +204,21 @@ class QueryExecutor:
 
     @staticmethod
     def _validate_arguments(tool: str, arguments: dict[str, object]) -> dict[str, Any]:
-        expected = (
-            {"source_id", "start_line", "end_line"}
-            if tool == "inspect_source" else {"source_id"}
-        )
-        if set(arguments) != expected:
+        if tool == "inspect_source":
+            try:
+                return normalize_source_arguments(arguments)
+            except (TypeError, ValueError):
+                return QueryExecutor._error(
+                    "invalid_arguments",
+                    "inspect_source arguments must describe one valid search or read.",
+                )
+        if set(arguments) != {"source_id"}:
             return QueryExecutor._error(
                 "invalid_arguments", "Tool arguments have missing or unknown fields."
             )
         source_id = arguments.get("source_id")
         if not isinstance(source_id, str) or not source_id.strip():
             return QueryExecutor._error("wrong_type", "source_id must be a non-empty string.")
-        if tool == "inspect_source":
-            start = arguments.get("start_line")
-            end = arguments.get("end_line")
-            if type(start) is not int or type(end) is not int:
-                return QueryExecutor._error("wrong_type", "Source line bounds must be integers.")
         return arguments
 
     @staticmethod

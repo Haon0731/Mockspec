@@ -94,8 +94,11 @@ def test_adjacent_observations_are_citeable_but_gaps_and_wrong_quotes_fail(
         )
 
         gap_store = SourceStore(task, repository=repository)
+        with pytest.raises(InputValidationError, match="content or identity changed"):
+            gap_store.record_observation(first)
+        first_in_gap_run = gap_store.read(logical_path, 1, 1)
         third = gap_store.read(logical_path, 3, 3)
-        gap_store.record_observation(first)
+        gap_store.record_observation(first_in_gap_run)
         gap_store.record_observation(third)
         with pytest.raises(ValueError, match="unobserved"):
             validate_contract(
