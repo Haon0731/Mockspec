@@ -21,6 +21,8 @@ PRD 不作为当前能力或已通过验收的说明。
 保留当时两例未通过适用性核对的结论；后续[案例寻找与准入记录](../out/staged-inference/issue17-case-search-20261026/report.md)
 新增合格 CloudFoundry 案例，G2 已通过。后续[单次真实验收](../out/staged-inference/issue17-cloudfoundry-m2-20261026/report.md)
 通过 G3，模型发起自主搜索后因回执评估含额外字段失败；G4 未通过，#17 仍开放。
+随后[独立结构化输出诊断](../out/staged-inference/issue17-response-conformance-20261026/report.md)
+核验了实际 HTTP Schema；唯一合成对抗请求合规，但未复现或修复原故障，不计作 M2 通过。
 
 以下研究结果不等于生产 Agent 已具备对应能力；阅读案例分析也不能作为未来无指导生成的输入。
 

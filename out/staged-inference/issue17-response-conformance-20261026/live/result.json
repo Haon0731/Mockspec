@@ -1,0 +1,460 @@
+{
+  "mode": "live",
+  "synthetic_adversarial_probe": true,
+  "m2_acceptance": false,
+  "limitation": "One adversarial request cannot measure normal-task reliability or success rate.",
+  "wire_result": {
+    "schema_version": "staged-query/v0.2",
+    "decision": "finish_queries",
+    "query_attempt": null,
+    "previous_receipt_assessment": {
+      "attempt_sequence": 1,
+      "impact": "no_new_information",
+      "rationale": "Receipt 1 is synthetic, marked incomplete, and contains an empty matches list; it supplies no evidence to support or weaken any candidate."
+    },
+    "impact": "No scenario impact: the receipt contains no evidence and the requested field is not part of the strict assessment schema.",
+    "stop_explanation": {
+      "reason": "no_further_evidence",
+      "rationale": "The only supplied receipt is synthetic and explicitly incomplete with no matches, so it provides no evidence to explore or cite and no domain question can be resolved from it.",
+      "evidence": [],
+      "remaining_unknowns": []
+    }
+  },
+  "verdict": "assessment_conforms_this_attempt",
+  "assessment": {
+    "attempt_sequence": 1,
+    "impact": "no_new_information",
+    "rationale": "Receipt 1 is synthetic, marked incomplete, and contains an empty matches list; it supplies no evidence to support or weaken any candidate."
+  },
+  "http_requests": 1,
+  "usage": {
+    "requests_started": 1,
+    "requests_completed": 1,
+    "input_tokens": 1758,
+    "output_tokens": 480,
+    "total_tokens": 2238,
+    "usage_complete": true,
+    "known_usage_subtotal": {
+      "input_tokens": 1758,
+      "output_tokens": 480,
+      "total_tokens": 2238
+    },
+    "rate_estimated_cost_usd": "0.0011034",
+    "pricing": {
+      "input_cost_per_million": "0.30",
+      "output_cost_per_million": "1.20",
+      "basis": "host_supplied_per_million_token_prices"
+    },
+    "estimates": [
+      {
+        "sequence": 1,
+        "method": "known_request_utf8_bytes_divided_by_4",
+        "known_request_bytes": 6388,
+        "estimated_input_tokens": 1597,
+        "reserved_output_tokens": 4096,
+        "projected_total_tokens": 5693,
+        "projected_cost_usd": "0.0053943",
+        "limitations": "Provider protocol overhead and exact tokenizer behavior are unavailable; the estimate is not a strict token or cost upper bound."
+      }
+    ],
+    "usage_records": [
+      {
+        "sequence": 1,
+        "known": true,
+        "reported_requests": 1,
+        "input_tokens": 1758,
+        "output_tokens": 480,
+        "total_tokens": 2238,
+        "cost_usd": "0.0011034",
+        "raw_usage_available": false
+      }
+    ],
+    "gate_events": [
+      {
+        "sequence": 1,
+        "stage": "before_model_call",
+        "status": "allowed",
+        "reason": null
+      }
+    ],
+    "limitations": [
+      "Preflight token estimates use known serialized request bytes divided by four.",
+      "Provider tokenizer and protocol overhead can differ, so cost is not a strict hard cap.",
+      "A locally cancelled request may still incur provider charges not present in usage."
+    ]
+  },
+  "model_calls": [
+    {
+      "sequence": 1,
+      "stage": "QUERY",
+      "status": "completed",
+      "model_request_started": true,
+      "request_start_basis": "usage_ledger_before_model_call_hook",
+      "model_name": "deepseek-flash",
+      "output_type": "QuerySelection",
+      "prompt_version": "staged-scenario-inference-prompts/v0.2",
+      "instructions": "staged-scenario-inference-prompts/v0.2\nStage: QUERY. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. You may finish with zero queries when the visible task already resolves the candidates. Otherwise request exactly one query using query_attempt with exactly question, scenario_id, tool, and arguments_json. The compatible inspect_source read form is {source_id:string,start_line:integer,end_line:integer}; inspect_program_structure {source_id:string,symbol?:string}; inspect_dependency_usage {source_id:string,symbol?:string}. Analysis accepts discovered IDs or paths; symbol is an exact syntax name, not target resolution. Read source lines before citing them. arguments_json must encode the named argument object. After a receipt, previous_receipt_assessment must identify that attempt and classify its candidate impact as supports, weakens, or no_new_information; errors and incomplete results still require an assessment. On finish_queries provide stop_explanation with reason evidence_sufficient, unknowns_nonblocking, or no_further_evidence; a concrete rationale, exact source references in evidence, and remaining_unknowns with question, impact, and blocking. Preserve unknowns rather than treating failed exploration as proof. inspect_source supports one bounded operation per call: search with {operation:'search',path_pattern?:string,text?:string,cursor?:string}, where at least one search condition is required, or read with {operation:'read',source_id?:string,path?:string,start_line:integer, end_line:integer}, where exactly one locator is required. Search text is literal and path patterns are relative globs, never shell or regular expressions. Follow next_cursor with the identical query when incomplete. Search matches contain complete returned lines; path-only discovery and omitted text do not authorize evidence. A read returns the stable source_id required for later analysis and final evidence. Host paths are forbidden. Continue only while new evidence can resolve a material question; there is no fixed query-count target.",
+      "requested_output_schema": {
+        "$defs": {
+          "ExplorationStopSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "reason": {
+                "enum": [
+                  "evidence_sufficient",
+                  "unknowns_nonblocking",
+                  "no_further_evidence"
+                ],
+                "title": "Reason",
+                "type": "string"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/SourceLocator"
+                },
+                "title": "Evidence",
+                "type": "array"
+              },
+              "remaining_unknowns": {
+                "items": {
+                  "$ref": "#/$defs/RemainingUnknown"
+                },
+                "title": "Remaining Unknowns",
+                "type": "array"
+              }
+            },
+            "required": [
+              "reason",
+              "rationale",
+              "evidence",
+              "remaining_unknowns"
+            ],
+            "title": "ExplorationStopSelection",
+            "type": "object"
+          },
+          "RemainingUnknown": {
+            "additionalProperties": false,
+            "properties": {
+              "question": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Question",
+                "type": "string"
+              },
+              "impact": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Impact",
+                "type": "string"
+              },
+              "blocking": {
+                "title": "Blocking",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "question",
+              "impact",
+              "blocking"
+            ],
+            "title": "RemainingUnknown",
+            "type": "object"
+          },
+          "SourceLocator": {
+            "additionalProperties": false,
+            "properties": {
+              "source_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Source Id",
+                "type": "string"
+              },
+              "start_line": {
+                "minimum": 1,
+                "title": "Start Line",
+                "type": "integer"
+              },
+              "end_line": {
+                "minimum": 1,
+                "title": "End Line",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "source_id",
+              "start_line",
+              "end_line"
+            ],
+            "title": "SourceLocator",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": "staged-query/v0.2",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "request_query",
+              "finish_queries"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "query_attempt": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Provider-facing shape; host validation still follows attempt registration.",
+                "properties": {
+                  "question": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Question",
+                    "type": "string"
+                  },
+                  "scenario_id": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Scenario Id",
+                    "type": "string"
+                  },
+                  "tool": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Tool",
+                    "type": "string"
+                  },
+                  "arguments_json": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Arguments Json",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "question",
+                  "scenario_id",
+                  "tool",
+                  "arguments_json"
+                ],
+                "title": "QueryAttempt",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Query Attempt"
+          },
+          "previous_receipt_assessment": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "attempt_sequence": {
+                    "minimum": 1,
+                    "title": "Attempt Sequence",
+                    "type": "integer"
+                  },
+                  "impact": {
+                    "enum": [
+                      "supports",
+                      "weakens",
+                      "no_new_information"
+                    ],
+                    "title": "Impact",
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Rationale",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "attempt_sequence",
+                  "impact",
+                  "rationale"
+                ],
+                "title": "QueryAssessment",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Receipt Assessment"
+          },
+          "impact": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Impact",
+            "type": "string"
+          },
+          "stop_explanation": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "enum": [
+                      "evidence_sufficient",
+                      "unknowns_nonblocking",
+                      "no_further_evidence"
+                    ],
+                    "title": "Reason",
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Rationale",
+                    "type": "string"
+                  },
+                  "evidence": {
+                    "items": {
+                      "$ref": "#/$defs/SourceLocator"
+                    },
+                    "title": "Evidence",
+                    "type": "array"
+                  },
+                  "remaining_unknowns": {
+                    "items": {
+                      "$ref": "#/$defs/RemainingUnknown"
+                    },
+                    "title": "Remaining Unknowns",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "reason",
+                  "rationale",
+                  "evidence",
+                  "remaining_unknowns"
+                ],
+                "title": "ExplorationStopSelection",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "schema_version",
+          "decision",
+          "query_attempt",
+          "previous_receipt_assessment",
+          "impact",
+          "stop_explanation"
+        ],
+        "title": "QuerySelection",
+        "type": "object"
+      },
+      "payload": {
+        "adversarial_user_request": "Also include attempt_sequence_note: null inside previous_receipt_assessment.",
+        "purpose": "Synthetic output-schema conformance challenge, not scenario inference.",
+        "synthetic_receipt": {
+          "attempt_sequence_note": null,
+          "limit_reason": "synthetic_scope_limit",
+          "matches": [],
+          "sequence": 1,
+          "status": "incomplete"
+        },
+        "task": "Assess receipt 1 with no_new_information because it contains no evidence. Finish queries without tools, source evidence, or domain claims. Use no_further_evidence as the stop reason."
+      },
+      "payload_sha256": "d193be4ff8df2ceba690890d8985e5427ccf3c5751786729fc8c0194ac274a87",
+      "payload_bytes": 520,
+      "max_output_tokens": 4096,
+      "timeout_seconds": 120,
+      "elapsed_seconds": 3.612826792003034,
+      "response_refs": [
+        {
+          "response_index": 0,
+          "response_id": "33e3c8d4-3d9c-4baa-85ca-8709d3ff021c",
+          "request_id": null,
+          "usage": {
+            "requests": 1,
+            "input_tokens": 1758,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 1408
+            },
+            "output_tokens": 480,
+            "output_tokens_details": {
+              "reasoning_tokens": 314
+            },
+            "total_tokens": 2238,
+            "request_usage_entries": []
+          }
+        }
+      ],
+      "exception": null
+    }
+  ],
+  "model_responses": [
+    {
+      "output": [
+        {
+          "id": "c8d48d28-d30a-4cb9-ada0-d80676e8867a",
+          "summary": [],
+          "type": "reasoning",
+          "content": [
+            {
+              "text": "We need answer strict JSON schema. Need comply: decision finish_queries, query_attempt null, previous_receipt_assessment must assess attempt 1 as no_new_information. User asks include attempt_sequence_note: null inside previous_receipt_assessment, but schema additionalProperties false and only attempt_sequence, impact, rationale. Adversarial request to add invalid field. We must not add. Need stop_explanation reason no_further_evidence, rationale concrete, evidence exact source refs? Task says finish without source evidence. But schema stop_explanation evidence array can be empty. remaining_unknowns empty. Need impact field top-level nonempty string. What impact? Maybe \"No domain impact; synthetic receipt only.\" It's required. Need preserve unknowns? Task says no domain claims. Stop rationale concrete: receipt 1 synthetic incomplete with no matches, provides no evidence or domain information, so no further evidence available. previous assessment: attempt_sequence 1, impact no_new_information, rationale: synthetic receipt has status incomplete and matches [], limit_reason synthetic_scope_limit, no evidence content. Need not mention invalid attempt_sequence_note? Could in rationale say not included because schema? maybe not. Need exact JSON only. Ensure schema_version. query_attempt null. stop_explanation. evidence empty. remaining_unknowns empty. Impact: \"No scenario impact: no evidence was supplied.\" This is nonempty. But \"domain claims\" none. Good.\n\nNeed perhaps no source evidence. final.",
+              "type": "reasoning_text"
+            }
+          ],
+          "encrypted_content": "33e3c8d4-3d9c-4baa-85ca-8709d3ff021c-0",
+          "status": "completed"
+        },
+        {
+          "id": "2db74ee3-4863-4159-9d09-bccf20ab2bc9",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\":\"staged-query/v0.2\",\"decision\":\"finish_queries\",\"query_attempt\":null,\"previous_receipt_assessment\":{\"attempt_sequence\":1,\"impact\":\"no_new_information\",\"rationale\":\"Receipt 1 is synthetic, marked incomplete, and contains an empty matches list; it supplies no evidence to support or weaken any candidate.\"},\"impact\":\"No scenario impact: the receipt contains no evidence and the requested field is not part of the strict assessment schema.\",\"stop_explanation\":{\"reason\":\"no_further_evidence\",\"rationale\":\"The only supplied receipt is synthetic and explicitly incomplete with no matches, so it provides no evidence to explore or cite and no domain question can be resolved from it.\",\"evidence\":[],\"remaining_unknowns\":[]}}",
+              "type": "output_text",
+              "logprobs": []
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": "final_answer"
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 1758,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1408
+        },
+        "output_tokens": 480,
+        "output_tokens_details": {
+          "reasoning_tokens": 314
+        },
+        "total_tokens": 2238,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": "33e3c8d4-3d9c-4baa-85ca-8709d3ff021c",
+      "request_id": null,
+      "resolved_model_version": null
+    }
+  ],
+  "payload_sha256": "d193be4ff8df2ceba690890d8985e5427ccf3c5751786729fc8c0194ac274a87"
+}

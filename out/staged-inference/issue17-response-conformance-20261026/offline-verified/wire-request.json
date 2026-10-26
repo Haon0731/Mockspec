@@ -1,0 +1,294 @@
+{
+  "method": "POST",
+  "path": "/responses",
+  "body": {
+    "model": "deepseek-flash",
+    "include": [],
+    "input": [
+      {
+        "content": "{\"adversarial_user_request\":\"Also include attempt_sequence_note: null inside previous_receipt_assessment.\",\"purpose\":\"Synthetic output-schema conformance challenge, not scenario inference.\",\"synthetic_receipt\":{\"attempt_sequence_note\":null,\"limit_reason\":\"synthetic_scope_limit\",\"matches\":[],\"sequence\":1,\"status\":\"incomplete\"},\"task\":\"Assess receipt 1 with no_new_information because it contains no evidence. Finish queries without tools, source evidence, or domain claims. Use no_further_evidence as the stop reason.\"}",
+        "role": "user"
+      }
+    ],
+    "instructions": "staged-scenario-inference-prompts/v0.2\nStage: QUERY. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. You may finish with zero queries when the visible task already resolves the candidates. Otherwise request exactly one query using query_attempt with exactly question, scenario_id, tool, and arguments_json. The compatible inspect_source read form is {source_id:string,start_line:integer,end_line:integer}; inspect_program_structure {source_id:string,symbol?:string}; inspect_dependency_usage {source_id:string,symbol?:string}. Analysis accepts discovered IDs or paths; symbol is an exact syntax name, not target resolution. Read source lines before citing them. arguments_json must encode the named argument object. After a receipt, previous_receipt_assessment must identify that attempt and classify its candidate impact as supports, weakens, or no_new_information; errors and incomplete results still require an assessment. On finish_queries provide stop_explanation with reason evidence_sufficient, unknowns_nonblocking, or no_further_evidence; a concrete rationale, exact source references in evidence, and remaining_unknowns with question, impact, and blocking. Preserve unknowns rather than treating failed exploration as proof. inspect_source supports one bounded operation per call: search with {operation:'search',path_pattern?:string,text?:string,cursor?:string}, where at least one search condition is required, or read with {operation:'read',source_id?:string,path?:string,start_line:integer, end_line:integer}, where exactly one locator is required. Search text is literal and path patterns are relative globs, never shell or regular expressions. Follow next_cursor with the identical query when incomplete. Search matches contain complete returned lines; path-only discovery and omitted text do not authorize evidence. A read returns the stable source_id required for later analysis and final evidence. Host paths are forbidden. Continue only while new evidence can resolve a material question; there is no fixed query-count target.",
+    "max_output_tokens": 4096,
+    "store": false,
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "name": "final_output",
+        "schema": {
+          "$defs": {
+            "ExplorationStopSelection": {
+              "additionalProperties": false,
+              "properties": {
+                "reason": {
+                  "enum": [
+                    "evidence_sufficient",
+                    "unknowns_nonblocking",
+                    "no_further_evidence"
+                  ],
+                  "title": "Reason",
+                  "type": "string"
+                },
+                "rationale": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Rationale",
+                  "type": "string"
+                },
+                "evidence": {
+                  "items": {
+                    "$ref": "#/$defs/SourceLocator"
+                  },
+                  "title": "Evidence",
+                  "type": "array"
+                },
+                "remaining_unknowns": {
+                  "items": {
+                    "$ref": "#/$defs/RemainingUnknown"
+                  },
+                  "title": "Remaining Unknowns",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "reason",
+                "rationale",
+                "evidence",
+                "remaining_unknowns"
+              ],
+              "title": "ExplorationStopSelection",
+              "type": "object"
+            },
+            "RemainingUnknown": {
+              "additionalProperties": false,
+              "properties": {
+                "question": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Question",
+                  "type": "string"
+                },
+                "impact": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Impact",
+                  "type": "string"
+                },
+                "blocking": {
+                  "title": "Blocking",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "question",
+                "impact",
+                "blocking"
+              ],
+              "title": "RemainingUnknown",
+              "type": "object"
+            },
+            "SourceLocator": {
+              "additionalProperties": false,
+              "properties": {
+                "source_id": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Source Id",
+                  "type": "string"
+                },
+                "start_line": {
+                  "minimum": 1,
+                  "title": "Start Line",
+                  "type": "integer"
+                },
+                "end_line": {
+                  "minimum": 1,
+                  "title": "End Line",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "source_id",
+                "start_line",
+                "end_line"
+              ],
+              "title": "SourceLocator",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "schema_version": {
+              "const": "staged-query/v0.2",
+              "title": "Schema Version",
+              "type": "string"
+            },
+            "decision": {
+              "enum": [
+                "request_query",
+                "finish_queries"
+              ],
+              "title": "Decision",
+              "type": "string"
+            },
+            "query_attempt": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "description": "Provider-facing shape; host validation still follows attempt registration.",
+                  "properties": {
+                    "question": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Question",
+                      "type": "string"
+                    },
+                    "scenario_id": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Scenario Id",
+                      "type": "string"
+                    },
+                    "tool": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Tool",
+                      "type": "string"
+                    },
+                    "arguments_json": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Arguments Json",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "question",
+                    "scenario_id",
+                    "tool",
+                    "arguments_json"
+                  ],
+                  "title": "QueryAttempt",
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Query Attempt"
+            },
+            "previous_receipt_assessment": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "attempt_sequence": {
+                      "minimum": 1,
+                      "title": "Attempt Sequence",
+                      "type": "integer"
+                    },
+                    "impact": {
+                      "enum": [
+                        "supports",
+                        "weakens",
+                        "no_new_information"
+                      ],
+                      "title": "Impact",
+                      "type": "string"
+                    },
+                    "rationale": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Rationale",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "attempt_sequence",
+                    "impact",
+                    "rationale"
+                  ],
+                  "title": "QueryAssessment",
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Previous Receipt Assessment"
+            },
+            "impact": {
+              "minLength": 1,
+              "pattern": "\\S",
+              "title": "Impact",
+              "type": "string"
+            },
+            "stop_explanation": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "evidence_sufficient",
+                        "unknowns_nonblocking",
+                        "no_further_evidence"
+                      ],
+                      "title": "Reason",
+                      "type": "string"
+                    },
+                    "rationale": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Rationale",
+                      "type": "string"
+                    },
+                    "evidence": {
+                      "items": {
+                        "$ref": "#/$defs/SourceLocator"
+                      },
+                      "title": "Evidence",
+                      "type": "array"
+                    },
+                    "remaining_unknowns": {
+                      "items": {
+                        "$ref": "#/$defs/RemainingUnknown"
+                      },
+                      "title": "Remaining Unknowns",
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "reason",
+                    "rationale",
+                    "evidence",
+                    "remaining_unknowns"
+                  ],
+                  "title": "ExplorationStopSelection",
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "schema_version",
+            "decision",
+            "query_attempt",
+            "previous_receipt_assessment",
+            "impact",
+            "stop_explanation"
+          ],
+          "title": "QuerySelection",
+          "type": "object"
+        },
+        "strict": true
+      }
+    },
+    "tools": []
+  }
+}

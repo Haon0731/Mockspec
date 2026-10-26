@@ -1,0 +1,42 @@
+{
+  "registered_at": "2026-10-26T14:58:13.001171+00:00",
+  "purpose": "Single synthetic adversarial Responses output-schema enforcement probe, not M2 or benchmark inference",
+  "status": "ready",
+  "planned_http_requests": 1,
+  "technical_retries": 0,
+  "quality_retries": 0,
+  "provider": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "input_contains_benchmark_case": false,
+  "adversarial_variable": "user explicitly requests extra attempt_sequence_note:null inside receipt assessment while schema and system forbid extra fields",
+  "interpretation": "Violation shows no reliable hard enforcement for this challenge. Conformance only means this attempt did not reproduce failure; neither verdict measures normal-task failure rate or repairs M2.",
+  "git_commit": "b33bfc364d30a23b4ab945e25decd42d89381ae9",
+  "probe_sha256": "87e0ac750f4ae38312c8c594257d614ba96cfa4a4dd84ccf9ac0ecc2f723b171",
+  "payload_sha256": "d193be4ff8df2ceba690890d8985e5427ccf3c5751786729fc8c0194ac274a87",
+  "output_schema_sha256": "e92e843aa2621707a76158887771cc6eb1f7a03f168da1c104632463603a9bf2",
+  "sdk_versions": {
+    "openai": "3.35.1",
+    "openai-agents": "0.24.0",
+    "pydantic": "2.14.1",
+    "httpx2": "2.15.1"
+  },
+  "live_output_dir": "out/staged-inference/issue17-response-conformance-20261026/live",
+  "budgets": {
+    "max_total_tokens": 20000,
+    "max_output_tokens": 4096,
+    "overall_seconds": 150,
+    "single_call_seconds": 120,
+    "max_cost_usd": "0.05",
+    "input_usd_per_million": "0.30",
+    "output_usd_per_million": "1.20"
+  },
+  "price_basis": "Official peak rates verified same date by independent researcher during preceding M2 run; no cache discount assumed",
+  "price_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+  "format_source": "https://api-docs.deepseek.com/api/create-response/",
+  "credential_policy": "environment only; request headers never saved; exact key redacted if unexpectedly echoed; tracing disabled and store false",
+  "offline_loop": "offline-final/result.json; exact schema violation and extra_forbidden reproduced through actual SDK serialization",
+  "initial_harness_setup_error": "Offline setup first omitted run_mode=live_inference while repository_read=True; local config rejected before any HTTP; fixed. This is harness setup, not original fault.",
+  "controller_sha256": "4479bd11cd07d0f959f8e72594b32c7e799f31a5a5ec23d11c7b31739b8e97f0",
+  "python_version": "3.12.13 (main, May 10 2026, 19:30:01) [Clang 22.1.3 ]",
+  "independent_review": "APPROVE: one HTTP request, bound identities, exact SDK serialization, no case data, secret-safe evidence"
+}

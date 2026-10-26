@@ -428,6 +428,9 @@ HTTP 400，已修复；逐调用诊断位于 `inference_record.json.model_calls`
 完成 G3 预检和单次运行。模型自主搜索取得父类声明行后，因回执评估多出
 `attempt_sequence_note` 被严格拒绝，未派发下一次读取，也未生成最终场景卡。
 G4 未通过；没有放宽 Schema、删除额外字段或自动重跑。
+后续[合成接口探针](../out/staged-inference/issue17-response-conformance-20261026/report.md)
+捕获实际 HTTP 请求并确认 strict/完整 Schema 保留；单次对抗请求合规，不能据此宣称
+原复杂任务问题已修复或恢复 M2。该探针属于单独留证的一次性诊断，不是生产入口。
 
 该案例精确 ID 为
 `de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri@d0085edf`，
