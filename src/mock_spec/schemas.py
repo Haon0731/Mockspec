@@ -12,6 +12,20 @@ class SchemaValidationError(ValueError):
     """Raised when task data violates the public input contract."""
 
 
+@dataclass(frozen=True)
+class SourceSlice:
+    """A run-time source range, which may consist only of blank lines."""
+
+    source_id: str
+    logical_path: str
+    text: str
+    symbol: str | None
+    start_line: int
+    end_line: int
+    resolution_status: str
+    target_precision: str
+
+
 def _require_mapping(value: object, path: str) -> Mapping[str, Any]:
     if not isinstance(value, dict):
         raise SchemaValidationError(f"{path} must be an object")

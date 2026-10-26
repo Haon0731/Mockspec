@@ -96,6 +96,7 @@ def _code_hashes() -> dict[str, str]:
         package / "budget.py",
         package / "source_tools.py",
         package / "source_analysis.py",
+        package / "source_repository.py",
         package / "analysis_process.py",
         package / "python_analysis.py",
         package / "python_analysis_runner.py",

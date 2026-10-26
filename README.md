@@ -43,8 +43,13 @@ CLI 默认仍为 V0.1，显式传 `--agent-version v0.2` 选择 V0.2。
    site-packages、依赖树，也不执行 Stub-Tester 的 loader、injector 或其他脚本。
 3. **Masking 检查**要求 Java 双区域为空、Python slot 集合和顺序一致且内容仅为 `pass`，
    同时拒绝本策略下的残留 mock 配置与验证。文件身份检查覆盖区域外的上下文。
-4. **Agent 边界**初始仅传递 `task.to_dict()`；验证器和 V0.2 工具只访问当前任务的内存 `SourceStore.get(source_id)`。
-   Store 不持有物理根目录或文件读取函数，不能以路径访问旧仓库。
+4. **Agent 边界**初始仅传递 `task.to_dict()`。默认仍为内存片段模式；V0.2 显式开启
+   `--repository-read` 时，宿主 Adapter 另行返回 `ReviewedRepository`，只绑定初始逻辑路径
+   对应的已审核完整文件。绑定及物理目录不进入 payload，也不能由模型更换。
+   工具和契约验证共用运行级 `SourceStore`，只登记实际返回的原文行；未读取的空洞不能引用。
+5. **扩展读取**使用目录描述符逐层打开并拒绝符号链接和非普通文件，每次读取核对已有文件身份。
+   路径越界、控制材料及内容变化均失败；不扫描其他文件、不重算全仓依赖身份、不自动批准输入。
+   仓库读取模式取消固定调用次数门禁，整次运行的超时、Token、费用及单次输出限制仍生效。
 
 Schema 合法不等于 masking 已审核。不能用 `UnifiedTask.from_dict()` 自行组装任意源码，
 再宣称它通过 Adapter 审核。内容检查也不是通用泄漏检测器：准入依据是已审查的固定

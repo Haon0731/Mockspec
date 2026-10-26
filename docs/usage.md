@@ -351,3 +351,35 @@ PYTHONPATH=src .venv/bin/python experiments/staged-inference/acceptance.py \
 本次预检发现缺少显式模型和 API 凭据，未发起真实模型请求；具体证据见
 [预检记录](../out/staged-inference/m1-validation/live-preflight.json)。
 真实产物可读性、场景推导质量与自主工具使用仍未验收，#11 和整个 M1 未全部完成。
+
+## 初始路径扩展读取（#13）
+
+生产 V0.2 的普通 CLI 与完整留证入口均可显式添加 `--repository-read`：
+
+```bash
+PYTHONPATH=src .venv/bin/python -m mock_spec.audited_run \
+  --agent-version v0.2 --language python --snapshot "$SNAPSHOT" \
+  --case-id flask_308 --model "$MOCKSPEC_MODEL" --standalone \
+  --repository-read --output-dir /tmp/mockspec-repository-run
+```
+
+其余凭据、超时、Token 与费用参数沿用上方运行约定；此示例不会自动配置模型或价格。
+研究入口 `experiments/staged-inference/run.py` 的 `--mode live_inference` 同样支持
+`--repository-read`，仍要求显式配置该入口的共享预算和价格。默认省略此参数时保留旧片段模式。
+V0.1 拒绝该选项；研究 synthetic_replay 的文件输入不能自行取得真实仓库准入。
+
+宿主 API 使用 Adapter 的 `load_task_with_repository` 返回 `(task, repository)`，
+再创建 `SourceStore(task, repository=repository)`，作为 `source_store` 传给 V0.2 推断。
+同一运行的工具与验证器必须共用该 Store；不同运行创建新 Store，用完关闭 repository。
+仅 `task.to_dict()` 进入初始模型输入，宿主绑定不会序列化。
+
+`inspect_source` 保持三个参数；`source_id` 可使用初始 ID、初始逻辑路径或本次返回的动态 ID。
+扩展读取返回动态 `source_id`，契约应使用回执中的 ID、行号与精确原文；相邻读取可合并引用，
+不能引用未返回的空洞。单次输出超限时返回省略回执，该片段不登记为已观察。
+两个语法工具仍分析可见片段或已观察且连续的文本，不隐式读取未返回源码。
+
+仓库模式不以 `max-turns`、`max-tool-calls` 或研究 `max-model-calls` 截断探索，
+仍共享整次运行超时、Token/费用账本与每次输出上限；记录中的有效次数上限为 null。
+SDK 轨迹包含原始参数、解析错误、调用 ID 与观察；研究记录保存查询回执和累计观察。
+路径、身份或分页内容变化失败也保留，失败不构成“没有相关行为”的证据。
+目前仅开放初始逻辑路径对应的完整审核文件；搜索、发现其他文件属于后续议题。

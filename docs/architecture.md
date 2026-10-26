@@ -26,7 +26,9 @@ budget.py                  inference_v02.py               source_tools.py
                                                         可见源码与语法事实
 ```
 
-`source_tools.build_source_tools` 每次构造独立的源码访问、调用计数与轨迹；它不负责推断。
+`source_tools.build_source_tools` 接收本次运行的 `SourceStore`，在 SDK 参数解析前登记原始请求、
+响应关联及失败；它不负责推断。默认片段模式保留原调用限额。显式仓库读取模式不设固定工具或
+SDK 轮数上限，由运行超时与共享用量账本停止。
 `InferenceBudget` 定义在 `budget.py`，原 `inference_v02.InferenceBudget` 导入仍可用。
 
 ## 一次输入如何流动
@@ -56,8 +58,9 @@ flowchart TD
 
 1. **输入审核**：宿主提供 snapshot 和 case ID。Adapter 检查已安装准入记录、文件身份和 masking，产出 `UnifiedTask`。
 2. **推断**：`infer_scenario` 将 `task.to_dict()` 作为初始输入。`build_agent` 配置对应 Prompt、模型、工具与 `output_type=ScenarioContract`。
-3. **工具查询**：V0.2 可以查询原文、程序结构和依赖使用。工具仅分析当前任务可见源码；分析失败或未解析状态保留。
-4. **输出验证**：模型返回候选契约；宿主检查结构、任务身份、引用、源码行范围和原文。引用存在不意味着结论成立。
+3. **工具查询**：V0.2 可以查询原文、程序结构和依赖使用。默认工具分析当前任务可见片段；仓库读取模式允许 `inspect_source` 的 `source_id` 参数
+   使用初始逻辑路径读取更多行，返回稳定的动态 source_id。分析失败或未解析状态保留。
+4. **输出验证**：模型返回候选契约；宿主使用同一运行 Store 检查结构、任务身份、初始或实际观察引用、源码行范围和原文。引用存在不意味着结论成立。
 5. **保存结果**：CLI 写简单 JSON；完整审计入口额外保存身份、原始响应、轨迹、用量和失败状态。
 
 ## 文件地图
@@ -69,6 +72,7 @@ flowchart TD
 | 审核输入 | [adapters/](../src/mock_spec/adapters/)、[schemas.py](../src/mock_spec/schemas.py)、[validation.py](../src/mock_spec/validation.py)、[reviewed_inputs.json](../src/mock_spec/reviewed_inputs.json) | 修改输入准入、源码范围或 SourceStore 时 |
 | Agent 核心 | [inference.py](../src/mock_spec/inference.py)、[inference_v02.py](../src/mock_spec/inference_v02.py)、[prompts/](../src/mock_spec/prompts/)、[scenario.py](../src/mock_spec/scenario.py) | 理解或修改场景推断与输出处理时 |
 | SDK 工具接入 | [source_tools.py](../src/mock_spec/source_tools.py) | 核对模型可见工具定义、任务级调用限额、轨迹与取消行为时 |
+| 宿主文件绑定 | [source_repository.py](../src/mock_spec/source_repository.py) | 初始路径的描述符相对读取、类型/大小限制及冻结身份核验；绑定不进入 UnifiedTask |
 | 源码工具 | [source_analysis.py](../src/mock_spec/source_analysis.py)、[python_analysis.py](../src/mock_spec/python_analysis.py)、[java_analysis.py](../src/mock_spec/java_analysis.py) | 核对可见源码与语法事实时 |
 | 解析进程 | [analysis_process.py](../src/mock_spec/analysis_process.py)、[python_analysis_runner.py](../src/mock_spec/python_analysis_runner.py)、[tools/](../src/mock_spec/tools/) | 检查超时、取消、隔离与 Java helper 时 |
 | 运行入口 | [cli.py](../src/mock_spec/cli.py)、[live.py](../src/mock_spec/live.py)、[audited_run.py](../src/mock_spec/audited_run.py) | 启动推断或选择留证方式时 |
@@ -141,7 +145,9 @@ M1-5 的 `acceptance.py` 汇总同一入口的固定回放并复核产物；`run
 `live_inference` 分支通过现有 Python Adapter 加载获准的 flask_308，再交给同一控制器。
 真实配置缺失时只记录预检缺口，不将固定模型或合成任务标为真实检查。
 `query.py` 的运行级 `QueryExecutor` 在参数解析前登记请求，再分派到既有
-`SourceAnalysis`；三种工具及失败、重试共用六次额度，第七次留拒绝回执且不执行分析。
+`SourceAnalysis`；旧片段模式的三种工具及失败、重试共用六次额度，第七次留拒绝回执且不执行分析。
+显式仓库读取模式改为共享超时、Token 与费用门禁，不以工具或模型调用次数截断；
+QueryExecutor 和各阶段契约检查共用本次 Store，观察记录随研究产物保存。
 模型经 QUERY 结构化消息请求工具，SDK 阶段 Agent 不注册可绕过计数的工具。
 后续 QUERY 评估上一回执，CONSTRUCT/DELIVER 接收累计回执；未完成判断明确留证。
 阶段切换和 SDK 对象重建不重置账本、模型请求数、查询数或绝对截止时间。

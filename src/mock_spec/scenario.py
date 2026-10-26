@@ -99,7 +99,7 @@ class ScenarioContract(ContractModel):
 
 
 def validate_contract(
-    output: object, task: UnifiedTask
+    output: object, task: UnifiedTask, *, source_store: SourceStore | None = None
 ) -> ScenarioContract:
     """Check shape, task identity, source ranges and exact quotes.
 
@@ -114,18 +114,15 @@ def validate_contract(
     contract = ScenarioContract.model_validate(output)
     if (contract.case_id, contract.language) != (task.case_id, task.language):
         raise ValueError("contract task identity mismatch")
-    store = SourceStore(task)
+    store = source_store or SourceStore(task)
+    store.validate_task(task)
     for evidence in contract.evidence:
-        source = store.get(evidence.source_id)
-        if not (
-            source.start_line <= evidence.start_line <= evidence.end_line <= source.end_line
-        ):
-            raise ValueError("evidence range outside allowed source")
-        lines = source.text.splitlines()
-        quote = "\n".join(lines[
-            evidence.start_line - source.start_line:
-            evidence.end_line - source.start_line + 1
-        ])
+        try:
+            quote = store.quote(
+                evidence.source_id, evidence.start_line, evidence.end_line
+            )
+        except ValueError as exc:
+            raise ValueError(str(exc)) from exc
         if evidence.quote != quote:
             raise ValueError("evidence quote does not match source range")
     return contract

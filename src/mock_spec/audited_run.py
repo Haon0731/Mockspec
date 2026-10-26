@@ -126,7 +126,15 @@ def main(argv: list[str] | None = None) -> int:
         "--standalone", action="store_true",
         help="Run one audited call outside the formal four-run experiment ledger.",
     )
+    parser.add_argument(
+        "--repository-read", action="store_true",
+        help="V0.2: read additional lines of initially reviewed logical paths.",
+    )
     args = parser.parse_args(argv)
+    if args.repository_read and args.agent_version != "v0.2":
+        parser.error("--repository-read requires --agent-version v0.2")
+    source_store = None
+
     args.model = (args.model or "").strip()
 
     if not args.model or not os.environ.get("OPENAI_API_KEY", "").strip():
@@ -165,7 +173,13 @@ def main(argv: list[str] | None = None) -> int:
             output_cost_per_million=args.output_cost_per_million,
         )
         loader = java.load_task if args.language == "java" else python.load_task
-        task = loader(args.snapshot, case_id=args.case_id)
+        if args.repository_read:
+            from .validation import SourceStore
+            adapter = java if args.language == "java" else python
+            task, repository = adapter.load_task_with_repository(args.snapshot, case_id=args.case_id)
+            source_store = SourceStore(task, repository=repository)
+        else:
+            task = loader(args.snapshot, case_id=args.case_id)
     except (InferenceError, ValueError, OSError) as exc:
         print(f"configuration/input error: {type(exc).__name__}", file=sys.stderr)
         return 2
@@ -194,8 +208,8 @@ def main(argv: list[str] | None = None) -> int:
         "model": args.model,
         "timeout_seconds": float(args.timeout),
         "configured_limits": {
-            "max_turns": budget.max_turns,
-            "max_tool_calls": budget.max_tool_calls,
+            "max_turns": None if args.repository_read else budget.max_turns,
+            "max_tool_calls": None if args.repository_read else budget.max_tool_calls,
             "max_output_tokens": budget.max_output_tokens,
             "max_total_tokens": budget.max_total_tokens,
             "max_tool_output_chars": budget.max_tool_output_chars,
@@ -265,8 +279,10 @@ def main(argv: list[str] | None = None) -> int:
         "packages": packages,
         "parameters": {
             "timeout_seconds": args.timeout,
-            "max_turns": 1 if args.agent_version == "v0.1" else budget.max_turns,
-            "max_tool_calls": None if args.agent_version == "v0.1" else budget.max_tool_calls,
+            "max_turns": (None if args.repository_read else
+                          1 if args.agent_version == "v0.1" else budget.max_turns),
+            "max_tool_calls": (None if args.repository_read or args.agent_version == "v0.1"
+                               else budget.max_tool_calls),
             "max_output_tokens": (
                 None if args.agent_version == "v0.1" else budget.max_output_tokens
             ),
@@ -306,6 +322,7 @@ def main(argv: list[str] | None = None) -> int:
             "configuration_sha256": formal_configuration_sha256,
             "application_level_retries": "none; retries require a new explicit attempt",
         },
+        "repository_read": args.repository_read,
         "raw_responses": raw_responses,
         "tool_trace": tool_trace,
         "usage": None,
@@ -347,6 +364,8 @@ def main(argv: list[str] | None = None) -> int:
                 tool_trace=tool_trace,
                 usage_ledger=usage_ledger,
             )
+        if source_store is not None:
+            kwargs["source_store"] = source_store
         contract = asyncio.run(selected.infer_scenario(task, **kwargs))
         artifact["contract"] = contract.model_dump()
         artifact["validation"] = "schema_and_evidence_locations_passed"

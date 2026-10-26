@@ -525,8 +525,8 @@ def query_script(
     count: int, replay_case: ReplayCase = "selected", *, variant: Literal["B", "C"] = "B"
 ) -> list[dict]:
     """Replay sequential queries across all three source tools, including repeats."""
-    if not 0 <= count <= 7:
-        raise ValueError("query count must be between zero and seven")
+    if type(count) is not int or count < 0:
+        raise ValueError("query count must be a non-negative integer")
     outputs = scripted_outputs(replay_case, variant=variant)
     queries = []
     for index in range(count + 1):

@@ -13,7 +13,9 @@ from decimal import Decimal
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
+import re
 import time
 from typing import Annotated, Any, Callable, Literal, TypeVar
 from uuid import uuid4
@@ -21,13 +23,14 @@ from uuid import uuid4
 from agents import Agent, ModelBehaviorError, ModelRetrySettings, ModelSettings, RunConfig, Runner
 from agents.models.interface import Model
 from agents.models.openai_responses import OpenAIResponsesModel
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, TypeAdapter, ValidationError, WithJsonSchema
 
 from mock_spec.budget import BudgetHooks, InferenceBudget, UsageLedger
 from mock_spec.execution_metadata import collect_execution_metadata
 from mock_spec.inference import InferenceError
 from mock_spec.scenario import ScenarioContract, validate_contract
 from mock_spec.schemas import UnifiedTask
+from mock_spec.source_repository import ReviewedRepository
 from mock_spec.validation import SourceStore
 
 from query import QueryExecutor
@@ -74,11 +77,26 @@ class QueryAssessment(StageModel):
     rationale: Text
 
 
+class QueryAttempt(StageModel):
+    """Provider-facing shape; host validation still follows attempt registration."""
+
+    question: Text
+    scenario_id: Text
+    tool: Text
+    arguments_json: Text
+
+
 class QueryResult(StageModel):
     schema_version: Literal["staged-query/v0.1"]
     decision: Literal["request_query", "finish_queries"]
-    query_attempt: Any | None
-    previous_receipt_assessment: Any | None = None
+    # Concrete wire schemas avoid untyped anyOf branches. Keep host values raw so
+    # malformed requests are counted before QueryExecutor validates them.
+    query_attempt: Annotated[Any | None, WithJsonSchema({
+        "anyOf": [QueryAttempt.model_json_schema(), {"type": "null"}],
+    })]
+    previous_receipt_assessment: Annotated[Any | None, WithJsonSchema({
+        "anyOf": [QueryAssessment.model_json_schema(), {"type": "null"}],
+    })] = None
     impact: Text
 
 
@@ -139,6 +157,7 @@ class StagedRunConfig:
     variant: Literal["B", "C"] = "B"
     run_mode: Literal["synthetic_replay", "live_inference"] = "synthetic_replay"
     model_name: str = "scripted-offline"
+    repository_read: bool = False
     max_model_calls: int = 10
     max_query_attempts: int = 6
     max_output_tokens: int = 4_096
@@ -157,6 +176,10 @@ class StagedRunConfig:
             raise ValueError("model_name is required")
         if self.run_mode not in ("synthetic_replay", "live_inference"):
             raise ValueError("run_mode must be synthetic_replay or live_inference")
+        if type(self.repository_read) is not bool:
+            raise ValueError("repository_read must be a boolean")
+        if self.repository_read and self.run_mode != "live_inference":
+            raise ValueError("repository_read requires live_inference")
         if self.run_mode == "synthetic_replay" and self.model_name != "scripted-offline":
             raise ValueError("synthetic replay requires the scripted-offline model profile")
         if self.run_mode == "live_inference" and self.model_name == "scripted-offline":
@@ -226,10 +249,100 @@ def _hash_file(path: Path) -> str:
     return sha256_bytes(path.read_bytes())
 
 
+_SECRET_PATTERNS = (
+    re.compile(r"(?i)\bBearer\s+[^\s,;]+"),
+    re.compile(r"\bsk-[A-Za-z0-9_-]+"),
+    re.compile(
+        r"(?i)\b(api[_-]?key|authorization|access[_-]?token|secret|password)\b"
+        r"[\"']?\s*[:=]\s*[\"']?[^\s,;\"'}]+"
+    ),
+)
+
+
+def _safe_external_text(value: object, *, limit: int = 500) -> str:
+    """Return a bounded diagnostic without credentials or authorization values."""
+    text = str(value or "")
+    api_key = os.environ.get("OPENAI_API_KEY", "")
+    if api_key:
+        text = text.replace(api_key, "<REDACTED>")
+    text = _SECRET_PATTERNS[0].sub("Bearer <REDACTED>", text)
+    text = _SECRET_PATTERNS[1].sub("<REDACTED>", text)
+    text = _SECRET_PATTERNS[2].sub(
+        lambda match: f"{match.group(1)}=<REDACTED>", text
+    )
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(text) > limit:
+        text = text[: limit - 1].rstrip() + "…"
+    return text
+
+
+def _exception_diagnostic(exc: BaseException, *, classification: str) -> dict[str, object]:
+    """Extract stable provider diagnostics without persisting bodies or headers."""
+    body = getattr(exc, "body", None)
+    provider_error = body.get("error", body) if isinstance(body, dict) else None
+    error_code = (
+        provider_error.get("code")
+        if isinstance(provider_error, dict) else None
+    )
+    if error_code is None:
+        error_code = getattr(exc, "code", None)
+    cause_types: list[str] = []
+    seen = {id(exc)}
+    current = exc.__cause__ or exc.__context__
+    while current is not None and id(current) not in seen and len(cause_types) < 6:
+        seen.add(id(current))
+        cause_types.append(type(current).__name__)
+        current = current.__cause__ or current.__context__
+    return {
+        "classification": classification,
+        "type": type(exc).__name__,
+        "message": _safe_external_text(exc),
+        "status_code": getattr(exc, "status_code", None),
+        "request_id": (
+            None
+            if getattr(exc, "request_id", None) is None
+            else _safe_external_text(getattr(exc, "request_id"), limit=200)
+        ),
+        "error_code": (
+            None if error_code is None else _safe_external_text(error_code, limit=200)
+        ),
+        "cause_types": cause_types,
+    }
+
+
+def _finish_model_call(
+    event: dict[str, object], *, started: float, ledger: UsageLedger,
+    responses: list[dict], response_start: int,
+) -> None:
+    requests_before = event.pop("ledger_requests_started_before")
+    if type(requests_before) is not int:
+        raise TypeError("model-call trace contains an invalid ledger baseline")
+    event["model_request_started"] = ledger.requests_started > requests_before
+    event["elapsed_seconds"] = time.monotonic() - started
+    event["response_refs"] = [
+        {
+            "response_index": index,
+            "response_id": response.get("response_id"),
+            "request_id": response.get("request_id"),
+            "usage": response.get("usage"),
+        }
+        for index, response in enumerate(responses[response_start:], start=response_start)
+    ]
+
+
 def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
                  config: StagedRunConfig) -> Agent[None]:
     stage_protocol = ""
     if stage == "QUERY":
+        repository_protocol = (
+            " For inspect_source, source_id also accepts an initial logical_path locator;"
+            " a successful expanded read returns the stable source_id required for later"
+            " structure, dependency-usage, and final evidence references. Host paths are"
+            " forbidden. Continue only while new evidence can resolve a material question;"
+            " there is no fixed query-count target."
+            if config.repository_read else
+            " inspect_source is limited to the supplied source IDs and visible ranges."
+        )
         stage_protocol = (
             " You may finish with zero queries when the visible task already resolves the candidates."
             " Otherwise request exactly one query using query_attempt with exactly question,"
@@ -240,6 +353,7 @@ def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
             " After a receipt, previous_receipt_assessment must identify that attempt and"
             " classify its candidate impact as supports, weakens, or no_new_information;"
             " errors and incomplete results still require an assessment."
+            f"{repository_protocol}"
         )
     elif stage == "CONSTRUCT":
         stage_protocol = (
@@ -301,23 +415,83 @@ async def _call_stage(
     config: StagedRunConfig,
     ledger: UsageLedger,
     responses: list[dict],
+    model_calls: list[dict],
     deadline: float,
+    model_call_limit: int | None = None,
 ) -> StageResult:
-    if ledger.requests_started >= config.max_model_calls:
+    payload_bytes = canonical_json(payload)
+    agent = _stage_agent(stage, output_type, model, config)
+    started = time.monotonic()
+    response_start = len(responses)
+    event: dict[str, object] = {
+        "sequence": len(model_calls) + 1,
+        "stage": stage,
+        "status": "started",
+        "model_request_started": False,
+        "request_start_basis": "usage_ledger_before_model_call_hook",
+        "model_name": config.model_name,
+        "output_type": output_type.__name__,
+        "prompt_version": PROMPT_VERSION,
+        "instructions": agent.instructions,
+        "requested_output_schema": TypeAdapter(output_type).json_schema(),
+        "payload": json.loads(payload_bytes),
+        "payload_sha256": sha256_bytes(payload_bytes),
+        "payload_bytes": len(payload_bytes),
+        "max_output_tokens": config.max_output_tokens,
+        "timeout_seconds": None,
+        "elapsed_seconds": None,
+        "response_refs": [],
+        "exception": None,
+        "ledger_requests_started_before": ledger.requests_started,
+    }
+    model_calls.append(event)
+    effective_call_limit = (
+        config.max_model_calls if model_call_limit is None else model_call_limit
+    )
+    if effective_call_limit >= 0 and ledger.requests_started >= effective_call_limit:
+        event["status"] = "blocked"
+        event["exception"] = {
+            "classification": "host_budget",
+            "type": "StagedInferenceError",
+            "message": "model-call limit exhausted",
+            "status_code": None,
+            "request_id": None,
+            "error_code": "model_call_limit",
+            "cause_types": [],
+        }
+        _finish_model_call(
+            event, started=started, ledger=ledger,
+            responses=responses, response_start=response_start,
+        )
         raise StagedInferenceError(
             "model-call limit exhausted", stage=stage, stop_reason="budget_exhausted"
         )
     remaining = deadline - time.monotonic()
     if remaining <= 0:
+        event["status"] = "blocked"
+        event["exception"] = {
+            "classification": "host_deadline",
+            "type": "StagedInferenceError",
+            "message": "run deadline exhausted",
+            "status_code": None,
+            "request_id": None,
+            "error_code": "run_deadline",
+            "cause_types": [],
+        }
+        _finish_model_call(
+            event, started=started, ledger=ledger,
+            responses=responses, response_start=response_start,
+        )
         raise StagedInferenceError(
             "run deadline exhausted", stage=stage, stop_reason="budget_exhausted"
         )
-    agent = _stage_agent(stage, output_type, model, config)
+    timeout_seconds = min(remaining, config.parsing_timeout_seconds)
+    event["timeout_seconds"] = timeout_seconds
     try:
         result = await asyncio.wait_for(
             Runner.run(
                 agent,
-                input=canonical_json(payload).decode("utf-8"),
+                input=payload_bytes.decode("utf-8"),
                 max_turns=1,
                 hooks=BudgetHooks(ledger, responses),
                 run_config=RunConfig(
@@ -326,32 +500,90 @@ async def _call_stage(
                     workflow_name=POLICY_VERSION,
                 ),
             ),
-            timeout=min(remaining, config.parsing_timeout_seconds),
+            timeout=timeout_seconds,
         )
-    except asyncio.TimeoutError:
+    except asyncio.CancelledError as exc:
+        event["status"] = "cancelled"
+        event["exception"] = _exception_diagnostic(exc, classification="cancelled")
+        _finish_model_call(
+            event, started=started, ledger=ledger,
+            responses=responses, response_start=response_start,
+        )
+        raise
+    except asyncio.TimeoutError as exc:
+        event["status"] = "failed"
+        event["exception"] = _exception_diagnostic(exc, classification="host_timeout")
+        _finish_model_call(
+            event, started=started, ledger=ledger,
+            responses=responses, response_start=response_start,
+        )
         raise StagedInferenceError(
             "stage timed out", stage=stage, stop_reason="budget_exhausted"
         ) from None
     except InferenceError as exc:
+        event["status"] = "failed"
+        event["exception"] = _exception_diagnostic(
+            exc,
+            classification=(
+                "host_budget" if exc.category == "budget_exhausted" else "inference_error"
+            ),
+        )
+        _finish_model_call(
+            event, started=started, ledger=ledger,
+            responses=responses, response_start=response_start,
+        )
         reason = "budget_exhausted" if exc.category == "budget_exhausted" else "model_error"
         raise StagedInferenceError("stage model call failed", stage=stage, stop_reason=reason) from None
-    except (ModelBehaviorError, ValidationError):
+    except (ModelBehaviorError, ValidationError) as exc:
+        event["status"] = "failed"
+        event["exception"] = _exception_diagnostic(exc, classification="output_invalid")
+        _finish_model_call(
+            event, started=started, ledger=ledger,
+            responses=responses, response_start=response_start,
+        )
         raise StagedInferenceError(
             "stage model output is invalid", stage=stage, stop_reason="output_invalid"
         ) from None
-    except Exception:
+    except Exception as exc:
+        classification = "api_status" if getattr(exc, "status_code", None) is not None else (
+            "provider_transport"
+            if type(exc).__name__ in {"APIConnectionError", "APITimeoutError"}
+            else "model_error"
+        )
+        event["status"] = "failed"
+        event["exception"] = _exception_diagnostic(exc, classification=classification)
+        _finish_model_call(
+            event, started=started, ledger=ledger,
+            responses=responses, response_start=response_start,
+        )
         raise StagedInferenceError(
             "stage model call failed", stage=stage, stop_reason="model_error"
         ) from None
     if not isinstance(result.final_output, output_type):
+        output_error = TypeError("stage final output has an unexpected type")
+        event["status"] = "failed"
+        event["exception"] = _exception_diagnostic(
+            output_error, classification="output_invalid"
+        )
+        _finish_model_call(
+            event, started=started, ledger=ledger,
+            responses=responses, response_start=response_start,
+        )
         raise StagedInferenceError(
             "stage model output is invalid", stage=stage, stop_reason="output_invalid"
         )
+    event["status"] = "completed"
+    _finish_model_call(
+        event, started=started, ledger=ledger,
+        responses=responses, response_start=response_start,
+    )
     return result.final_output
 
 
-def _check_source_reference(reference: SourceReference, task: UnifiedTask) -> None:
-    source = SourceStore(task).get(reference.source_id)
+def _check_source_reference(
+    reference: SourceReference, source_store: SourceStore
+) -> None:
+    source = source_store.get(reference.source_id)
     if not source.start_line <= reference.start_line <= reference.end_line <= source.end_line:
         raise ValueError("source reference outside visible input")
     lines = source.text.splitlines()
@@ -392,8 +624,10 @@ def _delivery_snapshot(raw: object) -> dict:
 
 async def _deliver_with_repair(
     payload: dict, *, constructed: ConstructResult, task: UnifiedTask,
+    source_store: SourceStore,
     model: Model, config: StagedRunConfig, ledger: UsageLedger,
-    responses: list[dict], stages: list[dict], repair_log: list[dict], deadline: float,
+    responses: list[dict], model_calls: list[dict], stages: list[dict],
+    repair_log: list[dict], deadline: float, model_call_limit: int,
 ) -> DeliverResult:
     expected = DeliverResult(
         schema_version="staged-deliver/v0.1", result_status=constructed.result_status,
@@ -403,7 +637,8 @@ async def _deliver_with_repair(
     try:
         delivered = await _call_stage(
             "DELIVER", DeliverResult, payload, model=model, config=config,
-            ledger=ledger, responses=responses, deadline=deadline,
+            ledger=ledger, responses=responses, model_calls=model_calls, deadline=deadline,
+            model_call_limit=model_call_limit,
         )
     except StagedInferenceError as exc:
         if exc.stop_reason != "output_invalid" and not (
@@ -446,7 +681,9 @@ async def _deliver_with_repair(
                  "semantic_snapshot": snapshot,
                  "repair_rule": "Repair envelope/version or decimal line formatting only; "
                                 "preserve every semantic field and evidence source/range/quote."},
-                model=model, config=config, ledger=ledger, responses=responses, deadline=deadline,
+                model=model, config=config, ledger=ledger, responses=responses,
+                model_calls=model_calls, deadline=deadline,
+                model_call_limit=model_call_limit,
             )
         except StagedInferenceError:
             entry["status"] = "failed"
@@ -468,17 +705,17 @@ async def _deliver_with_repair(
     if delivered.model_dump(mode="json") != expected:
         raise ValueError("DELIVER changed the constructed semantics")
     if delivered.contract is not None:
-        validate_contract(delivered.contract, task)
+        validate_contract(delivered.contract, task, source_store=source_store)
     return delivered
 
 
 def _validate_constructed(
-    constructed: ConstructResult, task: UnifiedTask
+    constructed: ConstructResult, task: UnifiedTask, source_store: SourceStore
 ) -> ScenarioContract | None:
     """Validate state-specific delivery rules and return a revalidated contract."""
     contract = (
         None if constructed.contract is None
-        else validate_contract(constructed.contract, task)
+        else validate_contract(constructed.contract, task, source_store=source_store)
     )
     hypotheses = {} if contract is None else {
         item.id: item for item in contract.scenario_hypotheses
@@ -595,6 +832,7 @@ async def execute_staged_run(
     )
     stages: list[dict] = []
     responses: list[dict] = []
+    model_calls: list[dict] = []
     format_repair_log: list[dict] = []
     contract: ScenarioContract | None = None
     selected_scenario_id: str | None = None
@@ -614,6 +852,9 @@ async def execute_staged_run(
     early_unresolved: list[str] = []
     current_stage = "INPUT"
     adapter_reviewed = False
+    repository = None
+    source_store: SourceStore | None = None
+    model_call_limit = -1
 
     budget: InferenceBudget | None = None
     ledger: UsageLedger | None = None
@@ -695,13 +936,19 @@ async def execute_staged_run(
         ledger = UsageLedger(budget)
         current_stage = "INPUT"
         if config.run_mode == "live_inference":
-            from mock_spec.adapters.python import load_task as load_reviewed_python_task
+            from mock_spec.adapters.python import load_task, load_task_with_repository
 
             try:
                 assert reviewed_snapshot is not None
-                task_payload = load_reviewed_python_task(
-                    reviewed_snapshot, case_id=requested_case_id or ""
-                ).to_dict()
+                if config.repository_read:
+                    reviewed_task, repository = load_task_with_repository(
+                        reviewed_snapshot, case_id=requested_case_id or ""
+                    )
+                else:
+                    reviewed_task = load_task(
+                        reviewed_snapshot, case_id=requested_case_id or ""
+                    )
+                task_payload = reviewed_task.to_dict()
                 adapter_reviewed = True
             except Exception as exc:
                 raise StagedInferenceError(
@@ -714,6 +961,14 @@ async def execute_staged_run(
                 raise ValueError("provide task_payload or task_loader, not both")
             try:
                 task_payload = task_loader()
+                if (
+                    isinstance(task_payload, tuple)
+                    and len(task_payload) == 2
+                    and isinstance(task_payload[0], UnifiedTask)
+                    and isinstance(task_payload[1], ReviewedRepository)
+                ):
+                    reviewed_task, repository = task_payload
+                    task_payload = reviewed_task.to_dict()
             except Exception as exc:
                 raise StagedInferenceError(
                     f"input review failed: {exc}",
@@ -723,6 +978,8 @@ async def execute_staged_run(
         if not isinstance(task_payload, dict):
             raise ValueError("task payload must be an object")
         task = UnifiedTask.from_dict(task_payload)
+        source_store = SourceStore(task, repository=repository)
+        model_call_limit = -1 if repository is not None else config.max_model_calls
         canonical_task = task.to_dict()
         input_bytes = canonical_json(canonical_task)
         input_hash = sha256_bytes(input_bytes)
@@ -733,14 +990,16 @@ async def execute_staged_run(
         extract = await _call_stage(
             "EXTRACT", ExtractResult,
             {"stage": "EXTRACT", "visible_task": canonical_task}, model=model,
-            config=config, ledger=ledger, responses=responses, deadline=deadline,
+            config=config, ledger=ledger, responses=responses,
+            model_calls=model_calls, deadline=deadline,
+            model_call_limit=model_call_limit,
         )
         stages.append({"stage": "EXTRACT", "result": extract.model_dump(mode="json")})
         for reference in extract.original_goals:
-            _check_source_reference(reference, task)
+            _check_source_reference(reference, source_store)
         for candidate in extract.candidates:
             for reference in candidate.evidence:
-                _check_source_reference(reference, task)
+                _check_source_reference(reference, source_store)
         if extract.result_status == "INCONCLUSIVE":
             if not extract.unresolved:
                 raise ValueError(
@@ -757,7 +1016,8 @@ async def execute_staged_run(
         current_stage = "QUERY"
         query_executor = QueryExecutor(
             task,
-            max_attempts=config.max_query_attempts,
+            source_store=source_store,
+            max_attempts=(None if repository is not None else config.max_query_attempts),
             max_output_chars=config.max_tool_output_chars,
             analysis_timeout_seconds=config.parsing_timeout_seconds,
             deadline=deadline,
@@ -774,7 +1034,8 @@ async def execute_staged_run(
                     "query_receipts": query_executor.attempts,
                 },
                 model=model, config=config, ledger=ledger,
-                responses=responses, deadline=deadline,
+                responses=responses, model_calls=model_calls, deadline=deadline,
+                model_call_limit=model_call_limit,
             )
             stages.append({"stage": "QUERY", "result": query.model_dump(mode="json")})
             observed_attempt = None
@@ -897,10 +1158,12 @@ async def execute_staged_run(
              "extract": extract.model_dump(mode="json"),
              "query": query.model_dump(mode="json"),
              "query_receipts": query_executor.attempts}, model=model,
-            config=config, ledger=ledger, responses=responses, deadline=deadline,
+            config=config, ledger=ledger, responses=responses,
+            model_calls=model_calls, deadline=deadline,
+            model_call_limit=model_call_limit,
         )
         stages.append({"stage": "CONSTRUCT", "result": constructed.model_dump(mode="json")})
-        constructed_contract = _validate_constructed(constructed, task)
+        constructed_contract = _validate_constructed(constructed, task, source_store)
         if constructed_contract is not None:
             contract_ids = {
                 item.id for item in constructed_contract.scenario_hypotheses
@@ -918,6 +1181,8 @@ async def execute_staged_run(
                  "query_receipts": query_executor.attempts,
                  "construct": constructed.model_dump(mode="json")}, model=model,
                 config=config, ledger=ledger, responses=responses, deadline=deadline,
+                model_calls=model_calls,
+                model_call_limit=model_call_limit,
             )
             stages.append({
                 "stage": "CONTRAST", "result": contrast.model_dump(mode="json")
@@ -934,6 +1199,8 @@ async def execute_staged_run(
                      "construct": before_revision.model_dump(mode="json"),
                      "contrast": contrast.model_dump(mode="json")}, model=model,
                     config=config, ledger=ledger, responses=responses, deadline=deadline,
+                    model_calls=model_calls,
+                    model_call_limit=model_call_limit,
                 )
                 stages.append({
                     "stage": "REVISE", "result": revision.model_dump(mode="json")
@@ -943,7 +1210,9 @@ async def execute_staged_run(
                 changed_objects = _changed_paths(before_dump, after_dump)
                 if not changed_objects:
                     raise ValueError("semantic revision must modify the constructed result")
-                revised_contract = _validate_constructed(revision.revised_construct, task)
+                revised_contract = _validate_constructed(
+                    revision.revised_construct, task, source_store
+                )
                 if revised_contract is None:
                     raise ValueError("semantic revision must preserve a complete contract")
                 # A legal replacement can use a new candidate ID. Rebinding an
@@ -1017,7 +1286,10 @@ async def execute_staged_run(
              "host": {"run_id": run_id, "case_id": case_id, "language": language,
                       "input_hash": input_hash, "variant": config.variant}}, model=model,
             constructed=constructed, task=task, stages=stages, repair_log=format_repair_log,
-            config=config, ledger=ledger, responses=responses, deadline=deadline,
+            source_store=source_store,
+            config=config, ledger=ledger, responses=responses,
+            model_calls=model_calls, deadline=deadline,
+            model_call_limit=model_call_limit,
         )
         contract = delivered.contract
         selected_scenario_id = delivered.selected_scenario_id
@@ -1134,10 +1406,14 @@ async def execute_staged_run(
             "observed_attempts": 0 if query_executor is None else query_executor.observed_attempts,
             "budgeted_attempts": 0 if query_executor is None else query_executor.budgeted_attempts,
             "limit": (
-                config.max_query_attempts
-                if isinstance(config, StagedRunConfig) else None
+                None
+                if repository is not None
+                else (config.max_query_attempts if isinstance(config, StagedRunConfig) else None)
             ),
         },
+        "source_observations": (
+            [] if source_store is None else list(source_store.observations())
+        ),
         "critical_behaviors": [] if constructed is None else [
             item.model_dump(mode="json") for item in constructed.critical_behaviors
         ],
@@ -1152,6 +1428,7 @@ async def execute_staged_run(
             early_unresolved or ([] if constructed is None else constructed.unresolved)
         ),
         "stages": stages,
+        "model_calls": model_calls,
         "model_responses": responses,
         "error": error,
     }
@@ -1211,6 +1488,20 @@ async def execute_staged_run(
             key: str(value) if isinstance(value, Decimal) else value
             for key, value in asdict(valid_config).items()
         },
+        "controller_limits": {
+            "model_calls": (
+                None if repository is not None
+                else (None if valid_config is None else valid_config.max_model_calls)
+            ),
+            "query_attempts": (
+                None if repository is not None
+                else (None if valid_config is None else valid_config.max_query_attempts)
+            ),
+            "termination": (
+                "shared_deadline_token_and_cost_budgets"
+                if repository is not None else "configured_call_limits_and_shared_budgets"
+            ),
+        },
         "model_identity": {
             "configured_name": (
                 None if valid_config is None else valid_config.model_name
@@ -1250,7 +1541,10 @@ async def execute_staged_run(
         "query_accounting": {
             "observed_attempts": 0 if query_executor is None else query_executor.observed_attempts,
             "budgeted_attempts": 0 if query_executor is None else query_executor.budgeted_attempts,
-            "limit": None if valid_config is None else valid_config.max_query_attempts,
+            "limit": (
+                None if repository is not None
+                else (None if valid_config is None else valid_config.max_query_attempts)
+            ),
         },
         "deadline": {
             "clock": "time.monotonic",
@@ -1263,6 +1557,8 @@ async def execute_staged_run(
         "artifact_sha256": artifact_hashes,
     }
     _write_json_exclusive(output_dir / "run_manifest.json", manifest)
+    if repository is not None:
+        repository.close()
     return {"record": record, "contract": contract, "manifest": manifest}
 
 

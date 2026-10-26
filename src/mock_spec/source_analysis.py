@@ -17,6 +17,7 @@ class SourceAnalysis:
         self,
         task: UnifiedTask,
         *,
+        source_store: SourceStore | None = None,
         max_output_chars: int = 16000,
         analysis_timeout_seconds: float = 15,
     ):
@@ -27,7 +28,8 @@ class SourceAnalysis:
                 or not math.isfinite(analysis_timeout_seconds)
                 or analysis_timeout_seconds <= 0):
             raise ValueError("analysis_timeout_seconds must be positive")
-        self.store = SourceStore(task)
+        self.store = source_store if source_store is not None else SourceStore(task)
+        self.store.validate_task(task)
         self.language = task.language
         self.max_output_chars = max_output_chars
         self.analysis_timeout_seconds = float(analysis_timeout_seconds)
@@ -92,23 +94,29 @@ class SourceAnalysis:
             }
         return bounded
 
-    async def inspect_source(self, source_id: str, start_line: int, end_line: int) -> dict:
-        """Return exact complete lines in the source's original coordinate system."""
+    async def inspect_source(
+        self, source_id: str, start_line: int, end_line: int,
+        *, response_id: str | None = None,
+    ) -> dict:
+        """Read initial IDs or bound logical paths, recording only returned lines."""
         try:
-            source = self.store.get(source_id)
-            if (type(start_line) is not int or type(end_line) is not int
-                    or not source.start_line <= start_line <= end_line <= source.end_line):
-                raise InputValidationError("invalid visible line range")
-        except (InputValidationError, TypeError):
-            return {"status": "error", "error_code": "invalid_source_or_range",
-                    "diagnostics": ["Use a visible source_id and its allowed line range."]}
-        lines = source.text.splitlines()
-        return self.bounded({
-            "status": "ok", "backend": "source_store", "source_id": source_id,
-            "start_line": start_line, "end_line": end_line,
-            "text": "\n".join(lines[start_line-source.start_line:end_line-source.start_line+1]),
-            "limitations": [],
-        })
+            source = self.store.read(source_id, start_line, end_line)
+            result = self.bounded({
+                "status": "ok", "backend": "source_store", "source_id": source.source_id,
+                "logical_path": source.logical_path,
+                "start_line": start_line, "end_line": end_line,
+                "text": source.text, "limitations": [],
+            })
+            if result.get("status") == "ok" and "text" in result:
+                self.store.record_observation(source, response_id=response_id)
+            return result
+        except (InputValidationError, ValueError, TypeError, OSError) as exc:
+            code = ("source_changed" if "identity changed" in str(exc)
+                    or "content changed" in str(exc) else "invalid_source_or_range")
+            return {"status": "error", "error_code": code,
+                    "diagnostics": [
+                        "Source unavailable: invalid range, denied path, or frozen identity changed."
+                    ]}
 
     async def inspect_program_structure(self, source_id: str) -> dict:
         """Return syntax structure for one visible source, never a flow proof."""

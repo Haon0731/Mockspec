@@ -8,7 +8,7 @@ from typing import Any
 
 from mock_spec.source_analysis import SourceAnalysis
 from mock_spec.schemas import UnifiedTask
-from mock_spec.validation import decode_json
+from mock_spec.validation import SourceStore, decode_json
 
 
 QUERY_TOOLS = {
@@ -25,13 +25,15 @@ class QueryExecutor:
         self,
         task: UnifiedTask,
         *,
-        max_attempts: int,
+        source_store: SourceStore | None = None,
+        max_attempts: int | None,
         max_output_chars: int,
         analysis_timeout_seconds: float,
         deadline: float,
     ) -> None:
         self.analysis = SourceAnalysis(
             task,
+            source_store=source_store,
             max_output_chars=max_output_chars,
             analysis_timeout_seconds=analysis_timeout_seconds,
         )
@@ -45,14 +47,19 @@ class QueryExecutor:
 
     @property
     def budgeted_attempts(self) -> int:
-        return min(self.observed_attempts, self.max_attempts)
+        return (
+            self.observed_attempts
+            if self.max_attempts is None
+            else min(self.observed_attempts, self.max_attempts)
+        )
 
     def register(self, request: object) -> dict[str, Any]:
         """Record an observed attempt before envelope or protocol validation."""
         sequence = self.observed_attempts + 1
         record: dict[str, Any] = {
             "sequence": sequence,
-            "within_budget": sequence <= self.max_attempts,
+            "response_id": f"query:{sequence}",
+            "within_budget": self.max_attempts is None or sequence <= self.max_attempts,
             "question": None,
             "scenario_id": None,
             "tool": None,
@@ -75,7 +82,7 @@ class QueryExecutor:
                 record,
                 started,
                 "budget_exhausted",
-                self._error("query_budget_exhausted", "The shared six-attempt query budget is exhausted."),
+                self._error("query_budget_exhausted", "The configured query-attempt limit is exhausted."),
             )
         return record
 
@@ -166,7 +173,10 @@ class QueryExecutor:
 
         try:
             call = getattr(self.analysis, record["tool"])
-            result = await asyncio.wait_for(call(**validated), timeout=remaining)
+            call_arguments = dict(validated)
+            if record["tool"] == "inspect_source":
+                call_arguments["response_id"] = record["response_id"]
+            result = await asyncio.wait_for(call(**call_arguments), timeout=remaining)
         except asyncio.TimeoutError:
             return self._finish(
                 record, started, "timeout",

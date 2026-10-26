@@ -3,13 +3,18 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 import io
 import json
 import re
 import tokenize
 from types import MappingProxyType
+from typing import TYPE_CHECKING
 
-from .schemas import Source, UnifiedTask
+from .schemas import Source, SourceSlice, UnifiedTask
+
+if TYPE_CHECKING:
+    from .source_repository import ReviewedRepository
 
 
 class InputValidationError(ValueError):
@@ -107,20 +112,178 @@ def validate_java_mask(text: str) -> None:
 
 
 class SourceStore:
-    """Task-scoped source view for validation and tools; holds no filesystem reader."""
+    """Run-scoped initial and observed source evidence."""
 
-    def __init__(self, task: UnifiedTask) -> None:
+    def __init__(
+        self, task: UnifiedTask, *, repository: ReviewedRepository | None = None
+    ) -> None:
         # Structural validation is not a new masking approval. Call after an adapter.
         task = UnifiedTask.from_dict(task.to_dict())
+        self._task_data = task.to_dict()
         self._sources = MappingProxyType({
             source.source_id: source
             for source in (task.mut_source, task.masked_test, *task.supporting_sources)
         })
+        self._repository = repository
+        if repository is not None:
+            repository.validate_task(task)
+        self._observations: list[dict[str, object]] = []
+        self._observed_sources: dict[str, dict[int, str]] = {}
+        self._observed_paths: dict[str, str] = {}
+        self._repository_sources: dict[str, str] = {}
+
+    @property
+    def repository(self) -> ReviewedRepository | None:
+        return self._repository
+
+    def validate_task(self, task: UnifiedTask) -> None:
+        """Reject accidental reuse of a run-scoped store with a different task."""
+        if not isinstance(task, UnifiedTask) or task.to_dict() != self._task_data:
+            raise InputValidationError("source store task identity mismatch")
 
     def get(self, source_id: str) -> Source:
-        if type(source_id) is not str or source_id not in self._sources:
+        if type(source_id) is not str:
             raise InputValidationError("unknown source_id")
-        return self._sources[source_id]
+        if source_id in self._sources:
+            return self._sources[source_id]
+        observed = self._observed_sources.get(source_id)
+        if not observed:
+            raise InputValidationError("unknown source_id")
+        start_line, end_line = min(observed), max(observed)
+        if set(observed) != set(range(start_line, end_line + 1)):
+            raise InputValidationError("observed source has an unread gap")
+        text = "\n".join(observed[line] for line in range(start_line, end_line + 1))
+        if not text.strip():
+            raise InputValidationError("observed source has no analyzable text")
+        if observed[end_line] == "":
+            text += "\n"
+        return Source(
+            source_id=source_id,
+            logical_path=self._observed_paths[source_id],
+            text=text,
+            symbol=None,
+            start_line=start_line,
+            end_line=end_line,
+            resolution_status="resolved",
+            target_precision="file",
+        )
+
+    def read(self, locator: str, start_line: int, end_line: int) -> SourceSlice:
+        """Read an initial fragment by ID or an allowed whole file by logical path."""
+        if type(locator) is not str:
+            raise InputValidationError("unknown source_id or logical path")
+        if locator in self._sources:
+            source = self._sources[locator]
+            if type(start_line) is int and type(end_line) is int and (
+                source.start_line <= start_line <= end_line <= source.end_line
+            ):
+                lines = source.text.splitlines()
+                return SourceSlice(
+                    source_id=source.source_id,
+                    logical_path=source.logical_path,
+                    text="\n".join(lines[
+                        start_line - source.start_line:end_line - source.start_line + 1
+                    ]),
+                    symbol=source.symbol,
+                    start_line=start_line,
+                    end_line=end_line,
+                    resolution_status=source.resolution_status,
+                    target_precision=source.target_precision,
+                )
+            if self._repository is not None:
+                repository_source = self._repository.read(
+                    source.logical_path, start_line, end_line
+                )
+                self._repository_sources[
+                    repository_source.source_id
+                ] = repository_source.logical_path
+                return repository_source
+            raise InputValidationError("invalid visible line range")
+        if locator in self._repository_sources and self._repository is not None:
+            return self._repository.read(
+                self._repository_sources[locator], start_line, end_line
+            )
+        if self._repository is None:
+            raise InputValidationError("unknown source_id or logical path")
+        repository_slice = self._repository.read(locator, start_line, end_line)
+        self._repository_sources[
+            repository_slice.source_id
+        ] = repository_slice.logical_path
+        return repository_slice
+
+    def record_observation(
+        self, source: Source | SourceSlice, *, response_id: str | None = None
+    ) -> None:
+        """Register only source text that was actually returned to the model."""
+        if not isinstance(source, (Source, SourceSlice)):
+            raise InputValidationError("observation must be a Source")
+        if response_id is not None and (
+            type(response_id) is not str or not response_id.strip()
+        ):
+            raise InputValidationError("response_id must be a non-empty string or null")
+        known = self._sources.get(source.source_id)
+        if known is not None:
+            if known.logical_path != source.logical_path:
+                raise InputValidationError("observation source identity mismatch")
+            expected = self.read(source.source_id, source.start_line, source.end_line)
+        else:
+            if self._repository is None:
+                raise InputValidationError("observation source identity mismatch")
+            expected = self._repository.read(
+                source.logical_path, source.start_line, source.end_line
+            )
+        if (
+            expected.source_id != source.source_id
+            or expected.logical_path != source.logical_path
+            or expected.text != source.text
+        ):
+            raise InputValidationError("observed source content or identity changed")
+        lines = source.text.split("\n")
+        if len(lines) != source.end_line - source.start_line + 1:
+            raise InputValidationError("observation line range does not match text")
+        observed = self._observed_sources.setdefault(source.source_id, {})
+        self._observed_paths.setdefault(source.source_id, source.logical_path)
+        if self._observed_paths[source.source_id] != source.logical_path:
+            raise InputValidationError("observation source identity mismatch")
+        for offset, line in enumerate(lines):
+            line_number = source.start_line + offset
+            previous = observed.get(line_number)
+            if previous is not None and previous != line:
+                raise InputValidationError("observed source content changed")
+            observed[line_number] = line
+        self._observations.append({
+            "snapshot_id": (
+                self._repository.snapshot_id if self._repository is not None else None
+            ),
+            "source_id": source.source_id,
+            "logical_path": source.logical_path,
+            "start_line": source.start_line,
+            "end_line": source.end_line,
+            "text": source.text,
+            "sha256": hashlib.sha256(source.text.encode("utf-8")).hexdigest(),
+            "response_id": response_id,
+        })
+
+    def observations(self) -> tuple[dict[str, object], ...]:
+        return tuple(dict(item) for item in self._observations)
+
+    def quote(self, source_id: str, start_line: int, end_line: int) -> str:
+        """Return exact citeable text; dynamic evidence must have been observed."""
+        source = self._sources.get(source_id)
+        if source is not None:
+            if not source.start_line <= start_line <= end_line <= source.end_line:
+                raise InputValidationError("evidence range outside allowed source")
+            lines = source.text.splitlines()
+            return "\n".join(lines[
+                start_line - source.start_line:end_line - source.start_line + 1
+            ])
+        observed = self._observed_sources.get(source_id)
+        if observed is None:
+            raise InputValidationError("unknown source_id")
+        try:
+            return "\n".join(observed[line] for line in range(start_line, end_line + 1))
+        except KeyError as exc:
+            raise InputValidationError("evidence range contains unobserved lines") from exc
 
     def ids(self) -> tuple[str, ...]:
-        return tuple(self._sources)
+        return tuple(dict.fromkeys((*self._sources, *self._observed_sources)))

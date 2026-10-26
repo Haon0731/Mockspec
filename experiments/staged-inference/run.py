@@ -35,6 +35,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--case-id")
     parser.add_argument("--model", default=os.environ.get("MOCKSPEC_MODEL"))
     parser.add_argument(
+        "--repository-read", action="store_true",
+        help="bind reviewed whole files for live read-observe-cite exploration",
+    )
+    parser.add_argument(
         "--replay-case",
         choices=[
             "selected", "ambiguous", "inconclusive", "error", "cache_miss",
@@ -47,9 +51,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--requested-case-id",
         help="case identity requested before input review; retained when loading fails",
     )
-    parser.add_argument("--query-count", type=int, choices=range(8), default=0,
-                        help="fixed replay query attempts (7 demonstrates rejection)")
-    parser.add_argument("--max-model-calls", type=int, default=10)
+    parser.add_argument("--query-count", type=int, default=0,
+                        help="fixed replay query attempts (legacy replay still enforces its configured limit)")
+    parser.add_argument(
+        "--max-model-calls", type=int, default=10,
+        help="legacy replay limit; repository exploration stops on shared resource budgets",
+    )
     parser.add_argument("--max-output-tokens", type=int, default=4096)
     parser.add_argument("--max-total-tokens", type=int, default=60000)
     parser.add_argument("--max-tool-output-chars", type=int, default=16000)
@@ -84,8 +91,10 @@ def main(argv: list[str] | None = None) -> int:
             model_name = args.model.strip()
             load_task = None
         else:
-            if args.snapshot is not None or args.case_id is not None:
-                raise ValueError("synthetic replay does not accept --snapshot or --case-id")
+            if args.snapshot is not None or args.case_id is not None or args.repository_read:
+                raise ValueError(
+                    "synthetic replay does not accept --snapshot, --case-id, or --repository-read"
+                )
 
             def load_task() -> object:
                 if args.task_json is None:
@@ -105,6 +114,7 @@ def main(argv: list[str] | None = None) -> int:
             model=model,
             config=StagedRunConfig(
                 variant=args.variant, run_mode=args.mode, model_name=model_name,
+                repository_read=args.repository_read,
                 max_model_calls=args.max_model_calls,
                 max_output_tokens=args.max_output_tokens,
                 max_total_tokens=args.max_total_tokens,

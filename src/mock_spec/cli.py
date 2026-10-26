@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import sys
+from typing import Any
 
 from .adapters import java, python
 from .scenario import validate_contract
@@ -28,7 +29,14 @@ def main(argv: list[str] | None = None) -> int:
         help="Validate a synthetic response offline; never reported as live inference.",
     )
     parser.add_argument("--output", type=Path, help="Default: JSON on stdout.")
+    parser.add_argument(
+        "--repository-read", action="store_true",
+        help="V0.2: read additional lines of initially reviewed logical paths.",
+    )
     args = parser.parse_args(argv)
+    if args.repository_read and args.agent_version != "v0.2":
+        parser.error("--repository-read requires --agent-version v0.2")
+    source_store = None
 
     if args.response_json is None and not args.model:
         print("configuration error: set MOCKSPEC_MODEL or --model", file=sys.stderr)
@@ -36,14 +44,20 @@ def main(argv: list[str] | None = None) -> int:
 
     loader = java.load_task if args.language == "java" else python.load_task
     try:
-        task = loader(args.snapshot, case_id=args.case_id)
+        if args.repository_read:
+            from .validation import SourceStore
+            adapter = java if args.language == "java" else python
+            task, repository = adapter.load_task_with_repository(args.snapshot, case_id=args.case_id)
+            source_store = SourceStore(task, repository=repository)
+        else:
+            task = loader(args.snapshot, case_id=args.case_id)
     except (ValueError, OSError):
         print("input error: reviewed snapshot/case validation failed", file=sys.stderr)
         return 2
 
     from .inference import InferenceError, PROMPT_VERSION, infer_scenario
 
-    inference_kwargs = {}
+    inference_kwargs: dict[str, Any] = {}
     if args.agent_version == "v0.2":
         from .budget import InferenceBudget
         from .inference_v02 import PROMPT_VERSION, infer_scenario
@@ -55,6 +69,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"configuration error: {exc}", file=sys.stderr)
             return 2
         inference_kwargs["tool_trace"] = []
+        if source_store is not None:
+            inference_kwargs["source_store"] = source_store
 
     try:
         if args.response_json is not None:

@@ -25,7 +25,7 @@ from .budget import BudgetHooks, InferenceBudget, UsageLedger
 from .inference import InferenceError
 from .scenario import ScenarioContract, validate_contract
 from .schemas import UnifiedTask
-from .validation import decode_json
+from .validation import SourceStore, decode_json
 
 
 PROMPT_VERSION: Final = "scenario-inference/v0.2"
@@ -68,6 +68,7 @@ def build_agent(
     *,
     budget: InferenceBudget | None = None,
     tool_trace: list | None = None,
+    source_store: SourceStore | None = None,
 ) -> Agent[None]:
     """Build one task-scoped V0.2 agent with read-only source access."""
 
@@ -90,7 +91,9 @@ def build_agent(
             preserve_raw_usage=True,
             retry=ModelRetrySettings(max_retries=0),
         ),
-        tools=build_source_tools(task, budget=budget, tool_trace=tool_trace),
+        tools=build_source_tools(
+            task, budget=budget, tool_trace=tool_trace, source_store=source_store
+        ),
         handoffs=[],
         output_type=ScenarioContract,
     )
@@ -103,6 +106,7 @@ async def infer_scenario(
     timeout_seconds: float = 120,
     responses: list | None = None,
     tool_trace: list | None = None,
+    source_store: SourceStore | None = None,
     budget: InferenceBudget | None = None,
     usage_ledger: UsageLedger | None = None,
 ) -> ScenarioContract:
@@ -121,7 +125,11 @@ async def infer_scenario(
     if not os.environ.get("OPENAI_API_KEY", "").strip():
         raise InferenceError("OPENAI_API_KEY is required for scenario inference")
 
-    agent = build_agent(model, task, budget=budget, tool_trace=tool_trace)
+    source_store = source_store if source_store is not None else SourceStore(task)
+    source_store.validate_task(task)
+    agent = build_agent(
+        model, task, budget=budget, tool_trace=tool_trace, source_store=source_store
+    )
     if usage_ledger is None:
         usage_ledger = UsageLedger(budget)
     elif not isinstance(usage_ledger, UsageLedger) or usage_ledger.budget != budget:
@@ -138,7 +146,7 @@ async def infer_scenario(
             Runner.run(
                 agent,
                 input=payload,
-                max_turns=budget.max_turns,
+                max_turns=None if source_store.repository is not None else budget.max_turns,
                 run_config=run_config,
                 hooks=BudgetHooks(usage_ledger, responses),
             ),
@@ -178,7 +186,7 @@ async def infer_scenario(
             "scenario inference returned an invalid contract", "structure_error"
         ) from None
     try:
-        return validate_contract(contract, task)
+        return validate_contract(contract, task, source_store=source_store)
     except (ValueError, KeyError):
         raise InferenceError(
             "scenario inference returned an invalid contract", "evidence_error"
