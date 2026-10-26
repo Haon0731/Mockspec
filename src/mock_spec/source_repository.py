@@ -469,7 +469,7 @@ class ReviewedRepository:
                 "bytes": getattr(exc, "bytes_read", 0),
                 "elapsed_seconds": monotonic() - started,
             }
-            if not isinstance(exc, _SearchReadLimit):
+            if isinstance(exc, _IdentityReadError):
                 self._invalidate("reviewed source changed")
             if isinstance(exc, _SearchReadLimit) and exc.reason == "timeout":
                 raise RepositoryTimeoutError(exc.bytes_read) from exc
@@ -497,6 +497,69 @@ class ReviewedRepository:
         )
         self._cache_observations(resolved_run_id, [source])
         return source
+
+    def read_for_analysis(
+        self,
+        locator: str,
+        *,
+        run_id: str | None = None,
+        deadline: float | None = None,
+    ) -> Source:
+        """Read one bound file for parsing without making its text citeable."""
+        self.assert_valid()
+        started = monotonic()
+        self._last_read_usage = {"bytes": 0, "elapsed_seconds": 0.0}
+        self._validated_run_id(run_id)
+        if deadline is not None and (
+            isinstance(deadline, bool)
+            or not isinstance(deadline, (int, float))
+            or not math.isfinite(deadline)
+        ):
+            raise InputValidationError("deadline must be finite")
+        logical_path = self._resolve_locator(locator)
+        try:
+            if logical_path in self._files:
+                reviewed = self._files[logical_path]
+                assert self._root_fd is not None
+                payload = read_regular_file(
+                    self._root_fd, reviewed.relative_path, reviewed.sha256,
+                    deadline=deadline,
+                )
+            else:
+                payload = self._read_discovered(logical_path, deadline=deadline)
+        except InputValidationError as exc:
+            self._last_read_usage = {
+                "bytes": getattr(exc, "bytes_read", 0),
+                "elapsed_seconds": monotonic() - started,
+            }
+            if isinstance(exc, _IdentityReadError):
+                self._invalidate("reviewed source changed")
+            if isinstance(exc, _SearchReadLimit) and exc.reason == "timeout":
+                raise RepositoryTimeoutError(exc.bytes_read) from exc
+            raise
+        self._last_read_usage = {
+            "bytes": len(payload), "elapsed_seconds": monotonic() - started
+        }
+        try:
+            text = payload.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise InputValidationError("reviewed source is not UTF-8 text") from exc
+        lines = text.splitlines()
+        if not lines:
+            raise InputValidationError("reviewed source has no analyzable text")
+        analysis_text = "\n".join(lines)
+        if lines[-1] == "":
+            analysis_text += "\n"
+        return Source(
+            source_id=self.source_id_for(logical_path),
+            logical_path=logical_path,
+            text=analysis_text,
+            symbol=None,
+            start_line=1,
+            end_line=len(lines),
+            resolution_status="resolved",
+            target_precision="file",
+        )
 
     def _enumerate_candidates(
         self, deadline: float

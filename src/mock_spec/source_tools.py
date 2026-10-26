@@ -15,7 +15,9 @@ from pydantic import StrictInt
 
 from .budget import InferenceBudget
 from .inference import InferenceError
-from .source_analysis import SourceAnalysis, normalize_source_arguments
+from .source_analysis import (
+    SourceAnalysis, normalize_source_arguments, normalize_analysis_arguments,
+)
 from .schemas import UnifiedTask
 from .validation import SourceStore, decode_json
 
@@ -87,11 +89,14 @@ def build_source_tools(
                     }
                 else:
                     result = await call()
-            elif set(parsed_arguments) != {"source_id"}:
-                result = {"status": "error", "error_code": "invalid_arguments",
-                          "diagnostics": ["Tool arguments must match the schema and use unique JSON keys."]}
             else:
-                result = await call()
+                try:
+                    normalize_analysis_arguments(parsed_arguments)
+                except (TypeError, ValueError):
+                    result = {"status": "error", "error_code": "invalid_arguments",
+                              "diagnostics": ["Analysis requires source_id and an optional symbol."]}
+                else:
+                    result = await call()
         except ModelBehaviorError:
             result = {"status": "error", "error_code": "invalid_arguments",
                       "diagnostics": ["Tool arguments do not match the declared schema."]}
@@ -172,24 +177,24 @@ def build_source_tools(
         )
 
     @function_tool(failure_error_function=None)
-    async def inspect_program_structure(source_id: str) -> dict:
+    async def inspect_program_structure(source_id: str, symbol: str | None = None) -> dict:
         """Return syntax-level calls, conditions, branches, returns, and handlers.
 
         Args:
-            source_id: An initial source ID or a dynamic ID returned by inspect_source.
+            source_id: An initial source ID, discovered relative path, or dynamic source ID.
+            symbol: Optional exact name or qualified syntax name; never a resolved-target claim.
         """
-        arguments = {"source_id": source_id}
-        return await analysis.inspect_program_structure(**arguments)
+        return await analysis.inspect_program_structure(source_id, symbol=symbol)
 
     @function_tool(failure_error_function=None)
-    async def inspect_dependency_usage(source_id: str) -> dict:
+    async def inspect_dependency_usage(source_id: str, symbol: str | None = None) -> dict:
         """Return syntax-level dependency calls and reliable local usage relations.
 
         Args:
-            source_id: An initial source ID or a dynamic ID returned by inspect_source.
+            source_id: An initial source ID, discovered relative path, or dynamic source ID.
+            symbol: Optional exact name or qualified syntax name; never a resolved-target claim.
         """
-        arguments = {"source_id": source_id}
-        return await analysis.inspect_dependency_usage(**arguments)
+        return await analysis.inspect_dependency_usage(source_id, symbol=symbol)
 
     registered = [inspect_source, inspect_program_structure, inspect_dependency_usage]
     for tool in registered:

@@ -63,7 +63,7 @@ def test_real_spoon_extracts_bounded_structural_and_local_reference_facts() -> N
     assert result["source_id"] == "mut:sample"
     kinds = {fact["kind"] for fact in result["facts"]}
     assert {
-        "method", "call", "variable_read", "if", "conditional",
+        "type", "method", "call", "variable_read", "if", "conditional",
         "return", "throw", "try", "catch",
     } <= kinds
     assert all(
@@ -77,6 +77,8 @@ def test_real_spoon_extracts_bounded_structural_and_local_reference_facts() -> N
         if fact["kind"] == "call" and fact["name"] == "helper"
     )
     assert helper_call["declaration_status"] == "resolved_local"
+    assert helper_call["resolution_status"] == "resolved_local"
+    assert helper_call["match_precision"] == "resolved_target"
     assert helper_call["declared_at"]["source_id"] == "mut:sample"
     assert helper_call["lexical_guards"][-1]["branch"] == "true"
     assert helper_call["quote"] == "        return helper(chosen);"
@@ -86,7 +88,14 @@ def test_real_spoon_extracts_bounded_structural_and_local_reference_facts() -> N
         if fact["kind"] == "call" and fact["name"] == "hashCode"
     )
     assert external_call["declaration_status"] == "unresolved"
+    assert external_call["resolution_status"] == "unresolved"
+    assert external_call["match_precision"] == "unresolved"
     assert external_call["declared_at"] is None
+    declarations = [
+        fact for fact in result["facts"] if fact["kind"] in {"type", "method"}
+    ]
+    assert {fact["name"] for fact in declarations} >= {"Sample", "inspect", "helper"}
+    assert all(fact["match_precision"] == "syntax_match" for fact in declarations)
     assert any("not proof of data flow" in item for item in result["limitations"])
     assert any("loop, switch, and lambda" in item for item in result["limitations"])
 
@@ -99,8 +108,20 @@ def test_missing_or_unpinned_backend_is_explicit(monkeypatch: pytest.MonkeyPatch
 
     assert result["status"] == "error"
     assert result["error_code"] == "backend_unavailable"
+    assert result["failure_kind"] == "backend_failure"
     assert result["facts"] == []
     assert result["diagnostics"][0]["category"] == "unsupported"
+
+
+def test_unparseable_java_is_distinct_from_backend_failure() -> None:
+    if java_analysis._backend_paths() is None:
+        pytest.skip("pinned Spoon backend is unavailable")
+
+    result = asyncio.run(analyze_source(source("class Broken { void target( {")))
+
+    assert result["status"] == "error"
+    assert result["error_code"] == "analysis_error"
+    assert result["failure_kind"] == "parse_error"
 
 
 def test_unsupported_constructs_retain_facts_but_mark_result_incomplete() -> None:

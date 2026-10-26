@@ -1,11 +1,19 @@
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.SimpleJavaFileObject;
+import javax.tools.ToolProvider;
+import com.sun.source.util.JavacTask;
 import spoon.Launcher;
 import spoon.reflect.CtModel;
 import spoon.reflect.code.CtCatch;
@@ -23,6 +31,7 @@ import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtType;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.reference.CtVariableReference;
@@ -51,13 +60,15 @@ public final class ScenarioSpoon {
         ScenarioSpoon tool = new ScenarioSpoon();
         Map<String, Object> result;
         if (args.length != 0) {
-            result = tool.error("analysis_error", "ScenarioSpoon accepts no arguments");
+            result = tool.error(
+                "analysis_error", "ScenarioSpoon accepts no arguments", "invalid_request");
         } else {
             try {
                 result = tool.analyze(JSON.readValue(
                     System.in, new TypeReference<Map<String, Object>>() {}));
             } catch (Exception exception) {
-                result = tool.error("analysis_error", "Invalid stdin request.");
+                result = tool.error(
+                    "analysis_error", "Invalid stdin request.", "invalid_request");
             }
         }
         System.out.print(JSON.writeValueAsString(result));
@@ -65,7 +76,9 @@ public final class ScenarioSpoon {
 
     private Map<String, Object> analyze(Map<String, Object> input) {
         if (!input.keySet().equals(java.util.Set.of("source_id", "text", "start_line"))) {
-            return error("analysis_error", "input must contain only source_id, text, start_line");
+            return error(
+                "analysis_error", "input must contain only source_id, text, start_line",
+                "invalid_request");
         }
         Object id = input.get("source_id");
         Object text = input.get("text");
@@ -73,7 +86,7 @@ public final class ScenarioSpoon {
         if (!(id instanceof String) || ((String) id).isBlank()
                 || !(text instanceof String) || ((String) text).isBlank()
                 || !(start instanceof Integer) || ((Integer) start) < 1) {
-            return error("analysis_error", "invalid source input");
+            return error("analysis_error", "invalid source input", "invalid_request");
         }
         sourceId = (String) id;
         sourceText = (String) text;
@@ -85,17 +98,41 @@ public final class ScenarioSpoon {
         }
 
         try {
-            Launcher launcher = new Launcher();
+            if (hasSyntaxErrors(sourceText)) {
+                return error(
+                    "analysis_error", "Java syntax parsing failed for the supplied source.",
+                    "parse_error");
+            }
+        } catch (Exception exception) {
+            return error(
+                "analysis_error", "The Java syntax parser failed.", "backend_failure");
+        }
+
+        Launcher launcher = new Launcher();
+        try {
             launcher.getEnvironment().setNoClasspath(true);
             launcher.getEnvironment().setComplianceLevel(17);
             launcher.getEnvironment().setShouldCompile(false);
             launcher.getEnvironment().setCommentEnabled(false);
+            launcher.getEnvironment().setIgnoreSyntaxErrors(false);
             launcher.addInputResource(new VirtualFile(sourceText, "ReviewedSource.java"));
             launcher.buildModel();
+            if (launcher.getEnvironment().getErrorCount() > 0) {
+                return error(
+                    "analysis_error", "Spoon reported syntax errors in the supplied source.",
+                    "parse_error");
+            }
+        } catch (Exception exception) {
+            return error(
+                "analysis_error", "Spoon could not build a model for the supplied source.",
+                "backend_failure");
+        }
+        try {
             extract(launcher.getModel());
         } catch (Exception exception) {
             return error(
-                "analysis_error", "Spoon could not build a model for the supplied source.");
+                "analysis_error", "Spoon failed while extracting syntax facts.",
+                "backend_failure");
         }
 
         facts.sort(Comparator
@@ -105,15 +142,53 @@ public final class ScenarioSpoon {
         return result(truncated || unsupportedEncountered ? "incomplete" : "ok");
     }
 
+    private static boolean hasSyntaxErrors(String text) throws IOException {
+        // Spoon's no-classpath model builder recovers from malformed input without
+        // reliably exposing parser errors.  Run javac's parse phase only so syntax
+        // failures remain distinct from Spoon backend failures; do not analyze,
+        // generate class files, discover source paths, or run annotation processors.
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) throw new IOException("system Java compiler unavailable");
+        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+        JavaFileObject source = new SimpleJavaFileObject(
+            URI.create("string:///ReviewedSource.java"), JavaFileObject.Kind.SOURCE) {
+                @Override public CharSequence getCharContent(boolean ignoreEncodingErrors) {
+                    return text;
+                }
+            };
+        JavacTask task = (JavacTask) compiler.getTask(
+            null, null, diagnostics,
+            List.of("-proc:none", "--release", "17", "-sourcepath", "", "-classpath", ""),
+            null, List.of(source));
+        task.parse();
+        return diagnostics.getDiagnostics().stream()
+            .anyMatch(item -> item.getKind() == Diagnostic.Kind.ERROR);
+    }
+
     private void extract(CtModel model) {
         noteUnsupported(model, CtLoop.class, "loop");
         noteUnsupported(model, CtSwitch.class, "switch");
         noteUnsupported(model, CtLambda.class, "lambda");
+        for (CtType<?> element : model.getElements(new TypeFilter<>(CtType.class))) {
+            Map<String, Object> fact = located("type", element);
+            if (fact == null) continue;
+            fact.put("name", element.getSimpleName());
+            fact.put("qualified_name", bounded(element.getQualifiedName()));
+            fact.put("match_precision", "syntax_match");
+            fact.put("resolution_status", "resolved_local");
+            add(fact);
+        }
         for (CtMethod<?> element : model.getElements(new TypeFilter<>(CtMethod.class))) {
             Map<String, Object> fact = located("method", element);
             if (fact == null) continue;
             fact.put("name", element.getSimpleName());
+            CtType<?> declaringType = element.getDeclaringType();
+            fact.put("qualified_name", declaringType == null
+                ? element.getSimpleName()
+                : bounded(declaringType.getQualifiedName() + "." + element.getSimpleName()));
             fact.put("signature", bounded(element.getSignature()));
+            fact.put("match_precision", "syntax_match");
+            fact.put("resolution_status", "resolved_local");
             add(fact);
         }
         for (CtInvocation<?> element : model.getElements(new TypeFilter<>(CtInvocation.class))) {
@@ -217,6 +292,7 @@ public final class ScenarioSpoon {
         Map<String, Object> fact = span(element);
         if (fact == null) return null;
         fact.put("kind", kind);
+        fact.put("match_precision", "syntax_match");
         String quote = quote(element);
         if (quote != null) {
             fact.put("quote", quote);
@@ -228,9 +304,13 @@ public final class ScenarioSpoon {
         Map<String, Object> declarationSpan = span(declaration);
         if (declarationSpan == null) {
             fact.put("declaration_status", "unresolved");
+            fact.put("resolution_status", "unresolved");
+            fact.put("match_precision", "unresolved");
             fact.put("declared_at", null);
         } else {
             fact.put("declaration_status", "resolved_local");
+            fact.put("resolution_status", "resolved_local");
+            fact.put("match_precision", "resolved_target");
             fact.put("declared_at", declarationSpan);
         }
     }
@@ -336,9 +416,10 @@ public final class ScenarioSpoon {
         return result;
     }
 
-    private Map<String, Object> error(String code, String message) {
+    private Map<String, Object> error(String code, String message, String failureKind) {
         Map<String, Object> result = result("error");
         result.put("error_code", code);
+        result.put("failure_kind", failureKind);
         diagnostics.add(diagnostic("analysis_error", code, message));
         result.put("diagnostics", diagnostics);
         return result;

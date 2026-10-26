@@ -56,8 +56,8 @@ def test_incomplete_backend_remains_incomplete_after_dependency_filter(monkeypat
     tools = SourceAnalysis(UnifiedTask.from_dict(valid_task_data()))
 
     async def incomplete(source_id):
-        return {"status": "incomplete", "facts": [{"kind": "condition"}],
-                "diagnostics": ["truncated"], "limitations": []}
+        return ({"status": "incomplete", "facts": [{"kind": "condition"}],
+                 "diagnostics": ["truncated"], "limitations": []}, None)
 
     monkeypatch.setattr(tools, "_analyze", incomplete)
     result = asyncio.run(tools.inspect_dependency_usage("mut:0"))
@@ -124,6 +124,7 @@ def test_malformed_backend_result_is_one_host_error(
         "backend": None,
         "source_id": "mut:0",
         "error_code": "analysis_error",
+        "failure_kind": "malformed_result",
         "facts": [],
         "diagnostics": ["Analysis backend returned malformed common fields."],
         "limitations": ["Analysis failure does not establish absence of behavior."],

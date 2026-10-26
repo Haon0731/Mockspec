@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import math
+import re
 
 from .schemas import UnifiedTask
 from .validation import SourceStore, InputValidationError
@@ -39,8 +40,24 @@ def normalize_source_arguments(arguments: dict) -> dict:
     return {"operation": operation, **values}
 
 
+def normalize_analysis_arguments(arguments: dict) -> dict:
+    """Validate the shared SDK/research analysis protocol without coercion."""
+    if not isinstance(arguments, dict) or set(arguments) - {"source_id", "symbol"}:
+        raise ValueError("Unknown analysis arguments")
+    source_id = arguments.get("source_id")
+    if type(source_id) is not str or not source_id.strip():
+        raise ValueError("source_id must be a non-empty string")
+    normalized = {"source_id": source_id}
+    symbol = arguments.get("symbol")
+    if symbol is not None:
+        if type(symbol) is not str or not symbol.strip():
+            raise ValueError("symbol must be a non-empty string or null")
+        normalized["symbol"] = symbol
+    return normalized
+
+
 class SourceAnalysis:
-    """Analyze only text already admitted by the host Adapter, never model paths."""
+    """Analyze initial snippets or discovered files within the host repository binding."""
 
     def __init__(
         self,
@@ -70,18 +87,18 @@ class SourceAnalysis:
         if result.get("status") == "error":
             compact = {
                 "status": "error",
-                "backend": result.get("backend"),
-                "source_id": result.get("source_id"),
                 "error_code": result.get("error_code", "analysis_error"),
                 "facts": [],
-                "diagnostics": ["Analysis error details omitted to fit the output limit."],
-                "limitations": ["Analysis failure does not establish absence of behavior."],
+                **self._classification(result),
+                "backend": result.get("backend"),
+                "source_id": result.get("source_id"),
+                "diagnostics": ["Analysis error details omitted."],
+                "limitations": ["Failure does not establish absence of behavior."],
             }
-            if len(json.dumps(compact, ensure_ascii=False)) > self.max_output_chars:
-                compact.pop("source_id")
-            if len(json.dumps(compact, ensure_ascii=False)) > self.max_output_chars:
-                compact["backend"] = None
-                compact["error_code"] = "analysis_error"
+            for optional in ("source_id", "backend", "diagnostics", "limitations"):
+                if len(json.dumps(compact, ensure_ascii=False)) <= self.max_output_chars:
+                    break
+                compact.pop(optional, None)
             return compact
         if result.get("backend") == "source_store":
             omitted = {
@@ -106,6 +123,7 @@ class SourceAnalysis:
             "limitations": limitations,
             "returned_fact_count": 0,
             "total_fact_count": len(result.get("facts", [])),
+            **self._classification(result),
         }
         for fact in result.get("facts", []):
             candidate = {**bounded, "facts": [*bounded["facts"], fact]}
@@ -116,13 +134,34 @@ class SourceAnalysis:
         if len(json.dumps(bounded, ensure_ascii=False)) > self.max_output_chars:
             bounded = {
                 "status": "incomplete",
-                "backend": result.get("backend"),
                 "error_code": "output_limit",
                 "facts": [],
-                "diagnostics": ["Result exceeds the output limit."],
-                "limitations": ["Syntax only; omitted evidence does not prove absence."],
+                **self._classification(result),
             }
         return bounded
+
+    @staticmethod
+    def _classification(result: dict) -> dict:
+        """Retain small machine-readable failure and resource fields under truncation."""
+        classification: dict = {}
+        for key in ("failure_kind", "complete", "limit_reason"):
+            value = result.get(key)
+            if isinstance(value, (str, bool)) and (
+                not isinstance(value, str) or len(value) <= 128
+            ):
+                classification[key] = value
+        usage = result.get("usage")
+        if isinstance(usage, dict):
+            compact_usage = {
+                key: usage[key]
+                for key in ("bytes", "elapsed_seconds")
+                if isinstance(usage.get(key), (int, float))
+                and not isinstance(usage.get(key), bool)
+                and math.isfinite(usage[key])
+            }
+            if compact_usage:
+                classification["usage"] = compact_usage
+        return classification
 
     async def inspect_source(
         self, source_id: str | None = None, start_line: int | None = None,
@@ -175,14 +214,20 @@ class SourceAnalysis:
                         "Source unavailable: invalid range, denied path, or frozen identity changed."
                     ]}
 
-    async def inspect_program_structure(self, source_id: str) -> dict:
+    async def inspect_program_structure(
+        self, source_id: str, symbol: str | None = None
+    ) -> dict:
         """Return syntax structure for one visible source, never a flow proof."""
-        result = await self._analyze(source_id)
+        result, source = await self._analyze(source_id)
+        if result.get("status") != "error":
+            result = self._select_symbol(result, symbol, source)
         return self.bounded(result)
 
-    async def inspect_dependency_usage(self, source_id: str) -> dict:
+    async def inspect_dependency_usage(
+        self, source_id: str, symbol: str | None = None
+    ) -> dict:
         """Return calls and reliable syntax-local use relationships."""
-        result = await self._analyze(source_id)
+        result, source = await self._analyze(source_id)
         if result.get("status") == "error":
             return self.bounded(result)
         allowed_kinds = {"call", "named_expression", "local_reference", "variable_read"}
@@ -190,8 +235,8 @@ class SourceAnalysis:
             fact for fact in result.get("facts", [])
             if fact.get("kind") in allowed_kinds
         ]
-        filtered = {**result, "facts": facts}
-        if not facts and result.get("status") != "incomplete":
+        filtered = self._select_symbol({**result, "facts": facts}, symbol, source)
+        if not filtered["facts"] and result.get("status") != "incomplete":
             filtered["status"] = "unresolved"
             filtered["diagnostics"] = [
                 *result.get("diagnostics", []),
@@ -203,19 +248,101 @@ class SourceAnalysis:
         ]
         return self.bounded(filtered)
 
-    async def _analyze(self, source_id: str) -> dict:
+    @staticmethod
+    def _fact_names(fact: dict) -> tuple[str, ...]:
+        values = []
+        for key in (
+            "callee", "name", "qualified_name", "bound_name", "exception"
+        ):
+            value = fact.get(key)
+            if isinstance(value, str) and value:
+                values.append(value)
+        return tuple(values)
+
+    @classmethod
+    def _matches_symbol(cls, fact: dict, symbol: str) -> bool:
+        """Match complete syntax names while excluding substring lookalikes."""
+        if fact.get("kind") == "named_expression" and fact.get("target") == symbol:
+            fact["match_precision"] = "syntax_match"
+            return True
+        for candidate in cls._fact_names(fact):
+            if candidate == symbol:
+                return True
+            if "." not in symbol and candidate.rsplit(".", 1)[-1] == symbol:
+                return True
+        return False
+
+    @staticmethod
+    def _text_matches(source, symbol: str) -> list[dict]:
+        pattern = re.compile(
+            rf"(?<![A-Za-z0-9_$]){re.escape(symbol)}(?![A-Za-z0-9_$])"
+        )
+        return [
+            {
+                "kind": "text_match",
+                "source_id": source.source_id,
+                "start_line": source.start_line + offset,
+                "end_line": source.start_line + offset,
+                "symbol": symbol,
+                "match_precision": "text_match",
+            }
+            for offset, line in enumerate(source.text.splitlines())
+            if pattern.search(line)
+        ]
+
+    def _select_symbol(self, result: dict, symbol: str | None, source) -> dict:
+        facts = [dict(fact) for fact in result.get("facts", [])]
+        if symbol is None:
+            return {**result, "facts": facts}
+
+        matched = [fact for fact in facts if self._matches_symbol(fact, symbol)]
+        if not matched and source is not None:
+            matched = self._text_matches(source, symbol)
+        selected = {
+            **result,
+            "facts": matched,
+            "query": {"symbol": symbol},
+        }
+        if not matched and result.get("status") != "incomplete":
+            selected["status"] = "unresolved"
+            selected["diagnostics"] = [
+                *result.get("diagnostics", []),
+                "No exact syntax-name or complete-token text match was found for the symbol.",
+            ]
+        selected["limitations"] = [
+            *result.get("limitations", []),
+            "Symbol matching is file-local; text and syntax matches do not prove a cross-file target or feasible path.",
+        ]
+        return selected
+
+    async def _analyze(self, source_id: str) -> tuple[dict, object | None]:
         try:
-            source = self.store.get(source_id)
-        except (InputValidationError, TypeError):
+            source = self.store.analysis_source(source_id)
+        except TimeoutError:
+            return {
+                "status": "error", "backend": None, "source_id": source_id,
+                "error_code": "timeout", "facts": [],
+                "failure_kind": "timeout",
+                "diagnostics": ["Repository analysis read timed out."],
+                "limitations": ["Timed-out analysis does not establish absence of behavior."],
+                **self._usage(),
+            }, None
+        except (InputValidationError, TypeError) as exc:
+            changed = "changed" in str(exc) or "evidence is invalid" in str(exc)
             return {
                 "status": "error",
                 "backend": None,
-                "source_id": None,
-                "error_code": "invalid_source",
+                "source_id": source_id,
+                "error_code": "source_changed" if changed else "invalid_source",
+                "failure_kind": "source_changed" if changed else "invalid_source",
                 "facts": [],
-                "diagnostics": ["Use a visible source_id from the supplied UnifiedTask."],
+                "diagnostics": [
+                    "Source identity changed during analysis."
+                    if changed else "Use a visible source_id from the supplied UnifiedTask."
+                ],
                 "limitations": ["No source was analyzed."],
-            }
+                **self._usage(),
+            }, None
 
         if self.language == "python":
             from .python_analysis import analyze_source_isolated
@@ -225,19 +352,34 @@ class SourceAnalysis:
                     source,
                     timeout_seconds=self.analysis_timeout_seconds,
                 )
-                return self._normalize(result, source_id)
+                normalized = self._hide_repository_quotes(
+                    self._normalize(result, source.source_id)
+                )
+                normalized.update(self._usage())
+                return normalized, source
             except asyncio.CancelledError:
                 raise
+            except asyncio.TimeoutError:
+                return {
+                    "status": "error", "backend": "cpython_ast",
+                    "source_id": source_id, "error_code": "timeout", "facts": [],
+                    "failure_kind": "timeout",
+                    "diagnostics": ["Python analysis timed out."],
+                    "limitations": ["Timed-out analysis does not establish absence of behavior."],
+                    **self._usage(),
+                }, source
             except Exception as exc:
                 return {
                     "status": "error",
                     "backend": "cpython_ast",
                     "source_id": source_id,
                     "error_code": "analysis_error",
+                    "failure_kind": "backend_failure",
                     "facts": [],
                     "diagnostics": [f"Python analysis failed: {type(exc).__name__}"],
                     "limitations": ["Analysis failure does not establish absence of behavior."],
-                }
+                    **self._usage(),
+                }, source
         if self.language == "java":
             try:
                 from .java_analysis import analyze_source
@@ -246,25 +388,66 @@ class SourceAnalysis:
                     source,
                     timeout_seconds=self.analysis_timeout_seconds,
                 )
-                return self._normalize(result, source_id)
+                normalized = self._hide_repository_quotes(
+                    self._normalize(result, source.source_id)
+                )
+                normalized.update(self._usage())
+                return normalized, source
+            except asyncio.CancelledError:
+                raise
+            except asyncio.TimeoutError:
+                return {
+                    "status": "error", "backend": "spoon",
+                    "source_id": source_id, "error_code": "timeout", "facts": [],
+                    "failure_kind": "timeout",
+                    "diagnostics": ["Java analysis timed out."],
+                    "limitations": ["Timed-out analysis does not establish absence of behavior."],
+                    **self._usage(),
+                }, source
             except Exception as exc:
                 return {
                     "status": "error",
                     "backend": "spoon",
                     "source_id": source_id,
                     "error_code": "analysis_error",
+                    "failure_kind": "backend_failure",
                     "facts": [],
                     "diagnostics": [f"Java analysis failed: {type(exc).__name__}"],
                     "limitations": ["Analysis failure does not establish absence of behavior."],
-                }
+                    **self._usage(),
+                }, source
         return {
             "status": "error",
             "backend": None,
             "source_id": source_id,
             "error_code": "unsupported",
+            "failure_kind": "unsupported_backend",
             "facts": [],
             "diagnostics": ["The task language has no configured analysis backend."],
             "limitations": ["Unsupported analysis does not establish absence of behavior."],
+            **self._usage(),
+        }, source
+
+    def _usage(self) -> dict:
+        return (
+            {"usage": self.store.last_read_usage}
+            if self.store.repository is not None else {}
+        )
+
+    def _hide_repository_quotes(self, result: dict) -> dict:
+        """Internal full-file parsing must not reveal or authorize repository text."""
+        if self.store.repository is None:
+            return result
+        return {
+            **result,
+            "facts": [
+                {key: value for key, value in fact.items() if key != "quote"}
+                for fact in result.get("facts", [])
+            ],
+            "limitations": [
+                *result.get("limitations", []),
+                "Analysis locations are not citeable source text; use inspect_source read for evidence quotes.",
+            ],
         }
 
     @staticmethod
@@ -274,6 +457,7 @@ class SourceAnalysis:
             "backend": None,
             "source_id": source_id,
             "error_code": "analysis_error",
+            "failure_kind": "malformed_result",
             "facts": [],
             "diagnostics": ["Analysis backend returned malformed common fields."],
             "limitations": ["Analysis failure does not establish absence of behavior."],
@@ -303,7 +487,11 @@ class SourceAnalysis:
             )
             and (
                 error_code is None
-                or (isinstance(error_code, str) and bool(error_code.strip()))
+                or (
+                    isinstance(error_code, str)
+                    and bool(error_code.strip())
+                    and len(error_code) <= 128
+                )
             )
             and (status != "error" or error_code is not None)
             and isinstance(facts, list)

@@ -63,6 +63,32 @@ def test_structure_preserves_slice_offsets_and_branch_polarity() -> None:
         ("if", "flag"),
         ("if_expression", "enabled()"),
     }
+    definition = next(
+        fact for fact in result["facts"] if fact["kind"] == "function_definition"
+    )
+    assert definition["name"] == "choose"
+    assert definition["qualified_name"] == "choose"
+    assert definition["match_precision"] == "syntax_match"
+    assert definition["resolution_status"] == "resolved_local"
+
+
+def test_structure_reports_nested_definition_names_without_resolving_calls() -> None:
+    result = analyze_source(_source(
+        "class Service:\n"
+        "    def fetch(self):\n"
+        "        return helper()"
+    ))
+
+    definitions = {
+        fact["qualified_name"]: fact
+        for fact in result["facts"]
+        if fact["kind"] in {"class_definition", "function_definition"}
+    }
+    assert definitions["Service"]["match_precision"] == "syntax_match"
+    assert definitions["Service.fetch"]["start_line"] == 41
+    call = next(fact for fact in result["facts"] if fact["kind"] == "call")
+    assert call["match_precision"] == "unresolved"
+    assert call["resolution_status"] == "unresolved"
 
 
 def test_structure_reports_return_raise_try_except_and_with_syntax() -> None:
@@ -203,6 +229,7 @@ def test_parse_failure_is_analysis_error_not_empty_success() -> None:
 
     assert result["status"] == "error"
     assert result["error_code"] == "analysis_error"
+    assert result["failure_kind"] == "parse_error"
     assert result["facts"] == []
     assert "visible line 90" in result["diagnostics"][0]
 
@@ -268,12 +295,30 @@ def test_isolated_analysis_timeout_kills_reaps_and_scrubs_environment(
 
     assert result["status"] == "error"
     assert result["error_code"] == "timeout"
+    assert result["failure_kind"] == "timeout"
     assert process.killed and process.returncode == -9
     assert captured["kwargs"]["env"] == {"LANG": "C.UTF-8", "LC_ALL": "C.UTF-8"}
     command = captured["args"]
     assert command[0] != "dependency"
     assert "-I" in command
     assert all("must-not-reach-python-analysis" not in str(item) for item in command)
+
+
+def test_isolated_malformed_backend_result_has_distinct_failure_kind(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import mock_spec.python_analysis as python_analysis
+
+    async def malformed(*args, **kwargs):
+        return 0, b"not-json", b""
+
+    monkeypatch.setattr(python_analysis, "_communicate", malformed)
+    result = asyncio.run(analyze_source_isolated(
+        _source("def target():\n    pass"), timeout_seconds=5
+    ))
+
+    assert result["error_code"] == "analysis_error"
+    assert result["failure_kind"] == "malformed_result"
 
 
 def test_isolated_analysis_cancellation_kills_and_reaps(

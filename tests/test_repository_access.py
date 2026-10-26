@@ -254,7 +254,9 @@ def test_observed_range_ending_in_blank_line_remains_analyzable(tmp_path: Path) 
         assert reconstructed.start_line == 2
         assert reconstructed.end_line == 4
         assert reconstructed.text == "def target():\n    return dependency()\n\n"
-        result = asyncio.run(SourceAnalysis(task, source_store=store)._analyze(source.source_id))
+        result, _ = asyncio.run(
+            SourceAnalysis(task, source_store=store)._analyze(source.source_id)
+        )
         assert result["status"] == "ok"
     finally:
         repository.close()

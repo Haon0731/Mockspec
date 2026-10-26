@@ -146,14 +146,28 @@ PYTHONPATH=src .venv/bin/python -m mock_spec.cli \
 默认仍为 V0.1。使用 `mock-spec-scenario --agent-version v0.2` 显式选择 V0.2，
 其独立 Prompt 和 SDK Agent 可自主调用 `inspect_source`、
 `inspect_program_structure`、`inspect_dependency_usage`，也可以零次调用。
-初始输入仍是完整可见 UnifiedTask；工具分析不增加源码可见范围。
+初始输入仍是完整可见 UnifiedTask；默认分析初始片段，仓库模式还可分析已发现的文件。
 
 Python 使用标准库 AST；Java 使用已固定的 Spoon 11.2.1 工具 JAR 和 Java 17+
 工具链（含 javac）。宿主可配置 `MOCKSPEC_SPOON_JAR` 和 `MOCKSPEC_JAVA`；
 默认查找本机 Step 5B 的独立 `/tmp/mockspec-step5b-tools`，不自动下载。
 JAR 必须符合 Step 5B 已记录身份。javac 只编译随包提供的可信 helper，不编译或执行目标源码。
+helper 先用宿主 JDK 的内存语法解析检查错误，再交给 Spoon 提取事实；关闭注解处理，
+不做目标源码的类型分析或代码生成。此预检用于避免 Spoon 容错解析将语法错误报告为空结果。
 工具不可用、分析失败、unsupported、unresolved 和输出截断均显式记录。
 语法嵌套、词法分支和局部声明引用不是数据流或可执行路径证明。
+
+两个分析工具共用 SDK/研究查询参数：`{"source_id":"发现返回的 ID 或相对路径","symbol":"可选名称"}`。
+省略 `symbol` 返回文件支持的结构/使用事实；指定简单名称或限定语法名称时精确筛选，
+例如 `dependency` 不匹配 `dependency_extra`，但同名语法匹配仍可能来自不同对象。
+初始 source_id 保留原片段语义；发现文件由宿主在已有大小、身份和时间限制内完整读取后交给 AST/Spoon。
+解析只传文本，不导入目标模块、不运行项目脚本；Java helper 编译和解析临时文件均位于宿主临时目录。
+
+`match_precision` 区分 `text_match`、`syntax_match`、`resolved_target` 和 `unresolved`；
+本文件可定位声明不等于完整跨文件解析。结果保留原始行位置、解析状态及局限，不能证明路径可行性。
+仓库模式的分析结果不提供可直接引用的 `quote`，内部读取不登记 observed；
+先按返回位置调用 `inspect_source` 读取完整原文行，才能用于最终契约引用。
+错误、不可解析、后端不可用、超时、取消和截断均保留在结果或调用轨迹中。
 
 ### Java 工具准备与单独验收
 

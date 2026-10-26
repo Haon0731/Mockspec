@@ -6,7 +6,9 @@ import asyncio
 import time
 from typing import Any
 
-from mock_spec.source_analysis import SourceAnalysis, normalize_source_arguments
+from mock_spec.source_analysis import (
+    SourceAnalysis, normalize_source_arguments, normalize_analysis_arguments,
+)
 from mock_spec.schemas import UnifiedTask
 from mock_spec.validation import SourceStore, decode_json
 
@@ -212,14 +214,12 @@ class QueryExecutor:
                     "invalid_arguments",
                     "inspect_source arguments must describe one valid search or read.",
                 )
-        if set(arguments) != {"source_id"}:
+        try:
+            return normalize_analysis_arguments(arguments)
+        except (TypeError, ValueError):
             return QueryExecutor._error(
-                "invalid_arguments", "Tool arguments have missing or unknown fields."
+                "invalid_arguments", "Analysis requires source_id and an optional symbol."
             )
-        source_id = arguments.get("source_id")
-        if not isinstance(source_id, str) or not source_id.strip():
-            return QueryExecutor._error("wrong_type", "source_id must be a non-empty string.")
-        return arguments
 
     @staticmethod
     def _error(code: str, diagnostic: str) -> dict[str, Any]:

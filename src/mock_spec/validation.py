@@ -203,6 +203,25 @@ class SourceStore:
             target_precision="file",
         )
 
+    def analysis_source(self, source_id: str) -> Source:
+        """Return complete parse input without registering it as observed evidence."""
+        self.last_read_usage = {"bytes": 0, "elapsed_seconds": 0.0}
+        if type(source_id) is not str:
+            raise InputValidationError("unknown source_id")
+        if source_id in self._sources:
+            return self._sources[source_id]
+        if self._repository is None:
+            return self.get(source_id)
+        locator = self._repository_sources.get(source_id, source_id)
+        try:
+            source = self._repository.read_for_analysis(
+                locator, run_id=self._run_id, deadline=self._deadline
+            )
+        finally:
+            self.last_read_usage = self._repository.last_read_usage
+        self._repository_sources[source.source_id] = source.logical_path
+        return source
+
     def read(self, locator: str, start_line: int, end_line: int) -> SourceSlice:
         """Read an initial fragment by ID or an allowed whole file by logical path."""
         self.last_read_usage = {"bytes": 0, "elapsed_seconds": 0.0}

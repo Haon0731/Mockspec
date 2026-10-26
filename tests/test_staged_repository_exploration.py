@@ -81,6 +81,80 @@ def _repository_run(tmp_path: Path, *, bad_quote: bool = False) -> dict:
     ))
 
 
+def _analysis_repository_run(tmp_path: Path) -> dict:
+    """Replay discovery, whole-file syntax analysis, an exact read, then citation."""
+    task = UnifiedTask.from_dict(synthetic_task())
+    tree = tmp_path / "snapshot" / "tree" / "src"
+    tree.mkdir(parents=True)
+    lines = [
+        "def dependency_extra(value):",
+        "    return value + 100",
+        "",
+        "def dependency(value):",
+        "    return value + 1",
+        "",
+        "def target(value):",
+        "    return dependency(value)",
+    ]
+    payload = ("\n".join(lines) + "\n").encode()
+    (tree / "example.py").write_bytes(payload)
+    root_fd = os.open(tmp_path / "snapshot", os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        repository = ReviewedRepository(
+            root_fd,
+            task=task,
+            snapshot_id="synthetic-reviewed-snapshot",
+            discovery_root="tree",
+            files_by_logical_path={
+                "src/example.py": (
+                    "tree/src/example.py", hashlib.sha256(payload).hexdigest()
+                )
+            },
+        )
+    finally:
+        os.close(root_fd)
+
+    source_id = repository.source_id_for("src/example.py")
+    outputs = query_script(4)
+    attempts = [output["query_attempt"] for output in outputs[1:5]]
+    requests = [
+        ("inspect_source", {"operation": "search", "path_pattern": "src/*.py"}),
+        ("inspect_program_structure", {"source_id": source_id, "symbol": "target"}),
+        ("inspect_dependency_usage", {"source_id": source_id, "symbol": "dependency"}),
+        ("inspect_source", {
+            "source_id": source_id, "start_line": 8, "end_line": 8,
+        }),
+    ]
+    for attempt, (tool, arguments) in zip(attempts, requests):
+        attempt["tool"] = tool
+        attempt["arguments_json"] = json.dumps(arguments)
+
+    dynamic = {
+        "id": "dynamic-call",
+        "source_id": source_id,
+        "start_line": 8,
+        "end_line": 8,
+        "quote": lines[7],
+        "rationale": "The repository observation shows the exact dependency call.",
+    }
+    construct = outputs[6]
+    deliver = outputs[7]
+    construct["contract"] = deepcopy(construct["contract"])
+    construct["contract"]["evidence"].append(dynamic)
+    construct["contract"]["dependency_constraints"][0]["evidence_ids"].append(
+        "dynamic-call"
+    )
+    deliver["contract"] = deepcopy(construct["contract"])
+
+    return asyncio.run(execute_staged_run(
+        output_dir=tmp_path / "analysis-run",
+        model=FixedScriptModel(outputs),
+        config=StagedRunConfig(),
+        task_loader=lambda: (task, repository),
+        requested_case_id=task.case_id,
+    ))
+
+
 def test_repository_mode_reads_more_than_six_times_and_strictly_cites_observation(
     tmp_path: Path,
 ) -> None:
@@ -113,3 +187,38 @@ def test_repository_observation_quote_mismatch_is_rejected(tmp_path: Path) -> No
     assert result["manifest"]["error_stage"] == "CONSTRUCT"
     assert result["manifest"]["stop_reason"] == "output_invalid"
     assert len(result["record"]["source_observations"]) == 7
+
+
+def test_controller_replays_discover_analyze_read_and_cite_without_implicit_observation(
+    tmp_path: Path,
+) -> None:
+    result = _analysis_repository_run(tmp_path)
+
+    assert result["manifest"]["result_status"] == "SELECTED", result["record"]["error"]
+    log = result["record"]["query_log"]
+    assert [item["tool"] for item in log] == [
+        "inspect_source",
+        "inspect_program_structure",
+        "inspect_dependency_usage",
+        "inspect_source",
+    ]
+    assert [item["status"] for item in log] == ["ok", "ok", "ok", "ok"]
+
+    structure = log[1]["result"]
+    assert structure["query"]["symbol"] == "target"
+    assert structure["facts"]
+    assert all(fact["match_precision"] in {"syntax_match", "resolved_target"}
+               for fact in structure["facts"])
+
+    usage = log[2]["result"]
+    assert usage["query"]["symbol"] == "dependency"
+    assert usage["facts"]
+    assert all(fact["match_precision"] in {"syntax_match", "resolved_target", "unresolved"}
+               for fact in usage["facts"])
+    assert not any(fact.get("callee") == "dependency_extra" for fact in usage["facts"])
+
+    # Path discovery and internal full-file parser input do not authorize citation.
+    observations = result["record"]["source_observations"]
+    assert [(item["start_line"], item["end_line"], item["response_id"])
+            for item in observations] == [(8, 8, "query:4")]
+    assert observations[0]["text"] == "    return dependency(value)"

@@ -22,13 +22,16 @@ _DEFAULT_JAVA = "/tmp/mockspec-step5b-tools/jdk/bin/java"
 _MAX_PROCESS_OUTPUT = 1_000_000
 
 
-def _failure(source_id: str, code: str, message: str) -> dict[str, Any]:
+def _failure(
+    source_id: str, code: str, message: str, *, failure_kind: str
+) -> dict[str, Any]:
     category = "unsupported" if code == "backend_unavailable" else "analysis_error"
     return {
         "status": "error",
         "backend": "spoon",
         "source_id": source_id,
         "error_code": code,
+        "failure_kind": failure_kind,
         "facts": [],
         "limitations": [
             "No result establishes that a structure or dependency is absent.",
@@ -89,6 +92,7 @@ async def analyze_source(
             source.source_id,
             "backend_unavailable",
             "Pinned Spoon 11.2.1 and its Java 17+ toolchain are unavailable.",
+            failure_kind="backend_failure",
         )
     jar, java, javac = backend
     helper = files("mock_spec").joinpath("tools/ScenarioSpoon.java")
@@ -110,6 +114,7 @@ async def analyze_source(
                     source.source_id,
                     "backend_unavailable",
                     "The fixed Spoon helper could not be compiled by the configured toolchain.",
+                    failure_kind="backend_failure",
                 )
 
             remaining = timeout_seconds - (asyncio.get_running_loop().time() - started)
@@ -131,24 +136,40 @@ async def analyze_source(
                 cwd=work,
             )
     except asyncio.TimeoutError:
-        return _failure(source.source_id, "timeout", "Spoon analysis timed out.")
+        return _failure(
+            source.source_id, "timeout", "Spoon analysis timed out.",
+            failure_kind="timeout",
+        )
     except asyncio.CancelledError:
         raise
     except OverflowError:
         return _failure(
-            source.source_id, "analysis_error", "Spoon process output exceeded the host limit."
+            source.source_id, "analysis_error", "Spoon process output exceeded the host limit.",
+            failure_kind="output_limit",
         )
     except OSError:
-        return _failure(source.source_id, "analysis_error", "Spoon process launch failed.")
+        return _failure(
+            source.source_id, "analysis_error", "Spoon process launch failed.",
+            failure_kind="backend_failure",
+        )
 
     if code != 0:
-        return _failure(source.source_id, "analysis_error", "Spoon analysis failed.")
+        return _failure(
+            source.source_id, "analysis_error", "Spoon analysis failed.",
+            failure_kind="backend_failure",
+        )
     try:
         result = json.loads(stdout)
     except (json.JSONDecodeError, UnicodeDecodeError):
-        return _failure(source.source_id, "analysis_error", "Spoon returned invalid JSON.")
+        return _failure(
+            source.source_id, "analysis_error", "Spoon returned invalid JSON.",
+            failure_kind="malformed_result",
+        )
     if not isinstance(result, dict) or result.get("source_id") != source.source_id:
-        return _failure(source.source_id, "analysis_error", "Spoon returned invalid identity.")
+        return _failure(
+            source.source_id, "analysis_error", "Spoon returned invalid identity.",
+            failure_kind="malformed_result",
+        )
     if not _stderr_is_benign(stderr):
         result.setdefault("diagnostics", []).append(
             {

@@ -77,6 +77,7 @@ class _FactCollector(ast.NodeVisitor):
             "kind": kind,
             **self._location(node),
             "lexical_guards": [dict(item) for item in self.guards],
+            "match_precision": "syntax_match",
             **details,
         })
 
@@ -90,6 +91,55 @@ class _FactCollector(ast.NodeVisitor):
     def _visit_children(self, node: ast.AST) -> None:
         for child in ast.iter_child_nodes(node):
             self._visit_child(child)
+
+    def _qualified_name(self, name: str) -> str:
+        owners = [
+            owner.name for owner in self.parents[:-1]
+            if isinstance(owner, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))
+        ]
+        return ".".join([*owners, name])
+
+    def _add_definition(self, kind: str, node: ast.AST, **details: Any) -> None:
+        """Locate a declaration header and retain the complete syntax extent separately."""
+        local_line = getattr(node, "lineno", 1)
+        end_local = getattr(node, "end_lineno", local_line)
+        self.facts.append({
+            "kind": kind,
+            "source_id": self.source.source_id,
+            "start_line": self._line(local_line),
+            "end_line": self._line(local_line),
+            "body_end_line": self._line(end_local),
+            "quote": self.original_lines[max(0, local_line - 1)],
+            "lexical_guards": [dict(item) for item in self.guards],
+            **details,
+        })
+
+    def visit_FunctionDef(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
+        """Report a located declaration without claiming runtime binding resolution."""
+        self._add_definition(
+            "function_definition",
+            node,
+            name=node.name,
+            qualified_name=self._qualified_name(node.name),
+            asynchronous=isinstance(node, ast.AsyncFunctionDef),
+            match_precision="syntax_match",
+            resolution_status="resolved_local",
+        )
+        self._visit_children(node)
+
+    visit_AsyncFunctionDef = visit_FunctionDef
+
+    def visit_ClassDef(self, node: ast.ClassDef) -> None:
+        """Report a located class declaration as a syntax fact."""
+        self._add_definition(
+            "class_definition",
+            node,
+            name=node.name,
+            qualified_name=self._qualified_name(node.name),
+            match_precision="syntax_match",
+            resolution_status="resolved_local",
+        )
+        self._visit_children(node)
 
     def _visit_branch(
         self,
@@ -243,6 +293,7 @@ class _FactCollector(ast.NodeVisitor):
             positional_argument_count=len(node.args),
             keyword_arguments=[item.arg for item in node.keywords],
             resolution_status="unresolved",
+            match_precision="unresolved",
             syntax_context=self._expression_context(node),
         )
         self._visit_children(node)
@@ -259,6 +310,7 @@ class _FactCollector(ast.NodeVisitor):
                 node,
                 name=node.id,
                 resolution_status="unresolved",
+                match_precision="unresolved",
                 relation="lexical_name_read",
             )
 
@@ -345,6 +397,7 @@ def analyze_source(source: Source) -> dict[str, Any]:
             "backend": BACKEND,
             "source_id": None,
             "error_code": "analysis_error",
+            "failure_kind": "invalid_request",
             "facts": [],
             "diagnostics": ["Python analysis requires a visible Source."],
             "limitations": list(_LIMITATIONS),
@@ -356,6 +409,7 @@ def analyze_source(source: Source) -> dict[str, Any]:
             "backend": BACKEND,
             "source_id": source.source_id,
             "error_code": "analysis_error",
+            "failure_kind": "input_limit",
             "facts": [],
             "diagnostics": ["Python source exceeds the bounded analyzer input size."],
             "limitations": [*_LIMITATIONS, _DIRECT_DEADLINE_LIMITATION],
@@ -371,6 +425,7 @@ def analyze_source(source: Source) -> dict[str, Any]:
             "backend": BACKEND,
             "source_id": source.source_id,
             "error_code": "analysis_error",
+            "failure_kind": "parse_error",
             "facts": [],
             "diagnostics": [f"Python syntax analysis failed at visible line {visible_line}: {message}"],
             "limitations": list(_LIMITATIONS),
@@ -382,6 +437,7 @@ def analyze_source(source: Source) -> dict[str, Any]:
             "backend": BACKEND,
             "source_id": source.source_id,
             "error_code": "analysis_error",
+            "failure_kind": "input_limit",
             "facts": [],
             "diagnostics": ["Python AST exceeds the bounded analyzer node count."],
             "limitations": [*_LIMITATIONS, _DIRECT_DEADLINE_LIMITATION],
@@ -412,12 +468,15 @@ def analyze_source(source: Source) -> dict[str, Any]:
     }
 
 
-def _failure(source_id: str | None, code: str, message: str) -> dict[str, Any]:
+def _failure(
+    source_id: str | None, code: str, message: str, *, failure_kind: str
+) -> dict[str, Any]:
     return {
         "status": "error",
         "backend": BACKEND,
         "source_id": source_id,
         "error_code": code,
+        "failure_kind": failure_kind,
         "facts": [],
         "diagnostics": [message],
         "limitations": [
@@ -451,7 +510,10 @@ async def analyze_source_isolated(
                 max_output_bytes=_MAX_PROCESS_OUTPUT,
             )
     except asyncio.TimeoutError:
-        return _failure(source.source_id, "timeout", "Python AST analysis timed out.")
+        return _failure(
+            source.source_id, "timeout", "Python AST analysis timed out.",
+            failure_kind="timeout",
+        )
     except asyncio.CancelledError:
         raise
     except OverflowError:
@@ -459,22 +521,29 @@ async def analyze_source_isolated(
             source.source_id,
             "analysis_error",
             "Python AST process output exceeded the host limit.",
+            failure_kind="output_limit",
         )
     except OSError:
         return _failure(
-            source.source_id, "analysis_error", "Python AST process launch failed."
+            source.source_id, "analysis_error", "Python AST process launch failed.",
+            failure_kind="backend_failure",
         )
     if code != 0 or stderr:
-        return _failure(source.source_id, "analysis_error", "Python AST analysis failed.")
+        return _failure(
+            source.source_id, "analysis_error", "Python AST analysis failed.",
+            failure_kind="backend_failure",
+        )
     try:
         result = decode_json(stdout.decode("utf-8"))
     except (UnicodeDecodeError, ValueError):
         return _failure(
-            source.source_id, "analysis_error", "Python AST analysis returned invalid JSON."
+            source.source_id, "analysis_error", "Python AST analysis returned invalid JSON.",
+            failure_kind="malformed_result",
         )
     if not isinstance(result, dict) or result.get("source_id") != source.source_id:
         return _failure(
-            source.source_id, "analysis_error", "Python AST analysis returned invalid identity."
+            source.source_id, "analysis_error", "Python AST analysis returned invalid identity.",
+            failure_kind="malformed_result",
         )
     limitations = result.get("limitations")
     if isinstance(limitations, list) and _DIRECT_DEADLINE_LIMITATION in limitations:
@@ -494,7 +563,10 @@ def _subprocess_main() -> int:
         source = Source.from_dict(payload)
         result = analyze_source(source)
     except Exception:
-        result = _failure(None, "analysis_error", "Python AST request was invalid.")
+        result = _failure(
+            None, "analysis_error", "Python AST request was invalid.",
+            failure_kind="invalid_request",
+        )
     sys.stdout.write(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
     return 0
 
