@@ -1,0 +1,178 @@
+{
+  "schema_version": "scenario-inference-record/v0.1",
+  "run_id": "b9c10bee-8594-4f34-acae-74718de5935e",
+  "requested_case_id": "flask_308",
+  "case_id": "flask_308",
+  "language": "python",
+  "input_hash": "1ad98f488c35f70e0bd08f7d64b90d6adc811cf6ac507234de23681dc98d0f69",
+  "result_status": "ERROR",
+  "stop_reason": "model_error",
+  "error_stage": "QUERY",
+  "selected_scenario_id": null,
+  "selection_rationale": null,
+  "claim_basis": [],
+  "query_log": [],
+  "query_accounting": {
+    "observed_attempts": 0,
+    "budgeted_attempts": 0,
+    "limit": 6
+  },
+  "critical_behaviors": [],
+  "allowed_variations": [],
+  "nonblocking_unknowns": [],
+  "degeneracy_contrast": {
+    "status": "unavailable",
+    "execution_status": "not_executed",
+    "alternative": null,
+    "bypass_behavior": null,
+    "evidence_ids": [],
+    "distinguishing_observation": null,
+    "revision_requested": false,
+    "revision_reason": null
+  },
+  "revision_log": [],
+  "format_repair_log": [],
+  "unresolved": [],
+  "stages": [
+    {
+      "stage": "EXTRACT",
+      "result": {
+        "schema_version": "staged-extract/v0.1",
+        "result_status": "CONTINUE",
+        "original_goals": [
+          {
+            "source_id": "test",
+            "start_line": 11,
+            "end_line": 11,
+            "quote": "@pytest.mark.parametrize(\"scenario,has_app_context,code,args,kwargs\", ["
+          },
+          {
+            "source_id": "test",
+            "start_line": 102,
+            "end_line": 103,
+            "quote": "    with pytest.raises(Exception) as exc_info:\n        abort(code, *args, **kwargs)"
+          },
+          {
+            "source_id": "mut",
+            "start_line": 269,
+            "end_line": 270,
+            "quote": "    If :data:`~flask.current_app` is available, it will call its\n    :attr:`~flask.Flask.aborter` object, otherwise it will use"
+          }
+        ],
+        "candidates": [
+          {
+            "scenario_id": "app_context_delegates_to_app_aborter",
+            "description": "When a Flask app context exists, abort(code, *args, **kwargs) should call current_app.aborter with the same code/args/kwargs and the resulting exception should report 'Aborted with {code}'.",
+            "evidence": [
+              {
+                "source_id": "test",
+                "start_line": 86,
+                "end_line": 86,
+                "quote": "    if has_app_context:"
+              },
+              {
+                "source_id": "test",
+                "start_line": 88,
+                "end_line": 89,
+                "quote": "        mock_ctx.app = mock_app\n        mock_app.aborter = mock_aborter"
+              },
+              {
+                "source_id": "test",
+                "start_line": 120,
+                "end_line": 120,
+                "quote": "        assert f\"Aborted with {code}\" in str(exc_info.value)"
+              },
+              {
+                "source_id": "mut",
+                "start_line": 282,
+                "end_line": 283,
+                "quote": "    if (ctx := _cv_app.get(None)) is not None:\n        ctx.app.aborter(code, *args, **kwargs)"
+              }
+            ]
+          },
+          {
+            "scenario_id": "no_app_context_uses_werkzeug_abort",
+            "description": "When no Flask app context exists, abort(code, *args, **kwargs) should fall back to werkzeug.exceptions.abort and the resulting exception should report 'Werkzeug abort {code}'.",
+            "evidence": [
+              {
+                "source_id": "test",
+                "start_line": 121,
+                "end_line": 121,
+                "quote": "    else:"
+              },
+              {
+                "source_id": "test",
+                "start_line": 126,
+                "end_line": 126,
+                "quote": "        assert f\"Werkzeug abort {code}\" in str(exc_info.value)"
+              },
+              {
+                "source_id": "mut",
+                "start_line": 285,
+                "end_line": 285,
+                "quote": "    _wz_abort(code, *args, **kwargs)"
+              }
+            ]
+          }
+        ],
+        "unresolved": []
+      }
+    }
+  ],
+  "model_responses": [
+    {
+      "output": [
+        {
+          "id": "7952056e-e651-43a8-a25f-099855337873",
+          "summary": [],
+          "type": "reasoning",
+          "content": [
+            {
+              "text": "We need answer strict JSON per schema. Need extract original goals? Need infer scenario candidates from visible task. Stage EXTRACT. Need output schema ExtractResult. Need maybe candidates describing scenarios inferred, evidence refs. Max 2 candidates. Need original_goals refs. unresolved list.\n\nWe need interpret: Task is staged scenario inference. We have masked test for test_abort_scenarios with slots. mut_source is abort implementation. Need extract candidate scenarios? We need return candidate drafts, each scenario_id, description, evidence. We need identify original goals likely from task. There is no explicit natural language goal except test behavior. We need derive original goals as source refs? Original goals probably refer to lines in mut/source or test that encode intended behavior. Need produce evidence quotes.\n\nLet's understand task. We are to infer scenario(s) from visible task. It's like given a masked test and mutated source, extract candidate scenarios that explain failure/bug. Need output strict schema. CandidateDraft scenario_id, description, evidence. Only up to 2. We need maybe one candidate: abort() should call current_app.aborter when app context exists, otherwise werkzeug abort, and preserve message/args/kwargs. Evidence from mut_source lines 277-285 and test lines with has_app_context branches/verify messages. Need line numbers exact.\n\nNeed comply with schema: schema_version \"staged-extract/v0.1\", result_status \"CONTINUE\" or INCONCLUSIVE. original_goals array of SourceReference. candidates array up to 2. unresolved array strings.\n\nNeed carefully quote source lines with start_line/end_line and quote. We must ensure quotes exactly from provided text and line numbers correspond. Need calculate line numbers for test and mut. For test, start_line 1 end_line 126. Provided text includes leading whitespace and blank lines with spaces. Need map lines. We need reference exact lines for key evidence. Could reference entire parameters block or branch. Need line numbers. We can count test text lines. Let's enumerate.\n\nTest text:\n1 \"   \"\n2 \"               \"\n3 \"        \"\n4 \"                          \"\n5 \"        \"\n6 \"   \"\n7 \"import pytest\"\n8 \"from flask.helpers import abort\"\n9 \"\"\n10 \"\"\n11 '@pytest.mark.parametrize(\"scenario,has_app_context,code,args,kwargs\", ['\n12 \"    (\"\n13 '        \"app_context_exists_404\",'\n14 \"        True,\"\n15 \"        404,\"\n16 \"        (),\"\n17 \"        {}\"\n18 \"    ),\"\n19 \"    (\"\n20 '        \"app_context_exists_500_with_message\",'\n21 \"        True,\"\n22 \"        500,\"\n23 '        (\"Internal Server Error\",),'\n24 \"        {}\"\n25 \"    ),\"\n26 \"    (\"\n27 '        \"no_app_context_403\",'\n28 \"        False,\"\n29 \"        403,\"\n30 \"        (),\"\n31 \"        {}\"\n32 \"    ),\"\n33 \"    (\"\n34 '        \"no_app_context_with_args_kwargs\",'\n35 \"        False,\"\n36 \"        400,\"\n37 '        (\"Bad Request\",),'\n38 '        {\"description\": \"Invalid input\"}'\n39 \"    ),\"\n40 \"    (\"\n41 '        \"app_context_custom_code\",'\n42 \"        True,\"\n43 \"        418,\"\n44 \"        (),\"\n45 '        {\"description\": \"I\\'m a teapot\"}'\n46 \"    ),\"\n47 \"])\"\n48 \"def test_abort_scenarios(mocker, scenario, has_app_context, code, args, kwargs):\"\n49 \"       \"\n50 \"                    \"\n51 \"\"\n52 \"       \"\n53 \"                                              \"\n54 \"                                                             \"\n55 \"                                          \"\n56 \"                                                       \"\n57 \"                                                \"\n58 \"\"\n59 \"         \"\n60 \"                          \"\n61 \"                                     \"\n62 \"                                    \"\n63 \"       \"\n64 \"                                 \"\n65 \"                      \"\n66 \"    # === PY-SLOT-START:mock_stub_001 ===\"\n67 \"    pass\"\n68 \"    # === PY-SLOT-END:mock_stub_001 ===\"\n69 \"\"\n70 \"                            \"\n71 \"    # === PY-SLOT-START:mock_stub_002 ===\"\n72 \"    pass\"\n73 \"    # === PY-SLOT-END:mock_stub_002 ===\"\n74 \"\"\n75 \"                                   \"\n76 \"    # === PY-SLOT-START:mock_stub_003 ===\"\n77 \"    pass\"\n78 \"    # === PY-SLOT-END:mock_stub_003 ===\"\n79 \"\"\n80 \"                        \"\n81 \"                         \"\n82 \"    # === PY-SLOT-START:mock_stub_004 ===\"\n83 \"    pass\"\n84 \"    # === PY-SLOT-END:mock_stub_004 ===\"\n85 \"\"\n86 \"    if has_app_context:\"\n87 \"                       \"\n88 \"        mock_ctx.app = mock_app\"\n89 \"        mock_app.aborter = mock_aborter\"\n90 \"                                \"\n91 \"        # === PY-SLOT-START:mock_stub_005 ===\"\n92 \"        pass\"\n93 \"        # === PY-SLOT-END:mock_stub_005 ===\"\n94 \"\"\n95 \"                            \"\n96 \"    # === PY-SLOT-START:mock_stub_006 ===\"\n97 \"    pass\"\n98 \"    # === PY-SLOT-END:mock_stub_006 ===\"\n99 \"                      \"\n100 \"\"\n101 \"                                 \"\n102 \"    with pytest.raises(Exception) as exc_info:\"\n103 \"        abort(code, *args, **kwargs)\"\n104 \"\"\n105 \"                        \"\n106 \"    # === PY-SLOT-START:verify_001 ===\"\n107 \"    pass\"\n108 \"    # === PY-SLOT-END:verify_001 ===\"\n109 \"\"\n110 \"                       \"\n111 \"    if has_app_context:\"\n112 \"                          \"\n113 \"        # === PY-SLOT-START:verify_002 ===\"\n114 \"        pass\"\n115 \"        # === PY-SLOT-END:verify_002 ===\"\n116 \"                                                 \"\n117 \"        # === PY-SLOT-START:verify_003 ===\"\n118 \"        pass\"\n119 \"        # === PY-SLOT-END:verify_003 ===\"\n120 '        assert f\"Aborted with {code}\" in str(exc_info.value)'\n121 \"    else:\"\n122 \"                             \"\n123 \"        # === PY-SLOT-START:verify_004 ===\"\n124 \"        pass\"\n125 \"        # === PY-SLOT-END:verify_004 ===\"\n126 '        assert f\"Werkzeug abort {code}\" in str(exc_info.value)'\n\nSeems line count matches end 126. Good.\n\nMut source start_line 265 end_line 285? Let's enumerate mut text from 265:\n265 \"def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:\"\n266 '    \"\"\"Raise an :exc:`~werkzeug.exceptions.HTTPException` for the given'\n267 \"    status code.\"\n268 \"\"\n269 \"    If :data:`~flask.current_app` is available, it will call its\"\n270 \"    :attr:`~flask.Flask.aborter` object, otherwise it will use\"\n271 \"    :func:`werkzeug.exceptions.abort`.\"\n272 \"\"\n273 \"    :param code: The status code for the exception, which must be\"\n274 \"        registered in ``app.aborter``.\"\n275 \"    :param args: Passed to the exception.\"\n276 \"    :param kwargs: Passed to the exception.\"\n277 \"\"\n278 \"    .. versionadded:: 2.2\"\n279 \"        Calls ``current_app.aborter`` if available instead of always\"\n280 \"        using Werkzeug's default ``abort``.\"\n281 '    \"\"\"'\n282 \"    if (ctx := _cv_app.get(None)) is not None:\"\n283 \"        ctx.app.aborter(code, *args, **kwargs)\"\n284 \"\"\n285 \"    _wz_abort(code, *args, **kwargs)\"\nYes.\n\nNeed decide candidates. The visible task likely has a mutation? The mut source appears correct? It calls app.aborter then _wz_abort. If app.aborter raises, _wz_abort not called. Test expects if app context, exception message \"Aborted with {code}\" from mock_aborter; if no context, Werkzeug abort message. So intended behavior is as source. But masked test has slots, likely need infer test implementation. Candidate scenarios could be:\n1. With app context: abort should route through current_app.aborter and raise \"Aborted with <code>\" including args/kwargs.\n2. Without app context: abort should fallback to werkzeug.exceptions.abort and raise \"Werkzeug abort <code>\".\nCould also include args/kwargs forwarding. But max 2 candidates. We can include two candidates each for branch. Or one combined candidate. Need original_goals maybe source refs representing the test's parameter rows and source docstring. Need think what schema expects. \"staged-scenario-inference-prompts\" perhaps from benchmark where model extracts task scenarios/goals from context. CandidateDraft description describes inferred scenario. Evidence source references. Original goals are maybe references to explicit goals in user prompt? There is no explicit prose, but test is source. We can include original_goals as key lines from test that specify scenarios? Usually original_goals would be source references to lines where original task goal is stated. In absence, maybe the docstring in mut source states behavior. Or test lines parameterization. Need fill something.\n\nNeed maybe result_status \"CONTINUE\". unresolved maybe empty or mention \"No explicit natural-language task statement; goals inferred from test and source. Slot implementations for mock/verify are masked and not fully visible.\" But if unresolved non-empty could be okay. Need not overdo. Since visible task has masked slots not visible; but we can still infer. \"unresolved\" likely list of unresolved questions. We could include \"Exact contents of masked mock/verify slots are not visible.\" But result_status CONTINUE. Hmm.\n\nNeed ensure evidence quotes line references exactly. For each candidate, evidence can include multiple SourceReferences from test and mut. Need quote exactly, including indentation? The quote field can be exact substring of text. Start/end line likely should correspond. For multi-line quote, include newlines. We can quote a few lines. Need be careful quote exact text; schema minLength and pattern \\S, no requirement exact matching maybe but should.\n\nCandidate 1: scenario_id \"app_context_routes_to_current_app_aborter\". Description: \"When Flask app context exists, abort(code, *args, **kwargs) must delegate to current_app.aborter, and the raised exception message should contain 'Aborted with {code}'.\" Evidence: test lines 86-93 (if has_app_context sets mock_ctx.app/mock_app/aborter and mock_stub_005), test lines 110-120 (verify branch asserts Aborted with code), mut lines 282-283 (if ctx ... ctx.app.aborter(...)). Could include lines 269-270 docstring. But each SourceReference can only one source id and contiguous range. We can include separate refs.\n\nCandidate 2: scenario_id \"no_app_context_falls_back_to_werkzeug_abort\". Description: \"When no Flask app context exists, abort must fall back to werkzeug.exceptions.abort, and the raised exception message should contain 'Werkzeug abort {code}'.\" Evidence: test lines 121-126 assert else branch; mut line 285 fallback; maybe test param rows no_app_context lines 26-39. Good.\n\nOriginal_goals: Could refer to test parameterization rows and assertions? Perhaps \"The test defines scenarios app_context_exists_404, app_context_exists_500_with_message, no_app_context_403, no_app_context_with_args_kwargs, app_context_custom_code\" and \"abort implementation docstring says if current_app available call app.aborter, otherwise werkzeug abort.\" But original_goals are SourceReference[] not descriptions. We can put source refs with quotes from test lines 11-47 parameterization and mut docstring lines 269-270. Maybe enough.\n\nNeed maybe include evidence for args/kwargs forwarding? Candidate descriptions can mention *args **kwargs because test has with message and description. The test expects abort called with code, *args, **kwargs. The implementation forwards them to aborter and _wz_abort. Could include evidence test lines 101-103 and mut 283/285. But we only need candidates.\n\nNeed strict JSON only. No markdown. Ensure schema version exact.\n\nPotential issue: \"original_goals\" should be source refs to explicit task goals. Since no explicit task text, could be empty? Schema allows empty array. But likely expected non-empty. We can use source refs from test parameterization and mut docstring. But are those \"original goals\"? They state intended behavior. I'll include.\n\nNeed decide if candidates max 2. Yes.\n\nLet's construct JSON.\n\nNeed quote exact. For test line 11-47 quote is long. Maybe original_goals can reference smaller lines:\n- test lines 11-18 quote \"@pytest.mark.parametrize(\\\"scenario,has_app_context,code,args,kwargs\\\", [\\n    (\\n        \\\"app_context_exists_404\\\",\\n        True,\\n        404,\\n        (),\\n        {}\\n    ),\"\n- test lines 26-39 quote for no app context? Maybe not needed.\n- mut lines 269-270 quote \"    If :data:`~flask.current_app` is available, it will call its\\n    :attr:`~flask.Flask.aborter` object, otherwise it will use\"\nThis states goal.\n\nBut original_goals maybe should be goals of original code? Hmm.\n\nCandidate evidence:\nCandidate1 evidence:\n1. source_id \"test\", start_line 86, end_line 93, quote:\n\"    if has_app_context:\\n                       \\n        mock_ctx.app = mock_app\\n        mock_app.aborter = mock_aborter\\n                                \\n        # === PY-SLOT-START:mock_stub_005 ===\\n        pass\\n        # === PY-SLOT-END:mock_stub_005 ===\"\nThis includes weird spaces. Need exact. Let's count lines 86-93:\n86 \"    if has_app_context:\"\n87 \"                       \"\n88 \"        mock_ctx.app = mock_app\"\n89 \"        mock_app.aborter = mock_aborter\"\n90 \"                                \"\n91 \"        # === PY-SLOT-START:mock_stub_005 ===\"\n92 \"        pass\"\n93 \"        # === PY-SLOT-END:mock_stub_005 ===\"\nYes.\n\n2. test 110-120:\n\"                       \\n    if has_app_context:\\n                          \\n        # === PY-SLOT-START:verify_002 ===\\n        pass\\n        # === PY-SLOT-END:verify_002 ===\\n                                                 \\n        # === PY-SLOT-START:verify_003 ===\\n        pass\\n        # === PY-SLOT-END:verify_003 ===\\n        assert f\\\"Aborted with {code}\\\" in str(exc_info.value)\"\nWait line 110 is \"                       \" (spaces) then 111 if. Should quote from 111 maybe. Start 111 end 120:\n\"    if has_app_context:\\n                          \\n        # === PY-SLOT-START:verify_002 ===\\n        pass\\n        # === PY-SLOT-END:verify_002 ===\\n                                                 \\n        # === PY-SLOT-START:verify_003 ===\\n        pass\\n        # === PY-SLOT-END:verify_003 ===\\n        assert f\\\"Aborted with {code}\\\" in str(exc_info.value)\"\nNeed exact spaces line 112: 26 spaces? It's fine if copied. Could avoid weird spaces by referencing only line 120 and line 111 separately. Maybe use start 120 end 120 quote assert. SourceReference allows single line. Better use minimal quotes to avoid exact whitespace issues. Evidence can reference single key line. For candidate1, use test line 111 \"    if has_app_context:\" and line 120 assert. And mut lines 282-283. That avoids weird blank spaces. But evidence of setting aborter is important; we can reference lines 88-89. Let's quote exact no weird spaces:\ntest start 88 end 89 quote \"        mock_ctx.app = mock_app\\n        mock_app.aborter = mock_aborter\"\ntest start 120 end 120 quote \"        assert f\\\"Aborted with {code}\\\" in str(exc_info.value)\"\nmut start 282 end 283 quote \"    if (ctx := _cv_app.get(None)) is not None:\\n        ctx.app.aborter(code, *args, **kwargs)\"\nThis is enough. Candidate1 description mentions app context. But line 88-89 only within if. Could include line 86 too? Quote line 86-89:\n\"    if has_app_context:\\n        mock_ctx.app = mock_app\\n        mock_app.aborter = mock_aborter\" Wait line 87 is blank spaces between 86 and 88. If we quote 86-89 we must include line 87 spaces. Not necessary. We can use line 86 single and line 88-89. Fine.\n\nCandidate2 evidence:\ntest start 121 end 126:\n\"    else:\\n                             \\n        # === PY-SLOT-START:verify_004 ===\\n        pass\\n        # === PY-SLOT-END:verify_004 ===\\n        assert f\\\"Werkzeug abort {code}\\\" in str(exc_info.value)\"\nIncludes weird line 122 spaces. Could just use line 126 assert and mut line 285. Also test line 121 \"    else:\" maybe. Use line 126 and mut line 285.\nmut start 285 end 285 quote \"    _wz_abort(code, *args, **kwargs)\"\ntest start 126 end 126 quote \"        assert f\\\"Werkzeug abort {code}\\\" in str(exc_info.value)\"\nMaybe include test line 28-29 no app context? Not needed.\n\nOriginal_goals refs:\n- test start 11 end 11 quote '@pytest.mark.parametrize(\"scenario,has_app_context,code,args,kwargs\", ['\n- mut start 269 end 270 quote \"    If :data:`~flask.current_app` is available, it will call its\\n    :attr:`~flask.Flask.aborter` object, otherwise it will use\"\nMaybe also test line 102-103 calling abort with args. Original goal includes \"abort(code, *args, **kwargs)\". We can include test lines 102-103 quote:\n\"    with pytest.raises(Exception) as exc_info:\\n        abort(code, *args, **kwargs)\"\nThis is central. Let's include maybe three original_goals. Schema allows.\n\nNeed maybe unresolved: Since masked test has slots unimplemented, we don't know exact mocks, but inferred. Maybe list \"Masked mock and verify slots are not visible; exact mock setup/assertions beyond visible lines are inferred.\" But result_status CONTINUE. Could be okay. However \"unresolved\" might be expected empty if no unresolved. If we list something, does it imply incomplete? The prompt says Result status default CONTINUE, unresolved list. It's okay. But maybe don't include unresolved if confident. Yet there are masked slots. The visible test has many `pass` placeholders, so exact intended mock usage is not visible. But we can infer candidate. Hmm.\n\nThe task is \"staged-scenario-inference-prompts\" likely wants extract candidates and unresolved. If source has masked slots, we can't know exact setup. But the mut_source gives enough. We can set unresolved to [\"Masked test slots hide exact mock setup for current_app and aborter, so candidate descriptions are inferred from visible branches and assertions.\"]. But maybe \"unresolved\" should list questions to resolve later, not caveats. Could include empty. The instructions: \"Return only requested strict structure.\" No further. I'll include a concise unresolved note maybe safe. But if evaluator expects exact? Hard to know. Since this is not compared exact maybe okay.\n\nNeed ensure JSON valid. No trailing commas. Use proper escaping. Since final answer must be JSON. Let's craft.\n\nWait, \"original_goals\" maybe should reference original code's docstring and test. Good.\n\nPotential issue: CandidateDraft evidence array min? no min. We can provide 3 each. Fine.\n\nLet's ensure start_line/end_line valid: test 11, 102-103, 120, 126, 88-89, mut 269-270, 282-283, 285.\n\nNeed quote line 11 exactly: '@pytest.mark.parametrize(\"scenario,has_app_context,code,args,kwargs\", [' with no leading spaces. Yes line 11 in text starts '@pytest...' no spaces. Good.\n\nQuote test 102-103:\n\"    with pytest.raises(Exception) as exc_info:\\n        abort(code, *args, **kwargs)\"\nYes.\n\nQuote mut 269-270:\n\"    If :data:`~flask.current_app` is available, it will call its\\n    :attr:`~flask.Flask.aborter` object, otherwise it will use\"\nYes.\n\nCandidate1 evidence:\n- test 86-86 quote \"    if has_app_context:\"\n- test 88-89 quote \"        mock_ctx.app = mock_app\\n        mock_app.aborter = mock_aborter\"\n- test 120-120 quote \"        assert f\\\"Aborted with {code}\\\" in str(exc_info.value)\"\n- mut 282-283 quote \"    if (ctx := _cv_app.get(None)) is not None:\\n        ctx.app.aborter(code, *args, **kwargs)\"\nCandidate2 evidence:\n- test 121-121 quote \"    else:\"\n- test 126-126 quote \"        assert f\\\"Werkzeug abort {code}\\\" in str(exc_info.value)\"\n- mut 285-285 quote \"    _wz_abort(code, *args, **kwargs)\"\n- Maybe test 34-37 no app context with args? Could add but not necessary.\n\nDescriptions:\nCandidate1: \"When a Flask app context exists, abort(code, *args, **kwargs) should call current_app.aborter with the same code/args/kwargs and the resulting exception should report 'Aborted with {code}'.\"\nCandidate2: \"When no Flask app context exists, abort(code, *args, **kwargs) should fall back to werkzeug.exceptions.abort and the resulting exception should report 'Werkzeug abort {code}'.\"\n\nScenario IDs: \"app_context_delegates_to_app_aborter\"; \"no_app_context_uses_werkzeug_abort\".\n\nUnresolved maybe [\"Exact implementations of masked mock and verify slots are not visible.\"] But maybe if we include this, result_status could still CONTINUE. I think okay. However \"unresolved\" expects strings, maybe \"Exact implementations...\" is fine. But could be seen as unresolved that undermines candidate. Hmm.\n\nMaybe include empty unresolved because we can infer enough. But the masked test has `pass` slots; exact mock setup is not visible but not needed. The schema allows empty. The instruction says \"unresolved\" required array. I'd include an empty array to reflect no blocking unresolved. But maybe there is unresolved: \"Whether app_context_exists_500_with_message expects aborter to receive message\" but inferred. I'd set [].\n\nNeed result_status CONTINUE. Good.\n\nLet's final JSON.",
+              "type": "reasoning_text"
+            }
+          ],
+          "encrypted_content": "d87c1cd3-279c-436c-a013-40217799a726-0",
+          "status": "completed"
+        },
+        {
+          "id": "e809f992-d786-4b65-9128-d6bc75e7ff99",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\":\"staged-extract/v0.1\",\"result_status\":\"CONTINUE\",\"original_goals\":[{\"source_id\":\"test\",\"start_line\":11,\"end_line\":11,\"quote\":\"@pytest.mark.parametrize(\\\"scenario,has_app_context,code,args,kwargs\\\", [\"},{\"source_id\":\"test\",\"start_line\":102,\"end_line\":103,\"quote\":\"    with pytest.raises(Exception) as exc_info:\\n        abort(code, *args, **kwargs)\"},{\"source_id\":\"mut\",\"start_line\":269,\"end_line\":270,\"quote\":\"    If :data:`~flask.current_app` is available, it will call its\\n    :attr:`~flask.Flask.aborter` object, otherwise it will use\"}],\"candidates\":[{\"scenario_id\":\"app_context_delegates_to_app_aborter\",\"description\":\"When a Flask app context exists, abort(code, *args, **kwargs) should call current_app.aborter with the same code/args/kwargs and the resulting exception should report 'Aborted with {code}'.\",\"evidence\":[{\"source_id\":\"test\",\"start_line\":86,\"end_line\":86,\"quote\":\"    if has_app_context:\"},{\"source_id\":\"test\",\"start_line\":88,\"end_line\":89,\"quote\":\"        mock_ctx.app = mock_app\\n        mock_app.aborter = mock_aborter\"},{\"source_id\":\"test\",\"start_line\":120,\"end_line\":120,\"quote\":\"        assert f\\\"Aborted with {code}\\\" in str(exc_info.value)\"},{\"source_id\":\"mut\",\"start_line\":282,\"end_line\":283,\"quote\":\"    if (ctx := _cv_app.get(None)) is not None:\\n        ctx.app.aborter(code, *args, **kwargs)\"}]},{\"scenario_id\":\"no_app_context_uses_werkzeug_abort\",\"description\":\"When no Flask app context exists, abort(code, *args, **kwargs) should fall back to werkzeug.exceptions.abort and the resulting exception should report 'Werkzeug abort {code}'.\",\"evidence\":[{\"source_id\":\"test\",\"start_line\":121,\"end_line\":121,\"quote\":\"    else:\"},{\"source_id\":\"test\",\"start_line\":126,\"end_line\":126,\"quote\":\"        assert f\\\"Werkzeug abort {code}\\\" in str(exc_info.value)\"},{\"source_id\":\"mut\",\"start_line\":285,\"end_line\":285,\"quote\":\"    _wz_abort(code, *args, **kwargs)\"}]}],\"unresolved\":[]}",
+              "type": "output_text",
+              "logprobs": []
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": "final_answer"
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 2266,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 5734,
+        "output_tokens_details": {
+          "reasoning_tokens": 5183
+        },
+        "total_tokens": 8000,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": "d87c1cd3-279c-436c-a013-40217799a726",
+      "request_id": null,
+      "resolved_model_version": null
+    }
+  ],
+  "error": {
+    "type": "StagedInferenceError",
+    "message": "stage model call failed"
+  }
+}

@@ -374,6 +374,16 @@ PYTHONPATH=src .venv/bin/python experiments/staged-inference/acceptance.py \
 真实检查仍使用同一个 `run.py`，显式选择 `--mode live_inference --variant C`，
 提供 `--snapshot`（已审核冻结 Python snapshot 根）、`--case-id flask_308` 与新输出目录。
 模型来自 `--model` 或 `MOCKSPEC_MODEL`，凭据来自 `OPENAI_API_KEY`；不在日志中保存凭据。
+本地配置可保存在 Git 忽略的 `.env.local` 中（权限 `0600`），运行前在同一 shell 加载：
+
+```bash
+source .env.local
+```
+
+入口不会自动读取该文件。使用兼容服务时，`OPENAI_BASE_URL` 应为 API 根地址
+（例如以 `/v1` 结尾，不包含 `/chat/completions`）；服务与模型必须支持当前入口的
+Responses API。仅迁移配置不代表接口已验证，也不替代下面的价格和费用预算参数。
+本地配置使用 `OPENAI_AGENTS_DISABLE_TRACING=1` 关闭 SDK tracing。
 该分支拒绝 `--task-json`，由现有 Python Adapter 核验输入，不能通过设置模式取得准入。
 运行前明确传入 `--max-model-calls`、`--max-output-tokens`、`--max-total-tokens`、
 `--timeout-seconds` 和 `--parsing-timeout-seconds`；实际配置及用量保存在 manifest。
@@ -381,9 +391,21 @@ PYTHONPATH=src .venv/bin/python experiments/staged-inference/acceptance.py \
 以及 `--max-cost-usd`；价格或费用预算缺失时不发起真实请求，记录为真实检查未完成。
 这些参数复用生产预算门禁，不是远端计费硬上限。技术重试与按质量重试均不开启。
 
-本次预检发现缺少显式模型和 API 凭据，未发起真实模型请求；具体证据见
-[预检记录](../out/staged-inference/m1-validation/live-preflight.json)。
-真实产物可读性、场景推导质量与自主工具使用仍未验收，#11 和整个 M1 未全部完成。
+2026-10-23 的[历史预检](../out/staged-inference/m1-validation/live-preflight.json)
+记录了当时缺少模型和凭据。2026-10-26 已用 `deepseek-flash` 完成一次真实检查，
+官方服务地址为 `https://api.deepseek.com`，支持现有 Responses 入口；配置、预算、
+产物及评阅见[真实检查记录](../out/staged-inference/m1-live-20261026/review.md)。
+本次在 QUERY 阶段失败，保留已完成 EXTRACT 与未知用量；没有最终契约或工具调用。
+#11/M1 的工程与真实检查交付条件已满足，真实推断成功、场景质量及自主工具使用
+尚未验证；M2/M3 不在本次交付范围。
+
+后续行动链排障采用新的阶段口径：M1 工程基础、M2 真实流程、M3 语义评阅、M4 方法实验。
+不要与上述历史议题的 M2/M3 编号混用。QUERY 的无类型 Schema 分支导致 DeepSeek
+HTTP 400，已修复；逐调用诊断位于 `inference_record.json.model_calls`，可关联
+`model_responses`、`query_log` 和 `stages` 复核输入、回执与失败层。
+这不会开启云端 tracing 或技术重试。定向工具协议检查已通过三个只读工具，
+但最新完整运行在 EXTRACT 引用原文校验失败，五步真实验收仍未通过；没有为取得
+成功结果重跑或修改语义规则。证据见[排障记录](../out/staged-inference/m2-query-diagnosis-20261026/report.md)。
 
 ## 冻结项目读取与搜索（#13 / #14）
 

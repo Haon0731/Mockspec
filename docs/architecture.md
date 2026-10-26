@@ -156,6 +156,10 @@ M1-5 的 `acceptance.py` 汇总同一入口的固定回放并复核产物；`run
 显式仓库读取模式改为共享超时、Token 与费用门禁，不以工具或模型调用次数截断；
 QueryExecutor 和各阶段契约检查共用本次 Store，观察记录随研究产物保存。
 模型经 QUERY 结构化消息请求工具，SDK 阶段 Agent 不注册可绕过计数的工具。
+QUERY 的供应商输出 Schema 明确描述请求及回执评估对象；宿主仍接收原始值，
+在登记尝试后校验，避免非法参数绕过计数。`inference_record.json` 的 `model_calls`
+保存每次阶段调用的冻结输入、Schema、指令、响应关联和脱敏异常信息。
+其中请求开始标记来自 SDK hook，表示已登记模型调用，不单独证明网络请求已发出。
 后续 QUERY 评估上一回执，CONSTRUCT/DELIVER 接收累计回执；未完成判断明确留证。
 阶段切换和 SDK 对象重建不重置账本、模型请求数、查询数或绝对截止时间。
 仓库模式的 QUERY 正常结束须提交 `stop_explanation`：停止理由、可校验原文引用、
@@ -180,7 +184,7 @@ C 的静态对照与一次语义修订由控制器管理，前后快照留在研
 
 这条路径验证 B/C 四状态流程、静态对照、修订修复、定向查询、共享预算及失败留证边界；
 合成任务不经过真实 Adapter 审核，不构成真实数据准入、目标测试执行或模型推断质量证据。
-M1-5 的入口验收与真实检查缺口见[验收记录](../experiments/staged-inference/acceptance-report.md)；用法及预算见[运行说明](usage.md#分阶段研究回放m1-1--m1-4)。
+M1-5 的入口验收及真实检查结果见[验收记录](../experiments/staged-inference/acceptance-report.md)；真实检查已执行并保留失败，不代表端到端推断成功。用法及预算见[运行说明](usage.md#分阶段研究回放m1-1--m1-4)。
 
 ```text
 experiments/scenario-research/
