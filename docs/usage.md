@@ -424,7 +424,10 @@ HTTP 400，已修复；逐调用诊断位于 `inference_record.json.model_calls`
 [M2-CITATION-1 工程与门禁记录](../out/staged-inference/issue17-citation-protocol-20261026/report.md)
 保留协议验证及当时两例的独立适用性核对；当时未建立合格案例，未发起新的真实请求。
 随后用户要求寻找新案例，[案例寻找与准入记录](../out/staged-inference/issue17-case-search-20261026/report.md)
-批准 CloudFoundry 案例，G2 已通过；G3 配置/预算预检和真实 M2 仍待执行。
+批准 CloudFoundry 案例，G2 已通过；后续[真实验收记录](../out/staged-inference/issue17-cloudfoundry-m2-20261026/report.md)
+完成 G3 预检和单次运行。模型自主搜索取得父类声明行后，因回执评估多出
+`attempt_sequence_note` 被严格拒绝，未派发下一次读取，也未生成最终场景卡。
+G4 未通过；没有放宽 Schema、删除额外字段或自动重跑。
 
 该案例精确 ID 为
 `de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri@d0085edf`，

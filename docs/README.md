@@ -19,7 +19,8 @@ PRD 不作为当前能力或已通过验收的说明。
 后续执行使用该 PRD 第 9 节的 `M2-CITATION-1`：研究引用选择协议、案例适用性和真实验收门禁。
 引用协议与离线工程验证已交付；[工程与案例门禁记录](../out/staged-inference/issue17-citation-protocol-20261026/report.md)
 保留当时两例未通过适用性核对的结论；后续[案例寻找与准入记录](../out/staged-inference/issue17-case-search-20261026/report.md)
-新增合格 CloudFoundry 案例，G2 已通过，尚未启动新的真实模型验收。
+新增合格 CloudFoundry 案例，G2 已通过。后续[单次真实验收](../out/staged-inference/issue17-cloudfoundry-m2-20261026/report.md)
+通过 G3，模型发起自主搜索后因回执评估含额外字段失败；G4 未通过，#17 仍开放。
 
 以下研究结果不等于生产 Agent 已具备对应能力；阅读案例分析也不能作为未来无指导生成的输入。
 

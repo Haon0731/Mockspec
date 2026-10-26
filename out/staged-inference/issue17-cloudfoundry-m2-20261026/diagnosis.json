@@ -1,0 +1,58 @@
+{
+  "classification": "model_output_protocol_violation",
+  "reproduced_offline": true,
+  "errors": [
+    {
+      "type": "extra_forbidden",
+      "loc": [
+        "attempt_sequence_note"
+      ],
+      "msg": "Extra inputs are not permitted"
+    }
+  ],
+  "provider_schema_forbids_extra_fields": true,
+  "requested_assessment_schema": {
+    "anyOf": [
+      {
+        "additionalProperties": false,
+        "properties": {
+          "attempt_sequence": {
+            "minimum": 1,
+            "title": "Attempt Sequence",
+            "type": "integer"
+          },
+          "impact": {
+            "enum": [
+              "supports",
+              "weakens",
+              "no_new_information"
+            ],
+            "title": "Impact",
+            "type": "string"
+          },
+          "rationale": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Rationale",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attempt_sequence",
+          "impact",
+          "rationale"
+        ],
+        "title": "QueryAssessment",
+        "type": "object"
+      },
+      {
+        "type": "null"
+      }
+    ],
+    "title": "Previous Receipt Assessment"
+  },
+  "schema_matches_current_code": true,
+  "host_behavior": "Strictly rejects extra attempt_sequence_note field; keeps attempted read in accounting but does not dispatch it.",
+  "repair_or_resample": false,
+  "reason": "No host/schema mismatch reproduced; deleting the extra field or resampling would change the observed model response, not repair a proven engineering fault."
+}
