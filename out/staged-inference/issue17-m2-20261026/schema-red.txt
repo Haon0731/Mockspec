@@ -1,0 +1,317 @@
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_query_schema_is_accepted_by_provider_without_untyped_union_branches ___
+
+    def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -> None:
+        requests: list[dict] = []
+        calls: list[dict] = []
+        result = {
+            "schema_version": "staged-query/v0.1",
+            "decision": "finish_queries",
+            "query_attempt": None,
+            "previous_receipt_assessment": None,
+            "impact": "The visible task is sufficient.",
+            "stop_explanation": None,
+        }
+    
+        def untyped_union(value):
+            if isinstance(value, dict):
+                if any("type" not in branch
+                       for branch in value.get("anyOf", [])):
+                    return True
+                return any(untyped_union(child) for child in value.values())
+            return isinstance(value, list) and any(untyped_union(child) for child in value)
+    
+        async def respond(**body):
+            requests.append(body)
+            if untyped_union(body["text"]["format"]["schema"]):
+                raise BadRequestError(
+                    "Invalid json schema: field `anyOf`: missing field `type`",
+                    response=httpx2.Response(400, request=httpx2.Request("POST", "https://provider.invalid/responses")),
+                    body={"code": "invalid_request_error"},
+                )
+            return Response.model_validate({
+                "id": "resp-query", "object": "response", "created_at": 1,
+                "status": "completed", "model": "test-model",
+                "parallel_tool_calls": False, "tools": [], "tool_choice": "auto",
+                "output": [{"id": "msg-query", "type": "message", "role": "assistant",
+                            "status": "completed", "content": [{"type": "output_text",
+                            "text": json.dumps(result), "annotations": []}]}],
+                "usage": {"input_tokens": 20, "output_tokens": 10, "total_tokens": 30,
+                          "input_tokens_details": {"cached_tokens": 0, "cache_write_tokens": 0},
+                          "output_tokens_details": {"reasoning_tokens": 0}},
+            })
+    
+        async def run():
+            client = SimpleNamespace(base_url="https://provider.invalid", responses=SimpleNamespace(create=respond))
+            return await _call_stage(
+                "QUERY", QueryResult, {"stage": "QUERY"},
+                model=OpenAIResponsesModel(model="test-model", openai_client=client),
+                config=StagedRunConfig(), ledger=UsageLedger(InferenceBudget()),
+                responses=[], model_calls=calls, deadline=time.monotonic() + 10,
+            )
+    
+        try:
+>           parsed = asyncio.run(run())
+                     ^^^^^^^^^^^^^^^^^^
+
+tests/test_staged_query_schema.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_staged_query_schema.py:66: in run
+    return await _call_stage(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+stage = 'QUERY', output_type = <class 'controller.QueryResult'>
+payload = {'stage': 'QUERY'}
+model = <agents.models.openai_responses.OpenAIResponsesModel object at 0x73206a15b800>
+config = StagedRunConfig(variant='B', run_mode='synthetic_replay', model_name='scripted-offline', repository_read=False, max_mo..._seconds=120, parsing_timeout_seconds=15, max_cost_usd=None, input_cost_per_million=None, output_cost_per_million=None)
+ledger = UsageLedger(budget=InferenceBudget(max_turns=6, max_tool_calls=8, max_repeated_no_progress=2, max_output_tokens=4096, ...}], usage_records=[], gate_events=[{'sequence': 1, 'stage': 'before_model_call', 'status': 'allowed', 'reason': None}])
+responses = []
+model_calls = [{'sequence': 1, 'stage': 'QUERY', 'status': 'failed', 'model_request_started': True, ...}]
+deadline = 24191.665661018, model_call_limit = None
+
+    async def _call_stage(
+        stage: str,
+        output_type: type[StageResult],
+        payload: object,
+        *,
+        model: Model,
+        config: StagedRunConfig,
+        ledger: UsageLedger,
+        responses: list[dict],
+        model_calls: list[dict],
+        deadline: float,
+        model_call_limit: int | None = None,
+    ) -> StageResult:
+        if isinstance(payload, dict) and "visible_task" in payload:
+            task = payload["visible_task"]
+            # Coordinate metadata for the already-visible text, not new evidence or
+            # repaired output. Preserve whitespace exactly as SourceStore.quote does.
+            payload = {**payload, "source_line_index": {
+                source["source_id"]: [
+                    {"line": number, "text": text}
+                    for number, text in enumerate(
+                        source["text"].splitlines(), start=source["start_line"]
+                    )
+                ]
+                for source in (
+                    task["masked_test"], task["mut_source"], *task["supporting_sources"]
+                )
+            }}
+        payload_bytes = canonical_json(payload)
+        agent = _stage_agent(stage, output_type, model, config)
+        started = time.monotonic()
+        response_start = len(responses)
+        event: dict[str, object] = {
+            "sequence": len(model_calls) + 1,
+            "stage": stage,
+            "status": "started",
+            "model_request_started": False,
+            "request_start_basis": "usage_ledger_before_model_call_hook",
+            "model_name": config.model_name,
+            "output_type": output_type.__name__,
+            "prompt_version": PROMPT_VERSION,
+            "instructions": agent.instructions,
+            "requested_output_schema": TypeAdapter(output_type).json_schema(),
+            "payload": json.loads(payload_bytes),
+            "payload_sha256": sha256_bytes(payload_bytes),
+            "payload_bytes": len(payload_bytes),
+            "max_output_tokens": config.max_output_tokens,
+            "timeout_seconds": None,
+            "elapsed_seconds": None,
+            "response_refs": [],
+            "exception": None,
+            "ledger_requests_started_before": ledger.requests_started,
+        }
+        model_calls.append(event)
+        effective_call_limit = (
+            config.max_model_calls if model_call_limit is None else model_call_limit
+        )
+        if effective_call_limit >= 0 and ledger.requests_started >= effective_call_limit:
+            event["status"] = "blocked"
+            event["exception"] = {
+                "classification": "host_budget",
+                "type": "StagedInferenceError",
+                "message": "model-call limit exhausted",
+                "status_code": None,
+                "request_id": None,
+                "error_code": "model_call_limit",
+                "cause_types": [],
+            }
+            _finish_model_call(
+                event, started=started, ledger=ledger,
+                responses=responses, response_start=response_start,
+            )
+            raise StagedInferenceError(
+                "model-call limit exhausted", stage=stage, stop_reason="budget_exhausted"
+            )
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            event["status"] = "blocked"
+            event["exception"] = {
+                "classification": "host_deadline",
+                "type": "StagedInferenceError",
+                "message": "run deadline exhausted",
+                "status_code": None,
+                "request_id": None,
+                "error_code": "run_deadline",
+                "cause_types": [],
+            }
+            _finish_model_call(
+                event, started=started, ledger=ledger,
+                responses=responses, response_start=response_start,
+            )
+            raise StagedInferenceError(
+                "run deadline exhausted", stage=stage, stop_reason="run_timeout"
+            )
+        timeout_seconds = min(remaining, config.parsing_timeout_seconds)
+        event["timeout_seconds"] = timeout_seconds
+        try:
+            result = await asyncio.wait_for(
+                Runner.run(
+                    agent,
+                    input=payload_bytes.decode("utf-8"),
+                    max_turns=1,
+                    hooks=BudgetHooks(ledger, responses),
+                    run_config=RunConfig(
+                        tracing_disabled=True,
+                        trace_include_sensitive_data=False,
+                        workflow_name=POLICY_VERSION,
+                    ),
+                ),
+                timeout=timeout_seconds,
+            )
+        except asyncio.CancelledError as exc:
+            event["status"] = "cancelled"
+            event["exception"] = _exception_diagnostic(exc, classification="cancelled")
+            _finish_model_call(
+                event, started=started, ledger=ledger,
+                responses=responses, response_start=response_start,
+            )
+            raise
+        except asyncio.TimeoutError as exc:
+            event["status"] = "failed"
+            event["exception"] = _exception_diagnostic(exc, classification="host_timeout")
+            _finish_model_call(
+                event, started=started, ledger=ledger,
+                responses=responses, response_start=response_start,
+            )
+            raise StagedInferenceError(
+                "stage timed out", stage=stage,
+                stop_reason="run_timeout" if remaining <= config.parsing_timeout_seconds else "timeout"
+            ) from None
+        except InferenceError as exc:
+            event["status"] = "failed"
+            event["exception"] = _exception_diagnostic(
+                exc,
+                classification=(
+                    "host_budget" if exc.category == "budget_exhausted" else "inference_error"
+                ),
+            )
+            _finish_model_call(
+                event, started=started, ledger=ledger,
+                responses=responses, response_start=response_start,
+            )
+            reason = "budget_exhausted" if exc.category == "budget_exhausted" else "model_error"
+            raise StagedInferenceError("stage model call failed", stage=stage, stop_reason=reason) from None
+        except (ModelBehaviorError, ValidationError) as exc:
+            event["status"] = "failed"
+            event["exception"] = _exception_diagnostic(exc, classification="output_invalid")
+            _finish_model_call(
+                event, started=started, ledger=ledger,
+                responses=responses, response_start=response_start,
+            )
+            raise StagedInferenceError(
+                "stage model output is invalid", stage=stage, stop_reason="output_invalid"
+            ) from None
+        except Exception as exc:
+            classification = "api_status" if getattr(exc, "status_code", None) is not None else (
+                "provider_transport"
+                if type(exc).__name__ in {"APIConnectionError", "APITimeoutError"}
+                else "model_error"
+            )
+            event["status"] = "failed"
+            event["exception"] = _exception_diagnostic(exc, classification=classification)
+            _finish_model_call(
+                event, started=started, ledger=ledger,
+                responses=responses, response_start=response_start,
+            )
+>           raise StagedInferenceError(
+                "stage model call failed", stage=stage, stop_reason="model_error"
+            ) from None
+E           controller.StagedInferenceError: stage model call failed
+
+experiments/staged-inference/controller.py:638: StagedInferenceError
+
+The above exception was the direct cause of the following exception:
+
+    def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -> None:
+        requests: list[dict] = []
+        calls: list[dict] = []
+        result = {
+            "schema_version": "staged-query/v0.1",
+            "decision": "finish_queries",
+            "query_attempt": None,
+            "previous_receipt_assessment": None,
+            "impact": "The visible task is sufficient.",
+            "stop_explanation": None,
+        }
+    
+        def untyped_union(value):
+            if isinstance(value, dict):
+                if any("type" not in branch
+                       for branch in value.get("anyOf", [])):
+                    return True
+                return any(untyped_union(child) for child in value.values())
+            return isinstance(value, list) and any(untyped_union(child) for child in value)
+    
+        async def respond(**body):
+            requests.append(body)
+            if untyped_union(body["text"]["format"]["schema"]):
+                raise BadRequestError(
+                    "Invalid json schema: field `anyOf`: missing field `type`",
+                    response=httpx2.Response(400, request=httpx2.Request("POST", "https://provider.invalid/responses")),
+                    body={"code": "invalid_request_error"},
+                )
+            return Response.model_validate({
+                "id": "resp-query", "object": "response", "created_at": 1,
+                "status": "completed", "model": "test-model",
+                "parallel_tool_calls": False, "tools": [], "tool_choice": "auto",
+                "output": [{"id": "msg-query", "type": "message", "role": "assistant",
+                            "status": "completed", "content": [{"type": "output_text",
+                            "text": json.dumps(result), "annotations": []}]}],
+                "usage": {"input_tokens": 20, "output_tokens": 10, "total_tokens": 30,
+                          "input_tokens_details": {"cached_tokens": 0, "cache_write_tokens": 0},
+                          "output_tokens_details": {"reasoning_tokens": 0}},
+            })
+    
+        async def run():
+            client = SimpleNamespace(base_url="https://provider.invalid", responses=SimpleNamespace(create=respond))
+            return await _call_stage(
+                "QUERY", QueryResult, {"stage": "QUERY"},
+                model=OpenAIResponsesModel(model="test-model", openai_client=client),
+                config=StagedRunConfig(), ledger=UsageLedger(InferenceBudget()),
+                responses=[], model_calls=calls, deadline=time.monotonic() + 10,
+            )
+    
+        try:
+            parsed = asyncio.run(run())
+        except Exception as exc:
+>           raise AssertionError(calls[-1]["exception"]) from exc
+E           AssertionError: {'classification': 'api_status', 'type': 'BadRequestError', 'message': 'Invalid json schema: field `anyOf`: missing field `type`', 'status_code': 400, 'request_id': None, 'error_code': 'invalid_request_error', 'cause_types': []}
+
+tests/test_staged_query_schema.py:76: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    openai.agents:openai_responses.py:668 Error getting response
+=========================== short test summary info ============================
+FAILED tests/test_staged_query_schema.py::test_query_schema_is_accepted_by_provider_without_untyped_union_branches
+1 failed, 1 passed in 1.33s

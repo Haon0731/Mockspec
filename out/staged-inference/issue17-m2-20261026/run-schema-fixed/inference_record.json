@@ -1,0 +1,1094 @@
+{
+  "schema_version": "scenario-inference-record/v0.1",
+  "run_id": "ed2c8b4d-97db-4b9d-8770-23100a6bf5d4",
+  "requested_case_id": "flask_308",
+  "case_id": "flask_308",
+  "language": "python",
+  "input_hash": "1ad98f488c35f70e0bd08f7d64b90d6adc811cf6ac507234de23681dc98d0f69",
+  "result_status": "ERROR",
+  "stop_reason": "output_invalid",
+  "error_stage": "EXTRACT",
+  "selected_scenario_id": null,
+  "selection_rationale": null,
+  "claim_basis": [],
+  "exploration_stop": null,
+  "termination": {
+    "initiator": "controller",
+    "reason": "output_invalid",
+    "evidence_sufficiency_claimed": false
+  },
+  "query_log": [],
+  "query_accounting": {
+    "observed_attempts": 0,
+    "budgeted_attempts": 0,
+    "limit": null
+  },
+  "repetition_policy": {
+    "name": "normalized_query_and_returned_evidence",
+    "max_no_progress_attempts": 4,
+    "scope": "consecutive repeated operations without evidence increment",
+    "total_query_limit": false
+  },
+  "source_observations": [],
+  "critical_behaviors": [],
+  "allowed_variations": [],
+  "nonblocking_unknowns": [],
+  "degeneracy_contrast": {
+    "status": "unavailable",
+    "execution_status": "not_executed",
+    "support": null,
+    "assumption_reason": null,
+    "semantic_role": null,
+    "alternative": null,
+    "bypass_behavior": null,
+    "evidence_ids": [],
+    "distinguishing_observation": null,
+    "revision_requested": false,
+    "revision_reason": null
+  },
+  "revision_log": [],
+  "format_repair_log": [],
+  "unresolved": [],
+  "stages": [
+    {
+      "stage": "EXTRACT",
+      "result": {
+        "schema_version": "staged-extract/v0.1",
+        "result_status": "CONTINUE",
+        "original_goals": [],
+        "candidates": [
+          {
+            "scenario_id": "abort_with_app_context_delegates_to_app_aborter",
+            "description": "When an application context is available, flask.helpers.abort must delegate to the current app's aborter with the status code, positional args, and keyword args. The test expects the aborter-raised exception message to contain 'Aborted with {code}'.",
+            "evidence": [
+              {
+                "source_id": "mut",
+                "start_line": 282,
+                "end_line": 283,
+                "quote": "if (ctx := _cv_app.get(None)) is not None:\n        ctx.app.aborter(code, *args, **kwargs)"
+              },
+              {
+                "source_id": "test",
+                "start_line": 120,
+                "end_line": 120,
+                "quote": "        assert f\"Aborted with {code}\" in str(exc_info.value)"
+              },
+              {
+                "source_id": "test",
+                "start_line": 13,
+                "end_line": 14,
+                "quote": "        \"app_context_exists_404\",\n        True,"
+              }
+            ]
+          },
+          {
+            "scenario_id": "abort_without_app_context_uses_werkzeug_abort",
+            "description": "When no application context is available, flask.helpers.abort must fall back to Werkzeug's abort with the same code, args, and kwargs. The test expects the Werkzeug-raised exception message to contain 'Werkzeug abort {code}'.",
+            "evidence": [
+              {
+                "source_id": "mut",
+                "start_line": 285,
+                "end_line": 285,
+                "quote": "    _wz_abort(code, *args, **kwargs)"
+              },
+              {
+                "source_id": "test",
+                "start_line": 126,
+                "end_line": 126,
+                "quote": "        assert f\"Werkzeug abort {code}\" in str(exc_info.value)"
+              },
+              {
+                "source_id": "test",
+                "start_line": 27,
+                "end_line": 28,
+                "quote": "        \"no_app_context_403\",\n        False,"
+              }
+            ]
+          }
+        ],
+        "unresolved": [
+          "Exact mock setup for _cv_app, mock_aborter, and _wz_abort is hidden in PY-SLOT stubs; delegation and fallback behavior are inferred from the visible assertions.",
+          "The visible test does not show whether the app-context aborter is always expected to raise before the _wz_abort fallback is reached."
+        ]
+      }
+    }
+  ],
+  "model_calls": [
+    {
+      "sequence": 1,
+      "stage": "EXTRACT",
+      "status": "completed",
+      "model_request_started": true,
+      "request_start_basis": "usage_ledger_before_model_call_hook",
+      "model_name": "deepseek-flash",
+      "output_type": "ExtractResult",
+      "prompt_version": "staged-scenario-inference-prompts/v0.1",
+      "instructions": "staged-scenario-inference-prompts/v0.1\nStage: EXTRACT. Return only the requested strict structure. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material.",
+      "requested_output_schema": {
+        "$defs": {
+          "CandidateDraft": {
+            "additionalProperties": false,
+            "properties": {
+              "scenario_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Scenario Id",
+                "type": "string"
+              },
+              "description": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Description",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/SourceReference"
+                },
+                "title": "Evidence",
+                "type": "array"
+              }
+            },
+            "required": [
+              "scenario_id",
+              "description",
+              "evidence"
+            ],
+            "title": "CandidateDraft",
+            "type": "object"
+          },
+          "SourceReference": {
+            "additionalProperties": false,
+            "properties": {
+              "source_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Source Id",
+                "type": "string"
+              },
+              "start_line": {
+                "minimum": 1,
+                "title": "Start Line",
+                "type": "integer"
+              },
+              "end_line": {
+                "minimum": 1,
+                "title": "End Line",
+                "type": "integer"
+              },
+              "quote": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Quote",
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "start_line",
+              "end_line",
+              "quote"
+            ],
+            "title": "SourceReference",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": "staged-extract/v0.1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "result_status": {
+            "default": "CONTINUE",
+            "enum": [
+              "CONTINUE",
+              "INCONCLUSIVE"
+            ],
+            "title": "Result Status",
+            "type": "string"
+          },
+          "original_goals": {
+            "items": {
+              "$ref": "#/$defs/SourceReference"
+            },
+            "title": "Original Goals",
+            "type": "array"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/$defs/CandidateDraft"
+            },
+            "maxItems": 2,
+            "title": "Candidates",
+            "type": "array"
+          },
+          "unresolved": {
+            "items": {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            "title": "Unresolved",
+            "type": "array"
+          }
+        },
+        "required": [
+          "schema_version",
+          "result_status",
+          "original_goals",
+          "candidates",
+          "unresolved"
+        ],
+        "title": "ExtractResult",
+        "type": "object"
+      },
+      "payload": {
+        "source_line_index": {
+          "imports": [
+            {
+              "line": 1,
+              "text": "from __future__ import annotations"
+            },
+            {
+              "line": 2,
+              "text": ""
+            },
+            {
+              "line": 3,
+              "text": "import importlib.util"
+            },
+            {
+              "line": 4,
+              "text": "import os"
+            },
+            {
+              "line": 5,
+              "text": "import sys"
+            },
+            {
+              "line": 6,
+              "text": "import typing as t"
+            },
+            {
+              "line": 7,
+              "text": "from datetime import datetime"
+            },
+            {
+              "line": 8,
+              "text": "from functools import cache"
+            },
+            {
+              "line": 9,
+              "text": "from functools import update_wrapper"
+            },
+            {
+              "line": 10,
+              "text": ""
+            },
+            {
+              "line": 11,
+              "text": "import werkzeug.utils"
+            },
+            {
+              "line": 12,
+              "text": "from werkzeug.exceptions import abort as _wz_abort"
+            },
+            {
+              "line": 13,
+              "text": "from werkzeug.utils import redirect as _wz_redirect"
+            },
+            {
+              "line": 14,
+              "text": "from werkzeug.wrappers import Response as BaseResponse"
+            },
+            {
+              "line": 15,
+              "text": ""
+            },
+            {
+              "line": 16,
+              "text": "from .globals import _cv_app"
+            },
+            {
+              "line": 17,
+              "text": "from .globals import app_ctx"
+            },
+            {
+              "line": 18,
+              "text": "from .globals import current_app"
+            },
+            {
+              "line": 19,
+              "text": "from .globals import request"
+            },
+            {
+              "line": 20,
+              "text": "from .globals import session"
+            },
+            {
+              "line": 21,
+              "text": "from .signals import message_flashed"
+            },
+            {
+              "line": 22,
+              "text": ""
+            },
+            {
+              "line": 23,
+              "text": "if t.TYPE_CHECKING:  # pragma: no cover"
+            },
+            {
+              "line": 24,
+              "text": "    from .wrappers import Response"
+            }
+          ],
+          "mut": [
+            {
+              "line": 265,
+              "text": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:"
+            },
+            {
+              "line": 266,
+              "text": "    \"\"\"Raise an :exc:`~werkzeug.exceptions.HTTPException` for the given"
+            },
+            {
+              "line": 267,
+              "text": "    status code."
+            },
+            {
+              "line": 268,
+              "text": ""
+            },
+            {
+              "line": 269,
+              "text": "    If :data:`~flask.current_app` is available, it will call its"
+            },
+            {
+              "line": 270,
+              "text": "    :attr:`~flask.Flask.aborter` object, otherwise it will use"
+            },
+            {
+              "line": 271,
+              "text": "    :func:`werkzeug.exceptions.abort`."
+            },
+            {
+              "line": 272,
+              "text": ""
+            },
+            {
+              "line": 273,
+              "text": "    :param code: The status code for the exception, which must be"
+            },
+            {
+              "line": 274,
+              "text": "        registered in ``app.aborter``."
+            },
+            {
+              "line": 275,
+              "text": "    :param args: Passed to the exception."
+            },
+            {
+              "line": 276,
+              "text": "    :param kwargs: Passed to the exception."
+            },
+            {
+              "line": 277,
+              "text": ""
+            },
+            {
+              "line": 278,
+              "text": "    .. versionadded:: 2.2"
+            },
+            {
+              "line": 279,
+              "text": "        Calls ``current_app.aborter`` if available instead of always"
+            },
+            {
+              "line": 280,
+              "text": "        using Werkzeug's default ``abort``."
+            },
+            {
+              "line": 281,
+              "text": "    \"\"\""
+            },
+            {
+              "line": 282,
+              "text": "    if (ctx := _cv_app.get(None)) is not None:"
+            },
+            {
+              "line": 283,
+              "text": "        ctx.app.aborter(code, *args, **kwargs)"
+            },
+            {
+              "line": 284,
+              "text": ""
+            },
+            {
+              "line": 285,
+              "text": "    _wz_abort(code, *args, **kwargs)"
+            }
+          ],
+          "test": [
+            {
+              "line": 1,
+              "text": "   "
+            },
+            {
+              "line": 2,
+              "text": "               "
+            },
+            {
+              "line": 3,
+              "text": "        "
+            },
+            {
+              "line": 4,
+              "text": "                          "
+            },
+            {
+              "line": 5,
+              "text": "        "
+            },
+            {
+              "line": 6,
+              "text": "   "
+            },
+            {
+              "line": 7,
+              "text": "import pytest"
+            },
+            {
+              "line": 8,
+              "text": "from flask.helpers import abort"
+            },
+            {
+              "line": 9,
+              "text": ""
+            },
+            {
+              "line": 10,
+              "text": ""
+            },
+            {
+              "line": 11,
+              "text": "@pytest.mark.parametrize(\"scenario,has_app_context,code,args,kwargs\", ["
+            },
+            {
+              "line": 12,
+              "text": "    ("
+            },
+            {
+              "line": 13,
+              "text": "        \"app_context_exists_404\","
+            },
+            {
+              "line": 14,
+              "text": "        True,"
+            },
+            {
+              "line": 15,
+              "text": "        404,"
+            },
+            {
+              "line": 16,
+              "text": "        (),"
+            },
+            {
+              "line": 17,
+              "text": "        {}"
+            },
+            {
+              "line": 18,
+              "text": "    ),"
+            },
+            {
+              "line": 19,
+              "text": "    ("
+            },
+            {
+              "line": 20,
+              "text": "        \"app_context_exists_500_with_message\","
+            },
+            {
+              "line": 21,
+              "text": "        True,"
+            },
+            {
+              "line": 22,
+              "text": "        500,"
+            },
+            {
+              "line": 23,
+              "text": "        (\"Internal Server Error\",),"
+            },
+            {
+              "line": 24,
+              "text": "        {}"
+            },
+            {
+              "line": 25,
+              "text": "    ),"
+            },
+            {
+              "line": 26,
+              "text": "    ("
+            },
+            {
+              "line": 27,
+              "text": "        \"no_app_context_403\","
+            },
+            {
+              "line": 28,
+              "text": "        False,"
+            },
+            {
+              "line": 29,
+              "text": "        403,"
+            },
+            {
+              "line": 30,
+              "text": "        (),"
+            },
+            {
+              "line": 31,
+              "text": "        {}"
+            },
+            {
+              "line": 32,
+              "text": "    ),"
+            },
+            {
+              "line": 33,
+              "text": "    ("
+            },
+            {
+              "line": 34,
+              "text": "        \"no_app_context_with_args_kwargs\","
+            },
+            {
+              "line": 35,
+              "text": "        False,"
+            },
+            {
+              "line": 36,
+              "text": "        400,"
+            },
+            {
+              "line": 37,
+              "text": "        (\"Bad Request\",),"
+            },
+            {
+              "line": 38,
+              "text": "        {\"description\": \"Invalid input\"}"
+            },
+            {
+              "line": 39,
+              "text": "    ),"
+            },
+            {
+              "line": 40,
+              "text": "    ("
+            },
+            {
+              "line": 41,
+              "text": "        \"app_context_custom_code\","
+            },
+            {
+              "line": 42,
+              "text": "        True,"
+            },
+            {
+              "line": 43,
+              "text": "        418,"
+            },
+            {
+              "line": 44,
+              "text": "        (),"
+            },
+            {
+              "line": 45,
+              "text": "        {\"description\": \"I'm a teapot\"}"
+            },
+            {
+              "line": 46,
+              "text": "    ),"
+            },
+            {
+              "line": 47,
+              "text": "])"
+            },
+            {
+              "line": 48,
+              "text": "def test_abort_scenarios(mocker, scenario, has_app_context, code, args, kwargs):"
+            },
+            {
+              "line": 49,
+              "text": "       "
+            },
+            {
+              "line": 50,
+              "text": "                    "
+            },
+            {
+              "line": 51,
+              "text": ""
+            },
+            {
+              "line": 52,
+              "text": "       "
+            },
+            {
+              "line": 53,
+              "text": "                                              "
+            },
+            {
+              "line": 54,
+              "text": "                                                             "
+            },
+            {
+              "line": 55,
+              "text": "                                          "
+            },
+            {
+              "line": 56,
+              "text": "                                                       "
+            },
+            {
+              "line": 57,
+              "text": "                                                "
+            },
+            {
+              "line": 58,
+              "text": ""
+            },
+            {
+              "line": 59,
+              "text": "         "
+            },
+            {
+              "line": 60,
+              "text": "                          "
+            },
+            {
+              "line": 61,
+              "text": "                                     "
+            },
+            {
+              "line": 62,
+              "text": "                                    "
+            },
+            {
+              "line": 63,
+              "text": "       "
+            },
+            {
+              "line": 64,
+              "text": "                                 "
+            },
+            {
+              "line": 65,
+              "text": "                      "
+            },
+            {
+              "line": 66,
+              "text": "    # === PY-SLOT-START:mock_stub_001 ==="
+            },
+            {
+              "line": 67,
+              "text": "    pass"
+            },
+            {
+              "line": 68,
+              "text": "    # === PY-SLOT-END:mock_stub_001 ==="
+            },
+            {
+              "line": 69,
+              "text": ""
+            },
+            {
+              "line": 70,
+              "text": "                            "
+            },
+            {
+              "line": 71,
+              "text": "    # === PY-SLOT-START:mock_stub_002 ==="
+            },
+            {
+              "line": 72,
+              "text": "    pass"
+            },
+            {
+              "line": 73,
+              "text": "    # === PY-SLOT-END:mock_stub_002 ==="
+            },
+            {
+              "line": 74,
+              "text": ""
+            },
+            {
+              "line": 75,
+              "text": "                                   "
+            },
+            {
+              "line": 76,
+              "text": "    # === PY-SLOT-START:mock_stub_003 ==="
+            },
+            {
+              "line": 77,
+              "text": "    pass"
+            },
+            {
+              "line": 78,
+              "text": "    # === PY-SLOT-END:mock_stub_003 ==="
+            },
+            {
+              "line": 79,
+              "text": ""
+            },
+            {
+              "line": 80,
+              "text": "                        "
+            },
+            {
+              "line": 81,
+              "text": "                         "
+            },
+            {
+              "line": 82,
+              "text": "    # === PY-SLOT-START:mock_stub_004 ==="
+            },
+            {
+              "line": 83,
+              "text": "    pass"
+            },
+            {
+              "line": 84,
+              "text": "    # === PY-SLOT-END:mock_stub_004 ==="
+            },
+            {
+              "line": 85,
+              "text": ""
+            },
+            {
+              "line": 86,
+              "text": "    if has_app_context:"
+            },
+            {
+              "line": 87,
+              "text": "                       "
+            },
+            {
+              "line": 88,
+              "text": "        mock_ctx.app = mock_app"
+            },
+            {
+              "line": 89,
+              "text": "        mock_app.aborter = mock_aborter"
+            },
+            {
+              "line": 90,
+              "text": "                                "
+            },
+            {
+              "line": 91,
+              "text": "        # === PY-SLOT-START:mock_stub_005 ==="
+            },
+            {
+              "line": 92,
+              "text": "        pass"
+            },
+            {
+              "line": 93,
+              "text": "        # === PY-SLOT-END:mock_stub_005 ==="
+            },
+            {
+              "line": 94,
+              "text": ""
+            },
+            {
+              "line": 95,
+              "text": "                            "
+            },
+            {
+              "line": 96,
+              "text": "    # === PY-SLOT-START:mock_stub_006 ==="
+            },
+            {
+              "line": 97,
+              "text": "    pass"
+            },
+            {
+              "line": 98,
+              "text": "    # === PY-SLOT-END:mock_stub_006 ==="
+            },
+            {
+              "line": 99,
+              "text": "                      "
+            },
+            {
+              "line": 100,
+              "text": ""
+            },
+            {
+              "line": 101,
+              "text": "                                 "
+            },
+            {
+              "line": 102,
+              "text": "    with pytest.raises(Exception) as exc_info:"
+            },
+            {
+              "line": 103,
+              "text": "        abort(code, *args, **kwargs)"
+            },
+            {
+              "line": 104,
+              "text": ""
+            },
+            {
+              "line": 105,
+              "text": "                        "
+            },
+            {
+              "line": 106,
+              "text": "    # === PY-SLOT-START:verify_001 ==="
+            },
+            {
+              "line": 107,
+              "text": "    pass"
+            },
+            {
+              "line": 108,
+              "text": "    # === PY-SLOT-END:verify_001 ==="
+            },
+            {
+              "line": 109,
+              "text": ""
+            },
+            {
+              "line": 110,
+              "text": "                       "
+            },
+            {
+              "line": 111,
+              "text": "    if has_app_context:"
+            },
+            {
+              "line": 112,
+              "text": "                          "
+            },
+            {
+              "line": 113,
+              "text": "        # === PY-SLOT-START:verify_002 ==="
+            },
+            {
+              "line": 114,
+              "text": "        pass"
+            },
+            {
+              "line": 115,
+              "text": "        # === PY-SLOT-END:verify_002 ==="
+            },
+            {
+              "line": 116,
+              "text": "                                                 "
+            },
+            {
+              "line": 117,
+              "text": "        # === PY-SLOT-START:verify_003 ==="
+            },
+            {
+              "line": 118,
+              "text": "        pass"
+            },
+            {
+              "line": 119,
+              "text": "        # === PY-SLOT-END:verify_003 ==="
+            },
+            {
+              "line": 120,
+              "text": "        assert f\"Aborted with {code}\" in str(exc_info.value)"
+            },
+            {
+              "line": 121,
+              "text": "    else:"
+            },
+            {
+              "line": 122,
+              "text": "                             "
+            },
+            {
+              "line": 123,
+              "text": "        # === PY-SLOT-START:verify_004 ==="
+            },
+            {
+              "line": 124,
+              "text": "        pass"
+            },
+            {
+              "line": 125,
+              "text": "        # === PY-SLOT-END:verify_004 ==="
+            },
+            {
+              "line": 126,
+              "text": "        assert f\"Werkzeug abort {code}\" in str(exc_info.value)"
+            }
+          ]
+        },
+        "stage": "EXTRACT",
+        "visible_task": {
+          "case_id": "flask_308",
+          "execution_context": {
+            "runtime_name": "cpython",
+            "runtime_version": "3.10",
+            "test_framework": "pytest",
+            "test_framework_version": null
+          },
+          "input_policy": {
+            "masking_contract": "python-mask-contract/v3",
+            "policy_id": "mock-spec-reviewed-frozen/v1",
+            "protocol_version": "developer_realistic_workspace_v1",
+            "visibility": "reviewed_frozen_sources"
+          },
+          "language": "python",
+          "masked_test": {
+            "end_line": 126,
+            "logical_path": "tests/test_308abort.py",
+            "resolution_status": "resolved",
+            "source_id": "test",
+            "start_line": 1,
+            "symbol": "tests/test_308abort.py::test_abort_scenarios",
+            "target_precision": "function",
+            "text": "   \n               \n        \n                          \n        \n   \nimport pytest\nfrom flask.helpers import abort\n\n\n@pytest.mark.parametrize(\"scenario,has_app_context,code,args,kwargs\", [\n    (\n        \"app_context_exists_404\",\n        True,\n        404,\n        (),\n        {}\n    ),\n    (\n        \"app_context_exists_500_with_message\",\n        True,\n        500,\n        (\"Internal Server Error\",),\n        {}\n    ),\n    (\n        \"no_app_context_403\",\n        False,\n        403,\n        (),\n        {}\n    ),\n    (\n        \"no_app_context_with_args_kwargs\",\n        False,\n        400,\n        (\"Bad Request\",),\n        {\"description\": \"Invalid input\"}\n    ),\n    (\n        \"app_context_custom_code\",\n        True,\n        418,\n        (),\n        {\"description\": \"I'm a teapot\"}\n    ),\n])\ndef test_abort_scenarios(mocker, scenario, has_app_context, code, args, kwargs):\n       \n                    \n\n       \n                                              \n                                                             \n                                          \n                                                       \n                                                \n\n         \n                          \n                                     \n                                    \n       \n                                 \n                      \n    # === PY-SLOT-START:mock_stub_001 ===\n    pass\n    # === PY-SLOT-END:mock_stub_001 ===\n\n                            \n    # === PY-SLOT-START:mock_stub_002 ===\n    pass\n    # === PY-SLOT-END:mock_stub_002 ===\n\n                                   \n    # === PY-SLOT-START:mock_stub_003 ===\n    pass\n    # === PY-SLOT-END:mock_stub_003 ===\n\n                        \n                         \n    # === PY-SLOT-START:mock_stub_004 ===\n    pass\n    # === PY-SLOT-END:mock_stub_004 ===\n\n    if has_app_context:\n                       \n        mock_ctx.app = mock_app\n        mock_app.aborter = mock_aborter\n                                \n        # === PY-SLOT-START:mock_stub_005 ===\n        pass\n        # === PY-SLOT-END:mock_stub_005 ===\n\n                            \n    # === PY-SLOT-START:mock_stub_006 ===\n    pass\n    # === PY-SLOT-END:mock_stub_006 ===\n                      \n\n                                 \n    with pytest.raises(Exception) as exc_info:\n        abort(code, *args, **kwargs)\n\n                        \n    # === PY-SLOT-START:verify_001 ===\n    pass\n    # === PY-SLOT-END:verify_001 ===\n\n                       \n    if has_app_context:\n                          \n        # === PY-SLOT-START:verify_002 ===\n        pass\n        # === PY-SLOT-END:verify_002 ===\n                                                 \n        # === PY-SLOT-START:verify_003 ===\n        pass\n        # === PY-SLOT-END:verify_003 ===\n        assert f\"Aborted with {code}\" in str(exc_info.value)\n    else:\n                             \n        # === PY-SLOT-START:verify_004 ===\n        pass\n        # === PY-SLOT-END:verify_004 ===\n        assert f\"Werkzeug abort {code}\" in str(exc_info.value)\n"
+          },
+          "mut_source": {
+            "end_line": 285,
+            "logical_path": "src/src/flask/helpers.py",
+            "resolution_status": "resolved",
+            "source_id": "mut",
+            "start_line": 265,
+            "symbol": "flask.helpers.abort",
+            "target_precision": "function",
+            "text": "def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:\n    \"\"\"Raise an :exc:`~werkzeug.exceptions.HTTPException` for the given\n    status code.\n\n    If :data:`~flask.current_app` is available, it will call its\n    :attr:`~flask.Flask.aborter` object, otherwise it will use\n    :func:`werkzeug.exceptions.abort`.\n\n    :param code: The status code for the exception, which must be\n        registered in ``app.aborter``.\n    :param args: Passed to the exception.\n    :param kwargs: Passed to the exception.\n\n    .. versionadded:: 2.2\n        Calls ``current_app.aborter`` if available instead of always\n        using Werkzeug's default ``abort``.\n    \"\"\"\n    if (ctx := _cv_app.get(None)) is not None:\n        ctx.app.aborter(code, *args, **kwargs)\n\n    _wz_abort(code, *args, **kwargs)\n"
+          },
+          "permitted_interfaces": [],
+          "schema_version": "mock-spec.task/v1",
+          "sources": [
+            {
+              "logical_path": "tests/test_308abort.py",
+              "role": "masked_test",
+              "source_id": "test"
+            },
+            {
+              "logical_path": "src/src/flask/helpers.py",
+              "role": "mut",
+              "source_id": "mut"
+            },
+            {
+              "logical_path": "src/src/flask/helpers.py",
+              "role": "supporting",
+              "source_id": "imports"
+            }
+          ],
+          "supporting_sources": [
+            {
+              "end_line": 24,
+              "logical_path": "src/src/flask/helpers.py",
+              "resolution_status": "resolved",
+              "source_id": "imports",
+              "start_line": 1,
+              "symbol": null,
+              "target_precision": "file",
+              "text": "from __future__ import annotations\n\nimport importlib.util\nimport os\nimport sys\nimport typing as t\nfrom datetime import datetime\nfrom functools import cache\nfrom functools import update_wrapper\n\nimport werkzeug.utils\nfrom werkzeug.exceptions import abort as _wz_abort\nfrom werkzeug.utils import redirect as _wz_redirect\nfrom werkzeug.wrappers import Response as BaseResponse\n\nfrom .globals import _cv_app\nfrom .globals import app_ctx\nfrom .globals import current_app\nfrom .globals import request\nfrom .globals import session\nfrom .signals import message_flashed\n\nif t.TYPE_CHECKING:  # pragma: no cover\n    from .wrappers import Response\n"
+            }
+          ]
+        }
+      },
+      "payload_sha256": "08fc00e0e0dc8cd8b788e6890ec1eedfd91be58213290c81db6a36350b5b7e72",
+      "payload_bytes": 14257,
+      "max_output_tokens": 8192,
+      "timeout_seconds": 120.0,
+      "elapsed_seconds": 21.619614862000162,
+      "response_refs": [
+        {
+          "response_index": 0,
+          "response_id": "9467a4eb-ad24-495e-aa13-f3540bce67d7",
+          "request_id": null,
+          "usage": {
+            "requests": 1,
+            "input_tokens": 4644,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 4480
+            },
+            "output_tokens": 3952,
+            "output_tokens_details": {
+              "reasoning_tokens": 3467
+            },
+            "total_tokens": 8596,
+            "request_usage_entries": []
+          }
+        }
+      ],
+      "exception": null
+    }
+  ],
+  "model_responses": [
+    {
+      "output": [
+        {
+          "id": "3f6428ac-49ed-4e71-a9ac-6824ea2b7356",
+          "summary": [],
+          "type": "reasoning",
+          "content": [
+            {
+              "text": "We need answer strict schema. Need extract original goals and candidates. We need infer scenario(s) from masked test and mut. Task stage EXTRACT. Need return only JSON. Need understand what \"original_goals\" should contain. Likely references to source excerpts that state goals? We have visible task with masked test and mut source. Need produce candidates max 2: scenario_id, description, evidence. Need original_goals maybe from test parametrization? Need derive scenarios perhaps one per parameterized case? Max 2 candidates. Need not expose host paths etc. Use source_id \"test\"/\"mut\"/\"imports\", line refs. Need include evidence references with quotes. Need result_status CONTINUE or INCONCLUSIVE. Since resolved and enough, CONTINUE.\n\nNeed determine intended candidate drafts. This benchmark likely asks to infer \"scenario\" from masked test? The test is about abort behavior with app context vs no app context. Candidates perhaps two scenarios:\n1. abort with app context delegates to current_app.aborter and does not call werkzeug abort / then if aborter doesn't raise? Wait code: if ctx app exists, ctx.app.aborter(code,*args,**kwargs), then _wz_abort(code,...). If custom aborter raises, _wz_abort not reached. Test expects Exception message \"Aborted with {code}\" for has_app_context. That suggests mock_aborter raises Exception(f\"Aborted with {code}\")? Need infer. For no app context, _wz_abort raises werkzeug HTTPException with message f\"Werkzeug abort {code}\"? Maybe monkeypatched _wz_abort to raise Exception(f\"Werkzeug abort {code}\"). Test expects message.\n\n2. abort without app context uses Werkzeug abort. \n\nBut candidate descriptions need likely \"Scenario: app context exists, abort delegates to app.aborter\" and \"Scenario: no app context, abort delegates to werkzeug abort\". Evidence from mut lines 282-285 and test lines 11-48, 86-126. Could include both.\n\nNeed original_goals: likely from the \"visible_task\" itself? There are no explicit goal text except test. The schema wants SourceReference array. Could include references to masked test parameterized names and assertions as original goals? Hmm.\n\nWe need reason from prompt: staged-scenario-inference-prompts/v0.1, Stage EXTRACT. The output requires original_goals, candidates, unresolved. \"Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material.\" So avoid logical paths? SourceReference only source_id/start/end/quote. Fine.\n\nOriginal_goals probably should contain references to the original task specification/goals. But in input only visible_task with case_id, execution context, masked test, mut source, etc. There is no natural language goal. Maybe we can set original_goals to references from test parametrization? But \"original_goals\" likely for provided original prompt or goal, if present. Could be empty if none. Need decide.\n\nCandidateDraft: scenario_id, description, evidence. Need candidates max 2. We can produce 2 candidates. Need unresolved maybe list ambiguities, e.g., mock setup details hidden in slots (how mock_ctx, mock_app, mock_aborter, _cv_app patched, werkzeug abort patched). But result_status CONTINUE maybe unresolved include details not inferable? However we are extracting scenarios from masked test. We should mention unresolved: exact mock setup for _cv_app, mock_aborter, _wz_abort, and whether app.aborter or werkzeug abort called. But if too many? The schema allows. Need possibly include \"mock setup details in masked slots are not visible\" as unresolved. But result_status can still CONTINUE.\n\nNeed produce only JSON.\n\nLet's parse test lines:\n\n1-6 blank-ish\n7 import pytest\n8 from flask.helpers import abort\n11 parametrize cases:\n- app_context_exists_404, True, 404, (), {}\n- app_context_exists_500_with_message, True, 500, (\"Internal Server Error\",), {}\n- no_app_context_403, False, 403, (), {}\n- no_app_context_with_args_kwargs, False, 400, (\"Bad Request\",), {\"description\":\"Invalid input\"}\n- app_context_custom_code, True, 418, (), {\"description\":\"I'm a teapot\"}\n\nFunction lines 48 onward.\n66-84 mock stub slots 1-4 likely patch _cv_app, current_app? At 86 if has_app_context:\nline 87 maybe \"mock_ctx = mocker.Mock()\" etc\n88 mock_ctx.app = mock_app\n89 mock_app.aborter = mock_aborter\n90 maybe \"mocker.patch('flask.helpers._cv_app.get', return_value=mock_ctx)\"? \n91-93 stub 5.\n95 maybe \"else: mocker.patch('flask.helpers._cv_app.get', return_value=None)\"? Actually lines 95-99 stub 6 likely patch _cv_app.get returns None for no context.\n101 maybe \"mocker.patch('flask.helpers._wz_abort')\"? Then with pytest.raises Exception: abort. Since _wz_abort is imported alias in helpers, patch likely \"flask.helpers._wz_abort\" with side_effect. Need infer from expected messages.\n\nAt 102 with pytest.raises(Exception) as exc_info:\n103 abort\n106 verify_001 maybe \"if has_app_context: mock_aborter.assert_called_once_with(code,*args,**kwargs)\"? Actually verify_001 before if. Maybe common assertion that mock_aborter? Let's infer:\n- For has_app_context, if aborter returns normally, code calls _wz_abort; but expected \"Aborted with {code}\" means aborter raises. The test likely sets mock_aborter.side_effect = Exception(f\"Aborted with {code}\") and mock _wz_abort side_effect = Exception(f\"Werkzeug abort {code}\").\n- For has_app_context, they assert mock_aborter called and maybe _wz_abort not called. For no app context, they assert _wz_abort called and mock_aborter not called? But mock_aborter may not exist? They might create.\n\nAt 111 if has_app_context:\n112 maybe \"mock_aborter.assert_called_once_with(code,*args,**kwargs)\"\n113 verify_002 maybe \"mock_aborter.assert_called_once_with(code, *args, **kwargs)\"? Actually order:\nline 112 maybe \"assert mock_aborter.called\"\nline 113-115 verify_002 likely \"mock_aborter.assert_called_once_with(code, *args, **kwargs)\"\nline 116 maybe \"assert not mock_wz_abort.called\"\nline 117-119 verify_003 maybe \"mock_wz_abort.assert_not_called()\"\nline 120 assert f\"Aborted with {code}\" in str(exc_info.value)\nelse:\nline 122 maybe \"assert not mock_aborter.called\"?\nline 123-125 verify_004 maybe \"mock_wz_abort.assert_called_once_with(code, *args, **kwargs)\"\nline 126 assert \"Werkzeug abort {code}\" in message.\n\nThe mut code: if ctx exists, calls ctx.app.aborter. It does not return. If aborter raises, _wz_abort not called. If no ctx, calls _wz_abort. So scenario.\n\nNeed maybe candidate descriptions should be behavior of abort with and without app context, including custom aborters and args kwargs.\n\nOriginal goals: Since no explicit goals, perhaps use lines from test's parametrization to show scenarios? But \"original_goals\" in extract likely should capture original problem goal statements if any. Could be empty. But maybe expected to include the test function doc? Hmm.\n\nLet's inspect schema: \"ExtractResult\" with original_goals list SourceReference, candidates list CandidateDraft max 2, unresolved list. It seems this is part of a pipeline where model extracts candidate scenarios from source. Original_goals likely should be references to \"original goals\" that may have been provided in the input. In this input, no separate original goal text, only visible_task. The task may be implicit: \"implement behavior to pass tests.\" We can set original_goals to references from the test function? But it says original_goals, not test goals. If empty allowed. We can include one reference to the test parameterization? But \"original_goals\" should be source refs. Could be empty if not explicitly provided. Yet schema requires field but array can be empty. Which is safer? For strict extraction, likely original_goals should list any explicit goal statements from task. There are none. So empty. But maybe they expect to capture test function as original goal? Hmm.\n\nNeed infer from \"staged-scenario-inference-prompts/v0.1\" likely scenario inference from a masked test. Stage EXTRACT: extract candidate scenarios and evidence. original_goals maybe identify original stated goals in the prompt, but none. Use empty.\n\nCandidates: Could name \"abort_with_app_context_delegates_to_aborter\" and \"abort_without_app_context_uses_werkzeug_abort\". Descriptions mention call with code args kwargs; with app context calls ctx.app.aborter and expected exception message \"Aborted with {code}\" for custom aborter; without context calls werkzeug abort and expected \"Werkzeug abort {code}\". Evidence include mut lines 282-285 and test lines 111-126 and param lines 11-47.\n\nNeed not include host paths. Use source_id only. Quote exact text from provided lines. Need ensure line numbers correspond. For test source lines in masked_test text maybe line numbers 1-126. We can use line refs from source_line_index/test. Need quote exact. We can quote multi-line? Quote must minLength and nonspace; can include newline? JSON string can contain \\n. It's okay. But maybe quote should be exact substring, possibly multi-line. We can use quote from a line or multiple. Need line start/end. For evidence, quote can be a snippet. Let's choose simple quotes.\n\nCandidate 1 evidence:\n- mut lines 282-283: \"if (ctx := _cv_app.get(None)) is not None:\\n        ctx.app.aborter(code, *args, **kwargs)\"\n- test lines 111-120: maybe \"if has_app_context:\\n                          \\n        # === PY-SLOT-START:verify_002 ===\\n        pass\\n        # === PY-SLOT-END:verify_002 ===\\n                                                 \\n        # === PY-SLOT-START:verify_003 ===\\n        pass\\n        # === PY-SLOT-END:verify_003 ===\\n        assert f\\\"Aborted with {code}\\\" in str(exc_info.value)\"\nBut quote includes masked slots. Maybe better just line 120: `assert f\"Aborted with {code}\" in str(exc_info.value)` with start 120 end 120. Also param lines 13-14 for app_context_exists_404. But evidence can include test line 120 and mut 282-283.\n\nCandidate 2 evidence:\n- mut lines 284-285: \"\\n    _wz_abort(code, *args, **kwargs)\"\n- test line 126: `assert f\"Werkzeug abort {code}\" in str(exc_info.value)`\n- test lines 27-31 no_app_context_403 maybe.\nMaybe test line 121-126 includes else branch and assertion.\n\nNeed include original_goals maybe references to param cases? Hmm.\n\nCould include original_goals as:\n- source_id \"test\", start_line 11, end_line 47, quote parameterization. This defines scenarios/goals. But \"original_goals\" maybe intended for explicit goal statement. Use maybe one reference to test parametrization because it's the closest to original goal. However original_goals might be used to compare candidate scenario to original. If we leave empty, maybe okay. But schema has it. Need decide.\n\nLet's consider possible evaluation: They might expect a JSON matching schema, not exact content? Likely human/LLM eval. Need be useful. We can include original_goals with test parametrization defining expected scenarios. The prompt: \"Stage: EXTRACT. Return only the requested strict structure.\" It may parse. original_goals could be empty if no goal. But we can fill with test lines to be safe? It says original_goals, not test cases. Overfilling might be penalized? Hmm.\n\nMaybe original_goals should reference the \"visible_task\" details? There is no source for visible_task. SourceReference requires source_id. We can use \"test\" and \"mut\". Could list test line 103 `abort(code, *args, **kwargs)` as original goal? That's not goal. No.\n\nI lean original_goals empty. But maybe schema expects at least one? Not required minItems. So empty allowed.\n\nUnresolved: Need list items strings. Could mention:\n- \"Exact mock setup for _cv_app, mock_aborter, and _wz_abort is hidden in PY-SLOT stubs; inferred only from assertions.\"\n- \"Whether aborter is expected to raise before _wz_abort fallback for app-context cases is not directly shown.\"\nBut perhaps unresolved should contain open questions from extraction. We can include 2-3.\n\nNeed ensure JSON only, no markdown. Let's craft.\n\nCandidateDraft descriptions:\n1. \"When an application context is available, flask.helpers.abort must delegate to current app's aborter with the status code, positional args, and keyword args, and the test expects the aborter's exception message to contain 'Aborted with {code}'.\"\n2. \"When no application context is available, flask.helpers.abort must fall back to Werkzeug's abort with the same code, args, and kwargs, and the test expects the Werkzeug exception message to contain 'Werkzeug abort {code}'.\"\n\nEvidence:\nFor candidate 1:\n- mut lines 282-283 quote exactly.\n- test line 120 quote.\n- test lines 13-14? maybe param name app_context_exists_404. Let's include test lines 13-14 start 13 end 14 quote `\"app_context_exists_404\",\\n        True,`? That is exact? Line 13 has `        \"app_context_exists_404\",` line 14 `        True,`. Could quote with whitespace. Fine.\n- test lines 41-45 for custom code maybe. But max evidence no limit. Keep 2-3.\n\nCandidate 2:\n- mut lines 284-285 quote `\\n    _wz_abort(code, *args, **kwargs)`? start 284 end 285. Line 284 empty. Quote should be non-whitespace; include line 285 only start 285 end 285: `    _wz_abort(code, *args, **kwargs)`.\n- test line 126.\n- test lines 27-28 maybe `\"no_app_context_403\",\\n        False,`. Good.\n\nOriginal_goals maybe include test parametrization? Let's revisit. If original_goals empty, candidates still okay. But maybe \"original_goals\" intended to capture quotes from original problem statement. None. Use empty.\n\nCould include unresolved \"The exact patch targets and side effects in mock_stub_* slots are not visible, so call assertions are inferred from surrounding comments/assertions.\" This is honest.\n\nNeed ensure no logical path. Use source_id \"test\" and \"mut\". Good.\n\nPotential issue: Schema requires \"candidates\" maxItems 2, we have 2. \"unresolved\" array strings. \"result_status\" enum. \"schema_version\" const.\n\nNeed not mention \"source_line_index\" etc.\n\nLet's produce JSON. Need valid JSON. Use escaped quotes in quote strings. Fine.\n\nNeed no markdown.",
+              "type": "reasoning_text"
+            }
+          ],
+          "encrypted_content": "9467a4eb-ad24-495e-aa13-f3540bce67d7-0",
+          "status": "completed"
+        },
+        {
+          "id": "81155bfe-f66f-4792-b5b5-6ec80dcf886d",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\":\"staged-extract/v0.1\",\"result_status\":\"CONTINUE\",\"original_goals\":[],\"candidates\":[{\"scenario_id\":\"abort_with_app_context_delegates_to_app_aborter\",\"description\":\"When an application context is available, flask.helpers.abort must delegate to the current app's aborter with the status code, positional args, and keyword args. The test expects the aborter-raised exception message to contain 'Aborted with {code}'.\",\"evidence\":[{\"source_id\":\"mut\",\"start_line\":282,\"end_line\":283,\"quote\":\"if (ctx := _cv_app.get(None)) is not None:\\n        ctx.app.aborter(code, *args, **kwargs)\"},{\"source_id\":\"test\",\"start_line\":120,\"end_line\":120,\"quote\":\"        assert f\\\"Aborted with {code}\\\" in str(exc_info.value)\"},{\"source_id\":\"test\",\"start_line\":13,\"end_line\":14,\"quote\":\"        \\\"app_context_exists_404\\\",\\n        True,\"}]},{\"scenario_id\":\"abort_without_app_context_uses_werkzeug_abort\",\"description\":\"When no application context is available, flask.helpers.abort must fall back to Werkzeug's abort with the same code, args, and kwargs. The test expects the Werkzeug-raised exception message to contain 'Werkzeug abort {code}'.\",\"evidence\":[{\"source_id\":\"mut\",\"start_line\":285,\"end_line\":285,\"quote\":\"    _wz_abort(code, *args, **kwargs)\"},{\"source_id\":\"test\",\"start_line\":126,\"end_line\":126,\"quote\":\"        assert f\\\"Werkzeug abort {code}\\\" in str(exc_info.value)\"},{\"source_id\":\"test\",\"start_line\":27,\"end_line\":28,\"quote\":\"        \\\"no_app_context_403\\\",\\n        False,\"}]}],\"unresolved\":[\"Exact mock setup for _cv_app, mock_aborter, and _wz_abort is hidden in PY-SLOT stubs; delegation and fallback behavior are inferred from the visible assertions.\",\"The visible test does not show whether the app-context aborter is always expected to raise before the _wz_abort fallback is reached.\"]}",
+              "type": "output_text",
+              "logprobs": []
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": "final_answer"
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 4644,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 4480
+        },
+        "output_tokens": 3952,
+        "output_tokens_details": {
+          "reasoning_tokens": 3467
+        },
+        "total_tokens": 8596,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": "9467a4eb-ad24-495e-aa13-f3540bce67d7",
+      "request_id": null,
+      "resolved_model_version": null
+    }
+  ],
+  "error": {
+    "type": "ValueError",
+    "message": "source reference quote mismatch: mut:282-283"
+  }
+}

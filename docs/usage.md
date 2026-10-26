@@ -407,6 +407,12 @@ HTTP 400，已修复；逐调用诊断位于 `inference_record.json.model_calls`
 但最新完整运行在 EXTRACT 引用原文校验失败，五步真实验收仍未通过；没有为取得
 成功结果重跑或修改语义规则。证据见[排障记录](../out/staged-inference/m2-query-diagnosis-20261026/report.md)。
 
+#17 的后续[验收尝试](../out/staged-inference/issue17-m2-20261026/report.md)
+为研究输入附加精确行坐标，并修复新增可空对象的供应商 Schema 兼容问题。
+独立 QUERY 协议检查返回 HTTP 200；完整复验仍因 EXTRACT 引用遗漏缩进失败，
+未取得自主新增证据或最终场景卡。#17 保持开放，#18 仍受真实 M2 验收阻塞。
+该记录中的复现命令需要新输出目录；不能将独立阶段回放计作完整验收。
+
 ## 冻结项目读取与搜索（#13 / #14）
 
 生产 V0.2 的普通 CLI 与完整留证入口均可显式添加 `--repository-read`：

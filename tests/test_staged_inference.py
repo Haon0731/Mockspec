@@ -56,6 +56,60 @@ def _model_payload(value: object) -> dict:
     return json.loads(value)
 
 
+def test_stage_inputs_expose_exact_source_line_coordinates(tmp_path) -> None:
+    task = synthetic_task()
+    # Masked input can contain significant whitespace and non-one-based snippets.
+    supporting = {
+        **task["mut_source"], "source_id": "context",
+        "start_line": 101, "end_line": 103,
+        "text": "   \nimport example\n\n",
+    }
+    task["supporting_sources"].append(supporting)
+    task["sources"].append({
+        "source_id": "context", "logical_path": supporting["logical_path"],
+        "role": "supporting",
+    })
+    model = FixedScriptModel()
+    result = asyncio.run(execute_staged_run(
+        task, output_dir=tmp_path / "run", model=model,
+        config=StagedRunConfig(), requested_case_id=task["case_id"],
+    ))
+    assert result["manifest"]["result_status"] == "SELECTED"
+    for raw in model.inputs:
+        payload = _model_payload(raw)
+        assert payload["visible_task"] == task
+        assert payload["source_line_index"]["context"] == [
+            {"line": 101, "text": "   "},
+            {"line": 102, "text": "import example"},
+            {"line": 103, "text": ""},
+        ]
+        for source in [task["masked_test"], task["mut_source"], *task["supporting_sources"]]:
+            indexed = payload["source_line_index"][source["source_id"]]
+            assert [row["line"] for row in indexed] == list(
+                range(source["start_line"], source["end_line"] + 1)
+            )
+            assert [row["text"] for row in indexed] == source["text"].splitlines()
+
+
+@pytest.mark.parametrize("source_id,start,end,quote", [
+    ("mut:0", 10, 11, "    return dependency(value)"),
+    ("mut:0", 10, 10, "    return dependency(value)"),
+    ("mut:0", 11, 11, "return dependency(value)"),
+])
+def test_inaccurate_extract_coordinates_remain_rejected(tmp_path, source_id, start, end, quote):
+    outputs = scripted_outputs()
+    outputs[0]["original_goals"] = [{
+        "source_id": source_id, "start_line": start, "end_line": end, "quote": quote,
+    }]
+    result, model, output_dir = _run(tmp_path, outputs)
+    assert result["manifest"]["error_stage"] == "EXTRACT"
+    assert result["record"]["error"]["message"] == (
+        f"source reference quote mismatch: {source_id}:{start}-{end}"
+    )
+    assert model.calls == 1
+    assert not (output_dir / "scenario_contract.json").exists()
+
+
 def test_variant_b_replay_preserves_identity_stages_and_artifact_hashes(tmp_path) -> None:
     result, model, output_dir = _run(tmp_path)
     task = synthetic_task()

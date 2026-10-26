@@ -13,8 +13,9 @@
 
 ## 独立研究验证
 
-下一轮需求：[冻结仓库主动只读探索 PRD](workspace-exploration-prd.md)。这是待实现的需求基线，
-不是当前能力或已通过验收的说明。
+需求基线：[冻结仓库主动只读探索 PRD](workspace-exploration-prd.md)。工程切片 #13–#16 已交付，
+真实 M2 仍未通过，见 [#17 验收尝试](../out/staged-inference/issue17-m2-20261026/report.md)；
+PRD 不作为当前能力或已通过验收的说明。
 
 以下研究结果不等于生产 Agent 已具备对应能力；阅读案例分析也不能作为未来无指导生成的输入。
 

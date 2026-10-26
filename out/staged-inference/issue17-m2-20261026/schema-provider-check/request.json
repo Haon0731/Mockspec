@@ -1,0 +1,301 @@
+{
+  "method": "POST",
+  "url": "https://api.deepseek.com/responses",
+  "body": {
+    "model": "deepseek-flash",
+    "include": [],
+    "input": [
+      {
+        "content": "{\"extract\":{\"candidates\":[{\"description\":\"When an application context is active, flask.helpers.abort must delegate to the app-level aborter: the context's app object (mock_ctx.app = mock_app) exposes .aborter (mock_app.aborter = mock_aborter) and abort invokes ctx.app.aborter(code, *args, **kwargs). The aborter's raised exception is propagated so the caller observes a failure whose message contains \\\"Aborted with {code}\\\", preserving the supplied code, args and kwargs (e.g. 404 with no extras, 500 with \\\"Internal Server Error\\\", 418 with a description kwarg).\",\"evidence\":[{\"end_line\":285,\"quote\":\"    if (ctx := _cv_app.get(None)) is not None:\\n        ctx.app.aborter(code, *args, **kwargs)\\n\\n    _wz_abort(code, *args, **kwargs)\",\"source_id\":\"mut\",\"start_line\":282},{\"end_line\":93,\"quote\":\"    if has_app_context:\\n                       \\n        mock_ctx.app = mock_app\\n        mock_app.aborter = mock_aborter\\n                                \\n        # === PY-SLOT-START:mock_stub_005 ===\\n        pass\\n        # === PY-SLOT-END:mock_stub_005 ===\",\"source_id\":\"test\",\"start_line\":86},{\"end_line\":120,\"quote\":\"        assert f\\\"Aborted with {code}\\\" in str(exc_info.value)\",\"source_id\":\"test\",\"start_line\":120},{\"end_line\":21,\"quote\":\"from .globals import _cv_app\\nfrom .globals import app_ctx\\nfrom .globals import current_app\\nfrom .globals import request\\nfrom .globals import session\\nfrom .signals import message_flashed\",\"source_id\":\"imports\",\"start_line\":16}],\"scenario_id\":\"abort_with_active_app_context_uses_aborter\"},{\"description\":\"When no application context is available (the context lookup _cv_app.get(None) yields None), flask.helpers.abort must not touch any aborter and instead fall back to Werkzeug's abort, forwarding the same code, args and kwargs. The resulting exception therefore reflects the Werkzeug path, and the test asserts its message contains \\\"Werkzeug abort {code}\\\" (e.g. 403 with no extras, 400 with \\\"Bad Request\\\" plus a description kwarg).\",\"evidence\":[{\"end_line\":285,\"quote\":\"    if (ctx := _cv_app.get(None)) is not None:\\n        ctx.app.aborter(code, *args, **kwargs)\\n\\n    _wz_abort(code, *args, **kwargs)\",\"source_id\":\"mut\",\"start_line\":282},{\"end_line\":12,\"quote\":\"from werkzeug.exceptions import abort as _wz_abort\",\"source_id\":\"imports\",\"start_line\":12},{\"end_line\":126,\"quote\":\"    else:\\n                             \\n        # === PY-SLOT-START:verify_004 ===\\n        pass\\n        # === PY-SLOT-END:verify_004 ===\\n        assert f\\\"Werkzeug abort {code}\\\" in str(exc_info.value)\",\"source_id\":\"test\",\"start_line\":121}],\"scenario_id\":\"abort_without_app_context_falls_back_to_werkzeug\"}],\"original_goals\":[{\"end_line\":271,\"quote\":\"    \\\"\\\"\\\"Raise an :exc:`~werkzeug.exceptions.HTTPException` for the given\\n    status code.\\n\\n    If :data:`~flask.current_app` is available, it will call its\\n    :attr:`~flask.Flask.aborter` object, otherwise it will use\\n    :func:`werkzeug.exceptions.abort`.\",\"source_id\":\"mut\",\"start_line\":266}],\"result_status\":\"CONTINUE\",\"schema_version\":\"staged-extract/v0.1\",\"unresolved\":[\"Contents of the masked slots (mock_stub_001..mock_stub_006, verify_001..verify_004) are not visible, so the exact patching targets and call-assertion helpers used to install the mocked context/aborter and to verify aborter invocation are inferred from surrounding visible lines.\",\"Whether the mocked aborter itself raises the exception observed by pytest.raises, versus a separate assertion on the aborter call record, cannot be confirmed from the visible source alone.\"]},\"query_receipts\":[],\"source_line_index\":{\"imports\":[{\"line\":1,\"text\":\"from __future__ import annotations\"},{\"line\":2,\"text\":\"\"},{\"line\":3,\"text\":\"import importlib.util\"},{\"line\":4,\"text\":\"import os\"},{\"line\":5,\"text\":\"import sys\"},{\"line\":6,\"text\":\"import typing as t\"},{\"line\":7,\"text\":\"from datetime import datetime\"},{\"line\":8,\"text\":\"from functools import cache\"},{\"line\":9,\"text\":\"from functools import update_wrapper\"},{\"line\":10,\"text\":\"\"},{\"line\":11,\"text\":\"import werkzeug.utils\"},{\"line\":12,\"text\":\"from werkzeug.exceptions import abort as _wz_abort\"},{\"line\":13,\"text\":\"from werkzeug.utils import redirect as _wz_redirect\"},{\"line\":14,\"text\":\"from werkzeug.wrappers import Response as BaseResponse\"},{\"line\":15,\"text\":\"\"},{\"line\":16,\"text\":\"from .globals import _cv_app\"},{\"line\":17,\"text\":\"from .globals import app_ctx\"},{\"line\":18,\"text\":\"from .globals import current_app\"},{\"line\":19,\"text\":\"from .globals import request\"},{\"line\":20,\"text\":\"from .globals import session\"},{\"line\":21,\"text\":\"from .signals import message_flashed\"},{\"line\":22,\"text\":\"\"},{\"line\":23,\"text\":\"if t.TYPE_CHECKING:  # pragma: no cover\"},{\"line\":24,\"text\":\"    from .wrappers import Response\"}],\"mut\":[{\"line\":265,\"text\":\"def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:\"},{\"line\":266,\"text\":\"    \\\"\\\"\\\"Raise an :exc:`~werkzeug.exceptions.HTTPException` for the given\"},{\"line\":267,\"text\":\"    status code.\"},{\"line\":268,\"text\":\"\"},{\"line\":269,\"text\":\"    If :data:`~flask.current_app` is available, it will call its\"},{\"line\":270,\"text\":\"    :attr:`~flask.Flask.aborter` object, otherwise it will use\"},{\"line\":271,\"text\":\"    :func:`werkzeug.exceptions.abort`.\"},{\"line\":272,\"text\":\"\"},{\"line\":273,\"text\":\"    :param code: The status code for the exception, which must be\"},{\"line\":274,\"text\":\"        registered in ``app.aborter``.\"},{\"line\":275,\"text\":\"    :param args: Passed to the exception.\"},{\"line\":276,\"text\":\"    :param kwargs: Passed to the exception.\"},{\"line\":277,\"text\":\"\"},{\"line\":278,\"text\":\"    .. versionadded:: 2.2\"},{\"line\":279,\"text\":\"        Calls ``current_app.aborter`` if available instead of always\"},{\"line\":280,\"text\":\"        using Werkzeug's default ``abort``.\"},{\"line\":281,\"text\":\"    \\\"\\\"\\\"\"},{\"line\":282,\"text\":\"    if (ctx := _cv_app.get(None)) is not None:\"},{\"line\":283,\"text\":\"        ctx.app.aborter(code, *args, **kwargs)\"},{\"line\":284,\"text\":\"\"},{\"line\":285,\"text\":\"    _wz_abort(code, *args, **kwargs)\"}],\"test\":[{\"line\":1,\"text\":\"   \"},{\"line\":2,\"text\":\"               \"},{\"line\":3,\"text\":\"        \"},{\"line\":4,\"text\":\"                          \"},{\"line\":5,\"text\":\"        \"},{\"line\":6,\"text\":\"   \"},{\"line\":7,\"text\":\"import pytest\"},{\"line\":8,\"text\":\"from flask.helpers import abort\"},{\"line\":9,\"text\":\"\"},{\"line\":10,\"text\":\"\"},{\"line\":11,\"text\":\"@pytest.mark.parametrize(\\\"scenario,has_app_context,code,args,kwargs\\\", [\"},{\"line\":12,\"text\":\"    (\"},{\"line\":13,\"text\":\"        \\\"app_context_exists_404\\\",\"},{\"line\":14,\"text\":\"        True,\"},{\"line\":15,\"text\":\"        404,\"},{\"line\":16,\"text\":\"        (),\"},{\"line\":17,\"text\":\"        {}\"},{\"line\":18,\"text\":\"    ),\"},{\"line\":19,\"text\":\"    (\"},{\"line\":20,\"text\":\"        \\\"app_context_exists_500_with_message\\\",\"},{\"line\":21,\"text\":\"        True,\"},{\"line\":22,\"text\":\"        500,\"},{\"line\":23,\"text\":\"        (\\\"Internal Server Error\\\",),\"},{\"line\":24,\"text\":\"        {}\"},{\"line\":25,\"text\":\"    ),\"},{\"line\":26,\"text\":\"    (\"},{\"line\":27,\"text\":\"        \\\"no_app_context_403\\\",\"},{\"line\":28,\"text\":\"        False,\"},{\"line\":29,\"text\":\"        403,\"},{\"line\":30,\"text\":\"        (),\"},{\"line\":31,\"text\":\"        {}\"},{\"line\":32,\"text\":\"    ),\"},{\"line\":33,\"text\":\"    (\"},{\"line\":34,\"text\":\"        \\\"no_app_context_with_args_kwargs\\\",\"},{\"line\":35,\"text\":\"        False,\"},{\"line\":36,\"text\":\"        400,\"},{\"line\":37,\"text\":\"        (\\\"Bad Request\\\",),\"},{\"line\":38,\"text\":\"        {\\\"description\\\": \\\"Invalid input\\\"}\"},{\"line\":39,\"text\":\"    ),\"},{\"line\":40,\"text\":\"    (\"},{\"line\":41,\"text\":\"        \\\"app_context_custom_code\\\",\"},{\"line\":42,\"text\":\"        True,\"},{\"line\":43,\"text\":\"        418,\"},{\"line\":44,\"text\":\"        (),\"},{\"line\":45,\"text\":\"        {\\\"description\\\": \\\"I'm a teapot\\\"}\"},{\"line\":46,\"text\":\"    ),\"},{\"line\":47,\"text\":\"])\"},{\"line\":48,\"text\":\"def test_abort_scenarios(mocker, scenario, has_app_context, code, args, kwargs):\"},{\"line\":49,\"text\":\"       \"},{\"line\":50,\"text\":\"                    \"},{\"line\":51,\"text\":\"\"},{\"line\":52,\"text\":\"       \"},{\"line\":53,\"text\":\"                                              \"},{\"line\":54,\"text\":\"                                                             \"},{\"line\":55,\"text\":\"                                          \"},{\"line\":56,\"text\":\"                                                       \"},{\"line\":57,\"text\":\"                                                \"},{\"line\":58,\"text\":\"\"},{\"line\":59,\"text\":\"         \"},{\"line\":60,\"text\":\"                          \"},{\"line\":61,\"text\":\"                                     \"},{\"line\":62,\"text\":\"                                    \"},{\"line\":63,\"text\":\"       \"},{\"line\":64,\"text\":\"                                 \"},{\"line\":65,\"text\":\"                      \"},{\"line\":66,\"text\":\"    # === PY-SLOT-START:mock_stub_001 ===\"},{\"line\":67,\"text\":\"    pass\"},{\"line\":68,\"text\":\"    # === PY-SLOT-END:mock_stub_001 ===\"},{\"line\":69,\"text\":\"\"},{\"line\":70,\"text\":\"                            \"},{\"line\":71,\"text\":\"    # === PY-SLOT-START:mock_stub_002 ===\"},{\"line\":72,\"text\":\"    pass\"},{\"line\":73,\"text\":\"    # === PY-SLOT-END:mock_stub_002 ===\"},{\"line\":74,\"text\":\"\"},{\"line\":75,\"text\":\"                                   \"},{\"line\":76,\"text\":\"    # === PY-SLOT-START:mock_stub_003 ===\"},{\"line\":77,\"text\":\"    pass\"},{\"line\":78,\"text\":\"    # === PY-SLOT-END:mock_stub_003 ===\"},{\"line\":79,\"text\":\"\"},{\"line\":80,\"text\":\"                        \"},{\"line\":81,\"text\":\"                         \"},{\"line\":82,\"text\":\"    # === PY-SLOT-START:mock_stub_004 ===\"},{\"line\":83,\"text\":\"    pass\"},{\"line\":84,\"text\":\"    # === PY-SLOT-END:mock_stub_004 ===\"},{\"line\":85,\"text\":\"\"},{\"line\":86,\"text\":\"    if has_app_context:\"},{\"line\":87,\"text\":\"                       \"},{\"line\":88,\"text\":\"        mock_ctx.app = mock_app\"},{\"line\":89,\"text\":\"        mock_app.aborter = mock_aborter\"},{\"line\":90,\"text\":\"                                \"},{\"line\":91,\"text\":\"        # === PY-SLOT-START:mock_stub_005 ===\"},{\"line\":92,\"text\":\"        pass\"},{\"line\":93,\"text\":\"        # === PY-SLOT-END:mock_stub_005 ===\"},{\"line\":94,\"text\":\"\"},{\"line\":95,\"text\":\"                            \"},{\"line\":96,\"text\":\"    # === PY-SLOT-START:mock_stub_006 ===\"},{\"line\":97,\"text\":\"    pass\"},{\"line\":98,\"text\":\"    # === PY-SLOT-END:mock_stub_006 ===\"},{\"line\":99,\"text\":\"                      \"},{\"line\":100,\"text\":\"\"},{\"line\":101,\"text\":\"                                 \"},{\"line\":102,\"text\":\"    with pytest.raises(Exception) as exc_info:\"},{\"line\":103,\"text\":\"        abort(code, *args, **kwargs)\"},{\"line\":104,\"text\":\"\"},{\"line\":105,\"text\":\"                        \"},{\"line\":106,\"text\":\"    # === PY-SLOT-START:verify_001 ===\"},{\"line\":107,\"text\":\"    pass\"},{\"line\":108,\"text\":\"    # === PY-SLOT-END:verify_001 ===\"},{\"line\":109,\"text\":\"\"},{\"line\":110,\"text\":\"                       \"},{\"line\":111,\"text\":\"    if has_app_context:\"},{\"line\":112,\"text\":\"                          \"},{\"line\":113,\"text\":\"        # === PY-SLOT-START:verify_002 ===\"},{\"line\":114,\"text\":\"        pass\"},{\"line\":115,\"text\":\"        # === PY-SLOT-END:verify_002 ===\"},{\"line\":116,\"text\":\"                                                 \"},{\"line\":117,\"text\":\"        # === PY-SLOT-START:verify_003 ===\"},{\"line\":118,\"text\":\"        pass\"},{\"line\":119,\"text\":\"        # === PY-SLOT-END:verify_003 ===\"},{\"line\":120,\"text\":\"        assert f\\\"Aborted with {code}\\\" in str(exc_info.value)\"},{\"line\":121,\"text\":\"    else:\"},{\"line\":122,\"text\":\"                             \"},{\"line\":123,\"text\":\"        # === PY-SLOT-START:verify_004 ===\"},{\"line\":124,\"text\":\"        pass\"},{\"line\":125,\"text\":\"        # === PY-SLOT-END:verify_004 ===\"},{\"line\":126,\"text\":\"        assert f\\\"Werkzeug abort {code}\\\" in str(exc_info.value)\"}]},\"stage\":\"QUERY\",\"visible_task\":{\"case_id\":\"flask_308\",\"execution_context\":{\"runtime_name\":\"cpython\",\"runtime_version\":\"3.10\",\"test_framework\":\"pytest\",\"test_framework_version\":null},\"input_policy\":{\"masking_contract\":\"python-mask-contract/v3\",\"policy_id\":\"mock-spec-reviewed-frozen/v1\",\"protocol_version\":\"developer_realistic_workspace_v1\",\"visibility\":\"reviewed_frozen_sources\"},\"language\":\"python\",\"masked_test\":{\"end_line\":126,\"logical_path\":\"tests/test_308abort.py\",\"resolution_status\":\"resolved\",\"source_id\":\"test\",\"start_line\":1,\"symbol\":\"tests/test_308abort.py::test_abort_scenarios\",\"target_precision\":\"function\",\"text\":\"   \\n               \\n        \\n                          \\n        \\n   \\nimport pytest\\nfrom flask.helpers import abort\\n\\n\\n@pytest.mark.parametrize(\\\"scenario,has_app_context,code,args,kwargs\\\", [\\n    (\\n        \\\"app_context_exists_404\\\",\\n        True,\\n        404,\\n        (),\\n        {}\\n    ),\\n    (\\n        \\\"app_context_exists_500_with_message\\\",\\n        True,\\n        500,\\n        (\\\"Internal Server Error\\\",),\\n        {}\\n    ),\\n    (\\n        \\\"no_app_context_403\\\",\\n        False,\\n        403,\\n        (),\\n        {}\\n    ),\\n    (\\n        \\\"no_app_context_with_args_kwargs\\\",\\n        False,\\n        400,\\n        (\\\"Bad Request\\\",),\\n        {\\\"description\\\": \\\"Invalid input\\\"}\\n    ),\\n    (\\n        \\\"app_context_custom_code\\\",\\n        True,\\n        418,\\n        (),\\n        {\\\"description\\\": \\\"I'm a teapot\\\"}\\n    ),\\n])\\ndef test_abort_scenarios(mocker, scenario, has_app_context, code, args, kwargs):\\n       \\n                    \\n\\n       \\n                                              \\n                                                             \\n                                          \\n                                                       \\n                                                \\n\\n         \\n                          \\n                                     \\n                                    \\n       \\n                                 \\n                      \\n    # === PY-SLOT-START:mock_stub_001 ===\\n    pass\\n    # === PY-SLOT-END:mock_stub_001 ===\\n\\n                            \\n    # === PY-SLOT-START:mock_stub_002 ===\\n    pass\\n    # === PY-SLOT-END:mock_stub_002 ===\\n\\n                                   \\n    # === PY-SLOT-START:mock_stub_003 ===\\n    pass\\n    # === PY-SLOT-END:mock_stub_003 ===\\n\\n                        \\n                         \\n    # === PY-SLOT-START:mock_stub_004 ===\\n    pass\\n    # === PY-SLOT-END:mock_stub_004 ===\\n\\n    if has_app_context:\\n                       \\n        mock_ctx.app = mock_app\\n        mock_app.aborter = mock_aborter\\n                                \\n        # === PY-SLOT-START:mock_stub_005 ===\\n        pass\\n        # === PY-SLOT-END:mock_stub_005 ===\\n\\n                            \\n    # === PY-SLOT-START:mock_stub_006 ===\\n    pass\\n    # === PY-SLOT-END:mock_stub_006 ===\\n                      \\n\\n                                 \\n    with pytest.raises(Exception) as exc_info:\\n        abort(code, *args, **kwargs)\\n\\n                        \\n    # === PY-SLOT-START:verify_001 ===\\n    pass\\n    # === PY-SLOT-END:verify_001 ===\\n\\n                       \\n    if has_app_context:\\n                          \\n        # === PY-SLOT-START:verify_002 ===\\n        pass\\n        # === PY-SLOT-END:verify_002 ===\\n                                                 \\n        # === PY-SLOT-START:verify_003 ===\\n        pass\\n        # === PY-SLOT-END:verify_003 ===\\n        assert f\\\"Aborted with {code}\\\" in str(exc_info.value)\\n    else:\\n                             \\n        # === PY-SLOT-START:verify_004 ===\\n        pass\\n        # === PY-SLOT-END:verify_004 ===\\n        assert f\\\"Werkzeug abort {code}\\\" in str(exc_info.value)\\n\"},\"mut_source\":{\"end_line\":285,\"logical_path\":\"src/src/flask/helpers.py\",\"resolution_status\":\"resolved\",\"source_id\":\"mut\",\"start_line\":265,\"symbol\":\"flask.helpers.abort\",\"target_precision\":\"function\",\"text\":\"def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:\\n    \\\"\\\"\\\"Raise an :exc:`~werkzeug.exceptions.HTTPException` for the given\\n    status code.\\n\\n    If :data:`~flask.current_app` is available, it will call its\\n    :attr:`~flask.Flask.aborter` object, otherwise it will use\\n    :func:`werkzeug.exceptions.abort`.\\n\\n    :param code: The status code for the exception, which must be\\n        registered in ``app.aborter``.\\n    :param args: Passed to the exception.\\n    :param kwargs: Passed to the exception.\\n\\n    .. versionadded:: 2.2\\n        Calls ``current_app.aborter`` if available instead of always\\n        using Werkzeug's default ``abort``.\\n    \\\"\\\"\\\"\\n    if (ctx := _cv_app.get(None)) is not None:\\n        ctx.app.aborter(code, *args, **kwargs)\\n\\n    _wz_abort(code, *args, **kwargs)\\n\"},\"permitted_interfaces\":[],\"schema_version\":\"mock-spec.task/v1\",\"sources\":[{\"logical_path\":\"tests/test_308abort.py\",\"role\":\"masked_test\",\"source_id\":\"test\"},{\"logical_path\":\"src/src/flask/helpers.py\",\"role\":\"mut\",\"source_id\":\"mut\"},{\"logical_path\":\"src/src/flask/helpers.py\",\"role\":\"supporting\",\"source_id\":\"imports\"}],\"supporting_sources\":[{\"end_line\":24,\"logical_path\":\"src/src/flask/helpers.py\",\"resolution_status\":\"resolved\",\"source_id\":\"imports\",\"start_line\":1,\"symbol\":null,\"target_precision\":\"file\",\"text\":\"from __future__ import annotations\\n\\nimport importlib.util\\nimport os\\nimport sys\\nimport typing as t\\nfrom datetime import datetime\\nfrom functools import cache\\nfrom functools import update_wrapper\\n\\nimport werkzeug.utils\\nfrom werkzeug.exceptions import abort as _wz_abort\\nfrom werkzeug.utils import redirect as _wz_redirect\\nfrom werkzeug.wrappers import Response as BaseResponse\\n\\nfrom .globals import _cv_app\\nfrom .globals import app_ctx\\nfrom .globals import current_app\\nfrom .globals import request\\nfrom .globals import session\\nfrom .signals import message_flashed\\n\\nif t.TYPE_CHECKING:  # pragma: no cover\\n    from .wrappers import Response\\n\"}]}}",
+        "role": "user"
+      }
+    ],
+    "instructions": "staged-scenario-inference-prompts/v0.1\nStage: QUERY. Return only the requested strict structure. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. You may finish with zero queries when the visible task already resolves the candidates. Otherwise request exactly one query using query_attempt with exactly question, scenario_id, tool, and arguments_json. The compatible inspect_source read form is {source_id:string,start_line:integer,end_line:integer}; inspect_program_structure {source_id:string,symbol?:string}; inspect_dependency_usage {source_id:string,symbol?:string}. Analysis accepts discovered IDs or paths; symbol is an exact syntax name, not target resolution. Read source lines before citing them. arguments_json must encode the named argument object. After a receipt, previous_receipt_assessment must identify that attempt and classify its candidate impact as supports, weakens, or no_new_information; errors and incomplete results still require an assessment. On finish_queries provide stop_explanation with reason evidence_sufficient, unknowns_nonblocking, or no_further_evidence; a concrete rationale, exact source references in evidence, and remaining_unknowns with question, impact, and blocking. Preserve unknowns rather than treating failed exploration as proof. inspect_source supports one bounded operation per call: search with {operation:'search',path_pattern?:string,text?:string,cursor?:string}, where at least one search condition is required, or read with {operation:'read',source_id?:string,path?:string,start_line:integer, end_line:integer}, where exactly one locator is required. Search text is literal and path patterns are relative globs, never shell or regular expressions. Follow next_cursor with the identical query when incomplete. Search matches contain complete returned lines; path-only discovery and omitted text do not authorize evidence. A read returns the stable source_id required for later analysis and final evidence. Host paths are forbidden. Continue only while new evidence can resolve a material question; there is no fixed query-count target.",
+    "max_output_tokens": 8192,
+    "store": false,
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "name": "final_output",
+        "schema": {
+          "$defs": {
+            "ExplorationStop": {
+              "additionalProperties": false,
+              "properties": {
+                "reason": {
+                  "enum": [
+                    "evidence_sufficient",
+                    "unknowns_nonblocking",
+                    "no_further_evidence"
+                  ],
+                  "title": "Reason",
+                  "type": "string"
+                },
+                "rationale": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Rationale",
+                  "type": "string"
+                },
+                "evidence": {
+                  "items": {
+                    "$ref": "#/$defs/SourceReference"
+                  },
+                  "title": "Evidence",
+                  "type": "array"
+                },
+                "remaining_unknowns": {
+                  "items": {
+                    "$ref": "#/$defs/RemainingUnknown"
+                  },
+                  "title": "Remaining Unknowns",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "reason",
+                "rationale",
+                "evidence",
+                "remaining_unknowns"
+              ],
+              "title": "ExplorationStop",
+              "type": "object"
+            },
+            "RemainingUnknown": {
+              "additionalProperties": false,
+              "properties": {
+                "question": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Question",
+                  "type": "string"
+                },
+                "impact": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Impact",
+                  "type": "string"
+                },
+                "blocking": {
+                  "title": "Blocking",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "question",
+                "impact",
+                "blocking"
+              ],
+              "title": "RemainingUnknown",
+              "type": "object"
+            },
+            "SourceReference": {
+              "additionalProperties": false,
+              "properties": {
+                "source_id": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Source Id",
+                  "type": "string"
+                },
+                "start_line": {
+                  "minimum": 1,
+                  "title": "Start Line",
+                  "type": "integer"
+                },
+                "end_line": {
+                  "minimum": 1,
+                  "title": "End Line",
+                  "type": "integer"
+                },
+                "quote": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Quote",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "source_id",
+                "start_line",
+                "end_line",
+                "quote"
+              ],
+              "title": "SourceReference",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "schema_version": {
+              "const": "staged-query/v0.1",
+              "title": "Schema Version",
+              "type": "string"
+            },
+            "decision": {
+              "enum": [
+                "request_query",
+                "finish_queries"
+              ],
+              "title": "Decision",
+              "type": "string"
+            },
+            "query_attempt": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "description": "Provider-facing shape; host validation still follows attempt registration.",
+                  "properties": {
+                    "question": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Question",
+                      "type": "string"
+                    },
+                    "scenario_id": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Scenario Id",
+                      "type": "string"
+                    },
+                    "tool": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Tool",
+                      "type": "string"
+                    },
+                    "arguments_json": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Arguments Json",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "question",
+                    "scenario_id",
+                    "tool",
+                    "arguments_json"
+                  ],
+                  "title": "QueryAttempt",
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Query Attempt"
+            },
+            "previous_receipt_assessment": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "attempt_sequence": {
+                      "minimum": 1,
+                      "title": "Attempt Sequence",
+                      "type": "integer"
+                    },
+                    "impact": {
+                      "enum": [
+                        "supports",
+                        "weakens",
+                        "no_new_information"
+                      ],
+                      "title": "Impact",
+                      "type": "string"
+                    },
+                    "rationale": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Rationale",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "attempt_sequence",
+                    "impact",
+                    "rationale"
+                  ],
+                  "title": "QueryAssessment",
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Previous Receipt Assessment"
+            },
+            "impact": {
+              "minLength": 1,
+              "pattern": "\\S",
+              "title": "Impact",
+              "type": "string"
+            },
+            "stop_explanation": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "evidence_sufficient",
+                        "unknowns_nonblocking",
+                        "no_further_evidence"
+                      ],
+                      "title": "Reason",
+                      "type": "string"
+                    },
+                    "rationale": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Rationale",
+                      "type": "string"
+                    },
+                    "evidence": {
+                      "items": {
+                        "$ref": "#/$defs/SourceReference"
+                      },
+                      "title": "Evidence",
+                      "type": "array"
+                    },
+                    "remaining_unknowns": {
+                      "items": {
+                        "$ref": "#/$defs/RemainingUnknown"
+                      },
+                      "title": "Remaining Unknowns",
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "reason",
+                    "rationale",
+                    "evidence",
+                    "remaining_unknowns"
+                  ],
+                  "title": "ExplorationStop",
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "schema_version",
+            "decision",
+            "query_attempt",
+            "previous_receipt_assessment",
+            "impact",
+            "stop_explanation"
+          ],
+          "title": "QueryResult",
+          "type": "object"
+        },
+        "strict": true
+      }
+    },
+    "tools": []
+  }
+}

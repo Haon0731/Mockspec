@@ -8,6 +8,7 @@ not approve an input for production use.
 from __future__ import annotations
 
 import asyncio
+from copy import deepcopy
 from dataclasses import asdict, dataclass
 from decimal import Decimal
 import hashlib
@@ -21,9 +22,10 @@ from typing import Annotated, Any, Callable, Literal, TypeVar
 from uuid import uuid4
 
 from agents import Agent, ModelBehaviorError, ModelRetrySettings, ModelSettings, RunConfig, Runner
+from agents.agent_output import AgentOutputSchema
 from agents.models.interface import Model
 from agents.models.openai_responses import OpenAIResponsesModel
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, TypeAdapter, ValidationError, WithJsonSchema
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, ValidationError, WithJsonSchema
 
 from mock_spec.budget import BudgetHooks, InferenceBudget, UsageLedger
 from mock_spec.execution_metadata import collect_execution_metadata
@@ -367,6 +369,33 @@ def _finish_model_call(
     ]
 
 
+class _StageOutputSchema(AgentOutputSchema):
+    """Inline union references for the provider; retain SDK/Pydantic validation."""
+
+    def json_schema(self) -> dict[str, Any]:
+        schema = deepcopy(super().json_schema())
+
+        def expand(value: Any, active: frozenset[str] = frozenset()) -> None:
+            if isinstance(value, list):
+                for item in value:
+                    expand(item, active)
+            elif isinstance(value, dict):
+                for branch in value.get("anyOf", []):
+                    reference = branch.get("$ref")
+                    if reference is not None:
+                        if reference in active or not reference.startswith("#/$defs/"):
+                            raise ValueError("unsupported stage union reference")
+                        definition = deepcopy(schema["$defs"][reference[len("#/$defs/"):]])
+                        expand(definition, active | {reference})
+                        branch.pop("$ref")
+                        branch.update(definition)
+                for child in value.values():
+                    expand(child, active)
+
+        expand(schema)
+        return schema
+
+
 def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
                  config: StagedRunConfig) -> Agent[None]:
     stage_protocol = ""
@@ -465,7 +494,7 @@ def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
         ),
         tools=[],
         handoffs=[],
-        output_type=output_type,
+        output_type=_StageOutputSchema(output_type),
     )
 
 
@@ -482,8 +511,24 @@ async def _call_stage(
     deadline: float,
     model_call_limit: int | None = None,
 ) -> StageResult:
+    if isinstance(payload, dict) and "visible_task" in payload:
+        task = payload["visible_task"]
+        # Coordinate metadata for the already-visible text, not new evidence or
+        # repaired output. Preserve whitespace exactly as SourceStore.quote does.
+        payload = {**payload, "source_line_index": {
+            source["source_id"]: [
+                {"line": number, "text": text}
+                for number, text in enumerate(
+                    source["text"].splitlines(), start=source["start_line"]
+                )
+            ]
+            for source in (
+                task["masked_test"], task["mut_source"], *task["supporting_sources"]
+            )
+        }}
     payload_bytes = canonical_json(payload)
     agent = _stage_agent(stage, output_type, model, config)
+    assert isinstance(agent.output_type, AgentOutputSchema)
     started = time.monotonic()
     response_start = len(responses)
     event: dict[str, object] = {
@@ -496,7 +541,7 @@ async def _call_stage(
         "output_type": output_type.__name__,
         "prompt_version": PROMPT_VERSION,
         "instructions": agent.instructions,
-        "requested_output_schema": TypeAdapter(output_type).json_schema(),
+        "requested_output_schema": agent.output_type.json_schema(),
         "payload": json.loads(payload_bytes),
         "payload_sha256": sha256_bytes(payload_bytes),
         "payload_bytes": len(payload_bytes),
@@ -651,7 +696,10 @@ def _check_source_reference(
         raise ValueError("source reference has a reversed range")
     quote = source_store.quote(reference.source_id, reference.start_line, reference.end_line)
     if quote != reference.quote:
-        raise ValueError("source reference quote mismatch")
+        raise ValueError(
+            f"source reference quote mismatch: {reference.source_id}:"
+            f"{reference.start_line}-{reference.end_line}"
+        )
 
 
 def _validate_exploration_stop(stop: ExplorationStop, store: SourceStore) -> None:
