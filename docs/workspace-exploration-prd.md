@@ -4,6 +4,7 @@
 第 1–8 节保留原探索需求，其中“目前”描述最初制定需求时的状态。
 第 9 节定义本次 M2 引用协议与验收补充要求；引用生成职责以第 9 节为准，
 其余输入、证据、冻结及五步流程边界继续适用。
+第 10 节是后续 QUERY 协议与受限格式纠正提案；在实施门禁通过前不代表当前能力。
 工程切片 #13–#16 已交付，真实 M2 尚未通过，当前进度见[材料索引](README.md)。
 
 读者：Scenario Agent、输入接入与工具模块的维护者，以及研究验收人员。
@@ -351,3 +352,204 @@ M2 成功还要求：真实模型自主获取初始材料之外的相关证据�
 
 最终交付包括：新研究协议与实现、离线回归、案例适用性记录、真实运行证据和独立验收结论。
 本节保留需求与执行门禁；已交付工程和未通过的真实验收分别记录，不互相替代。
+
+## 10. #17 QUERY 协议与受限格式纠正 PRD（M2-QUERY-RECOVERY-1）
+
+状态：独立设计审查通过（R0）；尚未实施，R1/R2/R3 未启动。日期：2026-10-26。
+用户要求解决问题，并继续上一轮提出的“先制定修复 PRD、再实施”路径。
+本节是研究协议变更提案，不把原模型输出不合规归因为已证实的宿主缺陷。
+
+### 10.1 问题、证据与目标
+
+CloudFoundry 的 [真实失败](../out/staged-inference/issue17-cloudfoundry-m2-20261026/report.md)
+表明：EXTRACT 已能用 locator 形成精确引用，模型也自主查询了父类；但评估回执时
+多出 `attempt_sequence_note: null`，被严格拒绝，下一次读取没有执行。
+[独立接口诊断](../out/staged-inference/issue17-response-conformance-20261026/report.md)
+确认实际 HTTP 请求保留严格 Schema；单次合成对抗请求合规，未定位原违规的确定原因。
+
+产品问题有两项：轻微表示错误会中断整个研究流程；候选描述把未知 slot 内容写成
+确定的 Mock 配置，混淆依赖约束与隐藏答案恢复。目标是让可证明语义未变的有限表示错误
+有一次显式纠正机会，并让候选以条件假设表达；不承诺任意模型错误都能恢复或一次 M2 成功。
+
+当前实现依据：
+
+- [QuerySelection / QueryAssessment](../experiments/staged-inference/controller.py) 的两个
+  QUERY 嵌套字段为 raw `Any` 加供应商 Schema，本地严格校验在 QUERY 循环后进行。
+- 同文件 `_call_stage` 和 `BudgetHooks` 保留失败响应与调用记录，但 SDK 解析失败时
+  QUERY 循环尚未登记 stage/attempt；收紧类型必须同时保留这条失败留证路径。
+- [QueryExecutor.register/reject/execute_registered](../experiments/staged-inference/query.py)
+  分别负责登记、拒绝及实际派发。原无效尝试不能被覆盖成成功记录。
+- `_deliver_with_repair` 只处理 DELIVER，依赖已确认的完整契约语义快照；不能直接用于 QUERY。
+- [格式修复测试](../tests/test_staged_format_repair.py) 已要求严格语义相等、引用失败不修复、
+  失败不再重试；[QUERY Schema 测试](../tests/test_staged_query_schema.py) 当前显式允许 raw 畸形对象供计数。
+
+### 10.2 范围与替代方案
+
+仅修改研究控制器、研究 QUERY 账本接入、对应合成回归和当前说明。
+生产 `src/mock_spec/`、正式 ScenarioContract/Schema、V0.1 Prompt、准入与 masking、
+冻结材料及旧证据保持不变。没有新 Agent、工具、依赖、通用修复框架或目标测试。
+本轮 PRD 不发起新真实请求；实现后按新协议另行登记一次完整验收。
+
+| 方案 | 收益 | 代价/判定 |
+| --- | --- | --- |
+| 保持所有格式错误直接失败 | 最少改动，原始结论清晰 | 无法改善本次表示错误中断；保留为默认拒绝分支 |
+| 宿主忽略未知字段或任意自动重试 | 实现简单或可能得到另一个结果 | 会掩盖原违规、缺少语义保持证明或造成抽样偏差，排除 |
+| 严格类型 + 宿主回执关联 + 一次有限模型纠正 | 减少模型重复生成控制字段；失败透明且可验证 | 增加一次潜在付费调用，需全程预算与精确快照；本节选用 |
+
+本提案只对第 9 节失败即终止规则增加第 10.4 节的明确例外。
+第 9 节引用失败不修复、无质量重跑、无隐藏读取和语义判断独立核验继续有效。
+
+### 10.3 输出职责与假设表达
+
+1. 新研究 QUERY wire 为 `staged-query/v0.3`。`query_attempt` 使用严格的
+   `QueryAttempt | null`；`previous_receipt_assessment` 使用严格的两字段类型：
+   `QueryAssessmentSelection`，包含
+   `impact ∈ {supports, weakens, no_new_information}` 和非空 `rationale`。
+   两处都拒绝未知字段；去掉 raw `Any` 与其手写 Schema 的双轨定义。
+2. 回执 `attempt_sequence` 由宿主串行状态绑定唯一的 `pending_receipt`，不由模型输出。
+   输入可显示宿主已有回执编号；初始 QUERY 要求 assessment=null，有待评估回执时必须非空。
+   不允许跨 case/run/旧 response 绑定；成功绑定前不得更新回执的 assessment 状态。
+   内部 `QueryAssessment` 继续保留 `attempt_sequence/impact/rationale`，`QueryResult`
+   继续使用内部 v0.1 标准对象。`_materialize_query` 在宿主绑定成功前不构造内部 assessment；
+   绑定后由宿主补号，再形成内部对象。不能删除内部关联编号或把补号记成模型原始输出。
+3. 新 policy、prompt、record 版本升至 v0.3；其他未变的阶段 wire 保留其已定义版本。
+   v0.2 响应不转换为 v0.3，不接受旧模型输出的 `attempt_sequence`，无静默降级。
+4. EXTRACT/QUERY/CONSTRUCT 的通用指令明确：推导有条件的依赖约束，不恢复隐藏 Mock
+   或 VERIFY 原文；候选中的未证实行为写为“若…则…”假设，缺少依据时列入 unresolved。
+   imports、测试名或最终断言不能单独证明隐藏配置或验证次数。
+5. 发现支持或反驳应指出所获行为事实；仅找到 import、字段或构造参数，尚未确定行为时
+   使用 `no_new_information` 并说明剩余缺口。类型检查不证明该判断正确，仍须独立语义评阅。
+   不新增针对 CloudFoundry 的答案、路径、用例分支或关键词打分规则。
+
+### 10.4 QUERY_FORMAT_REPAIR 的唯一允许范围
+
+原响应始终先判无效并保存；仅当以下条件**全部满足**时，允许请求一次模型格式纠正：
+
+- 由现有 BudgetHooks 保存的 output 中，取得唯一 message，其 status 必须明确为
+  `completed`，content 仅有一个 output_text；其余 output 只能是独立 reasoning 项。
+  不接受缺失完成状态、第二条最终文本、工具调用、混合 content、refusal 或截断标志。
+  不假设未保存的 provider 顶层状态，也不修改生产 hooks；用 `decode_json` 拒绝重复键。
+- 唯一一类校验错误是 `/previous_receipt_assessment/<未知直接子字段>` 的
+  `extra_forbidden`，且这些字段的值全部严格为 JSON null。字段名不能是已移交宿主的
+  `attempt_sequence`；旧协议版本也不属于格式错误。其他路径/值均不进入修复。
+- 所有规定字段已经齐全、类型正确；decision/attempt/stop 的组合合法；有且仅有本轮
+  待评估回执。候选 ID、工具名、参数 JSON 和参数形状已通过无 I/O 的原校验逻辑。
+- 已存在的所有来源、行范围、停止证据通过原 SourceStore 校验；来源失效、未观察或
+  错误引用直接失败，不能通过修复请求补读。任何身份、预算、用量或超时问题也不进入修复。
+- 本轮尚未消耗全局格式纠正名额，剩余共享时间/token/费用门禁允许一次调用。
+
+**语义保持判据：**宿主构造仅用于比较的快照：从完整 raw QUERY JSON 移除上面已经
+确认的未知 null 字段，除此以外保留所有值；投影必须通过严格 v0.3 类型及原业务校验。
+这份投影不是接受结果，不派发工具、不填入 stage.result、不作为最终模型输出。
+同时冻结 pending receipt 的 case/run、sequence/response_id 与规范化内容摘要。
+
+模型必须重新返回完整 v0.3 QUERY 对象。严格校验通过后，其全部规定字段必须与快照
+相等：decision、完整 query_attempt、assessment 的 impact/rationale、外层 impact、
+stop_explanation 及其证据/未知项。JSON 对象键顺序不敏感；列表顺序、文本、数值类型
+严格保持，尤其 `arguments_json` 字符串不重排、不 trim、不转换。
+不会用自然语言相似度代替相等，也不能把“合理的新判断”视作格式纠正。
+
+修复输入只含原无效 QUERY、允许错误的位置与错误类型、比较快照和通用保持规则，
+不提供新源码、工具或案例评阅答案。原槽位内容未知的问题不能通过这一步解决。
+修复后 pending receipt 仍须匹配冻结身份/摘要，SourceStore 仍有效；通过后才允许继续。
+无法获得完整 raw JSON、任何非 null 额外字段、缺字段、错类型、错关联、参数或引用错误、
+修复仍不合法/改变语义，全部终止；不进行第二轮纠正。
+
+### 10.5 状态、预算和账本
+
+新协议整次运行的**格式纠正总名额为 1**，由 QUERY_FORMAT_REPAIR 与现有 DELIVER
+FORMAT_REPAIR 共享，而非每个 QUERY 各一次。名额在准备发送纠正调用时预留并不恢复；
+网络失败、预算拒绝或取消都不能重新领取。实际请求数由原 UsageLedger 记录。
+DELIVER 的原允许错误和精确语义校验不扩大；若 QUERY 已用名额，后续无效 DELIVER 直接失败。
+
+整次运行创建一个共享 allowance，QUERY 和 DELIVER 接收同一实例。
+其状态只允许 `available → reserved`：通过结构/语义资格检查后，在进入 `_call_stage`
+前原子预留；之后只附加成功/拒绝/失败结果，不退回 available。
+进入前已知无剩余预算或用量未知则直接停止，不发送请求；预留后若 UsageLedger 的
+预发送门禁拒绝，请求数仍为 0，名额仍已消耗并记录 `blocked_budget`。
+“没有付费请求”与“未预留过纠正名额”必须分别统计，不能据零请求数自动恢复名额。
+
+所有纠正调用使用同一 deadline、UsageLedger 和费用门禁，`max_retries=0`；
+用量未知立即停止，不刷新预算或无进展计数。保留原输出长度/阶段超时上限；
+格式纠正并非新语义样本，不允许再次 EXTRACT、再次完整 QUERY 推理或重跑整例。
+
+执行状态顺序固定为：
+
+1. 保存 raw 响应与模型调用；即使 SDK 严格解析失败，也从唯一最终文本登记无效 QUERY
+   stage。只有经 `decode_json` 得到 JSON object，且 `decision == "request_query"`
+   或 `query_attempt` 键存在且值非 null 时，才以 raw query_attempt（缺失则为 null）
+   调用 `register` 恰好一次，并 `reject` 为 `protocol_error`；与当前登记谓词保持一致。
+   投影和资格检查不得再次登记。不能可靠取得 JSON object 时只保存 stage/原响应，
+   不从文本猜测工具尝试；`finish_queries + query_attempt=null` 也不登记。
+2. 检查修复资格并冻结比较快照及 pending receipt 身份。无效原尝试记录保持不变。
+3. 有资格且预算允许时记录 `QUERY_FORMAT_REPAIR` 并调用一次；无工具、无源码读取。
+4. 原严格校验及快照相等后，记录新的纠正响应。若仍请求查询，登记**新的**尝试并关联
+   原尝试/repair，使用下一 sequence 并照常消耗原 attempt budget；仅该新尝试派发一次。
+   原尝试永远保留 `protocol_error`，不借恢复退回预算。finish_queries 不捏造工具尝试。
+5. 修复失败终止，原 attempt 不改成成功；修复次数、模型请求数、已登记工具尝试数、
+   实际派发数分别留证。协议拒绝和纠正调用不计为新增源码证据，也不重置无进展保护。
+
+沿用现有 `format_repair_log`，新增 stage/category、原调用序号，以及确定的关联字段
+`original_attempt_sequence`、`repaired_attempt_sequence`、`repair_call_sequence`；
+没有 attempt 的 finish 分支前两项为 null，未进入纠正调用时 repair_call_sequence 为 null。
+另外记录错误位置、资格判定、raw before、comparison_snapshot/hash、pending receipt
+身份摘要、raw after、结局、全局名额使用与预算拒绝原因；无资格和名额已耗尽也留证。
+模型原始响应、宿主关联编号、宿主生成 quote 分开记录，不另建平行账本。
+
+### 10.6 实施归属与顺序
+
+| 工作包 | 位置 | 验证后才能进入下一步 |
+| --- | --- | --- |
+| A：严格 wire 与原始失败留证 | `controller.py` 的 QuerySelection、_call_stage 调用边界、QUERY 循环；`tests/test_staged_query_schema.py`、`tests/test_staged_trace.py` | v0.3 strict DTO、模型不生成编号；SDK 拒绝后仍能保存 stage/attempt；不破坏原派发计数 |
+| B：资格、快照与一次纠正 | `controller.py` 中独立 QUERY 修复 helper 及 `_deliver_with_repair` 的共享名额；`query.py` 的无 I/O 参数校验复用和尝试关联 | 先写负向回归，再实现 null-only 条件；不借 DELIVER 快照逻辑推断 QUERY 语义 |
+| C：通用候选表达与脚本样例 | `controller.py` 的 `_stage_agent`、`scripted.py`、`acceptance.py` 及对应 staged tests | 不增加案例答案；脚本回放覆盖原始拒绝、纠正成功/失败和共享预算 |
+| D：审查与留证 | architecture、usage、scenario-inference、docs/README 的原归属；#17 与独立输出目录 | 全部离线门禁和独立代码/语义边界审查通过，才登记新协议真实运行 |
+
+优先复用原 response hooks、decode_json、QueryExecutor 和预算机制。
+必须将 `execute_registered` 中 envelope、candidate ID、tool、参数 JSON 解码和参数
+规范化校验提取为 `query.py` 内同一无副作用函数：输入 request 与 candidate_ids，返回
+规范化 tool/arguments，或确定的错误 code/diagnostic；不读 Store、不登记/修改 attempt、
+不变更预算/无进展状态。正常派发与修复资格检查使用同一返回结果，不各自重复判定。
+对同一有效/无效请求矩阵验证两条入口结果等价，不为此创建通用模块。
+不修改共享生产 SourceStore、预算类型或原正式契约。
+
+### 10.7 可测试验收标准
+
+| 编号 | 必须证明的结果 |
+| --- | --- |
+| QR-01 | 实际 SDK 请求中的 v0.3 QUERY Schema 和本地类型一致；两嵌套对象未知字段拒绝，旧 wire/模型输出 attempt_sequence 拒绝 |
+| QR-02 | wire 仅两字段；内部 v0.1 assessment 由宿主补号；无 pending 只能 null，有 pending 必须评估，模型不能选择另一 case/run/receipt |
+| QR-03 | SDK 严格解析失败后 raw response、call、invalid stage 仍保存；按第10.5节唯一谓词恰好登记一次；非 JSON/重复键/完成状态缺失/截断/多文本不修复 |
+| QR-04 | 只有 assessment 内未知 null 直接子字段可以进入资格检查；非 null、顶层额外字段、错类型、缺字段、旧编号及多个混合错误均拒绝 |
+| QR-05 | 合格错误原响应仍无效；原 attempt 永为 protocol_error，新 attempt 用下一 sequence/正常预算；三项关联字段一致、仅新 attempt 派发一次，finish 分支零派发 |
+| QR-06 | 逐字段改变 decision、候选 ID、工具、arguments_json、impact/rationale、stop/evidence/unknown 或 pending receipt 身份/摘要均终止；不 trim/强转/模糊匹配 |
+| QR-07 | 参数错误、未知候选/工具、来源或引用失败、Store关闭/变化、跨运行、用量未知、调用前 deadline 已耗尽及预发送余额不足，均不发送纠正 provider 请求或派发工具；调用开始后的网络超时/取消可已有请求尝试，但不派发工具，allowance 保持 reserved 并留证 |
+| QR-08 | 同一共享 allowance 只有 available→reserved；预发送预算拒绝零请求但不退名额；QUERY→DELIVER、多个QUERY、失败/取消均无第二次纠正，共享预算不重置 |
+| QR-09 | 无副作用验证函数在资格/派发两入口的有效及无效矩阵结果等价；纠正零工具/来源读取/新观察，不伪造证据进展；请求、预留、尝试、派发分别核对 |
+| QR-10 | 原 v0.2 失败响应仍被原协议拒绝，历史文件摘要不变；另用明确标注的合成 v0.3 等价错误测试恢复，不迁移旧结果为成功 |
+| QR-11 | 通用 Prompt 明确假设/证据边界，合成语义评阅夹具覆盖“imports不能证明隐藏mock”“仅声明行不能支持行为”；机械测试不冒充真实生成质量通过 |
+| QR-12 | 原 staged/SourceStore/预算回归、全离线 pytest、Ruff、类型检查增量和独立审查通过；无生产/冻结/准入变更，无新依赖，版本/文档/脚本入口同步 |
+
+QR-11 的固定评阅夹具必须包含合格与不合格候选及理由，由独立 reviewer 核对，
+不能用关键词正则宣称解决自然语言过度推断。真实模型的假设表达质量仍由下一次验收判断。
+
+### 10.8 实施门禁、真实验收与停止条件
+
+- R0 设计：本节独立审查通过，明确同第 9 节相比仅新增的有限恢复例外。
+- R1 工程：QR-01 至 QR-12 全部满足；原代码门禁中既有类型诊断单列，无新增诊断。
+- R2 真实预检：复核已审核 CloudFoundry 输入、代码与新协议身份、凭据/费率和预算，
+  使用新目录，登记**一次**完整运行；沿用第 9.7 节预算量级，纠正调用计入同一预算。
+- R3 验收：继续满足 AC-17-10 至 AC-17-12；若用过纠正，额外证明其资格、语义保持、
+  零隐藏读取与完整留证。纠正成功不能替代自主获取相关证据或有效场景卡。
+
+未满足 R1 不进行真实调用；修复不合格、语义变化、预算不足或身份失败立即终止。
+一次新协议真实运行不利或仍失败，保存失败，不质量重跑；#17 只有全部真实验收通过才关闭。
+该设计不保证复杂响应始终合规；最小恢复范围之外的模型错误仍会中断运行。
+
+风险与对策：比较快照可能被误当成宿主修复结果——禁止其进入执行/成功输出；
+重复错误可能增加成本——全局一次、共享预算；类型收紧可能漏记尝试——QR-03/05；
+未知 slot 仍可能被模型当成事实——独立语义评阅；为恢复而扩大范围——null-only 条件和负向矩阵锁定。
+
+独立审查已要求并纳入：wire/宿主 DTO 分离、唯一尝试登记谓词与关联字段、共享名额
+状态机、同一无副作用验证器、以及预发送 deadline 与调用中超时的区别。
+R0 通过仅表示设计可实施，不表示代码或真实验收已经通过。
