@@ -48,6 +48,14 @@ V0.2 的源码工具只补充已有可见输入的事实，不写验证成功状
 
 ## 五步研究记录的字段映射
 
+研究 v0.2 使用引用选择协议：模型提供 `source_id/start_line/end_line`，
+以及正式证据所需的 `id/rationale`；宿主仅从本次已可见证据生成 `quote`。
+模型原始选择保存在 `wire_result`，宿主构造的标准对象保存在 `result`，
+`citation_mode` 为 `source_locator_host_materialized_quote/v1`。
+非法或未观察范围仍失败，不自动读文件、移动坐标或替换旧错误引用。
+正式 Evidence 和以下映射不变，最终契约继续通过原逐字校验；
+原文真实不意味着它支持模型结论，证据相关性仍需独立审查。
+
 分阶段研究控制器保持正式 `mock-spec.scenario/v0.1` 不变，并在
 `inference_record.json` 保存场景卡所需的研究旁路信息：
 

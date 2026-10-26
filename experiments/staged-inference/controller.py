@@ -25,7 +25,10 @@ from agents import Agent, ModelBehaviorError, ModelRetrySettings, ModelSettings,
 from agents.agent_output import AgentOutputSchema
 from agents.models.interface import Model
 from agents.models.openai_responses import OpenAIResponsesModel
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, ValidationError, WithJsonSchema
+from pydantic import (
+    BaseModel, ConfigDict, Field, StringConstraints, ValidationError,
+    WithJsonSchema,
+)
 
 from mock_spec.budget import BudgetHooks, InferenceBudget, UsageLedger
 from mock_spec.execution_metadata import collect_execution_metadata
@@ -39,10 +42,11 @@ from query import QueryExecutor
 
 
 Text = Annotated[str, StringConstraints(min_length=1, pattern=r"\S")]
-RECORD_VERSION = "scenario-inference-record/v0.1"
+RECORD_VERSION = "scenario-inference-record/v0.2"
 MANIFEST_VERSION = "scenario-inference-manifest/v0.1"
-POLICY_VERSION = "staged-scenario-inference/v0.1"
-PROMPT_VERSION = "staged-scenario-inference-prompts/v0.1"
+POLICY_VERSION = "staged-scenario-inference/v0.2"
+PROMPT_VERSION = "staged-scenario-inference-prompts/v0.2"
+CITATION_MODE = "source_locator_host_materialized_quote/v1"
 
 
 class StageModel(BaseModel):
@@ -59,6 +63,17 @@ class SourceReference(StageModel):
     quote: Text
 
 
+class SourceLocator(StageModel):
+    source_id: Text
+    start_line: Annotated[int, Field(ge=1)]
+    end_line: Annotated[int, Field(ge=1)]
+
+
+class EvidenceSelection(SourceLocator):
+    id: Text
+    rationale: Text
+
+
 class CandidateDraft(StageModel):
     scenario_id: Text
     description: Text
@@ -70,6 +85,20 @@ class ExtractResult(StageModel):
     result_status: Literal["CONTINUE", "INCONCLUSIVE"] = "CONTINUE"
     original_goals: list[SourceReference]
     candidates: Annotated[list[CandidateDraft], Field(max_length=2)]
+    unresolved: list[Text]
+
+
+class CandidateSelection(StageModel):
+    scenario_id: Text
+    description: Text
+    evidence: list[SourceLocator]
+
+
+class ExtractSelection(StageModel):
+    schema_version: Literal["staged-extract/v0.2"]
+    result_status: Literal["CONTINUE", "INCONCLUSIVE"] = "CONTINUE"
+    original_goals: list[SourceLocator]
+    candidates: Annotated[list[CandidateSelection], Field(max_length=2)]
     unresolved: list[Text]
 
 
@@ -101,6 +130,13 @@ class ExplorationStop(StageModel):
     remaining_unknowns: list[RemainingUnknown]
 
 
+class ExplorationStopSelection(StageModel):
+    reason: Literal["evidence_sufficient", "unknowns_nonblocking", "no_further_evidence"]
+    rationale: Text
+    evidence: list[SourceLocator]
+    remaining_unknowns: list[RemainingUnknown]
+
+
 class QueryResult(StageModel):
     schema_version: Literal["staged-query/v0.1"]
     decision: Literal["request_query", "finish_queries"]
@@ -116,6 +152,19 @@ class QueryResult(StageModel):
     stop_explanation: ExplorationStop | None = None
 
 
+class QuerySelection(StageModel):
+    schema_version: Literal["staged-query/v0.2"]
+    decision: Literal["request_query", "finish_queries"]
+    query_attempt: Annotated[Any | None, WithJsonSchema({
+        "anyOf": [QueryAttempt.model_json_schema(), {"type": "null"}],
+    })]
+    previous_receipt_assessment: Annotated[Any | None, WithJsonSchema({
+        "anyOf": [QueryAssessment.model_json_schema(), {"type": "null"}],
+    })] = None
+    impact: Text
+    stop_explanation: ExplorationStopSelection | None = None
+
+
 class CriticalBehavior(StageModel):
     behavior: Text
     observation: Text
@@ -128,8 +177,7 @@ class CriticalBehavior(StageModel):
     assumption_reason: Text | None = None
 
 
-class ConstructResult(StageModel):
-    schema_version: Literal["staged-construct/v0.1"]
+class ConstructContent(StageModel):
     result_status: Literal["SELECTED", "AMBIGUOUS", "INCONCLUSIVE"]
     selected_scenario_id: Text | None
     selection_rationale: Text
@@ -138,7 +186,24 @@ class ConstructResult(StageModel):
     allowed_variations: list[Text]
     unresolved: list[Text]
     nonblocking_unknowns: list[Text] = Field(default_factory=list)
+
+
+class ConstructResult(ConstructContent):
+    schema_version: Literal["staged-construct/v0.1"]
     contract: ScenarioContract | None
+
+
+class ScenarioContractSelection(ScenarioContract):
+    """Formal contract wire DTO that changes only evidence representation."""
+
+    # Pydantic intentionally specializes the inherited field while retaining
+    # every formal field definition and ScenarioContract reference validator.
+    evidence: list[EvidenceSelection]  # type: ignore[assignment]
+
+
+class ConstructSelection(ConstructContent):
+    schema_version: Literal["staged-construct/v0.2"]
+    contract: ScenarioContractSelection | None
 
 
 class ClaimBasis(StageModel):
@@ -183,11 +248,27 @@ class RevisionResult(StageModel):
     request_another_revision: bool = False
 
 
+class RevisionSelection(StageModel):
+    schema_version: Literal["staged-revise/v0.2"]
+    revised_construct: ConstructSelection
+    modified_objects: Annotated[list[Text], Field(min_length=1)]
+    evidence_reason: Text
+    evidence_ids: Annotated[list[Text], Field(min_length=1)]
+    request_another_revision: bool = False
+
+
 class DeliverResult(StageModel):
     schema_version: Literal["staged-deliver/v0.1"]
     result_status: Literal["SELECTED", "AMBIGUOUS", "INCONCLUSIVE"]
     selected_scenario_id: Text | None
     contract: ScenarioContract | None
+
+
+class DeliverSelection(StageModel):
+    schema_version: Literal["staged-deliver/v0.2"]
+    result_status: Literal["SELECTED", "AMBIGUOUS", "INCONCLUSIVE"]
+    selected_scenario_id: Text | None
+    contract: ScenarioContractSelection | None
 
 
 @dataclass(frozen=True)
@@ -256,6 +337,22 @@ class StagedInferenceError(RuntimeError):
         super().__init__(message)
         self.stage = stage
         self.stop_reason = stop_reason
+
+
+class CitationMaterializationError(ValueError):
+    def __init__(
+        self, message: str, *, field_path: str, locator: object = None,
+    ) -> None:
+        super().__init__(message)
+        raw = locator.model_dump() if isinstance(locator, SourceLocator) else locator
+        raw = raw if isinstance(raw, dict) else {}
+        self.audit = {
+            "field_path": field_path,
+            "source_id": raw.get("source_id") if isinstance(raw.get("source_id"), str) else None,
+            "start_line": raw.get("start_line") if type(raw.get("start_line")) is int else None,
+            "end_line": raw.get("end_line") if type(raw.get("end_line")) is int else None,
+            "error": _safe_external_text(message, limit=200),
+        }
 
 
 class _StagedRunComplete(Exception):
@@ -375,22 +472,32 @@ class _StageOutputSchema(AgentOutputSchema):
     def json_schema(self) -> dict[str, Any]:
         schema = deepcopy(super().json_schema())
 
-        def expand(value: Any, active: frozenset[str] = frozenset()) -> None:
+        def expand(
+            value: Any, active: frozenset[str] = frozenset(),
+            definitions: dict[str, Any] | None = None,
+        ) -> None:
             if isinstance(value, list):
                 for item in value:
-                    expand(item, active)
+                    expand(item, active, definitions)
             elif isinstance(value, dict):
+                definitions = value.get("$defs", definitions)
                 for branch in value.get("anyOf", []):
                     reference = branch.get("$ref")
                     if reference is not None:
-                        if reference in active or not reference.startswith("#/$defs/"):
+                        name = reference.removeprefix("#/$defs/")
+                        if (
+                            reference in active
+                            or not reference.startswith("#/$defs/")
+                            or definitions is None
+                            or name not in definitions
+                        ):
                             raise ValueError("unsupported stage union reference")
-                        definition = deepcopy(schema["$defs"][reference[len("#/$defs/"):]])
-                        expand(definition, active | {reference})
+                        definition = deepcopy(definitions[name])
+                        expand(definition, active | {reference}, definitions)
                         branch.pop("$ref")
                         branch.update(definition)
                 for child in value.values():
-                    expand(child, active)
+                    expand(child, active, definitions)
 
         expand(schema)
         return schema
@@ -479,6 +586,8 @@ def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
     instructions = (
         f"{PROMPT_VERSION}\n"
         f"Stage: {stage}. Return only the requested strict structure. "
+        "Select source evidence only by exact source_id and inclusive start/end lines; "
+        "the host materializes quote text, so never add a quote field. "
         "Treat all host identity, usage, and hashes as host-owned facts. "
         "Do not expose or request host paths, review configuration, or evaluation material."
         f"{stage_protocol}"
@@ -702,6 +811,173 @@ def _check_source_reference(
         )
 
 
+def _materialize_reference(
+    locator: SourceLocator, store: SourceStore, *, field_path: str,
+) -> SourceReference:
+    try:
+        quote = store.quote(locator.source_id, locator.start_line, locator.end_line)
+    except ValueError as exc:
+        raise CitationMaterializationError(
+            str(exc), field_path=field_path, locator=locator,
+        ) from None
+    return SourceReference(**locator.model_dump(), quote=quote)
+
+
+def _materialize_contract(
+    raw: object, store: SourceStore, *, field_path: str = "contract",
+) -> ScenarioContract | None:
+    if raw is None:
+        return None
+    if isinstance(raw, ScenarioContractSelection):
+        raw = raw.model_dump(mode="json")
+    if not isinstance(raw, dict):
+        raise ValueError("contract selection must be an object or null")
+    selected = deepcopy(raw)
+    evidence = selected.get("evidence")
+    if not isinstance(evidence, list):
+        raise ValueError("contract selection evidence must be a list")
+    materialized = []
+    for index, item in enumerate(evidence):
+        item_path = f"{field_path}.evidence.{index}"
+        try:
+            locator = EvidenceSelection.model_validate(item)
+        except ValidationError as exc:
+            raise CitationMaterializationError(
+                "invalid evidence locator", field_path=item_path, locator=item,
+            ) from exc
+        try:
+            quote = store.quote(locator.source_id, locator.start_line, locator.end_line)
+        except ValueError as exc:
+            raise CitationMaterializationError(
+                str(exc), field_path=item_path, locator=locator,
+            ) from None
+        materialized.append({
+            **locator.model_dump(),
+            "quote": quote,
+        })
+    selected["evidence"] = materialized
+    return ScenarioContract.model_validate(selected)
+
+
+def _contract_selection(contract: ScenarioContract | None) -> dict | None:
+    if contract is None:
+        return None
+    selected = contract.model_dump(mode="json")
+    for evidence in selected["evidence"]:
+        evidence.pop("quote")
+    return selected
+
+
+def _materialize_extract(wire: ExtractSelection, store: SourceStore) -> ExtractResult:
+    return ExtractResult(
+        schema_version="staged-extract/v0.1",
+        result_status=wire.result_status,
+        original_goals=[
+            _materialize_reference(item, store, field_path=f"original_goals.{index}")
+            for index, item in enumerate(wire.original_goals)
+        ],
+        candidates=[CandidateDraft(
+            scenario_id=item.scenario_id,
+            description=item.description,
+            evidence=[
+                _materialize_reference(
+                    ref, store, field_path=f"candidates.{candidate_index}.evidence.{index}"
+                )
+                for index, ref in enumerate(item.evidence)
+            ],
+        ) for candidate_index, item in enumerate(wire.candidates)],
+        unresolved=wire.unresolved,
+    )
+
+
+def _materialize_query(wire: QuerySelection, store: SourceStore) -> QueryResult:
+    stop = None
+    if wire.stop_explanation is not None:
+        stop = ExplorationStop(
+            reason=wire.stop_explanation.reason,
+            rationale=wire.stop_explanation.rationale,
+            evidence=[
+                _materialize_reference(
+                    item, store, field_path=f"stop_explanation.evidence.{index}"
+                )
+                for index, item in enumerate(wire.stop_explanation.evidence)
+            ],
+            remaining_unknowns=wire.stop_explanation.remaining_unknowns,
+        )
+    return QueryResult(
+        schema_version="staged-query/v0.1",
+        decision=wire.decision,
+        query_attempt=wire.query_attempt,
+        previous_receipt_assessment=wire.previous_receipt_assessment,
+        impact=wire.impact,
+        stop_explanation=stop,
+    )
+
+
+def _materialize_construct(
+    wire: ConstructSelection, store: SourceStore, *, field_path: str = "",
+) -> ConstructResult:
+    return ConstructResult(
+        schema_version="staged-construct/v0.1",
+        result_status=wire.result_status,
+        selected_scenario_id=wire.selected_scenario_id,
+        selection_rationale=wire.selection_rationale,
+        claim_basis=wire.claim_basis,
+        critical_behaviors=wire.critical_behaviors,
+        allowed_variations=wire.allowed_variations,
+        unresolved=wire.unresolved,
+        nonblocking_unknowns=wire.nonblocking_unknowns,
+        contract=_materialize_contract(
+            wire.contract, store,
+            field_path=f"{field_path}.contract".lstrip("."),
+        ),
+    )
+
+
+def _materialize_revision(wire: RevisionSelection, store: SourceStore) -> RevisionResult:
+    return RevisionResult(
+        schema_version="staged-revise/v0.1",
+        revised_construct=_materialize_construct(
+            wire.revised_construct, store, field_path="revised_construct"
+        ),
+        modified_objects=wire.modified_objects,
+        evidence_reason=wire.evidence_reason,
+        evidence_ids=wire.evidence_ids,
+        request_another_revision=wire.request_another_revision,
+    )
+
+
+def _materialize_delivery(wire: DeliverSelection, store: SourceStore) -> DeliverResult:
+    return DeliverResult(
+        schema_version="staged-deliver/v0.1",
+        result_status=wire.result_status,
+        selected_scenario_id=wire.selected_scenario_id,
+        contract=_materialize_contract(wire.contract, store, field_path="contract"),
+    )
+
+
+def _wire_stage_entry(
+    stage: str, wire: StageModel, *, model_call_sequence: int,
+) -> dict[str, object]:
+    return {
+        "stage": stage,
+        "model_call_sequence": model_call_sequence,
+        "citation_mode": CITATION_MODE,
+        "wire_result": wire.model_dump(mode="json"),
+        "result": None,
+    }
+
+
+def _complete_stage_entry(entry: dict[str, object], result: StageModel) -> None:
+    entry["result"] = result.model_dump(mode="json")
+
+
+def _record_citation_error(
+    entry: dict[str, object], error: CitationMaterializationError,
+) -> None:
+    entry["citation_error"] = error.audit
+
+
 def _validate_exploration_stop(stop: ExplorationStop, store: SourceStore) -> None:
     for reference in stop.evidence:
         _check_source_reference(reference, store)
@@ -720,16 +996,16 @@ def _delivery_snapshot(raw: object) -> dict:
     """Accept only unambiguous envelope/version and decimal-line formatting repairs.
 
     All semantic fields remain mandatory. A malformed JSON document, unknown
-    field, missing claim, or changed source/quote cannot establish a snapshot.
+    field, missing claim, or changed source/range cannot establish a snapshot.
     """
     from copy import deepcopy
 
     if not isinstance(raw, dict) or set(raw) - {
         "schema_version", "result_status", "selected_scenario_id", "contract"
     }:
-        raise ValueError("cannot establish delivery semantic snapshot")
+        raise ValueError("cannot establish delivery selection snapshot")
     normalized = deepcopy(raw)
-    normalized["schema_version"] = "staged-deliver/v0.1"
+    normalized["schema_version"] = "staged-deliver/v0.2"
     contract = normalized.get("contract")
     if isinstance(contract, dict):
         contract["schema_version"] = "mock-spec.scenario/v0.1"
@@ -740,7 +1016,7 @@ def _delivery_snapshot(raw: object) -> dict:
                 value = reference.get(key)
                 if isinstance(value, str) and value.isascii() and value.isdecimal():
                     reference[key] = int(value)
-    return DeliverResult.model_validate(normalized).model_dump(mode="json")
+    return DeliverSelection.model_validate(normalized).model_dump(mode="json")
 
 
 async def _deliver_with_repair(
@@ -754,10 +1030,17 @@ async def _deliver_with_repair(
         schema_version="staged-deliver/v0.1", result_status=constructed.result_status,
         selected_scenario_id=constructed.selected_scenario_id, contract=constructed.contract,
     ).model_dump(mode="json")
+    expected_wire = {
+        "schema_version": "staged-deliver/v0.2",
+        "result_status": constructed.result_status,
+        "selected_scenario_id": constructed.selected_scenario_id,
+        "contract": _contract_selection(constructed.contract),
+    }
     response_start = len(responses)
+    raw: object
     try:
-        delivered = await _call_stage(
-            "DELIVER", DeliverResult, payload, model=model, config=config,
+        wire = await _call_stage(
+            "DELIVER", DeliverSelection, payload, model=model, config=config,
             ledger=ledger, responses=responses, model_calls=model_calls, deadline=deadline,
             model_call_limit=model_call_limit,
         )
@@ -782,26 +1065,40 @@ async def _deliver_with_repair(
             # Actual usage can exhaust the budget before SDK output validation.
             # Never let that ordering publish a known-invalid final response.
             stages.append({"stage": "DELIVER", "unvalidated_result": raw})
-            exhausted_delivery = DeliverResult.model_validate(raw)
-            if exhausted_delivery.model_dump(mode="json") != expected:
+            exhausted_delivery = DeliverSelection.model_validate(raw)
+            if exhausted_delivery.model_dump(mode="json") != expected_wire:
                 raise ValueError("budget-exhausted DELIVER changed semantics or evidence")
             raise exc
         stages.append({"stage": "DELIVER", "invalid_result": raw})
+    else:
+        stage_entry = _wire_stage_entry(
+            "DELIVER", wire, model_call_sequence=int(model_calls[-1]["sequence"])
+        )
+        stages.append(stage_entry)
+        source_store.validate_task(task)
+        try:
+            delivered = _materialize_delivery(wire, source_store)
+        except CitationMaterializationError as exc:
+            _record_citation_error(stage_entry, exc)
+            raise
+        _complete_stage_entry(stage_entry, delivered)
+        raw = None
+    if raw is not None:
         snapshot = _delivery_snapshot(raw)
-        if snapshot != expected:
+        if snapshot != expected_wire:
             raise ValueError("invalid DELIVER changed semantics or evidence") from None
-        # Exact equality includes source ID, normalized range, and original quote;
-        # the already validated construct supplies the source identity proof.
+        # Exact equality includes source ID and normalized range; the already
+        # validated construct supplies the source identity proof.
         entry = {"before": raw, "semantic_snapshot": snapshot, "after": None,
                  "status": "requested"}
         repair_log.append(entry)
         try:
-            delivered = await _call_stage(
-                "FORMAT_REPAIR", DeliverResult,
+            wire = await _call_stage(
+                "FORMAT_REPAIR", DeliverSelection,
                 {**payload, "stage": "FORMAT_REPAIR", "invalid_delivery": raw,
                  "semantic_snapshot": snapshot,
                  "repair_rule": "Repair envelope/version or decimal line formatting only; "
-                                "preserve every semantic field and evidence source/range/quote."},
+                                "preserve every semantic field and evidence source/range."},
                 model=model, config=config, ledger=ledger, responses=responses,
                 model_calls=model_calls, deadline=deadline,
                 model_call_limit=model_call_limit,
@@ -814,17 +1111,26 @@ async def _deliver_with_repair(
                 "final format repair failed or its shared budget was exhausted",
                 stage="FORMAT_REPAIR", stop_reason="output_invalid",
             ) from None
-        entry["after"] = delivered.model_dump(mode="json")
-        stages.append({"stage": "FORMAT_REPAIR", "result": entry["after"]})
-        if delivered.model_dump(mode="json") != expected:
+        entry["after"] = wire.model_dump(mode="json")
+        stage_entry = _wire_stage_entry(
+            "FORMAT_REPAIR", wire,
+            model_call_sequence=int(model_calls[-1]["sequence"]),
+        )
+        stages.append(stage_entry)
+        if wire.model_dump(mode="json") != expected_wire:
             entry["status"] = "rejected_semantic_change"
             raise StagedInferenceError(
                 "FORMAT_REPAIR changed semantics or evidence",
                 stage="FORMAT_REPAIR", stop_reason="output_invalid",
             )
+        source_store.validate_task(task)
+        try:
+            delivered = _materialize_delivery(wire, source_store)
+        except CitationMaterializationError as exc:
+            _record_citation_error(stage_entry, exc)
+            raise
+        _complete_stage_entry(stage_entry, delivered)
         entry["status"] = "completed"
-    else:
-        stages.append({"stage": "DELIVER", "result": delivered.model_dump(mode="json")})
     if delivered.model_dump(mode="json") != expected:
         raise ValueError("DELIVER changed the constructed semantics")
     if delivered.contract is not None:
@@ -899,7 +1205,7 @@ def _validate_constructed(
         known_evidence = set() if contract is None else {
             item.id for item in contract.evidence
         }
-        role_claims = {
+        role_claims: dict[str, list[Any]] = {
             "dependency_contract": [] if contract is None else contract.dependency_constraints,
             "mut_path_condition": [] if contract is None else contract.scenario_hypotheses,
             "test_objective": [] if contract is None else contract.test_objectives,
@@ -1200,14 +1506,25 @@ async def execute_staged_run(
         _write_json_exclusive(output_dir / "input_snapshot.json", canonical_task, canonical=True)
 
         current_stage = "EXTRACT"
-        extract = await _call_stage(
-            "EXTRACT", ExtractResult,
+        extract_wire = await _call_stage(
+            "EXTRACT", ExtractSelection,
             {"stage": "EXTRACT", "visible_task": canonical_task}, model=model,
             config=config, ledger=ledger, responses=responses,
             model_calls=model_calls, deadline=deadline,
             model_call_limit=model_call_limit,
         )
-        stages.append({"stage": "EXTRACT", "result": extract.model_dump(mode="json")})
+        extract_entry = _wire_stage_entry(
+            "EXTRACT", extract_wire,
+            model_call_sequence=int(model_calls[-1]["sequence"]),
+        )
+        stages.append(extract_entry)
+        source_store.validate_task(task)
+        try:
+            extract = _materialize_extract(extract_wire, source_store)
+        except CitationMaterializationError as exc:
+            _record_citation_error(extract_entry, exc)
+            raise
+        _complete_stage_entry(extract_entry, extract)
         for reference in extract.original_goals:
             _check_source_reference(reference, source_store)
         for candidate in extract.candidates:
@@ -1239,8 +1556,8 @@ async def execute_staged_run(
         candidate_ids = {item.scenario_id for item in extract.candidates}
         pending_receipt: dict[str, object] | None = None
         while True:
-            query = await _call_stage(
-                "QUERY", QueryResult,
+            query_wire = await _call_stage(
+                "QUERY", QuerySelection,
                 {
                     "stage": "QUERY",
                     "visible_task": canonical_task,
@@ -1251,7 +1568,18 @@ async def execute_staged_run(
                 responses=responses, model_calls=model_calls, deadline=deadline,
                 model_call_limit=model_call_limit,
             )
-            stages.append({"stage": "QUERY", "result": query.model_dump(mode="json")})
+            query_entry = _wire_stage_entry(
+                "QUERY", query_wire,
+                model_call_sequence=int(model_calls[-1]["sequence"]),
+            )
+            stages.append(query_entry)
+            source_store.validate_task(task)
+            try:
+                query = _materialize_query(query_wire, source_store)
+            except CitationMaterializationError as exc:
+                _record_citation_error(query_entry, exc)
+                raise
+            _complete_stage_entry(query_entry, query)
             observed_attempt = None
             if query.decision == "request_query" or query.query_attempt is not None:
                 observed_attempt = query_executor.register(query.query_attempt)
@@ -1380,8 +1708,8 @@ async def execute_staged_run(
                 )
 
         current_stage = "CONSTRUCT"
-        constructed = await _call_stage(
-            "CONSTRUCT", ConstructResult,
+        construct_wire = await _call_stage(
+            "CONSTRUCT", ConstructSelection,
             {"stage": "CONSTRUCT", "visible_task": canonical_task,
              "extract": extract.model_dump(mode="json"),
              "query": query.model_dump(mode="json"),
@@ -1390,7 +1718,18 @@ async def execute_staged_run(
             model_calls=model_calls, deadline=deadline,
             model_call_limit=model_call_limit,
         )
-        stages.append({"stage": "CONSTRUCT", "result": constructed.model_dump(mode="json")})
+        construct_entry = _wire_stage_entry(
+            "CONSTRUCT", construct_wire,
+            model_call_sequence=int(model_calls[-1]["sequence"]),
+        )
+        stages.append(construct_entry)
+        source_store.validate_task(task)
+        try:
+            constructed = _materialize_construct(construct_wire, source_store)
+        except CitationMaterializationError as exc:
+            _record_citation_error(construct_entry, exc)
+            raise
+        _complete_stage_entry(construct_entry, constructed)
         constructed_contract = _validate_constructed(constructed, task, source_store,
                                                     strict_mapping=repository is not None)
         if exploration_stop is not None and any(
@@ -1425,8 +1764,8 @@ async def execute_staged_run(
             if contrast.revision_requested:
                 current_stage = "REVISE"
                 before_revision = constructed
-                revision = await _call_stage(
-                    "REVISE", RevisionResult,
+                revision_wire = await _call_stage(
+                    "REVISE", RevisionSelection,
                     {"stage": "REVISE", "visible_task": canonical_task,
                      "extract": extract.model_dump(mode="json"),
                      "query_receipts": query_executor.attempts,
@@ -1436,9 +1775,18 @@ async def execute_staged_run(
                     model_calls=model_calls,
                     model_call_limit=model_call_limit,
                 )
-                stages.append({
-                    "stage": "REVISE", "result": revision.model_dump(mode="json")
-                })
+                revision_entry = _wire_stage_entry(
+                    "REVISE", revision_wire,
+                    model_call_sequence=int(model_calls[-1]["sequence"]),
+                )
+                stages.append(revision_entry)
+                source_store.validate_task(task)
+                try:
+                    revision = _materialize_revision(revision_wire, source_store)
+                except CitationMaterializationError as exc:
+                    _record_citation_error(revision_entry, exc)
+                    raise
+                _complete_stage_entry(revision_entry, revision)
                 before_dump = before_revision.model_dump(mode="json")
                 after_dump = revision.revised_construct.model_dump(mode="json")
                 changed_objects = _changed_paths(before_dump, after_dump)
@@ -1615,6 +1963,7 @@ async def execute_staged_run(
 
     record: dict[str, object] = {
         "schema_version": RECORD_VERSION,
+        "citation_mode": CITATION_MODE,
         "run_id": run_id,
         "requested_case_id": requested_case_id,
         "case_id": case_id,
@@ -1729,6 +2078,7 @@ async def execute_staged_run(
             "prompts": PROMPT_VERSION,
             "record": RECORD_VERSION,
             "contract": "mock-spec.scenario/v0.1",
+            "citation_mode": CITATION_MODE,
         },
         "configuration": None if valid_config is None else {
             key: str(value) if isinstance(value, Decimal) else value

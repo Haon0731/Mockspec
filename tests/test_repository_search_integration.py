@@ -194,9 +194,9 @@ def test_public_staged_controller_mixes_seven_repository_queries_and_cites(
         "source_id": dynamic_id,
         "start_line": 1,
         "end_line": 1,
-        "quote": "SEARCH_CONTRACT = 'dependency result is 2'",
         "rationale": "A complete line returned by repository text search.",
     }
+    expected_quote = "SEARCH_CONTRACT = 'dependency result is 2'"
     construct = outputs[9]
     deliver = outputs[10]
     construct["contract"] = deepcopy(construct["contract"])
@@ -222,14 +222,20 @@ def test_public_staged_controller_mixes_seven_repository_queries_and_cites(
     assert attempts[1]["result"]["text"].startswith("def helper")
     assert attempts[2]["result"]["facts"]
     assert attempts[3]["result"]["facts"]
-    assert attempts[4]["result"]["matches"][0]["text"] == dynamic_evidence["quote"]
+    assert attempts[4]["result"]["matches"][0]["text"] == expected_quote
     assert attempts[5]["result"]["text"] == "# terminal context"
     assert attempts[6]["result"]["text"] == "# final context"
     observations = result["record"]["source_observations"]
     assert [item["response_id"] for item in observations] == [
         "query:2", "query:5", "query:6", "query:7",
     ]
-    assert result["contract"].evidence[-1].model_dump() == dynamic_evidence
+    assert result["contract"].evidence[-1].model_dump() == {
+        **dynamic_evidence, "quote": expected_quote,
+    }
+    constructed = next(item for item in result["record"]["stages"]
+                       if item["stage"] == "CONSTRUCT")
+    assert constructed["wire_result"]["contract"]["evidence"][-1] == dynamic_evidence
+    assert constructed["result"]["contract"]["evidence"][-1]["quote"] == expected_quote
 
 
 def test_staged_executor_uses_same_search_read_and_cursor_validation(

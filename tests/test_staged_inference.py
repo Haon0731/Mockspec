@@ -91,20 +91,41 @@ def test_stage_inputs_expose_exact_source_line_coordinates(tmp_path) -> None:
             assert [row["text"] for row in indexed] == source["text"].splitlines()
 
 
-@pytest.mark.parametrize("source_id,start,end,quote", [
-    ("mut:0", 10, 11, "    return dependency(value)"),
-    ("mut:0", 10, 10, "    return dependency(value)"),
-    ("mut:0", 11, 11, "return dependency(value)"),
-])
-def test_inaccurate_extract_coordinates_remain_rejected(tmp_path, source_id, start, end, quote):
+def test_legacy_extract_quote_is_rejected_without_conversion(tmp_path):
     outputs = scripted_outputs()
     outputs[0]["original_goals"] = [{
-        "source_id": source_id, "start_line": start, "end_line": end, "quote": quote,
+        "source_id": "test:0", "start_line": 5, "end_line": 5,
+        "quote": "    assert target(1) == 2",
     }]
     result, model, output_dir = _run(tmp_path, outputs)
     assert result["manifest"]["error_stage"] == "EXTRACT"
+    assert result["record"]["stop_reason"] == "output_invalid"
+    assert result["record"]["stages"] == []
+    assert model.calls == 1
+    assert not (output_dir / "scenario_contract.json").exists()
+
+
+def test_extract_locator_failure_retains_wire_selection(tmp_path):
+    outputs = scripted_outputs()
+    outputs[0]["original_goals"] = [{
+        "source_id": "mut:0", "start_line": 9, "end_line": 9,
+    }]
+    result, model, output_dir = _run(tmp_path, outputs)
+    assert result["manifest"]["error_stage"] == "EXTRACT"
+    stage = result["record"]["stages"][0]
+    assert stage["wire_result"]["original_goals"] == outputs[0]["original_goals"]
+    assert stage["wire_result"]["result_status"] == "CONTINUE"
+    assert stage["result"] is None
+    assert stage["model_call_sequence"] == 1
+    assert stage["citation_error"] == {
+        "field_path": "original_goals.0",
+        "source_id": "mut:0",
+        "start_line": 9,
+        "end_line": 9,
+        "error": "evidence range outside allowed source",
+    }
     assert result["record"]["error"]["message"] == (
-        f"source reference quote mismatch: {source_id}:{start}-{end}"
+        "evidence range outside allowed source"
     )
     assert model.calls == 1
     assert not (output_dir / "scenario_contract.json").exists()
@@ -136,6 +157,14 @@ def test_variant_b_replay_preserves_identity_stages_and_artifact_hashes(tmp_path
     assert [item["stage"] for item in record["stages"]] == [
         "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER"
     ]
+    assert record["schema_version"] == "scenario-inference-record/v0.2"
+    assert record["citation_mode"] == "source_locator_host_materialized_quote/v1"
+    assert manifest["versions"]["citation_mode"] == record["citation_mode"]
+    assert [item["model_call_sequence"] for item in record["stages"]] == [1, 2, 3, 4]
+    for stage in record["stages"]:
+        assert stage["citation_mode"] == record["citation_mode"]
+        assert '"quote"' not in json.dumps(stage["wire_result"])
+        assert '"quote"' in json.dumps(stage["result"])
     assert record["query_log"] == []
     assert 1 <= len(record["critical_behaviors"]) <= 3
     assert record["unresolved"] == []
@@ -894,7 +923,6 @@ def test_configured_result_size_reaches_analysis_and_manifest(tmp_path):
     task = synthetic_task()
     task["mut_source"]["text"] = "def target(value):\n    return dependency(value)" + " " * 1000
     outputs = query_script(1)
-    outputs[0]["candidates"][0]["evidence"][0]["quote"] += " " * 1000
     # Stop after the receipt to avoid requiring an unrelated new contract fixture.
     result = asyncio.run(execute_staged_run(
         task, output_dir=tmp_path / "bounded", model=FixedScriptModel(outputs),

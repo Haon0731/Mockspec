@@ -1,0 +1,262 @@
+{
+  "assessment_version": "m2-case-suitability/v1",
+  "saved_at": "2026-10-26T13:32:42.562554+00:00",
+  "provenance": "Independent read-only analyst assessment; parent persisted reported tool-receipt summaries. Full raw receipts remain in session and are not copied here. No repeat scans to fill record gaps.",
+  "scope": "Only two existing reviewed cases; bounded search/read via adapters, SourceStore and SourceAnalysis; not an exhaustive proof over all repository content.",
+  "boundaries": {
+    "live_model_requests": 0,
+    "target_tests_executed": false,
+    "raw_archive_gold_read": false,
+    "whole_dataset_scan": false,
+    "dependency_hash_scan": false,
+    "new_admission": false,
+    "assessment_not_in_model_payload": true
+  },
+  "cases": [
+    {
+      "case_id": "flask_308",
+      "snapshot_id": "241ef457f8d071c23e6acd658b684b11b54f13fa955e097d6bebe35dc755f47d",
+      "adapter": "python.load_task_with_repository",
+      "identity_and_masking_verified": true,
+      "question": "Does application-context/aborter construction reveal a material dependency constraint absent from the initial helper and masked test?",
+      "operations": [
+        {
+          "operation": "search",
+          "path_pattern": null,
+          "text": "aborter",
+          "complete": false,
+          "entries": 138,
+          "bytes": 1266075,
+          "limit_reason": "content_unavailable",
+          "match_count": null
+        },
+        {
+          "operation": "search",
+          "path_pattern": null,
+          "text": "_cv_app",
+          "complete": false,
+          "entries": 138,
+          "bytes": 1266075,
+          "limit_reason": "content_unavailable",
+          "match_count": null
+        },
+        {
+          "operation": "search",
+          "path_pattern": "src/src/flask/*.py",
+          "text": null,
+          "complete": true,
+          "entries": 138,
+          "bytes": 344534,
+          "limit_reason": null,
+          "match_count": null
+        },
+        {
+          "operation": "search",
+          "path_pattern": "src/src/flask/sansio/app.py",
+          "text": "aborter_class",
+          "complete": true,
+          "entries": 138,
+          "bytes": 39459,
+          "limit_reason": null,
+          "match_count": 4
+        },
+        {
+          "operation": "search",
+          "path_pattern": "src/src/flask/ctx.py",
+          "text": "_cv_app.set",
+          "complete": true,
+          "entries": 138,
+          "bytes": 17246,
+          "limit_reason": null,
+          "match_count": 1
+        }
+      ],
+      "selected_observations": [
+        {
+          "operation": "read",
+          "path": "src/src/flask/sansio/app.py",
+          "source_id": "repository:972c49da4e74de4bd68129cb",
+          "start_line": 150,
+          "end_line": 165,
+          "status": "ok",
+          "observed_text_sha256": "d0947622cd1415c0a46ca62b38eee5bac266c02fc2b65a8a939d39b4893fad5d",
+          "summary": "aborter_class defaults to Aborter and is used by flask.abort"
+        },
+        {
+          "operation": "read",
+          "path": "src/src/flask/sansio/app.py",
+          "source_id": "repository:972c49da4e74de4bd68129cb",
+          "start_line": 315,
+          "end_line": 325,
+          "status": "ok",
+          "observed_text_sha256": "395146c4c66cee5d7040050c9a66d20133f1dce5fb371d3d7cb5f87a96c045e9",
+          "summary": "self.aborter = self.make_aborter()"
+        },
+        {
+          "operation": "read",
+          "path": "src/src/flask/sansio/app.py",
+          "source_id": "repository:972c49da4e74de4bd68129cb",
+          "start_line": 495,
+          "end_line": 505,
+          "status": "ok",
+          "observed_text_sha256": "6e60baabd571e7afed2e46de5e52e12d9b31a71b6e0ec6a4211f839451fb4519",
+          "summary": "make_aborter returns self.aborter_class()"
+        },
+        {
+          "operation": "read",
+          "path": "src/src/flask/ctx.py",
+          "source_id": "repository:b7e7cfc1a5c2ec2ea88ea945",
+          "start_line": 416,
+          "end_line": 430,
+          "status": "ok",
+          "observed_text_sha256": "26afdd084b6f5259e7df403139e5637c3b8a1048261ef367dd1f0cde574cce86",
+          "summary": "AppContext push sets _cv_app"
+        }
+      ],
+      "finding": "Initial helper docstring/branches and ordinary assertions establish both main dependency paths. Additional context/aborter lifecycle facts explain implementation but did not establish a missing material constraint.",
+      "selection": "not_selected",
+      "limits": "Incomplete content_unavailable searches are not negative evidence; exact-path searches completed. This does not prove no other useful question exists."
+    },
+    {
+      "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+      "snapshot_id": "5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4",
+      "adapter": "java.load_task_with_repository",
+      "identity_and_masking_verified": true,
+      "question": "Can allowed context supply an unresolved material contract for the frozen StandardExplodedProcessor beyond the MUT calls and full output assertions?",
+      "operations": [
+        {
+          "operation": "search",
+          "path_pattern": null,
+          "text": "createLayers",
+          "complete": false,
+          "entries": 190,
+          "bytes": 2092641,
+          "limit_reason": "byte_limit",
+          "match_count": 0
+        },
+        {
+          "operation": "search",
+          "path_pattern": null,
+          "text": "computeEntrypoint",
+          "complete": false,
+          "entries": 190,
+          "bytes": 2092641,
+          "limit_reason": "byte_limit",
+          "match_count": 0
+        },
+        {
+          "operation": "search",
+          "path_pattern": null,
+          "text": "getJavaVersion",
+          "complete": false,
+          "entries": 190,
+          "bytes": 2092641,
+          "limit_reason": "byte_limit",
+          "match_count": 0
+        },
+        {
+          "operation": "search",
+          "path_pattern": null,
+          "text": "toJibContainerBuilder",
+          "complete": false,
+          "entries": 190,
+          "bytes": 2092641,
+          "limit_reason": "byte_limit",
+          "match_count": 0
+        },
+        {
+          "operation": "search",
+          "path_pattern": "src/main/java/com/google/cloud/tools/jib/cli/jar/ArtifactProcessor.java",
+          "text": "createLayers",
+          "complete": true,
+          "entries": 190,
+          "bytes": 1594,
+          "limit_reason": null,
+          "match_count": 1
+        },
+        {
+          "operation": "search",
+          "path_pattern": "src/main/java/com/google/cloud/tools/jib/cli/jar/*Processor.java",
+          "text": "createLayers",
+          "complete": true,
+          "entries": 190,
+          "bytes": 16225,
+          "limit_reason": null,
+          "match_count": 6
+        },
+        {
+          "operation": "search",
+          "path_pattern": "src/test/java/com/google/cloud/tools/jib/cli/jar/*Test.java",
+          "text": "createLayers",
+          "complete": true,
+          "entries": 190,
+          "bytes": 4271,
+          "limit_reason": null,
+          "match_count": 0
+        },
+        {
+          "operation": "search",
+          "path_pattern": "src/test/java/com/google/cloud/tools/jib/cli/jar/*Test.java",
+          "text": "computeEntrypoint",
+          "complete": true,
+          "entries": 190,
+          "bytes": 4271,
+          "limit_reason": null,
+          "match_count": 0
+        },
+        {
+          "operation": "search",
+          "path_pattern": "src/test/java/com/google/cloud/tools/jib/cli/jar/*Test.java",
+          "text": "getJavaVersion",
+          "complete": true,
+          "entries": 190,
+          "bytes": 4271,
+          "limit_reason": null,
+          "match_count": 0
+        },
+        {
+          "operation": "search",
+          "path_pattern": "src/main/java/com/google/cloud/tools/jib/cli/jar/ContainerBuilders.java",
+          "text": "create(",
+          "complete": true,
+          "entries": 190,
+          "bytes": 3668,
+          "limit_reason": null,
+          "match_count": 1
+        }
+      ],
+      "selected_observations": [
+        {
+          "path": "src/main/java/com/google/cloud/tools/jib/cli/jar/ArtifactProcessor.java",
+          "source_id": "repository:d131b4687fc4801a8d30a503",
+          "start_line": 34,
+          "end_line": 34,
+          "text": "  List<FileEntriesLayer> createLayers() throws IOException;",
+          "observed_text_sha256": "6f13785f45bc64c404e48774f643f5e98bd7304a467d690b8ad2098c52243cf7"
+        },
+        {
+          "path": "src/main/java/com/google/cloud/tools/jib/cli/jar/StandardExplodedProcessor.java",
+          "source_id": "repository:a59f6435482215020a63a2c9",
+          "start_line": 54,
+          "end_line": 54,
+          "text": "  public List<FileEntriesLayer> createLayers() throws IOException { throw new UnsupportedOperationException(); }",
+          "observed_text_sha256": "b8b739591eac25de225fe3ccbdce35d6bbfacc9b1dc8d327945de61357e26b6f"
+        },
+        {
+          "path": "src/main/java/com/google/cloud/tools/jib/cli/jar/ContainerBuilders.java",
+          "source_id": "repository:bffb8e1dc5aa5586f3874308",
+          "start_line": 52,
+          "end_line": 52,
+          "text": "  public static JibContainerBuilder create(",
+          "observed_text_sha256": "6cdb18c567237b554506494e3dfe5335261757b5b1d202f12d5fef89ed115b45"
+        }
+      ],
+      "finding": "MUT and full assertions determine needed layer/entrypoint outputs and Java-version branch. Extra signatures repeat existing interfaces; implementations of other processor variants cannot establish the masked StandardExploded behavior.",
+      "selection": "not_selected",
+      "limits": "Byte-limited initial pages are not evidence of absence. Scoped searches completed. Masked implementation was not restored; raw full receipts not persisted."
+    }
+  ],
+  "overall_status": "blocked_no_suitable_reviewed_case",
+  "conclusion": "本次限定审查未建立合格案例。G2未通过；工程工作继续，不发真实M2请求，不扩大研究CLI或准入范围。",
+  "next_required_evidence": "A finite candidate set with an initial-context gap affecting dependency constraints, allowed frozen evidence addressing it, and explicit source/masking/frozen-identity review. New admission is outside the approved implementation scope."
+}

@@ -137,6 +137,63 @@ def task_for_replay_case(replay_case: ReplayCase) -> dict:
     return synthetic_task()
 
 
+def _source_locator(reference: dict) -> dict:
+    """Build the explicit v0.2 wire locator used by deterministic fixtures."""
+    return {
+        "source_id": reference["source_id"],
+        "start_line": reference["start_line"],
+        "end_line": reference["end_line"],
+    }
+
+
+def _contract_selection(contract: dict | None) -> dict | None:
+    if contract is None:
+        return None
+    selected = deepcopy(contract)
+    selected["evidence"] = [
+        {
+            **_source_locator(reference),
+            "id": reference["id"],
+            "rationale": reference["rationale"],
+        }
+        for reference in selected["evidence"]
+    ]
+    return selected
+
+
+def _wire_outputs(outputs: list[dict]) -> list[dict]:
+    """Render canonical fixture semantics in the v0.2 model-facing protocol."""
+    rendered = deepcopy(outputs)
+    for output in rendered:
+        version = output["schema_version"]
+        if version == "staged-extract/v0.1":
+            output["schema_version"] = "staged-extract/v0.2"
+            output["original_goals"] = [
+                _source_locator(item) for item in output["original_goals"]
+            ]
+            for candidate in output["candidates"]:
+                candidate["evidence"] = [
+                    _source_locator(item) for item in candidate["evidence"]
+                ]
+        elif version == "staged-query/v0.1":
+            output["schema_version"] = "staged-query/v0.2"
+            stop = output.get("stop_explanation")
+            if stop is not None:
+                stop["evidence"] = [_source_locator(item) for item in stop["evidence"]]
+        elif version == "staged-construct/v0.1":
+            output["schema_version"] = "staged-construct/v0.2"
+            output["contract"] = _contract_selection(output["contract"])
+        elif version == "staged-revise/v0.1":
+            output["schema_version"] = "staged-revise/v0.2"
+            revised = output["revised_construct"]
+            revised["schema_version"] = "staged-construct/v0.2"
+            revised["contract"] = _contract_selection(revised["contract"])
+        elif version == "staged-deliver/v0.1":
+            output["schema_version"] = "staged-deliver/v0.2"
+            output["contract"] = _contract_selection(output["contract"])
+    return rendered
+
+
 def _contract(*, ambiguous: bool = False) -> dict:
     scenario_ids = ["dependency_returns_two"]
     if ambiguous:
@@ -455,7 +512,7 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
         "selected_scenario_id": deliver_construct["selected_scenario_id"],
         "contract": deliver_construct["contract"],
     })
-    return outputs
+    return _wire_outputs(outputs)
 
 
 def scripted_outputs(
@@ -613,7 +670,7 @@ def scripted_outputs(
             "semantic_role": "dependency_contract",
         })
     outputs.append(deliver)
-    return outputs
+    return _wire_outputs(outputs)
 
 
 def query_script(
@@ -642,7 +699,7 @@ def query_script(
                 "arguments_json": json.dumps(arguments),
             }
         queries.append({
-            "schema_version": "staged-query/v0.1",
+            "schema_version": "staged-query/v0.2",
             "decision": "finish_queries" if attempt is None else "request_query",
             "query_attempt": attempt, "previous_receipt_assessment": assessment,
             "impact": "Preserve the current candidate pending construction.",
@@ -650,7 +707,7 @@ def query_script(
                 "reason": "evidence_sufficient",
                 "rationale": "The visible delegation and assertion support construction; repeated syntax reads add no material fact.",
                 "evidence": [{"source_id": "test:0", "start_line": 5,
-                              "end_line": 5, "quote": "    assert target(1) == 2"}],
+                              "end_line": 5}],
                 "remaining_unknowns": [{
                     "question": "What is the hidden dependency implementation?",
                     "impact": "The conditional candidate remains explicit without that implementation.",

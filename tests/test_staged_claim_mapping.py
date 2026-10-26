@@ -14,7 +14,9 @@ sys.path.insert(0, str(STAGED_ROOT))
 
 from controller import (  # noqa: E402
     ConstructResult,
+    ConstructSelection,
     ContrastResult,
+    _materialize_construct,
     _validate_constructed,
     _validate_contrast,
 )
@@ -26,7 +28,12 @@ from mock_spec.validation import SourceStore  # noqa: E402
 def _selected() -> tuple[ConstructResult, UnifiedTask, SourceStore]:
     raw = scripted_outputs("selected")[2]
     task = UnifiedTask.from_dict(synthetic_task())
-    return ConstructResult.model_validate(raw), task, SourceStore(task)
+    store = SourceStore(task)
+    return _materialize_construct(ConstructSelection.model_validate(raw), store), task, store
+
+
+def _construct(raw: dict, store: SourceStore) -> ConstructResult:
+    return _materialize_construct(ConstructSelection.model_validate(raw), store)
 
 
 def test_strict_construct_accepts_evidence_assumption_and_formal_claim_mappings() -> None:
@@ -62,10 +69,11 @@ def test_strict_construct_rejects_unreviewable_mapping(mutation, message: str) -
     raw = deepcopy(scripted_outputs("selected")[2])
     mutation(raw)
     task = UnifiedTask.from_dict(synthetic_task())
+    store = SourceStore(task)
 
     with pytest.raises(ValueError, match=message):
         _validate_constructed(
-            ConstructResult.model_validate(raw), task, SourceStore(task),
+            _construct(raw, store), task, store,
             strict_mapping=True,
         )
 
@@ -103,9 +111,10 @@ def test_strict_construct_maps_nonblocking_unknowns() -> None:
     raw = deepcopy(scripted_outputs("selected")[2])
     raw["nonblocking_unknowns"] = ["Concrete dependency state remains unknown."]
     task = UnifiedTask.from_dict(synthetic_task())
+    store = SourceStore(task)
     with pytest.raises(ValueError, match="lack claim-basis mappings"):
         _validate_constructed(
-            ConstructResult.model_validate(raw), task, SourceStore(task),
+            _construct(raw, store), task, store,
             strict_mapping=True,
         )
 
@@ -120,7 +129,7 @@ def test_strict_construct_maps_nonblocking_unknowns() -> None:
         "assumption_reason": "The implementation remains hidden and does not affect selection.",
     })
     assert _validate_constructed(
-        ConstructResult.model_validate(raw), task, SourceStore(task),
+        _construct(raw, store), task, store,
         strict_mapping=True,
     ) is not None
 
@@ -129,9 +138,10 @@ def test_critical_behavior_keeps_legacy_evidence_rule_but_allows_strict_assumpti
     raw = deepcopy(scripted_outputs("selected")[2])
     raw["critical_behaviors"][0]["evidence_ids"] = []
     task = UnifiedTask.from_dict(synthetic_task())
+    store = SourceStore(task)
     with pytest.raises(ValueError, match="requires evidence"):
         _validate_constructed(
-            ConstructResult.model_validate(raw), task, SourceStore(task)
+            _construct(raw, store), task, store
         )
 
     raw["critical_behaviors"][0].update({
@@ -139,6 +149,6 @@ def test_critical_behavior_keeps_legacy_evidence_rule_but_allows_strict_assumpti
         "assumption_reason": "This behavior is retained as an explicit hypothesis.",
     })
     assert _validate_constructed(
-        ConstructResult.model_validate(raw), task, SourceStore(task),
+        _construct(raw, store), task, store,
         strict_mapping=True,
     ) is not None

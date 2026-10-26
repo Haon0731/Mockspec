@@ -1,0 +1,23 @@
+{
+  "code_review": {
+    "role": "code-reviewer",
+    "verdict": "APPROVE",
+    "controller_sha256": "63186ee523750ee9a67b0b2ec13ecbb05e279c4dee2689bbd0448f0e39c32caa",
+    "scripted_sha256": "9d8ef8cd2d0058a548af37eb4ce60e1914ee3eb88865bae92f1f2b65aeb4cf53",
+    "verification": "15 targeted checks plus Ruff/py_compile/mypy/diff-check; final read-only review found no blockers"
+  },
+  "architecture_review": {
+    "role": "architect",
+    "verdict": "CLEAR",
+    "verification": "11 targeted checks plus strict nested schema probes",
+    "invariants": [
+      "formal production contract and validator unchanged",
+      "new wire rejects legacy quotes and invalid nested fields",
+      "materialization reads current visible Store text only",
+      "unknown/unobserved/invalid/closed sources fail without FORMAT_REPAIR",
+      "model selections and host results have distinct trace fields and model-call linkage",
+      "no new admission, tools, target execution, model requests or historical response conversion"
+    ]
+  },
+  "remaining_acceptance_blocker": "G2 blocked_no_suitable_reviewed_case; review approval does not establish M2 success"
+}

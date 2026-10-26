@@ -10,6 +10,8 @@ import os
 from pathlib import Path
 import sys
 
+import pytest
+
 
 STAGED_ROOT = Path(__file__).parents[1] / "experiments" / "staged-inference"
 sys.path.insert(0, str(STAGED_ROOT))
@@ -21,7 +23,8 @@ from mock_spec.source_repository import ReviewedRepository  # noqa: E402
 
 
 def _repository_run(tmp_path: Path, *, bad_quote: bool = False, transform=None,
-                    config=None, model_class=FixedScriptModel) -> dict:
+                    config=None, model_class=FixedScriptModel,
+                    invalidate_before_materialization: str | None = None) -> dict:
     task = UnifiedTask.from_dict(synthetic_task())
     tree = tmp_path / "snapshot" / "tree" / "src"
     tree.mkdir(parents=True)
@@ -61,9 +64,10 @@ def _repository_run(tmp_path: Path, *, bad_quote: bool = False, transform=None,
         "source_id": source_id,
         "start_line": 1,
         "end_line": 1,
-        "quote": "wrong" if bad_quote else lines[0],
         "rationale": "The repository observation states the dependency result contract.",
     }
+    if bad_quote:
+        dynamic["quote"] = "wrong"
     construct = outputs[9]
     deliver = outputs[10]
     construct["contract"] = deepcopy(construct["contract"])
@@ -75,9 +79,25 @@ def _repository_run(tmp_path: Path, *, bad_quote: bool = False, transform=None,
 
     if transform is not None:
         transform(outputs)
+
+    model = model_class(outputs)
+    if invalidate_before_materialization is not None:
+        action = invalidate_before_materialization
+
+        class InvalidatingModel(FixedScriptModel):
+            async def get_response(self, *args, **kwargs):
+                response = await super().get_response(*args, **kwargs)
+                if self.calls == 1:
+                    if action == "closed":
+                        repository.close()
+                    else:
+                        repository._invalidate("test invalidation")
+                return response
+
+        model = InvalidatingModel(outputs)
     return asyncio.run(execute_staged_run(
         output_dir=tmp_path / "run",
-        model=model_class(outputs),
+        model=model,
         config=config or StagedRunConfig(),
         task_loader=lambda: (task, repository),
         requested_case_id=task.case_id,
@@ -137,7 +157,6 @@ def _analysis_repository_run(tmp_path: Path) -> dict:
         "source_id": source_id,
         "start_line": 8,
         "end_line": 8,
-        "quote": lines[7],
         "rationale": "The repository observation shows the exact dependency call.",
     }
     construct = outputs[6]
@@ -189,6 +208,28 @@ def test_repository_observation_quote_mismatch_is_rejected(tmp_path: Path) -> No
     assert result["manifest"]["error_stage"] == "CONSTRUCT"
     assert result["manifest"]["stop_reason"] == "output_invalid"
     assert len(result["record"]["source_observations"]) == 7
+
+
+@pytest.mark.parametrize("action", ["closed", "invalidated"])
+def test_repository_binding_is_revalidated_before_materializing_citations(
+    tmp_path: Path, action: str,
+) -> None:
+    result = _repository_run(
+        tmp_path, invalidate_before_materialization=action
+    )
+
+    assert result["contract"] is None
+    assert result["manifest"]["result_status"] == "ERROR"
+    assert result["manifest"]["error_stage"] == "EXTRACT"
+    assert len(result["record"]["stages"]) == 1
+    stage = result["record"]["stages"][0]
+    assert stage["stage"] == "EXTRACT"
+    assert stage["citation_mode"] == "source_locator_host_materialized_quote/v1"
+    assert stage["model_call_sequence"] == 1
+    assert stage["wire_result"]["schema_version"] == "staged-extract/v0.2"
+    assert stage["result"] is None
+    assert "quote" not in json.dumps(stage["wire_result"])
+    assert str(tmp_path) not in json.dumps(result["record"]["error"])
 
 
 def test_controller_replays_discover_analyze_read_and_cite_without_implicit_observation(

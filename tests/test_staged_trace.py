@@ -139,12 +139,12 @@ def test_api_failure_trace_preserves_safe_provider_diagnostics() -> None:
         "model_request_started": True,
         "model_name": "scripted-offline",
         "output_type": "QueryResult",
-        "prompt_version": "staged-scenario-inference-prompts/v0.1",
+        "prompt_version": "staged-scenario-inference-prompts/v0.2",
         "payload_bytes": 17,
     }
     assert call["payload_sha256"]
     assert call["payload"] == {"stage": "QUERY"}
-    assert call["instructions"].startswith("staged-scenario-inference-prompts/v0.1")
+    assert call["instructions"].startswith("staged-scenario-inference-prompts/v0.2")
     assert call["requested_output_schema"]["title"] == "QueryResult"
     assert call["request_start_basis"] == "usage_ledger_before_model_call_hook"
     assert call["timeout_seconds"] == pytest.approx(5, abs=0.1)

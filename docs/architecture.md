@@ -161,7 +161,14 @@ QUERY 的供应商输出 Schema 明确描述请求及回执评估对象；宿主
 保存每次阶段调用的冻结输入、Schema、指令、响应关联和脱敏异常信息。
 其中请求开始标记来自 SDK hook，表示已登记模型调用，不单独证明网络请求已发出。
 研究阶段输入另附 `source_line_index`，仅将初始可见源码按原坐标逐行表示，保留空白，
-不扩大证据范围或修补模型引用。研究输出 Schema 在 SDK 边界展开联合类型中的引用，
+不扩大证据范围。研究 v0.2 的模型响应只选择 `source_id` 和闭合行范围，
+不输出 `quote`；控制器用同一运行 Store 中已可见的原文构造标准阶段结果和正式证据，
+再执行原严格契约校验。引用选择解析不读取新文件、不调整坐标、不修补旧响应。
+EXTRACT、QUERY 停止说明、CONSTRUCT、REVISE、DELIVER 共用该边界；CONTRAST 沿用证据 ID。
+轨迹分别保留 `wire_result` 与宿主生成的 `result`，并声明
+`citation_mode=source_locator_host_materialized_quote/v1`。新协议拒绝旧响应的 `quote`，
+历史运行仍使用原提交复现，不自动降级或改写历史失败。
+研究输出 Schema 在 SDK 边界展开联合类型中的引用，
 兼容供应商的显式类型要求；本地仍由原 Pydantic 类型严格解析，轨迹保存实际发送的 Schema。
 后续 QUERY 评估上一回执，CONSTRUCT/DELIVER 接收累计回执；未完成判断明确留证。
 阶段切换和 SDK 对象重建不重置账本、模型请求数、查询数或绝对截止时间。

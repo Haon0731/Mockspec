@@ -9,8 +9,10 @@ import sys
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "experiments" / "staged-inference"))
-from controller import StagedRunConfig, execute_staged_run  # noqa: E402
+from controller import StagedRunConfig, _materialize_contract, execute_staged_run  # noqa: E402
 from scripted import FixedScriptModel, scripted_outputs, synthetic_task  # noqa: E402
+from mock_spec.schemas import UnifiedTask  # noqa: E402
+from mock_spec.validation import SourceStore  # noqa: E402
 
 
 def run_repair(tmp_path, *, damage, repair=None, max_calls=10):
@@ -23,7 +25,10 @@ def run_repair(tmp_path, *, damage, repair=None, max_calls=10):
         synthetic_task(), output_dir=tmp_path / "run", model=model,
         config=StagedRunConfig(max_model_calls=max_calls),
     ))
-    return result, model, expected
+    expected_contract = _materialize_contract(
+        expected["contract"], SourceStore(UnifiedTask.from_dict(synthetic_task()))
+    )
+    return result, model, expected_contract
 
 
 @pytest.mark.parametrize("damage", [
@@ -36,7 +41,7 @@ def test_repair_preserves_contract_selection_and_evidence(tmp_path, damage):
     assert result["record"]["result_status"] == "SELECTED"
     assert model.calls == 5
     assert result["manifest"]["usage"]["requests_started"] == 5
-    assert result["contract"].model_dump(mode="json") == expected["contract"]
+    assert result["contract"] == expected
     log = result["record"]["format_repair_log"]
     assert len(log) == 1 and log[0]["status"] == "completed"
     assert log[0]["semantic_snapshot"] == log[0]["after"]
@@ -56,6 +61,28 @@ def test_no_repair_without_unchanged_complete_snapshot(tmp_path, damage):
     assert result["record"]["stop_reason"] == "output_invalid"
     assert model.calls == 4
     assert not (tmp_path / "run" / "scenario_contract.json").exists()
+
+
+def test_unknown_delivery_locator_is_a_citation_failure_not_a_format_repair(tmp_path):
+    result, model, _ = run_repair(
+        tmp_path,
+        damage=lambda value: value["contract"]["evidence"][0].update(
+            source_id="unknown:0"
+        ),
+    )
+
+    assert model.calls == 4
+    assert result["record"]["format_repair_log"] == []
+    stage = result["record"]["stages"][-1]
+    assert stage["stage"] == "DELIVER"
+    assert stage["result"] is None
+    assert stage["citation_error"] == {
+        "field_path": "contract.evidence.0",
+        "source_id": "unknown:0",
+        "start_line": 11,
+        "end_line": 11,
+        "error": "unknown source_id",
+    }
 
 
 @pytest.mark.parametrize("field", ["test_objectives", "scenario_hypotheses",

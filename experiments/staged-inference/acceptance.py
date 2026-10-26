@@ -20,9 +20,9 @@ from mock_spec.source_analysis import SourceAnalysis
 from scripted import FixedScriptModel, query_script, scripted_outputs, synthetic_task
 
 
-REPORT_VERSION = "m1-staged-inference-acceptance/v0.1"
+REPORT_VERSION = "m1-staged-inference-acceptance/v0.2"
 MANIFEST_VERSION = "scenario-inference-manifest/v0.1"
-RECORD_VERSION = "scenario-inference-record/v0.1"
+RECORD_VERSION = "scenario-inference-record/v0.2"
 CONTRACT_VERSION = "mock-spec.scenario/v0.1"
 
 
@@ -229,10 +229,11 @@ def _verify_run(case: dict[str, object], run_dir: Path) -> dict[str, object]:
     if manifest["stop_reason"] != case["expected_stop_reason"]:
         raise ValueError(f"{case['name']}: unexpected stop reason")
     if manifest["versions"] != {
-        "policy": "staged-scenario-inference/v0.1",
-        "prompts": "staged-scenario-inference-prompts/v0.1",
+        "policy": "staged-scenario-inference/v0.2",
+        "prompts": "staged-scenario-inference-prompts/v0.2",
         "record": RECORD_VERSION,
         "contract": CONTRACT_VERSION,
+        "citation_mode": "source_locator_host_materialized_quote/v1",
     }:
         raise ValueError(f"{case['name']}: version set is incomplete or changed")
 
@@ -342,7 +343,7 @@ def build_acceptance(output_dir: Path) -> dict[str, object]:
             "All runs use synthetic tasks and the fixed offline SDK model.",
             "The evidence does not establish reviewed Adapter admission, target-test execution, or inference quality.",
             "The fixed model does not demonstrate autonomous tool selection.",
-            "Exact input references and quotes are protected, but this acceptance cannot prove the semantic faithfulness of an arbitrary free-text goal paraphrase.",
+            "Exact input locators and host-materialized quotes are protected, but this acceptance cannot prove the semantic faithfulness of an arbitrary free-text goal paraphrase.",
         ],
     }
     _write_json_exclusive(output_dir / "acceptance_report.json", report)

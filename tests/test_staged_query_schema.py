@@ -21,7 +21,7 @@ from mock_spec.budget import InferenceBudget, UsageLedger
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "experiments" / "staged-inference"))
 from controller import (  # noqa: E402
-    ConstructResult, DeliverResult, QueryResult, RevisionResult,
+    ConstructSelection, DeliverSelection, QuerySelection, RevisionSelection,
     StagedRunConfig, _StageOutputSchema, _call_stage,
 )
 
@@ -30,7 +30,7 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
     requests: list[dict] = []
     calls: list[dict] = []
     result = {
-        "schema_version": "staged-query/v0.1",
+        "schema_version": "staged-query/v0.2",
         "decision": "finish_queries",
         "query_attempt": None,
         "previous_receipt_assessment": None,
@@ -69,7 +69,7 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
     async def run():
         client = SimpleNamespace(base_url="https://provider.invalid", responses=SimpleNamespace(create=respond))
         return await _call_stage(
-            "QUERY", QueryResult, {"stage": "QUERY"},
+            "QUERY", QuerySelection, {"stage": "QUERY"},
             model=OpenAIResponsesModel(model="test-model", openai_client=client),
             config=StagedRunConfig(), ledger=UsageLedger(InferenceBudget()),
             responses=[], model_calls=calls, deadline=time.monotonic() + 10,
@@ -86,8 +86,8 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
 
 
 def test_malformed_query_envelope_remains_available_for_host_attempt_accounting() -> None:
-    result = QueryResult.model_validate({
-        "schema_version": "staged-query/v0.1", "decision": "request_query",
+    result = QuerySelection.model_validate({
+        "schema_version": "staged-query/v0.2", "decision": "request_query",
         "query_attempt": {"tool": "unknown", "arguments_json": "{"},
         "previous_receipt_assessment": "not-an-assessment", "impact": "inspect",
     })
@@ -95,7 +95,10 @@ def test_malformed_query_envelope_remains_available_for_host_attempt_accounting(
     assert result.previous_receipt_assessment == "not-an-assessment"
 
 
-@pytest.mark.parametrize("output_type", [QueryResult, ConstructResult, DeliverResult, RevisionResult])
+@pytest.mark.parametrize(
+    "output_type",
+    [QuerySelection, ConstructSelection, DeliverSelection, RevisionSelection],
+)
 def test_nested_nullable_stage_objects_have_explicit_wire_types(output_type) -> None:
     schema = _StageOutputSchema(output_type)
 
@@ -113,3 +116,43 @@ def test_nested_nullable_stage_objects_have_explicit_wire_types(output_type) -> 
     assert schema.is_strict_json_schema()
     with pytest.raises(ModelBehaviorError):
         schema.validate_json('{"unexpected": true}')
+
+
+def test_contract_selection_schema_strictly_rejects_legacy_quote_and_bad_nested_types() -> None:
+    schema = _StageOutputSchema(DeliverSelection)
+    contract = {
+        "schema_version": "mock-spec.scenario/v0.1",
+        "case_id": "case", "language": "python",
+        "test_objectives": [{
+            "statement": "goal", "status": "required", "scenario_ids": ["s"],
+            "condition": "always", "evidence_ids": ["e"],
+        }],
+        "scenario_hypotheses": [{
+            "id": "s", "description": "scenario", "condition": "always",
+            "status": "candidate", "evidence_ids": ["e"],
+        }],
+        "dependency_constraints": [], "expected_interactions": [],
+        "verification_candidates": [],
+        "evidence": [{
+            "id": "e", "source_id": "mut:0", "start_line": 1, "end_line": 1,
+            "rationale": "source",
+        }],
+        "uncertainty": [],
+    }
+    output = {
+        "schema_version": "staged-deliver/v0.2", "result_status": "SELECTED",
+        "selected_scenario_id": "s", "contract": contract,
+    }
+    assert schema.validate_json(json.dumps(output)).contract is not None
+
+    contract["evidence"][0]["quote"] = "legacy"
+    with pytest.raises(ModelBehaviorError):
+        schema.validate_json(json.dumps(output))
+    contract["evidence"][0].pop("quote")
+    contract["test_objectives"][0]["scenario_ids"] = "s"
+    with pytest.raises(ModelBehaviorError):
+        schema.validate_json(json.dumps(output))
+    contract["test_objectives"][0]["scenario_ids"] = ["s"]
+    contract["scenario_hypotheses"][0]["evidence_ids"] = ["unknown"]
+    with pytest.raises(ModelBehaviorError):
+        schema.validate_json(json.dumps(output))

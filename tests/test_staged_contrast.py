@@ -10,12 +10,19 @@ import sys
 STAGED_ROOT = Path(__file__).parents[1] / "experiments" / "staged-inference"
 sys.path.insert(0, str(STAGED_ROOT))
 
-from controller import StagedRunConfig, execute_staged_run  # noqa: E402
+from controller import (  # noqa: E402
+    ConstructSelection,
+    StagedRunConfig,
+    _materialize_construct,
+    execute_staged_run,
+)
 from scripted import (  # noqa: E402
     FixedScriptModel,
     scripted_outputs,
     task_for_replay_case,
 )
+from mock_spec.schemas import UnifiedTask  # noqa: E402
+from mock_spec.validation import SourceStore  # noqa: E402
 
 
 def _run(tmp_path: Path, case: str, variant: str = "C", **config_overrides):
@@ -190,7 +197,7 @@ def test_legal_alternative_can_replace_candidate_without_changing_original_goal(
         "revision_reason": "The proposed alternative is actually legal under ordinary equality.",
     }
     outputs.insert(4, {
-        "schema_version": "staged-revise/v0.1", "revised_construct": after,
+        "schema_version": "staged-revise/v0.2", "revised_construct": after,
         "modified_objects": ["contract", "selected_scenario_id", "selection_rationale"],
         "evidence_reason": "The same original equality accepts 2.0; rebind the unchanged goal.",
         "evidence_ids": ["assertion"], "request_another_revision": False,
@@ -206,5 +213,11 @@ def test_legal_alternative_can_replace_candidate_without_changing_original_goal(
     assert result["contract"].test_objectives[0].statement == (
         before["contract"]["test_objectives"][0]["statement"]
     )
-    assert result["record"]["revision_log"][0]["before"]["contract"] == before["contract"]
+    task = UnifiedTask.from_dict(task_for_replay_case("selected"))
+    expected_before = _materialize_construct(
+        ConstructSelection.model_validate(before), SourceStore(task)
+    )
+    assert result["record"]["revision_log"][0]["before"]["contract"] == (
+        expected_before.contract.model_dump(mode="json")
+    )
     assert result["record"]["query_log"] == []

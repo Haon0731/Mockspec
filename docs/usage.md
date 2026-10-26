@@ -413,6 +413,18 @@ HTTP 400，已修复；逐调用诊断位于 `inference_record.json.model_calls`
 未取得自主新增证据或最终场景卡。#17 保持开放，#18 仍受真实 M2 验收阻塞。
 该记录中的复现命令需要新输出目录；不能将独立阶段回放计作完整验收。
 
+研究入口现使用 v0.2 引用选择协议：模型选择来源与行范围，宿主从本次已可见证据
+生成精确 `quote`，最终仍使用原契约验证器。`inference_record.json` 的版本为
+`scenario-inference-record/v0.2`，`citation_mode` 为
+`source_locator_host_materialized_quote/v1`；阶段的 `wire_result` 与 `result`
+分别记录模型选择和宿主标准结果。旧模型响应中的 `quote` 不自动转换；
+历史运行按对应提交复现，不能把旧失败送入新协议后改称成功。
+
+[M2-CITATION-1 工程与门禁记录](../out/staged-inference/issue17-citation-protocol-20261026/report.md)
+保留协议验证及现有两例的独立适用性核对。本次限定审查未建立合格探索验收案例，
+G2 标为 `blocked_no_suitable_reviewed_case`，因此没有发起新的真实请求。
+研究 live 入口仍只接受现有审核的 `flask_308`，未因案例缺口放宽准入。
+
 ## 冻结项目读取与搜索（#13 / #14）
 
 生产 V0.2 的普通 CLI 与完整留证入口均可显式添加 `--repository-read`：
