@@ -56,6 +56,13 @@ V0.2 的源码工具只补充已有可见输入的事实，不写验证成功状
 正式 Evidence 和以下映射不变，最终契约继续通过原逐字校验；
 原文真实不意味着它支持模型结论，证据相关性仍需独立审查。
 
+QUERY wire 在此基础上使用 `staged-query/v0.3`：模型评估仅含 impact/rationale，
+宿主关联唯一 pending receipt 后补入内部 v0.1 assessment 的 attempt_sequence。
+原始 wire、宿主关联和宿主 quote 分别留证。未知 null 字段的有限纠正不接受宿主投影为结果；
+模型重发须与比较快照精确一致，且与 DELIVER 共用一次名额。
+候选表达有条件的依赖约束；imports、测试名与最终断言不能独自证明隐藏 Mock 配置，
+仅取得声明行且未确定行为时评估为 no_new_information。语义充分性由独立评阅判定。
+
 分阶段研究控制器保持正式 `mock-spec.scenario/v0.1` 不变，并在
 `inference_record.json` 保存场景卡所需的研究旁路信息：
 

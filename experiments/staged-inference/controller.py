@@ -25,10 +25,7 @@ from agents import Agent, ModelBehaviorError, ModelRetrySettings, ModelSettings,
 from agents.agent_output import AgentOutputSchema
 from agents.models.interface import Model
 from agents.models.openai_responses import OpenAIResponsesModel
-from pydantic import (
-    BaseModel, ConfigDict, Field, StringConstraints, ValidationError,
-    WithJsonSchema,
-)
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, ValidationError
 
 from mock_spec.budget import BudgetHooks, InferenceBudget, UsageLedger
 from mock_spec.execution_metadata import collect_execution_metadata
@@ -38,14 +35,14 @@ from mock_spec.schemas import UnifiedTask
 from mock_spec.source_repository import ReviewedRepository
 from mock_spec.validation import SourceStore
 
-from query import QueryExecutor
+from query import QueryExecutor, validate_query_request
 
 
 Text = Annotated[str, StringConstraints(min_length=1, pattern=r"\S")]
-RECORD_VERSION = "scenario-inference-record/v0.2"
+RECORD_VERSION = "scenario-inference-record/v0.3"
 MANIFEST_VERSION = "scenario-inference-manifest/v0.1"
-POLICY_VERSION = "staged-scenario-inference/v0.2"
-PROMPT_VERSION = "staged-scenario-inference-prompts/v0.2"
+POLICY_VERSION = "staged-scenario-inference/v0.3"
+PROMPT_VERSION = "staged-scenario-inference-prompts/v0.3"
 CITATION_MODE = "source_locator_host_materialized_quote/v1"
 FLASK_ABORT_CASE_ID = "flask_308"
 CLOUDFOUNDRY_APPLICATION_URI_CASE_ID = (
@@ -125,6 +122,13 @@ class QueryAssessment(StageModel):
     rationale: Text
 
 
+class QueryAssessmentSelection(StageModel):
+    """Model-facing assessment; the host owns receipt association."""
+
+    impact: Literal["supports", "weakens", "no_new_information"]
+    rationale: Text
+
+
 class QueryAttempt(StageModel):
     """Provider-facing shape; host validation still follows attempt registration."""
 
@@ -157,29 +161,19 @@ class ExplorationStopSelection(StageModel):
 class QueryResult(StageModel):
     schema_version: Literal["staged-query/v0.1"]
     decision: Literal["request_query", "finish_queries"]
-    # Concrete wire schemas avoid untyped anyOf branches. Keep host values raw so
-    # malformed requests are counted before QueryExecutor validates them.
-    query_attempt: Annotated[Any | None, WithJsonSchema({
-        "anyOf": [QueryAttempt.model_json_schema(), {"type": "null"}],
-    })]
-    previous_receipt_assessment: Annotated[Any | None, WithJsonSchema({
-        "anyOf": [QueryAssessment.model_json_schema(), {"type": "null"}],
-    })] = None
+    query_attempt: QueryAttempt | None
+    previous_receipt_assessment: QueryAssessment | None = None
     impact: Text
     stop_explanation: ExplorationStop | None = None
 
 
 class QuerySelection(StageModel):
-    schema_version: Literal["staged-query/v0.2"]
+    schema_version: Literal["staged-query/v0.3"]
     decision: Literal["request_query", "finish_queries"]
-    query_attempt: Annotated[Any | None, WithJsonSchema({
-        "anyOf": [QueryAttempt.model_json_schema(), {"type": "null"}],
-    })]
-    previous_receipt_assessment: Annotated[Any | None, WithJsonSchema({
-        "anyOf": [QueryAssessment.model_json_schema(), {"type": "null"}],
-    })] = None
+    query_attempt: QueryAttempt | None
+    previous_receipt_assessment: QueryAssessmentSelection | None
     impact: Text
-    stop_explanation: ExplorationStopSelection | None = None
+    stop_explanation: ExplorationStopSelection | None
 
 
 class CriticalBehavior(StageModel):
@@ -347,6 +341,21 @@ class StagedRunConfig:
             self.max_cost_usd is None or None in prices
         ):
             raise ValueError("live inference requires cost limit and input/output prices")
+
+
+@dataclass
+class FormatRepairAllowance:
+    """One irreversible reservation shared by QUERY and DELIVER repair."""
+
+    state: Literal["available", "reserved"] = "available"
+    category: str | None = None
+
+    def reserve(self, category: str) -> bool:
+        if self.state != "available":
+            return False
+        self.state = "reserved"
+        self.category = category
+        return True
 
 
 class StagedInferenceError(RuntimeError):
@@ -523,7 +532,14 @@ class _StageOutputSchema(AgentOutputSchema):
 def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
                  config: StagedRunConfig) -> Agent[None]:
     stage_protocol = ""
-    if stage == "QUERY":
+    if stage == "EXTRACT":
+        stage_protocol = (
+            " Infer conditional dependency constraints, not hidden Mock setup or hidden"
+            " verification text. State unconfirmed behavior as an if-then hypothesis and"
+            " preserve its missing basis in unresolved. Imports, test names, and final"
+            " assertions alone do not establish a hidden substitute, stub value, or call count."
+        )
+    elif stage == "QUERY":
         repository_protocol = (
             " inspect_source supports one bounded operation per call: search with"
             " {operation:'search',path_pattern?:string,text?:string,cursor?:string},"
@@ -550,9 +566,12 @@ def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
             " symbol is an exact syntax name, not target resolution."
             " Read source lines before citing them."
             " arguments_json must encode the named argument object."
-            " After a receipt, previous_receipt_assessment must identify that attempt and"
-            " classify its candidate impact as supports, weakens, or no_new_information;"
+            " After a receipt, previous_receipt_assessment classifies its candidate impact"
+            " as supports, weakens, or no_new_information; the host binds it to the one"
+            " pending receipt, so never return a receipt or attempt sequence field."
             " errors and incomplete results still require an assessment."
+            " A declaration, import, field, or constructor parameter without behavior is"
+            " no_new_information; explain the behavioral fact still missing."
             " On finish_queries provide stop_explanation with reason evidence_sufficient,"
             " unknowns_nonblocking, or no_further_evidence; a concrete rationale, exact"
             " source references in evidence, and remaining_unknowns with question, impact,"
@@ -561,6 +580,9 @@ def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
         )
     elif stage == "CONSTRUCT":
         stage_protocol = (
+            " Infer conditional dependency constraints, not hidden Mock setup or hidden"
+            " verification text. Imports, test names, and final assertions alone do not"
+            " prove hidden behavior or counts; preserve unsupported details as unresolved."
             " Preserve test_objectives as only the original visible goals; place newly"
             " inferred checks in verification_candidates. Every dependency constraint must"
             " state its condition, target call, parameter relationship, allowed return or"
@@ -907,7 +929,9 @@ def _materialize_extract(wire: ExtractSelection, store: SourceStore) -> ExtractR
     )
 
 
-def _materialize_query(wire: QuerySelection, store: SourceStore) -> QueryResult:
+def _materialize_query(
+    wire: QuerySelection, store: SourceStore, *, assessment_sequence: int | None = None,
+) -> QueryResult:
     stop = None
     if wire.stop_explanation is not None:
         stop = ExplorationStop(
@@ -921,11 +945,20 @@ def _materialize_query(wire: QuerySelection, store: SourceStore) -> QueryResult:
             ],
             remaining_unknowns=wire.stop_explanation.remaining_unknowns,
         )
+    assessment = None
+    if wire.previous_receipt_assessment is not None:
+        if assessment_sequence is None:
+            raise ValueError("QUERY assessment has no host-bound receipt")
+        assessment = QueryAssessment(
+            attempt_sequence=assessment_sequence,
+            impact=wire.previous_receipt_assessment.impact,
+            rationale=wire.previous_receipt_assessment.rationale,
+        )
     return QueryResult(
         schema_version="staged-query/v0.1",
         decision=wire.decision,
         query_attempt=wire.query_attempt,
-        previous_receipt_assessment=wire.previous_receipt_assessment,
+        previous_receipt_assessment=assessment,
         impact=wire.impact,
         stop_explanation=stop,
     )
@@ -1009,6 +1042,340 @@ def _validate_exploration_stop(stop: ExplorationStop, store: SourceStore) -> Non
         raise ValueError("no-further-evidence stop must preserve unknowns and their impact")
 
 
+def _completed_response_json(response: object) -> object:
+    """Decode one complete final text while rejecting ambiguous provider output."""
+    from mock_spec.validation import decode_json
+
+    if not isinstance(response, dict):
+        raise ValueError("response trace is not an object")
+    output = response.get("output")
+    if not isinstance(output, list):
+        raise ValueError("response trace has no output list")
+    messages = [item for item in output if isinstance(item, dict) and item.get("type") == "message"]
+    if len(messages) != 1:
+        raise ValueError("response must contain exactly one final message")
+    if any(not isinstance(item, dict) or item.get("type") not in {"message", "reasoning"}
+           for item in output):
+        raise ValueError("response contains a non-reasoning side output")
+    message = messages[0]
+    if message.get("status") != "completed":
+        raise ValueError("response message is not completed")
+    content = message.get("content")
+    if (not isinstance(content, list) or len(content) != 1
+            or not isinstance(content[0], dict)
+            or content[0].get("type") != "output_text"
+            or not isinstance(content[0].get("text"), str)):
+        raise ValueError("response must contain exactly one output_text")
+    return decode_json(content[0]["text"])
+
+
+def _query_repair_snapshot(raw: object) -> tuple[QuerySelection, dict, list[list[object]]]:
+    """Remove only eligible null extras and strictly validate the comparison projection."""
+    if not isinstance(raw, dict):
+        raise ValueError("QUERY output is not a JSON object")
+    if set(raw) != set(QuerySelection.model_fields):
+        raise ValueError("QUERY must include every known top-level field")
+    try:
+        QuerySelection.model_validate(raw)
+    except ValidationError as exc:
+        errors = exc.errors(include_url=False)
+    else:
+        raise ValueError("QUERY output is already valid")
+    assessment = raw.get("previous_receipt_assessment")
+    if not isinstance(assessment, dict):
+        raise ValueError("QUERY assessment is not an object")
+    known = set(QueryAssessmentSelection.model_fields)
+    if not known <= set(assessment):
+        raise ValueError("QUERY assessment must include every known field")
+    unknown = set(assessment) - known
+    if not unknown or "attempt_sequence" in unknown:
+        raise ValueError("QUERY has no eligible assessment-only null extras")
+    eligible_locations = {
+        ("previous_receipt_assessment", field) for field in unknown
+    }
+    if any(
+        error.get("type") != "extra_forbidden"
+        or tuple(error.get("loc", ())) not in eligible_locations
+        for error in errors
+    ):
+        raise ValueError("QUERY has validation errors outside eligible null extras")
+    if any(assessment[field] is not None for field in unknown):
+        raise ValueError("QUERY assessment extras must be JSON null")
+    projected = deepcopy(raw)
+    for field in unknown:
+        del projected["previous_receipt_assessment"][field]
+    wire = QuerySelection.model_validate(projected)
+    return wire, wire.model_dump(mode="json"), [
+        ["previous_receipt_assessment", field] for field in sorted(unknown)
+    ]
+
+
+def _pending_receipt_identity(
+    pending: dict[str, object] | None, *, run_id: str, case_id: str,
+) -> dict[str, object] | None:
+    if pending is None:
+        return None
+    return {
+        "run_id": run_id,
+        "case_id": case_id,
+        "sequence": pending.get("sequence"),
+        "response_id": pending.get("response_id"),
+        "content_sha256": sha256_bytes(canonical_json(pending)),
+    }
+
+
+def _validate_repairable_query(
+    wire: QuerySelection, *, pending_receipt: dict[str, object] | None,
+    candidate_ids: set[str], source_store: SourceStore, task: UnifiedTask,
+    require_explicit_stop: bool = False,
+) -> QueryResult:
+    if pending_receipt is None and wire.previous_receipt_assessment is not None:
+        raise ValueError("QUERY assessment has no pending receipt")
+    if pending_receipt is not None and wire.previous_receipt_assessment is None:
+        raise ValueError("QUERY omitted the pending receipt assessment")
+    if wire.decision == "request_query":
+        if wire.query_attempt is None or wire.stop_explanation is not None:
+            raise ValueError("request_query has an inconsistent envelope")
+        validation = validate_query_request(
+            wire.query_attempt.model_dump(mode="json"), candidate_ids=candidate_ids
+        )
+        if not validation.valid:
+            raise ValueError(validation.error_code or "invalid query request")
+        assert validation.tool is not None and validation.arguments is not None
+        if validation.tool == "inspect_source":
+            if validation.arguments.get("operation") == "read":
+                source_id = validation.arguments.get("source_id")
+                if not isinstance(source_id, str):
+                    raise ValueError("repair cannot prove a path-only read identity")
+                initial_sources = {
+                    source.source_id: source
+                    for source in (
+                        task.masked_test, task.mut_source, *task.supporting_sources
+                    )
+                }
+                initial_source = initial_sources.get(source_id)
+                if source_store.repository is not None:
+                    # A repository source may be known from a prior bounded search while
+                    # the requested next range is intentionally not observed yet. Repository
+                    # reads may also expand an initially supplied locator beyond its fragment.
+                    if source_id not in source_store.ids():
+                        raise ValueError("read source identity is not visible in this run")
+                elif initial_source is not None:
+                    start_line = validation.arguments.get("start_line")
+                    end_line = validation.arguments.get("end_line")
+                    if (
+                        type(start_line) is not int
+                        or type(end_line) is not int
+                        or not initial_source.start_line
+                        <= start_line <= end_line <= initial_source.end_line
+                    ):
+                        raise ValueError("read range is outside the supplied source")
+                else:
+                    raise ValueError("read source identity is not visible in this run")
+        else:
+            source_id = validation.arguments.get("source_id")
+            if not isinstance(source_id, str):
+                raise ValueError("analysis query has no stable source identity")
+            if source_store.repository is not None:
+                if source_id not in source_store.ids():
+                    raise ValueError("analysis source identity is not visible in this run")
+            else:
+                source_store.get(source_id)
+    else:
+        if wire.query_attempt is not None:
+            raise ValueError("finish_queries cannot contain a query attempt")
+        if require_explicit_stop and wire.stop_explanation is None:
+            raise ValueError("repository exploration requires an explicit stop explanation")
+    sequence = None if pending_receipt is None else pending_receipt.get("sequence")
+    if sequence is not None and type(sequence) is not int:
+        raise ValueError("pending receipt has an invalid sequence")
+    source_store.validate_task(task)
+    query = _materialize_query(wire, source_store, assessment_sequence=sequence)
+    if query.decision == "finish_queries" and query.stop_explanation is not None:
+        _validate_exploration_stop(query.stop_explanation, source_store)
+    return query
+
+
+async def _repair_query_output(
+    raw: object, *, original_call_sequence: int,
+    original_attempt_sequence: int | None, pending_receipt: dict[str, object] | None,
+    run_id: str, case_id: str, candidate_ids: set[str], task: UnifiedTask,
+    source_store: SourceStore, model: Model, config: StagedRunConfig,
+    ledger: UsageLedger, responses: list[dict], model_calls: list[dict],
+    stages: list[dict], repair_log: list[dict], allowance: FormatRepairAllowance,
+    deadline: float, model_call_limit: int,
+) -> QuerySelection:
+    entry: dict[str, object] = {
+        "stage": "QUERY_FORMAT_REPAIR",
+        "category": "assessment_unknown_null_fields",
+        "original_call_sequence": original_call_sequence,
+        "original_attempt_sequence": original_attempt_sequence,
+        "repaired_attempt_sequence": None,
+        "repair_call_sequence": None,
+        "error_positions": [],
+        "eligible": False,
+        "raw_before": raw,
+        "comparison_snapshot": None,
+        "comparison_snapshot_sha256": None,
+        "pending_receipt_identity": None,
+        "raw_after": None,
+        "outcome": "ineligible",
+        "allowance_use": allowance.state,
+        "budget_reason": None,
+    }
+    repair_log.append(entry)
+    try:
+        projected_wire, snapshot, locations = _query_repair_snapshot(raw)
+        _validate_repairable_query(
+            projected_wire, pending_receipt=pending_receipt,
+            candidate_ids=candidate_ids, source_store=source_store, task=task,
+            require_explicit_stop=config.repository_read,
+        )
+    except (ValueError, TypeError, CitationMaterializationError) as exc:
+        entry["budget_reason"] = _safe_external_text(exc, limit=200)
+        raise StagedInferenceError(
+            "QUERY output is outside the bounded repair policy",
+            stage="QUERY", stop_reason="output_invalid",
+        ) from None
+    identity = _pending_receipt_identity(pending_receipt, run_id=run_id, case_id=case_id)
+    entry.update({
+        "eligible": True,
+        "error_positions": locations,
+        "comparison_snapshot": snapshot,
+        "comparison_snapshot_sha256": sha256_bytes(canonical_json(snapshot)),
+        "pending_receipt_identity": identity,
+    })
+    known_budget_failure = None
+    if not ledger.usage_complete:
+        known_budget_failure = "prior_usage_unknown"
+    elif time.monotonic() >= deadline:
+        known_budget_failure = "run_deadline"
+    elif ledger.total_tokens >= config.max_total_tokens:
+        known_budget_failure = "total_token_limit"
+    elif (
+        config.max_cost_usd is not None
+        and ledger.rate_estimated_cost_usd is not None
+        and ledger.rate_estimated_cost_usd >= config.max_cost_usd
+    ):
+        known_budget_failure = "cost_limit"
+    elif model_call_limit >= 0 and ledger.requests_started >= model_call_limit:
+        known_budget_failure = "model_call_limit"
+    if known_budget_failure is not None:
+        entry["outcome"] = "blocked_budget"
+        entry["budget_reason"] = known_budget_failure
+        raise StagedInferenceError(
+            "QUERY repair budget is unavailable", stage="QUERY",
+            stop_reason="budget_exhausted" if known_budget_failure != "run_deadline" else "run_timeout",
+        )
+    if not allowance.reserve("QUERY_FORMAT_REPAIR"):
+        entry["outcome"] = "allowance_exhausted"
+        entry["allowance_use"] = allowance.state
+        raise StagedInferenceError(
+            "format repair allowance is exhausted", stage="QUERY", stop_reason="output_invalid"
+        )
+    entry["allowance_use"] = allowance.state
+    repair_response_start = len(responses)
+    try:
+        repaired = await _call_stage(
+            "QUERY_FORMAT_REPAIR", QuerySelection,
+            {
+                "stage": "QUERY_FORMAT_REPAIR",
+                "invalid_query": raw,
+                "eligible_errors": [
+                    {"location": location, "type": "extra_forbidden", "value": None}
+                    for location in locations
+                ],
+                "comparison_snapshot": snapshot,
+                "repair_rule": (
+                    "Return the complete staged-query/v0.3 object. Remove only the listed"
+                    " unknown null fields and preserve every listed value exactly; do not"
+                    " add evidence, source text, tools, or new reasoning."
+                ),
+            },
+            model=model, config=config, ledger=ledger, responses=responses,
+            model_calls=model_calls, deadline=deadline, model_call_limit=model_call_limit,
+        )
+    except asyncio.CancelledError:
+        if model_calls and model_calls[-1].get("stage") == "QUERY_FORMAT_REPAIR":
+            entry["repair_call_sequence"] = int(model_calls[-1]["sequence"])
+            entry["outcome"] = "cancelled"
+        if len(responses) == repair_response_start + 1:
+            try:
+                entry["raw_after"] = _completed_response_json(responses[-1])
+            except (ValueError, TypeError) as raw_exc:
+                entry["raw_after_error"] = _safe_external_text(raw_exc, limit=200)
+        raise
+    except StagedInferenceError as repair_exc:
+        if model_calls and model_calls[-1].get("stage") == "QUERY_FORMAT_REPAIR":
+            entry["repair_call_sequence"] = int(model_calls[-1]["sequence"])
+            entry["outcome"] = (
+                "blocked_budget"
+                if repair_exc.stop_reason == "budget_exhausted"
+                else (
+                    "rejected_invalid_repair"
+                    if repair_exc.stop_reason == "output_invalid"
+                    else "failed"
+                )
+            )
+        if len(responses) == repair_response_start + 1:
+            try:
+                entry["raw_after"] = _completed_response_json(responses[-1])
+            except (ValueError, TypeError) as raw_exc:
+                entry["raw_after_error"] = _safe_external_text(raw_exc, limit=200)
+        raise
+    entry["repair_call_sequence"] = int(model_calls[-1]["sequence"])
+    if len(responses) != repair_response_start + 1:
+        entry["outcome"] = "rejected_missing_raw_response"
+        raise StagedInferenceError(
+            "QUERY repair did not preserve one raw response",
+            stage="QUERY_FORMAT_REPAIR", stop_reason="output_invalid",
+        )
+    try:
+        after = _completed_response_json(responses[-1])
+    except (ValueError, TypeError) as raw_exc:
+        entry["outcome"] = "rejected_incomplete_raw_response"
+        entry["raw_after_error"] = _safe_external_text(raw_exc, limit=200)
+        raise StagedInferenceError(
+            "QUERY repair response is not uniquely complete",
+            stage="QUERY_FORMAT_REPAIR", stop_reason="output_invalid",
+        ) from None
+    entry["raw_after"] = after
+    if (
+        not isinstance(after, dict)
+        or set(after) != set(QuerySelection.model_fields)
+        or canonical_json(after) != canonical_json(snapshot)
+        or repaired.model_dump(mode="json") != snapshot
+    ):
+        entry["outcome"] = "rejected_semantic_change"
+        raise StagedInferenceError(
+            "QUERY format repair changed protocol semantics",
+            stage="QUERY_FORMAT_REPAIR", stop_reason="output_invalid",
+        )
+    try:
+        if _pending_receipt_identity(
+            pending_receipt, run_id=run_id, case_id=case_id
+        ) != identity:
+            raise ValueError("pending receipt identity changed")
+        _validate_repairable_query(
+            repaired, pending_receipt=pending_receipt, candidate_ids=candidate_ids,
+            source_store=source_store, task=task,
+            require_explicit_stop=config.repository_read,
+        )
+    except (ValueError, TypeError, CitationMaterializationError) as final_exc:
+        entry["outcome"] = "rejected_post_validation"
+        entry["budget_reason"] = _safe_external_text(final_exc, limit=200)
+        raise StagedInferenceError(
+            "QUERY repair failed pending identity or source validation",
+            stage="QUERY_FORMAT_REPAIR", stop_reason="output_invalid",
+        ) from None
+    entry["outcome"] = "completed"
+    stages.append(_wire_stage_entry(
+        "QUERY_FORMAT_REPAIR", repaired,
+        model_call_sequence=int(model_calls[-1]["sequence"]),
+    ))
+    return repaired
+
+
 def _delivery_snapshot(raw: object) -> dict:
     """Accept only unambiguous envelope/version and decimal-line formatting repairs.
 
@@ -1041,7 +1408,8 @@ async def _deliver_with_repair(
     source_store: SourceStore,
     model: Model, config: StagedRunConfig, ledger: UsageLedger,
     responses: list[dict], model_calls: list[dict], stages: list[dict],
-    repair_log: list[dict], deadline: float, model_call_limit: int,
+    repair_log: list[dict], allowance: FormatRepairAllowance,
+    deadline: float, model_call_limit: int,
 ) -> DeliverResult:
     expected = DeliverResult(
         schema_version="staged-deliver/v0.1", result_status=constructed.result_status,
@@ -1101,14 +1469,60 @@ async def _deliver_with_repair(
         _complete_stage_entry(stage_entry, delivered)
         raw = None
     if raw is not None:
-        snapshot = _delivery_snapshot(raw)
-        if snapshot != expected_wire:
+        entry = {
+            "stage": "FORMAT_REPAIR", "category": "delivery_format",
+            "original_call_sequence": int(model_calls[-1]["sequence"]),
+            "original_attempt_sequence": None, "repaired_attempt_sequence": None,
+            "repair_call_sequence": None, "before": raw,
+            "semantic_snapshot": None, "after": None, "status": "requested",
+            "allowance_use": allowance.state, "budget_reason": None,
+        }
+        repair_log.append(entry)
+        try:
+            snapshot = _delivery_snapshot(raw)
+            if snapshot != expected_wire:
+                raise ValueError("invalid DELIVER changed semantics or evidence")
+        except (ValueError, TypeError) as snapshot_exc:
+            entry["status"] = "ineligible"
+            entry["budget_reason"] = _safe_external_text(snapshot_exc, limit=200)
             raise ValueError("invalid DELIVER changed semantics or evidence") from None
+        entry["semantic_snapshot"] = snapshot
         # Exact equality includes source ID and normalized range; the already
         # validated construct supplies the source identity proof.
-        entry = {"before": raw, "semantic_snapshot": snapshot, "after": None,
-                 "status": "requested"}
-        repair_log.append(entry)
+        known_budget_failure = None
+        if not ledger.usage_complete:
+            known_budget_failure = "prior_usage_unknown"
+        elif time.monotonic() >= deadline:
+            known_budget_failure = "run_deadline"
+        elif ledger.total_tokens >= config.max_total_tokens:
+            known_budget_failure = "total_token_limit"
+        elif (
+            config.max_cost_usd is not None
+            and ledger.rate_estimated_cost_usd is not None
+            and ledger.rate_estimated_cost_usd >= config.max_cost_usd
+        ):
+            known_budget_failure = "cost_limit"
+        elif model_call_limit >= 0 and ledger.requests_started >= model_call_limit:
+            known_budget_failure = "model_call_limit"
+        if known_budget_failure is not None:
+            entry["status"] = "blocked_budget"
+            entry["budget_reason"] = known_budget_failure
+            raise StagedInferenceError(
+                "final format repair budget is unavailable", stage="FORMAT_REPAIR",
+                stop_reason=(
+                    "run_timeout" if known_budget_failure == "run_deadline"
+                    else "budget_exhausted"
+                ),
+            )
+        if not allowance.reserve("FORMAT_REPAIR"):
+            entry["status"] = "allowance_exhausted"
+            entry["allowance_use"] = allowance.state
+            raise StagedInferenceError(
+                "format repair allowance is exhausted",
+                stage="FORMAT_REPAIR", stop_reason="output_invalid",
+            )
+        entry["allowance_use"] = allowance.state
+        repair_response_start = len(responses)
         try:
             wire = await _call_stage(
                 "FORMAT_REPAIR", DeliverSelection,
@@ -1120,8 +1534,26 @@ async def _deliver_with_repair(
                 model_calls=model_calls, deadline=deadline,
                 model_call_limit=model_call_limit,
             )
+        except asyncio.CancelledError:
+            entry["status"] = "cancelled"
+            if model_calls and model_calls[-1].get("stage") == "FORMAT_REPAIR":
+                entry["repair_call_sequence"] = int(model_calls[-1]["sequence"])
+            if len(responses) == repair_response_start + 1:
+                try:
+                    entry["after"] = _completed_response_json(responses[-1])
+                except (ValueError, TypeError) as raw_exc:
+                    entry["after_error"] = _safe_external_text(raw_exc, limit=200)
+            raise
         except StagedInferenceError as exc:
-            entry["status"] = "failed"
+            entry["status"] = (
+                "blocked_budget" if exc.stop_reason == "budget_exhausted" else "failed"
+            )
+            entry["repair_call_sequence"] = int(model_calls[-1]["sequence"])
+            if len(responses) == repair_response_start + 1:
+                try:
+                    entry["after"] = _completed_response_json(responses[-1])
+                except (ValueError, TypeError) as raw_exc:
+                    entry["after_error"] = _safe_external_text(raw_exc, limit=200)
             if exc.stop_reason in {"budget_exhausted", "run_timeout", "timeout"}:
                 raise
             raise StagedInferenceError(
@@ -1129,6 +1561,7 @@ async def _deliver_with_repair(
                 stage="FORMAT_REPAIR", stop_reason="output_invalid",
             ) from None
         entry["after"] = wire.model_dump(mode="json")
+        entry["repair_call_sequence"] = int(model_calls[-1]["sequence"])
         stage_entry = _wire_stage_entry(
             "FORMAT_REPAIR", wire,
             model_call_sequence=int(model_calls[-1]["sequence"]),
@@ -1366,6 +1799,7 @@ async def execute_staged_run(
     responses: list[dict] = []
     model_calls: list[dict] = []
     format_repair_log: list[dict] = []
+    format_repair_allowance = FormatRepairAllowance()
     contract: ScenarioContract | None = None
     selected_scenario_id: str | None = None
     result_status = "ERROR"
@@ -1581,33 +2015,119 @@ async def execute_staged_run(
         candidate_ids = {item.scenario_id for item in extract.candidates}
         pending_receipt: dict[str, object] | None = None
         while True:
-            query_wire = await _call_stage(
-                "QUERY", QuerySelection,
-                {
-                    "stage": "QUERY",
-                    "visible_task": canonical_task,
-                    "extract": extract.model_dump(mode="json"),
-                    "query_receipts": query_executor.attempts,
-                },
-                model=model, config=config, ledger=ledger,
-                responses=responses, model_calls=model_calls, deadline=deadline,
-                model_call_limit=model_call_limit,
-            )
-            query_entry = _wire_stage_entry(
-                "QUERY", query_wire,
-                model_call_sequence=int(model_calls[-1]["sequence"]),
-            )
-            stages.append(query_entry)
-            source_store.validate_task(task)
+            query_payload = {
+                "stage": "QUERY",
+                "visible_task": canonical_task,
+                "extract": extract.model_dump(mode="json"),
+                "query_receipts": query_executor.attempts,
+            }
+            response_start = len(responses)
+            original_attempt = None
+            repaired_output = False
             try:
-                query = _materialize_query(query_wire, source_store)
-            except CitationMaterializationError as exc:
-                _record_citation_error(query_entry, exc)
-                raise
-            _complete_stage_entry(query_entry, query)
+                query_wire = await _call_stage(
+                    "QUERY", QuerySelection, query_payload,
+                    model=model, config=config, ledger=ledger,
+                    responses=responses, model_calls=model_calls, deadline=deadline,
+                    model_call_limit=model_call_limit,
+                )
+            except StagedInferenceError as exc:
+                saved_budget_response = (
+                    exc.stop_reason == "budget_exhausted"
+                    and len(responses) == response_start + 1
+                )
+                if exc.stop_reason != "output_invalid" and not saved_budget_response:
+                    raise
+                raw: object = None
+                raw_error: str | None = None
+                try:
+                    if len(responses) != response_start + 1:
+                        raise ValueError("QUERY failure did not preserve one response")
+                    raw = _completed_response_json(responses[-1])
+                except (ValueError, TypeError) as raw_exc:
+                    raw_error = _safe_external_text(raw_exc, limit=200)
+                original_call_sequence = int(model_calls[-1]["sequence"])
+                if saved_budget_response and raw_error is not None:
+                    stages.append({
+                        "stage": "QUERY", "model_call_sequence": original_call_sequence,
+                        "citation_mode": CITATION_MODE, "wire_result": raw, "result": None,
+                        "validation_error": raw_error,
+                    })
+                    format_repair_log.append({
+                        "stage": "QUERY_FORMAT_REPAIR", "category": "unavailable_raw",
+                        "original_call_sequence": original_call_sequence,
+                        "original_attempt_sequence": None,
+                        "repaired_attempt_sequence": None, "repair_call_sequence": None,
+                        "error_positions": [], "eligible": False, "raw_before": raw,
+                        "comparison_snapshot": None,
+                        "comparison_snapshot_sha256": None,
+                        "pending_receipt_identity": None, "raw_after": None,
+                        "outcome": "blocked_budget", "allowance_use": format_repair_allowance.state,
+                        "budget_reason": "budget exhausted after the saved response",
+                    })
+                    raise
+                if saved_budget_response:
+                    try:
+                        QuerySelection.model_validate(raw)
+                    except ValidationError:
+                        pass
+                    else:
+                        stages.append({
+                            "stage": "QUERY", "model_call_sequence": original_call_sequence,
+                            "citation_mode": CITATION_MODE, "unvalidated_result": raw,
+                            "result": None,
+                        })
+                        raise
+                stages.append({
+                    "stage": "QUERY",
+                    "model_call_sequence": original_call_sequence,
+                    "citation_mode": CITATION_MODE,
+                    "wire_result": raw,
+                    "result": None,
+                    "validation_error": raw_error or "strict staged-query/v0.3 validation failed",
+                })
+                if isinstance(raw, dict) and (
+                    raw.get("decision") == "request_query"
+                    or ("query_attempt" in raw and raw.get("query_attempt") is not None)
+                ):
+                    original_attempt = query_executor.register(raw.get("query_attempt"))
+                    query_executor.reject(
+                        original_attempt, status="protocol_error",
+                        code="invalid_query_protocol",
+                        diagnostic="The original QUERY response failed strict protocol validation.",
+                    )
+                query_wire = await _repair_query_output(
+                    raw,
+                    original_call_sequence=original_call_sequence,
+                    original_attempt_sequence=(
+                        None if original_attempt is None else int(original_attempt["sequence"])
+                    ),
+                    pending_receipt=pending_receipt, run_id=run_id, case_id=case_id,
+                    candidate_ids=candidate_ids, task=task, source_store=source_store,
+                    model=model, config=config, ledger=ledger, responses=responses,
+                    model_calls=model_calls, stages=stages, repair_log=format_repair_log,
+                    allowance=format_repair_allowance, deadline=deadline,
+                    model_call_limit=model_call_limit,
+                )
+                repaired_output = True
+            query_entry = _wire_stage_entry(
+                "QUERY" if not repaired_output else "QUERY_FORMAT_REPAIR",
+                query_wire, model_call_sequence=int(model_calls[-1]["sequence"]),
+            )
+            if repaired_output:
+                stages[-1] = query_entry
+            else:
+                stages.append(query_entry)
             observed_attempt = None
-            if query.decision == "request_query" or query.query_attempt is not None:
-                observed_attempt = query_executor.register(query.query_attempt)
+            if query_wire.decision == "request_query" or query_wire.query_attempt is not None:
+                observed_attempt = query_executor.register(
+                    None if query_wire.query_attempt is None
+                    else query_wire.query_attempt.model_dump(mode="json")
+                )
+                if repaired_output:
+                    format_repair_log[-1]["repaired_attempt_sequence"] = int(
+                        observed_attempt["sequence"]
+                    )
             if not ledger.usage_complete:
                 if observed_attempt is not None:
                     query_executor.reject(
@@ -1621,22 +2141,8 @@ async def execute_staged_run(
                     stage="QUERY",
                     stop_reason="budget_exhausted",
                 )
-            raw_assessment = query.previous_receipt_assessment
-            assessment: QueryAssessment | None = None
-            if raw_assessment is not None:
-                try:
-                    assessment = QueryAssessment.model_validate(raw_assessment)
-                except ValidationError:
-                    if observed_attempt is not None:
-                        query_executor.reject(
-                            observed_attempt,
-                            status="protocol_error",
-                            code="invalid_previous_receipt_assessment",
-                            diagnostic="The previous receipt assessment is malformed.",
-                        )
-                    raise ValueError("QUERY previous receipt assessment is malformed") from None
             if pending_receipt is None:
-                if assessment is not None:
+                if query_wire.previous_receipt_assessment is not None:
                     if observed_attempt is not None:
                         query_executor.reject(
                             observed_attempt,
@@ -1646,7 +2152,7 @@ async def execute_staged_run(
                         )
                     raise ValueError("QUERY assessed a receipt that does not exist")
             else:
-                if assessment is None:
+                if query_wire.previous_receipt_assessment is None:
                     if observed_attempt is not None:
                         query_executor.reject(
                             observed_attempt,
@@ -1655,17 +2161,28 @@ async def execute_staged_run(
                             diagnostic="The prior receipt must be assessed before another query.",
                         )
                     raise ValueError("QUERY must assess the previous receipt")
-                if assessment.attempt_sequence != pending_receipt["sequence"]:
-                    if observed_attempt is not None:
-                        query_executor.reject(
-                            observed_attempt,
-                            status="protocol_error",
-                            code="misassociated_previous_receipt_assessment",
-                            diagnostic="The assessment names a different prior receipt.",
-                        )
-                    raise ValueError("QUERY assessment references the wrong receipt")
-                pending_receipt["assessment"] = assessment.model_dump(mode="json")
+            source_store.validate_task(task)
+            assessment_sequence = None
+            if pending_receipt is not None:
+                pending_sequence = pending_receipt.get("sequence")
+                if type(pending_sequence) is not int:
+                    raise ValueError("pending receipt has an invalid sequence")
+                assessment_sequence = pending_sequence
+            try:
+                query = _materialize_query(
+                    query_wire, source_store,
+                    assessment_sequence=assessment_sequence,
+                )
+            except CitationMaterializationError as exc:
+                _record_citation_error(query_entry, exc)
+                raise
+            if pending_receipt is not None:
+                assert query.previous_receipt_assessment is not None
+                pending_receipt["assessment"] = (
+                    query.previous_receipt_assessment.model_dump(mode="json")
+                )
                 pending_receipt["assessment_status"] = "complete"
+            _complete_stage_entry(query_entry, query)
 
             if (
                 observed_attempt is not None
@@ -1894,6 +2411,7 @@ async def execute_staged_run(
              "host": {"run_id": run_id, "case_id": case_id, "language": language,
                       "input_hash": input_hash, "variant": config.variant}}, model=model,
             constructed=constructed, task=task, stages=stages, repair_log=format_repair_log,
+            allowance=format_repair_allowance,
             source_store=source_store,
             config=config, ledger=ledger, responses=responses,
             model_calls=model_calls, deadline=deadline,
@@ -2044,6 +2562,10 @@ async def execute_staged_run(
         "degeneracy_contrast": degeneracy_contrast,
         "revision_log": revision_log,
         "format_repair_log": format_repair_log,
+        "format_repair_allowance": {
+            "state": format_repair_allowance.state,
+            "category": format_repair_allowance.category,
+        },
         "unresolved": (
             early_unresolved or ([] if constructed is None else constructed.unresolved)
         ),

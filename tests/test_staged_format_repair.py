@@ -5,11 +5,16 @@ import asyncio
 from copy import deepcopy
 from pathlib import Path
 import sys
+import time
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "experiments" / "staged-inference"))
-from controller import StagedRunConfig, _materialize_contract, execute_staged_run  # noqa: E402
+from controller import (  # noqa: E402
+    FormatRepairAllowance, StagedInferenceError, StagedRunConfig,
+    _materialize_contract, _repair_query_output, execute_staged_run,
+)
+from mock_spec.budget import InferenceBudget, UsageLedger  # noqa: E402
 from scripted import FixedScriptModel, scripted_outputs, synthetic_task  # noqa: E402
 from mock_spec.schemas import UnifiedTask  # noqa: E402
 from mock_spec.validation import SourceStore  # noqa: E402
@@ -208,3 +213,186 @@ def test_actual_token_exhaustion_cannot_hide_invalid_final_response(tmp_path, in
         assert result["record"]["result_status"] == "INCONCLUSIVE"
         assert result["record"]["stop_reason"] == "budget_exhausted"
         assert result["contract"] is None
+
+
+def _query_repair_outputs(*, request_count=1):
+    from scripted import query_script
+
+    outputs = [deepcopy(item) for item in query_script(request_count)]
+    repaired = deepcopy(outputs[2])
+    outputs[2]["previous_receipt_assessment"]["format_note"] = None
+    outputs.insert(3, repaired)
+    return outputs
+
+
+def test_query_null_extra_repair_preserves_finish_semantics(tmp_path):
+    model = FixedScriptModel(_query_repair_outputs())
+    result = asyncio.run(execute_staged_run(
+        synthetic_task(), output_dir=tmp_path / "run", model=model,
+        config=StagedRunConfig(),
+    ))
+    assert result["record"]["result_status"] == "SELECTED"
+    assert model.calls == result["manifest"]["usage"]["requests_started"] == 6
+    log = result["record"]["format_repair_log"][0]
+    assert log["outcome"] == "completed"
+    assert log["original_attempt_sequence"] is None
+    assert log["repaired_attempt_sequence"] is None
+    assert log["repair_call_sequence"] == 4
+    assert log["comparison_snapshot"] == log["raw_after"]
+
+
+def test_query_request_repair_keeps_original_error_and_dispatches_new_attempt(tmp_path):
+    model = FixedScriptModel(_query_repair_outputs(request_count=2))
+    result = asyncio.run(execute_staged_run(
+        synthetic_task(), output_dir=tmp_path / "run", model=model,
+        config=StagedRunConfig(),
+    ))
+    receipts = result["record"]["query_log"]
+    assert result["record"]["result_status"] == "SELECTED"
+    assert [item["sequence"] for item in receipts] == [1, 2, 3]
+    assert receipts[1]["status"] == "protocol_error"
+    assert receipts[2]["status"] == "ok"
+    log = result["record"]["format_repair_log"][0]
+    assert (log["original_attempt_sequence"], log["repaired_attempt_sequence"]) == (2, 3)
+
+
+@pytest.mark.parametrize("mutation", [
+    lambda value: value.pop("stop_explanation"),
+    lambda value: value.update(impact="changed semantic impact"),
+])
+def test_query_repair_requires_complete_raw_and_exact_semantics(tmp_path, mutation):
+    outputs = _query_repair_outputs()
+    mutation(outputs[3])
+    model = FixedScriptModel(outputs)
+    result = asyncio.run(execute_staged_run(
+        synthetic_task(), output_dir=tmp_path / "run", model=model,
+        config=StagedRunConfig(),
+    ))
+    assert result["record"]["result_status"] == "ERROR"
+    assert model.calls == 4
+    entry = result["record"]["format_repair_log"][0]
+    assert entry["outcome"] in {
+        "rejected_semantic_change", "rejected_incomplete_raw_response",
+        "rejected_invalid_repair",
+    }
+    assert entry["raw_after"] is not None
+
+
+@pytest.mark.parametrize("arguments", [
+    '{"source_id":"unknown:0","start_line":1,"end_line":2}',
+    '{"source_id":"mut:0","start_line":1,"end_line":999}',
+])
+def test_query_repair_rejects_invalid_source_identity_or_initial_range(
+    tmp_path, arguments,
+):
+    outputs = _query_repair_outputs(request_count=2)
+    outputs[2]["query_attempt"]["arguments_json"] = arguments
+    model = FixedScriptModel(outputs)
+    result = asyncio.run(execute_staged_run(
+        synthetic_task(), output_dir=tmp_path / "run", model=model,
+        config=StagedRunConfig(),
+    ))
+    assert result["record"]["result_status"] == "ERROR"
+    assert model.calls == 3
+    assert result["record"]["query_log"][1]["status"] == "protocol_error"
+    assert result["record"]["format_repair_log"][0]["outcome"] == "ineligible"
+
+
+def test_query_and_delivery_share_one_irreversible_repair_allowance(tmp_path):
+    outputs = _query_repair_outputs()
+    expected_delivery = deepcopy(outputs[-1])
+    outputs[-1].pop("schema_version")
+    outputs.append(expected_delivery)
+    model = FixedScriptModel(outputs)
+    result = asyncio.run(execute_staged_run(
+        synthetic_task(), output_dir=tmp_path / "run", model=model,
+        config=StagedRunConfig(),
+    ))
+    assert result["record"]["result_status"] == "ERROR"
+    assert model.calls == 6
+    logs = result["record"]["format_repair_log"]
+    assert logs[0]["outcome"] == "completed"
+    assert logs[1]["status"] == "allowance_exhausted"
+
+
+@pytest.mark.parametrize("field", [
+    "decision", "candidate", "tool", "arguments_json", "assessment_impact",
+    "assessment_rationale", "outer_impact",
+])
+def test_query_repair_rejects_each_changed_request_field(tmp_path, field):
+    outputs = _query_repair_outputs(request_count=2)
+    repaired = outputs[3]
+    if field == "decision":
+        repaired["decision"] = "finish_queries"
+    elif field == "candidate":
+        repaired["query_attempt"]["scenario_id"] = "changed"
+    elif field == "tool":
+        repaired["query_attempt"]["tool"] = "inspect_dependency_usage"
+    elif field == "arguments_json":
+        repaired["query_attempt"]["arguments_json"] += " "
+    elif field == "assessment_impact":
+        repaired["previous_receipt_assessment"]["impact"] = "supports"
+    elif field == "assessment_rationale":
+        repaired["previous_receipt_assessment"]["rationale"] = "changed"
+    else:
+        repaired["impact"] = "changed"
+    result = asyncio.run(execute_staged_run(
+        synthetic_task(), output_dir=tmp_path / "run", model=FixedScriptModel(outputs),
+        config=StagedRunConfig(),
+    ))
+    assert result["record"]["result_status"] == "ERROR"
+    assert result["record"]["format_repair_log"][0]["outcome"] == (
+        "rejected_semantic_change"
+    )
+
+
+@pytest.mark.parametrize("field", ["stop_evidence", "stop_unknowns"])
+def test_query_repair_rejects_changed_stop_fields(tmp_path, field):
+    outputs = _query_repair_outputs()
+    if field == "stop_evidence":
+        outputs[3]["stop_explanation"]["evidence"][0]["end_line"] = 4
+    else:
+        outputs[3]["stop_explanation"]["remaining_unknowns"][0]["impact"] = "changed"
+    result = asyncio.run(execute_staged_run(
+        synthetic_task(), output_dir=tmp_path / "run", model=FixedScriptModel(outputs),
+        config=StagedRunConfig(),
+    ))
+    assert result["record"]["result_status"] == "ERROR"
+    assert result["record"]["format_repair_log"][0]["outcome"] == (
+        "rejected_semantic_change"
+    )
+
+
+def test_query_repair_rejects_pending_receipt_content_change():
+    from scripted import query_script
+
+    outputs = query_script(2)
+    raw = deepcopy(outputs[2])
+    repaired = deepcopy(raw)
+    raw["previous_receipt_assessment"]["format_note"] = None
+    pending = {
+        "sequence": 1, "response_id": "query:1", "status": "ok",
+        "result": {"status": "ok"}, "assessment": None,
+        "assessment_status": "incomplete",
+    }
+
+    class MutatingModel(FixedScriptModel):
+        async def get_response(self, *args, **kwargs):
+            response = await super().get_response(*args, **kwargs)
+            pending["result"] = {"status": "changed"}
+            return response
+
+    task = UnifiedTask.from_dict(synthetic_task())
+    logs = []
+    with pytest.raises(StagedInferenceError):
+        asyncio.run(_repair_query_output(
+            raw, original_call_sequence=2, original_attempt_sequence=2,
+            pending_receipt=pending, run_id="run", case_id=task.case_id,
+            candidate_ids={"dependency_returns_two"}, task=task,
+            source_store=SourceStore(task), model=MutatingModel([repaired]),
+            config=StagedRunConfig(), ledger=UsageLedger(InferenceBudget()),
+            responses=[], model_calls=[], stages=[], repair_log=logs,
+            allowance=FormatRepairAllowance(), deadline=time.monotonic() + 10,
+            model_call_limit=10,
+        ))
+    assert logs[0]["outcome"] == "rejected_post_validation"

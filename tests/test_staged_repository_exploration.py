@@ -16,10 +16,67 @@ import pytest
 STAGED_ROOT = Path(__file__).parents[1] / "experiments" / "staged-inference"
 sys.path.insert(0, str(STAGED_ROOT))
 
-from controller import StagedRunConfig, execute_staged_run  # noqa: E402
+from controller import (  # noqa: E402
+    QuerySelection, StagedRunConfig, _validate_repairable_query, execute_staged_run,
+)
 from scripted import FixedScriptModel, query_script, synthetic_task  # noqa: E402
 from mock_spec.schemas import UnifiedTask  # noqa: E402
 from mock_spec.source_repository import ReviewedRepository  # noqa: E402
+from mock_spec.validation import SourceStore  # noqa: E402
+
+
+def test_repair_qualification_allows_future_read_after_disjoint_search_matches(
+    tmp_path: Path,
+) -> None:
+    task = UnifiedTask.from_dict(synthetic_task())
+    tree = tmp_path / "snapshot" / "tree" / "src"
+    tree.mkdir(parents=True)
+    payload = b"head\nTOKEN first\ngap one\ngap two\nTOKEN second\ntail\n"
+    (tree / "example.py").write_bytes(payload)
+    root_fd = os.open(tmp_path / "snapshot", os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        repository = ReviewedRepository(
+            root_fd, task=task, snapshot_id="synthetic-reviewed-snapshot",
+            discovery_root="tree",
+            files_by_logical_path={
+                "src/example.py": (
+                    "tree/src/example.py", hashlib.sha256(payload).hexdigest()
+                )
+            },
+        )
+    finally:
+        os.close(root_fd)
+    try:
+        store = SourceStore(task, repository=repository)
+        search = store.search(text="TOKEN", max_output_chars=16000)
+        source_id = repository.source_id_for("src/example.py")
+        assert [match["start_line"] for match in search["matches"]] == [2, 5]
+        before = store.observations()
+        wire = QuerySelection.model_validate({
+            "schema_version": "staged-query/v0.3",
+            "decision": "request_query",
+            "query_attempt": {
+                "question": "What do the intervening lines establish?",
+                "scenario_id": "dependency_returns_two",
+                "tool": "inspect_source",
+                "arguments_json": json.dumps({
+                    "operation": "read", "source_id": source_id,
+                    "start_line": 3, "end_line": 4,
+                }),
+            },
+            "previous_receipt_assessment": None,
+            "impact": "The future bounded read may resolve the question.",
+            "stop_explanation": None,
+        })
+        query = _validate_repairable_query(
+            wire, pending_receipt=None,
+            candidate_ids={"dependency_returns_two"},
+            source_store=store, task=task, require_explicit_stop=True,
+        )
+        assert query.query_attempt is not None
+        assert store.observations() == before
+    finally:
+        repository.close()
 
 
 def _repository_run(tmp_path: Path, *, bad_quote: bool = False, transform=None,

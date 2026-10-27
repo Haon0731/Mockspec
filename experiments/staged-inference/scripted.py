@@ -176,7 +176,10 @@ def _wire_outputs(outputs: list[dict]) -> list[dict]:
                     _source_locator(item) for item in candidate["evidence"]
                 ]
         elif version == "staged-query/v0.1":
-            output["schema_version"] = "staged-query/v0.2"
+            output["schema_version"] = "staged-query/v0.3"
+            assessment = output.get("previous_receipt_assessment")
+            if assessment is not None:
+                assessment.pop("attempt_sequence", None)
             stop = output.get("stop_explanation")
             if stop is not None:
                 stop["evidence"] = [_source_locator(item) for item in stop["evidence"]]
@@ -683,7 +686,7 @@ def query_script(
     queries = []
     for index in range(count + 1):
         assessment = None if index == 0 else {
-            "attempt_sequence": index, "impact": "no_new_information",
+            "impact": "no_new_information",
             "rationale": "The receipt does not resolve the hidden dependency behavior.",
         }
         attempt = None
@@ -699,7 +702,7 @@ def query_script(
                 "arguments_json": json.dumps(arguments),
             }
         queries.append({
-            "schema_version": "staged-query/v0.2",
+            "schema_version": "staged-query/v0.3",
             "decision": "finish_queries" if attempt is None else "request_query",
             "query_attempt": attempt, "previous_receipt_assessment": assessment,
             "impact": "Preserve the current candidate pending construction.",

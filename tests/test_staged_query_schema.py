@@ -12,6 +12,7 @@ import httpx2
 import pytest
 from agents import ModelBehaviorError
 from openai import BadRequestError
+from pydantic import ValidationError
 from openai.types.responses import Response
 from types import SimpleNamespace
 from agents.models.openai_responses import OpenAIResponsesModel
@@ -30,7 +31,7 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
     requests: list[dict] = []
     calls: list[dict] = []
     result = {
-        "schema_version": "staged-query/v0.2",
+        "schema_version": "staged-query/v0.3",
         "decision": "finish_queries",
         "query_attempt": None,
         "previous_receipt_assessment": None,
@@ -85,14 +86,22 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
     assert calls[0]["requested_output_schema"] == requests[0]["text"]["format"]["schema"]
 
 
-def test_malformed_query_envelope_remains_available_for_host_attempt_accounting() -> None:
-    result = QuerySelection.model_validate({
-        "schema_version": "staged-query/v0.2", "decision": "request_query",
-        "query_attempt": {"tool": "unknown", "arguments_json": "{"},
-        "previous_receipt_assessment": "not-an-assessment", "impact": "inspect",
-    })
-    assert result.query_attempt == {"tool": "unknown", "arguments_json": "{"}
-    assert result.previous_receipt_assessment == "not-an-assessment"
+@pytest.mark.parametrize("invalid", [
+    {"schema_version": "staged-query/v0.2"},
+    {"previous_receipt_assessment": {"attempt_sequence": 1, "impact": "supports",
+                                     "rationale": "old host-owned field"}},
+    {"query_attempt": {"question": "q", "scenario_id": "s", "tool": "unknown",
+                       "arguments_json": "{}", "extra": None}},
+])
+def test_query_wire_strictly_rejects_legacy_or_unknown_fields(invalid) -> None:
+    value = {
+        "schema_version": "staged-query/v0.3", "decision": "finish_queries",
+        "query_attempt": None, "previous_receipt_assessment": None,
+        "impact": "inspect", "stop_explanation": None,
+    }
+    value.update(invalid)
+    with pytest.raises(ValidationError):
+        QuerySelection.model_validate(value)
 
 
 @pytest.mark.parametrize(

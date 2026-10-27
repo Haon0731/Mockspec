@@ -1,0 +1,39 @@
+[
+  {
+    "id": "import_only_bad",
+    "evidence": "from unittest.mock import Mock",
+    "candidate": "The hidden slot creates a Mock, stubs its return value, and verifies one call.",
+    "unresolved": [],
+    "expected_verdict": "reject",
+    "evidence_limit": "The import establishes availability only.",
+    "review_rationale": "It does not establish hidden substitution, stubbing, or an exact call count."
+  },
+  {
+    "id": "import_only_good",
+    "evidence": "from unittest.mock import Mock",
+    "candidate": "If hidden setup substitutes the dependency, the required return behavior remains unresolved.",
+    "unresolved": ["Whether a substitute is created", "Whether a return is stubbed", "Whether any exact call count is required"],
+    "expected_verdict": "approve",
+    "evidence_limit": "The import alone establishes no substitute, stub value, or count.",
+    "review_rationale": "The candidate is conditional and preserves every unsupported behavior as unresolved."
+  },
+  {
+    "id": "declaration_only_bad",
+    "evidence": "client: PaymentClient",
+    "assessment": {"impact": "supports", "rationale": "The declaration proves charge is called once with the exact request."},
+    "candidate": "Production calls client.charge once with the exact request.",
+    "expected_verdict": "reject",
+    "evidence_limit": "A declaration establishes dependency availability and type only.",
+    "review_rationale": "No behavioral source supports the branch, call, arguments, or count; the assessment must be no_new_information."
+  },
+  {
+    "id": "declaration_only_good",
+    "evidence": "client: PaymentClient",
+    "assessment": {"impact": "no_new_information", "rationale": "The declaration does not reveal runtime behavior."},
+    "candidate": "If the branch delegates to the client, its call, arguments, and count must be confirmed by behavioral source.",
+    "unresolved": ["Whether the branch delegates", "Which call is made", "Which arguments are used", "What count is required"],
+    "expected_verdict": "approve",
+    "evidence_limit": "A declaration establishes dependency availability and type only.",
+    "review_rationale": "The assessment records no new behavioral information and the candidate keeps all behavior conditional."
+  }
+]

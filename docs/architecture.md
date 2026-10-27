@@ -147,20 +147,27 @@ V0.1 无工具，V0.2 有三个只读工具；两版都使用正式 ScenarioCont
 、[M1-3 / #9](https://github.com/Haon0731/Mockspec/issues/9)
 及 [M1-4 / #10](https://github.com/Haon0731/Mockspec/issues/10) 的 B/C 变体离线回放：合成 Python `UnifiedTask` → 同一研究控制器的
 EXTRACT → QUERY（片段模式最多六次；仓库模式按证据与资源终止）→ CONSTRUCT → CONTRAST（仅 C）→
-REVISE（可选一次）→ DELIVER → FORMAT_REPAIR（可选一次）→ 契约、研究记录与运行清单。
+REVISE（可选一次）→ DELIVER → 契约、研究记录与运行清单。
+QUERY_FORMAT_REPAIR 与 DELIVER 的 FORMAT_REPAIR 共用整次运行一次的纠正名额。
 固定脚本模型仍经过 Agents SDK Runner；控制器复用生产 `UsageLedger`、
 `validate_contract`（含 `SourceStore` 原文校验）及运行身份采集组件。
 研究阶段协议、Prompt 与产物写入位于研究目录，生产包不反向依赖它。
 M1-5 的 `acceptance.py` 汇总同一入口的固定回放并复核产物；`run.py` 的
-`live_inference` 分支通过现有 Python Adapter 加载获准的 flask_308，再交给同一控制器。
+`live_inference` 分支按精确审核案例选择已有 Python/Java Adapter，加载获准的
+flask_308 或 CloudFoundry 案例，再交给同一控制器。
 真实配置缺失时只记录预检缺口，不将固定模型或合成任务标为真实检查。
 `query.py` 的运行级 `QueryExecutor` 在参数解析前登记请求，再分派到既有
 `SourceAnalysis`；旧片段模式的三种工具及失败、重试共用六次额度，第七次留拒绝回执且不执行分析。
 显式仓库读取模式改为共享超时、Token 与费用门禁，不以工具或模型调用次数截断；
 QueryExecutor 和各阶段契约检查共用本次 Store，观察记录随研究产物保存。
 模型经 QUERY 结构化消息请求工具，SDK 阶段 Agent 不注册可绕过计数的工具。
-QUERY 的供应商输出 Schema 明确描述请求及回执评估对象；宿主仍接收原始值，
-在登记尝试后校验，避免非法参数绕过计数。`inference_record.json` 的 `model_calls`
+QUERY v0.3 的供应商 Schema 与本地严格类型一致；模型只输出回执评估的 impact/rationale，
+宿主绑定本轮唯一待评估回执的编号。SDK 解析失败仍保存原始响应与无效 stage，
+按原请求谓词登记并拒绝尝试，避免非法参数绕过计数。
+仅评估对象内未知直接子字段全部为 null 的错误可申请一次模型纠正，旧编号不在允许范围。
+宿主比较投影仅用于检查；纠正结果须严格保留全部规定字段及待评估回执身份。
+原尝试保持 protocol_error，纠正后请求登记新尝试；两者关联留在 format_repair_log。
+查询参数的无副作用校验由 query.py 统一供资格检查与派发使用。`inference_record.json` 的 `model_calls`
 保存每次阶段调用的冻结输入、Schema、指令、响应关联和脱敏异常信息。
 其中请求开始标记来自 SDK hook，表示已登记模型调用，不单独证明网络请求已发出。
 研究阶段输入另附 `source_line_index`，仅将初始可见源码按原坐标逐行表示，保留空白，

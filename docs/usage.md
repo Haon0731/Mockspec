@@ -339,7 +339,7 @@ PYTHONPATH=src .venv/bin/python experiments/staged-inference/run.py \
 输出目录不可创建或写入失败时明确非成功退出，不保证存储故障下产物齐全。
 
 当前完成范围是 EXTRACT → QUERY（片段模式零至六次，仓库模式按证据与资源终止）→ CONSTRUCT →
-CONTRAST（仅 C）→ REVISE（可选一次）→ DELIVER → FORMAT_REPAIR（可选一次）
+CONTRAST（仅 C）→ REVISE（可选一次）→ DELIVER
 的 B/C 四状态回放，不是整个 M1。synthetic_replay 分支不审核真实 Adapter 输入；
 live_inference 分支见下方 M1-5 说明。两者均不生成 Mock、不执行目标测试。
 脚本回放通过仅证明控制器和校验边界，不证明真实模型的场景选择或语义推导质量。
@@ -416,7 +416,7 @@ HTTP 400，已修复；逐调用诊断位于 `inference_record.json.model_calls`
 
 研究入口现使用 v0.2 引用选择协议：模型选择来源与行范围，宿主从本次已可见证据
 生成精确 `quote`，最终仍使用原契约验证器。`inference_record.json` 的版本为
-`scenario-inference-record/v0.2`，`citation_mode` 为
+`scenario-inference-record/v0.3`，`citation_mode` 为
 `source_locator_host_materialized_quote/v1`；阶段的 `wire_result` 与 `result`
 分别记录模型选择和宿主标准结果。旧模型响应中的 `quote` 不自动转换；
 历史运行按对应提交复现，不能把旧失败送入新协议后改称成功。
@@ -431,6 +431,12 @@ G4 未通过；没有放宽 Schema、删除额外字段或自动重跑。
 后续[合成接口探针](../out/staged-inference/issue17-response-conformance-20261026/report.md)
 捕获实际 HTTP 请求并确认 strict/完整 Schema 保留；单次对抗请求合规，不能据此宣称
 原复杂任务问题已修复或恢复 M2。该探针属于单独留证的一次性诊断，不是生产入口。
+
+研究 QUERY v0.3 使用严格嵌套类型，回执编号由宿主绑定。整次运行的 QUERY_FORMAT_REPAIR
+与 DELIVER FORMAT_REPAIR 共用一次名额；预留后即使用量门禁拒绝或请求失败也不退回。
+QUERY 只允许纠正回执评估对象内未知的 null 字段，模型必须完整重发且保持规定字段逐值一致。
+参数、引用、身份、旧版本、缺字段或语义变化均终止；格式纠正不补读源码、不重置预算，
+原无效尝试保留，成功纠正后的查询另计一次尝试。详见 PRD 第 10 节。
 
 该案例精确 ID 为
 `de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri@d0085edf`，

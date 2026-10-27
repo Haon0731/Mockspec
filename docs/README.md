@@ -24,7 +24,8 @@ PRD 不作为当前能力或已通过验收的说明。
 随后[独立结构化输出诊断](../out/staged-inference/issue17-response-conformance-20261026/report.md)
 核验了实际 HTTP Schema；唯一合成对抗请求合规，但未复现或修复原故障，不计作 M2 通过。
 后续修复设计归同一 PRD 第 10 节 `M2-QUERY-RECOVERY-1`：严格 QUERY 类型、宿主回执关联、
-条件假设表达和全局一次的有限格式纠正；设计与当前已实现能力分别标记。
+条件假设表达和全局一次的有限格式纠正；[工程记录](../out/staged-inference/issue17-query-recovery-20261027/report.md)
+已通过 R1，真实验收另行登记并独立判定。
 
 以下研究结果不等于生产 Agent 已具备对应能力；阅读案例分析也不能作为未来无指导生成的输入。
 

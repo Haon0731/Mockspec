@@ -157,7 +157,7 @@ def test_variant_b_replay_preserves_identity_stages_and_artifact_hashes(tmp_path
     assert [item["stage"] for item in record["stages"]] == [
         "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER"
     ]
-    assert record["schema_version"] == "scenario-inference-record/v0.2"
+    assert record["schema_version"] == "scenario-inference-record/v0.3"
     assert record["citation_mode"] == "source_locator_host_materialized_quote/v1"
     assert manifest["versions"]["citation_mode"] == record["citation_mode"]
     assert [item["model_call_sequence"] for item in record["stages"]] == [1, 2, 3, 4]
@@ -778,6 +778,14 @@ def test_invalid_query_attempt_is_counted_and_receipt_reaches_model(tmp_path, ki
         request["arguments_json"] = json.dumps(arguments)
     result, model = _query_run(tmp_path, outputs)
     record = result["record"]
+    if kind in {"missing_question", "missing_candidate", "wrong_envelope"}:
+        assert record["result_status"] == "ERROR"
+        assert record["stop_reason"] == "output_invalid"
+        assert model.calls == 2
+        assert record["query_accounting"]["observed_attempts"] == 1
+        assert record["query_log"][0]["status"] == "protocol_error"
+        assert record["format_repair_log"][0]["outcome"] == "ineligible"
+        return
     assert record["result_status"] == "SELECTED", record.get("error")
     assert record["query_accounting"]["budgeted_attempts"] == 1
     receipt = record["query_log"][0]

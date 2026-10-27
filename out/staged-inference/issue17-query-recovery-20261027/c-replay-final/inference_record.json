@@ -1,0 +1,4943 @@
+{
+  "schema_version": "scenario-inference-record/v0.3",
+  "citation_mode": "source_locator_host_materialized_quote/v1",
+  "run_id": "d052677c-6631-4c1e-a172-0d06f24d8912",
+  "requested_case_id": "synthetic_python_delegation",
+  "case_id": "synthetic_python_delegation",
+  "language": "python",
+  "input_hash": "ee8d2e3f11798a38b3d84daf077dda41938500862046dc4c1f9d7081e0a92d4a",
+  "result_status": "SELECTED",
+  "stop_reason": "completed",
+  "error_stage": null,
+  "selected_scenario_id": "dependency_returns_two",
+  "selection_rationale": "Direct delegation and the ordinary assertion jointly constrain the result.",
+  "claim_basis": [
+    {
+      "claim": "objective",
+      "basis": "task_requirement",
+      "target": "formal_claim",
+      "target_index": 0,
+      "semantic_role": "test_objective",
+      "evidence_ids": [
+        "assertion"
+      ],
+      "support": "evidence",
+      "assumption_reason": null
+    },
+    {
+      "claim": "delegation",
+      "basis": "implementation_fact",
+      "target": "formal_claim",
+      "target_index": 0,
+      "semantic_role": "mut_path_condition",
+      "evidence_ids": [
+        "delegation"
+      ],
+      "support": "evidence",
+      "assumption_reason": null
+    },
+    {
+      "claim": "selected_scenario",
+      "basis": "scenario_inference",
+      "target": "selection_rationale",
+      "target_index": 0,
+      "semantic_role": "dependency_contract",
+      "evidence_ids": [
+        "delegation",
+        "assertion"
+      ],
+      "support": "evidence",
+      "assumption_reason": null
+    },
+    {
+      "claim": "allowed variation",
+      "basis": "scenario_inference",
+      "target": "allowed_variation",
+      "target_index": 0,
+      "semantic_role": "dependency_contract",
+      "evidence_ids": [],
+      "support": "assumption",
+      "assumption_reason": "Unrelated dependency state is outside the visible objective."
+    }
+  ],
+  "exploration_stop": {
+    "reason": "evidence_sufficient",
+    "rationale": "The visible delegation and assertion support construction; repeated syntax reads add no material fact.",
+    "evidence": [
+      {
+        "source_id": "test:0",
+        "start_line": 5,
+        "end_line": 5,
+        "quote": "    assert target(1) == 2"
+      }
+    ],
+    "remaining_unknowns": [
+      {
+        "question": "What is the hidden dependency implementation?",
+        "impact": "The conditional candidate remains explicit without that implementation.",
+        "blocking": false
+      }
+    ]
+  },
+  "termination": {
+    "initiator": "agent",
+    "reason": "completed",
+    "evidence_sufficiency_claimed": true
+  },
+  "query_log": [
+    {
+      "sequence": 1,
+      "response_id": "query:1",
+      "within_budget": true,
+      "question": "Does visible syntax distinguish the candidate's dependency result?",
+      "scenario_id": "dependency_returns_two",
+      "tool": "inspect_source",
+      "arguments_json": "{\"source_id\": \"mut:0\", \"start_line\": 10, \"end_line\": 11}",
+      "raw_request": {
+        "question": "Does visible syntax distinguish the candidate's dependency result?",
+        "scenario_id": "dependency_returns_two",
+        "tool": "inspect_source",
+        "arguments_json": "{\"source_id\": \"mut:0\", \"start_line\": 10, \"end_line\": 11}"
+      },
+      "status": "ok",
+      "semantic_category": "success",
+      "result": {
+        "status": "ok",
+        "backend": "source_store",
+        "source_id": "mut:0",
+        "logical_path": "src/example.py",
+        "start_line": 10,
+        "end_line": 11,
+        "text": "def target(value):\n    return dependency(value)",
+        "limitations": [],
+        "usage": {
+          "bytes": 0,
+          "elapsed_seconds": 0.0
+        }
+      },
+      "assessment": {
+        "attempt_sequence": 1,
+        "impact": "no_new_information",
+        "rationale": "The receipt does not resolve the hidden dependency behavior."
+      },
+      "assessment_status": "complete",
+      "duration_seconds": 0.00025317799008917063,
+      "exploration_progress": {
+        "made_progress": true,
+        "new_operation_or_position": true,
+        "new_evidence": true,
+        "new_question_review": true,
+        "operation_digest": "d057bd5ce112c4205b607623b4069c55d19843651088ef92580ae60d2f760275",
+        "evidence_digest": "d5c4eeedcab6afa4b3472feec40cf19d1ed0d37a96b984e2a2d73c8cbd7c347c",
+        "consecutive_no_progress": 0,
+        "threshold": 4,
+        "triggered": false,
+        "termination_initiator": null,
+        "termination_reason": null
+      }
+    }
+  ],
+  "query_accounting": {
+    "observed_attempts": 1,
+    "budgeted_attempts": 1,
+    "limit": 6
+  },
+  "repetition_policy": {
+    "name": "normalized_query_and_returned_evidence",
+    "max_no_progress_attempts": 4,
+    "scope": "consecutive repeated operations without evidence increment",
+    "total_query_limit": false
+  },
+  "source_observations": [
+    {
+      "run_id": "4c38723f62e3495faafb20e89c48be97",
+      "case_id": "synthetic_python_delegation",
+      "snapshot_id": null,
+      "source_id": "mut:0",
+      "logical_path": "src/example.py",
+      "start_line": 10,
+      "end_line": 11,
+      "text": "def target(value):\n    return dependency(value)",
+      "sha256": "23e23e4fe0d6d07fc0e0dda1e2b69ec6f48aaa40242d295e78b157eb7716aa5e",
+      "response_id": "query:1"
+    }
+  ],
+  "critical_behaviors": [
+    {
+      "behavior": "dependency(1) yields 2",
+      "observation": "target(1) returns 2 to the visible assertion",
+      "evidence_ids": [
+        "delegation",
+        "assertion"
+      ],
+      "semantic_role": "dependency_contract",
+      "formal_claim_index": 0,
+      "support": "evidence",
+      "assumption_reason": null
+    }
+  ],
+  "allowed_variations": [
+    "Internal dependency state and unrelated calls may vary when the returned value remains 2."
+  ],
+  "nonblocking_unknowns": [],
+  "degeneracy_contrast": {
+    "status": "none_identified",
+    "execution_status": "not_executed",
+    "alternative": null,
+    "bypass_behavior": null,
+    "evidence_ids": [],
+    "distinguishing_observation": null,
+    "revision_requested": false,
+    "revision_reason": null,
+    "support": "assumption",
+    "assumption_reason": "No evidence-backed static bypass was identified.",
+    "semantic_role": "dependency_contract"
+  },
+  "revision_log": [],
+  "format_repair_log": [],
+  "format_repair_allowance": {
+    "state": "available",
+    "category": null
+  },
+  "unresolved": [],
+  "stages": [
+    {
+      "stage": "EXTRACT",
+      "model_call_sequence": 1,
+      "citation_mode": "source_locator_host_materialized_quote/v1",
+      "wire_result": {
+        "schema_version": "staged-extract/v0.2",
+        "result_status": "CONTINUE",
+        "original_goals": [
+          {
+            "source_id": "test:0",
+            "start_line": 5,
+            "end_line": 5
+          }
+        ],
+        "candidates": [
+          {
+            "scenario_id": "dependency_returns_two",
+            "description": "Dependency returns the value observed by the ordinary oracle.",
+            "evidence": [
+              {
+                "source_id": "mut:0",
+                "start_line": 11,
+                "end_line": 11
+              },
+              {
+                "source_id": "test:0",
+                "start_line": 5,
+                "end_line": 5
+              }
+            ]
+          }
+        ],
+        "unresolved": []
+      },
+      "result": {
+        "schema_version": "staged-extract/v0.1",
+        "result_status": "CONTINUE",
+        "original_goals": [
+          {
+            "source_id": "test:0",
+            "start_line": 5,
+            "end_line": 5,
+            "quote": "    assert target(1) == 2"
+          }
+        ],
+        "candidates": [
+          {
+            "scenario_id": "dependency_returns_two",
+            "description": "Dependency returns the value observed by the ordinary oracle.",
+            "evidence": [
+              {
+                "source_id": "mut:0",
+                "start_line": 11,
+                "end_line": 11,
+                "quote": "    return dependency(value)"
+              },
+              {
+                "source_id": "test:0",
+                "start_line": 5,
+                "end_line": 5,
+                "quote": "    assert target(1) == 2"
+              }
+            ]
+          }
+        ],
+        "unresolved": []
+      }
+    },
+    {
+      "stage": "QUERY",
+      "model_call_sequence": 2,
+      "citation_mode": "source_locator_host_materialized_quote/v1",
+      "wire_result": {
+        "schema_version": "staged-query/v0.3",
+        "decision": "request_query",
+        "query_attempt": {
+          "question": "Does visible syntax distinguish the candidate's dependency result?",
+          "scenario_id": "dependency_returns_two",
+          "tool": "inspect_source",
+          "arguments_json": "{\"source_id\": \"mut:0\", \"start_line\": 10, \"end_line\": 11}"
+        },
+        "previous_receipt_assessment": null,
+        "impact": "Preserve the current candidate pending construction.",
+        "stop_explanation": null
+      },
+      "result": {
+        "schema_version": "staged-query/v0.1",
+        "decision": "request_query",
+        "query_attempt": {
+          "question": "Does visible syntax distinguish the candidate's dependency result?",
+          "scenario_id": "dependency_returns_two",
+          "tool": "inspect_source",
+          "arguments_json": "{\"source_id\": \"mut:0\", \"start_line\": 10, \"end_line\": 11}"
+        },
+        "previous_receipt_assessment": null,
+        "impact": "Preserve the current candidate pending construction.",
+        "stop_explanation": null
+      }
+    },
+    {
+      "stage": "QUERY",
+      "model_call_sequence": 3,
+      "citation_mode": "source_locator_host_materialized_quote/v1",
+      "wire_result": {
+        "schema_version": "staged-query/v0.3",
+        "decision": "finish_queries",
+        "query_attempt": null,
+        "previous_receipt_assessment": {
+          "impact": "no_new_information",
+          "rationale": "The receipt does not resolve the hidden dependency behavior."
+        },
+        "impact": "Preserve the current candidate pending construction.",
+        "stop_explanation": {
+          "reason": "evidence_sufficient",
+          "rationale": "The visible delegation and assertion support construction; repeated syntax reads add no material fact.",
+          "evidence": [
+            {
+              "source_id": "test:0",
+              "start_line": 5,
+              "end_line": 5
+            }
+          ],
+          "remaining_unknowns": [
+            {
+              "question": "What is the hidden dependency implementation?",
+              "impact": "The conditional candidate remains explicit without that implementation.",
+              "blocking": false
+            }
+          ]
+        }
+      },
+      "result": {
+        "schema_version": "staged-query/v0.1",
+        "decision": "finish_queries",
+        "query_attempt": null,
+        "previous_receipt_assessment": {
+          "attempt_sequence": 1,
+          "impact": "no_new_information",
+          "rationale": "The receipt does not resolve the hidden dependency behavior."
+        },
+        "impact": "Preserve the current candidate pending construction.",
+        "stop_explanation": {
+          "reason": "evidence_sufficient",
+          "rationale": "The visible delegation and assertion support construction; repeated syntax reads add no material fact.",
+          "evidence": [
+            {
+              "source_id": "test:0",
+              "start_line": 5,
+              "end_line": 5,
+              "quote": "    assert target(1) == 2"
+            }
+          ],
+          "remaining_unknowns": [
+            {
+              "question": "What is the hidden dependency implementation?",
+              "impact": "The conditional candidate remains explicit without that implementation.",
+              "blocking": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stage": "CONSTRUCT",
+      "model_call_sequence": 4,
+      "citation_mode": "source_locator_host_materialized_quote/v1",
+      "wire_result": {
+        "result_status": "SELECTED",
+        "selected_scenario_id": "dependency_returns_two",
+        "selection_rationale": "Direct delegation and the ordinary assertion jointly constrain the result.",
+        "claim_basis": [
+          {
+            "claim": "objective",
+            "basis": "task_requirement",
+            "target": "formal_claim",
+            "target_index": 0,
+            "semantic_role": "test_objective",
+            "evidence_ids": [
+              "assertion"
+            ],
+            "support": "evidence",
+            "assumption_reason": null
+          },
+          {
+            "claim": "delegation",
+            "basis": "implementation_fact",
+            "target": "formal_claim",
+            "target_index": 0,
+            "semantic_role": "mut_path_condition",
+            "evidence_ids": [
+              "delegation"
+            ],
+            "support": "evidence",
+            "assumption_reason": null
+          },
+          {
+            "claim": "selected_scenario",
+            "basis": "scenario_inference",
+            "target": "selection_rationale",
+            "target_index": 0,
+            "semantic_role": "dependency_contract",
+            "evidence_ids": [
+              "delegation",
+              "assertion"
+            ],
+            "support": "evidence",
+            "assumption_reason": null
+          },
+          {
+            "claim": "allowed variation",
+            "basis": "scenario_inference",
+            "target": "allowed_variation",
+            "target_index": 0,
+            "semantic_role": "dependency_contract",
+            "evidence_ids": [],
+            "support": "assumption",
+            "assumption_reason": "Unrelated dependency state is outside the visible objective."
+          }
+        ],
+        "critical_behaviors": [
+          {
+            "behavior": "dependency(1) yields 2",
+            "observation": "target(1) returns 2 to the visible assertion",
+            "evidence_ids": [
+              "delegation",
+              "assertion"
+            ],
+            "semantic_role": "dependency_contract",
+            "formal_claim_index": 0,
+            "support": "evidence",
+            "assumption_reason": null
+          }
+        ],
+        "allowed_variations": [
+          "Internal dependency state and unrelated calls may vary when the returned value remains 2."
+        ],
+        "unresolved": [],
+        "nonblocking_unknowns": [],
+        "schema_version": "staged-construct/v0.2",
+        "contract": {
+          "schema_version": "mock-spec.scenario/v0.1",
+          "case_id": "synthetic_python_delegation",
+          "language": "python",
+          "test_objectives": [
+            {
+              "statement": "The visible test expects target(1) to equal 2.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "The visible test invokes target(1).",
+              "evidence_ids": [
+                "assertion"
+              ]
+            }
+          ],
+          "scenario_hypotheses": [
+            {
+              "id": "dependency_returns_two",
+              "description": "The dependency returns 2.",
+              "condition": "target receives value 1.",
+              "status": "candidate",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ]
+            }
+          ],
+          "dependency_constraints": [
+            {
+              "statement": "dependency(1) returns 2.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "target delegates value 1 and completes normally.",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ]
+            }
+          ],
+          "expected_interactions": [
+            {
+              "statement": "dependency is called with 1.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "target is called with 1.",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ],
+              "assertion_policy": "not_implied"
+            }
+          ],
+          "verification_candidates": [],
+          "evidence": [
+            {
+              "source_id": "mut:0",
+              "start_line": 11,
+              "end_line": 11,
+              "id": "delegation",
+              "rationale": "The target directly returns the dependency result."
+            },
+            {
+              "source_id": "test:0",
+              "start_line": 5,
+              "end_line": 5,
+              "id": "assertion",
+              "rationale": "The visible ordinary oracle checks the returned value."
+            }
+          ],
+          "uncertainty": [
+            {
+              "statement": "The dependency implementation is not visible.",
+              "status": "unknown",
+              "scenario_ids": [],
+              "condition": null,
+              "evidence_ids": []
+            }
+          ]
+        }
+      },
+      "result": {
+        "result_status": "SELECTED",
+        "selected_scenario_id": "dependency_returns_two",
+        "selection_rationale": "Direct delegation and the ordinary assertion jointly constrain the result.",
+        "claim_basis": [
+          {
+            "claim": "objective",
+            "basis": "task_requirement",
+            "target": "formal_claim",
+            "target_index": 0,
+            "semantic_role": "test_objective",
+            "evidence_ids": [
+              "assertion"
+            ],
+            "support": "evidence",
+            "assumption_reason": null
+          },
+          {
+            "claim": "delegation",
+            "basis": "implementation_fact",
+            "target": "formal_claim",
+            "target_index": 0,
+            "semantic_role": "mut_path_condition",
+            "evidence_ids": [
+              "delegation"
+            ],
+            "support": "evidence",
+            "assumption_reason": null
+          },
+          {
+            "claim": "selected_scenario",
+            "basis": "scenario_inference",
+            "target": "selection_rationale",
+            "target_index": 0,
+            "semantic_role": "dependency_contract",
+            "evidence_ids": [
+              "delegation",
+              "assertion"
+            ],
+            "support": "evidence",
+            "assumption_reason": null
+          },
+          {
+            "claim": "allowed variation",
+            "basis": "scenario_inference",
+            "target": "allowed_variation",
+            "target_index": 0,
+            "semantic_role": "dependency_contract",
+            "evidence_ids": [],
+            "support": "assumption",
+            "assumption_reason": "Unrelated dependency state is outside the visible objective."
+          }
+        ],
+        "critical_behaviors": [
+          {
+            "behavior": "dependency(1) yields 2",
+            "observation": "target(1) returns 2 to the visible assertion",
+            "evidence_ids": [
+              "delegation",
+              "assertion"
+            ],
+            "semantic_role": "dependency_contract",
+            "formal_claim_index": 0,
+            "support": "evidence",
+            "assumption_reason": null
+          }
+        ],
+        "allowed_variations": [
+          "Internal dependency state and unrelated calls may vary when the returned value remains 2."
+        ],
+        "unresolved": [],
+        "nonblocking_unknowns": [],
+        "schema_version": "staged-construct/v0.1",
+        "contract": {
+          "schema_version": "mock-spec.scenario/v0.1",
+          "case_id": "synthetic_python_delegation",
+          "language": "python",
+          "test_objectives": [
+            {
+              "statement": "The visible test expects target(1) to equal 2.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "The visible test invokes target(1).",
+              "evidence_ids": [
+                "assertion"
+              ]
+            }
+          ],
+          "scenario_hypotheses": [
+            {
+              "id": "dependency_returns_two",
+              "description": "The dependency returns 2.",
+              "condition": "target receives value 1.",
+              "status": "candidate",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ]
+            }
+          ],
+          "dependency_constraints": [
+            {
+              "statement": "dependency(1) returns 2.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "target delegates value 1 and completes normally.",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ]
+            }
+          ],
+          "expected_interactions": [
+            {
+              "statement": "dependency is called with 1.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "target is called with 1.",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ],
+              "assertion_policy": "not_implied"
+            }
+          ],
+          "verification_candidates": [],
+          "evidence": [
+            {
+              "id": "delegation",
+              "source_id": "mut:0",
+              "start_line": 11,
+              "end_line": 11,
+              "quote": "    return dependency(value)",
+              "rationale": "The target directly returns the dependency result."
+            },
+            {
+              "id": "assertion",
+              "source_id": "test:0",
+              "start_line": 5,
+              "end_line": 5,
+              "quote": "    assert target(1) == 2",
+              "rationale": "The visible ordinary oracle checks the returned value."
+            }
+          ],
+          "uncertainty": [
+            {
+              "statement": "The dependency implementation is not visible.",
+              "status": "unknown",
+              "scenario_ids": [],
+              "condition": null,
+              "evidence_ids": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stage": "CONTRAST",
+      "result": {
+        "schema_version": "staged-contrast/v0.1",
+        "status": "none_identified",
+        "execution_status": "not_executed",
+        "alternative": null,
+        "bypass_behavior": null,
+        "evidence_ids": [],
+        "distinguishing_observation": null,
+        "revision_requested": false,
+        "revision_reason": null,
+        "support": "assumption",
+        "assumption_reason": "No evidence-backed static bypass was identified.",
+        "semantic_role": "dependency_contract"
+      }
+    },
+    {
+      "stage": "DELIVER",
+      "model_call_sequence": 6,
+      "citation_mode": "source_locator_host_materialized_quote/v1",
+      "wire_result": {
+        "schema_version": "staged-deliver/v0.2",
+        "result_status": "SELECTED",
+        "selected_scenario_id": "dependency_returns_two",
+        "contract": {
+          "schema_version": "mock-spec.scenario/v0.1",
+          "case_id": "synthetic_python_delegation",
+          "language": "python",
+          "test_objectives": [
+            {
+              "statement": "The visible test expects target(1) to equal 2.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "The visible test invokes target(1).",
+              "evidence_ids": [
+                "assertion"
+              ]
+            }
+          ],
+          "scenario_hypotheses": [
+            {
+              "id": "dependency_returns_two",
+              "description": "The dependency returns 2.",
+              "condition": "target receives value 1.",
+              "status": "candidate",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ]
+            }
+          ],
+          "dependency_constraints": [
+            {
+              "statement": "dependency(1) returns 2.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "target delegates value 1 and completes normally.",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ]
+            }
+          ],
+          "expected_interactions": [
+            {
+              "statement": "dependency is called with 1.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "target is called with 1.",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ],
+              "assertion_policy": "not_implied"
+            }
+          ],
+          "verification_candidates": [],
+          "evidence": [
+            {
+              "source_id": "mut:0",
+              "start_line": 11,
+              "end_line": 11,
+              "id": "delegation",
+              "rationale": "The target directly returns the dependency result."
+            },
+            {
+              "source_id": "test:0",
+              "start_line": 5,
+              "end_line": 5,
+              "id": "assertion",
+              "rationale": "The visible ordinary oracle checks the returned value."
+            }
+          ],
+          "uncertainty": [
+            {
+              "statement": "The dependency implementation is not visible.",
+              "status": "unknown",
+              "scenario_ids": [],
+              "condition": null,
+              "evidence_ids": []
+            }
+          ]
+        }
+      },
+      "result": {
+        "schema_version": "staged-deliver/v0.1",
+        "result_status": "SELECTED",
+        "selected_scenario_id": "dependency_returns_two",
+        "contract": {
+          "schema_version": "mock-spec.scenario/v0.1",
+          "case_id": "synthetic_python_delegation",
+          "language": "python",
+          "test_objectives": [
+            {
+              "statement": "The visible test expects target(1) to equal 2.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "The visible test invokes target(1).",
+              "evidence_ids": [
+                "assertion"
+              ]
+            }
+          ],
+          "scenario_hypotheses": [
+            {
+              "id": "dependency_returns_two",
+              "description": "The dependency returns 2.",
+              "condition": "target receives value 1.",
+              "status": "candidate",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ]
+            }
+          ],
+          "dependency_constraints": [
+            {
+              "statement": "dependency(1) returns 2.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "target delegates value 1 and completes normally.",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ]
+            }
+          ],
+          "expected_interactions": [
+            {
+              "statement": "dependency is called with 1.",
+              "status": "required",
+              "scenario_ids": [
+                "dependency_returns_two"
+              ],
+              "condition": "target is called with 1.",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ],
+              "assertion_policy": "not_implied"
+            }
+          ],
+          "verification_candidates": [],
+          "evidence": [
+            {
+              "id": "delegation",
+              "source_id": "mut:0",
+              "start_line": 11,
+              "end_line": 11,
+              "quote": "    return dependency(value)",
+              "rationale": "The target directly returns the dependency result."
+            },
+            {
+              "id": "assertion",
+              "source_id": "test:0",
+              "start_line": 5,
+              "end_line": 5,
+              "quote": "    assert target(1) == 2",
+              "rationale": "The visible ordinary oracle checks the returned value."
+            }
+          ],
+          "uncertainty": [
+            {
+              "statement": "The dependency implementation is not visible.",
+              "status": "unknown",
+              "scenario_ids": [],
+              "condition": null,
+              "evidence_ids": []
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "model_calls": [
+    {
+      "sequence": 1,
+      "stage": "EXTRACT",
+      "status": "completed",
+      "model_request_started": true,
+      "request_start_basis": "usage_ledger_before_model_call_hook",
+      "model_name": "scripted-offline",
+      "output_type": "ExtractSelection",
+      "prompt_version": "staged-scenario-inference-prompts/v0.3",
+      "instructions": "staged-scenario-inference-prompts/v0.3\nStage: EXTRACT. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. Infer conditional dependency constraints, not hidden Mock setup or hidden verification text. State unconfirmed behavior as an if-then hypothesis and preserve its missing basis in unresolved. Imports, test names, and final assertions alone do not establish a hidden substitute, stub value, or call count.",
+      "requested_output_schema": {
+        "$defs": {
+          "CandidateSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "scenario_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Scenario Id",
+                "type": "string"
+              },
+              "description": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Description",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/SourceLocator"
+                },
+                "title": "Evidence",
+                "type": "array"
+              }
+            },
+            "required": [
+              "scenario_id",
+              "description",
+              "evidence"
+            ],
+            "title": "CandidateSelection",
+            "type": "object"
+          },
+          "SourceLocator": {
+            "additionalProperties": false,
+            "properties": {
+              "source_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Source Id",
+                "type": "string"
+              },
+              "start_line": {
+                "minimum": 1,
+                "title": "Start Line",
+                "type": "integer"
+              },
+              "end_line": {
+                "minimum": 1,
+                "title": "End Line",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "source_id",
+              "start_line",
+              "end_line"
+            ],
+            "title": "SourceLocator",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": "staged-extract/v0.2",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "result_status": {
+            "default": "CONTINUE",
+            "enum": [
+              "CONTINUE",
+              "INCONCLUSIVE"
+            ],
+            "title": "Result Status",
+            "type": "string"
+          },
+          "original_goals": {
+            "items": {
+              "$ref": "#/$defs/SourceLocator"
+            },
+            "title": "Original Goals",
+            "type": "array"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/$defs/CandidateSelection"
+            },
+            "maxItems": 2,
+            "title": "Candidates",
+            "type": "array"
+          },
+          "unresolved": {
+            "items": {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            "title": "Unresolved",
+            "type": "array"
+          }
+        },
+        "required": [
+          "schema_version",
+          "result_status",
+          "original_goals",
+          "candidates",
+          "unresolved"
+        ],
+        "title": "ExtractSelection",
+        "type": "object"
+      },
+      "payload": {
+        "source_line_index": {
+          "mut:0": [
+            {
+              "line": 10,
+              "text": "def target(value):"
+            },
+            {
+              "line": 11,
+              "text": "    return dependency(value)"
+            }
+          ],
+          "support:0": [
+            {
+              "line": 1,
+              "text": "def dependency(value): ..."
+            }
+          ],
+          "test:0": [
+            {
+              "line": 4,
+              "text": "def test_target():"
+            },
+            {
+              "line": 5,
+              "text": "    assert target(1) == 2"
+            }
+          ]
+        },
+        "stage": "EXTRACT",
+        "visible_task": {
+          "case_id": "synthetic_python_delegation",
+          "execution_context": {
+            "runtime_name": "python",
+            "runtime_version": "3.10",
+            "test_framework": "pytest",
+            "test_framework_version": null
+          },
+          "input_policy": {
+            "masking_contract": "artifact-aware-slot-v1",
+            "policy_id": "synthetic-replay-v1",
+            "protocol_version": "synthetic_replay_v1",
+            "visibility": "reviewed_frozen_sources"
+          },
+          "language": "python",
+          "masked_test": {
+            "end_line": 5,
+            "logical_path": "tests/test_example.py",
+            "resolution_status": "resolved",
+            "source_id": "test:0",
+            "start_line": 4,
+            "symbol": "test_example.test_target",
+            "target_precision": "function",
+            "text": "def test_target():\n    assert target(1) == 2"
+          },
+          "mut_source": {
+            "end_line": 11,
+            "logical_path": "src/example.py",
+            "resolution_status": "resolved",
+            "source_id": "mut:0",
+            "start_line": 10,
+            "symbol": "example.target",
+            "target_precision": "function",
+            "text": "def target(value):\n    return dependency(value)"
+          },
+          "permitted_interfaces": [
+            {
+              "end_line": 1,
+              "resolution_status": "partial",
+              "signature": "dependency(value)",
+              "source_id": "support:0",
+              "start_line": 1,
+              "symbol": "example.dependency"
+            }
+          ],
+          "schema_version": "mock-spec.task/v1",
+          "sources": [
+            {
+              "logical_path": "src/example.py",
+              "role": "mut",
+              "source_id": "mut:0"
+            },
+            {
+              "logical_path": "tests/test_example.py",
+              "role": "masked_test",
+              "source_id": "test:0"
+            },
+            {
+              "logical_path": "src/dependency.py",
+              "role": "supporting",
+              "source_id": "support:0"
+            }
+          ],
+          "supporting_sources": [
+            {
+              "end_line": 1,
+              "logical_path": "src/dependency.py",
+              "resolution_status": "partial",
+              "source_id": "support:0",
+              "start_line": 1,
+              "symbol": "example.dependency",
+              "target_precision": "function",
+              "text": "def dependency(value): ..."
+            }
+          ]
+        }
+      },
+      "payload_sha256": "ab838e3e8f30f362514fdc012ce39184906adf8f56348b13557ed0b296a38f0e",
+      "payload_bytes": 1864,
+      "max_output_tokens": 4096,
+      "timeout_seconds": 15,
+      "elapsed_seconds": 0.05490121999173425,
+      "response_refs": [
+        {
+          "response_index": 0,
+          "response_id": null,
+          "request_id": null,
+          "usage": {
+            "requests": 1,
+            "input_tokens": 100,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens": 100,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 200,
+            "request_usage_entries": []
+          }
+        }
+      ],
+      "exception": null
+    },
+    {
+      "sequence": 2,
+      "stage": "QUERY",
+      "status": "completed",
+      "model_request_started": true,
+      "request_start_basis": "usage_ledger_before_model_call_hook",
+      "model_name": "scripted-offline",
+      "output_type": "QuerySelection",
+      "prompt_version": "staged-scenario-inference-prompts/v0.3",
+      "instructions": "staged-scenario-inference-prompts/v0.3\nStage: QUERY. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. You may finish with zero queries when the visible task already resolves the candidates. Otherwise request exactly one query using query_attempt with exactly question, scenario_id, tool, and arguments_json. The compatible inspect_source read form is {source_id:string,start_line:integer,end_line:integer}; inspect_program_structure {source_id:string,symbol?:string}; inspect_dependency_usage {source_id:string,symbol?:string}. Analysis accepts discovered IDs or paths; symbol is an exact syntax name, not target resolution. Read source lines before citing them. arguments_json must encode the named argument object. After a receipt, previous_receipt_assessment classifies its candidate impact as supports, weakens, or no_new_information; the host binds it to the one pending receipt, so never return a receipt or attempt sequence field. errors and incomplete results still require an assessment. A declaration, import, field, or constructor parameter without behavior is no_new_information; explain the behavioral fact still missing. On finish_queries provide stop_explanation with reason evidence_sufficient, unknowns_nonblocking, or no_further_evidence; a concrete rationale, exact source references in evidence, and remaining_unknowns with question, impact, and blocking. Preserve unknowns rather than treating failed exploration as proof. inspect_source is limited to the supplied source IDs and visible ranges.",
+      "requested_output_schema": {
+        "$defs": {
+          "ExplorationStopSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "reason": {
+                "enum": [
+                  "evidence_sufficient",
+                  "unknowns_nonblocking",
+                  "no_further_evidence"
+                ],
+                "title": "Reason",
+                "type": "string"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/SourceLocator"
+                },
+                "title": "Evidence",
+                "type": "array"
+              },
+              "remaining_unknowns": {
+                "items": {
+                  "$ref": "#/$defs/RemainingUnknown"
+                },
+                "title": "Remaining Unknowns",
+                "type": "array"
+              }
+            },
+            "required": [
+              "reason",
+              "rationale",
+              "evidence",
+              "remaining_unknowns"
+            ],
+            "title": "ExplorationStopSelection",
+            "type": "object"
+          },
+          "QueryAssessmentSelection": {
+            "additionalProperties": false,
+            "description": "Model-facing assessment; the host owns receipt association.",
+            "properties": {
+              "impact": {
+                "enum": [
+                  "supports",
+                  "weakens",
+                  "no_new_information"
+                ],
+                "title": "Impact",
+                "type": "string"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              }
+            },
+            "required": [
+              "impact",
+              "rationale"
+            ],
+            "title": "QueryAssessmentSelection",
+            "type": "object"
+          },
+          "QueryAttempt": {
+            "additionalProperties": false,
+            "description": "Provider-facing shape; host validation still follows attempt registration.",
+            "properties": {
+              "question": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Question",
+                "type": "string"
+              },
+              "scenario_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Scenario Id",
+                "type": "string"
+              },
+              "tool": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Tool",
+                "type": "string"
+              },
+              "arguments_json": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Arguments Json",
+                "type": "string"
+              }
+            },
+            "required": [
+              "question",
+              "scenario_id",
+              "tool",
+              "arguments_json"
+            ],
+            "title": "QueryAttempt",
+            "type": "object"
+          },
+          "RemainingUnknown": {
+            "additionalProperties": false,
+            "properties": {
+              "question": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Question",
+                "type": "string"
+              },
+              "impact": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Impact",
+                "type": "string"
+              },
+              "blocking": {
+                "title": "Blocking",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "question",
+              "impact",
+              "blocking"
+            ],
+            "title": "RemainingUnknown",
+            "type": "object"
+          },
+          "SourceLocator": {
+            "additionalProperties": false,
+            "properties": {
+              "source_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Source Id",
+                "type": "string"
+              },
+              "start_line": {
+                "minimum": 1,
+                "title": "Start Line",
+                "type": "integer"
+              },
+              "end_line": {
+                "minimum": 1,
+                "title": "End Line",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "source_id",
+              "start_line",
+              "end_line"
+            ],
+            "title": "SourceLocator",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": "staged-query/v0.3",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "request_query",
+              "finish_queries"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "query_attempt": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Provider-facing shape; host validation still follows attempt registration.",
+                "properties": {
+                  "question": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Question",
+                    "type": "string"
+                  },
+                  "scenario_id": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Scenario Id",
+                    "type": "string"
+                  },
+                  "tool": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Tool",
+                    "type": "string"
+                  },
+                  "arguments_json": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Arguments Json",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "question",
+                  "scenario_id",
+                  "tool",
+                  "arguments_json"
+                ],
+                "title": "QueryAttempt",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "previous_receipt_assessment": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Model-facing assessment; the host owns receipt association.",
+                "properties": {
+                  "impact": {
+                    "enum": [
+                      "supports",
+                      "weakens",
+                      "no_new_information"
+                    ],
+                    "title": "Impact",
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Rationale",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "impact",
+                  "rationale"
+                ],
+                "title": "QueryAssessmentSelection",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "impact": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Impact",
+            "type": "string"
+          },
+          "stop_explanation": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "enum": [
+                      "evidence_sufficient",
+                      "unknowns_nonblocking",
+                      "no_further_evidence"
+                    ],
+                    "title": "Reason",
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Rationale",
+                    "type": "string"
+                  },
+                  "evidence": {
+                    "items": {
+                      "$ref": "#/$defs/SourceLocator"
+                    },
+                    "title": "Evidence",
+                    "type": "array"
+                  },
+                  "remaining_unknowns": {
+                    "items": {
+                      "$ref": "#/$defs/RemainingUnknown"
+                    },
+                    "title": "Remaining Unknowns",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "reason",
+                  "rationale",
+                  "evidence",
+                  "remaining_unknowns"
+                ],
+                "title": "ExplorationStopSelection",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "schema_version",
+          "decision",
+          "query_attempt",
+          "previous_receipt_assessment",
+          "impact",
+          "stop_explanation"
+        ],
+        "title": "QuerySelection",
+        "type": "object"
+      },
+      "payload": {
+        "extract": {
+          "candidates": [
+            {
+              "description": "Dependency returns the value observed by the ordinary oracle.",
+              "evidence": [
+                {
+                  "end_line": 11,
+                  "quote": "    return dependency(value)",
+                  "source_id": "mut:0",
+                  "start_line": 11
+                },
+                {
+                  "end_line": 5,
+                  "quote": "    assert target(1) == 2",
+                  "source_id": "test:0",
+                  "start_line": 5
+                }
+              ],
+              "scenario_id": "dependency_returns_two"
+            }
+          ],
+          "original_goals": [
+            {
+              "end_line": 5,
+              "quote": "    assert target(1) == 2",
+              "source_id": "test:0",
+              "start_line": 5
+            }
+          ],
+          "result_status": "CONTINUE",
+          "schema_version": "staged-extract/v0.1",
+          "unresolved": []
+        },
+        "query_receipts": [],
+        "source_line_index": {
+          "mut:0": [
+            {
+              "line": 10,
+              "text": "def target(value):"
+            },
+            {
+              "line": 11,
+              "text": "    return dependency(value)"
+            }
+          ],
+          "support:0": [
+            {
+              "line": 1,
+              "text": "def dependency(value): ..."
+            }
+          ],
+          "test:0": [
+            {
+              "line": 4,
+              "text": "def test_target():"
+            },
+            {
+              "line": 5,
+              "text": "    assert target(1) == 2"
+            }
+          ]
+        },
+        "stage": "QUERY",
+        "visible_task": {
+          "case_id": "synthetic_python_delegation",
+          "execution_context": {
+            "runtime_name": "python",
+            "runtime_version": "3.10",
+            "test_framework": "pytest",
+            "test_framework_version": null
+          },
+          "input_policy": {
+            "masking_contract": "artifact-aware-slot-v1",
+            "policy_id": "synthetic-replay-v1",
+            "protocol_version": "synthetic_replay_v1",
+            "visibility": "reviewed_frozen_sources"
+          },
+          "language": "python",
+          "masked_test": {
+            "end_line": 5,
+            "logical_path": "tests/test_example.py",
+            "resolution_status": "resolved",
+            "source_id": "test:0",
+            "start_line": 4,
+            "symbol": "test_example.test_target",
+            "target_precision": "function",
+            "text": "def test_target():\n    assert target(1) == 2"
+          },
+          "mut_source": {
+            "end_line": 11,
+            "logical_path": "src/example.py",
+            "resolution_status": "resolved",
+            "source_id": "mut:0",
+            "start_line": 10,
+            "symbol": "example.target",
+            "target_precision": "function",
+            "text": "def target(value):\n    return dependency(value)"
+          },
+          "permitted_interfaces": [
+            {
+              "end_line": 1,
+              "resolution_status": "partial",
+              "signature": "dependency(value)",
+              "source_id": "support:0",
+              "start_line": 1,
+              "symbol": "example.dependency"
+            }
+          ],
+          "schema_version": "mock-spec.task/v1",
+          "sources": [
+            {
+              "logical_path": "src/example.py",
+              "role": "mut",
+              "source_id": "mut:0"
+            },
+            {
+              "logical_path": "tests/test_example.py",
+              "role": "masked_test",
+              "source_id": "test:0"
+            },
+            {
+              "logical_path": "src/dependency.py",
+              "role": "supporting",
+              "source_id": "support:0"
+            }
+          ],
+          "supporting_sources": [
+            {
+              "end_line": 1,
+              "logical_path": "src/dependency.py",
+              "resolution_status": "partial",
+              "source_id": "support:0",
+              "start_line": 1,
+              "symbol": "example.dependency",
+              "target_precision": "function",
+              "text": "def dependency(value): ..."
+            }
+          ]
+        }
+      },
+      "payload_sha256": "d0b639286a955c6e30cef878a2eca16a00250c7ccfae7762b61b222c8ae724c6",
+      "payload_bytes": 2407,
+      "max_output_tokens": 4096,
+      "timeout_seconds": 15,
+      "elapsed_seconds": 0.00902831599523779,
+      "response_refs": [
+        {
+          "response_index": 1,
+          "response_id": null,
+          "request_id": null,
+          "usage": {
+            "requests": 1,
+            "input_tokens": 100,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens": 100,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 200,
+            "request_usage_entries": []
+          }
+        }
+      ],
+      "exception": null
+    },
+    {
+      "sequence": 3,
+      "stage": "QUERY",
+      "status": "completed",
+      "model_request_started": true,
+      "request_start_basis": "usage_ledger_before_model_call_hook",
+      "model_name": "scripted-offline",
+      "output_type": "QuerySelection",
+      "prompt_version": "staged-scenario-inference-prompts/v0.3",
+      "instructions": "staged-scenario-inference-prompts/v0.3\nStage: QUERY. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. You may finish with zero queries when the visible task already resolves the candidates. Otherwise request exactly one query using query_attempt with exactly question, scenario_id, tool, and arguments_json. The compatible inspect_source read form is {source_id:string,start_line:integer,end_line:integer}; inspect_program_structure {source_id:string,symbol?:string}; inspect_dependency_usage {source_id:string,symbol?:string}. Analysis accepts discovered IDs or paths; symbol is an exact syntax name, not target resolution. Read source lines before citing them. arguments_json must encode the named argument object. After a receipt, previous_receipt_assessment classifies its candidate impact as supports, weakens, or no_new_information; the host binds it to the one pending receipt, so never return a receipt or attempt sequence field. errors and incomplete results still require an assessment. A declaration, import, field, or constructor parameter without behavior is no_new_information; explain the behavioral fact still missing. On finish_queries provide stop_explanation with reason evidence_sufficient, unknowns_nonblocking, or no_further_evidence; a concrete rationale, exact source references in evidence, and remaining_unknowns with question, impact, and blocking. Preserve unknowns rather than treating failed exploration as proof. inspect_source is limited to the supplied source IDs and visible ranges.",
+      "requested_output_schema": {
+        "$defs": {
+          "ExplorationStopSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "reason": {
+                "enum": [
+                  "evidence_sufficient",
+                  "unknowns_nonblocking",
+                  "no_further_evidence"
+                ],
+                "title": "Reason",
+                "type": "string"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/SourceLocator"
+                },
+                "title": "Evidence",
+                "type": "array"
+              },
+              "remaining_unknowns": {
+                "items": {
+                  "$ref": "#/$defs/RemainingUnknown"
+                },
+                "title": "Remaining Unknowns",
+                "type": "array"
+              }
+            },
+            "required": [
+              "reason",
+              "rationale",
+              "evidence",
+              "remaining_unknowns"
+            ],
+            "title": "ExplorationStopSelection",
+            "type": "object"
+          },
+          "QueryAssessmentSelection": {
+            "additionalProperties": false,
+            "description": "Model-facing assessment; the host owns receipt association.",
+            "properties": {
+              "impact": {
+                "enum": [
+                  "supports",
+                  "weakens",
+                  "no_new_information"
+                ],
+                "title": "Impact",
+                "type": "string"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              }
+            },
+            "required": [
+              "impact",
+              "rationale"
+            ],
+            "title": "QueryAssessmentSelection",
+            "type": "object"
+          },
+          "QueryAttempt": {
+            "additionalProperties": false,
+            "description": "Provider-facing shape; host validation still follows attempt registration.",
+            "properties": {
+              "question": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Question",
+                "type": "string"
+              },
+              "scenario_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Scenario Id",
+                "type": "string"
+              },
+              "tool": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Tool",
+                "type": "string"
+              },
+              "arguments_json": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Arguments Json",
+                "type": "string"
+              }
+            },
+            "required": [
+              "question",
+              "scenario_id",
+              "tool",
+              "arguments_json"
+            ],
+            "title": "QueryAttempt",
+            "type": "object"
+          },
+          "RemainingUnknown": {
+            "additionalProperties": false,
+            "properties": {
+              "question": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Question",
+                "type": "string"
+              },
+              "impact": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Impact",
+                "type": "string"
+              },
+              "blocking": {
+                "title": "Blocking",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "question",
+              "impact",
+              "blocking"
+            ],
+            "title": "RemainingUnknown",
+            "type": "object"
+          },
+          "SourceLocator": {
+            "additionalProperties": false,
+            "properties": {
+              "source_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Source Id",
+                "type": "string"
+              },
+              "start_line": {
+                "minimum": 1,
+                "title": "Start Line",
+                "type": "integer"
+              },
+              "end_line": {
+                "minimum": 1,
+                "title": "End Line",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "source_id",
+              "start_line",
+              "end_line"
+            ],
+            "title": "SourceLocator",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": "staged-query/v0.3",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "request_query",
+              "finish_queries"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "query_attempt": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Provider-facing shape; host validation still follows attempt registration.",
+                "properties": {
+                  "question": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Question",
+                    "type": "string"
+                  },
+                  "scenario_id": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Scenario Id",
+                    "type": "string"
+                  },
+                  "tool": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Tool",
+                    "type": "string"
+                  },
+                  "arguments_json": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Arguments Json",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "question",
+                  "scenario_id",
+                  "tool",
+                  "arguments_json"
+                ],
+                "title": "QueryAttempt",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "previous_receipt_assessment": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Model-facing assessment; the host owns receipt association.",
+                "properties": {
+                  "impact": {
+                    "enum": [
+                      "supports",
+                      "weakens",
+                      "no_new_information"
+                    ],
+                    "title": "Impact",
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Rationale",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "impact",
+                  "rationale"
+                ],
+                "title": "QueryAssessmentSelection",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "impact": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Impact",
+            "type": "string"
+          },
+          "stop_explanation": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "enum": [
+                      "evidence_sufficient",
+                      "unknowns_nonblocking",
+                      "no_further_evidence"
+                    ],
+                    "title": "Reason",
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Rationale",
+                    "type": "string"
+                  },
+                  "evidence": {
+                    "items": {
+                      "$ref": "#/$defs/SourceLocator"
+                    },
+                    "title": "Evidence",
+                    "type": "array"
+                  },
+                  "remaining_unknowns": {
+                    "items": {
+                      "$ref": "#/$defs/RemainingUnknown"
+                    },
+                    "title": "Remaining Unknowns",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "reason",
+                  "rationale",
+                  "evidence",
+                  "remaining_unknowns"
+                ],
+                "title": "ExplorationStopSelection",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "schema_version",
+          "decision",
+          "query_attempt",
+          "previous_receipt_assessment",
+          "impact",
+          "stop_explanation"
+        ],
+        "title": "QuerySelection",
+        "type": "object"
+      },
+      "payload": {
+        "extract": {
+          "candidates": [
+            {
+              "description": "Dependency returns the value observed by the ordinary oracle.",
+              "evidence": [
+                {
+                  "end_line": 11,
+                  "quote": "    return dependency(value)",
+                  "source_id": "mut:0",
+                  "start_line": 11
+                },
+                {
+                  "end_line": 5,
+                  "quote": "    assert target(1) == 2",
+                  "source_id": "test:0",
+                  "start_line": 5
+                }
+              ],
+              "scenario_id": "dependency_returns_two"
+            }
+          ],
+          "original_goals": [
+            {
+              "end_line": 5,
+              "quote": "    assert target(1) == 2",
+              "source_id": "test:0",
+              "start_line": 5
+            }
+          ],
+          "result_status": "CONTINUE",
+          "schema_version": "staged-extract/v0.1",
+          "unresolved": []
+        },
+        "query_receipts": [
+          {
+            "arguments_json": "{\"source_id\": \"mut:0\", \"start_line\": 10, \"end_line\": 11}",
+            "assessment": null,
+            "assessment_status": "incomplete",
+            "duration_seconds": 0.00025317799008917063,
+            "exploration_progress": {
+              "consecutive_no_progress": 0,
+              "evidence_digest": "d5c4eeedcab6afa4b3472feec40cf19d1ed0d37a96b984e2a2d73c8cbd7c347c",
+              "made_progress": true,
+              "new_evidence": true,
+              "new_operation_or_position": true,
+              "new_question_review": true,
+              "operation_digest": "d057bd5ce112c4205b607623b4069c55d19843651088ef92580ae60d2f760275",
+              "termination_initiator": null,
+              "termination_reason": null,
+              "threshold": 4,
+              "triggered": false
+            },
+            "question": "Does visible syntax distinguish the candidate's dependency result?",
+            "raw_request": {
+              "arguments_json": "{\"source_id\": \"mut:0\", \"start_line\": 10, \"end_line\": 11}",
+              "question": "Does visible syntax distinguish the candidate's dependency result?",
+              "scenario_id": "dependency_returns_two",
+              "tool": "inspect_source"
+            },
+            "response_id": "query:1",
+            "result": {
+              "backend": "source_store",
+              "end_line": 11,
+              "limitations": [],
+              "logical_path": "src/example.py",
+              "source_id": "mut:0",
+              "start_line": 10,
+              "status": "ok",
+              "text": "def target(value):\n    return dependency(value)",
+              "usage": {
+                "bytes": 0,
+                "elapsed_seconds": 0.0
+              }
+            },
+            "scenario_id": "dependency_returns_two",
+            "semantic_category": "success",
+            "sequence": 1,
+            "status": "ok",
+            "tool": "inspect_source",
+            "within_budget": true
+          }
+        ],
+        "source_line_index": {
+          "mut:0": [
+            {
+              "line": 10,
+              "text": "def target(value):"
+            },
+            {
+              "line": 11,
+              "text": "    return dependency(value)"
+            }
+          ],
+          "support:0": [
+            {
+              "line": 1,
+              "text": "def dependency(value): ..."
+            }
+          ],
+          "test:0": [
+            {
+              "line": 4,
+              "text": "def test_target():"
+            },
+            {
+              "line": 5,
+              "text": "    assert target(1) == 2"
+            }
+          ]
+        },
+        "stage": "QUERY",
+        "visible_task": {
+          "case_id": "synthetic_python_delegation",
+          "execution_context": {
+            "runtime_name": "python",
+            "runtime_version": "3.10",
+            "test_framework": "pytest",
+            "test_framework_version": null
+          },
+          "input_policy": {
+            "masking_contract": "artifact-aware-slot-v1",
+            "policy_id": "synthetic-replay-v1",
+            "protocol_version": "synthetic_replay_v1",
+            "visibility": "reviewed_frozen_sources"
+          },
+          "language": "python",
+          "masked_test": {
+            "end_line": 5,
+            "logical_path": "tests/test_example.py",
+            "resolution_status": "resolved",
+            "source_id": "test:0",
+            "start_line": 4,
+            "symbol": "test_example.test_target",
+            "target_precision": "function",
+            "text": "def test_target():\n    assert target(1) == 2"
+          },
+          "mut_source": {
+            "end_line": 11,
+            "logical_path": "src/example.py",
+            "resolution_status": "resolved",
+            "source_id": "mut:0",
+            "start_line": 10,
+            "symbol": "example.target",
+            "target_precision": "function",
+            "text": "def target(value):\n    return dependency(value)"
+          },
+          "permitted_interfaces": [
+            {
+              "end_line": 1,
+              "resolution_status": "partial",
+              "signature": "dependency(value)",
+              "source_id": "support:0",
+              "start_line": 1,
+              "symbol": "example.dependency"
+            }
+          ],
+          "schema_version": "mock-spec.task/v1",
+          "sources": [
+            {
+              "logical_path": "src/example.py",
+              "role": "mut",
+              "source_id": "mut:0"
+            },
+            {
+              "logical_path": "tests/test_example.py",
+              "role": "masked_test",
+              "source_id": "test:0"
+            },
+            {
+              "logical_path": "src/dependency.py",
+              "role": "supporting",
+              "source_id": "support:0"
+            }
+          ],
+          "supporting_sources": [
+            {
+              "end_line": 1,
+              "logical_path": "src/dependency.py",
+              "resolution_status": "partial",
+              "source_id": "support:0",
+              "start_line": 1,
+              "symbol": "example.dependency",
+              "target_precision": "function",
+              "text": "def dependency(value): ..."
+            }
+          ]
+        }
+      },
+      "payload_sha256": "19d2e928dcde42c1494607e551b2d25a984039e39c1546f116ecd862cfdea360",
+      "payload_bytes": 3734,
+      "max_output_tokens": 4096,
+      "timeout_seconds": 15,
+      "elapsed_seconds": 0.00896676599222701,
+      "response_refs": [
+        {
+          "response_index": 2,
+          "response_id": null,
+          "request_id": null,
+          "usage": {
+            "requests": 1,
+            "input_tokens": 100,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens": 100,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 200,
+            "request_usage_entries": []
+          }
+        }
+      ],
+      "exception": null
+    },
+    {
+      "sequence": 4,
+      "stage": "CONSTRUCT",
+      "status": "completed",
+      "model_request_started": true,
+      "request_start_basis": "usage_ledger_before_model_call_hook",
+      "model_name": "scripted-offline",
+      "output_type": "ConstructSelection",
+      "prompt_version": "staged-scenario-inference-prompts/v0.3",
+      "instructions": "staged-scenario-inference-prompts/v0.3\nStage: CONSTRUCT. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. Infer conditional dependency constraints, not hidden Mock setup or hidden verification text. Imports, test names, and final assertions alone do not prove hidden behavior or counts; preserve unsupported details as unresolved. Preserve test_objectives as only the original visible goals; place newly inferred checks in verification_candidates. Every dependency constraint must state its condition, target call, parameter relationship, allowed return or exception, and relevant state effect. Require exact values, counts, or order only when cited evidence supports them. Describe supported same-scenario variations, or explicitly say none were identified without claiming uniqueness. Keep expected_interactions assertion_policy as not_implied. A test name or an implementation branch alone does not make an interaction required. For every claim_basis and critical_behavior, classify semantic_role as dependency_contract, mut_path_condition, or test_objective, and state whether support is evidence or assumption. Evidence support requires formal evidence IDs; assumption support requires an explicit reason and no evidence IDs. Each critical behavior must point by zero-based formal_claim_index to the matching dependency constraint, scenario hypothesis, or test objective for its role. Map every remaining blocking and nonblocking unknown through claim_basis target unresolved or nonblocking_unknown and its zero-based index.",
+      "requested_output_schema": {
+        "$defs": {
+          "Claim": {
+            "additionalProperties": false,
+            "properties": {
+              "statement": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Statement",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "required",
+                  "candidate",
+                  "unknown"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "scenario_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Scenario Ids",
+                "type": "array"
+              },
+              "condition": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Condition"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "statement",
+              "status",
+              "scenario_ids",
+              "condition",
+              "evidence_ids"
+            ],
+            "title": "Claim",
+            "type": "object"
+          },
+          "ClaimBasis": {
+            "additionalProperties": false,
+            "properties": {
+              "claim": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Claim",
+                "type": "string"
+              },
+              "basis": {
+                "enum": [
+                  "task_requirement",
+                  "implementation_fact",
+                  "scenario_inference"
+                ],
+                "title": "Basis",
+                "type": "string"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "selection_rationale",
+                      "allowed_variation",
+                      "unresolved",
+                      "nonblocking_unknown",
+                      "formal_claim"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Target"
+              },
+              "target_index": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Target Index"
+              },
+              "semantic_role": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "dependency_contract",
+                      "mut_path_condition",
+                      "test_objective"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Semantic Role"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              },
+              "support": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "evidence",
+                      "assumption"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Support"
+              },
+              "assumption_reason": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Assumption Reason"
+              }
+            },
+            "required": [
+              "claim",
+              "basis",
+              "target",
+              "target_index",
+              "semantic_role",
+              "evidence_ids",
+              "support",
+              "assumption_reason"
+            ],
+            "title": "ClaimBasis",
+            "type": "object"
+          },
+          "CriticalBehavior": {
+            "additionalProperties": false,
+            "properties": {
+              "behavior": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Behavior",
+                "type": "string"
+              },
+              "observation": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Observation",
+                "type": "string"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              },
+              "semantic_role": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "dependency_contract",
+                      "mut_path_condition",
+                      "test_objective"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Semantic Role"
+              },
+              "formal_claim_index": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Formal Claim Index"
+              },
+              "support": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "evidence",
+                      "assumption"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Support"
+              },
+              "assumption_reason": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Assumption Reason"
+              }
+            },
+            "required": [
+              "behavior",
+              "observation",
+              "evidence_ids",
+              "semantic_role",
+              "formal_claim_index",
+              "support",
+              "assumption_reason"
+            ],
+            "title": "CriticalBehavior",
+            "type": "object"
+          },
+          "EvidenceSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "source_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Source Id",
+                "type": "string"
+              },
+              "start_line": {
+                "minimum": 1,
+                "title": "Start Line",
+                "type": "integer"
+              },
+              "end_line": {
+                "minimum": 1,
+                "title": "End Line",
+                "type": "integer"
+              },
+              "id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Id",
+                "type": "string"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "start_line",
+              "end_line",
+              "id",
+              "rationale"
+            ],
+            "title": "EvidenceSelection",
+            "type": "object"
+          },
+          "Hypothesis": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Id",
+                "type": "string"
+              },
+              "description": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Description",
+                "type": "string"
+              },
+              "condition": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Condition",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "candidate",
+                  "unknown"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "id",
+              "description",
+              "condition",
+              "status",
+              "evidence_ids"
+            ],
+            "title": "Hypothesis",
+            "type": "object"
+          },
+          "Interaction": {
+            "additionalProperties": false,
+            "properties": {
+              "statement": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Statement",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "required",
+                  "candidate",
+                  "unknown"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "scenario_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Scenario Ids",
+                "type": "array"
+              },
+              "condition": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Condition"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              },
+              "assertion_policy": {
+                "const": "not_implied",
+                "title": "Assertion Policy",
+                "type": "string"
+              }
+            },
+            "required": [
+              "statement",
+              "status",
+              "scenario_ids",
+              "condition",
+              "evidence_ids",
+              "assertion_policy"
+            ],
+            "title": "Interaction",
+            "type": "object"
+          },
+          "ScenarioContractSelection": {
+            "additionalProperties": false,
+            "description": "Formal contract wire DTO that changes only evidence representation.",
+            "properties": {
+              "schema_version": {
+                "const": "mock-spec.scenario/v0.1",
+                "title": "Schema Version",
+                "type": "string"
+              },
+              "case_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Case Id",
+                "type": "string"
+              },
+              "language": {
+                "enum": [
+                  "java",
+                  "python"
+                ],
+                "title": "Language",
+                "type": "string"
+              },
+              "test_objectives": {
+                "items": {
+                  "$ref": "#/$defs/Claim"
+                },
+                "minItems": 1,
+                "title": "Test Objectives",
+                "type": "array"
+              },
+              "scenario_hypotheses": {
+                "items": {
+                  "$ref": "#/$defs/Hypothesis"
+                },
+                "minItems": 1,
+                "title": "Scenario Hypotheses",
+                "type": "array"
+              },
+              "dependency_constraints": {
+                "items": {
+                  "$ref": "#/$defs/Claim"
+                },
+                "title": "Dependency Constraints",
+                "type": "array"
+              },
+              "expected_interactions": {
+                "items": {
+                  "$ref": "#/$defs/Interaction"
+                },
+                "title": "Expected Interactions",
+                "type": "array"
+              },
+              "verification_candidates": {
+                "items": {
+                  "$ref": "#/$defs/VerificationCandidate"
+                },
+                "title": "Verification Candidates",
+                "type": "array"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/EvidenceSelection"
+                },
+                "title": "Evidence",
+                "type": "array"
+              },
+              "uncertainty": {
+                "items": {
+                  "$ref": "#/$defs/Claim"
+                },
+                "title": "Uncertainty",
+                "type": "array"
+              }
+            },
+            "required": [
+              "schema_version",
+              "case_id",
+              "language",
+              "test_objectives",
+              "scenario_hypotheses",
+              "dependency_constraints",
+              "expected_interactions",
+              "verification_candidates",
+              "evidence",
+              "uncertainty"
+            ],
+            "title": "ScenarioContractSelection",
+            "type": "object"
+          },
+          "VerificationCandidate": {
+            "additionalProperties": false,
+            "properties": {
+              "statement": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Statement",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "candidate",
+                  "unknown"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "scenario_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Scenario Ids",
+                "type": "array"
+              },
+              "condition": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Condition"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "statement",
+              "status",
+              "scenario_ids",
+              "condition",
+              "evidence_ids"
+            ],
+            "title": "VerificationCandidate",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "result_status": {
+            "enum": [
+              "SELECTED",
+              "AMBIGUOUS",
+              "INCONCLUSIVE"
+            ],
+            "title": "Result Status",
+            "type": "string"
+          },
+          "selected_scenario_id": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Scenario Id"
+          },
+          "selection_rationale": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Selection Rationale",
+            "type": "string"
+          },
+          "claim_basis": {
+            "items": {
+              "$ref": "#/$defs/ClaimBasis"
+            },
+            "title": "Claim Basis",
+            "type": "array"
+          },
+          "critical_behaviors": {
+            "items": {
+              "$ref": "#/$defs/CriticalBehavior"
+            },
+            "maxItems": 3,
+            "title": "Critical Behaviors",
+            "type": "array"
+          },
+          "allowed_variations": {
+            "items": {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            "title": "Allowed Variations",
+            "type": "array"
+          },
+          "unresolved": {
+            "items": {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            "title": "Unresolved",
+            "type": "array"
+          },
+          "nonblocking_unknowns": {
+            "items": {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            "title": "Nonblocking Unknowns",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "staged-construct/v0.2",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "contract": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Formal contract wire DTO that changes only evidence representation.",
+                "properties": {
+                  "schema_version": {
+                    "const": "mock-spec.scenario/v0.1",
+                    "title": "Schema Version",
+                    "type": "string"
+                  },
+                  "case_id": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Case Id",
+                    "type": "string"
+                  },
+                  "language": {
+                    "enum": [
+                      "java",
+                      "python"
+                    ],
+                    "title": "Language",
+                    "type": "string"
+                  },
+                  "test_objectives": {
+                    "items": {
+                      "$ref": "#/$defs/Claim"
+                    },
+                    "minItems": 1,
+                    "title": "Test Objectives",
+                    "type": "array"
+                  },
+                  "scenario_hypotheses": {
+                    "items": {
+                      "$ref": "#/$defs/Hypothesis"
+                    },
+                    "minItems": 1,
+                    "title": "Scenario Hypotheses",
+                    "type": "array"
+                  },
+                  "dependency_constraints": {
+                    "items": {
+                      "$ref": "#/$defs/Claim"
+                    },
+                    "title": "Dependency Constraints",
+                    "type": "array"
+                  },
+                  "expected_interactions": {
+                    "items": {
+                      "$ref": "#/$defs/Interaction"
+                    },
+                    "title": "Expected Interactions",
+                    "type": "array"
+                  },
+                  "verification_candidates": {
+                    "items": {
+                      "$ref": "#/$defs/VerificationCandidate"
+                    },
+                    "title": "Verification Candidates",
+                    "type": "array"
+                  },
+                  "evidence": {
+                    "items": {
+                      "$ref": "#/$defs/EvidenceSelection"
+                    },
+                    "title": "Evidence",
+                    "type": "array"
+                  },
+                  "uncertainty": {
+                    "items": {
+                      "$ref": "#/$defs/Claim"
+                    },
+                    "title": "Uncertainty",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "schema_version",
+                  "case_id",
+                  "language",
+                  "test_objectives",
+                  "scenario_hypotheses",
+                  "dependency_constraints",
+                  "expected_interactions",
+                  "verification_candidates",
+                  "evidence",
+                  "uncertainty"
+                ],
+                "title": "ScenarioContractSelection",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "result_status",
+          "selected_scenario_id",
+          "selection_rationale",
+          "claim_basis",
+          "critical_behaviors",
+          "allowed_variations",
+          "unresolved",
+          "nonblocking_unknowns",
+          "schema_version",
+          "contract"
+        ],
+        "title": "ConstructSelection",
+        "type": "object"
+      },
+      "payload": {
+        "extract": {
+          "candidates": [
+            {
+              "description": "Dependency returns the value observed by the ordinary oracle.",
+              "evidence": [
+                {
+                  "end_line": 11,
+                  "quote": "    return dependency(value)",
+                  "source_id": "mut:0",
+                  "start_line": 11
+                },
+                {
+                  "end_line": 5,
+                  "quote": "    assert target(1) == 2",
+                  "source_id": "test:0",
+                  "start_line": 5
+                }
+              ],
+              "scenario_id": "dependency_returns_two"
+            }
+          ],
+          "original_goals": [
+            {
+              "end_line": 5,
+              "quote": "    assert target(1) == 2",
+              "source_id": "test:0",
+              "start_line": 5
+            }
+          ],
+          "result_status": "CONTINUE",
+          "schema_version": "staged-extract/v0.1",
+          "unresolved": []
+        },
+        "query": {
+          "decision": "finish_queries",
+          "impact": "Preserve the current candidate pending construction.",
+          "previous_receipt_assessment": {
+            "attempt_sequence": 1,
+            "impact": "no_new_information",
+            "rationale": "The receipt does not resolve the hidden dependency behavior."
+          },
+          "query_attempt": null,
+          "schema_version": "staged-query/v0.1",
+          "stop_explanation": {
+            "evidence": [
+              {
+                "end_line": 5,
+                "quote": "    assert target(1) == 2",
+                "source_id": "test:0",
+                "start_line": 5
+              }
+            ],
+            "rationale": "The visible delegation and assertion support construction; repeated syntax reads add no material fact.",
+            "reason": "evidence_sufficient",
+            "remaining_unknowns": [
+              {
+                "blocking": false,
+                "impact": "The conditional candidate remains explicit without that implementation.",
+                "question": "What is the hidden dependency implementation?"
+              }
+            ]
+          }
+        },
+        "query_receipts": [
+          {
+            "arguments_json": "{\"source_id\": \"mut:0\", \"start_line\": 10, \"end_line\": 11}",
+            "assessment": {
+              "attempt_sequence": 1,
+              "impact": "no_new_information",
+              "rationale": "The receipt does not resolve the hidden dependency behavior."
+            },
+            "assessment_status": "complete",
+            "duration_seconds": 0.00025317799008917063,
+            "exploration_progress": {
+              "consecutive_no_progress": 0,
+              "evidence_digest": "d5c4eeedcab6afa4b3472feec40cf19d1ed0d37a96b984e2a2d73c8cbd7c347c",
+              "made_progress": true,
+              "new_evidence": true,
+              "new_operation_or_position": true,
+              "new_question_review": true,
+              "operation_digest": "d057bd5ce112c4205b607623b4069c55d19843651088ef92580ae60d2f760275",
+              "termination_initiator": null,
+              "termination_reason": null,
+              "threshold": 4,
+              "triggered": false
+            },
+            "question": "Does visible syntax distinguish the candidate's dependency result?",
+            "raw_request": {
+              "arguments_json": "{\"source_id\": \"mut:0\", \"start_line\": 10, \"end_line\": 11}",
+              "question": "Does visible syntax distinguish the candidate's dependency result?",
+              "scenario_id": "dependency_returns_two",
+              "tool": "inspect_source"
+            },
+            "response_id": "query:1",
+            "result": {
+              "backend": "source_store",
+              "end_line": 11,
+              "limitations": [],
+              "logical_path": "src/example.py",
+              "source_id": "mut:0",
+              "start_line": 10,
+              "status": "ok",
+              "text": "def target(value):\n    return dependency(value)",
+              "usage": {
+                "bytes": 0,
+                "elapsed_seconds": 0.0
+              }
+            },
+            "scenario_id": "dependency_returns_two",
+            "semantic_category": "success",
+            "sequence": 1,
+            "status": "ok",
+            "tool": "inspect_source",
+            "within_budget": true
+          }
+        ],
+        "source_line_index": {
+          "mut:0": [
+            {
+              "line": 10,
+              "text": "def target(value):"
+            },
+            {
+              "line": 11,
+              "text": "    return dependency(value)"
+            }
+          ],
+          "support:0": [
+            {
+              "line": 1,
+              "text": "def dependency(value): ..."
+            }
+          ],
+          "test:0": [
+            {
+              "line": 4,
+              "text": "def test_target():"
+            },
+            {
+              "line": 5,
+              "text": "    assert target(1) == 2"
+            }
+          ]
+        },
+        "stage": "CONSTRUCT",
+        "visible_task": {
+          "case_id": "synthetic_python_delegation",
+          "execution_context": {
+            "runtime_name": "python",
+            "runtime_version": "3.10",
+            "test_framework": "pytest",
+            "test_framework_version": null
+          },
+          "input_policy": {
+            "masking_contract": "artifact-aware-slot-v1",
+            "policy_id": "synthetic-replay-v1",
+            "protocol_version": "synthetic_replay_v1",
+            "visibility": "reviewed_frozen_sources"
+          },
+          "language": "python",
+          "masked_test": {
+            "end_line": 5,
+            "logical_path": "tests/test_example.py",
+            "resolution_status": "resolved",
+            "source_id": "test:0",
+            "start_line": 4,
+            "symbol": "test_example.test_target",
+            "target_precision": "function",
+            "text": "def test_target():\n    assert target(1) == 2"
+          },
+          "mut_source": {
+            "end_line": 11,
+            "logical_path": "src/example.py",
+            "resolution_status": "resolved",
+            "source_id": "mut:0",
+            "start_line": 10,
+            "symbol": "example.target",
+            "target_precision": "function",
+            "text": "def target(value):\n    return dependency(value)"
+          },
+          "permitted_interfaces": [
+            {
+              "end_line": 1,
+              "resolution_status": "partial",
+              "signature": "dependency(value)",
+              "source_id": "support:0",
+              "start_line": 1,
+              "symbol": "example.dependency"
+            }
+          ],
+          "schema_version": "mock-spec.task/v1",
+          "sources": [
+            {
+              "logical_path": "src/example.py",
+              "role": "mut",
+              "source_id": "mut:0"
+            },
+            {
+              "logical_path": "tests/test_example.py",
+              "role": "masked_test",
+              "source_id": "test:0"
+            },
+            {
+              "logical_path": "src/dependency.py",
+              "role": "supporting",
+              "source_id": "support:0"
+            }
+          ],
+          "supporting_sources": [
+            {
+              "end_line": 1,
+              "logical_path": "src/dependency.py",
+              "resolution_status": "partial",
+              "source_id": "support:0",
+              "start_line": 1,
+              "symbol": "example.dependency",
+              "target_precision": "function",
+              "text": "def dependency(value): ..."
+            }
+          ]
+        }
+      },
+      "payload_sha256": "b943eeb50a475b2a78177a34300abca5f2181cc2ba32a61d66779abbc5e27591",
+      "payload_bytes": 4630,
+      "max_output_tokens": 4096,
+      "timeout_seconds": 15,
+      "elapsed_seconds": 0.011917089999769814,
+      "response_refs": [
+        {
+          "response_index": 3,
+          "response_id": null,
+          "request_id": null,
+          "usage": {
+            "requests": 1,
+            "input_tokens": 100,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens": 100,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 200,
+            "request_usage_entries": []
+          }
+        }
+      ],
+      "exception": null
+    },
+    {
+      "sequence": 5,
+      "stage": "CONTRAST",
+      "status": "completed",
+      "model_request_started": true,
+      "request_start_basis": "usage_ledger_before_model_call_hook",
+      "model_name": "scripted-offline",
+      "output_type": "ContrastResult",
+      "prompt_version": "staged-scenario-inference-prompts/v0.3",
+      "instructions": "staged-scenario-inference-prompts/v0.3\nStage: CONTRAST. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. Perform one static, not-executed degeneracy attempt. For proposed, identify an alternative Mock plan, the supported behavior it bypasses, evidence IDs, and the smallest distinguishing observation. Use none_identified only after completing the attempt without an evidence-backed alternative. An AMBIGUOUS result may be contrasted without selecting either candidate. Request semantic revision only when the contrast establishes that a legal same-scenario alternative should replace or change the formal candidates. Mark the contrast as evidence-supported with evidence_ids, or as an explicit assumption with an assumption_reason and no evidence IDs. It remains a static prediction with execution_status not_executed. Classify its semantic_role using the same three-way distinction.",
+      "requested_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": "staged-contrast/v0.1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "proposed",
+              "none_identified"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "execution_status": {
+            "const": "not_executed",
+            "title": "Execution Status",
+            "type": "string"
+          },
+          "alternative": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alternative"
+          },
+          "bypass_behavior": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bypass Behavior"
+          },
+          "evidence_ids": {
+            "items": {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "distinguishing_observation": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distinguishing Observation"
+          },
+          "revision_requested": {
+            "title": "Revision Requested",
+            "type": "boolean"
+          },
+          "revision_reason": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revision Reason"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "enum": [
+                  "evidence",
+                  "assumption"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "assumption_reason": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assumption Reason"
+          },
+          "semantic_role": {
+            "anyOf": [
+              {
+                "enum": [
+                  "dependency_contract",
+                  "mut_path_condition",
+                  "test_objective"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Semantic Role"
+          }
+        },
+        "required": [
+          "schema_version",
+          "status",
+          "execution_status",
+          "alternative",
+          "bypass_behavior",
+          "evidence_ids",
+          "distinguishing_observation",
+          "revision_requested",
+          "revision_reason",
+          "support",
+          "assumption_reason",
+          "semantic_role"
+        ],
+        "title": "ContrastResult",
+        "type": "object"
+      },
+      "payload": {
+        "construct": {
+          "allowed_variations": [
+            "Internal dependency state and unrelated calls may vary when the returned value remains 2."
+          ],
+          "claim_basis": [
+            {
+              "assumption_reason": null,
+              "basis": "task_requirement",
+              "claim": "objective",
+              "evidence_ids": [
+                "assertion"
+              ],
+              "semantic_role": "test_objective",
+              "support": "evidence",
+              "target": "formal_claim",
+              "target_index": 0
+            },
+            {
+              "assumption_reason": null,
+              "basis": "implementation_fact",
+              "claim": "delegation",
+              "evidence_ids": [
+                "delegation"
+              ],
+              "semantic_role": "mut_path_condition",
+              "support": "evidence",
+              "target": "formal_claim",
+              "target_index": 0
+            },
+            {
+              "assumption_reason": null,
+              "basis": "scenario_inference",
+              "claim": "selected_scenario",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ],
+              "semantic_role": "dependency_contract",
+              "support": "evidence",
+              "target": "selection_rationale",
+              "target_index": 0
+            },
+            {
+              "assumption_reason": "Unrelated dependency state is outside the visible objective.",
+              "basis": "scenario_inference",
+              "claim": "allowed variation",
+              "evidence_ids": [],
+              "semantic_role": "dependency_contract",
+              "support": "assumption",
+              "target": "allowed_variation",
+              "target_index": 0
+            }
+          ],
+          "contract": {
+            "case_id": "synthetic_python_delegation",
+            "dependency_constraints": [
+              {
+                "condition": "target delegates value 1 and completes normally.",
+                "evidence_ids": [
+                  "delegation",
+                  "assertion"
+                ],
+                "scenario_ids": [
+                  "dependency_returns_two"
+                ],
+                "statement": "dependency(1) returns 2.",
+                "status": "required"
+              }
+            ],
+            "evidence": [
+              {
+                "end_line": 11,
+                "id": "delegation",
+                "quote": "    return dependency(value)",
+                "rationale": "The target directly returns the dependency result.",
+                "source_id": "mut:0",
+                "start_line": 11
+              },
+              {
+                "end_line": 5,
+                "id": "assertion",
+                "quote": "    assert target(1) == 2",
+                "rationale": "The visible ordinary oracle checks the returned value.",
+                "source_id": "test:0",
+                "start_line": 5
+              }
+            ],
+            "expected_interactions": [
+              {
+                "assertion_policy": "not_implied",
+                "condition": "target is called with 1.",
+                "evidence_ids": [
+                  "delegation",
+                  "assertion"
+                ],
+                "scenario_ids": [
+                  "dependency_returns_two"
+                ],
+                "statement": "dependency is called with 1.",
+                "status": "required"
+              }
+            ],
+            "language": "python",
+            "scenario_hypotheses": [
+              {
+                "condition": "target receives value 1.",
+                "description": "The dependency returns 2.",
+                "evidence_ids": [
+                  "delegation",
+                  "assertion"
+                ],
+                "id": "dependency_returns_two",
+                "status": "candidate"
+              }
+            ],
+            "schema_version": "mock-spec.scenario/v0.1",
+            "test_objectives": [
+              {
+                "condition": "The visible test invokes target(1).",
+                "evidence_ids": [
+                  "assertion"
+                ],
+                "scenario_ids": [
+                  "dependency_returns_two"
+                ],
+                "statement": "The visible test expects target(1) to equal 2.",
+                "status": "required"
+              }
+            ],
+            "uncertainty": [
+              {
+                "condition": null,
+                "evidence_ids": [],
+                "scenario_ids": [],
+                "statement": "The dependency implementation is not visible.",
+                "status": "unknown"
+              }
+            ],
+            "verification_candidates": []
+          },
+          "critical_behaviors": [
+            {
+              "assumption_reason": null,
+              "behavior": "dependency(1) yields 2",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ],
+              "formal_claim_index": 0,
+              "observation": "target(1) returns 2 to the visible assertion",
+              "semantic_role": "dependency_contract",
+              "support": "evidence"
+            }
+          ],
+          "nonblocking_unknowns": [],
+          "result_status": "SELECTED",
+          "schema_version": "staged-construct/v0.1",
+          "selected_scenario_id": "dependency_returns_two",
+          "selection_rationale": "Direct delegation and the ordinary assertion jointly constrain the result.",
+          "unresolved": []
+        },
+        "extract": {
+          "candidates": [
+            {
+              "description": "Dependency returns the value observed by the ordinary oracle.",
+              "evidence": [
+                {
+                  "end_line": 11,
+                  "quote": "    return dependency(value)",
+                  "source_id": "mut:0",
+                  "start_line": 11
+                },
+                {
+                  "end_line": 5,
+                  "quote": "    assert target(1) == 2",
+                  "source_id": "test:0",
+                  "start_line": 5
+                }
+              ],
+              "scenario_id": "dependency_returns_two"
+            }
+          ],
+          "original_goals": [
+            {
+              "end_line": 5,
+              "quote": "    assert target(1) == 2",
+              "source_id": "test:0",
+              "start_line": 5
+            }
+          ],
+          "result_status": "CONTINUE",
+          "schema_version": "staged-extract/v0.1",
+          "unresolved": []
+        },
+        "query_receipts": [
+          {
+            "arguments_json": "{\"source_id\": \"mut:0\", \"start_line\": 10, \"end_line\": 11}",
+            "assessment": {
+              "attempt_sequence": 1,
+              "impact": "no_new_information",
+              "rationale": "The receipt does not resolve the hidden dependency behavior."
+            },
+            "assessment_status": "complete",
+            "duration_seconds": 0.00025317799008917063,
+            "exploration_progress": {
+              "consecutive_no_progress": 0,
+              "evidence_digest": "d5c4eeedcab6afa4b3472feec40cf19d1ed0d37a96b984e2a2d73c8cbd7c347c",
+              "made_progress": true,
+              "new_evidence": true,
+              "new_operation_or_position": true,
+              "new_question_review": true,
+              "operation_digest": "d057bd5ce112c4205b607623b4069c55d19843651088ef92580ae60d2f760275",
+              "termination_initiator": null,
+              "termination_reason": null,
+              "threshold": 4,
+              "triggered": false
+            },
+            "question": "Does visible syntax distinguish the candidate's dependency result?",
+            "raw_request": {
+              "arguments_json": "{\"source_id\": \"mut:0\", \"start_line\": 10, \"end_line\": 11}",
+              "question": "Does visible syntax distinguish the candidate's dependency result?",
+              "scenario_id": "dependency_returns_two",
+              "tool": "inspect_source"
+            },
+            "response_id": "query:1",
+            "result": {
+              "backend": "source_store",
+              "end_line": 11,
+              "limitations": [],
+              "logical_path": "src/example.py",
+              "source_id": "mut:0",
+              "start_line": 10,
+              "status": "ok",
+              "text": "def target(value):\n    return dependency(value)",
+              "usage": {
+                "bytes": 0,
+                "elapsed_seconds": 0.0
+              }
+            },
+            "scenario_id": "dependency_returns_two",
+            "semantic_category": "success",
+            "sequence": 1,
+            "status": "ok",
+            "tool": "inspect_source",
+            "within_budget": true
+          }
+        ],
+        "source_line_index": {
+          "mut:0": [
+            {
+              "line": 10,
+              "text": "def target(value):"
+            },
+            {
+              "line": 11,
+              "text": "    return dependency(value)"
+            }
+          ],
+          "support:0": [
+            {
+              "line": 1,
+              "text": "def dependency(value): ..."
+            }
+          ],
+          "test:0": [
+            {
+              "line": 4,
+              "text": "def test_target():"
+            },
+            {
+              "line": 5,
+              "text": "    assert target(1) == 2"
+            }
+          ]
+        },
+        "stage": "CONTRAST",
+        "visible_task": {
+          "case_id": "synthetic_python_delegation",
+          "execution_context": {
+            "runtime_name": "python",
+            "runtime_version": "3.10",
+            "test_framework": "pytest",
+            "test_framework_version": null
+          },
+          "input_policy": {
+            "masking_contract": "artifact-aware-slot-v1",
+            "policy_id": "synthetic-replay-v1",
+            "protocol_version": "synthetic_replay_v1",
+            "visibility": "reviewed_frozen_sources"
+          },
+          "language": "python",
+          "masked_test": {
+            "end_line": 5,
+            "logical_path": "tests/test_example.py",
+            "resolution_status": "resolved",
+            "source_id": "test:0",
+            "start_line": 4,
+            "symbol": "test_example.test_target",
+            "target_precision": "function",
+            "text": "def test_target():\n    assert target(1) == 2"
+          },
+          "mut_source": {
+            "end_line": 11,
+            "logical_path": "src/example.py",
+            "resolution_status": "resolved",
+            "source_id": "mut:0",
+            "start_line": 10,
+            "symbol": "example.target",
+            "target_precision": "function",
+            "text": "def target(value):\n    return dependency(value)"
+          },
+          "permitted_interfaces": [
+            {
+              "end_line": 1,
+              "resolution_status": "partial",
+              "signature": "dependency(value)",
+              "source_id": "support:0",
+              "start_line": 1,
+              "symbol": "example.dependency"
+            }
+          ],
+          "schema_version": "mock-spec.task/v1",
+          "sources": [
+            {
+              "logical_path": "src/example.py",
+              "role": "mut",
+              "source_id": "mut:0"
+            },
+            {
+              "logical_path": "tests/test_example.py",
+              "role": "masked_test",
+              "source_id": "test:0"
+            },
+            {
+              "logical_path": "src/dependency.py",
+              "role": "supporting",
+              "source_id": "support:0"
+            }
+          ],
+          "supporting_sources": [
+            {
+              "end_line": 1,
+              "logical_path": "src/dependency.py",
+              "resolution_status": "partial",
+              "source_id": "support:0",
+              "start_line": 1,
+              "symbol": "example.dependency",
+              "target_precision": "function",
+              "text": "def dependency(value): ..."
+            }
+          ]
+        }
+      },
+      "payload_sha256": "4f43f60a44ac67c17e3056762a103e5075ba2961f780ea08e8719c205f65d483",
+      "payload_bytes": 6997,
+      "max_output_tokens": 4096,
+      "timeout_seconds": 15,
+      "elapsed_seconds": 0.006660675993771292,
+      "response_refs": [
+        {
+          "response_index": 4,
+          "response_id": null,
+          "request_id": null,
+          "usage": {
+            "requests": 1,
+            "input_tokens": 100,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens": 100,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 200,
+            "request_usage_entries": []
+          }
+        }
+      ],
+      "exception": null
+    },
+    {
+      "sequence": 6,
+      "stage": "DELIVER",
+      "status": "completed",
+      "model_request_started": true,
+      "request_start_basis": "usage_ledger_before_model_call_hook",
+      "model_name": "scripted-offline",
+      "output_type": "DeliverSelection",
+      "prompt_version": "staged-scenario-inference-prompts/v0.3",
+      "instructions": "staged-scenario-inference-prompts/v0.3\nStage: DELIVER. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material.",
+      "requested_output_schema": {
+        "$defs": {
+          "Claim": {
+            "additionalProperties": false,
+            "properties": {
+              "statement": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Statement",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "required",
+                  "candidate",
+                  "unknown"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "scenario_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Scenario Ids",
+                "type": "array"
+              },
+              "condition": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Condition"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "statement",
+              "status",
+              "scenario_ids",
+              "condition",
+              "evidence_ids"
+            ],
+            "title": "Claim",
+            "type": "object"
+          },
+          "EvidenceSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "source_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Source Id",
+                "type": "string"
+              },
+              "start_line": {
+                "minimum": 1,
+                "title": "Start Line",
+                "type": "integer"
+              },
+              "end_line": {
+                "minimum": 1,
+                "title": "End Line",
+                "type": "integer"
+              },
+              "id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Id",
+                "type": "string"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "start_line",
+              "end_line",
+              "id",
+              "rationale"
+            ],
+            "title": "EvidenceSelection",
+            "type": "object"
+          },
+          "Hypothesis": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Id",
+                "type": "string"
+              },
+              "description": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Description",
+                "type": "string"
+              },
+              "condition": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Condition",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "candidate",
+                  "unknown"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "id",
+              "description",
+              "condition",
+              "status",
+              "evidence_ids"
+            ],
+            "title": "Hypothesis",
+            "type": "object"
+          },
+          "Interaction": {
+            "additionalProperties": false,
+            "properties": {
+              "statement": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Statement",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "required",
+                  "candidate",
+                  "unknown"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "scenario_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Scenario Ids",
+                "type": "array"
+              },
+              "condition": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Condition"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              },
+              "assertion_policy": {
+                "const": "not_implied",
+                "title": "Assertion Policy",
+                "type": "string"
+              }
+            },
+            "required": [
+              "statement",
+              "status",
+              "scenario_ids",
+              "condition",
+              "evidence_ids",
+              "assertion_policy"
+            ],
+            "title": "Interaction",
+            "type": "object"
+          },
+          "ScenarioContractSelection": {
+            "additionalProperties": false,
+            "description": "Formal contract wire DTO that changes only evidence representation.",
+            "properties": {
+              "schema_version": {
+                "const": "mock-spec.scenario/v0.1",
+                "title": "Schema Version",
+                "type": "string"
+              },
+              "case_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Case Id",
+                "type": "string"
+              },
+              "language": {
+                "enum": [
+                  "java",
+                  "python"
+                ],
+                "title": "Language",
+                "type": "string"
+              },
+              "test_objectives": {
+                "items": {
+                  "$ref": "#/$defs/Claim"
+                },
+                "minItems": 1,
+                "title": "Test Objectives",
+                "type": "array"
+              },
+              "scenario_hypotheses": {
+                "items": {
+                  "$ref": "#/$defs/Hypothesis"
+                },
+                "minItems": 1,
+                "title": "Scenario Hypotheses",
+                "type": "array"
+              },
+              "dependency_constraints": {
+                "items": {
+                  "$ref": "#/$defs/Claim"
+                },
+                "title": "Dependency Constraints",
+                "type": "array"
+              },
+              "expected_interactions": {
+                "items": {
+                  "$ref": "#/$defs/Interaction"
+                },
+                "title": "Expected Interactions",
+                "type": "array"
+              },
+              "verification_candidates": {
+                "items": {
+                  "$ref": "#/$defs/VerificationCandidate"
+                },
+                "title": "Verification Candidates",
+                "type": "array"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/EvidenceSelection"
+                },
+                "title": "Evidence",
+                "type": "array"
+              },
+              "uncertainty": {
+                "items": {
+                  "$ref": "#/$defs/Claim"
+                },
+                "title": "Uncertainty",
+                "type": "array"
+              }
+            },
+            "required": [
+              "schema_version",
+              "case_id",
+              "language",
+              "test_objectives",
+              "scenario_hypotheses",
+              "dependency_constraints",
+              "expected_interactions",
+              "verification_candidates",
+              "evidence",
+              "uncertainty"
+            ],
+            "title": "ScenarioContractSelection",
+            "type": "object"
+          },
+          "VerificationCandidate": {
+            "additionalProperties": false,
+            "properties": {
+              "statement": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Statement",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "candidate",
+                  "unknown"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "scenario_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Scenario Ids",
+                "type": "array"
+              },
+              "condition": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Condition"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "statement",
+              "status",
+              "scenario_ids",
+              "condition",
+              "evidence_ids"
+            ],
+            "title": "VerificationCandidate",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": "staged-deliver/v0.2",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "result_status": {
+            "enum": [
+              "SELECTED",
+              "AMBIGUOUS",
+              "INCONCLUSIVE"
+            ],
+            "title": "Result Status",
+            "type": "string"
+          },
+          "selected_scenario_id": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Scenario Id"
+          },
+          "contract": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Formal contract wire DTO that changes only evidence representation.",
+                "properties": {
+                  "schema_version": {
+                    "const": "mock-spec.scenario/v0.1",
+                    "title": "Schema Version",
+                    "type": "string"
+                  },
+                  "case_id": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Case Id",
+                    "type": "string"
+                  },
+                  "language": {
+                    "enum": [
+                      "java",
+                      "python"
+                    ],
+                    "title": "Language",
+                    "type": "string"
+                  },
+                  "test_objectives": {
+                    "items": {
+                      "$ref": "#/$defs/Claim"
+                    },
+                    "minItems": 1,
+                    "title": "Test Objectives",
+                    "type": "array"
+                  },
+                  "scenario_hypotheses": {
+                    "items": {
+                      "$ref": "#/$defs/Hypothesis"
+                    },
+                    "minItems": 1,
+                    "title": "Scenario Hypotheses",
+                    "type": "array"
+                  },
+                  "dependency_constraints": {
+                    "items": {
+                      "$ref": "#/$defs/Claim"
+                    },
+                    "title": "Dependency Constraints",
+                    "type": "array"
+                  },
+                  "expected_interactions": {
+                    "items": {
+                      "$ref": "#/$defs/Interaction"
+                    },
+                    "title": "Expected Interactions",
+                    "type": "array"
+                  },
+                  "verification_candidates": {
+                    "items": {
+                      "$ref": "#/$defs/VerificationCandidate"
+                    },
+                    "title": "Verification Candidates",
+                    "type": "array"
+                  },
+                  "evidence": {
+                    "items": {
+                      "$ref": "#/$defs/EvidenceSelection"
+                    },
+                    "title": "Evidence",
+                    "type": "array"
+                  },
+                  "uncertainty": {
+                    "items": {
+                      "$ref": "#/$defs/Claim"
+                    },
+                    "title": "Uncertainty",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "schema_version",
+                  "case_id",
+                  "language",
+                  "test_objectives",
+                  "scenario_hypotheses",
+                  "dependency_constraints",
+                  "expected_interactions",
+                  "verification_candidates",
+                  "evidence",
+                  "uncertainty"
+                ],
+                "title": "ScenarioContractSelection",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "schema_version",
+          "result_status",
+          "selected_scenario_id",
+          "contract"
+        ],
+        "title": "DeliverSelection",
+        "type": "object"
+      },
+      "payload": {
+        "construct": {
+          "allowed_variations": [
+            "Internal dependency state and unrelated calls may vary when the returned value remains 2."
+          ],
+          "claim_basis": [
+            {
+              "assumption_reason": null,
+              "basis": "task_requirement",
+              "claim": "objective",
+              "evidence_ids": [
+                "assertion"
+              ],
+              "semantic_role": "test_objective",
+              "support": "evidence",
+              "target": "formal_claim",
+              "target_index": 0
+            },
+            {
+              "assumption_reason": null,
+              "basis": "implementation_fact",
+              "claim": "delegation",
+              "evidence_ids": [
+                "delegation"
+              ],
+              "semantic_role": "mut_path_condition",
+              "support": "evidence",
+              "target": "formal_claim",
+              "target_index": 0
+            },
+            {
+              "assumption_reason": null,
+              "basis": "scenario_inference",
+              "claim": "selected_scenario",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ],
+              "semantic_role": "dependency_contract",
+              "support": "evidence",
+              "target": "selection_rationale",
+              "target_index": 0
+            },
+            {
+              "assumption_reason": "Unrelated dependency state is outside the visible objective.",
+              "basis": "scenario_inference",
+              "claim": "allowed variation",
+              "evidence_ids": [],
+              "semantic_role": "dependency_contract",
+              "support": "assumption",
+              "target": "allowed_variation",
+              "target_index": 0
+            }
+          ],
+          "contract": {
+            "case_id": "synthetic_python_delegation",
+            "dependency_constraints": [
+              {
+                "condition": "target delegates value 1 and completes normally.",
+                "evidence_ids": [
+                  "delegation",
+                  "assertion"
+                ],
+                "scenario_ids": [
+                  "dependency_returns_two"
+                ],
+                "statement": "dependency(1) returns 2.",
+                "status": "required"
+              }
+            ],
+            "evidence": [
+              {
+                "end_line": 11,
+                "id": "delegation",
+                "quote": "    return dependency(value)",
+                "rationale": "The target directly returns the dependency result.",
+                "source_id": "mut:0",
+                "start_line": 11
+              },
+              {
+                "end_line": 5,
+                "id": "assertion",
+                "quote": "    assert target(1) == 2",
+                "rationale": "The visible ordinary oracle checks the returned value.",
+                "source_id": "test:0",
+                "start_line": 5
+              }
+            ],
+            "expected_interactions": [
+              {
+                "assertion_policy": "not_implied",
+                "condition": "target is called with 1.",
+                "evidence_ids": [
+                  "delegation",
+                  "assertion"
+                ],
+                "scenario_ids": [
+                  "dependency_returns_two"
+                ],
+                "statement": "dependency is called with 1.",
+                "status": "required"
+              }
+            ],
+            "language": "python",
+            "scenario_hypotheses": [
+              {
+                "condition": "target receives value 1.",
+                "description": "The dependency returns 2.",
+                "evidence_ids": [
+                  "delegation",
+                  "assertion"
+                ],
+                "id": "dependency_returns_two",
+                "status": "candidate"
+              }
+            ],
+            "schema_version": "mock-spec.scenario/v0.1",
+            "test_objectives": [
+              {
+                "condition": "The visible test invokes target(1).",
+                "evidence_ids": [
+                  "assertion"
+                ],
+                "scenario_ids": [
+                  "dependency_returns_two"
+                ],
+                "statement": "The visible test expects target(1) to equal 2.",
+                "status": "required"
+              }
+            ],
+            "uncertainty": [
+              {
+                "condition": null,
+                "evidence_ids": [],
+                "scenario_ids": [],
+                "statement": "The dependency implementation is not visible.",
+                "status": "unknown"
+              }
+            ],
+            "verification_candidates": []
+          },
+          "critical_behaviors": [
+            {
+              "assumption_reason": null,
+              "behavior": "dependency(1) yields 2",
+              "evidence_ids": [
+                "delegation",
+                "assertion"
+              ],
+              "formal_claim_index": 0,
+              "observation": "target(1) returns 2 to the visible assertion",
+              "semantic_role": "dependency_contract",
+              "support": "evidence"
+            }
+          ],
+          "nonblocking_unknowns": [],
+          "result_status": "SELECTED",
+          "schema_version": "staged-construct/v0.1",
+          "selected_scenario_id": "dependency_returns_two",
+          "selection_rationale": "Direct delegation and the ordinary assertion jointly constrain the result.",
+          "unresolved": []
+        },
+        "extract": {
+          "candidates": [
+            {
+              "description": "Dependency returns the value observed by the ordinary oracle.",
+              "evidence": [
+                {
+                  "end_line": 11,
+                  "quote": "    return dependency(value)",
+                  "source_id": "mut:0",
+                  "start_line": 11
+                },
+                {
+                  "end_line": 5,
+                  "quote": "    assert target(1) == 2",
+                  "source_id": "test:0",
+                  "start_line": 5
+                }
+              ],
+              "scenario_id": "dependency_returns_two"
+            }
+          ],
+          "original_goals": [
+            {
+              "end_line": 5,
+              "quote": "    assert target(1) == 2",
+              "source_id": "test:0",
+              "start_line": 5
+            }
+          ],
+          "result_status": "CONTINUE",
+          "schema_version": "staged-extract/v0.1",
+          "unresolved": []
+        },
+        "host": {
+          "case_id": "synthetic_python_delegation",
+          "input_hash": "ee8d2e3f11798a38b3d84daf077dda41938500862046dc4c1f9d7081e0a92d4a",
+          "language": "python",
+          "run_id": "d052677c-6631-4c1e-a172-0d06f24d8912",
+          "variant": "C"
+        },
+        "query": {
+          "decision": "finish_queries",
+          "impact": "Preserve the current candidate pending construction.",
+          "previous_receipt_assessment": {
+            "attempt_sequence": 1,
+            "impact": "no_new_information",
+            "rationale": "The receipt does not resolve the hidden dependency behavior."
+          },
+          "query_attempt": null,
+          "schema_version": "staged-query/v0.1",
+          "stop_explanation": {
+            "evidence": [
+              {
+                "end_line": 5,
+                "quote": "    assert target(1) == 2",
+                "source_id": "test:0",
+                "start_line": 5
+              }
+            ],
+            "rationale": "The visible delegation and assertion support construction; repeated syntax reads add no material fact.",
+            "reason": "evidence_sufficient",
+            "remaining_unknowns": [
+              {
+                "blocking": false,
+                "impact": "The conditional candidate remains explicit without that implementation.",
+                "question": "What is the hidden dependency implementation?"
+              }
+            ]
+          }
+        },
+        "query_receipts": [
+          {
+            "arguments_json": "{\"source_id\": \"mut:0\", \"start_line\": 10, \"end_line\": 11}",
+            "assessment": {
+              "attempt_sequence": 1,
+              "impact": "no_new_information",
+              "rationale": "The receipt does not resolve the hidden dependency behavior."
+            },
+            "assessment_status": "complete",
+            "duration_seconds": 0.00025317799008917063,
+            "exploration_progress": {
+              "consecutive_no_progress": 0,
+              "evidence_digest": "d5c4eeedcab6afa4b3472feec40cf19d1ed0d37a96b984e2a2d73c8cbd7c347c",
+              "made_progress": true,
+              "new_evidence": true,
+              "new_operation_or_position": true,
+              "new_question_review": true,
+              "operation_digest": "d057bd5ce112c4205b607623b4069c55d19843651088ef92580ae60d2f760275",
+              "termination_initiator": null,
+              "termination_reason": null,
+              "threshold": 4,
+              "triggered": false
+            },
+            "question": "Does visible syntax distinguish the candidate's dependency result?",
+            "raw_request": {
+              "arguments_json": "{\"source_id\": \"mut:0\", \"start_line\": 10, \"end_line\": 11}",
+              "question": "Does visible syntax distinguish the candidate's dependency result?",
+              "scenario_id": "dependency_returns_two",
+              "tool": "inspect_source"
+            },
+            "response_id": "query:1",
+            "result": {
+              "backend": "source_store",
+              "end_line": 11,
+              "limitations": [],
+              "logical_path": "src/example.py",
+              "source_id": "mut:0",
+              "start_line": 10,
+              "status": "ok",
+              "text": "def target(value):\n    return dependency(value)",
+              "usage": {
+                "bytes": 0,
+                "elapsed_seconds": 0.0
+              }
+            },
+            "scenario_id": "dependency_returns_two",
+            "semantic_category": "success",
+            "sequence": 1,
+            "status": "ok",
+            "tool": "inspect_source",
+            "within_budget": true
+          }
+        ],
+        "source_line_index": {
+          "mut:0": [
+            {
+              "line": 10,
+              "text": "def target(value):"
+            },
+            {
+              "line": 11,
+              "text": "    return dependency(value)"
+            }
+          ],
+          "support:0": [
+            {
+              "line": 1,
+              "text": "def dependency(value): ..."
+            }
+          ],
+          "test:0": [
+            {
+              "line": 4,
+              "text": "def test_target():"
+            },
+            {
+              "line": 5,
+              "text": "    assert target(1) == 2"
+            }
+          ]
+        },
+        "stage": "DELIVER",
+        "visible_task": {
+          "case_id": "synthetic_python_delegation",
+          "execution_context": {
+            "runtime_name": "python",
+            "runtime_version": "3.10",
+            "test_framework": "pytest",
+            "test_framework_version": null
+          },
+          "input_policy": {
+            "masking_contract": "artifact-aware-slot-v1",
+            "policy_id": "synthetic-replay-v1",
+            "protocol_version": "synthetic_replay_v1",
+            "visibility": "reviewed_frozen_sources"
+          },
+          "language": "python",
+          "masked_test": {
+            "end_line": 5,
+            "logical_path": "tests/test_example.py",
+            "resolution_status": "resolved",
+            "source_id": "test:0",
+            "start_line": 4,
+            "symbol": "test_example.test_target",
+            "target_precision": "function",
+            "text": "def test_target():\n    assert target(1) == 2"
+          },
+          "mut_source": {
+            "end_line": 11,
+            "logical_path": "src/example.py",
+            "resolution_status": "resolved",
+            "source_id": "mut:0",
+            "start_line": 10,
+            "symbol": "example.target",
+            "target_precision": "function",
+            "text": "def target(value):\n    return dependency(value)"
+          },
+          "permitted_interfaces": [
+            {
+              "end_line": 1,
+              "resolution_status": "partial",
+              "signature": "dependency(value)",
+              "source_id": "support:0",
+              "start_line": 1,
+              "symbol": "example.dependency"
+            }
+          ],
+          "schema_version": "mock-spec.task/v1",
+          "sources": [
+            {
+              "logical_path": "src/example.py",
+              "role": "mut",
+              "source_id": "mut:0"
+            },
+            {
+              "logical_path": "tests/test_example.py",
+              "role": "masked_test",
+              "source_id": "test:0"
+            },
+            {
+              "logical_path": "src/dependency.py",
+              "role": "supporting",
+              "source_id": "support:0"
+            }
+          ],
+          "supporting_sources": [
+            {
+              "end_line": 1,
+              "logical_path": "src/dependency.py",
+              "resolution_status": "partial",
+              "source_id": "support:0",
+              "start_line": 1,
+              "symbol": "example.dependency",
+              "target_precision": "function",
+              "text": "def dependency(value): ..."
+            }
+          ]
+        }
+      },
+      "payload_sha256": "1393ceefae4f9a5dac5d062ea74828a33635e305e04d7284c8bdda5c35452bca",
+      "payload_bytes": 7978,
+      "max_output_tokens": 4096,
+      "timeout_seconds": 15,
+      "elapsed_seconds": 0.011455379004473798,
+      "response_refs": [
+        {
+          "response_index": 5,
+          "response_id": null,
+          "request_id": null,
+          "usage": {
+            "requests": 1,
+            "input_tokens": 100,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens": 100,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 200,
+            "request_usage_entries": []
+          }
+        }
+      ],
+      "exception": null
+    }
+  ],
+  "model_responses": [
+    {
+      "output": [
+        {
+          "id": "scripted-message",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"staged-extract/v0.2\", \"original_goals\": [{\"source_id\": \"test:0\", \"start_line\": 5, \"end_line\": 5}], \"candidates\": [{\"scenario_id\": \"dependency_returns_two\", \"description\": \"Dependency returns the value observed by the ordinary oracle.\", \"evidence\": [{\"source_id\": \"mut:0\", \"start_line\": 11, \"end_line\": 11}, {\"source_id\": \"test:0\", \"start_line\": 5, \"end_line\": 5}]}], \"unresolved\": []}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 100,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 200,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "id": "scripted-message",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"staged-query/v0.3\", \"decision\": \"request_query\", \"query_attempt\": {\"question\": \"Does visible syntax distinguish the candidate's dependency result?\", \"scenario_id\": \"dependency_returns_two\", \"tool\": \"inspect_source\", \"arguments_json\": \"{\\\"source_id\\\": \\\"mut:0\\\", \\\"start_line\\\": 10, \\\"end_line\\\": 11}\"}, \"previous_receipt_assessment\": null, \"impact\": \"Preserve the current candidate pending construction.\", \"stop_explanation\": null}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 100,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 200,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "id": "scripted-message",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"staged-query/v0.3\", \"decision\": \"finish_queries\", \"query_attempt\": null, \"previous_receipt_assessment\": {\"impact\": \"no_new_information\", \"rationale\": \"The receipt does not resolve the hidden dependency behavior.\"}, \"impact\": \"Preserve the current candidate pending construction.\", \"stop_explanation\": {\"reason\": \"evidence_sufficient\", \"rationale\": \"The visible delegation and assertion support construction; repeated syntax reads add no material fact.\", \"evidence\": [{\"source_id\": \"test:0\", \"start_line\": 5, \"end_line\": 5}], \"remaining_unknowns\": [{\"question\": \"What is the hidden dependency implementation?\", \"impact\": \"The conditional candidate remains explicit without that implementation.\", \"blocking\": false}]}}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 100,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 200,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "id": "scripted-message",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"staged-construct/v0.2\", \"result_status\": \"SELECTED\", \"selected_scenario_id\": \"dependency_returns_two\", \"selection_rationale\": \"Direct delegation and the ordinary assertion jointly constrain the result.\", \"claim_basis\": [{\"claim\": \"objective\", \"basis\": \"task_requirement\", \"target\": \"formal_claim\", \"target_index\": 0, \"semantic_role\": \"test_objective\", \"evidence_ids\": [\"assertion\"], \"support\": \"evidence\"}, {\"claim\": \"delegation\", \"basis\": \"implementation_fact\", \"target\": \"formal_claim\", \"target_index\": 0, \"semantic_role\": \"mut_path_condition\", \"evidence_ids\": [\"delegation\"], \"support\": \"evidence\"}, {\"claim\": \"selected_scenario\", \"basis\": \"scenario_inference\", \"target\": \"selection_rationale\", \"target_index\": 0, \"semantic_role\": \"dependency_contract\", \"evidence_ids\": [\"delegation\", \"assertion\"], \"support\": \"evidence\"}, {\"claim\": \"allowed variation\", \"basis\": \"scenario_inference\", \"target\": \"allowed_variation\", \"target_index\": 0, \"semantic_role\": \"dependency_contract\", \"evidence_ids\": [], \"support\": \"assumption\", \"assumption_reason\": \"Unrelated dependency state is outside the visible objective.\"}], \"critical_behaviors\": [{\"behavior\": \"dependency(1) yields 2\", \"observation\": \"target(1) returns 2 to the visible assertion\", \"evidence_ids\": [\"delegation\", \"assertion\"], \"semantic_role\": \"dependency_contract\", \"formal_claim_index\": 0, \"support\": \"evidence\"}], \"allowed_variations\": [\"Internal dependency state and unrelated calls may vary when the returned value remains 2.\"], \"unresolved\": [], \"contract\": {\"schema_version\": \"mock-spec.scenario/v0.1\", \"case_id\": \"synthetic_python_delegation\", \"language\": \"python\", \"test_objectives\": [{\"statement\": \"The visible test expects target(1) to equal 2.\", \"status\": \"required\", \"scenario_ids\": [\"dependency_returns_two\"], \"condition\": \"The visible test invokes target(1).\", \"evidence_ids\": [\"assertion\"]}], \"scenario_hypotheses\": [{\"id\": \"dependency_returns_two\", \"description\": \"The dependency returns 2.\", \"condition\": \"target receives value 1.\", \"status\": \"candidate\", \"evidence_ids\": [\"delegation\", \"assertion\"]}], \"dependency_constraints\": [{\"statement\": \"dependency(1) returns 2.\", \"status\": \"required\", \"scenario_ids\": [\"dependency_returns_two\"], \"condition\": \"target delegates value 1 and completes normally.\", \"evidence_ids\": [\"delegation\", \"assertion\"]}], \"expected_interactions\": [{\"statement\": \"dependency is called with 1.\", \"status\": \"required\", \"scenario_ids\": [\"dependency_returns_two\"], \"condition\": \"target is called with 1.\", \"evidence_ids\": [\"delegation\", \"assertion\"], \"assertion_policy\": \"not_implied\"}], \"verification_candidates\": [], \"evidence\": [{\"source_id\": \"mut:0\", \"start_line\": 11, \"end_line\": 11, \"id\": \"delegation\", \"rationale\": \"The target directly returns the dependency result.\"}, {\"source_id\": \"test:0\", \"start_line\": 5, \"end_line\": 5, \"id\": \"assertion\", \"rationale\": \"The visible ordinary oracle checks the returned value.\"}], \"uncertainty\": [{\"statement\": \"The dependency implementation is not visible.\", \"status\": \"unknown\", \"scenario_ids\": [], \"condition\": null, \"evidence_ids\": []}]}}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 100,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 200,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "id": "scripted-message",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"staged-contrast/v0.1\", \"status\": \"none_identified\", \"execution_status\": \"not_executed\", \"alternative\": null, \"bypass_behavior\": null, \"evidence_ids\": [], \"distinguishing_observation\": null, \"revision_requested\": false, \"revision_reason\": null, \"support\": \"assumption\", \"assumption_reason\": \"No evidence-backed static bypass was identified.\", \"semantic_role\": \"dependency_contract\"}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 100,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 200,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    },
+    {
+      "output": [
+        {
+          "id": "scripted-message",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"schema_version\": \"staged-deliver/v0.2\", \"result_status\": \"SELECTED\", \"selected_scenario_id\": \"dependency_returns_two\", \"contract\": {\"schema_version\": \"mock-spec.scenario/v0.1\", \"case_id\": \"synthetic_python_delegation\", \"language\": \"python\", \"test_objectives\": [{\"statement\": \"The visible test expects target(1) to equal 2.\", \"status\": \"required\", \"scenario_ids\": [\"dependency_returns_two\"], \"condition\": \"The visible test invokes target(1).\", \"evidence_ids\": [\"assertion\"]}], \"scenario_hypotheses\": [{\"id\": \"dependency_returns_two\", \"description\": \"The dependency returns 2.\", \"condition\": \"target receives value 1.\", \"status\": \"candidate\", \"evidence_ids\": [\"delegation\", \"assertion\"]}], \"dependency_constraints\": [{\"statement\": \"dependency(1) returns 2.\", \"status\": \"required\", \"scenario_ids\": [\"dependency_returns_two\"], \"condition\": \"target delegates value 1 and completes normally.\", \"evidence_ids\": [\"delegation\", \"assertion\"]}], \"expected_interactions\": [{\"statement\": \"dependency is called with 1.\", \"status\": \"required\", \"scenario_ids\": [\"dependency_returns_two\"], \"condition\": \"target is called with 1.\", \"evidence_ids\": [\"delegation\", \"assertion\"], \"assertion_policy\": \"not_implied\"}], \"verification_candidates\": [], \"evidence\": [{\"source_id\": \"mut:0\", \"start_line\": 11, \"end_line\": 11, \"id\": \"delegation\", \"rationale\": \"The target directly returns the dependency result.\"}, {\"source_id\": \"test:0\", \"start_line\": 5, \"end_line\": 5, \"id\": \"assertion\", \"rationale\": \"The visible ordinary oracle checks the returned value.\"}], \"uncertainty\": [{\"statement\": \"The dependency implementation is not visible.\", \"status\": \"unknown\", \"scenario_ids\": [], \"condition\": null, \"evidence_ids\": []}]}}",
+              "type": "output_text",
+              "logprobs": null
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "usage": {
+        "requests": 1,
+        "input_tokens": 100,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 200,
+        "request_usage_entries": []
+      },
+      "raw_usage": null,
+      "response_id": null,
+      "request_id": null,
+      "resolved_model_version": null
+    }
+  ],
+  "error": null
+}

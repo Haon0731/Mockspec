@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import asyncio
+from dataclasses import dataclass
 import hashlib
 import json
 import time
-from typing import Any
+from typing import Any, AbstractSet
 
 from mock_spec.source_analysis import (
     SourceAnalysis, normalize_source_arguments, normalize_analysis_arguments,
@@ -20,6 +21,82 @@ QUERY_TOOLS = {
     "inspect_program_structure",
     "inspect_dependency_usage",
 }
+
+
+@dataclass(frozen=True)
+class QueryRequestValidation:
+    """Side-effect-free validation result shared by qualification and dispatch."""
+
+    tool: str | None = None
+    arguments: dict[str, Any] | None = None
+    error_code: str | None = None
+    diagnostic: str | None = None
+
+    @property
+    def valid(self) -> bool:
+        return self.error_code is None
+
+
+def validate_query_request(
+    request: object, *, candidate_ids: AbstractSet[str]
+) -> QueryRequestValidation:
+    """Validate and normalize a QUERY request without observing repository state."""
+    if not isinstance(request, dict):
+        return _invalid_query_request("wrong_type", "The query request must be an object.")
+
+    expected_request_fields = {"question", "scenario_id", "tool", "arguments_json"}
+    if set(request) != expected_request_fields:
+        return _invalid_query_request(
+            "invalid_request_fields",
+            "The query request has missing or unknown fields.",
+        )
+    missing = [
+        field
+        for field in ("question", "scenario_id", "tool", "arguments_json")
+        if not isinstance(request[field], str) or not request[field].strip()
+    ]
+    if missing:
+        return _invalid_query_request(
+            "missing_association", f"Missing or invalid fields: {', '.join(missing)}."
+        )
+    if request["scenario_id"] not in candidate_ids:
+        return _invalid_query_request(
+            "unknown_candidate", "The query must name a current candidate."
+        )
+    tool = request["tool"]
+    if tool not in QUERY_TOOLS:
+        return _invalid_query_request(
+            "unknown_tool", "Only the three staged read-only tools are allowed."
+        )
+    try:
+        arguments = decode_json(request["arguments_json"])
+    except (ValueError, TypeError):
+        return _invalid_query_request("malformed_json", "Tool arguments are not valid JSON.")
+    if not isinstance(arguments, dict):
+        return _invalid_query_request("wrong_type", "Tool arguments must decode to an object.")
+
+    try:
+        validated = _normalize_query_arguments(tool, arguments)
+    except (TypeError, ValueError):
+        diagnostic = (
+            "inspect_source arguments must describe one valid search or read."
+            if tool == "inspect_source"
+            else "Analysis requires source_id and an optional symbol."
+        )
+        return _invalid_query_request("invalid_arguments", diagnostic)
+    return QueryRequestValidation(tool=tool, arguments=validated)
+
+
+def _invalid_query_request(code: str, diagnostic: str) -> QueryRequestValidation:
+    return QueryRequestValidation(error_code=code, diagnostic=diagnostic)
+
+
+def _normalize_query_arguments(
+    tool: str, arguments: dict[str, object]
+) -> dict[str, Any]:
+    if tool == "inspect_source":
+        return normalize_source_arguments(arguments)
+    return normalize_analysis_arguments(arguments)
 
 
 class QueryExecutor:
@@ -110,7 +187,7 @@ class QueryExecutor:
         diagnostic: str,
     ) -> dict[str, Any]:
         """Refuse an observed attempt without executing a read-only backend."""
-        if record["status"] == "budget_exhausted":
+        if record["status"] == "budget_exhausted" and status != "protocol_error":
             return record
         return self._finish(
             record,
@@ -127,57 +204,18 @@ class QueryExecutor:
             return record
         request = record["raw_request"]
         started = time.monotonic()
-
-        if not isinstance(request, dict):
+        validated = validate_query_request(request, candidate_ids=candidate_ids)
+        if not validated.valid:
+            assert validated.error_code is not None
+            assert validated.diagnostic is not None
             return self._finish(
-                record, started, "invalid_request",
-                self._error("wrong_type", "The query request must be an object."),
+                record,
+                started,
+                "invalid_request",
+                self._error(validated.error_code, validated.diagnostic),
             )
-
-        expected_request_fields = {"question", "scenario_id", "tool", "arguments_json"}
-        if set(request) != expected_request_fields:
-            return self._finish(
-                record, started, "invalid_request",
-                self._error(
-                    "invalid_request_fields",
-                    "The query request has missing or unknown fields.",
-                ),
-            )
-        missing = [
-            field for field in ("question", "scenario_id", "tool", "arguments_json")
-            if not isinstance(record[field], str) or not record[field].strip()
-        ]
-        if missing:
-            return self._finish(
-                record, started, "invalid_request",
-                self._error("missing_association", f"Missing or invalid fields: {', '.join(missing)}."),
-            )
-        if record["scenario_id"] not in candidate_ids:
-            return self._finish(
-                record, started, "invalid_request",
-                self._error("unknown_candidate", "The query must name a current candidate."),
-            )
-        if record["tool"] not in QUERY_TOOLS:
-            return self._finish(
-                record, started, "invalid_request",
-                self._error("unknown_tool", "Only the three staged read-only tools are allowed."),
-            )
-        try:
-            arguments = decode_json(record["arguments_json"])
-        except (ValueError, TypeError):
-            return self._finish(
-                record, started, "invalid_request",
-                self._error("malformed_json", "Tool arguments are not valid JSON."),
-            )
-        if not isinstance(arguments, dict):
-            return self._finish(
-                record, started, "invalid_request",
-                self._error("wrong_type", "Tool arguments must decode to an object."),
-            )
-
-        validated = self._validate_arguments(record["tool"], arguments)
-        if isinstance(validated, dict) and "error_code" in validated:
-            return self._finish(record, started, "invalid_request", validated)
+        assert validated.tool is not None
+        assert validated.arguments is not None
 
         remaining = self.deadline - time.monotonic()
         if remaining <= 0:
@@ -187,9 +225,9 @@ class QueryExecutor:
             )
 
         try:
-            call = getattr(self.analysis, record["tool"])
-            call_arguments = dict(validated)
-            if record["tool"] == "inspect_source":
+            call = getattr(self.analysis, validated.tool)
+            call_arguments = dict(validated.arguments)
+            if validated.tool == "inspect_source":
                 call_arguments["response_id"] = record["response_id"]
             result = await asyncio.wait_for(call(**call_arguments), timeout=remaining)
         except asyncio.TimeoutError:
@@ -215,7 +253,11 @@ class QueryExecutor:
                 self._error("malformed_result", "The analysis backend returned an invalid result."),
             )
         return self._finish(
-            record, started, status, result, normalized_arguments=validated,
+            record,
+            started,
+            status,
+            result,
+            normalized_arguments=validated.arguments,
         )
 
     @property
@@ -378,23 +420,6 @@ class QueryExecutor:
         return "success" if status == "ok" else status
 
     @staticmethod
-    def _validate_arguments(tool: str, arguments: dict[str, object]) -> dict[str, Any]:
-        if tool == "inspect_source":
-            try:
-                return normalize_source_arguments(arguments)
-            except (TypeError, ValueError):
-                return QueryExecutor._error(
-                    "invalid_arguments",
-                    "inspect_source arguments must describe one valid search or read.",
-                )
-        try:
-            return normalize_analysis_arguments(arguments)
-        except (TypeError, ValueError):
-            return QueryExecutor._error(
-                "invalid_arguments", "Analysis requires source_id and an optional symbol."
-            )
-
-    @staticmethod
     def _error(code: str, diagnostic: str) -> dict[str, Any]:
         return {
             "status": "error",
@@ -415,14 +440,23 @@ class QueryExecutor:
             result=result,
             duration_seconds=time.monotonic() - started,
         )
-        if "raw_request" in record and record["semantic_category"] not in {
+        if (
+            "raw_request" in record
+            and status != "protocol_error"
+            and record["semantic_category"] not in {
             "budget_exhausted", "run_timeout", "cancelled", "content_changed",
             "identity_mismatch",
-        }:
+            }
+        ):
             self._record_exploration_progress(
                 record, result, normalized_arguments=normalized_arguments,
             )
         return record
 
 
-__all__ = ["QUERY_TOOLS", "QueryExecutor"]
+__all__ = [
+    "QUERY_TOOLS",
+    "QueryExecutor",
+    "QueryRequestValidation",
+    "validate_query_request",
+]
