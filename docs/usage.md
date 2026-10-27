@@ -437,6 +437,9 @@ G4 未通过；没有放宽 Schema、删除额外字段或自动重跑。
 QUERY 只允许纠正回执评估对象内未知的 null 字段，模型必须完整重发且保持规定字段逐值一致。
 参数、引用、身份、旧版本、缺字段或语义变化均终止；格式纠正不补读源码、不重置预算，
 原无效尝试保留，成功纠正后的查询另计一次尝试。详见 PRD 第 10 节。
+[新协议工程与真实运行记录](../out/staged-inference/issue17-query-recovery-20261027/report.md)
+中 R1 通过；真实运行 QUERY 合规但零查询，CONSTRUCT 触发 max_output_tokens 截断，
+没有最终契约。第三次请求用量缺失，整次费用未知；M2 仍未通过，未自动重跑。
 
 该案例精确 ID 为
 `de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri@d0085edf`，
