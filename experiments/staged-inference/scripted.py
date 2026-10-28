@@ -711,7 +711,7 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
         "contract": deliver_construct["contract"],
     })
     rendered = _wire_outputs(outputs)
-    if replay_case == "second_revision":
+    if replay_case == "second_revision" and variant == "C":
         query_outputs = [
             output for output in rendered
             if output["schema_version"] == "staged-query/v0.4"

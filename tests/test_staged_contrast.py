@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from pathlib import Path
 import sys
 
@@ -140,6 +141,25 @@ def test_semantic_revision_request_reenters_investigation_before_delivery(tmp_pa
         "QUERY", "CONSTRUCT", "CONTRAST", "DELIVER",
     ]
     assert result["record"]["continuation_log"][0]["origin"] == "REVISE"
+
+
+def test_b_second_revision_replay_delivers_without_contrast(tmp_path) -> None:
+    from run import main
+
+    output = tmp_path / "b-second-revision"
+    assert main([
+        "--mode", "synthetic_replay", "--variant", "B",
+        "--replay-case", "second_revision", "--output-dir", str(output),
+    ]) == 0
+    record = json.loads((output / "inference_record.json").read_text())
+    spec = json.loads((output / "dependency_spec.json").read_text())
+    assert record["result_status"] == "SELECTED"
+    assert [stage["stage"] for stage in record["stages"]] == [
+        "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER",
+    ]
+    assert record["revision_log"] == record["continuation_log"] == []
+    assert record["degeneracy_contrast"]["status"] == "disabled_by_variant"
+    assert spec["semantics"]["delivery_status"] == "ready"
 
 
 def test_revision_budget_exhaustion_does_not_publish_pre_revision_contract(tmp_path) -> None:
