@@ -12,13 +12,13 @@ import pytest
 STAGED_ROOT = Path(__file__).parents[1] / "experiments" / "staged-inference"
 sys.path.insert(0, str(STAGED_ROOT))
 
-from controller import (  # noqa: E402
+from stage_protocol import (  # noqa: E402
     ConstructResult,
     ConstructSelection,
     ContrastResult,
-    _materialize_construct,
-    _validate_constructed,
-    _validate_contrast,
+    materialize_construct,
+    validate_constructed,
+    validate_contrast,
 )
 from scripted import scripted_outputs, synthetic_task  # noqa: E402
 from mock_spec.schemas import UnifiedTask  # noqa: E402
@@ -29,17 +29,17 @@ def _selected() -> tuple[ConstructResult, UnifiedTask, SourceStore]:
     raw = scripted_outputs("selected")[2]
     task = UnifiedTask.from_dict(synthetic_task())
     store = SourceStore(task)
-    return _materialize_construct(ConstructSelection.model_validate(raw), store), task, store
+    return materialize_construct(ConstructSelection.model_validate(raw), store), task, store
 
 
 def _construct(raw: dict, store: SourceStore) -> ConstructResult:
-    return _materialize_construct(ConstructSelection.model_validate(raw), store)
+    return materialize_construct(ConstructSelection.model_validate(raw), store)
 
 
 def test_strict_construct_accepts_evidence_assumption_and_formal_claim_mappings() -> None:
     constructed, task, store = _selected()
 
-    contract = _validate_constructed(
+    contract = validate_constructed(
         constructed, task, store, strict_mapping=True
     )
 
@@ -72,7 +72,7 @@ def test_strict_construct_rejects_unreviewable_mapping(mutation, message: str) -
     store = SourceStore(task)
 
     with pytest.raises(ValueError, match=message):
-        _validate_constructed(
+        validate_constructed(
             _construct(raw, store), task, store,
             strict_mapping=True,
         )
@@ -80,7 +80,7 @@ def test_strict_construct_rejects_unreviewable_mapping(mutation, message: str) -
 
 def test_strict_contrast_requires_evidence_or_explicit_assumption() -> None:
     constructed, task, store = _selected()
-    contract = _validate_constructed(constructed, task, store, strict_mapping=True)
+    contract = validate_constructed(constructed, task, store, strict_mapping=True)
     assert contract is not None
     raw = {
         "schema_version": "staged-contrast/v0.2",
@@ -100,13 +100,13 @@ def test_strict_contrast_requires_evidence_or_explicit_assumption() -> None:
         "observation_limits": "This static review does not execute a counterexample.",
         "investigation_requests": [],
     }
-    _validate_contrast(
+    validate_contrast(
         ContrastResult.model_validate(raw), contract, strict_mapping=True
     )
 
     raw["assumption_reason"] = None
     with pytest.raises(ValueError, match="explicit reason"):
-        _validate_contrast(
+        validate_contrast(
             ContrastResult.model_validate(raw), contract, strict_mapping=True
         )
 
@@ -117,7 +117,7 @@ def test_strict_construct_maps_nonblocking_unknowns() -> None:
     task = UnifiedTask.from_dict(synthetic_task())
     store = SourceStore(task)
     with pytest.raises(ValueError, match="lack claim-basis mappings"):
-        _validate_constructed(
+        validate_constructed(
             _construct(raw, store), task, store,
             strict_mapping=True,
         )
@@ -132,7 +132,7 @@ def test_strict_construct_maps_nonblocking_unknowns() -> None:
         "support": "assumption",
         "assumption_reason": "The implementation remains hidden and does not affect selection.",
     })
-    assert _validate_constructed(
+    assert validate_constructed(
         _construct(raw, store), task, store,
         strict_mapping=True,
     ) is not None
@@ -144,7 +144,7 @@ def test_critical_behavior_keeps_legacy_evidence_rule_but_allows_strict_assumpti
     task = UnifiedTask.from_dict(synthetic_task())
     store = SourceStore(task)
     with pytest.raises(ValueError, match="requires evidence"):
-        _validate_constructed(
+        validate_constructed(
             _construct(raw, store), task, store
         )
 
@@ -152,7 +152,7 @@ def test_critical_behavior_keeps_legacy_evidence_rule_but_allows_strict_assumpti
         "support": "assumption",
         "assumption_reason": "This behavior is retained as an explicit hypothesis.",
     })
-    assert _validate_constructed(
+    assert validate_constructed(
         _construct(raw, store), task, store,
         strict_mapping=True,
     ) is not None

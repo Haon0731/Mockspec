@@ -21,9 +21,9 @@ from mock_spec.budget import InferenceBudget, UsageLedger
 
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "experiments" / "staged-inference"))
-from controller import (  # noqa: E402
+from controller import StagedRunConfig, _StageOutputSchema, _call_stage  # noqa: E402
+from stage_protocol import (  # noqa: E402
     ConstructSelection, DeliverSelection, QuerySelection, RevisionSelection,
-    StagedRunConfig, _StageOutputSchema, _call_stage,
 )
 
 

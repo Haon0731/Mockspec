@@ -12,8 +12,9 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parents[1] / "experiments" / "staged-inference"))
 from controller import (  # noqa: E402
     FormatRepairAllowance, StagedInferenceError, StagedRunConfig,
-    _materialize_contract, _repair_query_output, execute_staged_run,
+    _repair_query_output, execute_staged_run,
 )
+from stage_protocol import materialize_contract  # noqa: E402
 from mock_spec.budget import InferenceBudget, UsageLedger  # noqa: E402
 from scripted import FixedScriptModel, scripted_outputs, synthetic_task  # noqa: E402
 from mock_spec.schemas import UnifiedTask  # noqa: E402
@@ -30,7 +31,7 @@ def run_repair(tmp_path, *, damage, repair=None, max_calls=10):
         synthetic_task(), output_dir=tmp_path / "run", model=model,
         config=StagedRunConfig(max_model_calls=max_calls),
     ))
-    expected_contract = _materialize_contract(
+    expected_contract = materialize_contract(
         expected["contract"], SourceStore(UnifiedTask.from_dict(synthetic_task()))
     )
     return result, model, expected_contract

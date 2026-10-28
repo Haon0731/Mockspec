@@ -20,9 +20,9 @@ STAGED = Path(__file__).parents[1] / "experiments" / "staged-inference"
 sys.path.insert(0, str(STAGED))
 
 from controller import (  # noqa: E402
-    InvestigationRequest, QuestionUpdate, StagedRunConfig, _add_questions,
-    _update_questions, execute_staged_run,
+    StagedRunConfig, _add_questions, _update_questions, execute_staged_run,
 )
+from stage_protocol import InvestigationRequest, QuestionUpdate  # noqa: E402
 from query import QueryExecutor  # noqa: E402
 from scripted import FixedScriptModel, synthetic_task  # noqa: E402
 from mock_spec.schemas import UnifiedTask  # noqa: E402
@@ -508,10 +508,10 @@ def test_partial_goal_coverage_and_unknown_impact_must_agree(defect):
         semantics["goal_coverage"][0].update(disposition="constrained", unknown_ids=[])
     else:
         semantics["unknowns"][0]["goal_indexes"] = []
-    # Materialize the fixture's source quotes through the normal controller helper.
-    from controller import ConstructSelection, _materialize_construct
+    # Materialize the fixture's source quotes through the stage protocol.
+    from stage_protocol import ConstructSelection, materialize_construct
     task, _ = product_reference(adjust=True)
-    contract = _materialize_construct(ConstructSelection.model_validate(constructed),
+    contract = materialize_construct(ConstructSelection.model_validate(constructed),
                                       SourceStore(UnifiedTask.from_dict(task))).contract
     assert isinstance(contract, ScenarioContract)
     with pytest.raises(ValueError, match="blocked coverage|affected goal indexes"):

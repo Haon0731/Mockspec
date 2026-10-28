@@ -22,12 +22,9 @@ STAGED_ROOT = Path(__file__).parents[1] / "experiments" / "staged-inference"
 sys.path.insert(0, str(STAGED_ROOT))
 
 from controller import (  # noqa: E402
-    QueryResult,
-    StagedInferenceError,
-    StagedRunConfig,
-    _call_stage,
-    execute_staged_run,
+    StagedInferenceError, StagedRunConfig, _call_stage, execute_staged_run,
 )
+from stage_protocol import QueryResult  # noqa: E402
 from scripted import FixedScriptModel, scripted_outputs, synthetic_task  # noqa: E402
 def _ledger(config: StagedRunConfig) -> UsageLedger:
     return UsageLedger(InferenceBudget(

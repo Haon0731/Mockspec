@@ -22,9 +22,8 @@ from mock_spec.budget import InferenceBudget, UsageLedger
 STAGED_ROOT = Path(__file__).parents[1] / "experiments" / "staged-inference"
 sys.path.insert(0, str(STAGED_ROOT))
 
-from controller import (  # noqa: E402
-    QuerySelection, StagedInferenceError, StagedRunConfig, _call_stage,
-)
+from controller import StagedInferenceError, StagedRunConfig, _call_stage  # noqa: E402
+from stage_protocol import QuerySelection  # noqa: E402
 from provider_capture import ProviderCaptureError, ResponseCapture  # noqa: E402
 
 

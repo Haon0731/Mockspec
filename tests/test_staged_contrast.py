@@ -10,12 +10,8 @@ import sys
 STAGED_ROOT = Path(__file__).parents[1] / "experiments" / "staged-inference"
 sys.path.insert(0, str(STAGED_ROOT))
 
-from controller import (  # noqa: E402
-    ConstructSelection,
-    StagedRunConfig,
-    _materialize_construct,
-    execute_staged_run,
-)
+from controller import StagedRunConfig, execute_staged_run  # noqa: E402
+from stage_protocol import ConstructSelection, materialize_construct  # noqa: E402
 from scripted import (  # noqa: E402
     FixedScriptModel,
     scripted_outputs,
@@ -232,7 +228,7 @@ def test_legal_alternative_can_replace_candidate_without_changing_original_goal(
         before["contract"]["test_objectives"][0]["statement"]
     )
     task = UnifiedTask.from_dict(task_for_replay_case("selected"))
-    expected_before = _materialize_construct(
+    expected_before = materialize_construct(
         ConstructSelection.model_validate(before), SourceStore(task)
     )
     assert result["record"]["revision_log"][0]["before"]["contract"] == (

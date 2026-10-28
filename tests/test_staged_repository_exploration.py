@@ -17,8 +17,9 @@ STAGED_ROOT = Path(__file__).parents[1] / "experiments" / "staged-inference"
 sys.path.insert(0, str(STAGED_ROOT))
 
 from controller import (  # noqa: E402
-    QuerySelection, StagedRunConfig, _validate_repairable_query, execute_staged_run,
+    StagedRunConfig, _validate_repairable_query, execute_staged_run,
 )
+from stage_protocol import QuerySelection  # noqa: E402
 from scripted import FixedScriptModel, query_script, synthetic_task  # noqa: E402
 from mock_spec.schemas import UnifiedTask  # noqa: E402
 from mock_spec.source_repository import ReviewedRepository  # noqa: E402
