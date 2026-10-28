@@ -164,6 +164,19 @@ flask_308 或 CloudFoundry 案例，再交给同一控制器。
 `SourceAnalysis`；旧片段模式的三种工具及失败、重试共用六次额度，第七次留拒绝回执且不执行分析。
 显式仓库读取模式改为共享超时、Token 与费用门禁，不以工具或模型调用次数截断；
 QueryExecutor 和各阶段契约检查共用本次 Store，观察记录随研究产物保存。
+
+研究实现按稳定职责拆分：`stage_protocol.py` 拥有阶段 DTO、来源定位物化以及构造/对照结果校验；
+`investigation.py` 的 `InvestigationLedger` 拥有原目标问题的 ID、重开、证据—回执关联和停止状态；
+`query.py` 继续负责查询协议与执行，`specification.py` 负责消费规格及显式映射校验，
+`provider_capture.py` 负责供应商响应留证。`controller.py` 通过这些接口组织阶段次序、续查、
+共享预算、格式修复、partial checkpoint 和最终发布。CONSTRUCT、CONTRAST、REVISE 对检查点的处理
+不同，仍由控制器显式编排，不隐藏在统一续查包装中。
+阶段类型和引用校验的 Python 导入位置改为 `stage_protocol`，问题账本从 `investigation`
+导入；当前研究调用者和测试随迁移更新，CLI 参数、阶段 JSON 版本和正式契约保持不变。
+现有 `budget.estimate_known_request_tokens` 对 SDK 输出包装类型使用 `repr` 估算，
+因此本次模块名迁移使每次预检多计 4 字节、约 1 Token；极限预算附近可能更早触发门禁。
+发送的 Schema 和提示词未变。修正这一生产预算估算路径需要独立验证两版生产入口，
+本次研究整理保留该行为，不伪装类型所属模块来维持旧估值。
 模型经 QUERY 结构化消息请求工具，SDK 阶段 Agent 不注册可绕过计数的工具。
 QUERY v0.4 的供应商 Schema 与本地严格类型一致；模型只输出回执评估的 impact/rationale，
 并显式更新原目标问题和候选；宿主绑定本轮唯一待评估回执的编号。SDK 解析失败仍保存原始响应与无效 stage，

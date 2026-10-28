@@ -1,7 +1,7 @@
-# Staged inference M1 replay
+# Staged inference research entry
 
-This research path implements the auditable five-stage Scenario Agent with a Python synthetic
-task and a fixed SDK model. Run `run.py --mode synthetic_replay --variant B
+This research path implements the auditable five-stage Scenario Agent for explicitly reviewed
+live inputs and explicit synthetic replay with a fixed SDK model. Run `run.py --mode synthetic_replay --variant B
 --replay-case selected --output-dir /tmp/mockspec-selected` with `PYTHONPATH=src`
 and the project virtualenv. Select `ambiguous`, `inconclusive`, or `error` for
 the other complete-entry replays; use a fresh output directory each time.
@@ -24,6 +24,14 @@ CONTRAST, or REVISE to reopen QUERY for a material evidence gap. Original goals,
 question and candidate history, observations, and all budgets carry across the loop.
 Semantic continuation is distinct from the one separately counted format repair.
 B disables contrast; it does not change evidence or output requirements.
+
+The implementation separates stable responsibilities: `stage_protocol.py` owns the strict
+stage DTOs, source-locator materialization, and constructed/contrast result validation;
+`investigation.py` owns the original-goal question ledger and stop consistency.
+`query.py`, `specification.py`, and `provider_capture.py` respectively own query execution,
+the consumer specification, and provider-response evidence. `controller.py` composes those
+modules while retaining stage order, shared resources, repair, partial checkpoints, and
+manifest-last publication. This is still a research entry and is not wired into the production CLI.
 
 Successful runs can publish `dependency_spec.json` (`mock-spec.dependency/v0.1`),
 which embeds the reviewed task, formal v0.1 contract, scope, premises, branch decisions,

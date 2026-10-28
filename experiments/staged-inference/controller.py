@@ -35,6 +35,7 @@ from mock_spec.schemas import UnifiedTask
 from mock_spec.source_repository import ReviewedRepository
 from mock_spec.validation import SourceStore
 
+from investigation import InvestigationLedger
 from query import QueryExecutor, validate_query_request
 from provider_capture import ResponseCapture
 from specification import build_dependency_spec, original_goal_mapping, validate_semantics
@@ -42,7 +43,7 @@ from stage_protocol import (
     CandidateDraft, CitationMaterializationError, ConstructResult, ConstructSelection,
     ContrastResult, DeliverResult, DeliverSelection, ExplorationStop, ExtractResult,
     ExtractSelection, InvestigationRequest, QueryAssessmentSelection, QueryResult,
-    QuerySelection, QuestionUpdate, RevisionSelection, StageModel, StageResult,
+    QuerySelection, RevisionSelection, StageModel, StageResult,
     check_source_reference, contract_selection, materialize_construct,
     materialize_delivery, materialize_extract, materialize_query, materialize_reference,
     materialize_revision, validate_constructed, validate_contrast,
@@ -702,121 +703,6 @@ def _validate_exploration_stop(stop: ExplorationStop, store: SourceStore) -> Non
         raise ValueError("no-further-evidence stop must preserve unknowns and their impact")
 
 
-def _add_questions(
-    questions: dict[str, dict], requests: list[InvestigationRequest], goal_count: int,
-    *, origin: str, repository_available: bool,
-) -> None:
-    names = [request.question.strip().casefold() for request in requests]
-    if len(set(names)) != len(names):
-        raise ValueError("duplicate investigation question in one continuation")
-    for request in requests:
-        if not set(request.goal_indexes) <= set(range(goal_count)):
-            raise ValueError("investigation references an unknown original goal")
-        existing = next((key for key, item in questions.items()
-                         if item["question"].strip().casefold() == request.question.strip().casefold()), None)
-        key = existing or f"q{len(questions) + 1}"
-        previous = questions.get(key)
-        if previous is not None and (
-            previous["question"] != request.question
-            or set(previous["goal_indexes"]) != set(request.goal_indexes)
-            or previous["impact"] != request.impact
-        ):
-            raise ValueError("reopening a question cannot rebind its original goals or impact")
-        # Reopening is explicit and retained in the stage history; it cannot
-        # inherit a previous nonblocking assessment after new counterevidence.
-        questions[key] = {
-            **request.model_dump(mode="json"), "question_id": key,
-            "state": "open", "rationale": f"Unresolved evidence gap from {origin}.",
-            "evidence": [] if previous is None else previous["evidence"], "acquisition": "available",
-            "attempted_sequences": [] if previous is None else previous["attempted_sequences"],
-            "origin": origin,
-        }
-
-
-def _update_questions(
-    questions: dict[str, dict], updates: list[QuestionUpdate], *,
-    goal_count: int, store: SourceStore, attempts: list[dict],
-    repository_available: bool, task: UnifiedTask,
-) -> None:
-    seen: set[str] = set()
-    for update in updates:
-        key = update.question_id or f"q{len(questions) + 1}"
-        if key in seen:
-            raise ValueError("duplicate question update")
-        seen.add(key)
-        if update.question_id is not None and key not in questions:
-            raise ValueError("question update references an unknown question")
-        if update.question_id is None and any(
-            item["question"].strip().casefold() == update.question.strip().casefold()
-            for item in questions.values()
-        ):
-            raise ValueError("duplicate question must use its existing host question ID")
-        if key in questions and questions[key]["question"] != update.question:
-            raise ValueError("cannot replace an outstanding question by renaming it")
-        if key in questions and set(questions[key]["goal_indexes"]) != set(update.goal_indexes):
-            raise ValueError("question update cannot remove or rebind original goals")
-        if not set(update.goal_indexes) <= set(range(goal_count)):
-            raise ValueError("question must reference original goals")
-        for locator in update.evidence:
-            materialize_reference(locator, store, field_path=f"questions.{key}.evidence")
-        known_attempts = {item["sequence"] for item in attempts
-                          if item["status"] != "registered" and item["result"] is not None}
-        if not set(update.attempted_sequences) <= known_attempts:
-            raise ValueError("question references an unknown query attempt")
-        associated_responses = {item["response_id"] for item in attempts
-                                if item["sequence"] in update.attempted_sequences}
-        observations = store.observations()
-        for locator in update.evidence:
-            if locator.source_id in {source.source_id for source in (
-                task.mut_source, task.masked_test, *task.supporting_sources
-            )}:
-                continue
-            covered: set[int] = set()
-            for item in observations:
-                if (item["source_id"] == locator.source_id
-                        and item.get("response_id") in associated_responses
-                        and isinstance(item["start_line"], int)
-                        and isinstance(item["end_line"], int)):
-                    covered.update(range(max(locator.start_line, item["start_line"]),
-                                         min(locator.end_line, item["end_line"]) + 1))
-            if not set(range(locator.start_line, locator.end_line + 1)) <= covered:
-                raise ValueError("question evidence must be associated with its observed query receipt")
-        if update.state in {"resolved", "nonblocking"} and not update.evidence:
-            raise ValueError("closing a question requires observed supporting evidence")
-        if update.state == "nonblocking" and update.acquisition != "not_needed":
-            raise ValueError("nonblocking question must explain why acquisition is not needed")
-        if update.state == "open" and update.acquisition == "not_needed":
-            raise ValueError("open material question cannot claim acquisition is unnecessary")
-        if (update.state == "open" and update.acquisition == "unavailable"
-                and repository_available and not update.attempted_sequences):
-            raise ValueError("repository evidence unavailable requires an actual attempted route")
-        if (update.state == "open" and update.acquisition == "unavailable"
-                and not update.attempted_sequences and not update.evidence):
-            raise ValueError("initial-only access limitation requires evidence of the affected behavior")
-        questions[key] = {
-            **update.model_dump(mode="json"), "question_id": key,
-            "origin": questions.get(key, {}).get("origin", "QUERY"),
-        }
-
-
-def _validate_goal_stop(stop: ExplorationStop, questions: dict[str, dict]) -> None:
-    remaining = {item.question: item for item in stop.remaining_unknowns}
-    expected = {item["question"]: item for item in questions.values()
-                if item["state"] != "resolved"}
-    if set(remaining) != set(expected) or len(remaining) != len(stop.remaining_unknowns):
-        raise ValueError("stop must preserve every unresolved original-goal question")
-    for question, state in expected.items():
-        unknown = remaining[question]
-        if unknown.blocking != (state["state"] == "open") or unknown.impact != state["impact"]:
-            raise ValueError("stop unknown impact/status differs from the question ledger")
-        if state["state"] == "open" and state["acquisition"] == "available":
-            raise ValueError("material evidence remains accessible; continue investigation")
-    if stop.reason in {"evidence_sufficient", "unknowns_nonblocking"} and any(
-        item["state"] == "open" for item in questions.values()
-    ):
-        raise ValueError("unresolved original-goal question prevents a sufficient stop")
-
-
 def _validate_goal_preservation(contract: ScenarioContract, extract: ExtractResult) -> None:
     evidence = {item.id: item for item in contract.evidence}
     goal_evidence = [evidence[key] for goal in contract.test_objectives for key in goal.evidence_ids]
@@ -827,7 +713,7 @@ def _validate_goal_preservation(contract: ScenarioContract, extract: ExtractResu
 
 
 def _validate_spec_delivery(
-    constructed: ConstructResult, questions: dict[str, dict], extract: ExtractResult,
+    constructed: ConstructResult, questions: list[dict], extract: ExtractResult,
 ) -> None:
     assert constructed.contract is not None
     if constructed.spec is None:
@@ -850,7 +736,7 @@ def _validate_spec_delivery(
         branch.disposition == "unresolved" for branch in semantics.branches
     ):
         raise ValueError("AMBIGUOUS requires unresolved branch legality, not merely multiple choices")
-    for question in questions.values():
+    for question in questions:
         if question["state"] == "resolved":
             continue
         unknown = unknowns.get(question["question"])
@@ -865,7 +751,7 @@ def _validate_spec_delivery(
 
 
 def _construct_investigations(
-    constructed: ConstructResult, extract: ExtractResult, questions: dict[str, dict],
+    constructed: ConstructResult, extract: ExtractResult, questions: list[dict],
 ) -> list[InvestigationRequest]:
     requests = list(constructed.investigation_requests)
     if constructed.contract is None or constructed.spec is None:
@@ -878,7 +764,7 @@ def _construct_investigations(
     for item in constructed.spec.unknowns:
         if item.disposition != "blocking" or item.question in requested or any(
             question["question"] == item.question and question["state"] == "open"
-            for question in questions.values()
+            for question in questions
         ):
             continue
         requests.append(InvestigationRequest(
@@ -1459,7 +1345,7 @@ async def execute_staged_run(
 
     The output directory must not exist. Once created, every handled attempt gets
     a record and manifest when storage remains available. A valid contract is
-    published for SELECTED and AMBIGUOUS, and may be retained for INCONCLUSIVE.
+    published for SELECTED, ALTERNATIVES and AMBIGUOUS, and may be retained for INCONCLUSIVE.
     """
     if output_dir.exists():
         raise FileExistsError(f"output directory already exists: {output_dir}")
@@ -1499,7 +1385,7 @@ async def execute_staged_run(
     model_call_limit = -1
     exploration_stop: ExplorationStop | None = None
     cancelled = False
-    questions: dict[str, dict] = {}
+    questions: InvestigationLedger | None = None
     continuation_log: list[dict] = []
     dependency_spec = None
     continuation_context: dict = {}
@@ -1689,11 +1575,11 @@ async def execute_staged_run(
             deadline=deadline,
         )
         candidate_ids = {item.scenario_id for item in extract.candidates} | {"original_task"}
-        _add_questions(questions, [InvestigationRequest(
+        questions = InvestigationLedger(len(extract.original_goals), repository_available=repository is not None)
+        questions.register([InvestigationRequest(
             question=item, goal_indexes=list(range(len(extract.original_goals))),
             impact="Unresolved EXTRACT question may change the original goal's dependency requirements.",
-        ) for item in extract.unresolved], len(extract.original_goals), origin="EXTRACT",
-            repository_available=repository is not None)
+        ) for item in extract.unresolved], origin="EXTRACT")
         while True:
             current_stage = "QUERY"
             pending_receipt: dict[str, object] | None = None
@@ -1703,7 +1589,7 @@ async def execute_staged_run(
                     "visible_task": canonical_task,
                     "extract": extract.model_dump(mode="json"),
                     "query_receipts": query_executor.attempts,
-                    "questions": list(questions.values()),
+                    "questions": questions.snapshot(),
                     "continuation": continuation_context,
                     "capabilities": {
                         "repository_search_and_read": repository is not None,
@@ -1874,10 +1760,9 @@ async def execute_staged_run(
                     )
                     pending_receipt["assessment_status"] = "complete"
                 _complete_stage_entry(query_entry, query)
-                _update_questions(
-                    questions, query_wire.question_updates, goal_count=len(extract.original_goals),
-                    store=source_store, attempts=query_executor.attempts,
-                    repository_available=repository is not None, task=task,
+                questions.apply_updates(
+                    query_wire.question_updates, store=source_store,
+                    attempts=query_executor.attempts, task=task,
                 )
                 updates = query_wire.candidate_updates
                 if len({item.scenario_id for item in updates}) != len(updates):
@@ -1892,7 +1777,7 @@ async def execute_staged_run(
                     extract.candidates = [item for item in extract.candidates
                                           if item.scenario_id != update.scenario_id] + [replacement]
                     candidate_ids.add(update.scenario_id)
-                query_entry["questions_after"] = deepcopy(list(questions.values()))
+                query_entry["questions_after"] = questions.snapshot()
 
                 if (
                     observed_attempt is not None
@@ -1932,10 +1817,9 @@ async def execute_staged_run(
                     exploration_stop = query.stop_explanation
                     if exploration_stop is None:
                         raise ValueError("repository exploration requires an explicit stop explanation")
-                    if exploration_stop is not None:
-                        source_store.validate_task(task)
-                        _validate_exploration_stop(exploration_stop, source_store)
-                        _validate_goal_stop(exploration_stop, questions)
+                    source_store.validate_task(task)
+                    _validate_exploration_stop(exploration_stop, source_store)
+                    questions.validate_stop(exploration_stop)
                     break
                 if query.stop_explanation is not None:
                     raise ValueError("request_query cannot declare exploration finished")
@@ -1967,7 +1851,7 @@ async def execute_staged_run(
                  "extract": extract.model_dump(mode="json"),
                  "query": query.model_dump(mode="json"),
                  "query_receipts": query_executor.attempts,
-                 "questions": list(questions.values()),
+                 "questions": questions.snapshot(),
                  "continuation": continuation_context}, model=model,
                 config=config, ledger=ledger, responses=responses,
                 model_calls=model_calls, deadline=deadline,
@@ -1990,30 +1874,28 @@ async def execute_staged_run(
                                                         strict_mapping=repository is not None)
             if constructed_contract is not None:
                 _validate_goal_preservation(constructed_contract, extract)
-            requests = _construct_investigations(constructed, extract, questions)
+            requests = _construct_investigations(constructed, extract, questions.snapshot())
             if requests:
-                _add_questions(questions, requests, len(extract.original_goals),
-                               origin="CONSTRUCT", repository_available=repository is not None)
+                questions.register(requests, origin="CONSTRUCT")
                 continuation_context = {"origin": "CONSTRUCT", "requests": [
                     item.model_dump(mode="json") for item in requests]}
                 continuation_log.append({**continuation_context,
                                          "after_model_call": int(model_calls[-1]["sequence"])})
                 if (constructed_contract is not None and constructed.spec is not None
                         and constructed.spec.delivery_status == "partial"):
-                    _validate_spec_delivery(constructed, questions, extract)
+                    _validate_spec_delivery(constructed, questions.snapshot(), extract)
                     partial_checkpoint = constructed.model_copy(deep=True)
                     checkpoint_attempts = len(query_executor.attempts)
                     checkpoint_call = int(model_calls[-1]["sequence"])
                 continue
             if constructed_contract is not None:
-                _validate_spec_delivery(constructed, questions, extract)
+                _validate_spec_delivery(constructed, questions.snapshot(), extract)
                 if constructed.spec is not None and constructed.spec.delivery_status == "partial":
                     partial_checkpoint = constructed.model_copy(deep=True)
                     checkpoint_attempts = len(query_executor.attempts)
                     checkpoint_call = int(model_calls[-1]["sequence"])
 
             if config.variant == "C" and constructed_contract is not None:
-                assert constructed_contract is not None
                 current_stage = "CONTRAST"
                 contrast = await _call_stage(
                     "CONTRAST", ContrastResult,
@@ -2032,8 +1914,7 @@ async def execute_staged_run(
                                    strict_mapping=repository is not None)
                 if contrast.investigation_requests:
                     partial_checkpoint = None
-                    _add_questions(questions, contrast.investigation_requests, len(extract.original_goals),
-                                   origin="CONTRAST", repository_available=repository is not None)
+                    questions.register(contrast.investigation_requests, origin="CONTRAST")
                     continuation_context = {"origin": "CONTRAST", "requests": [
                         item.model_dump(mode="json") for item in contrast.investigation_requests]}
                     continuation_log.append({**continuation_context,
@@ -2136,23 +2017,21 @@ async def execute_staged_run(
                     constructed_contract = revised_contract
                     _validate_goal_preservation(revised_contract, extract)
                     partial_checkpoint = None
-                    requests = _construct_investigations(constructed, extract, questions)
+                    requests = _construct_investigations(constructed, extract, questions.snapshot())
                     if requests:
-                        _add_questions(questions, requests,
-                                       len(extract.original_goals), origin="REVISE",
-                                       repository_available=repository is not None)
+                        questions.register(requests, origin="REVISE")
                     if revision.request_another_revision or requests:
                         continuation_context = {"origin": "REVISE", "reason": revision.evidence_reason,
                                                 "construct": constructed.model_dump(mode="json")}
                         continuation_log.append({"origin": "REVISE", "reason": revision.evidence_reason,
                                                  "after_model_call": int(model_calls[-1]["sequence"])})
                         if constructed.spec is not None and constructed.spec.delivery_status == "partial":
-                            _validate_spec_delivery(constructed, questions, extract)
+                            _validate_spec_delivery(constructed, questions.snapshot(), extract)
                             partial_checkpoint = constructed.model_copy(deep=True)
                             checkpoint_attempts = len(query_executor.attempts)
                             checkpoint_call = int(model_calls[-1]["sequence"])
                         continue
-                    _validate_spec_delivery(constructed, questions, extract)
+                    _validate_spec_delivery(constructed, questions.snapshot(), extract)
 
             break
 
@@ -2264,25 +2143,12 @@ async def execute_staged_run(
         )
         partial_spec_restored = True
 
-    if isinstance(config, StagedRunConfig) and config.variant == "C":
-        degeneracy_contrast = (
-            {
-                "status": "unavailable",
-                "execution_status": "not_executed",
-                "support": None, "assumption_reason": None, "semantic_role": None,
-                "alternative": None,
-                "bypass_behavior": None,
-                "evidence_ids": [],
-                "distinguishing_observation": None,
-                "revision_requested": False,
-                "revision_reason": None,
-            }
-            if contrast is None
-            else contrast.model_dump(mode="json", exclude={"schema_version"})
-        )
+    contrast_enabled = isinstance(config, StagedRunConfig) and config.variant == "C"
+    if contrast_enabled and contrast is not None:
+        degeneracy_contrast = contrast.model_dump(mode="json", exclude={"schema_version"})
     else:
         degeneracy_contrast = {
-            "status": "disabled_by_variant",
+            "status": "unavailable" if contrast_enabled else "disabled_by_variant",
             "execution_status": "not_executed",
             "support": None, "assumption_reason": None, "semantic_role": None,
             "alternative": None,
@@ -2325,7 +2191,7 @@ async def execute_staged_run(
             "evidence_sufficiency_claimed": error is None and exploration_stop is not None
             and exploration_stop.reason == "evidence_sufficient",
         },
-        "questions": list(questions.values()),
+        "questions": [] if questions is None else questions.snapshot(),
         "continuation_log": continuation_log,
         "dependency_spec_status": None if dependency_spec is None else dependency_spec.semantics.delivery_status,
         "partial_spec_checkpoint": None if not partial_spec_restored else {
@@ -2396,6 +2262,7 @@ async def execute_staged_run(
             research_root / "specification.py",
             research_root / "provider_capture.py",
             research_root / "stage_protocol.py",
+            research_root / "investigation.py",
         )
     }
     artifact_hashes = {

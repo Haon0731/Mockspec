@@ -227,6 +227,7 @@ PYTHONPATH=src .venv/bin/python experiments/staged-inference/run.py \
 .venv/bin/python -m ruff check src tests scripts experiments/staged-inference
 MYPYPATH=src .venv/bin/python -m mypy --follow-untyped-imports \
   experiments/staged-inference/controller.py experiments/staged-inference/run.py \
+  experiments/staged-inference/stage_protocol.py experiments/staged-inference/investigation.py \
   experiments/staged-inference/scripted.py experiments/staged-inference/query.py \
   experiments/staged-inference/specification.py experiments/staged-inference/provider_capture.py \
   experiments/staged-inference/acceptance.py
@@ -294,8 +295,12 @@ content_changed/identity_mismatch；后端或畸形结果为 backend_error/analy
 | `inference_record.json` | 阶段结果与可见模型响应、选择、关键行为、允许变化、错误；B 对照固定为 `disabled_by_variant/not_executed` |
 | `run_manifest.json` | 宿主身份、配置、版本、预算和用量、终态，以及前述产物实际字节的 SHA256；最后写入且不哈希自身 |
 
-`controller.execute_staged_run` 是研究控制器及统一产物边界，`specification.py` 定义生成器消费规格及
-机械一致性校验，`scripted.py` 提供可替换的
+`controller.execute_staged_run` 是研究流程与统一产物边界，负责阶段次序、共享预算、格式修复、
+部分规格检查点和发布顺序。`stage_protocol.py` 定义严格阶段 DTO，并集中来源定位物化与
+CONSTRUCT/CONTRAST 状态校验；`investigation.py` 的 `InvestigationLedger` 负责问题身份、重开时的
+目标/影响关联保留、查询回执证据关联及停止一致性。`specification.py` 定义生成器消费规格及机械一致性校验，
+`query.py` 负责查询请求登记、执行和回执，`provider_capture.py` 负责 SDK 终态解析前的供应商响应留证。
+`scripted.py` 提供可替换的
 合成输入和 SDK 模型，`run.py` 负责显式回放或受限真实检查的命令组装。契约不增加研究状态字段；
 自包含规格与清单通过任务身份和文件哈希关联正式契约。失败尝试保留可得阶段、用量与错误，
 无法写入时以非零退出码和 stderr 报告，不声称成功留证。

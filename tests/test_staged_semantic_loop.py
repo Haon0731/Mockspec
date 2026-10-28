@@ -19,9 +19,8 @@ import pytest
 STAGED = Path(__file__).parents[1] / "experiments" / "staged-inference"
 sys.path.insert(0, str(STAGED))
 
-from controller import (  # noqa: E402
-    StagedRunConfig, _add_questions, _update_questions, execute_staged_run,
-)
+from controller import StagedRunConfig, execute_staged_run  # noqa: E402
+from investigation import InvestigationLedger  # noqa: E402
 from stage_protocol import InvestigationRequest, QuestionUpdate  # noqa: E402
 from query import QueryExecutor  # noqa: E402
 from scripted import FixedScriptModel, synthetic_task  # noqa: E402
@@ -471,33 +470,56 @@ def test_question_citing_combined_read_ranges_requires_both_receipts(tmp_path):
         reference = locator(repository.source_id_for("helper.py"), 1, 2)
         update = question_update(state="resolved", evidence=[reference], acquisition="not_needed",
                                  sequences=[1], question_id=None)
+        questions = InvestigationLedger(1, repository_available=True)
         with pytest.raises(ValueError, match="associated with its observed query receipt"):
-            _update_questions({}, [QuestionUpdate.model_validate(update)], goal_count=1,
-                              store=store, attempts=executor.attempts, repository_available=True, task=task)
+            questions.apply_updates([QuestionUpdate.model_validate(update)],
+                                    store=store, attempts=executor.attempts, task=task)
+        assert questions.snapshot() == []
         update["attempted_sequences"] = [1, 2]
-        questions = {}
-        _update_questions(questions, [QuestionUpdate.model_validate(update)], goal_count=1,
-                          store=store, attempts=executor.attempts, repository_available=True, task=task)
-        assert questions["q1"]["state"] == "resolved"
+        questions.apply_updates([QuestionUpdate.model_validate(update)],
+                                store=store, attempts=executor.attempts, task=task)
+        assert questions.snapshot()[0]["state"] == "resolved"
     finally:
         repository.close()
 
 
 @pytest.mark.parametrize("origin", ["CONSTRUCT", "CONTRAST"])
 def test_reopening_question_cannot_erase_original_association(origin):
+    task_data, _ = product_reference(adjust=True)
+    task = UnifiedTask.from_dict(task_data)
     request = InvestigationRequest(question=QUESTION, goal_indexes=[0], impact=IMPACT)
-    questions = {}
-    _add_questions(questions, [request], 2, origin="EXTRACT", repository_available=True)
-    questions["q1"].update(state="resolved", evidence=[locator("mut:0", 1, 5)], attempted_sequences=[1])
-    before = deepcopy(questions)
+    questions = InvestigationLedger(2, repository_available=True)
+    questions.register([request], origin="EXTRACT")
+    update = question_update(state="resolved", evidence=[locator("mut:0", 1, 5)],
+                             acquisition="not_needed", sequences=[1], question_id="q1")
+    questions.apply_updates(
+        [QuestionUpdate.model_validate(update)], store=SourceStore(task), task=task,
+        attempts=[{"sequence": 1, "status": "ok", "result": {}, "response_id": "read-1"}],
+    )
+    before = questions.snapshot()
     with pytest.raises(ValueError, match="cannot rebind"):
-        _add_questions(questions, [request.model_copy(update={"goal_indexes": [1]})], 2,
-                       origin=origin, repository_available=True)
-    assert questions == before
-    _add_questions(questions, [request], 2, origin=origin, repository_available=True)
-    assert questions["q1"]["state"] == "open"
-    assert questions["q1"]["evidence"] == before["q1"]["evidence"]
-    assert questions["q1"]["attempted_sequences"] == [1]
+        questions.register([request.model_copy(update={"goal_indexes": [1]})], origin=origin)
+    assert questions.snapshot() == before
+    questions.register([request], origin=origin)
+    reopened = questions.snapshot()[0]
+    assert reopened["state"] == "open"
+    assert reopened["evidence"] == before[0]["evidence"]
+    assert reopened["attempted_sequences"] == [1]
+    assert before[0]["state"] == "resolved"
+
+
+def test_question_snapshot_cannot_mutate_the_ledger():
+    questions = InvestigationLedger(1, repository_available=True)
+    request = InvestigationRequest(question=QUESTION, goal_indexes=[0], impact=IMPACT)
+    questions.register([request], origin="EXTRACT")
+    before = questions.snapshot()
+    edited = questions.snapshot()
+    edited[0]["goal_indexes"].append(99)
+    edited[0]["evidence"].append(locator("unobserved", 1, 1))
+    edited[0]["state"] = "resolved"
+    edited.clear()
+
+    assert questions.snapshot() == before
 
 
 @pytest.mark.parametrize("defect", ["constrained_while_blocked", "reverse_goal_missing"])

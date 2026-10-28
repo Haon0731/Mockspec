@@ -86,10 +86,12 @@ PYTHONPATH=src .venv/bin/python examples/scenarios/semantic-calibration/check.py
   fetch(7) 返回 100。依据均为可见分支实现 + 测试目标的推导。无附加假设。
 - **行为实例**：允许 hit/100 或 miss/None→100，作为两个替代候选；排除同时要求 get 返回
   None 和 100、miss 下 fetch 返回 99。不能把 repo 必须被调用加到 hit 条件中。
-- **未知/影响**：原目标未区分两个场景，选择依据缺失；分支内行为已知，跨场景选择仍阻塞。
+- **未知/影响**：原目标不要求固定命中或未命中；在 D0 已明确两处依赖均可替换、无副作用，
+  且两条分支各自有正向实现与测试依据，因此这里是确认允许的替代，不是未消除的场景歧义。
   hit 下没有发生 fetch 不授权任意的未来 fetch 行为，也不自动产生禁止调用的 verify。
-- **交付**：可交付带条件多分支作为评阅资料；当前研究消费要求单一 selected ID，
-  因此映射为 AMBIGUOUS、selected=null，默认不生成。不可挑更容易实现的一支。
+- **交付**：当前协议映射为 ALTERNATIVES、selected=null；生成器可选择一条完整分支并遵守其
+  全部约束，不能合取两支或只抽取更容易实现的局部要求。早期草案曾因单一选择约定映射为
+  AMBIGUOUS；该判断已被当前分支语义取代，历史 JSON 投影仍仅用于结构参考。
 
 ## E — 状态关系（合成参考草案）
 
@@ -158,8 +160,8 @@ masking 与完整 126 行测试，只通过 task 的 mut/test/imports source_id 
   但不能扩大为任意异常或任意状态副作用。其他 API/调用历史未判断。
 - **交付**：真实材料适配完成，当前只有有用的条件约束，尚不充分支持单一场景生成。
   映射为 INCONCLUSIVE 的评阅判断；不制造运行记录或 SELECTED。
-  正式草案可容纳三条路径；若强映射成研究 AMBIGUOUS，会撞上恰好两候选限制。
-  需要先核实绑定和关键依赖语义，再判断是否缩小候选，而不是为通过格式删路径。
+  正式草案可容纳三条路径，当前研究协议也不再限制为两个候选；这些路径仍受绑定和关键依赖
+  语义未知阻塞，因此保持 INCONCLUSIVE，而不是为了通过格式删减路径。
 
 ## 研究记录投影与消费检查
 
@@ -174,10 +176,10 @@ R3 复用绑定前提 [2] 并对应后续异常关系 [4]（索引从 0 开始�
 | B | condition + `p=50` | allowed_variations=实现形式；claim_basis=推导 | 不得用“可变值”删 50；当前范围充分 |
 | C 前 | condition + transform(p)=100；uncertainty=语义未读 | unresolved=选 p 被阻塞；query/stop 信息=授权可读 | INCONCLUSIVE；结构有效不说明取得行为证据 |
 | C 后 | 新增 helper evidence；p=50 | claim_basis=新实现事实支持推导；allowed_variations=实现形式 | 当前范围充分；仍非真实查询轨迹 |
-| D | 两个 hypothesis 和各自条件约束 | result_status=AMBIGUOUS，selected=null，unresolved=缺选择依据 | 允许保存多分支，不支持直接当 SELECTED 交付 |
+| D | 两个 hypothesis 和各自条件约束 | result_status=ALTERNATIVES，selected=null；每支分别标 allowed 并绑定前提 | 当前条件下可选一条完整分支；历史投影没有新研究语义字段，不冒充当前运行产物 |
 | E | condition 限定单次读写；statement 写值关联 | allowed_variations=状态/预设实现、put 返回值；basis=API 事实 | 当前范围充分；不能由文字推断一般状态机完整性 |
 | F | sealed_transform(p)=100；uncertainty=映射/可满足性 | unresolved=输入选择阻塞；stop rationale=宿主明确无渠道 | INCONCLUSIVE；没有合法实例，不捏造 allowed_variations |
-| R | R0–R3、三条候选与绑定 unknown | claim_basis 区分候选假设；unresolved=绑定/语义；allowed_variations 附前提 | INCONCLUSIVE；三候选与研究 AMBIGUOUS 的两候选限制冲突 |
+| R | R0–R3、三条候选与绑定 unknown | claim_basis 区分候选假设；unresolved=绑定/语义；allowed_variations 附前提 | INCONCLUSIVE；阻塞原因是绑定和依赖语义未知，不是候选数量 |
 
 A/B/C后/E 的“充分”是本卡限定输入下的语义评阅，不是一次 SELECTED 运行记录。
 本目录没有用 statement 替代 allowed_variations/假设/未知字段的消费责任。
@@ -189,7 +191,7 @@ A/B/C后/E 的“充分”是本卡限定输入下的语义评阅，不是一次
 | A | 固定100/7 | 正整数乘积 | 保留乘积关联 | 未固定因子对 | 同关系多解 | 历史未判断 | 当前交互充分 |
 | B | 固定100/7 | 乘2反推50 | 精确值保留 | 不放宽50 | 与A有意不同 | 历史未判断 | 当前交互充分 |
 | C | 保留transform | 前后证据分开 | 前视图缺映射已明示 | 未读前不猜50 | 不混前后视图 | 可读不等于已读 | 前不足/后充分 |
-| D | 未添加回源目标 | 条件分支 | 缺选择依据已明示 | 不合取两支 | None/非None分开 | 保留选择歧义 | 不下发生成 |
+| D | 未添加回源目标 | 两支均有正向依据 | 不增加调用断言 | 不合取两支 | None/非None分开 | 范围外行为不授权变化 | ALTERNATIVES 可选完整分支 |
 | E | 固定读写7 | 显式API语义 | 保留写→读关系 | 不指定内部实现 | 单次历史一致 | 不泛化并发 | 当前交互充分 |
 | F | 转换保持真实 | 显式宿主范围 | 缺转换语义已明示 | 不编造解 | 不声称可满足 | 阻塞且无渠道 | 仅部分约束 |
 | R | 五行原断言 | 事实/推导/假设分列 | 装配/依赖语义待查 | 子串不收紧为相等 | 抛出/返回分支分开 | 不称不可探索 | 部分规约未充分 |
@@ -198,16 +200,14 @@ A/B/C后/E 的“充分”是本卡限定输入下的语义评阅，不是一次
 
 ## 仍待研究者决定与下一步
 
-1. 未来消费者是否支持条件多分支；当前仍保留单一选择约定，不改 AMBIGUOUS。
-2. 关键需求覆盖应如何显式评阅、哪些假设必须先核实；不能从 required 或 SELECTED 自动推定。
-3. 范围授权摘要、假设与正式 Claim 的绑定是否需要机器字段；本轮仅规定配套读取，暂不升级 Schema。
-4. flask_308 下一次授权取证应先确认 lookup/替换绑定和关键依赖语义，再判断候选范围；
+1. 关键需求覆盖应如何显式评阅、哪些假设必须先核实；不能从 required、SELECTED 或 ALTERNATIVES 自动推定。
+2. 范围授权摘要、假设与正式 Claim 的绑定是否需要进一步机器化；当前研究规格已有独立字段，正式 v0.1 Schema 保持兼容。
+3. flask_308 下一次授权取证应先确认 lookup/替换绑定和关键依赖语义，再判断候选范围；
    本轮并未耗尽授权仓库，也未证明某条分支可实际生成。
 
-建议下一项最小 Agent 改造：在研究侧 CONSTRUCT/DELIVER 的现有输出约定中，要求将
-每个关键依赖决定的依据、允许变化、阻塞未知逐项映射到已有 claim_basis 与正式 Claim，
-并明确覆盖范围，防止以查询停止代替交付充分性。先用本目录参考卡评阅这种改造，
-保持正式 Schema 与 QUERY 策略不变；本轮不实施，也不声称字段完整能自动证明语义。
+后续研究入口已在独立 `dependency_spec.json` 中把关键依赖决定的前提、允许变化、阻塞未知和
+目标覆盖显式关联，同时保持正式 v0.1 Schema 不变。本目录早于该消费规格，保存的是正式契约
+投影和人工语义参考；不能把这些投影反向冒充新规格或模型运行，也不能声称字段完整能自动证明语义。
 
 新增 check.py 的用途仅是复现本目录的七个合成输入投影及一个审核真实输入投影。
 已有 CLI 的真实 Adapter 入口不能加载这些微型合成 task，故使用这个局部薄包装，
@@ -234,8 +234,9 @@ examples/scenarios/semantic-calibration/check.py --follow-imports=skip` 通过�
 | R “Exception 子类”与 Exception 实例措辞不一致 | 合法实例与类型要求读法冲突 | 明确为 Exception 或其子类的实例 |
 
 修正后重新运行七个合成与一个真实草案的结构校验，全部通过。
-语义结论仍按评阅表限定：A/B/C后/E 在声明范围内充分；C前/F/R 是有用但不充分的部分规约；
-D 缺选择依据。独立自动审阅不构成人工确认，后续研究者仍需裁定消费和覆盖规则。
+语义结论仍按当时评阅表限定：A/B/C后/E 在声明范围内充分；C前/F/R 是有用但不充分的部分规约；
+D 当时结论为缺少选择依据。该 D 结论后来由当前 Q2/ALTERNATIVES 分支语义取代，见上方现行说明；
+此处保留 2026-10-27 复核原貌。独立自动审阅不构成人工确认，后续研究者仍需裁定覆盖规则。
 复用的四条 query_recovery_semantic_review 既有材料仍支持 import/声明不构成行为证据的
 评阅原则；本轮未把它们包装成新的真实运行或自动语义判定器。
 
