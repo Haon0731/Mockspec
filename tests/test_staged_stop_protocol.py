@@ -12,13 +12,14 @@ from agents.usage import Usage
 @pytest.mark.parametrize("reason", ["evidence_sufficient", "unknowns_nonblocking", "no_further_evidence"])
 def test_agent_stop_preserves_evidence_and_unknown_impact(tmp_path, reason):
     def change(outputs):
-        stop = outputs[8]["stop_explanation"]
+        final_query = outputs[8]
+        stop = final_query["stop_explanation"]
         stop["reason"] = reason
-        stop["remaining_unknowns"] = [] if reason == "evidence_sufficient" else [{
-            "question": "Other dependency inputs are not explored.",
-            "impact": "They do not affect this test input or candidate selection.",
-            "blocking": False,
-        }]
+        if reason == "evidence_sufficient":
+            stop["remaining_unknowns"] = []
+            for update in final_query["question_updates"]:
+                update["state"] = "resolved"
+                update["rationale"] = "The cited evidence closes this fixture question."
     result = _repository_run(tmp_path, transform=change)
     assert result["contract"] is not None, result["record"]["error"]
     record = result["record"]

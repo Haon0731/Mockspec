@@ -22,7 +22,7 @@ from scripted import FixedScriptModel, query_script, scripted_outputs, synthetic
 
 REPORT_VERSION = "m1-staged-inference-acceptance/v0.2"
 MANIFEST_VERSION = "scenario-inference-manifest/v0.1"
-RECORD_VERSION = "scenario-inference-record/v0.3"
+RECORD_VERSION = "scenario-inference-record/v0.4"
 CONTRACT_VERSION = "mock-spec.scenario/v0.1"
 
 
@@ -229,8 +229,8 @@ def _verify_run(case: dict[str, object], run_dir: Path) -> dict[str, object]:
     if manifest["stop_reason"] != case["expected_stop_reason"]:
         raise ValueError(f"{case['name']}: unexpected stop reason")
     if manifest["versions"] != {
-        "policy": "staged-scenario-inference/v0.3",
-        "prompts": "staged-scenario-inference-prompts/v0.3",
+        "policy": "staged-scenario-inference/v0.4",
+        "prompts": "staged-scenario-inference-prompts/v0.4",
         "record": RECORD_VERSION,
         "contract": CONTRACT_VERSION,
         "citation_mode": "source_locator_host_materialized_quote/v1",
@@ -239,6 +239,7 @@ def _verify_run(case: dict[str, object], run_dir: Path) -> dict[str, object]:
 
     expected_artifacts = {
         "input_snapshot.json", "inference_record.json", "scenario_contract.json",
+        "dependency_spec.json",
     }
     if set(manifest["artifact_sha256"]) != expected_artifacts:
         raise ValueError(f"{case['name']}: artifact inventory is incomplete or unexpected")

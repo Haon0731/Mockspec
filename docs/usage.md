@@ -219,18 +219,30 @@ Python 合成任务和固定脚本模型，经真实 SDK Runner 执行 B/C 变�
 ```bash
 PYTHONPATH=src .venv/bin/python experiments/staged-inference/run.py \
   --mode synthetic_replay --variant B --output-dir /tmp/mockspec-m1-b-replay
-.venv/bin/python -B -m pytest -q -p no:cacheprovider tests/test_staged_inference.py tests/test_staged_cancellation.py tests/test_staged_contrast.py tests/test_staged_format_repair.py
+.venv/bin/python -B -m pytest -q -p no:cacheprovider \
+  tests/test_staged_inference.py tests/test_staged_cancellation.py \
+  tests/test_staged_contrast.py tests/test_staged_format_repair.py \
+  tests/test_staged_semantic_loop.py tests/test_staged_specification.py \
+  tests/test_staged_provider_capture.py
 .venv/bin/python -m ruff check src tests scripts experiments/staged-inference
 MYPYPATH=src .venv/bin/python -m mypy --follow-untyped-imports \
   experiments/staged-inference/controller.py experiments/staged-inference/run.py \
   experiments/staged-inference/scripted.py experiments/staged-inference/query.py \
+  experiments/staged-inference/specification.py experiments/staged-inference/provider_capture.py \
   experiments/staged-inference/acceptance.py
 ```
 
 研究代码类型检查显式使用本仓 `src`，避免误读环境中其他安装版本；
 它仍会报告所引用生产模块的既有诊断，应与上方生产基线比较。
 
-输出目录必须不存在。有效语义结果（SELECTED、AMBIGUOUS、INCONCLUSIVE）退出码为 0，
+本轮模型效果尚未做真实评估。后续可在单独确认付费预算后预登记：仅使用现有审核的
+flask_308 与 CloudFoundry 各一次 C 运行，模型 deepseek-flash，开启 repository-read；
+每例共享上限为 200,000 Token、600 秒、单调用 120 秒及 US$1 估算门禁，输出上限 8192。
+运行前核对实际服务费率、配置和最终代码版本，分别写入全新输出目录；失败、截断、歧义和未决均计入结果，
+不重跑挑成功样本、不执行目标测试。人工/隔离评阅关注目标覆盖、依赖语义、过强/过弱约束与未知影响，
+不以 JSON 合法或查询次数替代规格质量。这是待执行方案，不是两次成功或模型效果改善的证据。
+
+输出目录必须不存在。有效语义结果（SELECTED、ALTERNATIVES、AMBIGUOUS、INCONCLUSIVE）退出码为 0，
 ERROR 为 1，命令或无法完成的产物写入错误为 2；
 重复运行需指定新目录，不覆盖原证据。入口默认配置为工程回放参数，不是正式实验预算：
 最多 10 次模型请求，每次最多 4096 输出 Token，总计 60000 Token，
@@ -246,7 +258,11 @@ ERROR 为 1，命令或无法完成的产物写入错误为 2；
 
 仓库模式正常停止必须提供 `stop_explanation`，理由为 `evidence_sufficient`、
 `unknowns_nonblocking` 或 `no_further_evidence`，附原文引用、明确依据、剩余未知及其影响。
-无更多有效证据不能当作证据充分；阻塞未知会阻止 SELECTED。
+QUERY 同时维护与原目标关联的问题状态；resolved/nonblocking 必须有已观察证据，仓库模式下把
+重要问题标为不可取证还必须关联实际尝试。剩余未知须与问题账本一致，仍可访问的实质证据会拒绝停止。
+无更多有效证据不能当作证据充分；阻塞未知会阻止 ready、SELECTED 或 ALTERNATIVES。
+查询的 `evidence_sufficient` 只允许进入构造，不是任务完成状态；生成消费看最终
+`dependency_spec.semantics.delivery_status`，并仍须理解机械校验不证明语义正确。
 `--repetition-threshold`（默认 4）配置连续重复且无进展的保护阈值；
 新分页、新位置或新增证据使探索继续，有目的复核可保留在问题和回执评估中。
 记录保存重复检测策略、触发依据、每次耗时与整次 Token 消耗；`termination.initiator`
@@ -274,12 +290,14 @@ content_changed/identity_mismatch；后端或畸形结果为 backend_error/analy
 | --- | --- |
 | `input_snapshot.json` | 完整可见任务的确定性 UTF-8 JSON；排序键、紧凑分隔，保持源码与普通 oracle 字符串 |
 | `scenario_contract.json` | 通过正式 v0.1 校验的契约；无效输出不发布此文件 |
+| `dependency_spec.json` | `mock-spec.dependency/v0.1` 自包含消费规格；绑定本次完整 task、正式契约、运行/输入身份、范围、依据、分支、允许变化、未知、冲突及停止摘要；合成回放不因此获得真实准入 |
 | `inference_record.json` | 阶段结果与可见模型响应、选择、关键行为、允许变化、错误；B 对照固定为 `disabled_by_variant/not_executed` |
-| `run_manifest.json` | 宿主身份、配置、版本、预算和用量、终态，以及前三份文件实际字节的 SHA256；最后写入且不哈希自身 |
+| `run_manifest.json` | 宿主身份、配置、版本、预算和用量、终态，以及前述产物实际字节的 SHA256；最后写入且不哈希自身 |
 
-`controller.execute_staged_run` 是研究控制器及统一产物边界，`scripted.py` 提供可替换的
+`controller.execute_staged_run` 是研究控制器及统一产物边界，`specification.py` 定义生成器消费规格及
+机械一致性校验，`scripted.py` 提供可替换的
 合成输入和 SDK 模型，`run.py` 负责显式回放或受限真实检查的命令组装。契约不增加研究状态字段；
-记录与清单通过任务身份和契约文件哈希关联正式契约。失败尝试保留可得阶段、用量与错误，
+自包含规格与清单通过任务身份和文件哈希关联正式契约。失败尝试保留可得阶段、用量与错误，
 无法写入时以非零退出码和 stderr 报告，不声称成功留证。
 
 可用 `--replay-case selected|ambiguous|inconclusive|error` 分别复现四种结果，默认 selected。
@@ -287,30 +305,36 @@ content_changed/identity_mismatch；后端或畸形结果为 backend_error/analy
 
 | 结果 | 最终契约与下游含义 |
 | --- | --- |
-| SELECTED | 必须有有效契约与当前候选 ID；1–3 项关键行为且无阻断性未决，可作为后续生成的输入依据 |
-| AMBIGUOUS | 必须有有效契约、恰好两个候选及分歧理由；选择 ID 为 null，不能自动择一生成 |
-| INCONCLUSIVE | 选择 ID 为 null，记录缺失绑定/材料及影响；完整有效契约仅供诊断，不可下发生成，无完整契约则不创建文件 |
+| SELECTED | 必须有有效契约、恰好一个 allowed 分支及对应候选 ID，规格为 ready；由真实代码独立决定的目标可以不增加依赖约束 |
+| ALTERNATIVES | 至少两个分支分别有正向证据和前提，研究规格全部标为 allowed 且 ready；选择 ID 为 null，生成器可选择其中一个完整分支 |
+| AMBIGUOUS | 必须有有效契约、至少两个候选及未决的合法性或选择依据；选择 ID 为 null，不能自动择一生成 |
+| INCONCLUSIVE | 选择 ID 为 null，记录缺失绑定/材料及影响；若正式契约与 semantics 完整有效，可发布 delivery_status=partial/conflict 的自包含规格说明限制；否则草案仅供诊断 |
 | ERROR | 不发布最终契约；记录错误阶段、分类及已完成阶段，中间草案只供诊断 |
 
 退出码 0 仅说明完成了有效结果交付，下游仍须读取 `result_status`。
 `stop_reason` 独立记录 completed、evidence_exhausted、budget_exhausted 等停止原因；
 预算耗尽、run_timeout、timeout 或 repeated_exploration 均返回保护性 INCONCLUSIVE，
-已有构造仅保留为诊断，不发布最终契约。取消保存 `cancelled` 后向调用者传播。
+没有完成正式契约及 semantics 校验时，已有构造仅保留为诊断，不发布自包含规格。
+若此前已完整校验 partial checkpoint 且此后没有查询尝试，可将该受限规格单独交付；
+其停止摘要和 record.partial_spec_checkpoint 明确保护性退出及校验位置，task_completion 保持 partial。
+旧 ready 提案不使用这条恢复路径。示例见 [自包含消费规格](../examples/scenarios/consumer-specs/README.md)。
+取消保存 `cancelled` 后向调用者传播。
 协议违规为 output_invalid，模型运行失败为 model_error，不伪装成语义未知。
 `unresolved` 保存阻断性未决，`nonblocking_unknowns` 保存不妨碍 SELECTED 的非关键未知。
 可恢复的工具错误留在查询日志，模型可评估回执并继续；不会自动把工具失败当作无行为证据。
 
 C 与 B 复用输入、控制器、输出及总预算；B 仅关闭对照并记录
-`disabled_by_variant/not_executed`。C 的 SELECTED 和已有可比较候选的 AMBIGUOUS
-进行一次静态 CONTRAST；提前材料或预算不足记录 `unavailable`，完成尝试但无有据替代
+`disabled_by_variant/not_executed`。C 对任何已形成正式契约的构造结果执行静态 CONTRAST；
+提前材料或预算不足记录 `unavailable`，完成尝试但无有据替代
 记录 `none_identified`。`proposed` 必须包含替代 Mock 方案、绕过行为、依据和最小区分观察。
 所有状态 `execution_status=not_executed`，不代表替代已执行或通过原测试。
 
-对照可请求一次 REVISE；`revision_log` 保留完整前后快照、准确修改字段和证据原因。
-合法替代可替换正式候选，但正式候选仍最多两个；原目标内容与证据不变，
-仅允许将被替换候选的绑定重指向新候选。修订后直接交付，不能重开查询。
-第二次语义修订请求返回 ERROR/output_invalid，不发布契约，保留中间记录。
-已要求修订但共享预算耗尽时返回 INCONCLUSIVE，未修订草案仅供诊断，不发布契约。
+CONTRAST 分别记录约束过弱、过强及观察不足的静态检查；未找到反例不是正确性证明，
+而合法但缺陷区分能力较弱的 Mock 不因此变成非法。CONSTRUCT、CONTRAST 或 REVISE 提出
+会实质改变规格的 `investigation_requests` 时，控制器回到 QUERY，问题和 continuation 原因留证。
+新证据可以增加、替换或放弃候选；原目标内容与证据必须保持。
+`revision_log` 保留完整前后快照、准确修改字段和证据原因；再次修订或补查继续消耗同一共享预算。
+共享预算耗尽时返回保护性 INCONCLUSIVE，未完成草案仅供诊断，不发布可消费规格。
 原目标保持在 `test_objectives`；新增观察建议进入 `verification_candidates`，
 `expected_interactions.assertion_policy` 保持 `not_implied`。
 
@@ -328,7 +352,7 @@ PYTHONPATH=src .venv/bin/python experiments/staged-inference/run.py \
 
 固定样例另有 `cache_unspecified`（移除任务说明，保留 AMBIGUOUS）、
 `legal_variation`（不锁定无关字段和构造形式，C 修订保留合法替代）和
-`second_revision`（拒绝第二次修订，预期退出码 1）。相同样例可选 `--variant B`，
+`second_revision`（缺少明确补查问题的再次修订请求仍按无效输出拒绝）。相同样例可选 `--variant B`，
 差异由关闭对照决定；B/C 不获额外预算。这些脚本只检验静态表示和控制流程，
 不证明模型会自主发现退化或接受合法变化。
 
@@ -416,7 +440,7 @@ HTTP 400，已修复；逐调用诊断位于 `inference_record.json.model_calls`
 
 研究入口现使用 v0.2 引用选择协议：模型选择来源与行范围，宿主从本次已可见证据
 生成精确 `quote`，最终仍使用原契约验证器。`inference_record.json` 的版本为
-`scenario-inference-record/v0.3`，`citation_mode` 为
+`scenario-inference-record/v0.4`，`citation_mode` 为
 `source_locator_host_materialized_quote/v1`；阶段的 `wire_result` 与 `result`
 分别记录模型选择和宿主标准结果。旧模型响应中的 `quote` 不自动转换；
 历史运行按对应提交复现，不能把旧失败送入新协议后改称成功。
@@ -432,7 +456,8 @@ G4 未通过；没有放宽 Schema、删除额外字段或自动重跑。
 捕获实际 HTTP 请求并确认 strict/完整 Schema 保留；单次对抗请求合规，不能据此宣称
 原复杂任务问题已修复或恢复 M2。该探针属于单独留证的一次性诊断，不是生产入口。
 
-研究 QUERY v0.3 使用严格嵌套类型，回执编号由宿主绑定。整次运行的 QUERY_FORMAT_REPAIR
+研究 QUERY v0.4 使用严格嵌套类型，回执编号由宿主绑定，并增加问题及候选更新；历史 v0.3
+响应仍按原运行记录解释，不静默升级。整次运行的 QUERY_FORMAT_REPAIR
 与 DELIVER FORMAT_REPAIR 共用一次名额；预留后即使用量门禁拒绝或请求失败也不退回。
 QUERY 只允许纠正回执评估对象内未知的 null 字段，模型必须完整重发且保持规定字段逐值一致。
 参数、引用、身份、旧版本、缺字段或语义变化均终止；格式纠正不补读源码、不重置预算，

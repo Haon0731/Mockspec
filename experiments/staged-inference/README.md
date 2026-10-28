@@ -1,6 +1,6 @@
 # Staged inference M1 replay
 
-This research path checks auditable variant-B/C outcomes with a Python synthetic
+This research path implements the auditable five-stage Scenario Agent with a Python synthetic
 task and a fixed SDK model. Run `run.py --mode synthetic_replay --variant B
 --replay-case selected --output-dir /tmp/mockspec-selected` with `PYTHONPATH=src`
 and the project virtualenv. Select `ambiguous`, `inconclusive`, or `error` for
@@ -8,7 +8,7 @@ the other complete-entry replays; use a fresh output directory each time.
 Commands, artifact fields, exit codes, and downstream meanings are maintained
 in [the usage guide](../../docs/usage.md#分阶段研究回放m1-1--m1-4).
 
-Issues #7, #8, and #9 cover the success path, four result states, source rejection,
+Issues #7, #8, and #9 established the original success path, four result states, source rejection,
 failure evidence, bounded queries, and shared run budgets. The tests exercise the SDK controller and artifact boundary
 without paid models, external datasets, or target test execution. Input rejection
 is synthetic schema validation, not proof of reviewed Adapter admission.
@@ -19,8 +19,24 @@ validation; every failure consumes the same six-attempt allowance. Model calls,
 token accounting, query counts, and the deadline persist across stages. Receipts
 and unfinished assessments remain in the record. No technical retries occur.
 
-Issue #10 adds one static CONTRAST for C, at most one semantic REVISE, and one
-separately counted format repair under the same budget. B disables only contrast.
+The current controller keeps the five responsibilities while allowing CONSTRUCT,
+CONTRAST, or REVISE to reopen QUERY for a material evidence gap. Original goals,
+question and candidate history, observations, and all budgets carry across the loop.
+Semantic continuation is distinct from the one separately counted format repair.
+B disables contrast; it does not change evidence or output requirements.
+
+Successful runs can publish `dependency_spec.json` (`mock-spec.dependency/v0.1`),
+which embeds the reviewed task, formal v0.1 contract, scope, premises, branch decisions,
+goal coverage, allowed variations, unknowns, conflicts, and stop summary. `ALTERNATIVES`
+means multiple branches are positively supported and selectable; `AMBIGUOUS` retains a
+material legality or selection uncertainty. The validators check references and state
+consistency, not semantic entailment or real-model reasoning quality.
+`ALTERNATIVES` adds the fifth current result state; historical four-state reports retain their original scope.
+
+Live runs capture non-streaming provider responses before SDK terminal-status parsing.
+Incomplete/failed response status, usage, and bounded redacted body remain diagnostic;
+missing usage stays unknown and prevents another model call. Capturing a partial response
+does not turn it into a contract or trigger continuation-style output repair.
 The cache-miss, unspecified-intent, legal-variation, and second-revision replays
 exercise AC-05/06/07/08 without executing target tests. See the usage guide for
 commands and repair limits. Real-model inference quality and the full M1 research

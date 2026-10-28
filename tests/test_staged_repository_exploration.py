@@ -53,7 +53,7 @@ def test_repair_qualification_allows_future_read_after_disjoint_search_matches(
         assert [match["start_line"] for match in search["matches"]] == [2, 5]
         before = store.observations()
         wire = QuerySelection.model_validate({
-            "schema_version": "staged-query/v0.3",
+            "schema_version": "staged-query/v0.4",
             "decision": "request_query",
             "query_attempt": {
                 "question": "What do the intervening lines establish?",
@@ -67,6 +67,8 @@ def test_repair_qualification_allows_future_read_after_disjoint_search_matches(
             "previous_receipt_assessment": None,
             "impact": "The future bounded read may resolve the question.",
             "stop_explanation": None,
+            "question_updates": [],
+            "candidate_updates": [],
         })
         query = _validate_repairable_query(
             wire, pending_receipt=None,

@@ -43,7 +43,6 @@ def test_b_and_c_share_input_and_only_c_runs_static_contrast(tmp_path) -> None:
     c = _run(tmp_path, "cache_miss", "C")
 
     assert b["record"]["input_hash"] == c["record"]["input_hash"]
-    assert set(b["record"]["degeneracy_contrast"]) == set(c["record"]["degeneracy_contrast"])
     assert b["contract"].model_dump() == c["contract"].model_dump()
     assert b["record"]["degeneracy_contrast"]["status"] == "disabled_by_variant"
     assert c["record"]["degeneracy_contrast"] == {
@@ -60,6 +59,10 @@ def test_b_and_c_share_input_and_only_c_runs_static_contrast(tmp_path) -> None:
         "support": "evidence",
         "assumption_reason": None,
         "semantic_role": "dependency_contract",
+        "weakness_review": "A direct cache hit can satisfy the return assertion without the miss path.",
+        "overconstraint_review": "Record construction and ignored return values remain variable.",
+        "observation_limits": "The static contrast is not executed and proves no defect detection.",
+        "investigation_requests": [],
     }
     assert [stage["stage"] for stage in b["record"]["stages"]] == [
         "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER",
@@ -117,6 +120,7 @@ def test_one_revision_preserves_snapshots_and_legal_variations(tmp_path) -> None
     revision = record["revision_log"][0]
     assert set(revision["modified_objects"]) == {
         "contract.verification_candidates", "allowed_variations",
+        "spec.allowed_variations",
     }
     assert revision["before"]["contract"]["test_objectives"] == (
         revision["after"]["contract"]["test_objectives"]
@@ -128,15 +132,18 @@ def test_one_revision_preserves_snapshots_and_legal_variations(tmp_path) -> None
     assert "unrelated mock fields" in allowed
 
 
-def test_second_semantic_revision_request_is_rejected_without_contract(tmp_path) -> None:
+def test_semantic_revision_request_reenters_investigation_before_delivery(tmp_path) -> None:
     result = _run(tmp_path, "second_revision")
 
-    assert result["record"]["result_status"] == "ERROR"
-    assert result["record"]["stop_reason"] == "output_invalid"
-    assert result["record"]["error_stage"] == "REVISE"
-    assert result["contract"] is None
-    assert result["record"]["revision_log"]
-    assert [stage["stage"] for stage in result["record"]["stages"]][-1] == "REVISE"
+    assert result["record"]["result_status"] == "SELECTED"
+    assert result["record"]["stop_reason"] == "completed"
+    assert result["contract"] is not None
+    assert len(result["record"]["revision_log"]) == 1
+    assert [stage["stage"] for stage in result["record"]["stages"]] == [
+        "EXTRACT", "QUERY", "CONSTRUCT", "CONTRAST", "REVISE",
+        "QUERY", "CONSTRUCT", "CONTRAST", "DELIVER",
+    ]
+    assert result["record"]["continuation_log"][0]["origin"] == "REVISE"
 
 
 def test_revision_budget_exhaustion_does_not_publish_pre_revision_contract(tmp_path) -> None:
@@ -187,18 +194,29 @@ def test_legal_alternative_can_replace_candidate_without_changing_original_goal(
     contract["dependency_constraints"][0]["statement"] = "dependency(1) returns 2.0."
     after["selected_scenario_id"] = "equivalent_return"
     after["selection_rationale"] = "The ordinary equality permits this alternative construction."
+    after["spec"]["branches"][0]["scenario_id"] = "equivalent_return"
+    after["spec"]["allowed_variations"][0]["scenario_ids"] = ["equivalent_return"]
+    after["spec"]["unknowns"][0]["scenario_ids"] = ["equivalent_return"]
     outputs[3] = {
-        "schema_version": "staged-contrast/v0.1", "status": "proposed",
+        "schema_version": "staged-contrast/v0.2", "status": "proposed",
         "execution_status": "not_executed", "alternative": "Return 2.0 rather than integer 2.",
         "bypass_behavior": "This challenges the draft's integer construction, not the original equality.",
         "evidence_ids": ["assertion"],
         "distinguishing_observation": "A type check would distinguish them, but is not an original goal.",
         "revision_requested": True,
         "revision_reason": "The proposed alternative is actually legal under ordinary equality.",
+        "support": "evidence", "assumption_reason": None,
+        "semantic_role": "dependency_contract",
+        "weakness_review": "The integer-only draft excludes an equality-compatible value.",
+        "overconstraint_review": "The original objective does not require a concrete numeric type.",
+        "observation_limits": "A new type check would be outside the original visible goal.",
+        "investigation_requests": [],
     }
     outputs.insert(4, {
         "schema_version": "staged-revise/v0.2", "revised_construct": after,
-        "modified_objects": ["contract", "selected_scenario_id", "selection_rationale"],
+        "modified_objects": [
+            "contract", "selected_scenario_id", "selection_rationale", "spec",
+        ],
         "evidence_reason": "The same original equality accepts 2.0; rebind the unchanged goal.",
         "evidence_ids": ["assertion"], "request_another_revision": False,
     })

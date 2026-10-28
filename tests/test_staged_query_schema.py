@@ -31,12 +31,14 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
     requests: list[dict] = []
     calls: list[dict] = []
     result = {
-        "schema_version": "staged-query/v0.3",
+        "schema_version": "staged-query/v0.4",
         "decision": "finish_queries",
         "query_attempt": None,
         "previous_receipt_assessment": None,
         "impact": "The visible task is sufficient.",
         "stop_explanation": None,
+        "question_updates": [],
+        "candidate_updates": [],
     }
 
     def untyped_union(value):
@@ -95,9 +97,10 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
 ])
 def test_query_wire_strictly_rejects_legacy_or_unknown_fields(invalid) -> None:
     value = {
-        "schema_version": "staged-query/v0.3", "decision": "finish_queries",
+        "schema_version": "staged-query/v0.4", "decision": "finish_queries",
         "query_attempt": None, "previous_receipt_assessment": None,
         "impact": "inspect", "stop_explanation": None,
+        "question_updates": [], "candidate_updates": [],
     }
     value.update(invalid)
     with pytest.raises(ValidationError):
@@ -149,7 +152,7 @@ def test_contract_selection_schema_strictly_rejects_legacy_quote_and_bad_nested_
         "uncertainty": [],
     }
     output = {
-        "schema_version": "staged-deliver/v0.2", "result_status": "SELECTED",
+        "schema_version": "staged-deliver/v0.3", "result_status": "SELECTED",
         "selected_scenario_id": "s", "contract": contract,
     }
     assert schema.validate_json(json.dumps(output)).contract is not None

@@ -1,0 +1,1185 @@
+{
+  "label": "Synthetic reference drafts, not model output or human gold",
+  "references": [
+    {
+      "reference": "A",
+      "task": {
+        "schema_version": "mock-spec.task/v1",
+        "language": "python",
+        "case_id": "semantic-A",
+        "mut_source": {
+          "source_id": "mut:0",
+          "logical_path": "synthetic/mut.txt",
+          "text": "p = left(7)\nq = right(7)\nreturn p*q",
+          "symbol": null,
+          "start_line": 1,
+          "end_line": 3,
+          "resolution_status": "partial",
+          "target_precision": "file"
+        },
+        "masked_test": {
+          "source_id": "test:0",
+          "logical_path": "synthetic/test.txt",
+          "text": "assert target() == 100",
+          "symbol": null,
+          "start_line": 1,
+          "end_line": 1,
+          "resolution_status": "partial",
+          "target_precision": "file"
+        },
+        "permitted_interfaces": [],
+        "supporting_sources": [
+          {
+            "source_id": "support:0",
+            "logical_path": "synthetic/scope.txt",
+            "text": "Only left/right may be substituted; responses are plain positive integers, excluding bool; no side effects.",
+            "symbol": null,
+            "start_line": 1,
+            "end_line": 1,
+            "resolution_status": "partial",
+            "target_precision": "file"
+          }
+        ],
+        "execution_context": {
+          "runtime_name": "python",
+          "runtime_version": "3.10",
+          "test_framework": "pytest",
+          "test_framework_version": null
+        },
+        "input_policy": {
+          "policy_id": "frozen-v1",
+          "protocol_version": "developer_realistic_workspace_v1",
+          "masking_contract": "artifact-aware-slot-v1",
+          "visibility": "reviewed_frozen_sources"
+        },
+        "sources": [
+          {
+            "source_id": "mut:0",
+            "logical_path": "synthetic/mut.txt",
+            "role": "mut"
+          },
+          {
+            "source_id": "test:0",
+            "logical_path": "synthetic/test.txt",
+            "role": "masked_test"
+          },
+          {
+            "source_id": "support:0",
+            "logical_path": "synthetic/scope.txt",
+            "role": "supporting"
+          }
+        ]
+      },
+      "contract": {
+        "schema_version": "mock-spec.scenario/v0.1",
+        "case_id": "semantic-A",
+        "language": "python",
+        "test_objectives": [
+          {
+            "statement": "assert target() == 100",
+            "status": "required",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "This single fixed invocation uses argument 7; only left/right responses are replaceable under the explicit scope.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "scenario_hypotheses": [
+          {
+            "id": "current",
+            "description": "A: current conditional reference view",
+            "condition": "This single fixed invocation uses argument 7; only left/right responses are replaceable under the explicit scope.",
+            "status": "candidate",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "dependency_constraints": [
+          {
+            "statement": "left(7) -> p and right(7) -> q normally; p,q are positive integers and p*q=100.",
+            "status": "required",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "This single fixed invocation uses argument 7; only left/right responses are replaceable under the explicit scope.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "expected_interactions": [],
+        "verification_candidates": [],
+        "evidence": [
+          {
+            "id": "e0",
+            "source_id": "mut:0",
+            "start_line": 1,
+            "end_line": 3,
+            "quote": "p = left(7)\nq = right(7)\nreturn p*q",
+            "rationale": "Synthetic implementation fact; not executed."
+          },
+          {
+            "id": "e1",
+            "source_id": "test:0",
+            "start_line": 1,
+            "end_line": 1,
+            "quote": "assert target() == 100",
+            "rationale": "Synthetic test requirement."
+          },
+          {
+            "id": "e2",
+            "source_id": "support:0",
+            "start_line": 1,
+            "end_line": 1,
+            "quote": "Only left/right may be substituted; responses are plain positive integers, excluding bool; no side effects.",
+            "rationale": "Explicit synthetic scope/API premise or observed helper view."
+          }
+        ],
+        "uncertainty": [
+          {
+            "statement": "Other inputs and histories have not been assessed; nonblocking for this invocation.",
+            "status": "unknown",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "This single fixed invocation uses argument 7; only left/right responses are replaceable under the explicit scope.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "reference": "B",
+      "task": {
+        "schema_version": "mock-spec.task/v1",
+        "language": "python",
+        "case_id": "semantic-B",
+        "mut_source": {
+          "source_id": "mut:0",
+          "logical_path": "synthetic/mut.txt",
+          "text": "p = left(7)\nreturn p*2",
+          "symbol": null,
+          "start_line": 1,
+          "end_line": 2,
+          "resolution_status": "partial",
+          "target_precision": "file"
+        },
+        "masked_test": {
+          "source_id": "test:0",
+          "logical_path": "synthetic/test.txt",
+          "text": "assert target() == 100",
+          "symbol": null,
+          "start_line": 1,
+          "end_line": 1,
+          "resolution_status": "partial",
+          "target_precision": "file"
+        },
+        "permitted_interfaces": [],
+        "supporting_sources": [
+          {
+            "source_id": "support:0",
+            "logical_path": "synthetic/scope.txt",
+            "text": "Only left may be substituted; response is a plain positive integer, excluding bool; no side effects.",
+            "symbol": null,
+            "start_line": 1,
+            "end_line": 1,
+            "resolution_status": "partial",
+            "target_precision": "file"
+          }
+        ],
+        "execution_context": {
+          "runtime_name": "python",
+          "runtime_version": "3.10",
+          "test_framework": "pytest",
+          "test_framework_version": null
+        },
+        "input_policy": {
+          "policy_id": "frozen-v1",
+          "protocol_version": "developer_realistic_workspace_v1",
+          "masking_contract": "artifact-aware-slot-v1",
+          "visibility": "reviewed_frozen_sources"
+        },
+        "sources": [
+          {
+            "source_id": "mut:0",
+            "logical_path": "synthetic/mut.txt",
+            "role": "mut"
+          },
+          {
+            "source_id": "test:0",
+            "logical_path": "synthetic/test.txt",
+            "role": "masked_test"
+          },
+          {
+            "source_id": "support:0",
+            "logical_path": "synthetic/scope.txt",
+            "role": "supporting"
+          }
+        ]
+      },
+      "contract": {
+        "schema_version": "mock-spec.scenario/v0.1",
+        "case_id": "semantic-B",
+        "language": "python",
+        "test_objectives": [
+          {
+            "statement": "assert target() == 100",
+            "status": "required",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "This single fixed invocation uses argument 7; only the left response is replaceable under the explicit scope.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "scenario_hypotheses": [
+          {
+            "id": "current",
+            "description": "B: current conditional reference view",
+            "condition": "This single fixed invocation uses argument 7; only the left response is replaceable under the explicit scope.",
+            "status": "candidate",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "dependency_constraints": [
+          {
+            "statement": "left(7) returns the exact integer 50 normally.",
+            "status": "required",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "This single fixed invocation uses argument 7; only the left response is replaceable under the explicit scope.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "expected_interactions": [],
+        "verification_candidates": [],
+        "evidence": [
+          {
+            "id": "e0",
+            "source_id": "mut:0",
+            "start_line": 1,
+            "end_line": 2,
+            "quote": "p = left(7)\nreturn p*2",
+            "rationale": "Synthetic implementation fact; not executed."
+          },
+          {
+            "id": "e1",
+            "source_id": "test:0",
+            "start_line": 1,
+            "end_line": 1,
+            "quote": "assert target() == 100",
+            "rationale": "Synthetic test requirement."
+          },
+          {
+            "id": "e2",
+            "source_id": "support:0",
+            "start_line": 1,
+            "end_line": 1,
+            "quote": "Only left may be substituted; response is a plain positive integer, excluding bool; no side effects.",
+            "rationale": "Explicit synthetic scope/API premise or observed helper view."
+          }
+        ],
+        "uncertainty": [
+          {
+            "statement": "Other inputs and histories have not been assessed; nonblocking for this invocation.",
+            "status": "unknown",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "This single fixed invocation uses argument 7; only the left response is replaceable under the explicit scope.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "reference": "C-before",
+      "task": {
+        "schema_version": "mock-spec.task/v1",
+        "language": "python",
+        "case_id": "semantic-C-before",
+        "mut_source": {
+          "source_id": "mut:0",
+          "logical_path": "synthetic/mut.txt",
+          "text": "from helper import transform\nreturn transform(dep(7))",
+          "symbol": null,
+          "start_line": 1,
+          "end_line": 2,
+          "resolution_status": "partial",
+          "target_precision": "file"
+        },
+        "masked_test": {
+          "source_id": "test:0",
+          "logical_path": "synthetic/test.txt",
+          "text": "assert target() == 100",
+          "symbol": null,
+          "start_line": 1,
+          "end_line": 1,
+          "resolution_status": "partial",
+          "target_precision": "file"
+        },
+        "permitted_interfaces": [],
+        "supporting_sources": [
+          {
+            "source_id": "support:0",
+            "logical_path": "synthetic/scope.txt",
+            "text": "Only dep may be substituted; its response is a plain positive integer; no side effects. Preserve real transform. Host permits locating and reading helper.py; its behavior has not been observed.",
+            "symbol": null,
+            "start_line": 1,
+            "end_line": 1,
+            "resolution_status": "partial",
+            "target_precision": "file"
+          }
+        ],
+        "execution_context": {
+          "runtime_name": "python",
+          "runtime_version": "3.10",
+          "test_framework": "pytest",
+          "test_framework_version": null
+        },
+        "input_policy": {
+          "policy_id": "frozen-v1",
+          "protocol_version": "developer_realistic_workspace_v1",
+          "masking_contract": "artifact-aware-slot-v1",
+          "visibility": "reviewed_frozen_sources"
+        },
+        "sources": [
+          {
+            "source_id": "mut:0",
+            "logical_path": "synthetic/mut.txt",
+            "role": "mut"
+          },
+          {
+            "source_id": "test:0",
+            "logical_path": "synthetic/test.txt",
+            "role": "masked_test"
+          },
+          {
+            "source_id": "support:0",
+            "logical_path": "synthetic/scope.txt",
+            "role": "supporting"
+          }
+        ]
+      },
+      "contract": {
+        "schema_version": "mock-spec.scenario/v0.1",
+        "case_id": "semantic-C-before",
+        "language": "python",
+        "test_objectives": [
+          {
+            "statement": "assert target() == 100",
+            "status": "required",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "This fixed invocation passes 7 to dep and preserves the real transform; only dep is replaceable.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "scenario_hypotheses": [
+          {
+            "id": "current",
+            "description": "C-before: current conditional reference view",
+            "condition": "This fixed invocation passes 7 to dep and preserves the real transform; only dep is replaceable.",
+            "status": "candidate",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "dependency_constraints": [
+          {
+            "statement": "dep(7) returns positive integer p normally, with real transform(p)=100; the mapping is not yet known.",
+            "status": "required",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "This fixed invocation passes 7 to dep and preserves the real transform; only dep is replaceable.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "expected_interactions": [],
+        "verification_candidates": [],
+        "evidence": [
+          {
+            "id": "e0",
+            "source_id": "mut:0",
+            "start_line": 1,
+            "end_line": 2,
+            "quote": "from helper import transform\nreturn transform(dep(7))",
+            "rationale": "Synthetic implementation fact; not executed."
+          },
+          {
+            "id": "e1",
+            "source_id": "test:0",
+            "start_line": 1,
+            "end_line": 1,
+            "quote": "assert target() == 100",
+            "rationale": "Synthetic test requirement."
+          },
+          {
+            "id": "e2",
+            "source_id": "support:0",
+            "start_line": 1,
+            "end_line": 1,
+            "quote": "Only dep may be substituted; its response is a plain positive integer; no side effects. Preserve real transform. Host permits locating and reading helper.py; its behavior has not been observed.",
+            "rationale": "Explicit synthetic scope/API premise or observed helper view."
+          }
+        ],
+        "uncertainty": [
+          {
+            "statement": "Transform behavior is unread and blocks choosing p. Authorized reading remains available; import/path/declaration is insufficient.",
+            "status": "unknown",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "This fixed invocation passes 7 to dep and preserves the real transform; only dep is replaceable.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "reference": "C-after",
+      "task": {
+        "schema_version": "mock-spec.task/v1",
+        "language": "python",
+        "case_id": "semantic-C-after",
+        "mut_source": {
+          "source_id": "mut:0",
+          "logical_path": "synthetic/mut.txt",
+          "text": "from helper import transform\nreturn transform(dep(7))",
+          "symbol": null,
+          "start_line": 1,
+          "end_line": 2,
+          "resolution_status": "partial",
+          "target_precision": "file"
+        },
+        "masked_test": {
+          "source_id": "test:0",
+          "logical_path": "synthetic/test.txt",
+          "text": "assert target() == 100",
+          "symbol": null,
+          "start_line": 1,
+          "end_line": 1,
+          "resolution_status": "partial",
+          "target_precision": "file"
+        },
+        "permitted_interfaces": [],
+        "supporting_sources": [
+          {
+            "source_id": "support:0",
+            "logical_path": "synthetic/scope.txt",
+            "text": "Only dep may be substituted; its response is a plain positive integer; no side effects. Preserve real transform. Host permits reading helper.py.",
+            "symbol": null,
+            "start_line": 1,
+            "end_line": 1,
+            "resolution_status": "partial",
+            "target_precision": "file"
+          },
+          {
+            "source_id": "helper:0",
+            "logical_path": "synthetic/helper.py",
+            "text": "def transform(p):\n    return p*2",
+            "symbol": null,
+            "start_line": 1,
+            "end_line": 2,
+            "resolution_status": "partial",
+            "target_precision": "file"
+          }
+        ],
+        "execution_context": {
+          "runtime_name": "python",
+          "runtime_version": "3.10",
+          "test_framework": "pytest",
+          "test_framework_version": null
+        },
+        "input_policy": {
+          "policy_id": "frozen-v1",
+          "protocol_version": "developer_realistic_workspace_v1",
+          "masking_contract": "artifact-aware-slot-v1",
+          "visibility": "reviewed_frozen_sources"
+        },
+        "sources": [
+          {
+            "source_id": "mut:0",
+            "logical_path": "synthetic/mut.txt",
+            "role": "mut"
+          },
+          {
+            "source_id": "test:0",
+            "logical_path": "synthetic/test.txt",
+            "role": "masked_test"
+          },
+          {
+            "source_id": "support:0",
+            "logical_path": "synthetic/scope.txt",
+            "role": "supporting"
+          },
+          {
+            "source_id": "helper:0",
+            "logical_path": "synthetic/helper.py",
+            "role": "supporting"
+          }
+        ]
+      },
+      "contract": {
+        "schema_version": "mock-spec.scenario/v0.1",
+        "case_id": "semantic-C-after",
+        "language": "python",
+        "test_objectives": [
+          {
+            "statement": "assert target() == 100",
+            "status": "required",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "This fixed invocation passes 7 to dep and preserves the real transform; only dep is replaceable.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2",
+              "e3"
+            ]
+          }
+        ],
+        "scenario_hypotheses": [
+          {
+            "id": "current",
+            "description": "C-after: current conditional reference view",
+            "condition": "This fixed invocation passes 7 to dep and preserves the real transform; only dep is replaceable.",
+            "status": "candidate",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2",
+              "e3"
+            ]
+          }
+        ],
+        "dependency_constraints": [
+          {
+            "statement": "dep(7) returns the exact integer 50 normally, preserving real transform.",
+            "status": "required",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "This fixed invocation passes 7 to dep and preserves the real transform; only dep is replaceable.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2",
+              "e3"
+            ]
+          }
+        ],
+        "expected_interactions": [],
+        "verification_candidates": [],
+        "evidence": [
+          {
+            "id": "e0",
+            "source_id": "mut:0",
+            "start_line": 1,
+            "end_line": 2,
+            "quote": "from helper import transform\nreturn transform(dep(7))",
+            "rationale": "Synthetic implementation fact; not executed."
+          },
+          {
+            "id": "e1",
+            "source_id": "test:0",
+            "start_line": 1,
+            "end_line": 1,
+            "quote": "assert target() == 100",
+            "rationale": "Synthetic test requirement."
+          },
+          {
+            "id": "e2",
+            "source_id": "support:0",
+            "start_line": 1,
+            "end_line": 1,
+            "quote": "Only dep may be substituted; its response is a plain positive integer; no side effects. Preserve real transform. Host permits reading helper.py.",
+            "rationale": "Explicit synthetic scope/API premise or observed helper view."
+          },
+          {
+            "id": "e3",
+            "source_id": "helper:0",
+            "start_line": 1,
+            "end_line": 2,
+            "quote": "def transform(p):\n    return p*2",
+            "rationale": "Explicit synthetic scope/API premise or observed helper view."
+          }
+        ],
+        "uncertainty": [
+          {
+            "statement": "Other inputs and histories have not been assessed; nonblocking for this invocation.",
+            "status": "unknown",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "This fixed invocation passes 7 to dep and preserves the real transform; only dep is replaceable.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2",
+              "e3"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "reference": "D",
+      "task": {
+        "schema_version": "mock-spec.task/v1",
+        "language": "python",
+        "case_id": "semantic-D",
+        "mut_source": {
+          "source_id": "mut:0",
+          "logical_path": "synthetic/mut.txt",
+          "text": "v = cache.get(7)\nreturn v if v is not None else repo.fetch(7)",
+          "symbol": null,
+          "start_line": 1,
+          "end_line": 2,
+          "resolution_status": "partial",
+          "target_precision": "file"
+        },
+        "masked_test": {
+          "source_id": "test:0",
+          "logical_path": "synthetic/test.txt",
+          "text": "assert target() == 100",
+          "symbol": null,
+          "start_line": 1,
+          "end_line": 1,
+          "resolution_status": "partial",
+          "target_precision": "file"
+        },
+        "permitted_interfaces": [],
+        "supporting_sources": [
+          {
+            "source_id": "support:0",
+            "logical_path": "synthetic/scope.txt",
+            "text": "Only cache.get and repo.fetch may be substituted; responses are plain integers or None; no side effects. No requirement to exercise a cache miss.",
+            "symbol": null,
+            "start_line": 1,
+            "end_line": 1,
+            "resolution_status": "partial",
+            "target_precision": "file"
+          }
+        ],
+        "execution_context": {
+          "runtime_name": "python",
+          "runtime_version": "3.10",
+          "test_framework": "pytest",
+          "test_framework_version": null
+        },
+        "input_policy": {
+          "policy_id": "frozen-v1",
+          "protocol_version": "developer_realistic_workspace_v1",
+          "masking_contract": "artifact-aware-slot-v1",
+          "visibility": "reviewed_frozen_sources"
+        },
+        "sources": [
+          {
+            "source_id": "mut:0",
+            "logical_path": "synthetic/mut.txt",
+            "role": "mut"
+          },
+          {
+            "source_id": "test:0",
+            "logical_path": "synthetic/test.txt",
+            "role": "masked_test"
+          },
+          {
+            "source_id": "support:0",
+            "logical_path": "synthetic/scope.txt",
+            "role": "supporting"
+          }
+        ]
+      },
+      "contract": {
+        "schema_version": "mock-spec.scenario/v0.1",
+        "case_id": "semantic-D",
+        "language": "python",
+        "test_objectives": [
+          {
+            "statement": "assert target() == 100",
+            "status": "required",
+            "scenario_ids": [
+              "hit",
+              "miss"
+            ],
+            "condition": "This fixed invocation uses key 7 and the explicit cache/repository replacement scope.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "scenario_hypotheses": [
+          {
+            "id": "hit",
+            "description": "D: hit conditional reference view",
+            "condition": "cache.get(7) returns a non-None value in this invocation.",
+            "status": "candidate",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          },
+          {
+            "id": "miss",
+            "description": "D: miss conditional reference view",
+            "condition": "cache.get(7) returns None in this invocation.",
+            "status": "candidate",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "dependency_constraints": [
+          {
+            "statement": "On hit, cache.get(7) returns 100; repo.fetch is not on this path.",
+            "status": "required",
+            "scenario_ids": [
+              "hit"
+            ],
+            "condition": "cache.get(7) returns a non-None value in this invocation.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          },
+          {
+            "statement": "On miss, cache.get(7) returns None and repo.fetch(7) returns 100 normally.",
+            "status": "required",
+            "scenario_ids": [
+              "miss"
+            ],
+            "condition": "cache.get(7) returns None in this invocation.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "expected_interactions": [],
+        "verification_candidates": [],
+        "evidence": [
+          {
+            "id": "e0",
+            "source_id": "mut:0",
+            "start_line": 1,
+            "end_line": 2,
+            "quote": "v = cache.get(7)\nreturn v if v is not None else repo.fetch(7)",
+            "rationale": "Synthetic implementation fact; not executed."
+          },
+          {
+            "id": "e1",
+            "source_id": "test:0",
+            "start_line": 1,
+            "end_line": 1,
+            "quote": "assert target() == 100",
+            "rationale": "Synthetic test requirement."
+          },
+          {
+            "id": "e2",
+            "source_id": "support:0",
+            "start_line": 1,
+            "end_line": 1,
+            "quote": "Only cache.get and repo.fetch may be substituted; responses are plain integers or None; no side effects. No requirement to exercise a cache miss.",
+            "rationale": "Explicit synthetic scope/API premise or observed helper view."
+          }
+        ],
+        "uncertainty": [
+          {
+            "statement": "The visible target does not select hit versus miss; blocking for the current single-selection consumer.",
+            "status": "unknown",
+            "scenario_ids": [
+              "hit",
+              "miss"
+            ],
+            "condition": "This fixed invocation uses key 7 and the explicit cache/repository replacement scope.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "reference": "E",
+      "task": {
+        "schema_version": "mock-spec.task/v1",
+        "language": "python",
+        "case_id": "semantic-E",
+        "mut_source": {
+          "source_id": "mut:0",
+          "logical_path": "synthetic/mut.txt",
+          "text": "store.put('k', 7)\nreturn store.get('k')",
+          "symbol": null,
+          "start_line": 1,
+          "end_line": 2,
+          "resolution_status": "partial",
+          "target_precision": "file"
+        },
+        "masked_test": {
+          "source_id": "test:0",
+          "logical_path": "synthetic/test.txt",
+          "text": "assert target() == 7",
+          "symbol": null,
+          "start_line": 1,
+          "end_line": 1,
+          "resolution_status": "partial",
+          "target_precision": "file"
+        },
+        "permitted_interfaces": [],
+        "supporting_sources": [
+          {
+            "source_id": "support:0",
+            "logical_path": "synthetic/scope.txt",
+            "text": "Only store.put/get may be substituted. API: in this single sequential interaction, after put(k,v) completes normally, with no intervening writes, get(k) returns v. The put return is ignored; no concurrency or other side effects.",
+            "symbol": null,
+            "start_line": 1,
+            "end_line": 1,
+            "resolution_status": "partial",
+            "target_precision": "file"
+          }
+        ],
+        "execution_context": {
+          "runtime_name": "python",
+          "runtime_version": "3.10",
+          "test_framework": "pytest",
+          "test_framework_version": null
+        },
+        "input_policy": {
+          "policy_id": "frozen-v1",
+          "protocol_version": "developer_realistic_workspace_v1",
+          "masking_contract": "artifact-aware-slot-v1",
+          "visibility": "reviewed_frozen_sources"
+        },
+        "sources": [
+          {
+            "source_id": "mut:0",
+            "logical_path": "synthetic/mut.txt",
+            "role": "mut"
+          },
+          {
+            "source_id": "test:0",
+            "logical_path": "synthetic/test.txt",
+            "role": "masked_test"
+          },
+          {
+            "source_id": "support:0",
+            "logical_path": "synthetic/scope.txt",
+            "role": "supporting"
+          }
+        ]
+      },
+      "contract": {
+        "schema_version": "mock-spec.scenario/v0.1",
+        "case_id": "semantic-E",
+        "language": "python",
+        "test_objectives": [
+          {
+            "statement": "assert target() == 7",
+            "status": "required",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "Only this put('k',7) then get('k'), with no intervening write or concurrency.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "scenario_hypotheses": [
+          {
+            "id": "current",
+            "description": "E: current conditional reference view",
+            "condition": "Only this put('k',7) then get('k'), with no intervening write or concurrency.",
+            "status": "candidate",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "dependency_constraints": [
+          {
+            "statement": "put('k',7) completes normally; the following get('k') returns the corresponding written value 7. The put return is unconstrained within the stated no-other-effects boundary.",
+            "status": "required",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "Only this put('k',7) then get('k'), with no intervening write or concurrency.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "expected_interactions": [],
+        "verification_candidates": [],
+        "evidence": [
+          {
+            "id": "e0",
+            "source_id": "mut:0",
+            "start_line": 1,
+            "end_line": 2,
+            "quote": "store.put('k', 7)\nreturn store.get('k')",
+            "rationale": "Synthetic implementation fact; not executed."
+          },
+          {
+            "id": "e1",
+            "source_id": "test:0",
+            "start_line": 1,
+            "end_line": 1,
+            "quote": "assert target() == 7",
+            "rationale": "Synthetic test requirement."
+          },
+          {
+            "id": "e2",
+            "source_id": "support:0",
+            "start_line": 1,
+            "end_line": 1,
+            "quote": "Only store.put/get may be substituted. API: in this single sequential interaction, after put(k,v) completes normally, with no intervening writes, get(k) returns v. The put return is ignored; no concurrency or other side effects.",
+            "rationale": "Explicit synthetic scope/API premise or observed helper view."
+          }
+        ],
+        "uncertainty": [
+          {
+            "statement": "Multiple keys, repeated writes and wider histories are unassessed, not licensed variations; nonblocking for this interaction.",
+            "status": "unknown",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "Only this put('k',7) then get('k'), with no intervening write or concurrency.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "reference": "F",
+      "task": {
+        "schema_version": "mock-spec.task/v1",
+        "language": "python",
+        "case_id": "semantic-F",
+        "mut_source": {
+          "source_id": "mut:0",
+          "logical_path": "synthetic/mut.txt",
+          "text": "return sealed_transform(dep(7))",
+          "symbol": null,
+          "start_line": 1,
+          "end_line": 1,
+          "resolution_status": "partial",
+          "target_precision": "file"
+        },
+        "masked_test": {
+          "source_id": "test:0",
+          "logical_path": "synthetic/test.txt",
+          "text": "assert target() == 100",
+          "symbol": null,
+          "start_line": 1,
+          "end_line": 1,
+          "resolution_status": "partial",
+          "target_precision": "file"
+        },
+        "permitted_interfaces": [],
+        "supporting_sources": [
+          {
+            "source_id": "support:0",
+            "logical_path": "synthetic/scope.txt",
+            "text": "Only dep may be substituted; response is a plain positive integer; no side effects. Preserve real sealed_transform. HOST SCOPE: its implementation and behavioral docs are outside authorized material; additional reads, network and execution are forbidden; no authorized evidence channel exists in this task.",
+            "symbol": null,
+            "start_line": 1,
+            "end_line": 1,
+            "resolution_status": "partial",
+            "target_precision": "file"
+          }
+        ],
+        "execution_context": {
+          "runtime_name": "python",
+          "runtime_version": "3.10",
+          "test_framework": "pytest",
+          "test_framework_version": null
+        },
+        "input_policy": {
+          "policy_id": "frozen-v1",
+          "protocol_version": "developer_realistic_workspace_v1",
+          "masking_contract": "artifact-aware-slot-v1",
+          "visibility": "reviewed_frozen_sources"
+        },
+        "sources": [
+          {
+            "source_id": "mut:0",
+            "logical_path": "synthetic/mut.txt",
+            "role": "mut"
+          },
+          {
+            "source_id": "test:0",
+            "logical_path": "synthetic/test.txt",
+            "role": "masked_test"
+          },
+          {
+            "source_id": "support:0",
+            "logical_path": "synthetic/scope.txt",
+            "role": "supporting"
+          }
+        ]
+      },
+      "contract": {
+        "schema_version": "mock-spec.scenario/v0.1",
+        "case_id": "semantic-F",
+        "language": "python",
+        "test_objectives": [
+          {
+            "statement": "assert target() == 100",
+            "status": "required",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "This fixed invocation passes 7 to dep and preserves real sealed_transform under the explicit host scope.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "scenario_hypotheses": [
+          {
+            "id": "current",
+            "description": "F: current conditional reference view",
+            "condition": "This fixed invocation passes 7 to dep and preserves real sealed_transform under the explicit host scope.",
+            "status": "candidate",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "dependency_constraints": [
+          {
+            "statement": "dep(7) returns positive integer p normally and real sealed_transform(p)=100. Existence of such a p is unresolved.",
+            "status": "required",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "This fixed invocation passes 7 to dep and preserves real sealed_transform under the explicit host scope.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "expected_interactions": [],
+        "verification_candidates": [],
+        "evidence": [
+          {
+            "id": "e0",
+            "source_id": "mut:0",
+            "start_line": 1,
+            "end_line": 1,
+            "quote": "return sealed_transform(dep(7))",
+            "rationale": "Synthetic implementation fact; not executed."
+          },
+          {
+            "id": "e1",
+            "source_id": "test:0",
+            "start_line": 1,
+            "end_line": 1,
+            "quote": "assert target() == 100",
+            "rationale": "Synthetic test requirement."
+          },
+          {
+            "id": "e2",
+            "source_id": "support:0",
+            "start_line": 1,
+            "end_line": 1,
+            "quote": "Only dep may be substituted; response is a plain positive integer; no side effects. Preserve real sealed_transform. HOST SCOPE: its implementation and behavioral docs are outside authorized material; additional reads, network and execution are forbidden; no authorized evidence channel exists in this task.",
+            "rationale": "Explicit synthetic scope/API premise or observed helper view."
+          }
+        ],
+        "uncertainty": [
+          {
+            "statement": "Unknown transform mapping blocks choosing p and establishing satisfiability. Host explicitly provides no authorized further channel.",
+            "status": "unknown",
+            "scenario_ids": [
+              "current"
+            ],
+            "condition": "This fixed invocation passes 7 to dep and preserves real sealed_transform under the explicit host scope.",
+            "evidence_ids": [
+              "e0",
+              "e1",
+              "e2"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

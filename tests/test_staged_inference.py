@@ -77,7 +77,13 @@ def test_stage_inputs_expose_exact_source_line_coordinates(tmp_path) -> None:
     assert result["manifest"]["result_status"] == "SELECTED"
     for raw in model.inputs:
         payload = _model_payload(raw)
-        assert payload["visible_task"] == task
+        projected_task = deepcopy(task)
+        for source in (
+            projected_task["masked_test"], projected_task["mut_source"],
+            *projected_task["supporting_sources"],
+        ):
+            source.pop("text")
+        assert payload["visible_task"] == projected_task
         assert payload["source_line_index"]["context"] == [
             {"line": 101, "text": "   "},
             {"line": 102, "text": "import example"},
@@ -138,6 +144,7 @@ def test_variant_b_replay_preserves_identity_stages_and_artifact_hashes(tmp_path
     snapshot = output_dir / "input_snapshot.json"
     record_path = output_dir / "inference_record.json"
     contract_path = output_dir / "scenario_contract.json"
+    spec_path = output_dir / "dependency_spec.json"
     manifest_path = output_dir / "run_manifest.json"
     record = _read(record_path)
     contract = _read(contract_path)
@@ -157,7 +164,7 @@ def test_variant_b_replay_preserves_identity_stages_and_artifact_hashes(tmp_path
     assert [item["stage"] for item in record["stages"]] == [
         "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER"
     ]
-    assert record["schema_version"] == "scenario-inference-record/v0.3"
+    assert record["schema_version"] == "scenario-inference-record/v0.4"
     assert record["citation_mode"] == "source_locator_host_materialized_quote/v1"
     assert manifest["versions"]["citation_mode"] == record["citation_mode"]
     assert [item["model_call_sequence"] for item in record["stages"]] == [1, 2, 3, 4]
@@ -189,6 +196,7 @@ def test_variant_b_replay_preserves_identity_stages_and_artifact_hashes(tmp_path
         "input_snapshot.json": _sha256(snapshot),
         "inference_record.json": _sha256(record_path),
         "scenario_contract.json": _sha256(contract_path),
+        "dependency_spec.json": _sha256(spec_path),
     }
     assert "run_manifest.json" not in manifest["artifact_sha256"]
     assert result["record"] == record
@@ -205,7 +213,14 @@ def test_variant_b_replay_preserves_identity_stages_and_artifact_hashes(tmp_path
         "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER"
     ]
     for model_input in model.inputs:
-        assert _model_payload(model_input)["visible_task"] == task
+        payload = _model_payload(model_input)
+        projected_task = deepcopy(task)
+        for source in (
+            projected_task["masked_test"], projected_task["mut_source"],
+            *projected_task["supporting_sources"],
+        ):
+            source.pop("text")
+        assert payload["visible_task"] == projected_task
         serialized = _serialized_model_input(model_input)
         assert "reviewed_inputs" not in serialized
         assert "physical_path" not in serialized
@@ -297,6 +312,8 @@ def _invalid_outputs(kind: str) -> tuple[list[dict], str, int]:
             construct["contract"]["scenario_hypotheses"].append(candidate)
     elif kind == "zero_critical_behaviors":
         construct["critical_behaviors"] = []
+        # The self-contained spec must still map every formal dependency constraint.
+        construct["spec"]["constraint_basis"] = []
     elif kind == "four_critical_behaviors":
         construct["critical_behaviors"] = construct["critical_behaviors"] * 4
     elif kind == "blocking_unresolved":
@@ -532,13 +549,10 @@ def test_result_invariants_reject_model_forgery(tmp_path, kind) -> None:
 
 
 def test_inconclusive_can_retain_valid_diagnostic_contract(tmp_path) -> None:
-    outputs = deepcopy(scripted_outputs())
+    outputs = deepcopy(scripted_outputs("ambiguous"))
     for output in outputs[2:]:
         output["result_status"] = "INCONCLUSIVE"
         output["selected_scenario_id"] = None
-    outputs[2]["unresolved"] = [
-        "Dependency binding is missing; the candidate cannot be safely selected for generation."
-    ]
     result, _, output_dir = _run(tmp_path, outputs)
     record, manifest = _assert_artifacts(output_dir)
     assert record["result_status"] == "INCONCLUSIVE"
@@ -661,18 +675,20 @@ def test_selected_allows_explicit_nonblocking_unknowns(tmp_path) -> None:
     assert record["unresolved"] == []
 
 
-def test_extract_can_stop_for_missing_material_without_shell_contract(tmp_path) -> None:
-    outputs = deepcopy(scripted_outputs())
+def test_extract_inconclusive_marker_does_not_shrink_later_investigation(tmp_path) -> None:
+    outputs = deepcopy(scripted_outputs("inconclusive"))
     outputs[0].update({
         "result_status": "INCONCLUSIVE", "candidates": [],
-        "unresolved": ["Dependency binding is missing, so no deliverable candidate can be built."],
     })
-    result, model, output_dir = _run(tmp_path, outputs[:1])
+    result, model, output_dir = _run(tmp_path, outputs)
     record, manifest = _assert_artifacts(output_dir)
-    assert model.calls == 1
+    assert model.calls == 4
     assert result["contract"] is None
     assert record["result_status"] == "INCONCLUSIVE"
     assert record["unresolved"] == outputs[0]["unresolved"]
+    assert [stage["stage"] for stage in record["stages"]] == [
+        "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER",
+    ]
     assert manifest["stop_reason"] == "evidence_exhausted"
     assert manifest["artifact_sha256"]["scenario_contract.json"] is None
 

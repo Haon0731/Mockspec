@@ -45,3 +45,14 @@ mock-spec-scenario \
   --response-json examples/scenarios/python.synthetic.json \
   --output examples/scenarios/python.replay.json
 ```
+
+## 首轮 Spec 语义校准
+
+[六类微型合成参考卡及 flask_308 适配草案](semantic-calibration/README.md)补充语义评阅、
+正式字段投影与离线复现。均为手写参考草案，不是模型结果或人工金标准。
+旧 synthetic/replay 文件保留原用途，不改写历史回放。
+
+## 自包含消费协议
+
+[版本化依赖规格示例](consumer-specs/README.md)展示关系允许多个合法 Mock，以及关键未知如何限制消费。
+这些文件由人工合成假响应经过当前研究控制器生成；不是实际模型推断结果。

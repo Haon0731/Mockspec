@@ -26,6 +26,11 @@ PRD 不作为当前能力或已通过验收的说明。
 后续修复设计归同一 PRD 第 10 节 `M2-QUERY-RECOVERY-1`：严格 QUERY 类型、宿主回执关联、
 条件假设表达和全局一次的有限格式纠正；[工程记录](../out/staged-inference/issue17-query-recovery-20261027/report.md)
 已通过 R1；新协议单次真实验收因零查询停止及 CONSTRUCT 输出截断未通过，#17 保持开放。
+下一步开发需求归同一 [PRD 第 11 节](workspace-exploration-prd.md#11-17-两个工程工作包query-aci-与-construct-输出可靠性)
+`M2-ACI-CONSTRUCT-1`：A 为 QUERY 能力呈现、问题状态与有依据停止，B 为 CONSTRUCT 上下文/
+输出减负及截断计量留证。当前研究实现已增加原目标问题账本、构造/对照后的继续调查、
+自包含 `dependency_spec.json` 和 provider 失败响应留证；离线工程验证与真实 M2 仍分别报告，
+不能据此宣称真实模型的规格推导效果已经提高。
 
 以下研究结果不等于生产 Agent 已具备对应能力；阅读案例分析也不能作为未来无指导生成的输入。
 

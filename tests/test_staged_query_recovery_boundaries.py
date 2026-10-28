@@ -16,7 +16,7 @@ from controller import _completed_response_json, _query_repair_snapshot  # noqa:
 
 def _query_with_extra(*, extra_name: str = "attempt_sequence_note", value=None) -> dict:
     return {
-        "schema_version": "staged-query/v0.3",
+        "schema_version": "staged-query/v0.4",
         "decision": "request_query",
         "query_attempt": {
             "question": "What behavior constrains this candidate?",
@@ -31,6 +31,8 @@ def _query_with_extra(*, extra_name: str = "attempt_sequence_note", value=None) 
         },
         "impact": "A behavior read remains necessary.",
         "stop_explanation": None,
+        "question_updates": [],
+        "candidate_updates": [],
     }
 
 
@@ -92,8 +94,8 @@ def test_completed_response_rejects_ambiguous_or_incomplete_output(mutation: str
 
 def test_completed_response_rejects_duplicate_json_keys() -> None:
     response = _response(
-        '{"schema_version":"staged-query/v0.3",'
-        '"schema_version":"staged-query/v0.3"}'
+        '{"schema_version":"staged-query/v0.4",'
+        '"schema_version":"staged-query/v0.4"}'
     )
 
     with pytest.raises(ValueError):

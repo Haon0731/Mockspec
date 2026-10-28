@@ -83,7 +83,7 @@ def test_strict_contrast_requires_evidence_or_explicit_assumption() -> None:
     contract = _validate_constructed(constructed, task, store, strict_mapping=True)
     assert contract is not None
     raw = {
-        "schema_version": "staged-contrast/v0.1",
+        "schema_version": "staged-contrast/v0.2",
         "status": "none_identified",
         "execution_status": "not_executed",
         "alternative": None,
@@ -95,6 +95,10 @@ def test_strict_contrast_requires_evidence_or_explicit_assumption() -> None:
         "support": "assumption",
         "assumption_reason": "No evidence-backed static bypass was identified.",
         "semantic_role": "dependency_contract",
+        "weakness_review": "No evidence-backed weaker alternative was identified.",
+        "overconstraint_review": "Unrelated implementation details remain variable.",
+        "observation_limits": "This static review does not execute a counterexample.",
+        "investigation_requests": [],
     }
     _validate_contrast(
         ContrastResult.model_validate(raw), contract, strict_mapping=True

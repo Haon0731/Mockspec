@@ -161,9 +161,120 @@ def _contract_selection(contract: dict | None) -> dict | None:
     return selected
 
 
+def _fixture_spec(
+    contract: dict | None, *, result_status: str, allowed_variations: list[str],
+    remaining_question: str, remaining_impact: str,
+) -> dict | None:
+    """Build explicit semantics for fixed synthetic fixtures only.
+
+    Production code must not infer these judgments from a completed contract.
+    """
+    if contract is None:
+        return None
+    evidence = contract["evidence"]
+    evidence_ids = [item["id"] for item in evidence]
+    test_evidence = [
+        item["id"] for item in evidence if item["source_id"].startswith("test:")
+    ]
+    implementation_evidence = [
+        item["id"] for item in evidence if not item["source_id"].startswith("test:")
+    ]
+    scenario_ids = [item["id"] for item in contract["scenario_hypotheses"]]
+    ambiguous = result_status == "AMBIGUOUS"
+    ambiguity_id = "unresolved-scenario-choice"
+    premises = [
+        {"id": "fixture-implementation", "kind": "implementation_fact",
+         "statement": "The synthetic MUT evidence defines the visible execution paths.",
+         "evidence_ids": implementation_evidence, "assumption_impact": None},
+        {"id": "fixture-requirement", "kind": "test_requirement",
+         "statement": "The synthetic test evidence defines the fixed observable goals.",
+         "evidence_ids": test_evidence, "assumption_impact": None},
+    ]
+    unknowns = [{
+        "id": ambiguity_id if ambiguous else "unobserved-internals",
+        "question": remaining_question,
+        "impact": remaining_impact,
+        "disposition": "blocking" if ambiguous else "nonblocking",
+        "goal_indexes": list(range(len(contract["test_objectives"]))),
+        "constraint_indexes": list(range(len(contract["dependency_constraints"]))),
+        "scenario_ids": scenario_ids,
+        "formal_uncertainty_indexes": list(range(len(contract["uncertainty"]))),
+        "rationale": (
+            "The missing selection basis blocks a safe branch choice."
+            if ambiguous else
+            "The fixture constrains observable behavior without specifying internals."
+        ),
+    }]
+    return {
+        "schema_version": "staged-spec-semantics/v0.1",
+        "delivery_status": "partial" if ambiguous else "ready",
+        "fixed_inputs": [{
+            "statement": "The synthetic test inputs and invocation conditions are fixed.",
+            "goal_indexes": list(range(len(contract["test_objectives"]))),
+            "evidence_ids": test_evidence,
+        }],
+        "replacement_boundary": [{
+            "id": "fixture-dependencies", "target": "The dependency calls in the formal contract",
+            "replaceable_behavior": "Only the declared dependency responses and effects are controlled.",
+            "preserved_behavior": "The synthetic MUT computation and branch logic remain real.",
+            "status": "confirmed", "evidence_ids": implementation_evidence,
+            "premise_ids": ["fixture-implementation"], "unknown_ids": [],
+        }],
+        "preserved_real_logic": [{
+            "statement": "The visible synthetic MUT path and computation remain real code.",
+            "evidence_ids": implementation_evidence,
+            "premise_ids": ["fixture-implementation"],
+        }],
+        "premises": premises,
+        "constraint_basis": [{
+            "constraint_index": index,
+            "premise_ids": ["fixture-implementation", "fixture-requirement"],
+        } for index in range(len(contract["dependency_constraints"]))],
+        "branches": [{
+            "scenario_id": scenario_id,
+            "disposition": "unresolved" if ambiguous else "allowed",
+            "rationale": (
+                "The fixture lacks evidence that makes this candidate an allowed choice."
+                if ambiguous else
+                "The implementation facts and test requirement support this complete branch."
+            ),
+            "evidence_ids": [] if ambiguous else evidence_ids,
+            "premise_ids": [] if ambiguous else [
+                "fixture-implementation", "fixture-requirement"
+            ],
+            "unknown_ids": [ambiguity_id] if ambiguous else [],
+        } for scenario_id in scenario_ids],
+        "goal_coverage": [{
+            "goal_index": index,
+            "disposition": "blocked" if ambiguous else "constrained",
+            "constraint_indexes": (
+                [] if ambiguous else list(range(len(contract["dependency_constraints"])))
+            ),
+            "unknown_ids": [ambiguity_id] if ambiguous else [],
+            "rationale": (
+                "Candidate meaning remains unresolved."
+                if ambiguous else "The mapped dependency constraints support this fixed goal."
+            ),
+            "evidence_ids": goal["evidence_ids"],
+            "premise_ids": ["fixture-implementation", "fixture-requirement"],
+        } for index, goal in enumerate(contract["test_objectives"])],
+        "unknowns": unknowns,
+        "allowed_variations": [{
+            "id": f"fixture-variation-{index + 1}",
+            "statement": statement,
+            "scenario_ids": scenario_ids,
+            "constraint_indexes": list(range(len(contract["dependency_constraints"]))),
+            "evidence_ids": evidence_ids,
+            "premise_ids": ["fixture-implementation", "fixture-requirement"],
+        } for index, statement in enumerate(allowed_variations)],
+        "conflicts": [],
+    }
+
+
 def _wire_outputs(outputs: list[dict]) -> list[dict]:
-    """Render canonical fixture semantics in the v0.2 model-facing protocol."""
+    """Render canonical fixture semantics in the current model-facing protocol."""
     rendered = deepcopy(outputs)
+    initial_unresolved = list(rendered[0].get("unresolved", []))
     for output in rendered:
         version = output["schema_version"]
         if version == "staged-extract/v0.1":
@@ -176,23 +287,55 @@ def _wire_outputs(outputs: list[dict]) -> list[dict]:
                     _source_locator(item) for item in candidate["evidence"]
                 ]
         elif version == "staged-query/v0.1":
-            output["schema_version"] = "staged-query/v0.3"
+            output["schema_version"] = "staged-query/v0.4"
             assessment = output.get("previous_receipt_assessment")
             if assessment is not None:
                 assessment.pop("attempt_sequence", None)
             stop = output.get("stop_explanation")
             if stop is not None:
                 stop["evidence"] = [_source_locator(item) for item in stop["evidence"]]
+                updates = []
+                for index, unknown in enumerate(stop["remaining_unknowns"]):
+                    question_id = f"q{index + 1}" if index < len(initial_unresolved) else None
+                    question = (
+                        initial_unresolved[index]
+                        if question_id is not None else unknown["question"]
+                    )
+                    unknown["question"] = question
+                    updates.append({
+                        "question_id": question_id,
+                        "question": question,
+                        "goal_indexes": [0],
+                        "impact": unknown["impact"],
+                        "state": "open" if unknown["blocking"] else "nonblocking",
+                        "rationale": (
+                            "The remaining gap blocks a safe scenario decision."
+                            if unknown["blocking"] else
+                            "The cited goal evidence makes this detail unnecessary for the result."
+                        ),
+                        # For an initial-only run this evidence identifies the
+                        # observed behavior affected by the inaccessible gap;
+                        # it does not claim to resolve the blocking question.
+                        "evidence": list(stop["evidence"]),
+                        "acquisition": "unavailable" if unknown["blocking"] else "not_needed",
+                        "attempted_sequences": [],
+                    })
+                output["question_updates"] = updates
+            else:
+                output["question_updates"] = []
+            output["candidate_updates"] = []
         elif version == "staged-construct/v0.1":
-            output["schema_version"] = "staged-construct/v0.2"
+            output["schema_version"] = "staged-construct/v0.3"
             output["contract"] = _contract_selection(output["contract"])
+            output.setdefault("investigation_requests", [])
         elif version == "staged-revise/v0.1":
             output["schema_version"] = "staged-revise/v0.2"
             revised = output["revised_construct"]
-            revised["schema_version"] = "staged-construct/v0.2"
+            revised["schema_version"] = "staged-construct/v0.3"
             revised["contract"] = _contract_selection(revised["contract"])
+            revised.setdefault("investigation_requests", [])
         elif version == "staged-deliver/v0.1":
-            output["schema_version"] = "staged-deliver/v0.2"
+            output["schema_version"] = "staged-deliver/v0.3"
             output["contract"] = _contract_selection(output["contract"])
     return rendered
 
@@ -425,6 +568,23 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
         "unresolved": ([
             "No visible task requirement distinguishes the cache-hit and cache-miss/refill candidates."
         ] if ambiguous else []),
+        "spec": _fixture_spec(
+            contract,
+            result_status="AMBIGUOUS" if ambiguous else "SELECTED",
+            allowed_variations=[
+                "Record construction form, unrelated fields on mock objects, and ignored cache.set return values may vary."
+            ],
+            remaining_question=(
+                "No visible task requirement distinguishes the cache-hit and cache-miss/refill candidates."
+                if ambiguous else "What concrete cache implementation is used?"
+            ),
+            remaining_impact=(
+                "Both remain candidates; the ambiguity blocks selection only."
+                if ambiguous else
+                "It does not change the selected conditional behavior."
+            ),
+        ),
+        "investigation_requests": [],
         "contract": contract,
     }
     extract = {
@@ -455,7 +615,7 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
          "query_attempt": None, "previous_receipt_assessment": None,
          "impact": "The visible branches and task statement are sufficient for construction.",
          "stop_explanation": {
-             "reason": "no_further_evidence" if ambiguous else "evidence_sufficient",
+             "reason": "no_further_evidence" if ambiguous else "unknowns_nonblocking",
              "rationale": (
                  "The return assertion supports both candidates; their distinction remains explicit."
                  if ambiguous else
@@ -480,7 +640,7 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
     ]
     if variant == "C":
         contrast = {
-            "schema_version": "staged-contrast/v0.1", "status": "proposed",
+            "schema_version": "staged-contrast/v0.2", "status": "proposed",
             "execution_status": "not_executed",
             "alternative": "Mock cache.get('k') to return the asserted record directly.",
             "bypass_behavior": "The correct return bypasses backend.fetch and cache.set.",
@@ -493,29 +653,72 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
             ),
             "support": "evidence", "assumption_reason": None,
             "semantic_role": "dependency_contract",
+            "weakness_review": "A direct cache hit can satisfy the return assertion without the miss path.",
+            "overconstraint_review": "Record construction and ignored return values remain variable.",
+            "observation_limits": "The static contrast is not executed and proves no defect detection.",
+            "investigation_requests": [],
         }
         outputs.append(contrast)
         if contrast["revision_requested"]:
             revised = deepcopy(construct)
             revised["contract"] = revised_contract
-            revised["allowed_variations"] = [
+            revised_variations = [
                 "Any record construction form is allowed when equality and the fetch-to-refill value relationship are preserved; unrelated mock fields are unconstrained."
             ]
+            revised["allowed_variations"] = revised_variations
+            revised["spec"] = _fixture_spec(
+                revised_contract,
+                result_status="SELECTED",
+                allowed_variations=revised_variations,
+                remaining_question="What concrete cache implementation is used?",
+                remaining_impact="It does not change the selected conditional behavior.",
+            )
             outputs.append({
                 "schema_version": "staged-revise/v0.1", "revised_construct": revised,
-                "modified_objects": ["contract.verification_candidates", "allowed_variations"],
+                "modified_objects": [
+                    "contract.verification_candidates", "allowed_variations",
+                    "spec.allowed_variations",
+                ],
                 "evidence_reason": "The contrast exposes an observation gap, not a basis for exact construction or unrelated fields.",
                 "evidence_ids": ["miss_requirement", "miss_branch", "refill", "assertion"],
                 "request_another_revision": replay_case == "second_revision",
             })
             deliver_construct = revised
+            if replay_case == "second_revision":
+                # A request for another semantic pass now re-enters QUERY; it
+                # is not a protocol error or a fixed one-revision ceiling.
+                outputs.extend([
+                    deepcopy(outputs[1]),
+                    deepcopy(revised),
+                    {
+                        **deepcopy(contrast),
+                        "status": "none_identified",
+                        "alternative": None,
+                        "bypass_behavior": None,
+                        "evidence_ids": [],
+                        "distinguishing_observation": None,
+                        "revision_requested": False,
+                        "revision_reason": None,
+                        "weakness_review": "The prior observation gap is retained in the revised contract.",
+                        "overconstraint_review": "The revision preserves equivalent construction choices.",
+                        "observation_limits": "No further static counterexample is established by this fixture.",
+                    },
+                ])
     outputs.append({
         "schema_version": "staged-deliver/v0.1",
         "result_status": deliver_construct["result_status"],
         "selected_scenario_id": deliver_construct["selected_scenario_id"],
         "contract": deliver_construct["contract"],
     })
-    return _wire_outputs(outputs)
+    rendered = _wire_outputs(outputs)
+    if replay_case == "second_revision":
+        query_outputs = [
+            output for output in rendered
+            if output["schema_version"] == "staged-query/v0.4"
+        ]
+        for update in query_outputs[1]["question_updates"]:
+            update["question_id"] = "q1"
+    return rendered
 
 
 def scripted_outputs(
@@ -596,6 +799,24 @@ def scripted_outputs(
             "Internal dependency state and unrelated calls may vary when the returned value remains 2."
         ],
         "unresolved": unresolved,
+        "spec": _fixture_spec(
+            None if replay_case == "inconclusive" else contract,
+            result_status=result_status,
+            allowed_variations=[
+                "Internal dependency state and unrelated calls may vary when the returned value remains 2."
+            ],
+            remaining_question=(
+                unresolved[0]
+                if replay_case == "ambiguous" else
+                "What is the hidden dependency implementation?"
+            ),
+            remaining_impact=(
+                "The missing selection basis prevents choosing either candidate."
+                if replay_case == "ambiguous" else
+                "It does not invalidate the explicit candidate or ambiguity."
+            ),
+        ),
+        "investigation_requests": [],
         "contract": None if replay_case == "inconclusive" else contract,
     }
     extract_candidates = [{
@@ -638,7 +859,7 @@ def scripted_outputs(
              "reason": (
                  "no_further_evidence" if replay_case == "inconclusive" else
                  "no_further_evidence" if replay_case == "ambiguous" else
-                 "evidence_sufficient"
+                 "unknowns_nonblocking"
              ),
              "rationale": (
                  "The missing dependency contract cannot be recovered from visible sources."
@@ -654,16 +875,18 @@ def scripted_outputs(
                  "impact": (
                      "No safe response constraint can be delivered."
                      if replay_case == "inconclusive" else
+                     "The missing selection basis prevents choosing either candidate."
+                     if replay_case == "ambiguous" else
                      "It does not invalidate the explicit candidate or ambiguity."
                  ),
-                 "blocking": replay_case == "inconclusive",
+                 "blocking": replay_case in ("ambiguous", "inconclusive"),
              }],
          }},
         construct,
     ]
     if variant == "C" and result_status in ("SELECTED", "AMBIGUOUS"):
         outputs.append({
-            "schema_version": "staged-contrast/v0.1", "status": "none_identified",
+            "schema_version": "staged-contrast/v0.2", "status": "none_identified",
             "execution_status": "not_executed", "alternative": None,
             "bypass_behavior": None, "evidence_ids": [],
             "distinguishing_observation": None, "revision_requested": False,
@@ -671,6 +894,10 @@ def scripted_outputs(
             "support": "assumption",
             "assumption_reason": "No evidence-backed static bypass was identified.",
             "semantic_role": "dependency_contract",
+            "weakness_review": "No evidence-backed weaker constraint was identified in this fixture.",
+            "overconstraint_review": "Unrelated internal state remains an allowed variation.",
+            "observation_limits": "The static review does not prove the contract globally correct.",
+            "investigation_requests": [],
         })
     outputs.append(deliver)
     return _wire_outputs(outputs)
@@ -683,6 +910,9 @@ def query_script(
     if type(count) is not int or count < 0:
         raise ValueError("query count must be a non-negative integer")
     outputs = scripted_outputs(replay_case, variant=variant)
+    final_query = deepcopy(outputs[1])
+    for update in final_query["question_updates"]:
+        update["attempted_sequences"] = list(range(1, count + 1))
     queries = []
     for index in range(count + 1):
         assessment = None if index == 0 else {
@@ -702,21 +932,20 @@ def query_script(
                 "arguments_json": json.dumps(arguments),
             }
         queries.append({
-            "schema_version": "staged-query/v0.3",
+            "schema_version": "staged-query/v0.4",
             "decision": "finish_queries" if attempt is None else "request_query",
             "query_attempt": attempt, "previous_receipt_assessment": assessment,
-            "impact": "Preserve the current candidate pending construction.",
-            "stop_explanation": (None if attempt is not None else {
-                "reason": "evidence_sufficient",
-                "rationale": "The visible delegation and assertion support construction; repeated syntax reads add no material fact.",
-                "evidence": [{"source_id": "test:0", "start_line": 5,
-                              "end_line": 5}],
-                "remaining_unknowns": [{
-                    "question": "What is the hidden dependency implementation?",
-                    "impact": "The conditional candidate remains explicit without that implementation.",
-                    "blocking": False,
-                }],
-            }),
+            "impact": (
+                "Preserve the current candidate pending construction."
+                if attempt is not None else final_query["impact"]
+            ),
+            "stop_explanation": (
+                None if attempt is not None else final_query["stop_explanation"]
+            ),
+            "question_updates": (
+                [] if attempt is not None else final_query["question_updates"]
+            ),
+            "candidate_updates": [],
         })
     return [outputs[0], *queries, *outputs[2:]]
 

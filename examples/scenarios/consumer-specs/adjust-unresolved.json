@@ -1,0 +1,337 @@
+{
+  "schema_version": "mock-spec.dependency/v0.1",
+  "run_id": "77188ddc-4a4f-4ba3-bd8c-827d4f442b89",
+  "input_sha256": "7abc8ef0c971f7f3f3e154d13d17ce29429d96acb9f8b64ae44503823e1c29a2",
+  "case_id": "synthetic_relational_product",
+  "language": "python",
+  "input_origin": "synthetic_fixture",
+  "consumption_rule": "Only a ready spec supports instantiation under its stated premises. Choose one complete allowed branch and obey every applicable constraint; never conjoin mutually exclusive branches. Partial/conflict specs retain useful claims but do not establish a complete valid Mock. Evidence linkage is not a proof of entailment.",
+  "task": {
+    "schema_version": "mock-spec.task/v1",
+    "language": "python",
+    "case_id": "synthetic_relational_product",
+    "mut_source": {
+      "source_id": "mut:0",
+      "logical_path": "src/example.py",
+      "text": "def target(k):\n    p = left(k)\n    q = right(k)\n    if q == 0: return 0\n    return adjust(p * q)",
+      "symbol": "example.target",
+      "start_line": 1,
+      "end_line": 5,
+      "resolution_status": "resolved",
+      "target_precision": "function"
+    },
+    "masked_test": {
+      "source_id": "test:0",
+      "logical_path": "tests/test_example.py",
+      "text": "def test_target():\n    assert target(\"business\") == 100",
+      "symbol": "test_example.test_target",
+      "start_line": 1,
+      "end_line": 2,
+      "resolution_status": "resolved",
+      "target_precision": "function"
+    },
+    "permitted_interfaces": [],
+    "supporting_sources": [
+      {
+        "source_id": "support:0",
+        "logical_path": "src/dependency.py",
+        "text": "# left(k): positive int p; right(k): nonnegative int q.\n# Only left/right responses are replaceable; no side effects or exceptions.\n# Same business key; no other cross-return relation; integers do not overflow.",
+        "symbol": "example.dependency",
+        "start_line": 1,
+        "end_line": 3,
+        "resolution_status": "partial",
+        "target_precision": "function"
+      }
+    ],
+    "execution_context": {
+      "runtime_name": "python",
+      "runtime_version": "3.10",
+      "test_framework": "pytest",
+      "test_framework_version": null
+    },
+    "input_policy": {
+      "policy_id": "synthetic-replay-v1",
+      "protocol_version": "synthetic_replay_v1",
+      "masking_contract": "artifact-aware-slot-v1",
+      "visibility": "reviewed_frozen_sources"
+    },
+    "sources": [
+      {
+        "source_id": "mut:0",
+        "logical_path": "src/example.py",
+        "role": "mut"
+      },
+      {
+        "source_id": "test:0",
+        "logical_path": "tests/test_example.py",
+        "role": "masked_test"
+      },
+      {
+        "source_id": "support:0",
+        "logical_path": "src/dependency.py",
+        "role": "supporting"
+      }
+    ]
+  },
+  "regression_reference": {
+    "status": "reference_only",
+    "mut_source_id": "mut:0",
+    "statement": "The frozen MUT execution chain is the regression reference for path analysis; it is not asserted to be a verified business specification."
+  },
+  "original_goal_locations": [
+    {
+      "source_id": "test:0",
+      "start_line": 2,
+      "end_line": 2
+    }
+  ],
+  "original_goal_mapping": {
+    "0": [
+      0
+    ]
+  },
+  "exploration": {
+    "reason": "no_further_evidence",
+    "rationale": "Evidence supports the declared conclusion and limits.",
+    "evidence_ids": [
+      "test"
+    ],
+    "unknown_ids": [
+      "adjust-gap"
+    ]
+  },
+  "semantics": {
+    "schema_version": "staged-spec-semantics/v0.1",
+    "delivery_status": "partial",
+    "fixed_inputs": [
+      {
+        "statement": "The same business key is passed to both dependencies.",
+        "goal_indexes": [
+          0
+        ],
+        "evidence_ids": [
+          "test",
+          "mut"
+        ]
+      }
+    ],
+    "replacement_boundary": [
+      {
+        "id": "ports",
+        "target": "left(k), right(k) in target",
+        "replaceable_behavior": "The two return values, within the given interface constraints.",
+        "preserved_behavior": "Real branch, arithmetic, and adjust when present.",
+        "status": "confirmed",
+        "evidence_ids": [
+          "api",
+          "mut"
+        ],
+        "premise_ids": [
+          "api",
+          "mut"
+        ],
+        "unknown_ids": []
+      }
+    ],
+    "preserved_real_logic": [
+      {
+        "statement": "Keep target, its zero guard, arithmetic, and any adjust real.",
+        "evidence_ids": [
+          "mut"
+        ],
+        "premise_ids": [
+          "mut"
+        ]
+      }
+    ],
+    "premises": [
+      {
+        "id": "mut",
+        "kind": "implementation_fact",
+        "statement": "q=0 returns 0; otherwise the real computation consumes p*q.",
+        "evidence_ids": [
+          "mut"
+        ],
+        "assumption_impact": null
+      },
+      {
+        "id": "test",
+        "kind": "test_requirement",
+        "statement": "The fixed key must produce 100.",
+        "evidence_ids": [
+          "test"
+        ],
+        "assumption_impact": null
+      },
+      {
+        "id": "api",
+        "kind": "dependency_semantics",
+        "statement": "p positive int; q nonnegative int; stated boundary and no additional relation.",
+        "evidence_ids": [
+          "api"
+        ],
+        "assumption_impact": null
+      }
+    ],
+    "constraint_basis": [
+      {
+        "constraint_index": 0,
+        "premise_ids": [
+          "mut",
+          "test",
+          "api"
+        ]
+      }
+    ],
+    "branches": [
+      {
+        "scenario_id": "product",
+        "disposition": "unresolved",
+        "rationale": "Whether values can satisfy the target is unknown.",
+        "evidence_ids": [
+          "mut",
+          "test",
+          "api"
+        ],
+        "premise_ids": [
+          "mut",
+          "test",
+          "api"
+        ],
+        "unknown_ids": [
+          "adjust-gap"
+        ]
+      }
+    ],
+    "goal_coverage": [
+      {
+        "goal_index": 0,
+        "disposition": "blocked",
+        "constraint_indexes": [
+          0
+        ],
+        "unknown_ids": [
+          "adjust-gap"
+        ],
+        "rationale": "The final goal depends on adjust; product=100 alone is not sufficient.",
+        "evidence_ids": [
+          "mut",
+          "test"
+        ],
+        "premise_ids": [
+          "mut",
+          "test",
+          "api"
+        ]
+      }
+    ],
+    "unknowns": [
+      {
+        "id": "adjust-gap",
+        "question": "What does the real adjust do to the product?",
+        "impact": "The final goal depends on adjust; product=100 alone is not sufficient.",
+        "disposition": "blocking",
+        "goal_indexes": [
+          0
+        ],
+        "constraint_indexes": [
+          0
+        ],
+        "scenario_ids": [
+          "product"
+        ],
+        "formal_uncertainty_indexes": [
+          0
+        ],
+        "rationale": "The real transformation has not been observed."
+      }
+    ],
+    "allowed_variations": [],
+    "conflicts": []
+  },
+  "contract": {
+    "schema_version": "mock-spec.scenario/v0.1",
+    "case_id": "synthetic_relational_product",
+    "language": "python",
+    "test_objectives": [
+      {
+        "statement": "target('business') must normally return 100.",
+        "status": "required",
+        "scenario_ids": [
+          "product"
+        ],
+        "condition": "k is the fixed business key; only left/right are replaceable; real MUT and integer semantics are preserved.",
+        "evidence_ids": [
+          "test"
+        ]
+      }
+    ],
+    "scenario_hypotheses": [
+      {
+        "id": "product",
+        "description": "Nonzero divisor branch.",
+        "condition": "k is the fixed business key; only left/right are replaceable; real MUT and integer semantics are preserved.",
+        "status": "candidate",
+        "evidence_ids": [
+          "mut"
+        ]
+      }
+    ],
+    "dependency_constraints": [
+      {
+        "statement": "left(k) returns positive integer p; right(k) returns nonnegative integer q; q > 0 and adjust(p * q) == 100; no exceptions or side effects.",
+        "status": "required",
+        "scenario_ids": [
+          "product"
+        ],
+        "condition": "k is the fixed business key; only left/right are replaceable; real MUT and integer semantics are preserved.",
+        "evidence_ids": [
+          "mut",
+          "test",
+          "api"
+        ]
+      }
+    ],
+    "expected_interactions": [],
+    "verification_candidates": [],
+    "evidence": [
+      {
+        "id": "mut",
+        "source_id": "mut:0",
+        "start_line": 1,
+        "end_line": 5,
+        "quote": "def target(k):\n    p = left(k)\n    q = right(k)\n    if q == 0: return 0\n    return adjust(p * q)",
+        "rationale": "Real control flow and result computation."
+      },
+      {
+        "id": "test",
+        "source_id": "test:0",
+        "start_line": 2,
+        "end_line": 2,
+        "quote": "    assert target(\"business\") == 100",
+        "rationale": "Fixed business key and original result requirement."
+      },
+      {
+        "id": "api",
+        "source_id": "support:0",
+        "start_line": 1,
+        "end_line": 3,
+        "quote": "# left(k): positive int p; right(k): nonnegative int q.\n# Only left/right responses are replaceable; no side effects or exceptions.\n# Same business key; no other cross-return relation; integers do not overflow.",
+        "rationale": "Explicit dependency conditions and replacement scope."
+      }
+    ],
+    "uncertainty": [
+      {
+        "statement": "What does the real adjust do to the product?",
+        "status": "unknown",
+        "scenario_ids": [
+          "product"
+        ],
+        "condition": "k is the fixed business key; only left/right are replaceable; real MUT and integer semantics are preserved.",
+        "evidence_ids": [
+          "mut"
+        ]
+      }
+    ]
+  }
+}

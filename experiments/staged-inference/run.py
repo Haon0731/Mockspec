@@ -15,6 +15,7 @@ from controller import (
 from agents.models.interface import Model
 from mock_spec.validation import decode_json
 from scripted import FixedScriptModel, query_script, task_for_replay_case
+from provider_capture import ResponseCapture
 
 
 def _positive_decimal(value: str) -> Decimal:
@@ -85,11 +86,17 @@ def main(argv: list[str] | None = None) -> int:
             if not (args.model or "").strip() or not os.environ.get("OPENAI_API_KEY", "").strip():
                 raise ValueError("live inference requires model and OPENAI_API_KEY")
             from agents.models.openai_responses import OpenAIResponsesModel
-            from openai import AsyncOpenAI
+            from openai import AsyncOpenAI, DefaultAsyncHttpxClient
 
-            model = OpenAIResponsesModel(
-                model=args.model.strip(), openai_client=AsyncOpenAI(max_retries=0)
+            response_capture = ResponseCapture()
+            http_client = DefaultAsyncHttpxClient(
+                event_hooks={"response": [response_capture.on_response]}
             )
+            model = OpenAIResponsesModel(
+                model=args.model.strip(),
+                openai_client=AsyncOpenAI(max_retries=0, http_client=http_client),
+            )
+            setattr(model, "response_capture", response_capture)
             requested_case_id = args.case_id
             model_name = args.model.strip()
             load_task = None

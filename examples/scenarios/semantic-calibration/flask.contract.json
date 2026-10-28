@@ -1,0 +1,271 @@
+{
+  "schema_version": "mock-spec.scenario/v0.1",
+  "case_id": "flask_308",
+  "language": "python",
+  "test_objectives": [
+    {
+      "statement": "Each visible parameterized case expects abort(code, *args, **kwargs) to raise an exception.",
+      "status": "required",
+      "scenario_ids": [
+        "python-no-context",
+        "python-context-aborter-raises",
+        "python-context-aborter-returns"
+      ],
+      "condition": "For every visible parameterized case in the selected test.",
+      "evidence_ids": [
+        "python-test-call"
+      ]
+    },
+    {
+      "statement": "App-context cases expect an exception message containing 'Aborted with {code}', while no-context cases expect one containing 'Werkzeug abort {code}'.",
+      "status": "required",
+      "scenario_ids": [
+        "python-no-context",
+        "python-context-aborter-raises",
+        "python-context-aborter-returns"
+      ],
+      "condition": "According to the has_app_context branch of the selected visible test.",
+      "evidence_ids": [
+        "python-test-message-app",
+        "python-test-message-werkzeug"
+      ]
+    }
+  ],
+  "scenario_hypotheses": [
+    {
+      "id": "python-no-context",
+      "description": "The context lookup returns None, so Flask delegates directly to Werkzeug's abort function with the original arguments.",
+      "condition": "has_app_context is false and _cv_app.get(None) returns None.",
+      "status": "candidate",
+      "evidence_ids": [
+        "python-mut-branches",
+        "python-test-parameters",
+        "python-test-message-werkzeug"
+      ]
+    },
+    {
+      "id": "python-context-aborter-raises",
+      "description": "The context lookup returns an object whose app aborter raises the exception expected by app-context cases, preventing Werkzeug abort from being reached.",
+      "condition": "has_app_context is true and ctx.app.aborter raises.",
+      "status": "candidate",
+      "evidence_ids": [
+        "python-test-context-wiring",
+        "python-mut-branches",
+        "python-test-message-app"
+      ]
+    },
+    {
+      "id": "python-context-aborter-returns",
+      "description": "If the app aborter returns normally, execution continues to Werkzeug abort because there is no return after the app-aborter call.",
+      "condition": "_cv_app.get(None) returns a context and ctx.app.aborter returns normally.",
+      "status": "candidate",
+      "evidence_ids": [
+        "python-mut-branches"
+      ]
+    }
+  ],
+  "dependency_constraints": [
+    {
+      "statement": "_cv_app.get(None) must return None for the no-context scenario.",
+      "status": "candidate",
+      "scenario_ids": [
+        "python-no-context"
+      ],
+      "condition": "Only for cases intended to exercise the no-app-context path.",
+      "evidence_ids": [
+        "python-mut-branches",
+        "python-test-parameters"
+      ]
+    },
+    {
+      "statement": "_wz_abort must receive code, args, and kwargs and raise an exception whose message contains 'Werkzeug abort {code}'.",
+      "status": "required",
+      "scenario_ids": [
+        "python-no-context"
+      ],
+      "condition": "For the selected no-app-context test cases.",
+      "evidence_ids": [
+        "python-mut-branches",
+        "python-test-call",
+        "python-test-message-werkzeug"
+      ]
+    },
+    {
+      "statement": "_cv_app.get(None) must return a context whose app is the visible mock_app for the app-context scenario.",
+      "status": "candidate",
+      "scenario_ids": [
+        "python-context-aborter-raises",
+        "python-context-aborter-returns"
+      ],
+      "condition": "Only for cases intended to exercise an app context; the masked setup determining the lookup result is not visible.",
+      "evidence_ids": [
+        "python-test-context-wiring",
+        "python-mut-branches"
+      ]
+    },
+    {
+      "statement": "ctx.app.aborter must raise an exception whose message contains 'Aborted with {code}'.",
+      "status": "candidate",
+      "scenario_ids": [
+        "python-context-aborter-raises"
+      ],
+      "condition": "Only for the hypothesis where the app aborter supplies the visible app-context exception and stops execution.",
+      "evidence_ids": [
+        "python-test-context-wiring",
+        "python-mut-branches",
+        "python-test-message-app"
+      ]
+    },
+    {
+      "statement": "_wz_abort must raise an exception whose message contains 'Aborted with {code}' after the app aborter returns normally.",
+      "status": "candidate",
+      "scenario_ids": [
+        "python-context-aborter-returns"
+      ],
+      "condition": "Only when an app context exists and ctx.app.aborter returns normally.",
+      "evidence_ids": [
+        "python-mut-branches",
+        "python-test-call",
+        "python-test-message-app"
+      ]
+    }
+  ],
+  "expected_interactions": [
+    {
+      "statement": "_cv_app.get(None) is called to obtain an optional app context.",
+      "status": "required",
+      "scenario_ids": [
+        "python-no-context",
+        "python-context-aborter-raises",
+        "python-context-aborter-returns"
+      ],
+      "condition": "Whenever abort executes far enough to evaluate its context branch.",
+      "evidence_ids": [
+        "python-mut-branches"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "ctx.app.aborter(code, *args, **kwargs) is called.",
+      "status": "candidate",
+      "scenario_ids": [
+        "python-context-aborter-raises",
+        "python-context-aborter-returns"
+      ],
+      "condition": "Only when _cv_app.get(None) returns a context.",
+      "evidence_ids": [
+        "python-mut-branches"
+      ],
+      "assertion_policy": "not_implied"
+    },
+    {
+      "statement": "_wz_abort(code, *args, **kwargs) is called.",
+      "status": "candidate",
+      "scenario_ids": [
+        "python-no-context",
+        "python-context-aborter-returns"
+      ],
+      "condition": "When there is no context, or when the app aborter returns normally.",
+      "evidence_ids": [
+        "python-mut-branches"
+      ],
+      "assertion_policy": "not_implied"
+    }
+  ],
+  "verification_candidates": [],
+  "evidence": [
+    {
+      "id": "python-test-parameters",
+      "source_id": "test",
+      "start_line": 11,
+      "end_line": 47,
+      "quote": "@pytest.mark.parametrize(\"scenario,has_app_context,code,args,kwargs\", [\n    (\n        \"app_context_exists_404\",\n        True,\n        404,\n        (),\n        {}\n    ),\n    (\n        \"app_context_exists_500_with_message\",\n        True,\n        500,\n        (\"Internal Server Error\",),\n        {}\n    ),\n    (\n        \"no_app_context_403\",\n        False,\n        403,\n        (),\n        {}\n    ),\n    (\n        \"no_app_context_with_args_kwargs\",\n        False,\n        400,\n        (\"Bad Request\",),\n        {\"description\": \"Invalid input\"}\n    ),\n    (\n        \"app_context_custom_code\",\n        True,\n        418,\n        (),\n        {\"description\": \"I'm a teapot\"}\n    ),\n])",
+      "rationale": "The visible test explicitly varies app-context presence, code, positional arguments, and keyword arguments."
+    },
+    {
+      "id": "python-test-context-wiring",
+      "source_id": "test",
+      "start_line": 86,
+      "end_line": 89,
+      "quote": "    if has_app_context:\n                       \n        mock_ctx.app = mock_app\n        mock_app.aborter = mock_aborter",
+      "rationale": "The visible setup maps the context's app to mock_app and mock_app.aborter to mock_aborter when an app context is requested."
+    },
+    {
+      "id": "python-test-call",
+      "source_id": "test",
+      "start_line": 102,
+      "end_line": 103,
+      "quote": "    with pytest.raises(Exception) as exc_info:\n        abort(code, *args, **kwargs)",
+      "rationale": "The only visible exception-type requirement is the broad Exception base class; exact exception types are not asserted."
+    },
+    {
+      "id": "python-test-message-app",
+      "source_id": "test",
+      "start_line": 120,
+      "end_line": 120,
+      "quote": "        assert f\"Aborted with {code}\" in str(exc_info.value)",
+      "rationale": "The app-context branch visibly requires this message fragment."
+    },
+    {
+      "id": "python-test-message-werkzeug",
+      "source_id": "test",
+      "start_line": 126,
+      "end_line": 126,
+      "quote": "        assert f\"Werkzeug abort {code}\" in str(exc_info.value)",
+      "rationale": "The no-context branch visibly requires this message fragment."
+    },
+    {
+      "id": "python-mut-branches",
+      "source_id": "mut",
+      "start_line": 282,
+      "end_line": 285,
+      "quote": "    if (ctx := _cv_app.get(None)) is not None:\n        ctx.app.aborter(code, *args, **kwargs)\n\n    _wz_abort(code, *args, **kwargs)",
+      "rationale": "The app aborter runs only with a context; Werkzeug abort always remains reachable if the app aborter returns normally."
+    }
+  ],
+  "uncertainty": [
+    {
+      "statement": "The masked slots do not reveal how _cv_app.get(None), mock_ctx, mock_app, mock_aborter, or _wz_abort are stubbed.",
+      "status": "unknown",
+      "scenario_ids": [
+        "python-no-context",
+        "python-context-aborter-raises",
+        "python-context-aborter-returns"
+      ],
+      "condition": "Until a legal masked setup is supplied.",
+      "evidence_ids": [
+        "python-test-context-wiring",
+        "python-test-call"
+      ]
+    },
+    {
+      "statement": "No unique exact exception class is specified. Exception subclasses and message prefixes/suffixes may vary only if the visible substring requirements and all applicable dependency restrictions remain satisfied; those dependency restrictions are not yet fully established.",
+      "status": "unknown",
+      "scenario_ids": [
+        "python-no-context",
+        "python-context-aborter-raises",
+        "python-context-aborter-returns"
+      ],
+      "condition": "For all visible parameterized cases.",
+      "evidence_ids": [
+        "python-test-call",
+        "python-test-message-app",
+        "python-test-message-werkzeug"
+      ]
+    },
+    {
+      "statement": "Blocking: setup/lookup binding and legal substitution of the relevant dependency calls require confirmation; has_app_context alone does not establish lookup behavior. Candidate response relations are not a complete generation-ready specification. Further authorized evidence has not been exhausted.",
+      "status": "unknown",
+      "scenario_ids": [
+        "python-no-context",
+        "python-context-aborter-raises",
+        "python-context-aborter-returns"
+      ],
+      "condition": "Before consuming this partial draft for any parameter row.",
+      "evidence_ids": [
+        "python-test-context-wiring",
+        "python-mut-branches"
+      ]
+    }
+  ]
+}
