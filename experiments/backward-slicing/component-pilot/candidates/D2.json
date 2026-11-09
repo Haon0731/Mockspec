@@ -1,0 +1,8 @@
+{
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"actuator/health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "CloudFoundryApplicationFactory.getServiceBaseUrl() turns the first configured URI into http://application/Uppercase, and DefaultApplicationFactory.getServiceUrl() adds the trailing slash. Because no distinct management port is set, getManagementBaseUrl() uses that service URL. DefaultApplicationFactory.getHealthUrl() then appends '/' and the value returned by PathMappedEndpoints.getPath(EndpointId.of(\"health\")). Returning actuator/health therefore produces the asserted http://application/Uppercase/actuator/health. The health value is nonblank, so the status fallback is not queried; verification asserts the supported health lookup interaction.",
+    "unknowns": []
+  }
+}

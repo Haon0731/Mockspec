@@ -1,0 +1,8 @@
+{
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"actuator/health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "DefaultApplicationFactory.getHealthUrl() builds directly from getManagementBaseUrl(), then appends '/' and getHealthEndpointPath(); it does not append WebEndpointProperties.getBasePath(). CloudFoundryApplicationFactory supplies the service base http://application/Uppercase, and the normal first branch of getHealthEndpointPath() returns the nonblank value from pathMappedEndpoints.getPath(EndpointId.of(\"health\")). Therefore the dependency must return actuator/health to produce the asserted http://application/Uppercase/actuator/health. The supplied candidate's health response would instead produce http://application/Uppercase/health, matching the packet's reported conflict. Verification asserts the health-path lookup that selects this branch; the status fallback is not reached.",
+    "unknowns": []
+  }
+}

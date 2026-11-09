@@ -1,0 +1,35 @@
+[
+  {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "experiments/backward-slicing"
+    ],
+    "exit_code": 0,
+    "output": "verification-0.txt"
+  },
+  {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "ruff",
+      "check",
+      "experiments/backward-slicing"
+    ],
+    "exit_code": 0,
+    "output": "verification-1.txt"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "output": "verification-2.txt"
+  }
+]

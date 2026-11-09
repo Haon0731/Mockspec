@@ -1,0 +1,503 @@
+{
+  "backend": "python-ast-bounded-paths/v1",
+  "complete": false,
+  "entry": {
+    "function": "abort",
+    "line": 265,
+    "source_id": "mut"
+  },
+  "exploration_complete": true,
+  "limitations": [
+    "Only the selected function is interpreted; calls are unknown boundaries.",
+    "Each unknown invocation has independent normal and exceptional outcomes.",
+    "Null, constant, and simple integer contradictions are checked without SMT.",
+    "Attribute/subscript evaluation, loops, try, comprehensions, dynamic dispatch, and heap effects are not modeled precisely.",
+    "candidate_consistent means no contradiction was found in the supported abstraction, not executable feasibility.",
+    "The analysis contains no mock-framework replaceability or read-only binding model."
+  ],
+  "limits": {
+    "max_calls_per_path": 16,
+    "max_paths": 64
+  },
+  "paths": [
+    {
+      "events": [
+        {
+          "arguments": [
+            "None"
+          ],
+          "callsite": "mut:282:15",
+          "effect": "unknown",
+          "event_id": "mut:282:15#1",
+          "keyword_arguments": [],
+          "outcome": "normal",
+          "receiver": "_cv_app",
+          "resolution": "external_or_unresolved",
+          "target": "_cv_app.get"
+        },
+        {
+          "arguments": [
+            "code",
+            "*args"
+          ],
+          "callsite": "mut:283:8",
+          "effect": "unknown",
+          "event_id": "mut:283:8#1",
+          "keyword_arguments": [
+            {
+              "name": "**",
+              "value": "kwargs"
+            }
+          ],
+          "outcome": "raise",
+          "receiver": "result[mut:282:15#1].app",
+          "resolution": "external_or_unresolved",
+          "target": "ctx.app.aborter"
+        }
+      ],
+      "guards": [
+        {
+          "expression": "(result[mut:282:15#1] is not None)",
+          "polarity": true,
+          "source": "mut:282:4"
+        }
+      ],
+      "outcome": {
+        "event_id": "mut:283:8#1",
+        "exception": "exception[mut:283:8#1]",
+        "kind": "raise",
+        "origin": "unknown_call"
+      },
+      "path_id": "p1",
+      "precision": "bounded_with_unknowns",
+      "unknowns": [
+        {
+          "code": "_cv_app.get(None)",
+          "reason": "external_call_effect_unknown",
+          "source": "mut:282:15"
+        },
+        {
+          "code": "_cv_app.get",
+          "reason": "call_receiver_evaluation_not_modeled",
+          "source": "mut:282:15"
+        },
+        {
+          "code": "ctx.app.aborter(code, *args, **kwargs)",
+          "reason": "external_call_effect_unknown",
+          "source": "mut:283:8"
+        },
+        {
+          "code": "ctx.app.aborter",
+          "reason": "call_receiver_evaluation_not_modeled",
+          "source": "mut:283:8"
+        }
+      ],
+      "value_relations": [
+        {
+          "source": "mut:282:8",
+          "target": "ctx",
+          "value": "result[mut:282:15#1]"
+        }
+      ],
+      "verdict": "candidate_consistent"
+    },
+    {
+      "events": [
+        {
+          "arguments": [
+            "None"
+          ],
+          "callsite": "mut:282:15",
+          "effect": "unknown",
+          "event_id": "mut:282:15#1",
+          "keyword_arguments": [],
+          "outcome": "raise",
+          "receiver": "_cv_app",
+          "resolution": "external_or_unresolved",
+          "target": "_cv_app.get"
+        }
+      ],
+      "guards": [],
+      "outcome": {
+        "event_id": "mut:282:15#1",
+        "exception": "exception[mut:282:15#1]",
+        "kind": "raise",
+        "origin": "unknown_call"
+      },
+      "path_id": "p2",
+      "precision": "bounded_with_unknowns",
+      "unknowns": [
+        {
+          "code": "_cv_app.get(None)",
+          "reason": "external_call_effect_unknown",
+          "source": "mut:282:15"
+        },
+        {
+          "code": "_cv_app.get",
+          "reason": "call_receiver_evaluation_not_modeled",
+          "source": "mut:282:15"
+        }
+      ],
+      "value_relations": [],
+      "verdict": "candidate_consistent"
+    },
+    {
+      "events": [
+        {
+          "arguments": [
+            "None"
+          ],
+          "callsite": "mut:282:15",
+          "effect": "unknown",
+          "event_id": "mut:282:15#1",
+          "keyword_arguments": [],
+          "outcome": "normal",
+          "receiver": "_cv_app",
+          "resolution": "external_or_unresolved",
+          "target": "_cv_app.get"
+        },
+        {
+          "arguments": [
+            "code",
+            "*args"
+          ],
+          "callsite": "mut:283:8",
+          "effect": "unknown",
+          "event_id": "mut:283:8#1",
+          "keyword_arguments": [
+            {
+              "name": "**",
+              "value": "kwargs"
+            }
+          ],
+          "outcome": "normal",
+          "receiver": "result[mut:282:15#1].app",
+          "resolution": "external_or_unresolved",
+          "target": "ctx.app.aborter"
+        },
+        {
+          "arguments": [
+            "code",
+            "*args"
+          ],
+          "callsite": "mut:285:4",
+          "effect": "unknown",
+          "event_id": "mut:285:4#1",
+          "keyword_arguments": [
+            {
+              "name": "**",
+              "value": "kwargs"
+            }
+          ],
+          "outcome": "raise",
+          "receiver": null,
+          "resolution": "external_or_unresolved",
+          "target": "_wz_abort"
+        }
+      ],
+      "guards": [
+        {
+          "expression": "(result[mut:282:15#1] is not None)",
+          "polarity": true,
+          "source": "mut:282:4"
+        }
+      ],
+      "outcome": {
+        "event_id": "mut:285:4#1",
+        "exception": "exception[mut:285:4#1]",
+        "kind": "raise",
+        "origin": "unknown_call"
+      },
+      "path_id": "p3",
+      "precision": "bounded_with_unknowns",
+      "unknowns": [
+        {
+          "code": "_cv_app.get(None)",
+          "reason": "external_call_effect_unknown",
+          "source": "mut:282:15"
+        },
+        {
+          "code": "_cv_app.get",
+          "reason": "call_receiver_evaluation_not_modeled",
+          "source": "mut:282:15"
+        },
+        {
+          "code": "ctx.app.aborter(code, *args, **kwargs)",
+          "reason": "external_call_effect_unknown",
+          "source": "mut:283:8"
+        },
+        {
+          "code": "ctx.app.aborter",
+          "reason": "call_receiver_evaluation_not_modeled",
+          "source": "mut:283:8"
+        },
+        {
+          "code": "_wz_abort(code, *args, **kwargs)",
+          "reason": "external_call_effect_unknown",
+          "source": "mut:285:4"
+        }
+      ],
+      "value_relations": [
+        {
+          "source": "mut:282:8",
+          "target": "ctx",
+          "value": "result[mut:282:15#1]"
+        }
+      ],
+      "verdict": "candidate_consistent"
+    },
+    {
+      "events": [
+        {
+          "arguments": [
+            "None"
+          ],
+          "callsite": "mut:282:15",
+          "effect": "unknown",
+          "event_id": "mut:282:15#1",
+          "keyword_arguments": [],
+          "outcome": "normal",
+          "receiver": "_cv_app",
+          "resolution": "external_or_unresolved",
+          "target": "_cv_app.get"
+        },
+        {
+          "arguments": [
+            "code",
+            "*args"
+          ],
+          "callsite": "mut:285:4",
+          "effect": "unknown",
+          "event_id": "mut:285:4#1",
+          "keyword_arguments": [
+            {
+              "name": "**",
+              "value": "kwargs"
+            }
+          ],
+          "outcome": "raise",
+          "receiver": null,
+          "resolution": "external_or_unresolved",
+          "target": "_wz_abort"
+        }
+      ],
+      "guards": [
+        {
+          "expression": "not ((result[mut:282:15#1] is not None))",
+          "polarity": false,
+          "source": "mut:282:4"
+        }
+      ],
+      "outcome": {
+        "event_id": "mut:285:4#1",
+        "exception": "exception[mut:285:4#1]",
+        "kind": "raise",
+        "origin": "unknown_call"
+      },
+      "path_id": "p4",
+      "precision": "bounded_with_unknowns",
+      "unknowns": [
+        {
+          "code": "_cv_app.get(None)",
+          "reason": "external_call_effect_unknown",
+          "source": "mut:282:15"
+        },
+        {
+          "code": "_cv_app.get",
+          "reason": "call_receiver_evaluation_not_modeled",
+          "source": "mut:282:15"
+        },
+        {
+          "code": "_wz_abort(code, *args, **kwargs)",
+          "reason": "external_call_effect_unknown",
+          "source": "mut:285:4"
+        }
+      ],
+      "value_relations": [
+        {
+          "source": "mut:282:8",
+          "target": "ctx",
+          "value": "result[mut:282:15#1]"
+        }
+      ],
+      "verdict": "candidate_consistent"
+    },
+    {
+      "events": [
+        {
+          "arguments": [
+            "None"
+          ],
+          "callsite": "mut:282:15",
+          "effect": "unknown",
+          "event_id": "mut:282:15#1",
+          "keyword_arguments": [],
+          "outcome": "normal",
+          "receiver": "_cv_app",
+          "resolution": "external_or_unresolved",
+          "target": "_cv_app.get"
+        },
+        {
+          "arguments": [
+            "code",
+            "*args"
+          ],
+          "callsite": "mut:283:8",
+          "effect": "unknown",
+          "event_id": "mut:283:8#1",
+          "keyword_arguments": [
+            {
+              "name": "**",
+              "value": "kwargs"
+            }
+          ],
+          "outcome": "normal",
+          "receiver": "result[mut:282:15#1].app",
+          "resolution": "external_or_unresolved",
+          "target": "ctx.app.aborter"
+        },
+        {
+          "arguments": [
+            "code",
+            "*args"
+          ],
+          "callsite": "mut:285:4",
+          "effect": "unknown",
+          "event_id": "mut:285:4#1",
+          "keyword_arguments": [
+            {
+              "name": "**",
+              "value": "kwargs"
+            }
+          ],
+          "outcome": "normal",
+          "receiver": null,
+          "resolution": "external_or_unresolved",
+          "target": "_wz_abort"
+        }
+      ],
+      "guards": [
+        {
+          "expression": "(result[mut:282:15#1] is not None)",
+          "polarity": true,
+          "source": "mut:282:4"
+        }
+      ],
+      "outcome": {
+        "kind": "fallthrough"
+      },
+      "path_id": "p5",
+      "precision": "bounded_with_unknowns",
+      "unknowns": [
+        {
+          "code": "_cv_app.get(None)",
+          "reason": "external_call_effect_unknown",
+          "source": "mut:282:15"
+        },
+        {
+          "code": "_cv_app.get",
+          "reason": "call_receiver_evaluation_not_modeled",
+          "source": "mut:282:15"
+        },
+        {
+          "code": "ctx.app.aborter(code, *args, **kwargs)",
+          "reason": "external_call_effect_unknown",
+          "source": "mut:283:8"
+        },
+        {
+          "code": "ctx.app.aborter",
+          "reason": "call_receiver_evaluation_not_modeled",
+          "source": "mut:283:8"
+        },
+        {
+          "code": "_wz_abort(code, *args, **kwargs)",
+          "reason": "external_call_effect_unknown",
+          "source": "mut:285:4"
+        }
+      ],
+      "value_relations": [
+        {
+          "source": "mut:282:8",
+          "target": "ctx",
+          "value": "result[mut:282:15#1]"
+        }
+      ],
+      "verdict": "candidate_consistent"
+    },
+    {
+      "events": [
+        {
+          "arguments": [
+            "None"
+          ],
+          "callsite": "mut:282:15",
+          "effect": "unknown",
+          "event_id": "mut:282:15#1",
+          "keyword_arguments": [],
+          "outcome": "normal",
+          "receiver": "_cv_app",
+          "resolution": "external_or_unresolved",
+          "target": "_cv_app.get"
+        },
+        {
+          "arguments": [
+            "code",
+            "*args"
+          ],
+          "callsite": "mut:285:4",
+          "effect": "unknown",
+          "event_id": "mut:285:4#1",
+          "keyword_arguments": [
+            {
+              "name": "**",
+              "value": "kwargs"
+            }
+          ],
+          "outcome": "normal",
+          "receiver": null,
+          "resolution": "external_or_unresolved",
+          "target": "_wz_abort"
+        }
+      ],
+      "guards": [
+        {
+          "expression": "not ((result[mut:282:15#1] is not None))",
+          "polarity": false,
+          "source": "mut:282:4"
+        }
+      ],
+      "outcome": {
+        "kind": "fallthrough"
+      },
+      "path_id": "p6",
+      "precision": "bounded_with_unknowns",
+      "unknowns": [
+        {
+          "code": "_cv_app.get(None)",
+          "reason": "external_call_effect_unknown",
+          "source": "mut:282:15"
+        },
+        {
+          "code": "_cv_app.get",
+          "reason": "call_receiver_evaluation_not_modeled",
+          "source": "mut:282:15"
+        },
+        {
+          "code": "_wz_abort(code, *args, **kwargs)",
+          "reason": "external_call_effect_unknown",
+          "source": "mut:285:4"
+        }
+      ],
+      "value_relations": [
+        {
+          "source": "mut:282:8",
+          "target": "ctx",
+          "value": "result[mut:282:15#1]"
+        }
+      ],
+      "verdict": "candidate_consistent"
+    }
+  ],
+  "pruned_paths": [],
+  "status": "ok"
+}

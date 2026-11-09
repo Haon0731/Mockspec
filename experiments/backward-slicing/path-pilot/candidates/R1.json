@@ -1,0 +1,24 @@
+{
+  "flask": {
+    "slots": {
+      "mock_stub_001": "mock_ctx = mocker.Mock()",
+      "mock_stub_002": "mock_app = mocker.Mock()",
+      "mock_stub_003": "mock_aborter = mocker.Mock()",
+      "mock_stub_004": "mock_cv_app = mocker.patch(\"flask.helpers._cv_app\")",
+      "mock_stub_005": "mock_aborter.side_effect = Exception(f\"Aborted with {code}\")",
+      "mock_stub_006": "mock_cv_app.get.return_value = mock_ctx if has_app_context else None\nmock_wz_abort = mocker.patch(\n    \"flask.helpers._wz_abort\",\n    side_effect=Exception(f\"Werkzeug abort {code}\"),\n)",
+      "verify_001": "mock_cv_app.get.assert_called_once_with(None)",
+      "verify_002": "mock_aborter.assert_called_once_with(code, *args, **kwargs)",
+      "verify_003": "mock_wz_abort.assert_not_called()",
+      "verify_004": "mock_aborter.assert_not_called()\nmock_wz_abort.assert_called_once_with(code, *args, **kwargs)"
+    },
+    "reasoning": "The visible implementation reads _cv_app.get(None). With an app context, the configured app aborter receives the exact forwarded arguments and raises the exception asserted by the test, so execution never reaches Werkzeug. Without a context, _wz_abort receives the same arguments and raises the Werkzeug-specific exception.",
+    "unknowns": []
+  },
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "The visible factory builds the health URL from the management base URL and PathMappedEndpoints.getPath for the health endpoint. Returning health selects the normal first-choice endpoint path and yields the asserted /actuator/health URL; verification checks that dependency interaction.",
+    "unknowns": []
+  }
+}

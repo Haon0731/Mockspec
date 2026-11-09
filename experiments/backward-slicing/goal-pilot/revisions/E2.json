@@ -1,0 +1,8 @@
+{
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"actuator/health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "DefaultApplicationFactory.getHealthUrl() starts from the visible management base URL http://application/Uppercase/, appends a slash, and then appends getHealthEndpointPath(). The first-choice path calls pathMappedEndpoints.getPath(EndpointId.of(\"health\")) and returns that value when it has text. Returning actuator/health therefore constructs the asserted http://application/Uppercase/actuator/health; the supplied health response would construct http://application/Uppercase/health, as the packet consistency check reports. Because the non-empty health response takes the first branch, only the health lookup is justified for verification and the status fallback is not called.",
+    "unknowns": []
+  }
+}

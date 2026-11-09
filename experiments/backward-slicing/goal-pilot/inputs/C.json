@@ -1,0 +1,9 @@
+{
+  "candidate": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "The visible factory builds the health URL from the management base URL and PathMappedEndpoints.getPath for the health endpoint. Returning health selects the normal first-choice endpoint path and yields the asserted /actuator/health URL; verification checks that dependency interaction.",
+    "unknowns": []
+  },
+  "extra_evidence": null
+}

@@ -1,0 +1,78 @@
+{
+  "date": "2026-11-09",
+  "branch": "research/mock-slicing-path-constraints",
+  "base_commit": "f028a0597c3290adddce3e97bb5208242e0f0fed",
+  "scope": "Four bounded research rounds, implementations, masked source projections, generated candidates, original execution receipts and documentation navigation; unrelated worktree changes excluded.",
+  "research_files_copied_byte_for_byte": 499,
+  "verified_manifests": [
+    {
+      "manifest": "path-pilot/inputs/manifest.json",
+      "verified_entries": 6
+    },
+    {
+      "manifest": "goal-pilot/inputs/manifest.json",
+      "verified_entries": 10
+    },
+    {
+      "manifest": "component-pilot/inputs/manifest.json",
+      "verified_entries": 20
+    },
+    {
+      "manifest": "component-pilot/artifact-identities.json",
+      "verified_entries": 105
+    }
+  ],
+  "verification": {
+    "pytest": {
+      "command": "PYTHONPATH=src python -m pytest -q -p no:cacheprovider experiments/backward-slicing",
+      "result": "38 passed, 1 skipped in 31.75s",
+      "environment": "existing /home/haon/projects/Mockspec/.venv; PYTHONPATH resolves this isolated worktree src",
+      "new_target_junit_runs": 0
+    },
+    "ruff": "passed",
+    "implementation_and_documentation_diff_check": "passed",
+    "raw_artifact_diff_check": {
+      "status": "preserved whitespace diagnostics",
+      "files": {
+        "experiments/backward-slicing/component-pilot/junit-mutants/D2/duplicate_health_lookup/test.stdout.txt": 2,
+        "experiments/backward-slicing/component-pilot/junit-mutants/D2/unexpected_status_lookup/test.stdout.txt": 1,
+        "experiments/backward-slicing/component-pilot/junit-original/C1/test.stdout.txt": 1,
+        "experiments/backward-slicing/component-pilot/junit-original/C2/test.stdout.txt": 1,
+        "experiments/backward-slicing/component-pilot/junit-original/D1/test.stdout.txt": 1,
+        "experiments/backward-slicing/component-pilot/junit-original/D2/test.stdout.txt": 1,
+        "experiments/backward-slicing/component-pilot/junit-original/R1/test.stdout.txt": 1,
+        "experiments/backward-slicing/component-pilot/junit-original/R2/test.stdout.txt": 1,
+        "experiments/backward-slicing/component-pilot/junit-original/RD1/test.stdout.txt": 1,
+        "experiments/backward-slicing/component-pilot/junit-original/RD2/test.stdout.txt": 1,
+        "experiments/backward-slicing/goal-pilot/junit-probes/empty_endpoints/test.stdout.txt": 1,
+        "experiments/backward-slicing/goal-pilot/junit-probes/encoded_path/test.stdout.txt": 1,
+        "experiments/backward-slicing/goal-pilot/junit-probes/slash_health/test.stdout.txt": 1,
+        "experiments/backward-slicing/goal-pilot/junit-probes/status_fallback/test.stdout.txt": 1,
+        "experiments/backward-slicing/goal-pilot/junit-revisions/C1/test.stdout.txt": 1,
+        "experiments/backward-slicing/goal-pilot/junit-revisions/C2/test.stdout.txt": 1,
+        "experiments/backward-slicing/goal-pilot/junit-revisions/E1/test.stdout.txt": 1,
+        "experiments/backward-slicing/goal-pilot/junit-revisions/E2/test.stdout.txt": 1,
+        "experiments/backward-slicing/path-pilot/java-eval-a-lombok/test.stdout.txt": 1,
+        "experiments/backward-slicing/path-pilot/java-eval-b/test.stdout.txt": 1,
+        "experiments/backward-slicing/path-pilot/java-eval-status-fallback/test.stdout.txt": 1,
+        "experiments/backward-slicing/path-pilot/java-generated/G1/test.stdout.txt": 1,
+        "experiments/backward-slicing/path-pilot/java-generated/G2/test.stdout.txt": 1,
+        "experiments/backward-slicing/path-pilot/java-generated/R1/test.stdout.txt": 1,
+        "experiments/backward-slicing/path-pilot/java-generated/R2/test.stdout.txt": 1,
+        "experiments/backward-slicing/path-pilot/java-generated/S1/test.stdout.txt": 1,
+        "experiments/backward-slicing/path-pilot/java-generated/S2/test.stdout.txt": 1,
+        "experiments/backward-slicing/path-pilot/python-generated/G1/candidate.py": 35,
+        "experiments/backward-slicing/path-pilot/python-generated/G2/candidate.py": 35,
+        "experiments/backward-slicing/path-pilot/python-generated/R1/candidate.py": 35,
+        "experiments/backward-slicing/path-pilot/python-generated/R2/candidate.py": 35,
+        "experiments/backward-slicing/path-pilot/python-generated/S1/candidate.py": 35,
+        "experiments/backward-slicing/path-pilot/python-generated/S2/candidate.py": 35,
+        "experiments/backward-slicing/results/eval-a/candidate.py": 35,
+        "experiments/backward-slicing/results/eval-b/candidate.py": 35
+      },
+      "reason": "Original JUnit stdout includes terminal blank lines; original masked candidate source preserves whitespace. These are evidence bytes and must not be reformatted."
+    }
+  },
+  "excluded": "__pycache__, pyc, project dependencies, original dataset tree, unrelated production and staged-inference modifications",
+  "execution_receipts": "Commands retain original local absolute mount paths for audit; those paths are not portable runtime dependencies."
+}

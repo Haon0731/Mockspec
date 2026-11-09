@@ -1,0 +1,8 @@
+{
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"actuator/health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "DefaultApplicationFactory.getHealthUrl() appends a slash and the value returned by getHealthEndpointPath() to the management base URL. getHealthEndpointPath() first calls pathMappedEndpoints.getPath(EndpointId.of(\"health\")) and returns any nonblank result. The CloudFoundry service base becomes http://application/Uppercase, while the asserted health URL is http://application/Uppercase/actuator/health, so the supported response is actuator/health. Because that response is nonblank, the status fallback is not called; verification therefore checks the single health-path lookup.",
+    "unknowns": []
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "flask": {
+    "slots": {
+      "mock_stub_001": "mock_ctx = mocker.MagicMock()",
+      "mock_stub_002": "mock_app = mocker.MagicMock()",
+      "mock_stub_003": "mock_aborter = mocker.Mock()",
+      "mock_stub_004": "mock_cv_app = mocker.patch(\"flask.helpers._cv_app\")\nmock_cv_app.get.return_value = mock_ctx if has_app_context else None",
+      "mock_stub_005": "mock_aborter.side_effect = Exception(f\"Aborted with {code}\")",
+      "mock_stub_006": "mock_wz_abort = mocker.patch(\"flask.helpers._wz_abort\")\nmock_wz_abort.side_effect = Exception(f\"Werkzeug abort {code}\")",
+      "verify_001": "mock_cv_app.get.assert_called_once_with(None)",
+      "verify_002": "mock_aborter.assert_called_once_with(code, *args, **kwargs)",
+      "verify_003": "mock_wz_abort.assert_not_called()",
+      "verify_004": "mock_wz_abort.assert_called_once_with(code, *args, **kwargs)"
+    },
+    "reasoning": "The visible implementation first reads _cv_app with None as the default. When a context exists, its app aborter is configured to raise the exception asserted by the ordinary test, so execution does not fall through to Werkzeug. Without a context, the patched Werkzeug abort raises the separately asserted exception. Each branch verifies the call implied by that control flow with the original args and kwargs.",
+    "unknowns": []
+  },
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"/health\");\nwebEndpoint.setBasePath(\"/actuator\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "The configured non-empty URI selects the first Cloud Foundry URI as the HTTP service base. The ordinary URL assertions require the actuator base path and a health endpoint path; the visible factory flow queries PathMappedEndpoints for the health EndpointId, so that lookup is stubbed and verified.",
+    "unknowns": []
+  }
+}

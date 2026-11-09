@@ -1,0 +1,8 @@
+{
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "CloudFoundryApplicationFactory.getServiceBaseUrl() uses the first configured Cloud Foundry URI, so the supplied application/Uppercase value produces the http://application/Uppercase service base. DefaultApplicationFactory reuses that service URL as the management base when the management port is unset, appends WebEndpointProperties.getBasePath() for the asserted management URL, and obtains the health suffix through PathMappedEndpoints.getPath(EndpointId.of(\"health\")). Returning health therefore produces the asserted http://application/Uppercase/actuator/health value, while verification confirms the dependency interaction that selected that suffix.",
+    "unknowns": []
+  }
+}

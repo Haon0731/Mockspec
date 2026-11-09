@@ -1,0 +1,1530 @@
+{
+  "condition": "G",
+  "extra_evidence": {
+    "flask": {
+      "backend": "python-ast-bounded-paths/v1",
+      "limitations": [
+        "Only the selected function is interpreted; calls are unknown boundaries.",
+        "Each unknown invocation has independent normal and exceptional outcomes.",
+        "Null, constant, and simple integer contradictions are checked without SMT.",
+        "Attribute/subscript evaluation, loops, try, comprehensions, dynamic dispatch, and heap effects are not modeled precisely.",
+        "candidate_consistent means no contradiction was found in the supported abstraction, not executable feasibility.",
+        "The analysis contains no mock-framework replaceability or read-only binding model."
+      ],
+      "paths": [
+        {
+          "path_id": "p1",
+          "guards": [
+            {
+              "expression": "(result[mut:282:15#1] is not None)",
+              "polarity": true,
+              "source": "mut:282:4"
+            }
+          ]
+        },
+        {
+          "path_id": "p2",
+          "guards": []
+        },
+        {
+          "path_id": "p3",
+          "guards": [
+            {
+              "expression": "(result[mut:282:15#1] is not None)",
+              "polarity": true,
+              "source": "mut:282:4"
+            }
+          ]
+        },
+        {
+          "path_id": "p4",
+          "guards": [
+            {
+              "expression": "not ((result[mut:282:15#1] is not None))",
+              "polarity": false,
+              "source": "mut:282:4"
+            }
+          ]
+        },
+        {
+          "path_id": "p5",
+          "guards": [
+            {
+              "expression": "(result[mut:282:15#1] is not None)",
+              "polarity": true,
+              "source": "mut:282:4"
+            }
+          ]
+        },
+        {
+          "path_id": "p6",
+          "guards": [
+            {
+              "expression": "not ((result[mut:282:15#1] is not None))",
+              "polarity": false,
+              "source": "mut:282:4"
+            }
+          ]
+        }
+      ]
+    },
+    "cloudfoundry": {
+      "backend": "spoon-guarded-method-summary-prototype",
+      "limitations": [
+        "Summaries preserve source expressions and guards; they do not interpret URI, string, collection, or framework semantics.",
+        "Visible call targets are conservative type/name/arity candidates and do not prove runtime dispatch.",
+        "Opaque calls may return normally or throw; their effects and values are unknown.",
+        "In value_effect mode call records inherit their enclosing method location to keep bounded packets compact.",
+        "Loops and try/catch are reported unsupported and are not path-expanded.",
+        "Assignments are lexical substitutions without heap alias or reaching-definition proofs.",
+        "Expansion is bounded and an incomplete result must not be treated as absence of behavior."
+      ],
+      "methods": [
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactory.getServiceBaseUrl()",
+          "location": {
+            "source_id": "mut",
+            "end_line": 50,
+            "start_line": 43
+          },
+          "guard_sites": [
+            {
+              "location": {
+                "source_id": "mut",
+                "end_line": 45,
+                "start_line": 45
+              },
+              "guards": [
+                {
+                  "condition": "cfApplicationProperties.getUris().isEmpty()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "mut",
+                "end_line": 49,
+                "start_line": 49
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "cfApplicationProperties.getUris().isEmpty()"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "mut",
+                "end_line": 50,
+                "start_line": 43
+              },
+              "guards": [
+                {
+                  "condition": "cfApplicationProperties.getUris().isEmpty()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "mut",
+                "end_line": 50,
+                "start_line": 43
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "cfApplicationProperties.getUris().isEmpty()"
+                }
+              ]
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.createApplication()",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 77,
+            "start_line": 70
+          },
+          "guard_sites": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 76,
+                "start_line": 71
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 77,
+                "start_line": 70
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 77,
+                "start_line": 70
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 77,
+                "start_line": 70
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 77,
+                "start_line": 70
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 77,
+                "start_line": 70
+              },
+              "guards": []
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getEndpointsWebPath()",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 145,
+            "start_line": 143
+          },
+          "guard_sites": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 144,
+                "start_line": 144
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 145,
+                "start_line": 143
+              },
+              "guards": []
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getHealthEndpointPath()",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 206,
+            "start_line": 196
+          },
+          "guard_sites": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 199,
+                "start_line": 199
+              },
+              "guards": [
+                {
+                  "condition": "org.springframework.util.StringUtils.hasText(health)",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 203,
+                "start_line": 203
+              },
+              "guards": [
+                {
+                  "condition": "org.springframework.util.StringUtils.hasText(status)",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "org.springframework.util.StringUtils.hasText(health)"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 206,
+                "start_line": 196
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 206,
+                "start_line": 196
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "org.springframework.util.StringUtils.hasText(health)"
+                }
+              ]
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getHealthUrl()",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 155,
+            "start_line": 147
+          },
+          "guard_sites": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 149,
+                "start_line": 149
+              },
+              "guards": [
+                {
+                  "condition": "instance.getHealthUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 154,
+                "start_line": 151
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getHealthUrl() != null"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 155,
+                "start_line": 147
+              },
+              "guards": [
+                {
+                  "condition": "instance.getHealthUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 155,
+                "start_line": 147
+              },
+              "guards": [
+                {
+                  "condition": "instance.getHealthUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 155,
+                "start_line": 147
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getHealthUrl() != null"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 155,
+                "start_line": 147
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getHealthUrl() != null"
+                }
+              ]
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getManagementBaseUrl()",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 137,
+            "start_line": 120
+          },
+          "guard_sites": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 124,
+                "start_line": 124
+              },
+              "guards": [
+                {
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 128,
+                "start_line": 128
+              },
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 136,
+                "start_line": 132
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 137,
+                "start_line": 120
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 137,
+                "start_line": 120
+              },
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 137,
+                "start_line": 120
+              },
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 137,
+                "start_line": 120
+              },
+              "guards": [
+                {
+                  "condition": "management.getSsl() != null",
+                  "kind": "lexical_conditional_guard",
+                  "polarity": "unknown"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 137,
+                "start_line": 120
+              },
+              "guards": [
+                {
+                  "condition": "management.getSsl() != null",
+                  "kind": "lexical_conditional_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 137,
+                "start_line": 120
+              },
+              "guards": [
+                {
+                  "condition": "management.getSsl() != null",
+                  "kind": "lexical_conditional_guard",
+                  "polarity": "false"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 137,
+                "start_line": 120
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 137,
+                "start_line": 120
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 137,
+                "start_line": 120
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getManagementUrl()",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 118,
+            "start_line": 109
+          },
+          "guard_sites": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 111,
+                "start_line": 111
+              },
+              "guards": [
+                {
+                  "condition": "instance.getManagementUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 117,
+                "start_line": 114
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getManagementUrl() != null"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 118,
+                "start_line": 109
+              },
+              "guards": [
+                {
+                  "condition": "instance.getManagementUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 118,
+                "start_line": 109
+              },
+              "guards": [
+                {
+                  "condition": "instance.getManagementUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 118,
+                "start_line": 109
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getManagementUrl() != null"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 118,
+                "start_line": 109
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getManagementUrl() != null"
+                }
+              ]
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getMetadata()",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 162,
+            "start_line": 157
+          },
+          "guard_sites": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 161,
+                "start_line": 161
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 162,
+                "start_line": 157
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 162,
+                "start_line": 157
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 162,
+                "start_line": 157
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 162,
+                "start_line": 157
+              },
+              "guards": []
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getName()",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 81,
+            "start_line": 79
+          },
+          "guard_sites": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 80,
+                "start_line": 80
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 81,
+                "start_line": 79
+              },
+              "guards": []
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getServiceBaseUrl()",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 107,
+            "start_line": 91
+          },
+          "guard_sites": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 95,
+                "start_line": 95
+              },
+              "guards": [
+                {
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 106,
+                "start_line": 102
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "getLocalServerPort() == null"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 107,
+                "start_line": 91
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 107,
+                "start_line": 91
+              },
+              "guards": [
+                {
+                  "condition": "getLocalServerPort() == null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 107,
+                "start_line": 91
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "getLocalServerPort() == null"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 107,
+                "start_line": 91
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "getLocalServerPort() == null"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 107,
+                "start_line": 91
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "getLocalServerPort() == null"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 107,
+                "start_line": 91
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "getLocalServerPort() == null"
+                }
+              ]
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getServiceUrl()",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 89,
+            "start_line": 83
+          },
+          "guard_sites": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 85,
+                "start_line": 85
+              },
+              "guards": [
+                {
+                  "condition": "instance.getServiceUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 88,
+                "start_line": 88
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getServiceUrl() != null"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 89,
+                "start_line": 83
+              },
+              "guards": [
+                {
+                  "condition": "instance.getServiceUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 89,
+                "start_line": 83
+              },
+              "guards": [
+                {
+                  "condition": "instance.getServiceUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 89,
+                "start_line": 83
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getServiceUrl() != null"
+                }
+              ]
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getManagementBaseUrl()",
+          "location": {
+            "source_id": "repository:645ddd877524863a056a8201",
+            "end_line": 91,
+            "start_line": 69
+          },
+          "guard_sites": [
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 73,
+                "start_line": 73
+              },
+              "guards": [
+                {
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 81,
+                "start_line": 77
+              },
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 90,
+                "start_line": 85
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 91,
+                "start_line": 69
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 91,
+                "start_line": 69
+              },
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 91,
+                "start_line": 69
+              },
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 91,
+                "start_line": 69
+              },
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 91,
+                "start_line": 69
+              },
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 91,
+                "start_line": 69
+              },
+              "guards": [
+                {
+                  "condition": "management.getSsl() != null",
+                  "kind": "lexical_conditional_guard",
+                  "polarity": "unknown"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 91,
+                "start_line": 69
+              },
+              "guards": [
+                {
+                  "condition": "management.getSsl() != null",
+                  "kind": "lexical_conditional_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 91,
+                "start_line": 69
+              },
+              "guards": [
+                {
+                  "condition": "management.getSsl() != null",
+                  "kind": "lexical_conditional_guard",
+                  "polarity": "false"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 91,
+                "start_line": 69
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 91,
+                "start_line": 69
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 91,
+                "start_line": 69
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 91,
+                "start_line": 69
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getServerContextPath()",
+          "location": {
+            "source_id": "repository:645ddd877524863a056a8201",
+            "end_line": 99,
+            "start_line": 97
+          },
+          "guard_sites": [
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 98,
+                "start_line": 98
+              },
+              "guards": []
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 99,
+                "start_line": 97
+              },
+              "guards": []
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getServiceUrl()",
+          "location": {
+            "source_id": "repository:645ddd877524863a056a8201",
+            "end_line": 66,
+            "start_line": 57
+          },
+          "guard_sites": [
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 59,
+                "start_line": 59
+              },
+              "guards": [
+                {
+                  "condition": "instance.getServiceUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 65,
+                "start_line": 62
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getServiceUrl() != null"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 66,
+                "start_line": 57
+              },
+              "guards": [
+                {
+                  "condition": "instance.getServiceUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 66,
+                "start_line": 57
+              },
+              "guards": [
+                {
+                  "condition": "instance.getServiceUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 66,
+                "start_line": 57
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getServiceUrl() != null"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 66,
+                "start_line": 57
+              },
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getServiceUrl() != null"
+                }
+              ]
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.metadata.MetadataContributor.getMetadata()",
+          "location": {
+            "source_id": "repository:4d2fe5d96c0fc9ae8881f94b",
+            "end_line": 24,
+            "start_line": 24
+          },
+          "guard_sites": [],
+          "unsupported": []
+        }
+      ]
+    }
+  }
+}

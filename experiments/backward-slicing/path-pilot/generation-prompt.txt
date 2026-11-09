@@ -1,0 +1,28 @@
+Complete the masked Mock regions of two real tests using only the supplied evidence.
+
+Read exactly these two input files (paths supplied by the leader): COMMON and EVIDENCE.
+Do not read any other repository file, prior candidate, report, evaluator, or reference answer. Do not browse, run tests, or execute target code. You may use local Python or shell to inspect the two JSON inputs in bounded chunks, avoiding truncation. All relevant visible source is in COMMON. EVIDENCE may contain automatically derived, approximate summaries; unsupported or unknown behavior is not proof of absence or feasibility.
+
+Produce one candidate for each task. Preserve the complete ordinary test, parameters, imports and assertions. Fill only masked Mock regions, using existing imports or imports within a region when needed. Select one coherent scenario supported by the unmasked test and visible implementation. Mock responses, exceptions and assertions must be mutually consistent. Verify justified interactions, without requiring behavior that is not implied by the selected scenario. Do not bypass or replace the MUT, delete ordinary assertions, skip tests, introspect runtime internals, or read files from generated code.
+
+Write a single JSON object to OUTPUT with this schema:
+{
+  "flask": {
+    "slots": {
+      "mock_stub_001": "Python code without surrounding marker indentation",
+      "mock_stub_002": "...", "mock_stub_003": "...", "mock_stub_004": "...",
+      "mock_stub_005": "...", "mock_stub_006": "...",
+      "verify_001": "...", "verify_002": "...", "verify_003": "...", "verify_004": "..."
+    },
+    "reasoning": "Brief evidence-based explanation, including chosen normal/exceptional behavior.",
+    "unknowns": []
+  },
+  "cloudfoundry": {
+    "mock_stub": "Java code without surrounding marker indentation",
+    "verify": "Java code without surrounding marker indentation",
+    "reasoning": "Brief evidence-based explanation.",
+    "unknowns": []
+  }
+}
+
+Do not include marker comments in code strings. A slot may be empty if justified. Produce exactly one attempt; no execution feedback or candidate revision. You own only OUTPUT; other agents are working in this workspace, so do not change their files. End with the files actually read and the attempt count. The leader supplies COMMON, EVIDENCE and OUTPUT below.

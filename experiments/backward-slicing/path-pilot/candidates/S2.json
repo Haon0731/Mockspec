@@ -1,0 +1,24 @@
+{
+  "flask": {
+    "slots": {
+      "mock_stub_001": "mock_ctx = mocker.Mock()",
+      "mock_stub_002": "mock_app = mocker.Mock()",
+      "mock_stub_003": "mock_aborter = mocker.Mock(side_effect=Exception(f\"Aborted with {code}\"))",
+      "mock_stub_004": "mock_cv_app = mocker.patch(\"flask.helpers._cv_app\")",
+      "mock_stub_005": "mock_cv_app.get.return_value = mock_ctx",
+      "mock_stub_006": "if not has_app_context:\n    mock_cv_app.get.return_value = None\nmock_wz_abort = mocker.patch(\n    \"flask.helpers._wz_abort\",\n    side_effect=Exception(f\"Werkzeug abort {code}\"),\n)",
+      "verify_001": "mock_cv_app.get.assert_called_once_with(None)",
+      "verify_002": "mock_aborter.assert_called_once_with(code, *args, **kwargs)",
+      "verify_003": "mock_wz_abort.assert_not_called()",
+      "verify_004": "mock_aborter.assert_not_called()\nmock_wz_abort.assert_called_once_with(code, *args, **kwargs)"
+    },
+    "reasoning": "The implementation first calls _cv_app.get(None). With an app context, the configured app aborter receives the exact code, positional arguments, and keyword arguments and raises the exception asserted by the test, so Werkzeug is not reached. Without a context, _cv_app.get returns None and the patched Werkzeug abort receives the same arguments and raises the corresponding exception.",
+    "unknowns": []
+  },
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"actuator/health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "The inherited factory asks PathMappedEndpoints for the health endpoint path when building the health URL. Returning actuator/health combines with the Cloud Foundry application URI to produce the asserted health URL, while the ordinary configuration supplies the default actuator management base path.",
+    "unknowns": []
+  }
+}

@@ -36,6 +36,7 @@ PRD 不作为当前能力或已通过验收的说明。
 
 | 材料 | 已验证的范围 | 复现入口 |
 | --- | --- | --- |
+| [后向切片与 Mock 生成探索](../experiments/backward-slicing/README.md) | 四轮有界研究：候选图、路径/目标关系、Mock 修订、真实执行与交互变异；含 Jib 迁移失败及未验证范围 | [最新结果与复现](../experiments/backward-slicing/component-pilot/README.md)；[归档核验](../experiments/backward-slicing/archive-validation.json) |
 | [M1-5 集成验收](../experiments/staged-inference/acceptance-report.md) | B/C 四状态、静态对照、有界修订修复、定向查询与共享预算；真实检查状态及需求映射见验收记录 | [运行说明](usage.md#分阶段研究回放m1-1--m1-4)；[架构边界](architecture.md#研究路径) |
 | [Scenario Contract Research](scenario-research/decision.md) | 人工契约及有限模型 PoC；Limited-Go | [复现说明](scenario-research/reproduce.md) |
 | [源码绑定局部检查](source-bound-local/report.md) | 可见源码的受支持局部返回值条件；未接入 Agent | [run_local.py](../experiments/scenario-research/run_local.py)；命令和限制见报告 |
