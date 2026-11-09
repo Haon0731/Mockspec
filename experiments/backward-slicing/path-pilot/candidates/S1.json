@@ -1,0 +1,24 @@
+{
+  "flask": {
+    "slots": {
+      "mock_stub_001": "mock_ctx = mocker.Mock()",
+      "mock_stub_002": "mock_app = mocker.Mock()",
+      "mock_stub_003": "mock_aborter = mocker.Mock()",
+      "mock_stub_004": "mock_get = mocker.patch(\"flask.helpers._cv_app.get\", return_value=mock_ctx if has_app_context else None)",
+      "mock_stub_005": "mock_aborter.side_effect = Exception(f\"Aborted with {code}\")",
+      "mock_stub_006": "mock_wz_abort = mocker.patch(\"flask.helpers._wz_abort\", side_effect=Exception(f\"Werkzeug abort {code}\"))",
+      "verify_001": "mock_get.assert_called_once_with(None)",
+      "verify_002": "mock_aborter.assert_called_once_with(code, *args, **kwargs)",
+      "verify_003": "mock_wz_abort.assert_not_called()",
+      "verify_004": "mock_aborter.assert_not_called()\nmock_wz_abort.assert_called_once_with(code, *args, **kwargs)"
+    },
+    "reasoning": "The implementation reads _cv_app with a None default. With an app context, the configured app aborter is invoked with the original code, args, and kwargs; making it raise the expected app-specific exception prevents the subsequent Werkzeug call. Without an app context, Werkzeug abort receives the same arguments and raises the expected Werkzeug-specific exception.",
+    "unknowns": []
+  },
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "createApplication derives the health URL through getHealthEndpointPath, which first queries PathMappedEndpoints for the health EndpointId. Returning health yields the asserted /actuator/health URL, while the Cloud Foundry URI supplies the asserted service and management bases.",
+    "unknowns": []
+  }
+}

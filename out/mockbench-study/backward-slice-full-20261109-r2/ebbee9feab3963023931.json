@@ -1,0 +1,142 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "product_source_not_located",
+    "test_to_product_not_reached",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_265apply_token_merging.py::test_apply_token_merging",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_apply_token_merging",
+          "start_line": 95,
+          "end_line": 179
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 179,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [],
+    "diagnostics": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 5199,
+    "read_bytes": 5199,
+    "attempted_files": 0,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_265apply_token_merging.py",
+      "sha256": "658ae793d4ec8b6677f048d85789dfb56120b22c8ebe0b9c71d4dc02ec15ea9e",
+      "bytes": 5199
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "from": "test:95:54:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:179:4:Assert",
+        "variable": "target_ratio"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "assert sd_model.applied_token_merged_ratio == target_ratio",
+        "end_line": 179,
+        "id": "test:179:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 179
+      },
+      {
+        "code": "target_ratio",
+        "end_line": 95,
+        "id": "test:95:54:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 95
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:179:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:179:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 2,
+    "edges": 1,
+    "edge_kinds": {
+      "data_candidate": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:179:4:Assert",
+        "node_ids": [
+          "test:179:4:Assert",
+          "test:95:54:arg"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": []
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:179:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": false,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.0545,
+  "identity": {
+    "case_id": "stable-diffusion-webui_265",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "eaa56821765699f7745007df14f8c8f062373dd41c27e76a1cea037d395720a7"
+  }
+}

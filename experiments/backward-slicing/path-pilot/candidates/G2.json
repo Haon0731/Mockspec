@@ -1,0 +1,24 @@
+{
+  "flask": {
+    "slots": {
+      "mock_stub_001": "mock_ctx = mocker.MagicMock()",
+      "mock_stub_002": "mock_app = mocker.MagicMock()",
+      "mock_stub_003": "mock_aborter = mocker.Mock(side_effect=Exception(f\"Aborted with {code}\"))",
+      "mock_stub_004": "mock_wz_abort = mocker.patch(\"flask.helpers._wz_abort\", side_effect=Exception(f\"Werkzeug abort {code}\"))",
+      "mock_stub_005": "",
+      "mock_stub_006": "mock_cv_app = mocker.patch(\"flask.helpers._cv_app\")\nmock_cv_app.get.return_value = mock_ctx if has_app_context else None",
+      "verify_001": "mock_cv_app.get.assert_called_once_with(None)",
+      "verify_002": "mock_aborter.assert_called_once_with(code, *args, **kwargs)",
+      "verify_003": "mock_wz_abort.assert_not_called()",
+      "verify_004": "mock_aborter.assert_not_called()\nmock_wz_abort.assert_called_once_with(code, *args, **kwargs)"
+    },
+    "reasoning": "The implementation first reads _cv_app.get(None). With an application context, the configured app aborter raises an exception carrying the asserted message, so the Werkzeug fallback is not reached. Without a context, _wz_abort receives the same code, args, and kwargs and raises the fallback exception expected by the ordinary assertion.",
+    "unknowns": []
+  },
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "The configured non-empty Cloud Foundry URI makes getServiceBaseUrl return its http URL. The factory uses WebEndpointProperties' ordinary actuator base path for management and asks PathMappedEndpoints for the health endpoint path; returning health is consistent with the asserted management and health URLs.",
+    "unknowns": []
+  }
+}

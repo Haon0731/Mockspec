@@ -1,0 +1,2475 @@
+{
+  "condition": "R",
+  "extra_evidence": {
+    "flask": {
+      "backend": "python-ast-bounded-paths/v1",
+      "complete": false,
+      "entry": {
+        "function": "abort",
+        "line": 265,
+        "source_id": "mut"
+      },
+      "exploration_complete": true,
+      "limitations": [
+        "Only the selected function is interpreted; calls are unknown boundaries.",
+        "Each unknown invocation has independent normal and exceptional outcomes.",
+        "Null, constant, and simple integer contradictions are checked without SMT.",
+        "Attribute/subscript evaluation, loops, try, comprehensions, dynamic dispatch, and heap effects are not modeled precisely.",
+        "candidate_consistent means no contradiction was found in the supported abstraction, not executable feasibility.",
+        "The analysis contains no mock-framework replaceability or read-only binding model."
+      ],
+      "limits": {
+        "max_calls_per_path": 16,
+        "max_paths": 64
+      },
+      "paths": [
+        {
+          "events": [
+            {
+              "arguments": [
+                "None"
+              ],
+              "callsite": "mut:282:15",
+              "effect": "unknown",
+              "event_id": "mut:282:15#1",
+              "keyword_arguments": [],
+              "outcome": "normal",
+              "receiver": "_cv_app",
+              "resolution": "external_or_unresolved",
+              "target": "_cv_app.get"
+            },
+            {
+              "arguments": [
+                "code",
+                "*args"
+              ],
+              "callsite": "mut:283:8",
+              "effect": "unknown",
+              "event_id": "mut:283:8#1",
+              "keyword_arguments": [
+                {
+                  "name": "**",
+                  "value": "kwargs"
+                }
+              ],
+              "outcome": "raise",
+              "receiver": "result[mut:282:15#1].app",
+              "resolution": "external_or_unresolved",
+              "target": "ctx.app.aborter"
+            }
+          ],
+          "guards": [
+            {
+              "expression": "(result[mut:282:15#1] is not None)",
+              "polarity": true,
+              "source": "mut:282:4"
+            }
+          ],
+          "outcome": {
+            "event_id": "mut:283:8#1",
+            "exception": "exception[mut:283:8#1]",
+            "kind": "raise",
+            "origin": "unknown_call"
+          },
+          "path_id": "p1",
+          "precision": "bounded_with_unknowns",
+          "unknowns": [
+            {
+              "code": "_cv_app.get(None)",
+              "reason": "external_call_effect_unknown",
+              "source": "mut:282:15"
+            },
+            {
+              "code": "_cv_app.get",
+              "reason": "call_receiver_evaluation_not_modeled",
+              "source": "mut:282:15"
+            },
+            {
+              "code": "ctx.app.aborter(code, *args, **kwargs)",
+              "reason": "external_call_effect_unknown",
+              "source": "mut:283:8"
+            },
+            {
+              "code": "ctx.app.aborter",
+              "reason": "call_receiver_evaluation_not_modeled",
+              "source": "mut:283:8"
+            }
+          ],
+          "value_relations": [
+            {
+              "source": "mut:282:8",
+              "target": "ctx",
+              "value": "result[mut:282:15#1]"
+            }
+          ],
+          "verdict": "candidate_consistent"
+        },
+        {
+          "events": [
+            {
+              "arguments": [
+                "None"
+              ],
+              "callsite": "mut:282:15",
+              "effect": "unknown",
+              "event_id": "mut:282:15#1",
+              "keyword_arguments": [],
+              "outcome": "raise",
+              "receiver": "_cv_app",
+              "resolution": "external_or_unresolved",
+              "target": "_cv_app.get"
+            }
+          ],
+          "guards": [],
+          "outcome": {
+            "event_id": "mut:282:15#1",
+            "exception": "exception[mut:282:15#1]",
+            "kind": "raise",
+            "origin": "unknown_call"
+          },
+          "path_id": "p2",
+          "precision": "bounded_with_unknowns",
+          "unknowns": [
+            {
+              "code": "_cv_app.get(None)",
+              "reason": "external_call_effect_unknown",
+              "source": "mut:282:15"
+            },
+            {
+              "code": "_cv_app.get",
+              "reason": "call_receiver_evaluation_not_modeled",
+              "source": "mut:282:15"
+            }
+          ],
+          "value_relations": [],
+          "verdict": "candidate_consistent"
+        },
+        {
+          "events": [
+            {
+              "arguments": [
+                "None"
+              ],
+              "callsite": "mut:282:15",
+              "effect": "unknown",
+              "event_id": "mut:282:15#1",
+              "keyword_arguments": [],
+              "outcome": "normal",
+              "receiver": "_cv_app",
+              "resolution": "external_or_unresolved",
+              "target": "_cv_app.get"
+            },
+            {
+              "arguments": [
+                "code",
+                "*args"
+              ],
+              "callsite": "mut:283:8",
+              "effect": "unknown",
+              "event_id": "mut:283:8#1",
+              "keyword_arguments": [
+                {
+                  "name": "**",
+                  "value": "kwargs"
+                }
+              ],
+              "outcome": "normal",
+              "receiver": "result[mut:282:15#1].app",
+              "resolution": "external_or_unresolved",
+              "target": "ctx.app.aborter"
+            },
+            {
+              "arguments": [
+                "code",
+                "*args"
+              ],
+              "callsite": "mut:285:4",
+              "effect": "unknown",
+              "event_id": "mut:285:4#1",
+              "keyword_arguments": [
+                {
+                  "name": "**",
+                  "value": "kwargs"
+                }
+              ],
+              "outcome": "raise",
+              "receiver": null,
+              "resolution": "external_or_unresolved",
+              "target": "_wz_abort"
+            }
+          ],
+          "guards": [
+            {
+              "expression": "(result[mut:282:15#1] is not None)",
+              "polarity": true,
+              "source": "mut:282:4"
+            }
+          ],
+          "outcome": {
+            "event_id": "mut:285:4#1",
+            "exception": "exception[mut:285:4#1]",
+            "kind": "raise",
+            "origin": "unknown_call"
+          },
+          "path_id": "p3",
+          "precision": "bounded_with_unknowns",
+          "unknowns": [
+            {
+              "code": "_cv_app.get(None)",
+              "reason": "external_call_effect_unknown",
+              "source": "mut:282:15"
+            },
+            {
+              "code": "_cv_app.get",
+              "reason": "call_receiver_evaluation_not_modeled",
+              "source": "mut:282:15"
+            },
+            {
+              "code": "ctx.app.aborter(code, *args, **kwargs)",
+              "reason": "external_call_effect_unknown",
+              "source": "mut:283:8"
+            },
+            {
+              "code": "ctx.app.aborter",
+              "reason": "call_receiver_evaluation_not_modeled",
+              "source": "mut:283:8"
+            },
+            {
+              "code": "_wz_abort(code, *args, **kwargs)",
+              "reason": "external_call_effect_unknown",
+              "source": "mut:285:4"
+            }
+          ],
+          "value_relations": [
+            {
+              "source": "mut:282:8",
+              "target": "ctx",
+              "value": "result[mut:282:15#1]"
+            }
+          ],
+          "verdict": "candidate_consistent"
+        },
+        {
+          "events": [
+            {
+              "arguments": [
+                "None"
+              ],
+              "callsite": "mut:282:15",
+              "effect": "unknown",
+              "event_id": "mut:282:15#1",
+              "keyword_arguments": [],
+              "outcome": "normal",
+              "receiver": "_cv_app",
+              "resolution": "external_or_unresolved",
+              "target": "_cv_app.get"
+            },
+            {
+              "arguments": [
+                "code",
+                "*args"
+              ],
+              "callsite": "mut:285:4",
+              "effect": "unknown",
+              "event_id": "mut:285:4#1",
+              "keyword_arguments": [
+                {
+                  "name": "**",
+                  "value": "kwargs"
+                }
+              ],
+              "outcome": "raise",
+              "receiver": null,
+              "resolution": "external_or_unresolved",
+              "target": "_wz_abort"
+            }
+          ],
+          "guards": [
+            {
+              "expression": "not ((result[mut:282:15#1] is not None))",
+              "polarity": false,
+              "source": "mut:282:4"
+            }
+          ],
+          "outcome": {
+            "event_id": "mut:285:4#1",
+            "exception": "exception[mut:285:4#1]",
+            "kind": "raise",
+            "origin": "unknown_call"
+          },
+          "path_id": "p4",
+          "precision": "bounded_with_unknowns",
+          "unknowns": [
+            {
+              "code": "_cv_app.get(None)",
+              "reason": "external_call_effect_unknown",
+              "source": "mut:282:15"
+            },
+            {
+              "code": "_cv_app.get",
+              "reason": "call_receiver_evaluation_not_modeled",
+              "source": "mut:282:15"
+            },
+            {
+              "code": "_wz_abort(code, *args, **kwargs)",
+              "reason": "external_call_effect_unknown",
+              "source": "mut:285:4"
+            }
+          ],
+          "value_relations": [
+            {
+              "source": "mut:282:8",
+              "target": "ctx",
+              "value": "result[mut:282:15#1]"
+            }
+          ],
+          "verdict": "candidate_consistent"
+        },
+        {
+          "events": [
+            {
+              "arguments": [
+                "None"
+              ],
+              "callsite": "mut:282:15",
+              "effect": "unknown",
+              "event_id": "mut:282:15#1",
+              "keyword_arguments": [],
+              "outcome": "normal",
+              "receiver": "_cv_app",
+              "resolution": "external_or_unresolved",
+              "target": "_cv_app.get"
+            },
+            {
+              "arguments": [
+                "code",
+                "*args"
+              ],
+              "callsite": "mut:283:8",
+              "effect": "unknown",
+              "event_id": "mut:283:8#1",
+              "keyword_arguments": [
+                {
+                  "name": "**",
+                  "value": "kwargs"
+                }
+              ],
+              "outcome": "normal",
+              "receiver": "result[mut:282:15#1].app",
+              "resolution": "external_or_unresolved",
+              "target": "ctx.app.aborter"
+            },
+            {
+              "arguments": [
+                "code",
+                "*args"
+              ],
+              "callsite": "mut:285:4",
+              "effect": "unknown",
+              "event_id": "mut:285:4#1",
+              "keyword_arguments": [
+                {
+                  "name": "**",
+                  "value": "kwargs"
+                }
+              ],
+              "outcome": "normal",
+              "receiver": null,
+              "resolution": "external_or_unresolved",
+              "target": "_wz_abort"
+            }
+          ],
+          "guards": [
+            {
+              "expression": "(result[mut:282:15#1] is not None)",
+              "polarity": true,
+              "source": "mut:282:4"
+            }
+          ],
+          "outcome": {
+            "kind": "fallthrough"
+          },
+          "path_id": "p5",
+          "precision": "bounded_with_unknowns",
+          "unknowns": [
+            {
+              "code": "_cv_app.get(None)",
+              "reason": "external_call_effect_unknown",
+              "source": "mut:282:15"
+            },
+            {
+              "code": "_cv_app.get",
+              "reason": "call_receiver_evaluation_not_modeled",
+              "source": "mut:282:15"
+            },
+            {
+              "code": "ctx.app.aborter(code, *args, **kwargs)",
+              "reason": "external_call_effect_unknown",
+              "source": "mut:283:8"
+            },
+            {
+              "code": "ctx.app.aborter",
+              "reason": "call_receiver_evaluation_not_modeled",
+              "source": "mut:283:8"
+            },
+            {
+              "code": "_wz_abort(code, *args, **kwargs)",
+              "reason": "external_call_effect_unknown",
+              "source": "mut:285:4"
+            }
+          ],
+          "value_relations": [
+            {
+              "source": "mut:282:8",
+              "target": "ctx",
+              "value": "result[mut:282:15#1]"
+            }
+          ],
+          "verdict": "candidate_consistent"
+        },
+        {
+          "events": [
+            {
+              "arguments": [
+                "None"
+              ],
+              "callsite": "mut:282:15",
+              "effect": "unknown",
+              "event_id": "mut:282:15#1",
+              "keyword_arguments": [],
+              "outcome": "normal",
+              "receiver": "_cv_app",
+              "resolution": "external_or_unresolved",
+              "target": "_cv_app.get"
+            },
+            {
+              "arguments": [
+                "code",
+                "*args"
+              ],
+              "callsite": "mut:285:4",
+              "effect": "unknown",
+              "event_id": "mut:285:4#1",
+              "keyword_arguments": [
+                {
+                  "name": "**",
+                  "value": "kwargs"
+                }
+              ],
+              "outcome": "normal",
+              "receiver": null,
+              "resolution": "external_or_unresolved",
+              "target": "_wz_abort"
+            }
+          ],
+          "guards": [
+            {
+              "expression": "not ((result[mut:282:15#1] is not None))",
+              "polarity": false,
+              "source": "mut:282:4"
+            }
+          ],
+          "outcome": {
+            "kind": "fallthrough"
+          },
+          "path_id": "p6",
+          "precision": "bounded_with_unknowns",
+          "unknowns": [
+            {
+              "code": "_cv_app.get(None)",
+              "reason": "external_call_effect_unknown",
+              "source": "mut:282:15"
+            },
+            {
+              "code": "_cv_app.get",
+              "reason": "call_receiver_evaluation_not_modeled",
+              "source": "mut:282:15"
+            },
+            {
+              "code": "_wz_abort(code, *args, **kwargs)",
+              "reason": "external_call_effect_unknown",
+              "source": "mut:285:4"
+            }
+          ],
+          "value_relations": [
+            {
+              "source": "mut:282:8",
+              "target": "ctx",
+              "value": "result[mut:282:15#1]"
+            }
+          ],
+          "verdict": "candidate_consistent"
+        }
+      ],
+      "pruned_paths": [],
+      "status": "ok"
+    },
+    "cloudfoundry": {
+      "backend": "spoon-guarded-method-summary-prototype",
+      "limitations": [
+        "Summaries preserve source expressions and guards; they do not interpret URI, string, collection, or framework semantics.",
+        "Visible call targets are conservative type/name/arity candidates and do not prove runtime dispatch.",
+        "Opaque calls may return normally or throw; their effects and values are unknown.",
+        "In value_effect mode call records inherit their enclosing method location to keep bounded packets compact.",
+        "Loops and try/catch are reported unsupported and are not path-expanded.",
+        "Assignments are lexical substitutions without heap alias or reaching-definition proofs.",
+        "Expansion is bounded and an incomplete result must not be treated as absence of behavior."
+      ],
+      "methods": [
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactory.getServiceBaseUrl()",
+          "visibility": "protected",
+          "location": {
+            "source_id": "mut",
+            "end_line": 50,
+            "start_line": 43
+          },
+          "parameters": [],
+          "assignments": [
+            {
+              "value": "cfApplicationProperties.getUris().get(0)",
+              "name": "uri",
+              "location": {
+                "source_id": "mut",
+                "end_line": 48,
+                "start_line": 48
+              }
+            }
+          ],
+          "returns": [
+            {
+              "location": {
+                "source_id": "mut",
+                "end_line": 45,
+                "start_line": 45
+              },
+              "expression": "null",
+              "guards": [
+                {
+                  "condition": "cfApplicationProperties.getUris().isEmpty()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "mut",
+                "end_line": 49,
+                "start_line": 49
+              },
+              "expression": "\"http://\" + uri",
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "cfApplicationProperties.getUris().isEmpty()"
+                }
+              ]
+            }
+          ],
+          "calls": [
+            {
+              "expression": "cfApplicationProperties.getUris()",
+              "receiver": "cfApplicationProperties",
+              "name": "getUris",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "cfApplicationProperties.getUris().isEmpty()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "cfApplicationProperties.getUris()",
+              "receiver": "cfApplicationProperties",
+              "name": "getUris",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "cfApplicationProperties.getUris().isEmpty()"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            }
+          ],
+          "events": [],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.createApplication()",
+          "visibility": "public",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 77,
+            "start_line": 70
+          },
+          "parameters": [],
+          "assignments": [],
+          "returns": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 76,
+                "start_line": 71
+              },
+              "expression": "de.codecentric.boot.admin.client.registration.Application.create(getName()).healthUrl(getHealthUrl()).managementUrl(getManagementUrl()).serviceUrl(getServiceUrl()).metadata(getMetadata()).build()",
+              "guards": []
+            }
+          ],
+          "calls": [
+            {
+              "expression": "getName()",
+              "receiver": "",
+              "name": "getName",
+              "arguments": [],
+              "guards": [],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getName()"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "getHealthUrl()",
+              "receiver": "",
+              "name": "getHealthUrl",
+              "arguments": [],
+              "guards": [],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getHealthUrl()"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "getManagementUrl()",
+              "receiver": "",
+              "name": "getManagementUrl",
+              "arguments": [],
+              "guards": [],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getManagementUrl()"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "getServiceUrl()",
+              "receiver": "",
+              "name": "getServiceUrl",
+              "arguments": [],
+              "guards": [],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getServiceUrl()",
+                "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getServiceUrl()"
+              ],
+              "resolution": "dynamic_dispatch_candidates"
+            },
+            {
+              "expression": "getMetadata()",
+              "receiver": "",
+              "name": "getMetadata",
+              "arguments": [],
+              "guards": [],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getMetadata()"
+              ],
+              "resolution": "single_visible_candidate"
+            }
+          ],
+          "events": [],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getEndpointsWebPath()",
+          "visibility": "protected",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 145,
+            "start_line": 143
+          },
+          "parameters": [],
+          "assignments": [],
+          "returns": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 144,
+                "start_line": 144
+              },
+              "expression": "webEndpoint.getBasePath()",
+              "guards": []
+            }
+          ],
+          "calls": [
+            {
+              "expression": "webEndpoint.getBasePath()",
+              "receiver": "webEndpoint",
+              "name": "getBasePath",
+              "arguments": [],
+              "guards": [],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            }
+          ],
+          "events": [],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getHealthEndpointPath()",
+          "visibility": "protected",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 206,
+            "start_line": 196
+          },
+          "parameters": [],
+          "assignments": [
+            {
+              "value": "pathMappedEndpoints.getPath(org.springframework.boot.actuate.endpoint.EndpointId.of(\"health\"))",
+              "name": "health",
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 197,
+                "start_line": 197
+              }
+            },
+            {
+              "value": "pathMappedEndpoints.getPath(org.springframework.boot.actuate.endpoint.EndpointId.of(\"status\"))",
+              "name": "status",
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 201,
+                "start_line": 201
+              }
+            }
+          ],
+          "returns": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 199,
+                "start_line": 199
+              },
+              "expression": "health",
+              "guards": [
+                {
+                  "condition": "org.springframework.util.StringUtils.hasText(health)",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 203,
+                "start_line": 203
+              },
+              "expression": "status",
+              "guards": [
+                {
+                  "condition": "org.springframework.util.StringUtils.hasText(status)",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "org.springframework.util.StringUtils.hasText(health)"
+                }
+              ]
+            }
+          ],
+          "calls": [
+            {
+              "expression": "pathMappedEndpoints.getPath(org.springframework.boot.actuate.endpoint.EndpointId.of(\"health\"))",
+              "receiver": "pathMappedEndpoints",
+              "name": "getPath",
+              "arguments": [
+                "org.springframework.boot.actuate.endpoint.EndpointId.of(\"health\")"
+              ],
+              "guards": [],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "pathMappedEndpoints.getPath(org.springframework.boot.actuate.endpoint.EndpointId.of(\"status\"))",
+              "receiver": "pathMappedEndpoints",
+              "name": "getPath",
+              "arguments": [
+                "org.springframework.boot.actuate.endpoint.EndpointId.of(\"status\")"
+              ],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "org.springframework.util.StringUtils.hasText(health)"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            }
+          ],
+          "events": [
+            {
+              "expression": "new java.lang.IllegalStateException(\"Either health or status endpoint must be enabled!\")",
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "org.springframework.util.StringUtils.hasText(health)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "org.springframework.util.StringUtils.hasText(status)"
+                }
+              ],
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 205,
+                "start_line": 205
+              },
+              "kind": "throw"
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getHealthUrl()",
+          "visibility": "protected",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 155,
+            "start_line": 147
+          },
+          "parameters": [],
+          "assignments": [],
+          "returns": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 149,
+                "start_line": 149
+              },
+              "expression": "instance.getHealthUrl()",
+              "guards": [
+                {
+                  "condition": "instance.getHealthUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 154,
+                "start_line": 151
+              },
+              "expression": "org.springframework.web.util.UriComponentsBuilder.fromHttpUrl(getManagementBaseUrl()).path(\"/\").path(getHealthEndpointPath()).toUriString()",
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getHealthUrl() != null"
+                }
+              ]
+            }
+          ],
+          "calls": [
+            {
+              "expression": "instance.getHealthUrl()",
+              "receiver": "instance",
+              "name": "getHealthUrl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "instance.getHealthUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "instance.getHealthUrl()",
+              "receiver": "instance",
+              "name": "getHealthUrl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "instance.getHealthUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "getManagementBaseUrl()",
+              "receiver": "",
+              "name": "getManagementBaseUrl",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getHealthUrl() != null"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getManagementBaseUrl()",
+                "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getManagementBaseUrl()"
+              ],
+              "resolution": "dynamic_dispatch_candidates"
+            },
+            {
+              "expression": "getHealthEndpointPath()",
+              "receiver": "",
+              "name": "getHealthEndpointPath",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getHealthUrl() != null"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getHealthEndpointPath()"
+              ],
+              "resolution": "single_visible_candidate"
+            }
+          ],
+          "events": [],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getManagementBaseUrl()",
+          "visibility": "protected",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 137,
+            "start_line": 120
+          },
+          "parameters": [],
+          "assignments": [
+            {
+              "value": "instance.getManagementBaseUrl()",
+              "name": "baseUrl",
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 121,
+                "start_line": 121
+              }
+            },
+            {
+              "value": "(management.getSsl() != null) ? management.getSsl() : server.getSsl()",
+              "name": "ssl",
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 131,
+                "start_line": 131
+              }
+            }
+          ],
+          "returns": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 124,
+                "start_line": 124
+              },
+              "expression": "baseUrl",
+              "guards": [
+                {
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 128,
+                "start_line": 128
+              },
+              "expression": "this.getServiceUrl()",
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 136,
+                "start_line": 132
+              },
+              "expression": "org.springframework.web.util.UriComponentsBuilder.newInstance().scheme(getScheme(ssl)).host(getManagementHost()).port(getLocalManagementPort()).toUriString()",
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            }
+          ],
+          "calls": [
+            {
+              "expression": "instance.getManagementBaseUrl()",
+              "receiver": "instance",
+              "name": "getManagementBaseUrl",
+              "arguments": [],
+              "guards": [],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "isManagementPortEqual()",
+              "receiver": "",
+              "name": "isManagementPortEqual",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.isManagementPortEqual()"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "this.getServiceUrl()",
+              "receiver": "this",
+              "name": "getServiceUrl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getServiceUrl()",
+                "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getServiceUrl()"
+              ],
+              "resolution": "dynamic_dispatch_candidates"
+            },
+            {
+              "expression": "management.getSsl()",
+              "receiver": "management",
+              "name": "getSsl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "management.getSsl() != null",
+                  "kind": "lexical_conditional_guard",
+                  "polarity": "unknown"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "management.getSsl()",
+              "receiver": "management",
+              "name": "getSsl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "management.getSsl() != null",
+                  "kind": "lexical_conditional_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "server.getSsl()",
+              "receiver": "server",
+              "name": "getSsl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "management.getSsl() != null",
+                  "kind": "lexical_conditional_guard",
+                  "polarity": "false"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "getScheme(ssl)",
+              "receiver": "",
+              "name": "getScheme",
+              "arguments": [
+                "ssl"
+              ],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getScheme(org.springframework.boot.web.server.Ssl)"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "getManagementHost()",
+              "receiver": "",
+              "name": "getManagementHost",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getManagementHost()"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "getLocalManagementPort()",
+              "receiver": "",
+              "name": "getLocalManagementPort",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getLocalManagementPort()"
+              ],
+              "resolution": "single_visible_candidate"
+            }
+          ],
+          "events": [],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getManagementUrl()",
+          "visibility": "protected",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 118,
+            "start_line": 109
+          },
+          "parameters": [],
+          "assignments": [],
+          "returns": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 111,
+                "start_line": 111
+              },
+              "expression": "instance.getManagementUrl()",
+              "guards": [
+                {
+                  "condition": "instance.getManagementUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 117,
+                "start_line": 114
+              },
+              "expression": "org.springframework.web.util.UriComponentsBuilder.fromUriString(getManagementBaseUrl()).path(\"/\").path(getEndpointsWebPath()).toUriString()",
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getManagementUrl() != null"
+                }
+              ]
+            }
+          ],
+          "calls": [
+            {
+              "expression": "instance.getManagementUrl()",
+              "receiver": "instance",
+              "name": "getManagementUrl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "instance.getManagementUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "instance.getManagementUrl()",
+              "receiver": "instance",
+              "name": "getManagementUrl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "instance.getManagementUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "getManagementBaseUrl()",
+              "receiver": "",
+              "name": "getManagementBaseUrl",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getManagementUrl() != null"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getManagementBaseUrl()",
+                "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getManagementBaseUrl()"
+              ],
+              "resolution": "dynamic_dispatch_candidates"
+            },
+            {
+              "expression": "getEndpointsWebPath()",
+              "receiver": "",
+              "name": "getEndpointsWebPath",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getManagementUrl() != null"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getEndpointsWebPath()"
+              ],
+              "resolution": "single_visible_candidate"
+            }
+          ],
+          "events": [],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getMetadata()",
+          "visibility": "protected",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 162,
+            "start_line": 157
+          },
+          "parameters": [],
+          "assignments": [
+            {
+              "value": "new java.util.LinkedHashMap<>()",
+              "name": "metadata",
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 158,
+                "start_line": 158
+              }
+            }
+          ],
+          "returns": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 161,
+                "start_line": 161
+              },
+              "expression": "metadata",
+              "guards": []
+            }
+          ],
+          "calls": [
+            {
+              "expression": "metadata.putAll(metadataContributor.getMetadata())",
+              "receiver": "metadata",
+              "name": "putAll",
+              "arguments": [
+                "metadataContributor.getMetadata()"
+              ],
+              "guards": [],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "metadataContributor.getMetadata()",
+              "receiver": "metadataContributor",
+              "name": "getMetadata",
+              "arguments": [],
+              "guards": [],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.metadata.MetadataContributor.getMetadata()"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "metadata.putAll(instance.getMetadata())",
+              "receiver": "metadata",
+              "name": "putAll",
+              "arguments": [
+                "instance.getMetadata()"
+              ],
+              "guards": [],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "instance.getMetadata()",
+              "receiver": "instance",
+              "name": "getMetadata",
+              "arguments": [],
+              "guards": [],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            }
+          ],
+          "events": [],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getName()",
+          "visibility": "protected",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 81,
+            "start_line": 79
+          },
+          "parameters": [],
+          "assignments": [],
+          "returns": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 80,
+                "start_line": 80
+              },
+              "expression": "instance.getName()",
+              "guards": []
+            }
+          ],
+          "calls": [
+            {
+              "expression": "instance.getName()",
+              "receiver": "instance",
+              "name": "getName",
+              "arguments": [],
+              "guards": [],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            }
+          ],
+          "events": [],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getServiceBaseUrl()",
+          "visibility": "protected",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 107,
+            "start_line": 91
+          },
+          "parameters": [],
+          "assignments": [
+            {
+              "value": "instance.getServiceBaseUrl()",
+              "name": "baseUrl",
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 92,
+                "start_line": 92
+              }
+            }
+          ],
+          "returns": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 95,
+                "start_line": 95
+              },
+              "expression": "baseUrl",
+              "guards": [
+                {
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 106,
+                "start_line": 102
+              },
+              "expression": "org.springframework.web.util.UriComponentsBuilder.newInstance().scheme(getScheme(server.getSsl())).host(getServiceHost()).port(getLocalServerPort()).toUriString()",
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "getLocalServerPort() == null"
+                }
+              ]
+            }
+          ],
+          "calls": [
+            {
+              "expression": "instance.getServiceBaseUrl()",
+              "receiver": "instance",
+              "name": "getServiceBaseUrl",
+              "arguments": [],
+              "guards": [],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "getLocalServerPort()",
+              "receiver": "",
+              "name": "getLocalServerPort",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "getLocalServerPort() == null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getLocalServerPort()"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "getScheme(server.getSsl())",
+              "receiver": "",
+              "name": "getScheme",
+              "arguments": [
+                "server.getSsl()"
+              ],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "getLocalServerPort() == null"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getScheme(org.springframework.boot.web.server.Ssl)"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "server.getSsl()",
+              "receiver": "server",
+              "name": "getSsl",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "getLocalServerPort() == null"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "getServiceHost()",
+              "receiver": "",
+              "name": "getServiceHost",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "getLocalServerPort() == null"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getServiceHost()"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "getLocalServerPort()",
+              "receiver": "",
+              "name": "getLocalServerPort",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "getLocalServerPort() == null"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getLocalServerPort()"
+              ],
+              "resolution": "single_visible_candidate"
+            }
+          ],
+          "events": [
+            {
+              "expression": "new java.lang.IllegalStateException(\"couldn't determine local port. Please set spring.boot.admin.client.instance.service-base-url.\")",
+              "guards": [
+                {
+                  "condition": "getLocalServerPort() == null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ],
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 99,
+                "start_line": 99
+              },
+              "kind": "throw"
+            }
+          ],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getServiceUrl()",
+          "visibility": "protected",
+          "location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "end_line": 89,
+            "start_line": 83
+          },
+          "parameters": [],
+          "assignments": [],
+          "returns": [
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 85,
+                "start_line": 85
+              },
+              "expression": "instance.getServiceUrl()",
+              "guards": [
+                {
+                  "condition": "instance.getServiceUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                "end_line": 88,
+                "start_line": 88
+              },
+              "expression": "org.springframework.web.util.UriComponentsBuilder.fromUriString(getServiceBaseUrl()).path(\"/\").toUriString()",
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getServiceUrl() != null"
+                }
+              ]
+            }
+          ],
+          "calls": [
+            {
+              "expression": "instance.getServiceUrl()",
+              "receiver": "instance",
+              "name": "getServiceUrl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "instance.getServiceUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "instance.getServiceUrl()",
+              "receiver": "instance",
+              "name": "getServiceUrl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "instance.getServiceUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "getServiceBaseUrl()",
+              "receiver": "",
+              "name": "getServiceBaseUrl",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getServiceUrl() != null"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactory.getServiceBaseUrl()",
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getServiceBaseUrl()"
+              ],
+              "resolution": "dynamic_dispatch_candidates"
+            }
+          ],
+          "events": [],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getManagementBaseUrl()",
+          "visibility": "protected",
+          "location": {
+            "source_id": "repository:645ddd877524863a056a8201",
+            "end_line": 91,
+            "start_line": 69
+          },
+          "parameters": [],
+          "assignments": [
+            {
+              "value": "instance.getManagementBaseUrl()",
+              "name": "baseUrl",
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 70,
+                "start_line": 70
+              }
+            },
+            {
+              "value": "(management.getSsl() != null) ? management.getSsl() : server.getSsl()",
+              "name": "ssl",
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 84,
+                "start_line": 84
+              }
+            }
+          ],
+          "returns": [
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 73,
+                "start_line": 73
+              },
+              "expression": "baseUrl",
+              "guards": [
+                {
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 81,
+                "start_line": 77
+              },
+              "expression": "org.springframework.web.util.UriComponentsBuilder.fromHttpUrl(getServiceUrl()).path(\"/\").path(getDispatcherServletPrefix()).path(getManagementContextPath()).toUriString()",
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 90,
+                "start_line": 85
+              },
+              "expression": "org.springframework.web.util.UriComponentsBuilder.newInstance().scheme(getScheme(ssl)).host(getManagementHost()).port(getLocalManagementPort()).path(getManagementContextPath()).toUriString()",
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ]
+            }
+          ],
+          "calls": [
+            {
+              "expression": "instance.getManagementBaseUrl()",
+              "receiver": "instance",
+              "name": "getManagementBaseUrl",
+              "arguments": [],
+              "guards": [],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "isManagementPortEqual()",
+              "receiver": "",
+              "name": "isManagementPortEqual",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.isManagementPortEqual()"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "getServiceUrl()",
+              "receiver": "",
+              "name": "getServiceUrl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getServiceUrl()",
+                "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getServiceUrl()"
+              ],
+              "resolution": "dynamic_dispatch_candidates"
+            },
+            {
+              "expression": "getDispatcherServletPrefix()",
+              "receiver": "",
+              "name": "getDispatcherServletPrefix",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getDispatcherServletPrefix()"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "getManagementContextPath()",
+              "receiver": "",
+              "name": "getManagementContextPath",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "isManagementPortEqual()",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getManagementContextPath()"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "management.getSsl()",
+              "receiver": "management",
+              "name": "getSsl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "management.getSsl() != null",
+                  "kind": "lexical_conditional_guard",
+                  "polarity": "unknown"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "management.getSsl()",
+              "receiver": "management",
+              "name": "getSsl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "management.getSsl() != null",
+                  "kind": "lexical_conditional_guard",
+                  "polarity": "true"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "server.getSsl()",
+              "receiver": "server",
+              "name": "getSsl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "management.getSsl() != null",
+                  "kind": "lexical_conditional_guard",
+                  "polarity": "false"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "getScheme(ssl)",
+              "receiver": "",
+              "name": "getScheme",
+              "arguments": [
+                "ssl"
+              ],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getScheme(org.springframework.boot.web.server.Ssl)"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "getManagementHost()",
+              "receiver": "",
+              "name": "getManagementHost",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getManagementHost()"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "getLocalManagementPort()",
+              "receiver": "",
+              "name": "getLocalManagementPort",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getLocalManagementPort()"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "getManagementContextPath()",
+              "receiver": "",
+              "name": "getManagementContextPath",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "!org.springframework.util.StringUtils.isEmpty(baseUrl)"
+                },
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "isManagementPortEqual()"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getManagementContextPath()"
+              ],
+              "resolution": "single_visible_candidate"
+            }
+          ],
+          "events": [],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getServerContextPath()",
+          "visibility": "protected",
+          "location": {
+            "source_id": "repository:645ddd877524863a056a8201",
+            "end_line": 99,
+            "start_line": 97
+          },
+          "parameters": [],
+          "assignments": [],
+          "returns": [
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 98,
+                "start_line": 98
+              },
+              "expression": "servletContext.getContextPath()",
+              "guards": []
+            }
+          ],
+          "calls": [
+            {
+              "expression": "servletContext.getContextPath()",
+              "receiver": "servletContext",
+              "name": "getContextPath",
+              "arguments": [],
+              "guards": [],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            }
+          ],
+          "events": [],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getServiceUrl()",
+          "visibility": "protected",
+          "location": {
+            "source_id": "repository:645ddd877524863a056a8201",
+            "end_line": 66,
+            "start_line": 57
+          },
+          "parameters": [],
+          "assignments": [],
+          "returns": [
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 59,
+                "start_line": 59
+              },
+              "expression": "instance.getServiceUrl()",
+              "guards": [
+                {
+                  "condition": "instance.getServiceUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ]
+            },
+            {
+              "location": {
+                "source_id": "repository:645ddd877524863a056a8201",
+                "end_line": 65,
+                "start_line": 62
+              },
+              "expression": "org.springframework.web.util.UriComponentsBuilder.fromUriString(getServiceBaseUrl()).path(\"/\").path(getServerContextPath()).toUriString()",
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getServiceUrl() != null"
+                }
+              ]
+            }
+          ],
+          "calls": [
+            {
+              "expression": "instance.getServiceUrl()",
+              "receiver": "instance",
+              "name": "getServiceUrl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "instance.getServiceUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "unknown"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "instance.getServiceUrl()",
+              "receiver": "instance",
+              "name": "getServiceUrl",
+              "arguments": [],
+              "guards": [
+                {
+                  "condition": "instance.getServiceUrl() != null",
+                  "kind": "lexical_if_guard",
+                  "polarity": "true"
+                }
+              ],
+              "normal_outcome": "opaque_value_if_returns_normally",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [],
+              "resolution": "opaque_or_unresolved"
+            },
+            {
+              "expression": "getServiceBaseUrl()",
+              "receiver": "",
+              "name": "getServiceBaseUrl",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getServiceUrl() != null"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getServiceBaseUrl()"
+              ],
+              "resolution": "single_visible_candidate"
+            },
+            {
+              "expression": "getServerContextPath()",
+              "receiver": "",
+              "name": "getServerContextPath",
+              "arguments": [],
+              "guards": [
+                {
+                  "polarity": "false",
+                  "precision": "same_block_true_branch_definitely_exits",
+                  "kind": "sequential_early_exit_guard",
+                  "condition": "instance.getServiceUrl() != null"
+                }
+              ],
+              "normal_outcome": "visible_candidate_value",
+              "exception_outcome": "possible_unknown_exception",
+              "target_candidates": [
+                "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getServerContextPath()"
+              ],
+              "resolution": "single_visible_candidate"
+            }
+          ],
+          "events": [],
+          "unsupported": []
+        },
+        {
+          "qualified_signature": "de.codecentric.boot.admin.client.registration.metadata.MetadataContributor.getMetadata()",
+          "visibility": "public",
+          "location": {
+            "source_id": "repository:4d2fe5d96c0fc9ae8881f94b",
+            "end_line": 24,
+            "start_line": 24
+          },
+          "parameters": [],
+          "assignments": [],
+          "returns": [],
+          "calls": [],
+          "events": [],
+          "unsupported": []
+        }
+      ],
+      "mode": "value_effect",
+      "status": "ok",
+      "bounds": {
+        "max_observed_expanded_paths_per_method": 0,
+        "max_expanded_paths": 32,
+        "max_expansion_depth": 2
+      }
+    }
+  }
+}

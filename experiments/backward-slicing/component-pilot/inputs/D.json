@@ -1,0 +1,51 @@
+{
+  "candidate": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "The visible factory builds the health URL from the management base URL and PathMappedEndpoints.getPath for the health endpoint. Returning health selects the normal first-choice endpoint path and yields the asserted /actuator/health URL; verification checks that dependency interaction.",
+    "unknowns": []
+  },
+  "extra_evidence": {
+    "check_of_supplied_candidate": [
+      {
+        "verdict": "conflict",
+        "goal_id": "test:54:9:healthUrl:1",
+        "paths": [
+          {
+            "path_id": "p1",
+            "verdict": "excluded",
+            "reason": "configured normal return excludes this exception exit"
+          },
+          {
+            "path_id": "p2",
+            "verdict": "excluded",
+            "reason": "prefix guard false before next event"
+          },
+          {
+            "path_id": "p3",
+            "verdict": "excluded",
+            "reason": "prefix guard false before next event"
+          },
+          {
+            "path_id": "p4",
+            "actual": "http://application/Uppercase/health",
+            "expected": "http://application/Uppercase/actuator/health",
+            "response_symbols": {
+              "result:repository:f1cbe4e7534b595de231fa4a:197:25#1": "health"
+            },
+            "verdict": "conflict",
+            "reason": "constructed value differs from original assertion"
+          },
+          {
+            "path_id": "p5",
+            "verdict": "excluded",
+            "reason": "prefix guard false before next event"
+          }
+        ],
+        "scope": "projected goal under recorded normal-completion and library-summary assumptions; not whole-test validity"
+      }
+    ],
+    "library_summary_scope": "Spring 5.1.2.RELEASE; null/ASCII predicates and restricted HTTP(S) URI path construction; no query/fragment/templates/percent-encoding/dot segments",
+    "checker_scope": "one projected property with recorded normal-completion obligations, not complete test correctness"
+  }
+}

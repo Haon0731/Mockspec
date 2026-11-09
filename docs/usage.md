@@ -93,6 +93,76 @@ agent_payload = task.to_dict()
 没有写出文件、修改旧仓库或自动回退来源的行为。可迁移 snapshot 的物理位置，
 但目录的 dataset/snapshot ID、所选控制文件和源码内容必须与已审核记录一致。
 
+## 完整 MockBench 研究框架
+
+先生成冻结 agent 案例清单。默认 `--input-policy frozen-agent` 直接使用 Stub-Tester
+正式索引，不受历史三例白名单限制；这一步只读取元数据：
+
+```bash
+PYTHONPATH=src .venv/bin/python experiments/mockbench-study/run.py inventory \
+  --registry-root /home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max \
+  --output out/mockbench-study/inventory.json
+```
+
+该 registry 包含 Java 59 例、Python 106 例。接着实际加载全部案例，校验控制身份、
+masked test 和 injector，输出逐例状态；不运行分析器、模型或目标测试：
+
+```bash
+PYTHONPATH=src .venv/bin/python experiments/mockbench-study/run.py check-inputs \
+  --inventory out/mockbench-study/inventory.json \
+  --output-dir out/mockbench-study/input-check
+```
+
+`check-inputs` 退出码 0 表示所有案例加载成功，1 表示存在逐例加载失败，2 表示命令或
+清单无效。结果目录必须不存在。`summary.json` 汇总语言与总量，`results.json` 保留每例结果；
+不会导出整份数据集。加载不要求提前知道 MUT。
+
+运行目标导向后向候选切片（无模型调用、不执行目标测试）：
+
+```bash
+PYTHONPATH=src .venv/bin/python experiments/backward-slicing/batch_slice.py \
+  --inventory out/mockbench-study/inventory.json \
+  --output out/mockbench-study/backward-slice
+```
+
+Java复用下文的固定 Spoon/JDK；Python使用标准库AST。默认每例最多8个文件、
+200000字节选定源码、后端30秒；`--case-id` 可重复选择探针，其余案例仍记入分母。
+结果目录必须不存在。逐例图和失败保存在 `results.json`，源码身份和实际读取预算
+随案例留证。`partial` 是候选图完成，不是关系正确或Mock恢复成功；命令正常退出仅
+表示批次报告写完，需检查 `summary.json` 的失败/超时分布。
+准则、边界与精度说明见[候选切片研究入口](../experiments/backward-slicing/README.md#全量候选切片入口2026-11-09)。
+
+Python 宿主按需读取源码，明确选择 MUT 后再构造现有 `UnifiedTask`：
+
+```python
+from pathlib import Path
+from mock_spec.adapters.frozen_dataset import FrozenDataset
+
+dataset = FrozenDataset(
+    Path("/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max"),
+    dataset="python-benchmark-new",
+    inventory_revision="0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc",
+)
+with dataset.load_case("flask_308") as case:
+    print(case.masked_test.text)
+    print(case.source_paths)  # 只列冻结 manifest 中允许的源码，不遍历依赖树
+    source = case.read_source("src/src/flask/helpers.py")
+    task = case.to_task(mut_path="src/src/flask/helpers.py")
+```
+
+`case_ids` 和 `snapshot_ids` 提供闭合索引。源码读取拒绝身份变化、越界、控制材料与链接。
+固定测试上下文按上游版本保留；完整数据策略不会删掉区域外已有的 Mock 创建或普通交互 oracle。
+这一策略的审查依据与限制见[输入记录](input-audit.md#完整冻结-agent-数据接入2026-11-09)。
+
+历史三例语法基线仍可通过 `inventory --input-policy reviewed` 生成清单，再调用原
+`batch --inventory ... --output-dir ... --limit 1 --timeout-seconds 60`。
+它的退出码 0 只表示报告写完，后端结果需看 `summary.json`；不要把它当作全量输入检查。
+研究归因与后续边界见[研究框架](../experiments/mockbench-study/README.md)。
+
+```bash
+.venv/bin/python -m pytest -q tests/test_frozen_dataset.py tests/test_mask_policy.py tests/test_mockbench_inventory.py tests/test_mockbench_intake.py tests/test_mockbench_batch.py
+```
+
 ## Schema
 
 `UnifiedTask` 使用不可变 dataclass；`from_dict()` 对每一层实施严格字段白名单、

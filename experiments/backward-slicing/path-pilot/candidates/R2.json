@@ -1,0 +1,24 @@
+{
+  "flask": {
+    "slots": {
+      "mock_stub_001": "mock_ctx = mocker.MagicMock()",
+      "mock_stub_002": "mock_app = mocker.MagicMock()",
+      "mock_stub_003": "mock_aborter = mocker.Mock()",
+      "mock_stub_004": "mock_cv_app = mocker.patch(\"flask.helpers._cv_app\")",
+      "mock_stub_005": "mock_cv_app.get.return_value = mock_ctx\nmock_aborter.side_effect = Exception(f\"Aborted with {code}\")",
+      "mock_stub_006": "if not has_app_context:\n    mock_cv_app.get.return_value = None\nmock_wz_abort = mocker.patch(\"flask.helpers._wz_abort\")\nmock_wz_abort.side_effect = Exception(f\"Werkzeug abort {code}\")",
+      "verify_001": "mock_cv_app.get.assert_called_once_with(None)",
+      "verify_002": "mock_aborter.assert_called_once_with(code, *args, **kwargs)",
+      "verify_003": "mock_wz_abort.assert_not_called()",
+      "verify_004": "mock_aborter.assert_not_called()\nmock_wz_abort.assert_called_once_with(code, *args, **kwargs)"
+    },
+    "reasoning": "The context variable is made to return the constructed app context only for context-present cases. There the app aborter raises the message expected by the ordinary assertion, so the later Werkzeug call is not reached. Without a context, Werkzeug abort receives the same code, positional arguments, and keyword arguments and raises the alternate expected message.",
+    "unknowns": []
+  },
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "The factory derives the health URL from the first non-empty mapped health/status endpoint. Returning the health path matches the asserted /actuator/health URL, and the verification checks the interaction justified by that selected normal path.",
+    "unknowns": []
+  }
+}

@@ -1,0 +1,533 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "test_to_product_not_reached",
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "com.ctrip.framework.apollo.openapi.filter.ConsumerAuthenticationFilterTest#testAuthFailed",
+      "status": "located",
+      "precision": "java_lexical_method_scope",
+      "locations": [
+        {
+          "symbol": "testAuthFailed",
+          "start_line": 24,
+          "end_line": 39
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 37,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 38,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:1"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_import",
+        "hint": "com.ctrip.framework.apollo.openapi.util.ConsumerAuditUtil",
+        "candidates": [
+          "src/main/java/com/ctrip/framework/apollo/openapi/util/ConsumerAuditUtil.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_import",
+        "hint": "com.ctrip.framework.apollo.openapi.util.ConsumerAuthUtil",
+        "candidates": [
+          "src/main/java/com/ctrip/framework/apollo/openapi/util/ConsumerAuthUtil.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_same_package_type",
+        "hint": "com.ctrip.framework.apollo.openapi.filter.ConsumerAuthenticationFilter",
+        "candidates": [
+          "src/main/java/com/ctrip/framework/apollo/openapi/filter/ConsumerAuthenticationFilter.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/main/java/com/ctrip/framework/apollo/openapi/util/ConsumerAuditUtil.java",
+        "hint_kind": "java_import",
+        "hint": "com.ctrip.framework.apollo.openapi.entity.ConsumerAudit",
+        "candidates": [
+          "src/main/java/com/ctrip/framework/apollo/openapi/entity/ConsumerAudit.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/main/java/com/ctrip/framework/apollo/openapi/util/ConsumerAuditUtil.java",
+        "hint_kind": "java_import",
+        "hint": "com.ctrip.framework.apollo.openapi.service.ConsumerService",
+        "candidates": [
+          "src/main/java/com/ctrip/framework/apollo/openapi/service/ConsumerService.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "truncated": false,
+    "opaque_methods": [
+      {
+        "source_id": "source:1",
+        "name": "audit",
+        "start_line": 42,
+        "end_line": 44
+      },
+      {
+        "source_id": "source:2",
+        "name": "getConsumerId",
+        "start_line": 18,
+        "end_line": 20
+      },
+      {
+        "source_id": "source:2",
+        "name": "storeConsumerId",
+        "start_line": 20,
+        "end_line": 22
+      }
+    ],
+    "selected_bytes": 19290,
+    "read_bytes": 19290,
+    "attempted_files": 5,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "src/test/java/com/ctrip/framework/apollo/openapi/filter/ConsumerAuthenticationFilterTest.java",
+      "sha256": "bc842bfdb4ea8ba6b597c5e5a25a40230e5b832de3335ce9c32bd81d92e72d44",
+      "bytes": 1539
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/main/java/com/ctrip/framework/apollo/openapi/util/ConsumerAuditUtil.java",
+      "sha256": "7d7af90a0e9bb27d61365ac027bddd7d581eec8f21e195661addede0557a2bd0",
+      "bytes": 2393
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/main/java/com/ctrip/framework/apollo/openapi/util/ConsumerAuthUtil.java",
+      "sha256": "2de390c0bc9b3a67a75a5c9a934f8c5ed2874489f745ea3386bda863cb2eebec",
+      "bytes": 1014
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/main/java/com/ctrip/framework/apollo/openapi/filter/ConsumerAuthenticationFilter.java",
+      "sha256": "36ded3aa00672539975563cb1231e2535a3a5106c5be17bc5b9c4b56dbf0c11d",
+      "bytes": 1807
+    },
+    {
+      "source_id": "source:4",
+      "logical_path": "src/main/java/com/ctrip/framework/apollo/openapi/entity/ConsumerAudit.java",
+      "sha256": "2cd3531669f2d729b1c291fc302daa712ffc2a79caa64758cbb4badaf9fffcfa",
+      "bytes": 2555
+    },
+    {
+      "source_id": "source:5",
+      "logical_path": "src/main/java/com/ctrip/framework/apollo/openapi/service/ConsumerService.java",
+      "sha256": "89f0ade157935db5cf07c94f5745425a72aa85f5d0553ac9a7dceea078f4db7c",
+      "bytes": 9982
+    }
+  ],
+  "graph": {
+    "status": "ok",
+    "limitations": [
+      "data_candidate edges are conservative name/declaration candidates, not a sound reaching-def analysis",
+      "lexical_control edges describe AST ancestry, not post-dominator control dependence",
+      "call_return edges use no-classpath resolution plus name/arity virtual candidates and do not prove dispatch",
+      "expression_value_candidate edges preserve syntax containment, not runtime evaluation or value equality",
+      "heap aliasing, reflection, exceptions, concurrency, and path feasibility are not modeled",
+      "boundary calls are retained as nodes and are not traversed into dependency implementations"
+    ],
+    "seeds": [
+      "test:37:5:CtInvocationImpl",
+      "test:38:5:CtInvocationImpl"
+    ],
+    "nodes": [
+      {
+        "id": "test:33:29:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 33,
+        "end_line": 33,
+        "kind": "CtLocalVariableImpl",
+        "code": "org.mockito.ArgumentCaptor<java.lang.Integer> statusCaptor = org.mockito.ArgumentCaptor.forClass(java.lang.Integer.class)",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "org.mockito.ArgumentCaptor.forClass(java.lang.Integer.class)"
+        ]
+      },
+      {
+        "id": "test:33:44:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 33,
+        "end_line": 33,
+        "kind": "CtInvocationImpl",
+        "code": "org.mockito.ArgumentCaptor.forClass(java.lang.Integer.class)"
+      },
+      {
+        "id": "test:33:44:CtTypeAccessImpl",
+        "source_id": "test",
+        "start_line": 33,
+        "end_line": 33,
+        "kind": "expression",
+        "code": "org.mockito.ArgumentCaptor"
+      },
+      {
+        "id": "test:33:68:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 33,
+        "end_line": 33,
+        "kind": "expression",
+        "code": "java.lang.Integer.class"
+      },
+      {
+        "id": "test:34:28:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 34,
+        "end_line": 34,
+        "kind": "CtLocalVariableImpl",
+        "code": "org.mockito.ArgumentCaptor<java.lang.String> msgCaptor = org.mockito.ArgumentCaptor.forClass(java.lang.String.class)",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "org.mockito.ArgumentCaptor.forClass(java.lang.String.class)"
+        ]
+      },
+      {
+        "id": "test:34:40:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 34,
+        "end_line": 34,
+        "kind": "CtInvocationImpl",
+        "code": "org.mockito.ArgumentCaptor.forClass(java.lang.String.class)"
+      },
+      {
+        "id": "test:34:40:CtTypeAccessImpl",
+        "source_id": "test",
+        "start_line": 34,
+        "end_line": 34,
+        "kind": "expression",
+        "code": "org.mockito.ArgumentCaptor"
+      },
+      {
+        "id": "test:34:64:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 34,
+        "end_line": 34,
+        "kind": "expression",
+        "code": "java.lang.String.class"
+      },
+      {
+        "id": "test:37:18:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 37,
+        "end_line": 37,
+        "kind": "expression",
+        "code": "javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED"
+      },
+      {
+        "id": "test:37:5:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 37,
+        "end_line": 37,
+        "kind": "CtInvocationImpl",
+        "code": "// === VERIFY-START === // === VERIFY-END === org.junit.Assert.assertEquals(javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED, ((int) (statusCaptor.getValue())))",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "((int) (statusCaptor.getValue()))"
+        ]
+      },
+      {
+        "id": "test:37:61:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 37,
+        "end_line": 37,
+        "kind": "CtInvocationImpl",
+        "code": "((int) (statusCaptor.getValue()))"
+      },
+      {
+        "id": "test:37:61:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 37,
+        "end_line": 37,
+        "kind": "expression",
+        "code": "statusCaptor"
+      },
+      {
+        "id": "test:38:18:CtLiteralImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "expression",
+        "code": "\"Unauthorized\""
+      },
+      {
+        "id": "test:38:34:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "CtInvocationImpl",
+        "code": "msgCaptor.getValue()"
+      },
+      {
+        "id": "test:38:34:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "expression",
+        "code": "msgCaptor"
+      },
+      {
+        "id": "test:38:5:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "CtInvocationImpl",
+        "code": "org.junit.Assert.assertEquals(\"Unauthorized\", msgCaptor.getValue())",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "msgCaptor.getValue()"
+        ]
+      }
+    ],
+    "backend": "spoon-source-evidence-prototype",
+    "edges": [
+      {
+        "from": "test:33:44:CtInvocationImpl",
+        "to": "test:33:29:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:33:44:CtTypeAccessImpl",
+        "to": "test:33:44:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:33:68:CtFieldReadImpl",
+        "to": "test:33:44:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:34:40:CtInvocationImpl",
+        "to": "test:34:28:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:34:40:CtTypeAccessImpl",
+        "to": "test:34:40:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:34:64:CtFieldReadImpl",
+        "to": "test:34:40:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:37:18:CtFieldReadImpl",
+        "to": "test:37:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:37:61:CtInvocationImpl",
+        "to": "test:37:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:37:61:CtVariableReadImpl",
+        "to": "test:37:61:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:38:18:CtLiteralImpl",
+        "to": "test:38:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:38:34:CtInvocationImpl",
+        "to": "test:38:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:38:34:CtVariableReadImpl",
+        "to": "test:38:34:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:33:29:CtLocalVariableImpl",
+        "to": "test:37:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "resolved_declaration",
+        "variable": "statusCaptor"
+      },
+      {
+        "from": "test:33:29:CtLocalVariableImpl",
+        "to": "test:37:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "prior_write_same_method",
+        "variable": "statusCaptor"
+      },
+      {
+        "from": "test:33:29:CtLocalVariableImpl",
+        "to": "test:37:61:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "resolved_declaration",
+        "variable": "statusCaptor"
+      },
+      {
+        "from": "test:33:29:CtLocalVariableImpl",
+        "to": "test:37:61:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "prior_write_same_method",
+        "variable": "statusCaptor"
+      },
+      {
+        "from": "test:34:28:CtLocalVariableImpl",
+        "to": "test:38:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "resolved_declaration",
+        "variable": "msgCaptor"
+      },
+      {
+        "from": "test:34:28:CtLocalVariableImpl",
+        "to": "test:38:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "prior_write_same_method",
+        "variable": "msgCaptor"
+      },
+      {
+        "from": "test:34:28:CtLocalVariableImpl",
+        "to": "test:38:34:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "resolved_declaration",
+        "variable": "msgCaptor"
+      },
+      {
+        "from": "test:34:28:CtLocalVariableImpl",
+        "to": "test:38:34:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "prior_write_same_method",
+        "variable": "msgCaptor"
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:37:5:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:38:5:CtInvocationImpl"
+      }
+    ]
+  },
+  "evidence": {
+    "nodes": 16,
+    "edges": 20,
+    "edge_kinds": {
+      "expression_value_candidate": 12,
+      "data_candidate": 8
+    },
+    "criteria": [
+      {
+        "seed": "test:37:5:CtInvocationImpl",
+        "node_ids": [
+          "test:33:29:CtLocalVariableImpl",
+          "test:33:44:CtInvocationImpl",
+          "test:33:44:CtTypeAccessImpl",
+          "test:33:68:CtFieldReadImpl",
+          "test:37:18:CtFieldReadImpl",
+          "test:37:5:CtInvocationImpl",
+          "test:37:61:CtInvocationImpl",
+          "test:37:61:CtVariableReadImpl"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:33:29:CtLocalVariableImpl",
+          "test:37:5:CtInvocationImpl"
+        ]
+      },
+      {
+        "seed": "test:38:5:CtInvocationImpl",
+        "node_ids": [
+          "test:34:28:CtLocalVariableImpl",
+          "test:34:40:CtInvocationImpl",
+          "test:34:40:CtTypeAccessImpl",
+          "test:34:64:CtFieldReadImpl",
+          "test:38:18:CtLiteralImpl",
+          "test:38:34:CtInvocationImpl",
+          "test:38:34:CtVariableReadImpl",
+          "test:38:5:CtInvocationImpl"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:34:28:CtLocalVariableImpl",
+          "test:38:5:CtInvocationImpl"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:37:5:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:38:5:CtInvocationImpl"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 1.8208,
+  "identity": {
+    "case_id": "com.ctrip.framework.apollo.openapi.filter.ConsumerAuthenticationFilterTest#testAuthFailed@6ff6ddd4",
+    "dataset": "java-bechmark-strong",
+    "language": "java",
+    "snapshot_id": "19181beec2f4e3e2f27ba80e9b6944529f246bdc63b3407ea0abb686a1ee378f"
+  }
+}

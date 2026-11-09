@@ -1,0 +1,8 @@
+{
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "DefaultApplicationFactory.createApplication() obtains the health URL through getHealthUrl(), which appends getHealthEndpointPath() to the management base URL. The visible getHealthEndpointPath() first calls pathMappedEndpoints.getPath(EndpointId.of(\"health\")) and returns that value when it has text. Returning \"health\" therefore combines with the Cloud Foundry service base URL and the default /actuator management base to produce the asserted http://application/Uppercase/actuator/health. Verifying the health lookup confirms the dependency interaction that selected this path.",
+    "unknowns": []
+  }
+}

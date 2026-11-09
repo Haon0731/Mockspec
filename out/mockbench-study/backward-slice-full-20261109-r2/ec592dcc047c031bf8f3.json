@@ -1,0 +1,1121 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_302env_file_callback.py::test_env_file_callback_scenarios",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_env_file_callback_scenarios",
+          "start_line": 37,
+          "end_line": 77
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 63,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 65,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 70,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:2"
+      }
+    ],
+    "dynamic_loading": [
+      {
+        "line": 50,
+        "name": "load_function_from_source_ast",
+        "precision": "python_ast_call_name"
+      }
+    ],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "typing",
+        "candidates": [
+          "src/src/flask/typing.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_dynamic_path",
+        "hint": "src/src/flask/cli.py",
+        "candidates": [
+          "src/src/flask/cli.py"
+        ],
+        "precision": "exact_visible_path"
+      }
+    ],
+    "diagnostics": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 42365,
+    "read_bytes": 42365,
+    "attempted_files": 2,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_302env_file_callback.py",
+      "sha256": "b049ebd0886325642446d0f4658d6ba8f76e4dac5daa474031dae7ac1297ec67",
+      "bytes": 2443
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/src/flask/typing.py",
+      "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+      "bytes": 3114
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/src/flask/cli.py",
+      "sha256": "1f2e6624f5a34c86eb0e1928c6acb6b85297b19be0e039791bf0c065d2b2b7af",
+      "bytes": 36808
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "branch": "true",
+        "from": "test:62:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:63:8:With"
+      },
+      {
+        "branch": "true",
+        "from": "test:62:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:65:8:Assert"
+      },
+      {
+        "field": "body",
+        "from": "test:64:12:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:63:8:With"
+      },
+      {
+        "branch": "false",
+        "from": "test:62:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:70:8:Assert"
+      },
+      {
+        "from": "test:49:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:49:4:Name"
+      },
+      {
+        "from": "test:50:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:50:4:Name"
+      },
+      {
+        "from": "test:49:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:50:4:Assign",
+        "variable": "click"
+      },
+      {
+        "from": "test:55:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:55:4:Name"
+      },
+      {
+        "from": "test:41:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:55:4:Assign",
+        "variable": "load_dotenv_defaults"
+      },
+      {
+        "from": "test:56:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:56:4:Name"
+      },
+      {
+        "from": "test:63:8:With",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:63:44:Name"
+      },
+      {
+        "from": "test:50:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:64:12:Expr",
+        "variable": "_env_file_callback"
+      },
+      {
+        "from": "test:55:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:64:12:Expr",
+        "variable": "context"
+      },
+      {
+        "from": "test:56:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:64:12:Expr",
+        "variable": "parameter"
+      },
+      {
+        "from": "test:40:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:64:12:Expr",
+        "variable": "value"
+      },
+      {
+        "from": "test:63:44:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:65:8:Assert",
+        "variable": "exc_info"
+      },
+      {
+        "from": "test:50:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:70:8:Assert",
+        "variable": "_env_file_callback"
+      },
+      {
+        "from": "test:55:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:70:8:Assert",
+        "variable": "context"
+      },
+      {
+        "from": "test:56:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:70:8:Assert",
+        "variable": "parameter"
+      },
+      {
+        "from": "test:40:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:70:8:Assert",
+        "variable": "value"
+      },
+      {
+        "callee": "_env_file_callback",
+        "from": "source:2:512:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:64:12:Expr"
+      },
+      {
+        "callee": "_env_file_callback",
+        "from": "source:2:502:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:64:12:Expr"
+      },
+      {
+        "callee": "_env_file_callback",
+        "from": "source:2:510:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:64:12:Expr"
+      },
+      {
+        "callee": "_env_file_callback",
+        "from": "source:2:512:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:70:8:Assert"
+      },
+      {
+        "callee": "_env_file_callback",
+        "from": "source:2:502:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:70:8:Assert"
+      },
+      {
+        "callee": "_env_file_callback",
+        "from": "source:2:510:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:70:8:Assert"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:509:7:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:510:8:Expr"
+      },
+      {
+        "from": "source:2:494:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:502:12:Raise",
+        "variable": "ctx"
+      },
+      {
+        "from": "source:2:494:24:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:502:12:Raise",
+        "variable": "param"
+      },
+      {
+        "from": "source:2:494:45:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:510:8:Expr",
+        "variable": "value"
+      },
+      {
+        "from": "source:2:494:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:510:8:Expr",
+        "variable": "ctx"
+      },
+      {
+        "from": "source:2:494:45:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:512:4:Return",
+        "variable": "value"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:747:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:748:8:For"
+      },
+      {
+        "field": "body",
+        "from": "source:2:752:12:AugAssign",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "source:2:748:8:For"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:749:15:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:750:16:Continue"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:750:16:Continue",
+        "kind": "normal_branch_exit",
+        "precision": "possible_only_if_branch_completes_normally",
+        "to": "source:2:749:12:If"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:754:7:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:755:8:AugAssign"
+      },
+      {
+        "from": "source:2:745:4:AnnAssign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:745:4:Name"
+      },
+      {
+        "from": "source:2:748:8:For",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:748:12:Name"
+      },
+      {
+        "from": "source:2:749:12:If",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:749:20:Name"
+      },
+      {
+        "from": "source:2:748:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:749:12:If",
+        "variable": "default_name"
+      },
+      {
+        "from": "source:2:752:12:AugAssign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:752:12:Name"
+      },
+      {
+        "from": "source:2:749:20:NamedExpr",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:752:12:AugAssign",
+        "variable": "default_path"
+      },
+      {
+        "from": "source:2:749:20:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:752:12:AugAssign",
+        "variable": "default_path"
+      },
+      {
+        "from": "source:2:755:8:AugAssign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:755:8:Name"
+      },
+      {
+        "from": "source:2:699:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:755:8:AugAssign",
+        "variable": "path"
+      },
+      {
+        "from": "source:2:745:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:763:4:Return",
+        "variable": "data"
+      },
+      {
+        "from": "source:2:752:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:763:4:Return",
+        "variable": "data"
+      },
+      {
+        "from": "source:2:755:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:763:4:Return",
+        "variable": "data"
+      },
+      {
+        "callee": "load_dotenv",
+        "from": "source:2:743:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:510:8:Expr"
+      },
+      {
+        "callee": "load_dotenv",
+        "from": "source:2:763:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:510:8:Expr"
+      },
+      {
+        "callee": "load_dotenv",
+        "from": "source:2:736:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:510:8:Expr"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "param: click.Option",
+        "end_line": 494,
+        "id": "source:2:494:24:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 494
+      },
+      {
+        "code": "value: str | None",
+        "end_line": 494,
+        "id": "source:2:494:45:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 494
+      },
+      {
+        "code": "ctx: click.Context",
+        "end_line": 494,
+        "id": "source:2:494:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 494
+      },
+      {
+        "code": "raise click.BadParameter('python-dotenv must be installed to load an env file.', ctx=ctx, param=param) from None",
+        "contains_unresolved_call": true,
+        "end_line": 506,
+        "exception_possible": true,
+        "id": "source:2:502:12:Raise",
+        "kind": "Raise",
+        "source_id": "source:2",
+        "start_line": 502,
+        "unresolved_calls": [
+          "click.BadParameter('python-dotenv must be installed to load an env file.', ctx=ctx, param=param)"
+        ]
+      },
+      {
+        "code": "value is not None or ctx.obj.load_dotenv_defaults",
+        "end_line": 509,
+        "id": "source:2:509:7:BoolOp",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 509
+      },
+      {
+        "code": "load_dotenv(value, load_defaults=ctx.obj.load_dotenv_defaults)",
+        "end_line": 510,
+        "exception_possible": true,
+        "id": "source:2:510:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 510
+      },
+      {
+        "code": "return value",
+        "end_line": 512,
+        "id": "source:2:512:4:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 512
+      },
+      {
+        "code": "path: str | os.PathLike[str] | None",
+        "end_line": 699,
+        "id": "source:2:699:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 699
+      },
+      {
+        "code": "click.secho(' * Tip: There are .env files present. Install python-dotenv to use them.', fg='yellow', err=True)",
+        "contains_unresolved_call": true,
+        "end_line": 741,
+        "exception_possible": true,
+        "id": "source:2:736:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 736,
+        "unresolved_calls": [
+          "click.secho(' * Tip: There are .env files present. Install python-dotenv to use them.', fg='yellow', err=True)"
+        ]
+      },
+      {
+        "code": "return False",
+        "end_line": 743,
+        "id": "source:2:743:8:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 743
+      },
+      {
+        "code": "data: dict[str, str | None] = {}",
+        "end_line": 745,
+        "id": "source:2:745:4:AnnAssign",
+        "kind": "AnnAssign",
+        "source_id": "source:2",
+        "start_line": 745
+      },
+      {
+        "code": "data",
+        "end_line": 745,
+        "id": "source:2:745:4:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 745
+      },
+      {
+        "code": "load_defaults",
+        "end_line": 747,
+        "id": "source:2:747:7:Name",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 747
+      },
+      {
+        "code": "default_name",
+        "end_line": 748,
+        "id": "source:2:748:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 748
+      },
+      {
+        "code": "for default_name in ('.flaskenv', '.env'):\n    if not (default_path := dotenv.find_dotenv(default_name, usecwd=True)):\n        continue\n    data |= dotenv.dotenv_values(default_path, encoding='utf-8')",
+        "end_line": 752,
+        "id": "source:2:748:8:For",
+        "kind": "For",
+        "source_id": "source:2",
+        "start_line": 748
+      },
+      {
+        "code": "if not (default_path := dotenv.find_dotenv(default_name, usecwd=True)):\n    continue",
+        "contains_unresolved_call": true,
+        "end_line": 750,
+        "exception_possible": true,
+        "id": "source:2:749:12:If",
+        "kind": "If",
+        "source_id": "source:2",
+        "start_line": 749,
+        "unresolved_calls": [
+          "dotenv.find_dotenv(default_name, usecwd=True)"
+        ]
+      },
+      {
+        "code": "not (default_path := dotenv.find_dotenv(default_name, usecwd=True))",
+        "end_line": 749,
+        "id": "source:2:749:15:UnaryOp",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 749
+      },
+      {
+        "code": "default_path",
+        "end_line": 749,
+        "id": "source:2:749:20:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 749
+      },
+      {
+        "code": "(default_path := dotenv.find_dotenv(default_name, usecwd=True))",
+        "end_line": 749,
+        "id": "source:2:749:20:NamedExpr",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 749
+      },
+      {
+        "code": "continue",
+        "end_line": 750,
+        "id": "source:2:750:16:Continue",
+        "kind": "Continue",
+        "source_id": "source:2",
+        "start_line": 750
+      },
+      {
+        "code": "data |= dotenv.dotenv_values(default_path, encoding='utf-8')",
+        "contains_unresolved_call": true,
+        "end_line": 752,
+        "exception_possible": true,
+        "id": "source:2:752:12:AugAssign",
+        "kind": "AugAssign",
+        "source_id": "source:2",
+        "start_line": 752,
+        "unresolved_calls": [
+          "dotenv.dotenv_values(default_path, encoding='utf-8')"
+        ]
+      },
+      {
+        "code": "data",
+        "end_line": 752,
+        "id": "source:2:752:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 752
+      },
+      {
+        "code": "path is not None and os.path.isfile(path)",
+        "end_line": 754,
+        "id": "source:2:754:7:BoolOp",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 754
+      },
+      {
+        "code": "data |= dotenv.dotenv_values(path, encoding='utf-8')",
+        "contains_unresolved_call": true,
+        "end_line": 755,
+        "exception_possible": true,
+        "id": "source:2:755:8:AugAssign",
+        "kind": "AugAssign",
+        "source_id": "source:2",
+        "start_line": 755,
+        "unresolved_calls": [
+          "dotenv.dotenv_values(path, encoding='utf-8')"
+        ]
+      },
+      {
+        "code": "data",
+        "end_line": 755,
+        "id": "source:2:755:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 755
+      },
+      {
+        "code": "return bool(data)",
+        "contains_unresolved_call": true,
+        "end_line": 763,
+        "exception_possible": true,
+        "id": "source:2:763:4:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 763,
+        "unresolved_calls": [
+          "bool(data)"
+        ]
+      },
+      {
+        "code": "value",
+        "end_line": 40,
+        "id": "test:40:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 40
+      },
+      {
+        "code": "load_dotenv_defaults",
+        "end_line": 41,
+        "id": "test:41:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 41
+      },
+      {
+        "code": "click = SimpleNamespace(BadParameter=BadParameter, Context=Context, Option=Option)",
+        "contains_unresolved_call": true,
+        "end_line": 49,
+        "exception_possible": true,
+        "id": "test:49:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 49,
+        "unresolved_calls": [
+          "SimpleNamespace(BadParameter=BadParameter, Context=Context, Option=Option)"
+        ]
+      },
+      {
+        "code": "click",
+        "end_line": 49,
+        "id": "test:49:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 49
+      },
+      {
+        "code": "_env_file_callback = load_function_from_source_ast(SRC_PATH, '_env_file_callback', namespace={'click': click, 'load_dotenv': load_dotenv, 't': t})",
+        "contains_unresolved_call": true,
+        "end_line": 54,
+        "exception_possible": true,
+        "id": "test:50:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 50,
+        "unresolved_calls": [
+          "load_function_from_source_ast(SRC_PATH, '_env_file_callback', namespace={'click': click, 'load_dotenv': load_dotenv, 't': t})"
+        ]
+      },
+      {
+        "code": "_env_file_callback",
+        "end_line": 50,
+        "id": "test:50:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 50
+      },
+      {
+        "code": "context = SimpleNamespace(obj=SimpleNamespace(load_dotenv_defaults=load_dotenv_defaults))",
+        "contains_unresolved_call": true,
+        "end_line": 55,
+        "exception_possible": true,
+        "id": "test:55:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 55,
+        "unresolved_calls": [
+          "SimpleNamespace(obj=SimpleNamespace(load_dotenv_defaults=load_dotenv_defaults))",
+          "SimpleNamespace(load_dotenv_defaults=load_dotenv_defaults)"
+        ]
+      },
+      {
+        "code": "context",
+        "end_line": 55,
+        "id": "test:55:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 55
+      },
+      {
+        "code": "parameter = object()",
+        "contains_unresolved_call": true,
+        "end_line": 56,
+        "exception_possible": true,
+        "id": "test:56:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 56,
+        "unresolved_calls": [
+          "object()"
+        ]
+      },
+      {
+        "code": "parameter",
+        "end_line": 56,
+        "id": "test:56:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 56
+      },
+      {
+        "code": "should_error",
+        "end_line": 62,
+        "id": "test:62:7:Name",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 62
+      },
+      {
+        "code": "exc_info",
+        "end_line": 63,
+        "id": "test:63:44:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 63
+      },
+      {
+        "code": "with pytest.raises(BadParameter) as exc_info:\n    _env_file_callback(context, parameter, value)",
+        "contains_unresolved_call": true,
+        "end_line": 64,
+        "exception_possible": true,
+        "id": "test:63:8:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 63,
+        "unresolved_calls": [
+          "pytest.raises(BadParameter)"
+        ]
+      },
+      {
+        "code": "_env_file_callback(context, parameter, value)",
+        "end_line": 64,
+        "exception_possible": true,
+        "id": "test:64:12:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 64
+      },
+      {
+        "code": "assert 'dotenv' in str(exc_info.value).lower()",
+        "contains_unresolved_call": true,
+        "end_line": 65,
+        "exception_possible": true,
+        "id": "test:65:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 65,
+        "unresolved_calls": [
+          "str(exc_info.value).lower()",
+          "str(exc_info.value)"
+        ]
+      },
+      {
+        "code": "assert _env_file_callback(context, parameter, value) == value",
+        "end_line": 70,
+        "exception_possible": true,
+        "id": "test:70:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 70
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:63:8:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:65:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:70:8:Assert"
+      }
+    ],
+    "seeds": [
+      "test:63:8:With",
+      "test:65:8:Assert",
+      "test:70:8:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 42,
+    "edges": 52,
+    "edge_kinds": {
+      "lexical_control": 7,
+      "normal_body_exit": 2,
+      "definition_value_candidate": 10,
+      "data_candidate": 23,
+      "call_target_candidate": 4,
+      "call_event_candidate": 5,
+      "normal_branch_exit": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:63:8:With",
+        "node_ids": [
+          "source:2:494:24:arg",
+          "source:2:494:45:arg",
+          "source:2:494:4:arg",
+          "source:2:502:12:Raise",
+          "source:2:509:7:BoolOp",
+          "source:2:510:8:Expr",
+          "source:2:512:4:Return",
+          "source:2:699:4:arg",
+          "source:2:736:12:Expr",
+          "source:2:743:8:Return",
+          "source:2:745:4:AnnAssign",
+          "source:2:745:4:Name",
+          "source:2:747:7:Name",
+          "source:2:748:12:Name",
+          "source:2:748:8:For",
+          "source:2:749:12:If",
+          "source:2:749:15:UnaryOp",
+          "source:2:749:20:Name",
+          "source:2:749:20:NamedExpr",
+          "source:2:750:16:Continue",
+          "source:2:752:12:AugAssign",
+          "source:2:752:12:Name",
+          "source:2:754:7:BoolOp",
+          "source:2:755:8:AugAssign",
+          "source:2:755:8:Name",
+          "source:2:763:4:Return",
+          "test:40:4:arg",
+          "test:41:4:arg",
+          "test:49:4:Assign",
+          "test:49:4:Name",
+          "test:50:4:Assign",
+          "test:50:4:Name",
+          "test:55:4:Assign",
+          "test:55:4:Name",
+          "test:56:4:Assign",
+          "test:56:4:Name",
+          "test:62:7:Name",
+          "test:63:8:With",
+          "test:64:12:Expr"
+        ],
+        "product_source_candidates": [
+          "source:2"
+        ],
+        "unknown_call_nodes": [
+          "source:2:502:12:Raise",
+          "source:2:736:12:Expr",
+          "source:2:749:12:If",
+          "source:2:752:12:AugAssign",
+          "source:2:755:8:AugAssign",
+          "source:2:763:4:Return",
+          "test:49:4:Assign",
+          "test:50:4:Assign",
+          "test:55:4:Assign",
+          "test:56:4:Assign",
+          "test:63:8:With"
+        ]
+      },
+      {
+        "seed": "test:65:8:Assert",
+        "node_ids": [
+          "source:2:494:24:arg",
+          "source:2:494:45:arg",
+          "source:2:494:4:arg",
+          "source:2:502:12:Raise",
+          "source:2:509:7:BoolOp",
+          "source:2:510:8:Expr",
+          "source:2:512:4:Return",
+          "source:2:699:4:arg",
+          "source:2:736:12:Expr",
+          "source:2:743:8:Return",
+          "source:2:745:4:AnnAssign",
+          "source:2:745:4:Name",
+          "source:2:747:7:Name",
+          "source:2:748:12:Name",
+          "source:2:748:8:For",
+          "source:2:749:12:If",
+          "source:2:749:15:UnaryOp",
+          "source:2:749:20:Name",
+          "source:2:749:20:NamedExpr",
+          "source:2:750:16:Continue",
+          "source:2:752:12:AugAssign",
+          "source:2:752:12:Name",
+          "source:2:754:7:BoolOp",
+          "source:2:755:8:AugAssign",
+          "source:2:755:8:Name",
+          "source:2:763:4:Return",
+          "test:40:4:arg",
+          "test:41:4:arg",
+          "test:49:4:Assign",
+          "test:49:4:Name",
+          "test:50:4:Assign",
+          "test:50:4:Name",
+          "test:55:4:Assign",
+          "test:55:4:Name",
+          "test:56:4:Assign",
+          "test:56:4:Name",
+          "test:62:7:Name",
+          "test:63:44:Name",
+          "test:63:8:With",
+          "test:64:12:Expr",
+          "test:65:8:Assert"
+        ],
+        "product_source_candidates": [
+          "source:2"
+        ],
+        "unknown_call_nodes": [
+          "source:2:502:12:Raise",
+          "source:2:736:12:Expr",
+          "source:2:749:12:If",
+          "source:2:752:12:AugAssign",
+          "source:2:755:8:AugAssign",
+          "source:2:763:4:Return",
+          "test:49:4:Assign",
+          "test:50:4:Assign",
+          "test:55:4:Assign",
+          "test:56:4:Assign",
+          "test:63:8:With",
+          "test:65:8:Assert"
+        ]
+      },
+      {
+        "seed": "test:70:8:Assert",
+        "node_ids": [
+          "source:2:494:24:arg",
+          "source:2:494:45:arg",
+          "source:2:494:4:arg",
+          "source:2:502:12:Raise",
+          "source:2:509:7:BoolOp",
+          "source:2:510:8:Expr",
+          "source:2:512:4:Return",
+          "source:2:699:4:arg",
+          "source:2:736:12:Expr",
+          "source:2:743:8:Return",
+          "source:2:745:4:AnnAssign",
+          "source:2:745:4:Name",
+          "source:2:747:7:Name",
+          "source:2:748:12:Name",
+          "source:2:748:8:For",
+          "source:2:749:12:If",
+          "source:2:749:15:UnaryOp",
+          "source:2:749:20:Name",
+          "source:2:749:20:NamedExpr",
+          "source:2:750:16:Continue",
+          "source:2:752:12:AugAssign",
+          "source:2:752:12:Name",
+          "source:2:754:7:BoolOp",
+          "source:2:755:8:AugAssign",
+          "source:2:755:8:Name",
+          "source:2:763:4:Return",
+          "test:40:4:arg",
+          "test:41:4:arg",
+          "test:49:4:Assign",
+          "test:49:4:Name",
+          "test:50:4:Assign",
+          "test:50:4:Name",
+          "test:55:4:Assign",
+          "test:55:4:Name",
+          "test:56:4:Assign",
+          "test:56:4:Name",
+          "test:62:7:Name",
+          "test:70:8:Assert"
+        ],
+        "product_source_candidates": [
+          "source:2"
+        ],
+        "unknown_call_nodes": [
+          "source:2:502:12:Raise",
+          "source:2:736:12:Expr",
+          "source:2:749:12:If",
+          "source:2:752:12:AugAssign",
+          "source:2:755:8:AugAssign",
+          "source:2:763:4:Return",
+          "test:49:4:Assign",
+          "test:50:4:Assign",
+          "test:55:4:Assign",
+          "test:56:4:Assign"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:63:8:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:65:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:70:8:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.2376,
+  "identity": {
+    "case_id": "flask_302",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "70fd780980a098c8692700bc13f1dafd2de6afa06684064d9e038681a376796b"
+  }
+}

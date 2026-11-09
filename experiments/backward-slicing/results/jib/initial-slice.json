@@ -1,0 +1,672 @@
+{
+  "nodes": [
+    {
+      "id": "mut:51:25:CtParameterImpl",
+      "source_id": "mut",
+      "start_line": 51,
+      "end_line": 51,
+      "kind": "CtParameterImpl",
+      "code": "com.google.cloud.tools.jib.cli.ArtifactProcessor processor"
+    },
+    {
+      "id": "mut:53:24:CtParameterImpl",
+      "source_id": "mut",
+      "start_line": 53,
+      "end_line": 53,
+      "kind": "CtParameterImpl",
+      "code": "com.google.cloud.tools.jib.cli.CommonCliOptions commonCliOptions"
+    },
+    {
+      "id": "mut:54:39:CtParameterImpl",
+      "source_id": "mut",
+      "start_line": 54,
+      "end_line": 54,
+      "kind": "CtParameterImpl",
+      "code": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions commonContainerConfigCliOptions"
+    },
+    {
+      "id": "mut:55:21:CtParameterImpl",
+      "source_id": "mut",
+      "start_line": 55,
+      "end_line": 55,
+      "kind": "CtParameterImpl",
+      "code": "com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger logger"
+    },
+    {
+      "id": "mut:59:25:CtLocalVariableImpl",
+      "source_id": "mut",
+      "start_line": 59,
+      "end_line": 59,
+      "kind": "CtLocalVariableImpl",
+      "code": "// Use AdoptOpenJDK image as the default base image. com.google.cloud.tools.jib.api.JibContainerBuilder containerBuilder"
+    },
+    {
+      "id": "mut:60:9:CtInvocationImpl",
+      "source_id": "mut",
+      "start_line": 60,
+      "end_line": 60,
+      "kind": "CtInvocationImpl",
+      "code": "commonContainerConfigCliOptions.getFrom().isPresent()"
+    },
+    {
+      "id": "mut:61:7:CtAssignmentImpl",
+      "source_id": "mut",
+      "start_line": 61,
+      "end_line": 66,
+      "kind": "CtAssignmentImpl",
+      "code": "containerBuilder = com.google.cloud.tools.jib.cli.ContainerBuilders.create(commonContainerConfigCliOptions.getFrom().get(), java.util.Collections.emptySet(), commonCliOptions, logger)"
+    },
+    {
+      "id": "mut:68:7:CtAssignmentImpl",
+      "source_id": "mut",
+      "start_line": 68,
+      "end_line": 71,
+      "kind": "CtAssignmentImpl",
+      "code": "containerBuilder = (processor.getJavaVersion() <= 8) ? com.google.cloud.tools.jib.api.Jib.from(\"adoptopenjdk:8-jre\") : com.google.cloud.tools.jib.api.Jib.from(\"adoptopenjdk:11-jre\")",
+      "contains_boundary_call": true,
+      "boundary_call": "processor.getJavaVersion()"
+    },
+    {
+      "id": "mut:93:5:CtReturnImpl",
+      "source_id": "mut",
+      "start_line": 93,
+      "end_line": 93,
+      "kind": "CtReturnImpl",
+      "code": "return containerBuilder"
+    },
+    {
+      "id": "test:62:25:CtLocalVariableImpl",
+      "source_id": "test",
+      "start_line": 62,
+      "end_line": 68,
+      "kind": "CtLocalVariableImpl",
+      "code": "// === MOCK-STUB-START === // === MOCK-STUB-END === com.google.cloud.tools.jib.api.JibContainerBuilder containerBuilder = com.google.cloud.tools.jib.cli.jar.JarFiles.toJibContainerBuilder(mockStandardExplodedProcessor, mockJarCommand, mockCommonCliOptions, mockCommonContainerConfigCliOptions, moc..."
+    },
+    {
+      "id": "test:64:13:CtFieldReadImpl",
+      "source_id": "test",
+      "start_line": 64,
+      "end_line": 64,
+      "kind": "call_argument",
+      "code": "mockStandardExplodedProcessor"
+    },
+    {
+      "id": "test:66:13:CtFieldReadImpl",
+      "source_id": "test",
+      "start_line": 66,
+      "end_line": 66,
+      "kind": "call_argument",
+      "code": "mockCommonCliOptions"
+    },
+    {
+      "id": "test:67:13:CtFieldReadImpl",
+      "source_id": "test",
+      "start_line": 67,
+      "end_line": 67,
+      "kind": "call_argument",
+      "code": "mockCommonContainerConfigCliOptions"
+    },
+    {
+      "id": "test:68:13:CtFieldReadImpl",
+      "source_id": "test",
+      "start_line": 68,
+      "end_line": 68,
+      "kind": "call_argument",
+      "code": "mockLogger"
+    },
+    {
+      "id": "test:69:24:CtLocalVariableImpl",
+      "source_id": "test",
+      "start_line": 69,
+      "end_line": 69,
+      "kind": "CtLocalVariableImpl",
+      "code": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan buildPlan = containerBuilder.toContainerBuildPlan()"
+    },
+    {
+      "id": "test:71:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 71,
+      "end_line": 71,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(\"adoptopenjdk:8-jre\", buildPlan.getBaseImage())"
+    },
+    {
+      "id": "test:72:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 72,
+      "end_line": 72,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(com.google.common.collect.ImmutableSet.of(new com.google.cloud.tools.jib.api.buildplan.Platform(\"amd64\", \"linux\")), buildPlan.getPlatforms())"
+    },
+    {
+      "id": "test:73:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 73,
+      "end_line": 73,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(java.time.Instant.EPOCH, buildPlan.getCreationTime())"
+    },
+    {
+      "id": "test:74:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 74,
+      "end_line": 74,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(com.google.cloud.tools.jib.api.buildplan.ImageFormat.Docker, buildPlan.getFormat())"
+    },
+    {
+      "id": "test:75:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 75,
+      "end_line": 75,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(0, buildPlan.getEnvironment().size())"
+    },
+    {
+      "id": "test:76:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 76,
+      "end_line": 76,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(0, buildPlan.getLabels().size())"
+    },
+    {
+      "id": "test:77:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 77,
+      "end_line": 77,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(0, buildPlan.getVolumes().size())"
+    },
+    {
+      "id": "test:78:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 78,
+      "end_line": 78,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(0, buildPlan.getExposedPorts().size())"
+    },
+    {
+      "id": "test:81:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 81,
+      "end_line": 81,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(4, buildPlan.getEntrypoint().size())"
+    },
+    {
+      "id": "test:82:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 82,
+      "end_line": 82,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(\"java\", buildPlan.getEntrypoint().get(0))"
+    },
+    {
+      "id": "test:83:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 83,
+      "end_line": 83,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(\"-cp\", buildPlan.getEntrypoint().get(1))"
+    },
+    {
+      "id": "test:84:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 84,
+      "end_line": 84,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(\"/app/explodedJar:/app/dependencies/*\", buildPlan.getEntrypoint().get(2))"
+    },
+    {
+      "id": "test:85:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 85,
+      "end_line": 85,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(\"HelloWorld\", buildPlan.getEntrypoint().get(3))"
+    },
+    {
+      "id": "test:86:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 86,
+      "end_line": 86,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(1, buildPlan.getLayers().size())"
+    },
+    {
+      "id": "test:87:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 87,
+      "end_line": 87,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(\"classes\", buildPlan.getLayers().get(0).getName())"
+    },
+    {
+      "id": "test:97:5:CtInvocationImpl",
+      "source_id": "test",
+      "start_line": 97,
+      "end_line": 99,
+      "kind": "CtInvocationImpl",
+      "code": "assertEquals(com.google.cloud.tools.jib.api.buildplan.AbsoluteUnixPath.get(\"/app/explodedJar/class1.class\"), ((com.google.cloud.tools.jib.api.buildplan.FileEntriesLayer) (buildPlan.getLayers().get(0))).getEntries().get(0).getExtractionPath())"
+    }
+  ],
+  "seeds": [
+    "test:71:5:CtInvocationImpl",
+    "test:72:5:CtInvocationImpl",
+    "test:73:5:CtInvocationImpl",
+    "test:74:5:CtInvocationImpl",
+    "test:75:5:CtInvocationImpl",
+    "test:76:5:CtInvocationImpl",
+    "test:77:5:CtInvocationImpl",
+    "test:78:5:CtInvocationImpl",
+    "test:81:5:CtInvocationImpl",
+    "test:82:5:CtInvocationImpl",
+    "test:83:5:CtInvocationImpl",
+    "test:84:5:CtInvocationImpl",
+    "test:85:5:CtInvocationImpl",
+    "test:86:5:CtInvocationImpl",
+    "test:87:5:CtInvocationImpl",
+    "test:97:5:CtInvocationImpl"
+  ],
+  "edges": [
+    {
+      "from": "mut:60:9:CtInvocationImpl",
+      "to": "mut:61:7:CtAssignmentImpl",
+      "kind": "lexical_control",
+      "precision": "ast_ancestry",
+      "branch": "true"
+    },
+    {
+      "from": "mut:60:9:CtInvocationImpl",
+      "to": "mut:68:7:CtAssignmentImpl",
+      "kind": "lexical_control",
+      "precision": "ast_ancestry",
+      "branch": "false"
+    },
+    {
+      "from": "mut:54:39:CtParameterImpl",
+      "to": "mut:60:9:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "commonContainerConfigCliOptions",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "mut:59:25:CtLocalVariableImpl",
+      "to": "mut:61:7:CtAssignmentImpl",
+      "kind": "data_candidate",
+      "variable": "containerBuilder",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "mut:59:25:CtLocalVariableImpl",
+      "to": "mut:61:7:CtAssignmentImpl",
+      "kind": "data_candidate",
+      "variable": "containerBuilder",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "mut:54:39:CtParameterImpl",
+      "to": "mut:61:7:CtAssignmentImpl",
+      "kind": "data_candidate",
+      "variable": "commonContainerConfigCliOptions",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "mut:53:24:CtParameterImpl",
+      "to": "mut:61:7:CtAssignmentImpl",
+      "kind": "data_candidate",
+      "variable": "commonCliOptions",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "mut:55:21:CtParameterImpl",
+      "to": "mut:61:7:CtAssignmentImpl",
+      "kind": "data_candidate",
+      "variable": "logger",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "mut:59:25:CtLocalVariableImpl",
+      "to": "mut:68:7:CtAssignmentImpl",
+      "kind": "data_candidate",
+      "variable": "containerBuilder",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "mut:59:25:CtLocalVariableImpl",
+      "to": "mut:68:7:CtAssignmentImpl",
+      "kind": "data_candidate",
+      "variable": "containerBuilder",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "mut:61:7:CtAssignmentImpl",
+      "to": "mut:68:7:CtAssignmentImpl",
+      "kind": "data_candidate",
+      "variable": "containerBuilder",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "mut:51:25:CtParameterImpl",
+      "to": "mut:68:7:CtAssignmentImpl",
+      "kind": "data_candidate",
+      "variable": "processor",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "mut:59:25:CtLocalVariableImpl",
+      "to": "mut:93:5:CtReturnImpl",
+      "kind": "data_candidate",
+      "variable": "containerBuilder",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "mut:59:25:CtLocalVariableImpl",
+      "to": "mut:93:5:CtReturnImpl",
+      "kind": "data_candidate",
+      "variable": "containerBuilder",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "mut:61:7:CtAssignmentImpl",
+      "to": "mut:93:5:CtReturnImpl",
+      "kind": "data_candidate",
+      "variable": "containerBuilder",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "mut:68:7:CtAssignmentImpl",
+      "to": "mut:93:5:CtReturnImpl",
+      "kind": "data_candidate",
+      "variable": "containerBuilder",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:62:25:CtLocalVariableImpl",
+      "to": "test:69:24:CtLocalVariableImpl",
+      "kind": "data_candidate",
+      "variable": "containerBuilder",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:62:25:CtLocalVariableImpl",
+      "to": "test:69:24:CtLocalVariableImpl",
+      "kind": "data_candidate",
+      "variable": "containerBuilder",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:71:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:71:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:72:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:72:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:73:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:73:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:74:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:74:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:75:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:75:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:76:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:76:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:77:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:77:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:78:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:78:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:81:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:81:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:82:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:82:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:83:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:83:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:84:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:84:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:85:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:85:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:86:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:86:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:87:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:87:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:97:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "resolved_declaration"
+    },
+    {
+      "from": "test:69:24:CtLocalVariableImpl",
+      "to": "test:97:5:CtInvocationImpl",
+      "kind": "data_candidate",
+      "variable": "buildPlan",
+      "precision": "prior_write_same_method"
+    },
+    {
+      "from": "mut:93:5:CtReturnImpl",
+      "to": "test:62:25:CtLocalVariableImpl",
+      "kind": "call_return",
+      "precision": "single_source_candidate",
+      "callee": "com.google.cloud.tools.jib.cli.jar.JarFiles.toJibContainerBuilder(com.google.cloud.tools.jib.cli.ArtifactProcessor,com.google.cloud.tools.jib.cli.Jar,com.google.cloud.tools.jib.cli.CommonCliOptions,com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions,com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger)"
+    },
+    {
+      "from": "test:64:13:CtFieldReadImpl",
+      "to": "mut:51:25:CtParameterImpl",
+      "kind": "argument_binding_candidate",
+      "callee": "com.google.cloud.tools.jib.cli.jar.JarFiles.toJibContainerBuilder(com.google.cloud.tools.jib.cli.ArtifactProcessor,com.google.cloud.tools.jib.cli.Jar,com.google.cloud.tools.jib.cli.CommonCliOptions,com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions,com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger)",
+      "parameter": "processor",
+      "precision": "single_source_candidate"
+    },
+    {
+      "from": "test:66:13:CtFieldReadImpl",
+      "to": "mut:53:24:CtParameterImpl",
+      "kind": "argument_binding_candidate",
+      "callee": "com.google.cloud.tools.jib.cli.jar.JarFiles.toJibContainerBuilder(com.google.cloud.tools.jib.cli.ArtifactProcessor,com.google.cloud.tools.jib.cli.Jar,com.google.cloud.tools.jib.cli.CommonCliOptions,com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions,com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger)",
+      "parameter": "commonCliOptions",
+      "precision": "single_source_candidate"
+    },
+    {
+      "from": "test:67:13:CtFieldReadImpl",
+      "to": "mut:54:39:CtParameterImpl",
+      "kind": "argument_binding_candidate",
+      "callee": "com.google.cloud.tools.jib.cli.jar.JarFiles.toJibContainerBuilder(com.google.cloud.tools.jib.cli.ArtifactProcessor,com.google.cloud.tools.jib.cli.Jar,com.google.cloud.tools.jib.cli.CommonCliOptions,com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions,com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger)",
+      "parameter": "commonContainerConfigCliOptions",
+      "precision": "single_source_candidate"
+    },
+    {
+      "from": "test:68:13:CtFieldReadImpl",
+      "to": "mut:55:21:CtParameterImpl",
+      "kind": "argument_binding_candidate",
+      "callee": "com.google.cloud.tools.jib.cli.jar.JarFiles.toJibContainerBuilder(com.google.cloud.tools.jib.cli.ArtifactProcessor,com.google.cloud.tools.jib.cli.Jar,com.google.cloud.tools.jib.cli.CommonCliOptions,com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions,com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger)",
+      "parameter": "logger",
+      "precision": "single_source_candidate"
+    }
+  ],
+  "limitations": [
+    "data_candidate edges are conservative name/declaration candidates, not a sound reaching-def analysis",
+    "lexical_control edges describe AST ancestry, not post-dominator control dependence",
+    "call_return edges use no-classpath resolution plus name/arity virtual candidates and do not prove dispatch",
+    "heap aliasing, reflection, exceptions, concurrency, and path feasibility are not modeled",
+    "boundary calls are retained as nodes and are not traversed into dependency implementations"
+  ],
+  "backend": "spoon-source-evidence-prototype",
+  "status": "ok"
+}

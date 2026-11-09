@@ -1,0 +1,289 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "test_to_product_not_reached",
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_436post.py::test_post_sends_compact_json_and_suppresses_transport_errors",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_post_sends_compact_json_and_suppresses_transport_errors",
+          "start_line": 27,
+          "end_line": 56
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 45,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [
+      {
+        "line": 38,
+        "name": "load_function_from_source_ast",
+        "precision": "python_ast_call_name"
+      }
+    ],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_dynamic_path",
+        "hint": "src/ultralytics/utils/events.py",
+        "candidates": [
+          "src/ultralytics/utils/events.py"
+        ],
+        "precision": "exact_visible_path"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/ultralytics/utils/events.py",
+        "hint_kind": "python_import",
+        "hint": "ultralytics",
+        "candidates": [
+          "src/ultralytics/__init__.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/ultralytics/utils/events.py",
+        "hint_kind": "python_import",
+        "hint": "ultralytics.utils",
+        "candidates": [
+          "src/ultralytics/utils/__init__.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/ultralytics/utils/events.py",
+        "hint_kind": "python_import",
+        "hint": "ultralytics.utils.downloads",
+        "candidates": [
+          "src/ultralytics/utils/downloads.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/ultralytics/utils/events.py",
+        "hint_kind": "python_import",
+        "hint": "ultralytics.utils.torch_utils",
+        "candidates": [
+          "src/ultralytics/utils/torch_utils.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 126095,
+    "read_bytes": 126095,
+    "attempted_files": 5,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_436post.py",
+      "sha256": "ba259467daac4fecae7a3b104beb8963883f4e7891ca70256442b74ffdb51a89",
+      "bytes": 1637
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/ultralytics/utils/events.py",
+      "sha256": "eafaacfe24b1a1722143cd38b0e8c0a4d6665f0356f45505b636873d8f2d6b5d",
+      "bytes": 4665
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/ultralytics/__init__.py",
+      "sha256": "b9ce56c33c39a33384547c372d5d75377e33fa7e1a677887ea9c1cbd0e133f92",
+      "bytes": 1300
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/ultralytics/utils/__init__.py",
+      "sha256": "5cb10afe9be9b7335684968ef31d0c5a0851108c840de8b42ce1a7527994d4a8",
+      "bytes": 55145
+    },
+    {
+      "source_id": "source:4",
+      "logical_path": "src/ultralytics/utils/downloads.py",
+      "sha256": "4d65e4630479844a553162fa7db8ddcb00e665ed365a1c8bffc62e2d571efae3",
+      "bytes": 23069
+    },
+    {
+      "source_id": "source:5",
+      "logical_path": "src/ultralytics/utils/torch_utils.py",
+      "sha256": "5ba397f29ddf238e201744d474f4cb579359953134dd87700db7195f2fded399",
+      "bytes": 40279
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "from": "test:38:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:38:4:Name"
+      },
+      {
+        "from": "test:43:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:43:4:Name"
+      },
+      {
+        "from": "test:38:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:45:4:Assert",
+        "variable": "post"
+      },
+      {
+        "from": "test:43:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:45:4:Assert",
+        "variable": "payload"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "post = load_function_from_source_ast(SRC_PATH, '_post', namespace={'json': json, 'Request': Request, 'urlopen': urlopen})",
+        "contains_unresolved_call": true,
+        "end_line": 42,
+        "exception_possible": true,
+        "id": "test:38:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 38,
+        "unresolved_calls": [
+          "load_function_from_source_ast(SRC_PATH, '_post', namespace={'json': json, 'Request': Request, 'urlopen': urlopen})"
+        ]
+      },
+      {
+        "code": "post",
+        "end_line": 38,
+        "id": "test:38:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 38
+      },
+      {
+        "code": "payload = {'event': 'export', 'count': 2}",
+        "end_line": 43,
+        "id": "test:43:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 43
+      },
+      {
+        "code": "payload",
+        "end_line": 43,
+        "id": "test:43:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 43
+      },
+      {
+        "code": "assert post('https://events.example/collect', payload, timeout=1.25) is None",
+        "contains_unresolved_call": true,
+        "end_line": 45,
+        "exception_possible": true,
+        "id": "test:45:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 45,
+        "unresolved_calls": [
+          "post('https://events.example/collect', payload, timeout=1.25)"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:45:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:45:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 5,
+    "edges": 4,
+    "edge_kinds": {
+      "definition_value_candidate": 2,
+      "data_candidate": 2
+    },
+    "criteria": [
+      {
+        "seed": "test:45:4:Assert",
+        "node_ids": [
+          "test:38:4:Assign",
+          "test:38:4:Name",
+          "test:43:4:Assign",
+          "test:43:4:Name",
+          "test:45:4:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:38:4:Assign",
+          "test:45:4:Assert"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:45:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.3797,
+  "identity": {
+    "case_id": "ultralytics_436",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "1110dab4dd9a1145105bda59c9a7dd07cfa57f0432c2057810b685bf361c0ae5"
+  }
+}

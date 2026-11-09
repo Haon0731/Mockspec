@@ -1,0 +1,755 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "org.springframework.boot.actuate.availability.ReadinessProbeHealthIndicatorTests#readinessIsReady",
+      "status": "located",
+      "precision": "java_lexical_method_scope",
+      "locations": [
+        {
+          "symbol": "readinessIsReady",
+          "start_line": 34,
+          "end_line": 42
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 38,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 39,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:1"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_import",
+        "hint": "org.springframework.boot.actuate.health.Status",
+        "candidates": [
+          "src/main/java/org/springframework/boot/actuate/health/Status.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_same_package_type",
+        "hint": "org.springframework.boot.actuate.availability.ReadinessProbeHealthIndicator",
+        "candidates": [
+          "src/main/java/org/springframework/boot/actuate/availability/ReadinessProbeHealthIndicator.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/main/java/org/springframework/boot/actuate/availability/ReadinessProbeHealthIndicator.java",
+        "hint_kind": "java_import",
+        "hint": "org.springframework.boot.actuate.health.AbstractHealthIndicator",
+        "candidates": [
+          "src/main/java/org/springframework/boot/actuate/health/AbstractHealthIndicator.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/main/java/org/springframework/boot/actuate/availability/ReadinessProbeHealthIndicator.java",
+        "hint_kind": "java_import",
+        "hint": "org.springframework.boot.actuate.health.Health",
+        "candidates": [
+          "src/main/java/org/springframework/boot/actuate/health/Health.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/main/java/org/springframework/boot/actuate/availability/ReadinessProbeHealthIndicator.java",
+        "hint_kind": "java_import",
+        "hint": "org.springframework.boot.actuate.health.HealthIndicator",
+        "candidates": [
+          "src/main/java/org/springframework/boot/actuate/health/HealthIndicator.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 20055,
+    "read_bytes": 20055,
+    "attempted_files": 5,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "src/test/java/org/springframework/boot/actuate/availability/ReadinessProbeHealthIndicatorTests.java",
+      "sha256": "70c2fb4446baf56cc4f61cff60511b066148a9397e7cb921ab79e87255a02ff1",
+      "bytes": 1551
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/main/java/org/springframework/boot/actuate/health/Status.java",
+      "sha256": "db6df1f35c2d26d24f008866ab91b2caa07f48343e9877cfcb9918d2391d5573",
+      "bytes": 3337
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/main/java/org/springframework/boot/actuate/availability/ReadinessProbeHealthIndicator.java",
+      "sha256": "64f046c6b3d3bd190108b241180339acfadf9d6005877fd653a3e11bd86b9103",
+      "bytes": 1752
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/main/java/org/springframework/boot/actuate/health/AbstractHealthIndicator.java",
+      "sha256": "a55757864b6ae859915beece96130dc6a9650a79092cb56053780432e441217f",
+      "bytes": 3400
+    },
+    {
+      "source_id": "source:4",
+      "logical_path": "src/main/java/org/springframework/boot/actuate/health/Health.java",
+      "sha256": "9604c45bff70cdfdf2b92e9cb15b5437dfdebeddc8d104b2dcf97f27556648c8",
+      "bytes": 8684
+    },
+    {
+      "source_id": "source:5",
+      "logical_path": "src/main/java/org/springframework/boot/actuate/health/HealthIndicator.java",
+      "sha256": "23ee138d2b87ee0085fb01ae710a29253f28c7eb6921a58ac4d8c811864627af",
+      "bytes": 1331
+    }
+  ],
+  "graph": {
+    "limitations": [
+      "data_candidate edges are conservative name/declaration candidates, not a sound reaching-def analysis",
+      "lexical_control edges describe AST ancestry, not post-dominator control dependence",
+      "call_return edges use no-classpath resolution plus name/arity virtual candidates and do not prove dispatch",
+      "expression_value_candidate edges preserve syntax containment, not runtime evaluation or value equality",
+      "heap aliasing, reflection, exceptions, concurrency, and path feasibility are not modeled",
+      "boundary calls are retained as nodes and are not traversed into dependency implementations"
+    ],
+    "status": "ok",
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:38:3:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:39:3:CtInvocationImpl"
+      }
+    ],
+    "edges": [
+      {
+        "from": "test:37:51:CtConstructorCallImpl",
+        "to": "test:37:33:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:37:85:CtFieldReadImpl",
+        "to": "test:37:51:CtConstructorCallImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:38:16:CtFieldReadImpl",
+        "to": "test:38:3:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:38:16:CtTypeAccessImpl",
+        "to": "test:38:16:CtFieldReadImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:38:27:CtInvocationImpl",
+        "to": "test:38:3:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:38:27:CtVariableReadImpl",
+        "to": "test:38:27:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:39:16:CtLiteralImpl",
+        "to": "test:39:3:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:39:22:CtInvocationImpl",
+        "to": "test:39:3:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:39:22:CtVariableReadImpl",
+        "to": "test:39:22:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:3:80:28:CtConstructorCallImpl",
+        "to": "source:3:80:18:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:3:91:10:CtInvocationImpl",
+        "to": "source:3:91:3:CtReturnImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:3:91:10:CtVariableReadImpl",
+        "to": "source:3:91:10:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:4:79:10:CtFieldReadImpl",
+        "to": "source:4:79:3:CtReturnImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:4:79:10:CtThisAccessImpl",
+        "to": "source:4:79:10:CtFieldReadImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:4:88:10:CtFieldReadImpl",
+        "to": "source:4:88:3:CtReturnImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:4:88:10:CtThisAccessImpl",
+        "to": "source:4:88:10:CtFieldReadImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:4:329:11:CtConstructorCallImpl",
+        "to": "source:4:329:4:CtReturnImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:4:329:22:CtThisAccessImpl",
+        "to": "source:4:329:11:CtConstructorCallImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:1:49:29:CtFieldImpl",
+        "to": "test:38:3:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "UP",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:37:33:CtLocalVariableImpl",
+        "to": "test:38:3:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "healthIndicator",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:37:33:CtLocalVariableImpl",
+        "to": "test:38:3:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "healthIndicator",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:37:33:CtLocalVariableImpl",
+        "to": "test:38:27:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "healthIndicator",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:37:33:CtLocalVariableImpl",
+        "to": "test:38:27:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "healthIndicator",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:37:33:CtLocalVariableImpl",
+        "to": "test:39:3:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "healthIndicator",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:37:33:CtLocalVariableImpl",
+        "to": "test:39:3:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "healthIndicator",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:37:33:CtLocalVariableImpl",
+        "to": "test:39:22:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "healthIndicator",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:37:33:CtLocalVariableImpl",
+        "to": "test:39:22:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "healthIndicator",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "source:3:80:18:CtLocalVariableImpl",
+        "to": "source:3:91:3:CtReturnImpl",
+        "kind": "data_candidate",
+        "variable": "builder",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "source:3:80:18:CtLocalVariableImpl",
+        "to": "source:3:91:3:CtReturnImpl",
+        "kind": "data_candidate",
+        "variable": "builder",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "source:3:80:18:CtLocalVariableImpl",
+        "to": "source:3:91:10:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "builder",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "source:3:80:18:CtLocalVariableImpl",
+        "to": "source:3:91:10:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "builder",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "source:4:54:23:CtFieldImpl",
+        "to": "source:4:79:3:CtReturnImpl",
+        "kind": "data_candidate",
+        "variable": "status",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "source:4:56:36:CtFieldImpl",
+        "to": "source:4:88:3:CtReturnImpl",
+        "kind": "data_candidate",
+        "variable": "details",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "source:4:79:3:CtReturnImpl",
+        "to": "test:38:3:CtInvocationImpl",
+        "kind": "call_return",
+        "precision": "single_source_candidate",
+        "callee": "org.springframework.boot.actuate.health.Health.getStatus()"
+      },
+      {
+        "from": "source:3:91:3:CtReturnImpl",
+        "to": "test:38:27:CtInvocationImpl",
+        "kind": "call_return",
+        "precision": "single_source_candidate",
+        "callee": "org.springframework.boot.actuate.health.AbstractHealthIndicator.health()"
+      },
+      {
+        "from": "source:4:88:3:CtReturnImpl",
+        "to": "test:39:22:CtInvocationImpl",
+        "kind": "call_return",
+        "precision": "single_source_candidate",
+        "callee": "org.springframework.boot.actuate.health.Health.getDetails()"
+      },
+      {
+        "from": "source:3:91:3:CtReturnImpl",
+        "to": "test:39:22:CtInvocationImpl",
+        "kind": "call_return",
+        "precision": "single_source_candidate",
+        "callee": "org.springframework.boot.actuate.health.AbstractHealthIndicator.health()"
+      },
+      {
+        "from": "source:4:329:4:CtReturnImpl",
+        "to": "source:3:91:3:CtReturnImpl",
+        "kind": "call_return",
+        "precision": "single_source_candidate",
+        "callee": "org.springframework.boot.actuate.health.Health$Builder.build()"
+      }
+    ],
+    "backend": "spoon-source-evidence-prototype",
+    "nodes": [
+      {
+        "id": "source:1:49:29:CtFieldImpl",
+        "source_id": "source:1",
+        "start_line": 49,
+        "end_line": 49,
+        "kind": "CtFieldImpl",
+        "code": "/** * {@link Status} indicating that the component or subsystem is functioning as * expected. */ public static final org.springframework.boot.actuate.health.Status UP = new org.springframework.boot.actuate.health.Status(\"UP\");"
+      },
+      {
+        "id": "source:3:80:18:CtLocalVariableImpl",
+        "source_id": "source:3",
+        "start_line": 80,
+        "end_line": 80,
+        "kind": "CtLocalVariableImpl",
+        "code": "org.springframework.boot.actuate.health.Health.Builder builder = new org.springframework.boot.actuate.health.Health.Builder()"
+      },
+      {
+        "id": "source:3:80:28:CtConstructorCallImpl",
+        "source_id": "source:3",
+        "start_line": 80,
+        "end_line": 80,
+        "kind": "CtConstructorCallImpl",
+        "code": "new org.springframework.boot.actuate.health.Health.Builder()"
+      },
+      {
+        "id": "source:3:91:10:CtInvocationImpl",
+        "source_id": "source:3",
+        "start_line": 91,
+        "end_line": 91,
+        "kind": "CtInvocationImpl",
+        "code": "builder.build()"
+      },
+      {
+        "id": "source:3:91:10:CtVariableReadImpl",
+        "source_id": "source:3",
+        "start_line": 91,
+        "end_line": 91,
+        "kind": "expression",
+        "code": "builder"
+      },
+      {
+        "id": "source:3:91:3:CtReturnImpl",
+        "source_id": "source:3",
+        "start_line": 91,
+        "end_line": 91,
+        "kind": "CtReturnImpl",
+        "code": "return builder.build()"
+      },
+      {
+        "id": "source:4:329:11:CtConstructorCallImpl",
+        "source_id": "source:4",
+        "start_line": 329,
+        "end_line": 329,
+        "kind": "CtConstructorCallImpl",
+        "code": "new org.springframework.boot.actuate.health.Health(this)"
+      },
+      {
+        "id": "source:4:329:22:CtThisAccessImpl",
+        "source_id": "source:4",
+        "start_line": 329,
+        "end_line": 329,
+        "kind": "expression",
+        "code": "this"
+      },
+      {
+        "id": "source:4:329:4:CtReturnImpl",
+        "source_id": "source:4",
+        "start_line": 329,
+        "end_line": 329,
+        "kind": "CtReturnImpl",
+        "code": "return new org.springframework.boot.actuate.health.Health(this)"
+      },
+      {
+        "id": "source:4:54:23:CtFieldImpl",
+        "source_id": "source:4",
+        "start_line": 54,
+        "end_line": 54,
+        "kind": "CtFieldImpl",
+        "code": "private final org.springframework.boot.actuate.health.Status status;"
+      },
+      {
+        "id": "source:4:56:36:CtFieldImpl",
+        "source_id": "source:4",
+        "start_line": 56,
+        "end_line": 56,
+        "kind": "CtFieldImpl",
+        "code": "private final java.util.Map<java.lang.String, java.lang.Object> details;"
+      },
+      {
+        "id": "source:4:79:10:CtFieldReadImpl",
+        "source_id": "source:4",
+        "start_line": 79,
+        "end_line": 79,
+        "kind": "expression",
+        "code": "this.status"
+      },
+      {
+        "id": "source:4:79:10:CtThisAccessImpl",
+        "source_id": "source:4",
+        "start_line": 79,
+        "end_line": 79,
+        "kind": "expression",
+        "code": "this"
+      },
+      {
+        "id": "source:4:79:3:CtReturnImpl",
+        "source_id": "source:4",
+        "start_line": 79,
+        "end_line": 79,
+        "kind": "CtReturnImpl",
+        "code": "return this.status"
+      },
+      {
+        "id": "source:4:88:10:CtFieldReadImpl",
+        "source_id": "source:4",
+        "start_line": 88,
+        "end_line": 88,
+        "kind": "expression",
+        "code": "this.details"
+      },
+      {
+        "id": "source:4:88:10:CtThisAccessImpl",
+        "source_id": "source:4",
+        "start_line": 88,
+        "end_line": 88,
+        "kind": "expression",
+        "code": "this"
+      },
+      {
+        "id": "source:4:88:3:CtReturnImpl",
+        "source_id": "source:4",
+        "start_line": 88,
+        "end_line": 88,
+        "kind": "CtReturnImpl",
+        "code": "return this.details"
+      },
+      {
+        "id": "test:37:33:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 37,
+        "end_line": 37,
+        "kind": "CtLocalVariableImpl",
+        "code": "// === MOCK-STUB-START === // === MOCK-STUB-END === org.springframework.boot.actuate.availability.ReadinessProbeHealthIndicator healthIndicator = new org.springframework.boot.actuate.availability.ReadinessProbeHealthIndicator(availability)"
+      },
+      {
+        "id": "test:37:51:CtConstructorCallImpl",
+        "source_id": "test",
+        "start_line": 37,
+        "end_line": 37,
+        "kind": "CtConstructorCallImpl",
+        "code": "new org.springframework.boot.actuate.availability.ReadinessProbeHealthIndicator(availability)"
+      },
+      {
+        "id": "test:37:85:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 37,
+        "end_line": 37,
+        "kind": "expression",
+        "code": "availability"
+      },
+      {
+        "id": "test:38:16:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "expression",
+        "code": "org.springframework.boot.actuate.health.Status.UP"
+      },
+      {
+        "id": "test:38:16:CtTypeAccessImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "expression",
+        "code": "org.springframework.boot.actuate.health.Status"
+      },
+      {
+        "id": "test:38:27:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "CtInvocationImpl",
+        "code": "healthIndicator.health().getStatus()"
+      },
+      {
+        "id": "test:38:27:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "expression",
+        "code": "healthIndicator"
+      },
+      {
+        "id": "test:38:3:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "CtInvocationImpl",
+        "code": "org.junit.jupiter.api.Assertions.assertEquals(org.springframework.boot.actuate.health.Status.UP, healthIndicator.health().getStatus())"
+      },
+      {
+        "id": "test:39:16:CtLiteralImpl",
+        "source_id": "test",
+        "start_line": 39,
+        "end_line": 39,
+        "kind": "expression",
+        "code": "true"
+      },
+      {
+        "id": "test:39:22:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 39,
+        "end_line": 39,
+        "kind": "CtInvocationImpl",
+        "code": "healthIndicator.health().getDetails().isEmpty()"
+      },
+      {
+        "id": "test:39:22:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 39,
+        "end_line": 39,
+        "kind": "expression",
+        "code": "healthIndicator"
+      },
+      {
+        "id": "test:39:3:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 39,
+        "end_line": 39,
+        "kind": "CtInvocationImpl",
+        "code": "org.junit.jupiter.api.Assertions.assertEquals(true, healthIndicator.health().getDetails().isEmpty())",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "healthIndicator.health().getDetails().isEmpty()"
+        ]
+      }
+    ],
+    "seeds": [
+      "test:38:3:CtInvocationImpl",
+      "test:39:3:CtInvocationImpl"
+    ]
+  },
+  "evidence": {
+    "nodes": 29,
+    "edges": 38,
+    "edge_kinds": {
+      "expression_value_candidate": 18,
+      "data_candidate": 15,
+      "call_return": 5
+    },
+    "criteria": [
+      {
+        "seed": "test:38:3:CtInvocationImpl",
+        "node_ids": [
+          "source:1:49:29:CtFieldImpl",
+          "source:3:80:18:CtLocalVariableImpl",
+          "source:3:80:28:CtConstructorCallImpl",
+          "source:3:91:10:CtInvocationImpl",
+          "source:3:91:10:CtVariableReadImpl",
+          "source:3:91:3:CtReturnImpl",
+          "source:4:329:11:CtConstructorCallImpl",
+          "source:4:329:22:CtThisAccessImpl",
+          "source:4:329:4:CtReturnImpl",
+          "source:4:54:23:CtFieldImpl",
+          "source:4:79:10:CtFieldReadImpl",
+          "source:4:79:10:CtThisAccessImpl",
+          "source:4:79:3:CtReturnImpl",
+          "test:37:33:CtLocalVariableImpl",
+          "test:37:51:CtConstructorCallImpl",
+          "test:37:85:CtFieldReadImpl",
+          "test:38:16:CtFieldReadImpl",
+          "test:38:16:CtTypeAccessImpl",
+          "test:38:27:CtInvocationImpl",
+          "test:38:27:CtVariableReadImpl",
+          "test:38:3:CtInvocationImpl"
+        ],
+        "product_source_candidates": [
+          "source:1",
+          "source:3",
+          "source:4"
+        ],
+        "unknown_call_nodes": []
+      },
+      {
+        "seed": "test:39:3:CtInvocationImpl",
+        "node_ids": [
+          "source:3:80:18:CtLocalVariableImpl",
+          "source:3:80:28:CtConstructorCallImpl",
+          "source:3:91:10:CtInvocationImpl",
+          "source:3:91:10:CtVariableReadImpl",
+          "source:3:91:3:CtReturnImpl",
+          "source:4:329:11:CtConstructorCallImpl",
+          "source:4:329:22:CtThisAccessImpl",
+          "source:4:329:4:CtReturnImpl",
+          "source:4:56:36:CtFieldImpl",
+          "source:4:88:10:CtFieldReadImpl",
+          "source:4:88:10:CtThisAccessImpl",
+          "source:4:88:3:CtReturnImpl",
+          "test:37:33:CtLocalVariableImpl",
+          "test:37:51:CtConstructorCallImpl",
+          "test:37:85:CtFieldReadImpl",
+          "test:39:16:CtLiteralImpl",
+          "test:39:22:CtInvocationImpl",
+          "test:39:22:CtVariableReadImpl",
+          "test:39:3:CtInvocationImpl"
+        ],
+        "product_source_candidates": [
+          "source:3",
+          "source:4"
+        ],
+        "unknown_call_nodes": [
+          "test:39:3:CtInvocationImpl"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:38:3:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:39:3:CtInvocationImpl"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 1.7687,
+  "identity": {
+    "case_id": "org.springframework.boot.actuate.availability.ReadinessProbeHealthIndicatorTests#readinessIsReady@bb79c847",
+    "dataset": "java-bechmark-strong",
+    "language": "java",
+    "snapshot_id": "6cc0f22d060663f1f715c19c4018aff4897af637c541fb5d2c9835f21f9701bd"
+  }
+}

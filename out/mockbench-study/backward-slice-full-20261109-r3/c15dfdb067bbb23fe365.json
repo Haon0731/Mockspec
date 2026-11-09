@@ -1,0 +1,751 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_407expand_args.py::test_expand_args",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_expand_args",
+          "start_line": 97,
+          "end_line": 181
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 159,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "click.utils",
+        "candidates": [
+          "src/click/utils.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/click/utils.py",
+        "hint_kind": "python_import",
+        "hint": "types",
+        "candidates": [
+          "src/click/types.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [
+      {
+        "source_id": "source:2",
+        "name": "arity",
+        "start_line": 167,
+        "end_line": 168
+      }
+    ],
+    "selected_bytes": 64426,
+    "read_bytes": 64426,
+    "attempted_files": 2,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_407expand_args.py",
+      "sha256": "4fad7cd25f6ce0de7bffa5b50b6a96a494ba1a6b755e2f4f6ea9883f750576e4",
+      "bytes": 4242
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/click/utils.py",
+      "sha256": "8025287b0740840f902c15141f1acb878ba3ea6ed3d568d964c34fbd1d08ed80",
+      "bytes": 20257
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/click/types.py",
+      "sha256": "7a4e7804d485c0f2acaad7d3ee3b2a71ce161ee8bc00815530a338a156485e17",
+      "bytes": 39927
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "from": "test:156:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:156:4:Name"
+      },
+      {
+        "from": "test:97:39:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:156:4:Assign",
+        "variable": "args"
+      },
+      {
+        "from": "test:97:45:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:156:4:Assign",
+        "variable": "user"
+      },
+      {
+        "from": "test:97:51:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:156:4:Assign",
+        "variable": "env"
+      },
+      {
+        "from": "test:97:56:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:156:4:Assign",
+        "variable": "glob_recursive"
+      },
+      {
+        "from": "test:156:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:159:4:Assert",
+        "variable": "result"
+      },
+      {
+        "from": "test:97:72:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:159:4:Assert",
+        "variable": "expected_result"
+      },
+      {
+        "callee": "_expand_args",
+        "from": "source:1:627:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:156:4:Assign"
+      },
+      {
+        "callee": "_expand_args",
+        "from": "source:1:623:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:156:4:Assign"
+      },
+      {
+        "callee": "_expand_args",
+        "from": "source:1:625:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:156:4:Assign"
+      },
+      {
+        "field": "body",
+        "from": "source:1:622:8:If",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "source:1:610:4:For"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:611:11:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:612:12:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:614:11:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:615:12:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:622:11:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:623:12:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:623:12:Expr",
+        "kind": "normal_branch_exit",
+        "precision": "possible_only_if_branch_completes_normally",
+        "to": "source:1:622:8:If"
+      },
+      {
+        "branch": "false",
+        "from": "source:1:622:11:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:625:12:Expr"
+      },
+      {
+        "branch": "false",
+        "from": "source:1:625:12:Expr",
+        "kind": "normal_branch_exit",
+        "precision": "possible_only_if_branch_completes_normally",
+        "to": "source:1:622:8:If"
+      },
+      {
+        "from": "source:1:608:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:608:4:Name"
+      },
+      {
+        "from": "source:1:610:4:For",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:610:8:Name"
+      },
+      {
+        "from": "source:1:579:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:610:4:For",
+        "variable": "args"
+      },
+      {
+        "from": "source:1:612:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:612:12:Name"
+      },
+      {
+        "from": "source:1:610:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:612:12:Assign",
+        "variable": "arg"
+      },
+      {
+        "from": "source:1:612:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:612:12:Assign",
+        "variable": "arg"
+      },
+      {
+        "from": "source:1:615:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:615:12:Name"
+      },
+      {
+        "from": "source:1:610:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:615:12:Assign",
+        "variable": "arg"
+      },
+      {
+        "from": "source:1:612:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:615:12:Assign",
+        "variable": "arg"
+      },
+      {
+        "from": "source:1:615:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:615:12:Assign",
+        "variable": "arg"
+      },
+      {
+        "from": "source:1:618:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:618:12:Name"
+      },
+      {
+        "from": "source:1:610:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:618:12:Assign",
+        "variable": "arg"
+      },
+      {
+        "from": "source:1:612:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:618:12:Assign",
+        "variable": "arg"
+      },
+      {
+        "from": "source:1:615:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:618:12:Assign",
+        "variable": "arg"
+      },
+      {
+        "from": "source:1:583:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:618:12:Assign",
+        "variable": "glob_recursive"
+      },
+      {
+        "from": "source:1:620:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:620:12:Name"
+      },
+      {
+        "from": "source:1:618:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:622:8:If",
+        "variable": "matches"
+      },
+      {
+        "from": "source:1:620:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:622:8:If",
+        "variable": "matches"
+      },
+      {
+        "from": "source:1:608:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:623:12:Expr",
+        "variable": "out"
+      },
+      {
+        "from": "source:1:610:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:623:12:Expr",
+        "variable": "arg"
+      },
+      {
+        "from": "source:1:612:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:623:12:Expr",
+        "variable": "arg"
+      },
+      {
+        "from": "source:1:615:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:623:12:Expr",
+        "variable": "arg"
+      },
+      {
+        "from": "source:1:608:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:625:12:Expr",
+        "variable": "out"
+      },
+      {
+        "from": "source:1:618:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:625:12:Expr",
+        "variable": "matches"
+      },
+      {
+        "from": "source:1:620:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:625:12:Expr",
+        "variable": "matches"
+      },
+      {
+        "from": "source:1:608:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:627:4:Return",
+        "variable": "out"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "args: cabc.Iterable[str]",
+        "end_line": 579,
+        "id": "source:1:579:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 579
+      },
+      {
+        "code": "glob_recursive: bool",
+        "end_line": 583,
+        "id": "source:1:583:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 583
+      },
+      {
+        "code": "out = []",
+        "end_line": 608,
+        "id": "source:1:608:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 608
+      },
+      {
+        "code": "out",
+        "end_line": 608,
+        "id": "source:1:608:4:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 608
+      },
+      {
+        "code": "for arg in args:\n    if user:\n        arg = os.path.expanduser(arg)\n    if env:\n        arg = os.path.expandvars(arg)\n    try:\n        matches = glob(arg, recursive=glob_recursive)\n    except re.error:\n        matches = []\n    if not matches:\n        out.append(arg)\n    else:\n        out.extend(matc",
+        "end_line": 625,
+        "id": "source:1:610:4:For",
+        "kind": "For",
+        "source_id": "source:1",
+        "start_line": 610
+      },
+      {
+        "code": "arg",
+        "end_line": 610,
+        "id": "source:1:610:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 610
+      },
+      {
+        "code": "user",
+        "end_line": 611,
+        "id": "source:1:611:11:Name",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 611
+      },
+      {
+        "code": "arg = os.path.expanduser(arg)",
+        "contains_unresolved_call": true,
+        "end_line": 612,
+        "exception_possible": true,
+        "id": "source:1:612:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 612,
+        "unresolved_calls": [
+          "os.path.expanduser(arg)"
+        ]
+      },
+      {
+        "code": "arg",
+        "end_line": 612,
+        "id": "source:1:612:12:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 612
+      },
+      {
+        "code": "env",
+        "end_line": 614,
+        "id": "source:1:614:11:Name",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 614
+      },
+      {
+        "code": "arg = os.path.expandvars(arg)",
+        "contains_unresolved_call": true,
+        "end_line": 615,
+        "exception_possible": true,
+        "id": "source:1:615:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 615,
+        "unresolved_calls": [
+          "os.path.expandvars(arg)"
+        ]
+      },
+      {
+        "code": "arg",
+        "end_line": 615,
+        "id": "source:1:615:12:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 615
+      },
+      {
+        "code": "matches = glob(arg, recursive=glob_recursive)",
+        "contains_unresolved_call": true,
+        "end_line": 618,
+        "exception_possible": true,
+        "id": "source:1:618:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 618,
+        "unresolved_calls": [
+          "glob(arg, recursive=glob_recursive)"
+        ]
+      },
+      {
+        "code": "matches",
+        "end_line": 618,
+        "id": "source:1:618:12:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 618
+      },
+      {
+        "code": "matches = []",
+        "end_line": 620,
+        "id": "source:1:620:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 620
+      },
+      {
+        "code": "matches",
+        "end_line": 620,
+        "id": "source:1:620:12:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 620
+      },
+      {
+        "code": "not matches",
+        "end_line": 622,
+        "id": "source:1:622:11:UnaryOp",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 622
+      },
+      {
+        "code": "if not matches:\n    out.append(arg)\nelse:\n    out.extend(matches)",
+        "end_line": 625,
+        "id": "source:1:622:8:If",
+        "kind": "If",
+        "source_id": "source:1",
+        "start_line": 622
+      },
+      {
+        "code": "out.append(arg)",
+        "contains_unresolved_call": true,
+        "end_line": 623,
+        "exception_possible": true,
+        "id": "source:1:623:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 623,
+        "unresolved_calls": [
+          "out.append(arg)"
+        ]
+      },
+      {
+        "code": "out.extend(matches)",
+        "contains_unresolved_call": true,
+        "end_line": 625,
+        "exception_possible": true,
+        "id": "source:1:625:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 625,
+        "unresolved_calls": [
+          "out.extend(matches)"
+        ]
+      },
+      {
+        "code": "return out",
+        "end_line": 627,
+        "id": "source:1:627:4:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 627
+      },
+      {
+        "code": "result = _expand_args(args, user=user, env=env, glob_recursive=glob_recursive)",
+        "end_line": 156,
+        "exception_possible": true,
+        "id": "test:156:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 156
+      },
+      {
+        "code": "result",
+        "end_line": 156,
+        "id": "test:156:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 156
+      },
+      {
+        "code": "assert result == expected_result",
+        "end_line": 159,
+        "id": "test:159:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 159
+      },
+      {
+        "code": "args",
+        "end_line": 97,
+        "id": "test:97:39:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 97
+      },
+      {
+        "code": "user",
+        "end_line": 97,
+        "id": "test:97:45:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 97
+      },
+      {
+        "code": "env",
+        "end_line": 97,
+        "id": "test:97:51:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 97
+      },
+      {
+        "code": "glob_recursive",
+        "end_line": 97,
+        "id": "test:97:56:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 97
+      },
+      {
+        "code": "expected_result",
+        "end_line": 97,
+        "id": "test:97:72:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 97
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:159:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:159:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 29,
+    "edges": 43,
+    "edge_kinds": {
+      "definition_value_candidate": 7,
+      "data_candidate": 26,
+      "call_target_candidate": 1,
+      "call_event_candidate": 2,
+      "normal_body_exit": 1,
+      "lexical_control": 4,
+      "normal_branch_exit": 2
+    },
+    "criteria": [
+      {
+        "seed": "test:159:4:Assert",
+        "node_ids": [
+          "source:1:579:4:arg",
+          "source:1:583:4:arg",
+          "source:1:608:4:Assign",
+          "source:1:608:4:Name",
+          "source:1:610:4:For",
+          "source:1:610:8:Name",
+          "source:1:611:11:Name",
+          "source:1:612:12:Assign",
+          "source:1:612:12:Name",
+          "source:1:614:11:Name",
+          "source:1:615:12:Assign",
+          "source:1:615:12:Name",
+          "source:1:618:12:Assign",
+          "source:1:618:12:Name",
+          "source:1:620:12:Assign",
+          "source:1:620:12:Name",
+          "source:1:622:11:UnaryOp",
+          "source:1:622:8:If",
+          "source:1:623:12:Expr",
+          "source:1:625:12:Expr",
+          "source:1:627:4:Return",
+          "test:156:4:Assign",
+          "test:156:4:Name",
+          "test:159:4:Assert",
+          "test:97:39:arg",
+          "test:97:45:arg",
+          "test:97:51:arg",
+          "test:97:56:arg",
+          "test:97:72:arg"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:612:12:Assign",
+          "source:1:615:12:Assign",
+          "source:1:618:12:Assign",
+          "source:1:623:12:Expr",
+          "source:1:625:12:Expr"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:159:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.2251,
+  "identity": {
+    "case_id": "click_407",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "b45ad8cfdcf62d9b01fdaf1f87dfb2cd3605c6c5c5552dab1b725e684fb4b107"
+  }
+}

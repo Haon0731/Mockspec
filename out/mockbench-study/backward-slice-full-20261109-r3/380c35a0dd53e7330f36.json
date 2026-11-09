@@ -1,0 +1,476 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_311copy_current_request_context.py::test_copy_current_request_context_scenarios",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_copy_current_request_context_scenarios",
+          "start_line": 36,
+          "end_line": 119
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 107,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 118,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:1"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "flask.ctx",
+        "candidates": [
+          "src/src/flask/ctx.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/flask/ctx.py",
+        "hint_kind": "python_import",
+        "hint": "typing",
+        "candidates": [
+          "src/src/flask/typing.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 23476,
+    "read_bytes": 23476,
+    "attempted_files": 2,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_311copy_current_request_context.py",
+      "sha256": "f7b20a019ef39ce318e63945426c6b12b4c53a91cb7b86cb50def5f982fe9202",
+      "bytes": 3116
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/src/flask/ctx.py",
+      "sha256": "cc66952d5f9b722fb1c7a002952fd8ebd997c4e5931fac8f7b5dbee55afd14a8",
+      "bytes": 17246
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/src/flask/typing.py",
+      "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+      "bytes": 3114
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "branch": "true",
+        "from": "test:59:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:103:8:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "test:59:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:104:8:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "test:59:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:107:8:Assert"
+      },
+      {
+        "branch": "false",
+        "from": "test:59:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:118:8:With"
+      },
+      {
+        "field": "body",
+        "from": "test:119:12:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:118:8:With"
+      },
+      {
+        "from": "test:103:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:103:8:Name"
+      },
+      {
+        "from": "test:104:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:104:8:Name"
+      },
+      {
+        "from": "test:103:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:104:8:Assign",
+        "variable": "decorated"
+      },
+      {
+        "from": "test:36:78:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:104:8:Assign",
+        "variable": "func_args"
+      },
+      {
+        "from": "test:36:89:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:104:8:Assign",
+        "variable": "func_kwargs"
+      },
+      {
+        "from": "test:104:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:107:8:Assert",
+        "variable": "result"
+      },
+      {
+        "from": "test:36:115:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:107:8:Assert",
+        "variable": "ensure_sync_return"
+      },
+      {
+        "callee": "copy_current_request_context",
+        "from": "source:1:205:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:103:8:Assign"
+      },
+      {
+        "callee": "copy_current_request_context",
+        "from": "source:1:194:8:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:103:8:Assign"
+      },
+      {
+        "callee": "copy_current_request_context",
+        "from": "source:1:205:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:119:12:Expr"
+      },
+      {
+        "callee": "copy_current_request_context",
+        "from": "source:1:194:8:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:119:12:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:193:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:194:8:Raise"
+      },
+      {
+        "from": "source:1:153:33:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:205:4:Return",
+        "variable": "f"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "f: F",
+        "end_line": 153,
+        "id": "source:1:153:33:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 153
+      },
+      {
+        "code": "ctx is None",
+        "end_line": 193,
+        "id": "source:1:193:7:Compare",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 193
+      },
+      {
+        "code": "raise RuntimeError(\"'copy_current_request_context' can only be used when a request context is active, such as in a view function.\")",
+        "contains_unresolved_call": true,
+        "end_line": 197,
+        "exception_possible": true,
+        "id": "source:1:194:8:Raise",
+        "kind": "Raise",
+        "source_id": "source:1",
+        "start_line": 194,
+        "unresolved_calls": [
+          "RuntimeError(\"'copy_current_request_context' can only be used when a request context is active, such as in a view function.\")"
+        ]
+      },
+      {
+        "code": "return update_wrapper(wrapper, f)",
+        "contains_unresolved_call": true,
+        "end_line": 205,
+        "exception_possible": true,
+        "id": "source:1:205:4:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 205,
+        "unresolved_calls": [
+          "update_wrapper(wrapper, f)"
+        ]
+      },
+      {
+        "code": "decorated = copy_current_request_context(test_func)",
+        "end_line": 103,
+        "exception_possible": true,
+        "id": "test:103:8:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 103
+      },
+      {
+        "code": "decorated",
+        "end_line": 103,
+        "id": "test:103:8:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 103
+      },
+      {
+        "code": "result = decorated(*func_args, **func_kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 104,
+        "exception_possible": true,
+        "id": "test:104:8:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 104,
+        "unresolved_calls": [
+          "decorated(*func_args, **func_kwargs)"
+        ]
+      },
+      {
+        "code": "result",
+        "end_line": 104,
+        "id": "test:104:8:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 104
+      },
+      {
+        "code": "assert result == ensure_sync_return",
+        "end_line": 107,
+        "id": "test:107:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 107
+      },
+      {
+        "code": "with pytest.raises(RuntimeError, match=\"'copy_current_request_context' can only be used when a request context is active\"):\n    copy_current_request_context(lambda: None)",
+        "contains_unresolved_call": true,
+        "end_line": 119,
+        "exception_possible": true,
+        "id": "test:118:8:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 118,
+        "unresolved_calls": [
+          "pytest.raises(RuntimeError, match=\"'copy_current_request_context' can only be used when a request context is active\")"
+        ]
+      },
+      {
+        "code": "copy_current_request_context(lambda: None)",
+        "end_line": 119,
+        "exception_possible": true,
+        "id": "test:119:12:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 119
+      },
+      {
+        "code": "ensure_sync_return",
+        "end_line": 36,
+        "id": "test:36:115:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 36
+      },
+      {
+        "code": "func_args",
+        "end_line": 36,
+        "id": "test:36:78:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 36
+      },
+      {
+        "code": "func_kwargs",
+        "end_line": 36,
+        "id": "test:36:89:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 36
+      },
+      {
+        "code": "ctx_exists",
+        "end_line": 59,
+        "id": "test:59:7:Name",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 59
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:107:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:118:8:With"
+      }
+    ],
+    "seeds": [
+      "test:107:8:Assert",
+      "test:118:8:With"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 15,
+    "edges": 18,
+    "edge_kinds": {
+      "lexical_control": 5,
+      "normal_body_exit": 1,
+      "definition_value_candidate": 2,
+      "data_candidate": 6,
+      "call_target_candidate": 2,
+      "call_event_candidate": 2
+    },
+    "criteria": [
+      {
+        "seed": "test:107:8:Assert",
+        "node_ids": [
+          "source:1:153:33:arg",
+          "source:1:193:7:Compare",
+          "source:1:194:8:Raise",
+          "source:1:205:4:Return",
+          "test:103:8:Assign",
+          "test:103:8:Name",
+          "test:104:8:Assign",
+          "test:104:8:Name",
+          "test:107:8:Assert",
+          "test:36:115:arg",
+          "test:36:78:arg",
+          "test:36:89:arg",
+          "test:59:7:Name"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:194:8:Raise",
+          "source:1:205:4:Return",
+          "test:104:8:Assign"
+        ]
+      },
+      {
+        "seed": "test:118:8:With",
+        "node_ids": [
+          "source:1:153:33:arg",
+          "source:1:193:7:Compare",
+          "source:1:194:8:Raise",
+          "source:1:205:4:Return",
+          "test:118:8:With",
+          "test:119:12:Expr",
+          "test:59:7:Name"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:194:8:Raise",
+          "source:1:205:4:Return",
+          "test:118:8:With"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:107:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:118:8:With"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.1118,
+  "identity": {
+    "case_id": "flask_311",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "ae6f4b7f3b58a3b9b73f3d62694a1b550f7862d8a66ccca7afc52ccbacfdeb34"
+  }
+}

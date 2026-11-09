@@ -1,0 +1,1137 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "source_budget",
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "org.apache.dubbo.rpc.filter.ExceptionFilterTest#testRuntimeException",
+      "status": "located",
+      "precision": "java_lexical_method_scope",
+      "locations": [
+        {
+          "symbol": "testRuntimeException",
+          "start_line": 36,
+          "end_line": 55
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 49,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 50,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 51,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:2"
+      }
+    ],
+    "dynamic_loading": [
+      {
+        "line": 47,
+        "name": "unresolved_dynamic_call",
+        "precision": "java_lexical_method_scope"
+      }
+    ],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_import",
+        "hint": "org.apache.dubbo.rpc.AppResponse",
+        "candidates": [
+          "src/main/java/org/apache/dubbo/rpc/AppResponse.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_import",
+        "hint": "org.apache.dubbo.rpc.Invoker",
+        "candidates": [
+          "src/main/java/org/apache/dubbo/rpc/Invoker.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_import",
+        "hint": "org.apache.dubbo.rpc.Result",
+        "candidates": [
+          "src/main/java/org/apache/dubbo/rpc/Result.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_import",
+        "hint": "org.apache.dubbo.rpc.RpcInvocation",
+        "candidates": [
+          "src/main/java/org/apache/dubbo/rpc/RpcInvocation.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_same_package_type",
+        "hint": "org.apache.dubbo.rpc.filter.ExceptionFilter",
+        "candidates": [
+          "src/main/java/org/apache/dubbo/rpc/filter/ExceptionFilter.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/main/java/org/apache/dubbo/rpc/AppResponse.java",
+        "hint_kind": "java_same_package_type",
+        "hint": "org.apache.dubbo.rpc.AbstractResult",
+        "candidates": [
+          "src/main/java/org/apache/dubbo/rpc/AbstractResult.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/main/java/org/apache/dubbo/rpc/Invoker.java",
+        "hint_kind": "java_same_package_type",
+        "hint": "org.apache.dubbo.rpc.Invocation",
+        "candidates": [
+          "src/main/java/org/apache/dubbo/rpc/Invocation.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/main/java/org/apache/dubbo/rpc/Invoker.java",
+        "hint_kind": "java_same_package_type",
+        "hint": "org.apache.dubbo.rpc.RpcException",
+        "candidates": [
+          "src/main/java/org/apache/dubbo/rpc/RpcException.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [
+      "file_budget_exhausted"
+    ],
+    "source_rejections": [],
+    "truncated": true,
+    "opaque_methods": [
+      {
+        "source_id": "source:1",
+        "name": "thenApplyWithContext",
+        "start_line": 137,
+        "end_line": 140
+      }
+    ],
+    "selected_bytes": 29483,
+    "read_bytes": 29483,
+    "attempted_files": 7,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "src/test/java/org/apache/dubbo/rpc/filter/ExceptionFilterTest.java",
+      "sha256": "9dd265421c1c45cb95670e89a398f10a170933b61a8a765f75bc2a7458da2e85",
+      "bytes": 2213
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/main/java/org/apache/dubbo/rpc/AppResponse.java",
+      "sha256": "1e130784f31ae60aea05745979a2556540d7404a9d87c2f7f2585367f24d3520",
+      "bytes": 4426
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/main/java/org/apache/dubbo/rpc/Invoker.java",
+      "sha256": "40cb3b6c15fcc959cb3bc7856dc08271c6f73a2b8cfeb4190c60cc26d1449f93",
+      "bytes": 1444
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/main/java/org/apache/dubbo/rpc/Result.java",
+      "sha256": "cd458559efbff9f5fe3ae1e393a90d6a8d9ba56565582dc72eeabb282198fa83",
+      "bytes": 4000
+    },
+    {
+      "source_id": "source:4",
+      "logical_path": "src/main/java/org/apache/dubbo/rpc/RpcInvocation.java",
+      "sha256": "8c6e84205967e3af784ed103571260c6023d2c4d63ccb04b17fe70ecdbfe3b27",
+      "bytes": 8132
+    },
+    {
+      "source_id": "source:5",
+      "logical_path": "src/main/java/org/apache/dubbo/rpc/filter/ExceptionFilter.java",
+      "sha256": "9323f82f1d6b7c5de01b5f71743a02364b2ffb154861cb2b21e2fe5be0bd5e78",
+      "bytes": 6110
+    },
+    {
+      "source_id": "source:6",
+      "logical_path": "src/main/java/org/apache/dubbo/rpc/AbstractResult.java",
+      "sha256": "4bded22a9b86c7f320b68d9b3bf6153191f2d4011bea48f39ec4f7793b6912b9",
+      "bytes": 985
+    },
+    {
+      "source_id": "source:7",
+      "logical_path": "src/main/java/org/apache/dubbo/rpc/Invocation.java",
+      "sha256": "fc60a7917c326fe769916c784f0f392bf0f86a9f7a1a7d67dfb95c8dc18fb927",
+      "bytes": 2173
+    }
+  ],
+  "graph": {
+    "limitations": [
+      "data_candidate edges are conservative name/declaration candidates, not a sound reaching-def analysis",
+      "lexical_control edges describe AST ancestry, not post-dominator control dependence",
+      "call_return edges use no-classpath resolution plus name/arity virtual candidates and do not prove dispatch",
+      "expression_value_candidate edges preserve syntax containment, not runtime evaluation or value equality",
+      "heap aliasing, reflection, exceptions, concurrency, and path feasibility are not modeled",
+      "boundary calls are retained as nodes and are not traversed into dependency implementations"
+    ],
+    "status": "ok",
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:49:9:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:50:9:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:51:9:CtInvocationImpl"
+      }
+    ],
+    "edges": [
+      {
+        "from": "source:5:55:16:CtInvocationImpl",
+        "to": "source:5:55:9:CtReturnImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:5:55:16:CtVariableReadImpl",
+        "to": "source:5:55:16:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:5:55:31:CtVariableReadImpl",
+        "to": "source:5:55:16:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:38:36:CtConstructorCallImpl",
+        "to": "test:38:23:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:38:54:CtLiteralImpl",
+        "to": "test:38:36:CtConstructorCallImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:38:66:CtNewArrayImpl",
+        "to": "test:38:36:CtConstructorCallImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:38:81:CtFieldReadImpl",
+        "to": "test:38:66:CtNewArrayImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:38:96:CtNewArrayImpl",
+        "to": "test:38:36:CtConstructorCallImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:38:109:CtLiteralImpl",
+        "to": "test:38:96:CtNewArrayImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:39:35:CtConstructorCallImpl",
+        "to": "test:39:21:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:46:43:CtConstructorCallImpl",
+        "to": "test:46:25:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:47:28:CtInvocationImpl",
+        "to": "test:47:16:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:47:28:CtVariableReadImpl",
+        "to": "test:47:28:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:47:51:CtFieldReadImpl",
+        "to": "test:47:28:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:47:60:CtVariableReadImpl",
+        "to": "test:47:28:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:49:9:CtTypeAccessImpl",
+        "to": "test:49:9:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:49:33:CtInvocationImpl",
+        "to": "test:49:9:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:49:33:CtVariableReadImpl",
+        "to": "test:49:33:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:49:61:CtInvocationImpl",
+        "to": "test:49:9:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:49:61:CtVariableReadImpl",
+        "to": "test:49:61:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:50:9:CtTypeAccessImpl",
+        "to": "test:50:9:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:50:33:CtFieldReadImpl",
+        "to": "test:50:9:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:50:55:CtInvocationImpl",
+        "to": "test:50:9:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:50:55:CtVariableReadImpl",
+        "to": "test:50:55:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:51:9:CtTypeAccessImpl",
+        "to": "test:51:9:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:51:33:CtLiteralImpl",
+        "to": "test:51:9:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:51:51:CtInvocationImpl",
+        "to": "test:51:9:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:51:51:CtVariableReadImpl",
+        "to": "test:51:51:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:1:83:16:CtFieldReadImpl",
+        "to": "source:1:83:9:CtReturnImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:5:54:37:CtParameterImpl",
+        "to": "source:5:55:9:CtReturnImpl",
+        "kind": "data_candidate",
+        "variable": "invoker",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "source:5:54:57:CtParameterImpl",
+        "to": "source:5:55:9:CtReturnImpl",
+        "kind": "data_candidate",
+        "variable": "invocation",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "source:5:54:37:CtParameterImpl",
+        "to": "source:5:55:16:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "invoker",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "source:5:54:57:CtParameterImpl",
+        "to": "source:5:55:16:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "invocation",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:46:25:CtLocalVariableImpl",
+        "to": "test:47:16:CtLocalVariableImpl",
+        "kind": "data_candidate",
+        "variable": "exceptionFilter",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:46:25:CtLocalVariableImpl",
+        "to": "test:47:16:CtLocalVariableImpl",
+        "kind": "data_candidate",
+        "variable": "exceptionFilter",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:38:23:CtLocalVariableImpl",
+        "to": "test:47:16:CtLocalVariableImpl",
+        "kind": "data_candidate",
+        "variable": "invocation",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:38:23:CtLocalVariableImpl",
+        "to": "test:47:16:CtLocalVariableImpl",
+        "kind": "data_candidate",
+        "variable": "invocation",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:46:25:CtLocalVariableImpl",
+        "to": "test:47:28:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "exceptionFilter",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:46:25:CtLocalVariableImpl",
+        "to": "test:47:28:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "exceptionFilter",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:38:23:CtLocalVariableImpl",
+        "to": "test:47:28:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "invocation",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:38:23:CtLocalVariableImpl",
+        "to": "test:47:28:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "invocation",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:39:21:CtLocalVariableImpl",
+        "to": "test:49:9:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "appResponse",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:39:21:CtLocalVariableImpl",
+        "to": "test:49:9:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "appResponse",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:47:16:CtLocalVariableImpl",
+        "to": "test:49:9:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newResult",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:47:16:CtLocalVariableImpl",
+        "to": "test:49:9:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newResult",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:39:21:CtLocalVariableImpl",
+        "to": "test:49:33:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "appResponse",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:39:21:CtLocalVariableImpl",
+        "to": "test:49:33:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "appResponse",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:47:16:CtLocalVariableImpl",
+        "to": "test:49:61:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newResult",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:47:16:CtLocalVariableImpl",
+        "to": "test:49:61:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newResult",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:47:16:CtLocalVariableImpl",
+        "to": "test:50:9:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newResult",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:47:16:CtLocalVariableImpl",
+        "to": "test:50:9:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newResult",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:47:16:CtLocalVariableImpl",
+        "to": "test:50:55:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newResult",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:47:16:CtLocalVariableImpl",
+        "to": "test:50:55:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newResult",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:47:16:CtLocalVariableImpl",
+        "to": "test:51:9:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newResult",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:47:16:CtLocalVariableImpl",
+        "to": "test:51:9:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newResult",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:47:16:CtLocalVariableImpl",
+        "to": "test:51:51:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newResult",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:47:16:CtLocalVariableImpl",
+        "to": "test:51:51:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newResult",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "source:1:49:23:CtFieldImpl",
+        "to": "source:1:83:9:CtReturnImpl",
+        "kind": "data_candidate",
+        "variable": "exception",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "source:5:55:9:CtReturnImpl",
+        "to": "test:47:16:CtLocalVariableImpl",
+        "kind": "call_return",
+        "precision": "single_source_candidate",
+        "callee": "org.apache.dubbo.rpc.filter.ExceptionFilter.invoke(org.apache.dubbo.rpc.Invoker,org.apache.dubbo.rpc.Invocation)"
+      },
+      {
+        "from": "test:47:51:CtFieldReadImpl",
+        "to": "source:5:54:37:CtParameterImpl",
+        "kind": "argument_binding_candidate",
+        "parameter": "invoker",
+        "precision": "single_source_candidate",
+        "callee": "org.apache.dubbo.rpc.filter.ExceptionFilter.invoke(org.apache.dubbo.rpc.Invoker,org.apache.dubbo.rpc.Invocation)"
+      },
+      {
+        "from": "test:47:60:CtVariableReadImpl",
+        "to": "source:5:54:57:CtParameterImpl",
+        "kind": "argument_binding_candidate",
+        "parameter": "invocation",
+        "precision": "single_source_candidate",
+        "callee": "org.apache.dubbo.rpc.filter.ExceptionFilter.invoke(org.apache.dubbo.rpc.Invoker,org.apache.dubbo.rpc.Invocation)"
+      },
+      {
+        "from": "source:1:83:9:CtReturnImpl",
+        "to": "test:49:9:CtInvocationImpl",
+        "kind": "call_return",
+        "precision": "single_source_candidate",
+        "callee": "org.apache.dubbo.rpc.AppResponse.getException()"
+      }
+    ],
+    "backend": "spoon-source-evidence-prototype",
+    "nodes": [
+      {
+        "id": "source:1:49:23:CtFieldImpl",
+        "source_id": "source:1",
+        "start_line": 49,
+        "end_line": 49,
+        "kind": "CtFieldImpl",
+        "code": "private java.lang.Throwable exception;"
+      },
+      {
+        "id": "source:1:83:16:CtFieldReadImpl",
+        "source_id": "source:1",
+        "start_line": 83,
+        "end_line": 83,
+        "kind": "expression",
+        "code": "exception"
+      },
+      {
+        "id": "source:1:83:9:CtReturnImpl",
+        "source_id": "source:1",
+        "start_line": 83,
+        "end_line": 83,
+        "kind": "CtReturnImpl",
+        "code": "return exception"
+      },
+      {
+        "id": "source:5:54:37:CtParameterImpl",
+        "source_id": "source:5",
+        "start_line": 54,
+        "end_line": 54,
+        "kind": "CtParameterImpl",
+        "code": "org.apache.dubbo.rpc.Invoker<?> invoker"
+      },
+      {
+        "id": "source:5:54:57:CtParameterImpl",
+        "source_id": "source:5",
+        "start_line": 54,
+        "end_line": 54,
+        "kind": "CtParameterImpl",
+        "code": "org.apache.dubbo.rpc.Invocation invocation"
+      },
+      {
+        "id": "source:5:55:16:CtInvocationImpl",
+        "source_id": "source:5",
+        "start_line": 55,
+        "end_line": 55,
+        "kind": "CtInvocationImpl",
+        "code": "invoker.invoke(invocation)"
+      },
+      {
+        "id": "source:5:55:16:CtVariableReadImpl",
+        "source_id": "source:5",
+        "start_line": 55,
+        "end_line": 55,
+        "kind": "expression",
+        "code": "invoker"
+      },
+      {
+        "id": "source:5:55:31:CtVariableReadImpl",
+        "source_id": "source:5",
+        "start_line": 55,
+        "end_line": 55,
+        "kind": "expression",
+        "code": "invocation"
+      },
+      {
+        "id": "source:5:55:9:CtReturnImpl",
+        "source_id": "source:5",
+        "start_line": 55,
+        "end_line": 55,
+        "kind": "CtReturnImpl",
+        "code": "return invoker.invoke(invocation)"
+      },
+      {
+        "id": "test:38:109:CtLiteralImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "expression",
+        "code": "\"world\""
+      },
+      {
+        "id": "test:38:23:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "CtLocalVariableImpl",
+        "code": "org.apache.dubbo.rpc.RpcInvocation invocation = new org.apache.dubbo.rpc.RpcInvocation(\"sayHello\", new java.lang.Class<?>[]{ java.lang.String.class }, new java.lang.Object[]{ \"world\" })"
+      },
+      {
+        "id": "test:38:36:CtConstructorCallImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "CtConstructorCallImpl",
+        "code": "new org.apache.dubbo.rpc.RpcInvocation(\"sayHello\", new java.lang.Class<?>[]{ java.lang.String.class }, new java.lang.Object[]{ \"world\" })"
+      },
+      {
+        "id": "test:38:54:CtLiteralImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "expression",
+        "code": "\"sayHello\""
+      },
+      {
+        "id": "test:38:66:CtNewArrayImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "expression",
+        "code": "new java.lang.Class<?>[]{ java.lang.String.class }"
+      },
+      {
+        "id": "test:38:81:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "expression",
+        "code": "java.lang.String.class"
+      },
+      {
+        "id": "test:38:96:CtNewArrayImpl",
+        "source_id": "test",
+        "start_line": 38,
+        "end_line": 38,
+        "kind": "expression",
+        "code": "new java.lang.Object[]{ \"world\" }"
+      },
+      {
+        "id": "test:39:21:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 39,
+        "end_line": 39,
+        "kind": "CtLocalVariableImpl",
+        "code": "org.apache.dubbo.rpc.AppResponse appResponse = new org.apache.dubbo.rpc.AppResponse()"
+      },
+      {
+        "id": "test:39:35:CtConstructorCallImpl",
+        "source_id": "test",
+        "start_line": 39,
+        "end_line": 39,
+        "kind": "CtConstructorCallImpl",
+        "code": "new org.apache.dubbo.rpc.AppResponse()"
+      },
+      {
+        "id": "test:46:25:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 46,
+        "end_line": 46,
+        "kind": "CtLocalVariableImpl",
+        "code": "// === MOCK-STUB-START === // === MOCK-STUB-END === org.apache.dubbo.rpc.filter.ExceptionFilter exceptionFilter = new org.apache.dubbo.rpc.filter.ExceptionFilter()"
+      },
+      {
+        "id": "test:46:43:CtConstructorCallImpl",
+        "source_id": "test",
+        "start_line": 46,
+        "end_line": 46,
+        "kind": "CtConstructorCallImpl",
+        "code": "new org.apache.dubbo.rpc.filter.ExceptionFilter()"
+      },
+      {
+        "id": "test:47:16:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 47,
+        "end_line": 47,
+        "kind": "CtLocalVariableImpl",
+        "code": "org.apache.dubbo.rpc.Result newResult = exceptionFilter.invoke(invoker, invocation)"
+      },
+      {
+        "id": "test:47:28:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 47,
+        "end_line": 47,
+        "kind": "CtInvocationImpl",
+        "code": "exceptionFilter.invoke(invoker, invocation)"
+      },
+      {
+        "id": "test:47:28:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 47,
+        "end_line": 47,
+        "kind": "expression",
+        "code": "exceptionFilter"
+      },
+      {
+        "id": "test:47:51:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 47,
+        "end_line": 47,
+        "kind": "expression",
+        "code": "invoker"
+      },
+      {
+        "id": "test:47:60:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 47,
+        "end_line": 47,
+        "kind": "expression",
+        "code": "invocation"
+      },
+      {
+        "id": "test:49:33:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 49,
+        "end_line": 49,
+        "kind": "CtInvocationImpl",
+        "code": "appResponse.getException()"
+      },
+      {
+        "id": "test:49:33:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 49,
+        "end_line": 49,
+        "kind": "expression",
+        "code": "appResponse"
+      },
+      {
+        "id": "test:49:61:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 49,
+        "end_line": 49,
+        "kind": "CtInvocationImpl",
+        "code": "newResult.getException()"
+      },
+      {
+        "id": "test:49:61:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 49,
+        "end_line": 49,
+        "kind": "expression",
+        "code": "newResult"
+      },
+      {
+        "id": "test:49:9:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 49,
+        "end_line": 49,
+        "kind": "CtInvocationImpl",
+        "code": "org.junit.jupiter.api.Assertions.assertEquals(appResponse.getException(), newResult.getException())"
+      },
+      {
+        "id": "test:49:9:CtTypeAccessImpl",
+        "source_id": "test",
+        "start_line": 49,
+        "end_line": 49,
+        "kind": "expression",
+        "code": "org.junit.jupiter.api.Assertions"
+      },
+      {
+        "id": "test:50:33:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 50,
+        "end_line": 50,
+        "kind": "expression",
+        "code": "org.apache.dubbo.rpc.support.LocalException.class"
+      },
+      {
+        "id": "test:50:55:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 50,
+        "end_line": 50,
+        "kind": "CtInvocationImpl",
+        "code": "newResult.getException().getClass()"
+      },
+      {
+        "id": "test:50:55:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 50,
+        "end_line": 50,
+        "kind": "expression",
+        "code": "newResult"
+      },
+      {
+        "id": "test:50:9:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 50,
+        "end_line": 50,
+        "kind": "CtInvocationImpl",
+        "code": "org.junit.jupiter.api.Assertions.assertEquals(org.apache.dubbo.rpc.support.LocalException.class, newResult.getException().getClass())",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "newResult.getException().getClass()"
+        ]
+      },
+      {
+        "id": "test:50:9:CtTypeAccessImpl",
+        "source_id": "test",
+        "start_line": 50,
+        "end_line": 50,
+        "kind": "expression",
+        "code": "org.junit.jupiter.api.Assertions"
+      },
+      {
+        "id": "test:51:33:CtLiteralImpl",
+        "source_id": "test",
+        "start_line": 51,
+        "end_line": 51,
+        "kind": "expression",
+        "code": "\"localException\""
+      },
+      {
+        "id": "test:51:51:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 51,
+        "end_line": 51,
+        "kind": "CtInvocationImpl",
+        "code": "newResult.getException().getMessage()"
+      },
+      {
+        "id": "test:51:51:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 51,
+        "end_line": 51,
+        "kind": "expression",
+        "code": "newResult"
+      },
+      {
+        "id": "test:51:9:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 51,
+        "end_line": 51,
+        "kind": "CtInvocationImpl",
+        "code": "org.junit.jupiter.api.Assertions.assertEquals(\"localException\", newResult.getException().getMessage())",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "newResult.getException().getMessage()"
+        ]
+      },
+      {
+        "id": "test:51:9:CtTypeAccessImpl",
+        "source_id": "test",
+        "start_line": 51,
+        "end_line": 51,
+        "kind": "expression",
+        "code": "org.junit.jupiter.api.Assertions"
+      }
+    ],
+    "seeds": [
+      "test:49:9:CtInvocationImpl",
+      "test:50:9:CtInvocationImpl",
+      "test:51:9:CtInvocationImpl"
+    ]
+  },
+  "evidence": {
+    "nodes": 41,
+    "edges": 62,
+    "edge_kinds": {
+      "expression_value_candidate": 29,
+      "data_candidate": 29,
+      "call_return": 2,
+      "argument_binding_candidate": 2
+    },
+    "criteria": [
+      {
+        "seed": "test:49:9:CtInvocationImpl",
+        "node_ids": [
+          "source:1:49:23:CtFieldImpl",
+          "source:1:83:16:CtFieldReadImpl",
+          "source:1:83:9:CtReturnImpl",
+          "source:5:54:37:CtParameterImpl",
+          "source:5:54:57:CtParameterImpl",
+          "source:5:55:16:CtInvocationImpl",
+          "source:5:55:16:CtVariableReadImpl",
+          "source:5:55:31:CtVariableReadImpl",
+          "source:5:55:9:CtReturnImpl",
+          "test:38:109:CtLiteralImpl",
+          "test:38:23:CtLocalVariableImpl",
+          "test:38:36:CtConstructorCallImpl",
+          "test:38:54:CtLiteralImpl",
+          "test:38:66:CtNewArrayImpl",
+          "test:38:81:CtFieldReadImpl",
+          "test:38:96:CtNewArrayImpl",
+          "test:39:21:CtLocalVariableImpl",
+          "test:39:35:CtConstructorCallImpl",
+          "test:46:25:CtLocalVariableImpl",
+          "test:46:43:CtConstructorCallImpl",
+          "test:47:16:CtLocalVariableImpl",
+          "test:47:28:CtInvocationImpl",
+          "test:47:28:CtVariableReadImpl",
+          "test:47:51:CtFieldReadImpl",
+          "test:47:60:CtVariableReadImpl",
+          "test:49:33:CtInvocationImpl",
+          "test:49:33:CtVariableReadImpl",
+          "test:49:61:CtInvocationImpl",
+          "test:49:61:CtVariableReadImpl",
+          "test:49:9:CtInvocationImpl",
+          "test:49:9:CtTypeAccessImpl"
+        ],
+        "product_source_candidates": [
+          "source:1",
+          "source:5"
+        ],
+        "unknown_call_nodes": []
+      },
+      {
+        "seed": "test:50:9:CtInvocationImpl",
+        "node_ids": [
+          "source:5:54:37:CtParameterImpl",
+          "source:5:54:57:CtParameterImpl",
+          "source:5:55:16:CtInvocationImpl",
+          "source:5:55:16:CtVariableReadImpl",
+          "source:5:55:31:CtVariableReadImpl",
+          "source:5:55:9:CtReturnImpl",
+          "test:38:109:CtLiteralImpl",
+          "test:38:23:CtLocalVariableImpl",
+          "test:38:36:CtConstructorCallImpl",
+          "test:38:54:CtLiteralImpl",
+          "test:38:66:CtNewArrayImpl",
+          "test:38:81:CtFieldReadImpl",
+          "test:38:96:CtNewArrayImpl",
+          "test:46:25:CtLocalVariableImpl",
+          "test:46:43:CtConstructorCallImpl",
+          "test:47:16:CtLocalVariableImpl",
+          "test:47:28:CtInvocationImpl",
+          "test:47:28:CtVariableReadImpl",
+          "test:47:51:CtFieldReadImpl",
+          "test:47:60:CtVariableReadImpl",
+          "test:50:33:CtFieldReadImpl",
+          "test:50:55:CtInvocationImpl",
+          "test:50:55:CtVariableReadImpl",
+          "test:50:9:CtInvocationImpl",
+          "test:50:9:CtTypeAccessImpl"
+        ],
+        "product_source_candidates": [
+          "source:5"
+        ],
+        "unknown_call_nodes": [
+          "test:50:9:CtInvocationImpl"
+        ]
+      },
+      {
+        "seed": "test:51:9:CtInvocationImpl",
+        "node_ids": [
+          "source:5:54:37:CtParameterImpl",
+          "source:5:54:57:CtParameterImpl",
+          "source:5:55:16:CtInvocationImpl",
+          "source:5:55:16:CtVariableReadImpl",
+          "source:5:55:31:CtVariableReadImpl",
+          "source:5:55:9:CtReturnImpl",
+          "test:38:109:CtLiteralImpl",
+          "test:38:23:CtLocalVariableImpl",
+          "test:38:36:CtConstructorCallImpl",
+          "test:38:54:CtLiteralImpl",
+          "test:38:66:CtNewArrayImpl",
+          "test:38:81:CtFieldReadImpl",
+          "test:38:96:CtNewArrayImpl",
+          "test:46:25:CtLocalVariableImpl",
+          "test:46:43:CtConstructorCallImpl",
+          "test:47:16:CtLocalVariableImpl",
+          "test:47:28:CtInvocationImpl",
+          "test:47:28:CtVariableReadImpl",
+          "test:47:51:CtFieldReadImpl",
+          "test:47:60:CtVariableReadImpl",
+          "test:51:33:CtLiteralImpl",
+          "test:51:51:CtInvocationImpl",
+          "test:51:51:CtVariableReadImpl",
+          "test:51:9:CtInvocationImpl",
+          "test:51:9:CtTypeAccessImpl"
+        ],
+        "product_source_candidates": [
+          "source:5"
+        ],
+        "unknown_call_nodes": [
+          "test:51:9:CtInvocationImpl"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:49:9:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:50:9:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:51:9:CtInvocationImpl"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 1.9516,
+  "identity": {
+    "case_id": "org.apache.dubbo.rpc.filter.ExceptionFilterTest#testRuntimeException@ebafc18c",
+    "dataset": "java-bechmark-strong",
+    "language": "java",
+    "snapshot_id": "b56b9a54a062eeb44adf0481002aa027f11a64720cd48ebc82f555c3c9f27b2d"
+  }
+}

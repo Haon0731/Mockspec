@@ -142,6 +142,30 @@ V0.1 无工具，V0.2 有三个只读工具；两版都使用正式 ScenarioCont
 
 ## 研究路径
 
+`experiments/mockbench-study/` 是完整 MockBench 的独立研究入口：
+冻结 agent validation reports＋正式索引 → `inventory.py` 全量清单 →
+`batch.check_inputs` → `adapters/frozen_dataset.py` → 目标测试、源码访问接口与逐例加载报告。
+`FrozenDataset` 沿用用户指定的上游冻结准备协议，不依赖三例白名单；`FrozenCase` 校验
+控制身份、完整 masked test 和 injector，按需读取源码时核对已有 manifest 摘要。
+未请求 MUT 时不构造 `UnifiedTask`；宿主选择 MUT 路径后由 `to_task` 生成已有契约输入。
+不会将 masked test 伪装成 MUT，也不会从 gold 定位。`FrozenCase` 用上下文管理器关闭文件描述符。
+旧 `batch` 语法基线只接收 `--input-policy reviewed` 产生的三例策略清单；它继续复用
+原 Adapter 和 `SourceAnalysis`，作为历史对照保留，不能把全量输入误判为旧目录未准入。
+当前不运行模型、目标测试或完整关系恢复，语义正确性保持未评价。
+技术路线由后续失败分类与对照结果决定，不预先绑定 WALA 或完整符号执行。
+详细边界见[研究框架](../experiments/mockbench-study/README.md)，命令见
+[全量清单与批处理](usage.md#完整-mockbench-研究框架)。生产代码不反向依赖这一入口。
+
+目标导向候选切片入口是 `experiments/backward-slicing/batch_slice.py`：同一冻结清单
+→ `criteria.py` 定位目标测试与观察准则 → `source_selection.py` 按可见导入/加载路径
+有界选源码 → Python AST / 固定 Spoon 后向候选图 → 每准则闭包、源码身份与逐例失败。
+它复用历史 `python_probe.py` / `SliceProbe.java`，不调用后来的 GoalIR 符号解释器。
+批处理的 Python 配置排除普通语句前驱边，避免把所有先前语句当作数据依赖；占位方法保持
+opaque，不能把占位异常当真实效果。调用、数据及词法控制边仍是候选，未实现完整
+SDG、heap/异常流或路径可行性，也未确认哪些未知调用必然属于 Mock。
+未解析、预算不足、构图失败和超时保留在全量分母；协议与运行解释见
+[候选切片研究入口](../experiments/backward-slicing/README.md#全量候选切片入口2026-11-09)。
+
 `experiments/staged-inference/` 承接 [M1-1 / #7](https://github.com/Haon0731/Mockspec/issues/7)
 、[M1-2 / #8](https://github.com/Haon0731/Mockspec/issues/8)
 、[M1-3 / #9](https://github.com/Haon0731/Mockspec/issues/9)

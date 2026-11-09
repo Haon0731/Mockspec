@@ -1,0 +1,57 @@
+{
+  "status": "failed",
+  "failure_categories": [
+    "analysis_error"
+  ],
+  "stage": "source_selection",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_432load_model.py::test_load_model_dispatches_to_the_matching_loader",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_load_model_dispatches_to_the_matching_loader",
+          "start_line": 23,
+          "end_line": 94
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 61,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 66,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      }
+    ],
+    "dynamic_loading": [
+      {
+        "line": 34,
+        "name": "load_function_from_source_ast",
+        "precision": "python_ast_call_name"
+      }
+    ],
+    "diagnostics": []
+  },
+  "error": {
+    "type": "InputValidationError",
+    "message": "frozen source is empty"
+  },
+  "elapsed_seconds": 0.0728,
+  "identity": {
+    "case_id": "spaCy_432",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "8ef2a267df79c3cf93ff9d341e0d166c9ab6d76604a3595816638e87b5faae13"
+  }
+}

@@ -1,0 +1,312 @@
+{
+  "status": "ok",
+  "backend": "python-ast-source-evidence-prototype",
+  "seeds": [
+    "test:120:8:Assert",
+    "test:126:8:Assert",
+    "mut:285:4:Expr",
+    "mut:283:8:Expr",
+    "mut:282:7:Compare"
+  ],
+  "nodes": [
+    {
+      "id": "mut:265:10:arg",
+      "source_id": "mut",
+      "start_line": 265,
+      "end_line": 265,
+      "kind": "name_definition",
+      "code": "code: int | BaseResponse"
+    },
+    {
+      "id": "mut:266:4:Expr",
+      "source_id": "mut",
+      "start_line": 266,
+      "end_line": 281,
+      "kind": "Expr",
+      "code": "\"Raise an :exc:`~werkzeug.exceptions.HTTPException` for the given\\n    status code.\\n\\n    If :data:`~flask.current_app` is available, it will call its\\n    :attr:`~flask.Flask.aborter` object, otherwise it will use\\n    :func:`werkzeug.exceptions.abort`.\\n\\n    :param code: The status code for the "
+    },
+    {
+      "id": "mut:282:4:If",
+      "source_id": "mut",
+      "start_line": 282,
+      "end_line": 283,
+      "kind": "If",
+      "code": "if (ctx := _cv_app.get(None)) is not None:\n    ctx.app.aborter(code, *args, **kwargs)",
+      "contains_unresolved_call": true,
+      "unresolved_calls": [
+        "_cv_app.get(None)"
+      ],
+      "exception_possible": true
+    },
+    {
+      "id": "mut:282:7:Compare",
+      "source_id": "mut",
+      "start_line": 282,
+      "end_line": 282,
+      "kind": "if_condition",
+      "code": "(ctx := _cv_app.get(None)) is not None"
+    },
+    {
+      "id": "mut:282:8:Name",
+      "source_id": "mut",
+      "start_line": 282,
+      "end_line": 282,
+      "kind": "name_definition",
+      "code": "ctx"
+    },
+    {
+      "id": "mut:282:8:NamedExpr",
+      "source_id": "mut",
+      "start_line": 282,
+      "end_line": 282,
+      "kind": "name_definition",
+      "code": "(ctx := _cv_app.get(None))"
+    },
+    {
+      "id": "mut:283:8:Expr",
+      "source_id": "mut",
+      "start_line": 283,
+      "end_line": 283,
+      "kind": "Expr",
+      "code": "ctx.app.aborter(code, *args, **kwargs)",
+      "contains_unresolved_call": true,
+      "unresolved_calls": [
+        "ctx.app.aborter(code, *args, **kwargs)"
+      ],
+      "exception_possible": true
+    },
+    {
+      "id": "mut:285:4:Expr",
+      "source_id": "mut",
+      "start_line": 285,
+      "end_line": 285,
+      "kind": "Expr",
+      "code": "_wz_abort(code, *args, **kwargs)",
+      "contains_unresolved_call": true,
+      "unresolved_calls": [
+        "_wz_abort(code, *args, **kwargs)"
+      ],
+      "exception_possible": true
+    },
+    {
+      "id": "test:102:37:Name",
+      "source_id": "test",
+      "start_line": 102,
+      "end_line": 102,
+      "kind": "name_definition",
+      "code": "exc_info"
+    },
+    {
+      "id": "test:111:7:Name",
+      "source_id": "test",
+      "start_line": 111,
+      "end_line": 111,
+      "kind": "if_condition",
+      "code": "has_app_context"
+    },
+    {
+      "id": "test:114:8:Pass",
+      "source_id": "test",
+      "start_line": 114,
+      "end_line": 114,
+      "kind": "Pass",
+      "code": "pass"
+    },
+    {
+      "id": "test:118:8:Pass",
+      "source_id": "test",
+      "start_line": 118,
+      "end_line": 118,
+      "kind": "Pass",
+      "code": "pass"
+    },
+    {
+      "id": "test:120:8:Assert",
+      "source_id": "test",
+      "start_line": 120,
+      "end_line": 120,
+      "kind": "Assert",
+      "code": "assert f'Aborted with {code}' in str(exc_info.value)",
+      "contains_unresolved_call": true,
+      "unresolved_calls": [
+        "str(exc_info.value)"
+      ],
+      "exception_possible": true
+    },
+    {
+      "id": "test:124:8:Pass",
+      "source_id": "test",
+      "start_line": 124,
+      "end_line": 124,
+      "kind": "Pass",
+      "code": "pass"
+    },
+    {
+      "id": "test:126:8:Assert",
+      "source_id": "test",
+      "start_line": 126,
+      "end_line": 126,
+      "kind": "Assert",
+      "code": "assert f'Werkzeug abort {code}' in str(exc_info.value)",
+      "contains_unresolved_call": true,
+      "unresolved_calls": [
+        "str(exc_info.value)"
+      ],
+      "exception_possible": true
+    },
+    {
+      "id": "test:48:60:arg",
+      "source_id": "test",
+      "start_line": 48,
+      "end_line": 48,
+      "kind": "name_definition",
+      "code": "code"
+    }
+  ],
+  "edges": [
+    {
+      "from": "test:111:7:Name",
+      "to": "test:114:8:Pass",
+      "kind": "lexical_control",
+      "branch": "true",
+      "precision": "ast_ancestry"
+    },
+    {
+      "from": "test:111:7:Name",
+      "to": "test:118:8:Pass",
+      "kind": "lexical_control",
+      "branch": "true",
+      "precision": "ast_ancestry"
+    },
+    {
+      "from": "test:111:7:Name",
+      "to": "test:120:8:Assert",
+      "kind": "lexical_control",
+      "branch": "true",
+      "precision": "ast_ancestry"
+    },
+    {
+      "from": "test:114:8:Pass",
+      "to": "test:118:8:Pass",
+      "kind": "normal_predecessor",
+      "precision": "syntactic_sequence_after_normal_completion"
+    },
+    {
+      "from": "test:118:8:Pass",
+      "to": "test:120:8:Assert",
+      "kind": "normal_predecessor",
+      "precision": "syntactic_sequence_after_normal_completion"
+    },
+    {
+      "from": "test:111:7:Name",
+      "to": "test:124:8:Pass",
+      "kind": "lexical_control",
+      "branch": "false",
+      "precision": "ast_ancestry"
+    },
+    {
+      "from": "test:111:7:Name",
+      "to": "test:126:8:Assert",
+      "kind": "lexical_control",
+      "branch": "false",
+      "precision": "ast_ancestry"
+    },
+    {
+      "from": "test:124:8:Pass",
+      "to": "test:126:8:Assert",
+      "kind": "normal_predecessor",
+      "precision": "syntactic_sequence_after_normal_completion"
+    },
+    {
+      "from": "test:48:60:arg",
+      "to": "test:120:8:Assert",
+      "kind": "data_candidate",
+      "variable": "code",
+      "precision": "prior_lexical_write"
+    },
+    {
+      "from": "test:102:37:Name",
+      "to": "test:120:8:Assert",
+      "kind": "data_candidate",
+      "variable": "exc_info",
+      "precision": "prior_lexical_write"
+    },
+    {
+      "from": "test:48:60:arg",
+      "to": "test:126:8:Assert",
+      "kind": "data_candidate",
+      "variable": "code",
+      "precision": "prior_lexical_write"
+    },
+    {
+      "from": "test:102:37:Name",
+      "to": "test:126:8:Assert",
+      "kind": "data_candidate",
+      "variable": "exc_info",
+      "precision": "prior_lexical_write"
+    },
+    {
+      "from": "mut:266:4:Expr",
+      "to": "mut:282:4:If",
+      "kind": "normal_predecessor",
+      "precision": "syntactic_sequence_after_normal_completion"
+    },
+    {
+      "from": "mut:282:4:If",
+      "to": "mut:285:4:Expr",
+      "kind": "normal_predecessor",
+      "precision": "syntactic_sequence_after_normal_completion"
+    },
+    {
+      "from": "mut:282:7:Compare",
+      "to": "mut:283:8:Expr",
+      "kind": "lexical_control",
+      "branch": "true",
+      "precision": "ast_ancestry"
+    },
+    {
+      "from": "mut:283:8:Expr",
+      "to": "mut:282:4:If",
+      "kind": "normal_branch_exit",
+      "branch": "true",
+      "precision": "possible_only_if_branch_completes_normally"
+    },
+    {
+      "from": "mut:265:10:arg",
+      "to": "mut:283:8:Expr",
+      "kind": "data_candidate",
+      "variable": "code",
+      "precision": "prior_lexical_write"
+    },
+    {
+      "from": "mut:282:8:NamedExpr",
+      "to": "mut:283:8:Expr",
+      "kind": "data_candidate",
+      "variable": "ctx",
+      "precision": "prior_lexical_write"
+    },
+    {
+      "from": "mut:282:8:Name",
+      "to": "mut:283:8:Expr",
+      "kind": "data_candidate",
+      "variable": "ctx",
+      "precision": "prior_lexical_write"
+    },
+    {
+      "from": "mut:265:10:arg",
+      "to": "mut:285:4:Expr",
+      "kind": "data_candidate",
+      "variable": "code",
+      "precision": "prior_lexical_write"
+    }
+  ],
+  "limitations": [
+    "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+    "lexical_control edges are AST ancestry, not post-dominator control dependence",
+    "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+    "an exception-capable call may prevent its normal successor from running",
+    "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+    "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+    "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+  ]
+}

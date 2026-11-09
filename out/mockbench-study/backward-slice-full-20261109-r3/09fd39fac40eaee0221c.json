@@ -1,0 +1,377 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "test_to_product_not_reached",
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "org.apache.ibatis.type.OffsetTimeTypeHandlerTest#shouldGetResultFromResultSetByPosition",
+      "status": "located",
+      "precision": "java_lexical_method_scope",
+      "locations": [
+        {
+          "symbol": "shouldGetResultFromResultSetByPosition",
+          "start_line": 31,
+          "end_line": 39
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 36,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_same_package_type",
+        "hint": "org.apache.ibatis.type.OffsetTimeTypeHandler",
+        "candidates": [
+          "src/main/java/org/apache/ibatis/type/OffsetTimeTypeHandler.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_same_package_type",
+        "hint": "org.apache.ibatis.type.TypeHandler",
+        "candidates": [
+          "src/main/java/org/apache/ibatis/type/TypeHandler.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/main/java/org/apache/ibatis/type/OffsetTimeTypeHandler.java",
+        "hint_kind": "java_same_package_type",
+        "hint": "org.apache.ibatis.type.BaseTypeHandler",
+        "candidates": [
+          "src/main/java/org/apache/ibatis/type/BaseTypeHandler.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/main/java/org/apache/ibatis/type/OffsetTimeTypeHandler.java",
+        "hint_kind": "java_same_package_type",
+        "hint": "org.apache.ibatis.type.JdbcType",
+        "candidates": [
+          "src/main/java/org/apache/ibatis/type/JdbcType.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 11092,
+    "read_bytes": 11092,
+    "attempted_files": 4,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "src/test/java/org/apache/ibatis/type/OffsetTimeTypeHandlerTest.java",
+      "sha256": "abf195d3e78170929fa52a16bd0fdc72a55486948f98330c25601158a372a0a1",
+      "bytes": 1409
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/main/java/org/apache/ibatis/type/OffsetTimeTypeHandler.java",
+      "sha256": "5b39e59816126dd1924ed0e9d8f9e6a2d834e946bf0e3154a11d1d835a874f44",
+      "bytes": 1672
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/main/java/org/apache/ibatis/type/TypeHandler.java",
+      "sha256": "64c7b3567710cf3ec934b8a4d72b23a42e54fd1e1652b9a45cd2c65c4126a442",
+      "bytes": 1215
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/main/java/org/apache/ibatis/type/BaseTypeHandler.java",
+      "sha256": "c7f9338896d8d1731f80865cfc5106dfb14a1bf4289ab8fdc11825eea61e0eb4",
+      "bytes": 4289
+    },
+    {
+      "source_id": "source:4",
+      "logical_path": "src/main/java/org/apache/ibatis/type/JdbcType.java",
+      "sha256": "212a941757372b03dde2cf0efecbf2c4763f5b488053191b661551ce9908364b",
+      "bytes": 2507
+    }
+  ],
+  "graph": {
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:36:5:CtInvocationImpl"
+      }
+    ],
+    "edges": [
+      {
+        "from": "test:32:29:CtInvocationImpl",
+        "to": "test:32:16:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:32:29:CtTypeAccessImpl",
+        "to": "test:32:29:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:33:43:CtConstructorCallImpl",
+        "to": "test:33:29:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:36:18:CtVariableReadImpl",
+        "to": "test:36:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:36:30:CtInvocationImpl",
+        "to": "test:36:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:36:30:CtVariableReadImpl",
+        "to": "test:36:30:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:36:52:CtFieldReadImpl",
+        "to": "test:36:30:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:36:56:CtLiteralImpl",
+        "to": "test:36:30:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:32:16:CtLocalVariableImpl",
+        "to": "test:36:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "offsetTime",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:32:16:CtLocalVariableImpl",
+        "to": "test:36:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "offsetTime",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:33:29:CtLocalVariableImpl",
+        "to": "test:36:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "typeHandler",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:33:29:CtLocalVariableImpl",
+        "to": "test:36:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "typeHandler",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:33:29:CtLocalVariableImpl",
+        "to": "test:36:30:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "typeHandler",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:33:29:CtLocalVariableImpl",
+        "to": "test:36:30:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "typeHandler",
+        "precision": "prior_write_same_method"
+      }
+    ],
+    "backend": "spoon-source-evidence-prototype",
+    "nodes": [
+      {
+        "id": "test:32:16:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 32,
+        "end_line": 32,
+        "kind": "CtLocalVariableImpl",
+        "code": "java.time.OffsetTime offsetTime = java.time.OffsetTime.now()",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "java.time.OffsetTime.now()"
+        ]
+      },
+      {
+        "id": "test:32:29:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 32,
+        "end_line": 32,
+        "kind": "CtInvocationImpl",
+        "code": "java.time.OffsetTime.now()"
+      },
+      {
+        "id": "test:32:29:CtTypeAccessImpl",
+        "source_id": "test",
+        "start_line": 32,
+        "end_line": 32,
+        "kind": "expression",
+        "code": "java.time.OffsetTime"
+      },
+      {
+        "id": "test:33:29:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 33,
+        "end_line": 33,
+        "kind": "CtLocalVariableImpl",
+        "code": "org.apache.ibatis.type.TypeHandler<java.time.OffsetTime> typeHandler = new org.apache.ibatis.type.OffsetTimeTypeHandler()"
+      },
+      {
+        "id": "test:33:43:CtConstructorCallImpl",
+        "source_id": "test",
+        "start_line": 33,
+        "end_line": 33,
+        "kind": "CtConstructorCallImpl",
+        "code": "new org.apache.ibatis.type.OffsetTimeTypeHandler()"
+      },
+      {
+        "id": "test:36:18:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 36,
+        "end_line": 36,
+        "kind": "expression",
+        "code": "offsetTime"
+      },
+      {
+        "id": "test:36:30:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 36,
+        "end_line": 36,
+        "kind": "CtInvocationImpl",
+        "code": "typeHandler.getResult(rs, 1)"
+      },
+      {
+        "id": "test:36:30:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 36,
+        "end_line": 36,
+        "kind": "expression",
+        "code": "typeHandler"
+      },
+      {
+        "id": "test:36:52:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 36,
+        "end_line": 36,
+        "kind": "expression",
+        "code": "rs"
+      },
+      {
+        "id": "test:36:56:CtLiteralImpl",
+        "source_id": "test",
+        "start_line": 36,
+        "end_line": 36,
+        "kind": "expression",
+        "code": "1"
+      },
+      {
+        "id": "test:36:5:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 36,
+        "end_line": 36,
+        "kind": "CtInvocationImpl",
+        "code": "// === MOCK-STUB-START === // === MOCK-STUB-END === assertEquals(offsetTime, typeHandler.getResult(rs, 1))"
+      }
+    ],
+    "seeds": [
+      "test:36:5:CtInvocationImpl"
+    ],
+    "limitations": [
+      "data_candidate edges are conservative name/declaration candidates, not a sound reaching-def analysis",
+      "lexical_control edges describe AST ancestry, not post-dominator control dependence",
+      "call_return edges use no-classpath resolution plus name/arity virtual candidates and do not prove dispatch",
+      "expression_value_candidate edges preserve syntax containment, not runtime evaluation or value equality",
+      "heap aliasing, reflection, exceptions, concurrency, and path feasibility are not modeled",
+      "boundary calls are retained as nodes and are not traversed into dependency implementations"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 11,
+    "edges": 14,
+    "edge_kinds": {
+      "expression_value_candidate": 8,
+      "data_candidate": 6
+    },
+    "criteria": [
+      {
+        "seed": "test:36:5:CtInvocationImpl",
+        "node_ids": [
+          "test:32:16:CtLocalVariableImpl",
+          "test:32:29:CtInvocationImpl",
+          "test:32:29:CtTypeAccessImpl",
+          "test:33:29:CtLocalVariableImpl",
+          "test:33:43:CtConstructorCallImpl",
+          "test:36:18:CtVariableReadImpl",
+          "test:36:30:CtInvocationImpl",
+          "test:36:30:CtVariableReadImpl",
+          "test:36:52:CtFieldReadImpl",
+          "test:36:56:CtLiteralImpl",
+          "test:36:5:CtInvocationImpl"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:32:16:CtLocalVariableImpl"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:36:5:CtInvocationImpl"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 1.5215,
+  "identity": {
+    "case_id": "org.apache.ibatis.type.OffsetTimeTypeHandlerTest#shouldGetResultFromResultSetByPosition@f5124674",
+    "dataset": "java-bechmark-strong",
+    "language": "java",
+    "snapshot_id": "0ba498ca411dda63c3a488bd9f13f6b92b9ebd6b68370b85325d24642692a995"
+  }
+}

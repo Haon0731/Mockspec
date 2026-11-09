@@ -1,0 +1,26 @@
+{
+  "flask": {
+    "slots": {
+      "mock_stub_001": "mock_ctx = mocker.Mock()",
+      "mock_stub_002": "mock_app = mocker.Mock()",
+      "mock_stub_003": "mock_aborter = mocker.Mock(side_effect=Exception(f\"Aborted with {code}\"))",
+      "mock_stub_004": "mock_cv_get = mocker.patch(\"flask.helpers._cv_app.get\", return_value=None)",
+      "mock_stub_005": "mock_cv_get.return_value = mock_ctx",
+      "mock_stub_006": "mock_wz_abort = mocker.patch(\"flask.helpers._wz_abort\", side_effect=Exception(f\"Werkzeug abort {code}\"))",
+      "verify_001": "mock_cv_get.assert_called_once_with(None)",
+      "verify_002": "mock_aborter.assert_called_once_with(code, *args, **kwargs)",
+      "verify_003": "mock_wz_abort.assert_not_called()",
+      "verify_004": "mock_wz_abort.assert_called_once_with(code, *args, **kwargs)"
+    },
+    "reasoning": "Patch the exact collaborators referenced by abort: the app-context ContextVar lookup and Werkzeug fallback. When an app context is requested, return a context wired to an app whose aborter raises a scenario-specific exception; otherwise return None so the patched Werkzeug abort raises. Assertions check the lookup plus the mutually exclusive delegate call while preserving arbitrary positional and keyword arguments. The exception type is intentionally broad because the ordinary test already expects Exception and only constrains its message."
+  },
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"/actuator/health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "The existing imports for Mockito mock/when/verify and EndpointId, together with the constructor's required PathMappedEndpoints argument and the asserted health URL, support mocking the health endpoint mapping as /actuator/health. The unmasked WebEndpointProperties supplies the default /actuator management base path, while the Cloud Foundry URI supplies the service base URL.",
+    "unknowns": [
+      "The DefaultApplicationFactory implementation is not included, so the precise number of getPath calls is not visible; verification therefore checks that the health mapping is consulted without overconstraining invocation count.",
+      "No supporting source confirms whether additional endpoint mappings are queried, so only the health endpoint required by the asserted URL is stubbed."
+    ]
+  }
+}

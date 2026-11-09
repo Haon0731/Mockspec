@@ -1,0 +1,4183 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_422edit.py::test_edit",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_edit",
+          "start_line": 15,
+          "end_line": 52
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 45,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 50,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "click.termui",
+        "candidates": [
+          "src/click/termui.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "click._termui_impl",
+        "candidates": [
+          "src/click/_termui_impl.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/click/_termui_impl.py",
+        "hint_kind": "python_import",
+        "hint": "types",
+        "candidates": [
+          "src/click/types.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [
+      {
+        "source_id": "source:3",
+        "name": "arity",
+        "start_line": 167,
+        "end_line": 168
+      }
+    ],
+    "selected_bytes": 99484,
+    "read_bytes": 99484,
+    "attempted_files": 3,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_422edit.py",
+      "sha256": "ae42181f037695ee35c5a9b3ad952c8c73df97c4dce9bdaca7531775bfc9e5da",
+      "bytes": 1427
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/click/termui.py",
+      "sha256": "86a0848cd9dd53e9f35b4f2744090169581f669fc574203d2b17c85a529868c7",
+      "bytes": 31037
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/click/_termui_impl.py",
+      "sha256": "ae009bdce9fc5f9038db4d2b0392fa8b5deee626a99857abeecaeee7b272eb30",
+      "bytes": 27093
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/click/types.py",
+      "sha256": "7a4e7804d485c0f2acaad7d3ee3b2a71ce161ee8bc00815530a338a156485e17",
+      "bytes": 39927
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "branch": "true",
+        "from": "test:44:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:45:8:Assert"
+      },
+      {
+        "branch": "false",
+        "from": "test:44:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:50:8:Assert"
+      },
+      {
+        "from": "test:32:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:32:4:Name"
+      },
+      {
+        "from": "test:15:32:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:32:4:Assign",
+        "variable": "text"
+      },
+      {
+        "from": "test:15:38:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:32:4:Assign",
+        "variable": "filename"
+      },
+      {
+        "from": "test:32:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:45:8:Assert",
+        "variable": "result"
+      },
+      {
+        "from": "test:15:48:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:45:8:Assert",
+        "variable": "expected_result"
+      },
+      {
+        "from": "test:32:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:50:8:Assert",
+        "variable": "result"
+      },
+      {
+        "callee": "edit",
+        "from": "source:1:773:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:32:4:Assign"
+      },
+      {
+        "callee": "edit",
+        "from": "source:1:779:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:32:4:Assign"
+      },
+      {
+        "callee": "edit",
+        "from": "source:1:778:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:32:4:Assign"
+      },
+      {
+        "callee": "edit",
+        "from": "source:2:663:16:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:32:4:Assign"
+      },
+      {
+        "callee": "edit",
+        "from": "source:2:669:16:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:32:4:Assign"
+      },
+      {
+        "callee": "edit",
+        "from": "source:2:671:12:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:32:4:Assign"
+      },
+      {
+        "callee": "edit",
+        "from": "source:2:649:16:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:32:4:Assign"
+      },
+      {
+        "callee": "edit",
+        "from": "source:2:655:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:32:4:Assign"
+      },
+      {
+        "callee": "edit",
+        "from": "source:2:660:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:32:4:Assign"
+      },
+      {
+        "callee": "edit",
+        "from": "source:2:673:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:32:4:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:772:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:773:8:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:775:7:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:776:8:Assign"
+      },
+      {
+        "from": "source:1:770:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:770:4:Name"
+      },
+      {
+        "from": "source:1:726:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:770:4:Assign",
+        "variable": "editor"
+      },
+      {
+        "from": "source:1:727:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:770:4:Assign",
+        "variable": "env"
+      },
+      {
+        "from": "source:1:728:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:770:4:Assign",
+        "variable": "require_save"
+      },
+      {
+        "from": "source:1:729:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:770:4:Assign",
+        "variable": "extension"
+      },
+      {
+        "from": "source:1:770:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:773:8:Return",
+        "variable": "ed"
+      },
+      {
+        "from": "source:1:725:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:773:8:Return",
+        "variable": "text"
+      },
+      {
+        "from": "source:1:776:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:776:8:Name"
+      },
+      {
+        "from": "source:1:730:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:776:8:Assign",
+        "variable": "filename"
+      },
+      {
+        "from": "source:1:776:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:776:8:Assign",
+        "variable": "filename"
+      },
+      {
+        "from": "source:1:770:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:778:4:Expr",
+        "variable": "ed"
+      },
+      {
+        "from": "source:1:730:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:778:4:Expr",
+        "variable": "filename"
+      },
+      {
+        "from": "source:1:776:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:778:4:Expr",
+        "variable": "filename"
+      },
+      {
+        "callee": "edit_files",
+        "from": "source:2:602:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:778:4:Expr"
+      },
+      {
+        "callee": "edit_files",
+        "from": "source:2:612:16:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:778:4:Expr"
+      },
+      {
+        "callee": "edit_files",
+        "from": "source:2:616:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:778:4:Expr"
+      },
+      {
+        "callee": "edit",
+        "from": "source:1:779:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:1:773:8:Return"
+      },
+      {
+        "callee": "edit",
+        "from": "source:1:778:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:773:8:Return"
+      },
+      {
+        "callee": "edit",
+        "from": "source:2:663:16:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:1:773:8:Return"
+      },
+      {
+        "callee": "edit",
+        "from": "source:2:669:16:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:1:773:8:Return"
+      },
+      {
+        "callee": "edit",
+        "from": "source:2:671:12:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:1:773:8:Return"
+      },
+      {
+        "callee": "edit",
+        "from": "source:2:649:16:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:773:8:Return"
+      },
+      {
+        "callee": "edit",
+        "from": "source:2:655:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:773:8:Return"
+      },
+      {
+        "callee": "edit",
+        "from": "source:2:660:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:773:8:Return"
+      },
+      {
+        "callee": "edit",
+        "from": "source:2:673:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:773:8:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:167:11:Attribute",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:168:12:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:167:11:Attribute",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:169:12:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:167:11:Attribute",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:170:12:AugAssign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:167:11:Attribute",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:171:12:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:167:11:Attribute",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:172:12:AugAssign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:167:11:Attribute",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:173:12:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:167:11:Attribute",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:174:12:AugAssign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:175:15:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:176:16:Return"
+      },
+      {
+        "branch": "false",
+        "from": "source:2:175:15:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:178:16:Return"
+      },
+      {
+        "from": "source:2:168:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:168:12:Name"
+      },
+      {
+        "from": "source:2:166:19:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:168:12:Assign",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:169:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:169:12:Name"
+      },
+      {
+        "from": "source:2:168:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:169:12:Assign",
+        "variable": "t"
+      },
+      {
+        "from": "source:2:170:12:AugAssign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:170:12:Name"
+      },
+      {
+        "from": "source:2:171:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:171:12:Name"
+      },
+      {
+        "from": "source:2:168:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:171:12:Assign",
+        "variable": "t"
+      },
+      {
+        "from": "source:2:170:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:171:12:Assign",
+        "variable": "t"
+      },
+      {
+        "from": "source:2:172:12:AugAssign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:172:12:Name"
+      },
+      {
+        "from": "source:2:173:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:173:12:Name"
+      },
+      {
+        "from": "source:2:168:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:173:12:Assign",
+        "variable": "t"
+      },
+      {
+        "from": "source:2:170:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:173:12:Assign",
+        "variable": "t"
+      },
+      {
+        "from": "source:2:172:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:173:12:Assign",
+        "variable": "t"
+      },
+      {
+        "from": "source:2:174:12:AugAssign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:174:12:Name"
+      },
+      {
+        "from": "source:2:168:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:176:16:Return",
+        "variable": "t"
+      },
+      {
+        "from": "source:2:170:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:176:16:Return",
+        "variable": "t"
+      },
+      {
+        "from": "source:2:172:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:176:16:Return",
+        "variable": "t"
+      },
+      {
+        "from": "source:2:174:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:176:16:Return",
+        "variable": "t"
+      },
+      {
+        "from": "source:2:173:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:176:16:Return",
+        "variable": "hours"
+      },
+      {
+        "from": "source:2:171:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:176:16:Return",
+        "variable": "minutes"
+      },
+      {
+        "from": "source:2:169:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:176:16:Return",
+        "variable": "seconds"
+      },
+      {
+        "from": "source:2:173:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:178:16:Return",
+        "variable": "hours"
+      },
+      {
+        "from": "source:2:171:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:178:16:Return",
+        "variable": "minutes"
+      },
+      {
+        "from": "source:2:169:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:178:16:Return",
+        "variable": "seconds"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:183:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:184:12:AugAssign"
+      },
+      {
+        "from": "source:2:182:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:182:8:Name"
+      },
+      {
+        "from": "source:2:181:19:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:182:8:Assign",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:184:12:AugAssign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:184:12:Name"
+      },
+      {
+        "from": "source:2:181:19:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:184:12:AugAssign",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:182:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:185:8:Return",
+        "variable": "pos"
+      },
+      {
+        "from": "source:2:184:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:185:8:Return",
+        "variable": "pos"
+      },
+      {
+        "from": "source:2:187:19:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:188:8:Return",
+        "variable": "self"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:191:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:192:12:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:191:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:193:12:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:191:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:194:12:AugAssign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:195:13:Attribute",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:196:12:Assign"
+      },
+      {
+        "branch": "false",
+        "from": "source:2:195:13:Attribute",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:198:12:Assign"
+      },
+      {
+        "branch": "false",
+        "from": "source:2:195:13:Attribute",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:206:12:Assign"
+      },
+      {
+        "from": "source:2:192:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:192:12:Name"
+      },
+      {
+        "from": "source:2:190:19:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:192:12:Assign",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:193:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:193:12:Name"
+      },
+      {
+        "from": "source:2:190:19:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:193:12:Assign",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:192:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:193:12:Assign",
+        "variable": "bar_length"
+      },
+      {
+        "from": "source:2:194:12:AugAssign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:194:12:Name"
+      },
+      {
+        "from": "source:2:190:19:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:194:12:AugAssign",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:192:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:194:12:AugAssign",
+        "variable": "bar_length"
+      },
+      {
+        "from": "source:2:196:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:196:12:Name"
+      },
+      {
+        "from": "source:2:190:19:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:196:12:Assign",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:198:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:198:12:Name"
+      },
+      {
+        "from": "source:2:190:19:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:198:12:Assign",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:206:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:206:12:Name"
+      },
+      {
+        "from": "source:2:198:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:206:12:Assign",
+        "variable": "chars"
+      },
+      {
+        "from": "source:2:193:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:207:8:Return",
+        "variable": "bar"
+      },
+      {
+        "from": "source:2:194:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:207:8:Return",
+        "variable": "bar"
+      },
+      {
+        "from": "source:2:196:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:207:8:Return",
+        "variable": "bar"
+      },
+      {
+        "from": "source:2:206:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:207:8:Return",
+        "variable": "bar"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:216:11:Attribute",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:217:12:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:218:11:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:219:12:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:220:11:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:221:12:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:222:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:223:12:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:224:15:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:225:16:Expr"
+      },
+      {
+        "from": "source:2:212:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:212:8:Name"
+      },
+      {
+        "from": "source:2:212:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:217:12:Expr",
+        "variable": "info_bits"
+      },
+      {
+        "from": "source:2:209:29:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:217:12:Expr",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:212:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:219:12:Expr",
+        "variable": "info_bits"
+      },
+      {
+        "from": "source:2:209:29:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:219:12:Expr",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:212:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:221:12:Expr",
+        "variable": "info_bits"
+      },
+      {
+        "from": "source:2:209:29:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:221:12:Expr",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:223:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:223:12:Name"
+      },
+      {
+        "from": "source:2:209:29:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:223:12:Assign",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:212:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:225:16:Expr",
+        "variable": "info_bits"
+      },
+      {
+        "from": "source:2:223:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:225:16:Expr",
+        "variable": "item_info"
+      },
+      {
+        "from": "source:2:209:29:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:227:8:Return",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:212:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:227:8:Return",
+        "variable": "info_bits"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:237:11:Attribute",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:238:12:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:240:11:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:245:12:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:242:15:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:244:16:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:256:15:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:257:16:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:256:15:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:258:16:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:263:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:264:12:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:277:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:279:12:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:277:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:280:12:Expr"
+      },
+      {
+        "from": "source:2:236:24:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:244:16:Expr",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:247:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:247:8:Name"
+      },
+      {
+        "from": "source:2:247:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:257:16:Expr",
+        "variable": "buf"
+      },
+      {
+        "from": "source:2:247:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:258:16:Expr",
+        "variable": "buf"
+      },
+      {
+        "from": "source:2:236:24:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:258:16:Expr",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:262:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:262:8:Name"
+      },
+      {
+        "from": "source:2:236:24:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:262:8:Assign",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:264:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:264:12:Name"
+      },
+      {
+        "from": "source:2:236:24:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:264:12:Assign",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:247:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:266:8:Expr",
+        "variable": "buf"
+      },
+      {
+        "from": "source:2:267:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:267:8:Name"
+      },
+      {
+        "from": "source:2:236:24:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:267:8:Assign",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:268:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:268:8:Name"
+      },
+      {
+        "from": "source:2:267:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:268:8:Assign",
+        "variable": "line"
+      },
+      {
+        "from": "source:2:247:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:272:8:Expr",
+        "variable": "buf"
+      },
+      {
+        "from": "source:2:267:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:272:8:Expr",
+        "variable": "line"
+      },
+      {
+        "from": "source:2:247:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:273:8:Expr",
+        "variable": "buf"
+      },
+      {
+        "from": "source:2:262:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:273:8:Expr",
+        "variable": "clear_width"
+      },
+      {
+        "from": "source:2:264:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:273:8:Expr",
+        "variable": "clear_width"
+      },
+      {
+        "from": "source:2:268:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:273:8:Expr",
+        "variable": "line_len"
+      },
+      {
+        "from": "source:2:274:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:274:8:Name"
+      },
+      {
+        "from": "source:2:247:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:274:8:Assign",
+        "variable": "buf"
+      },
+      {
+        "from": "source:2:267:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:279:12:Expr",
+        "variable": "line"
+      },
+      {
+        "from": "source:2:274:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:279:12:Expr",
+        "variable": "line"
+      },
+      {
+        "from": "source:2:236:24:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:279:12:Expr",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:236:24:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:280:12:Expr",
+        "variable": "self"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:287:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:288:12:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:325:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:326:12:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:325:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:327:12:Expr"
+      },
+      {
+        "from": "source:2:304:15:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:326:12:Expr",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:304:15:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:327:12:Expr",
+        "variable": "self"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:578:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:579:12:Return"
+      },
+      {
+        "field": "body",
+        "from": "source:2:582:12:If",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "source:2:580:8:For"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:582:15:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:583:16:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:583:16:Return",
+        "kind": "normal_branch_exit",
+        "precision": "possible_only_if_branch_completes_normally",
+        "to": "source:2:582:12:If"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:584:11:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:585:12:Return"
+      },
+      {
+        "field": "body",
+        "from": "source:2:590:12:If",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "source:2:589:8:For"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:590:15:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:591:16:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:591:16:Return",
+        "kind": "normal_branch_exit",
+        "precision": "possible_only_if_branch_completes_normally",
+        "to": "source:2:590:12:If"
+      },
+      {
+        "from": "source:2:577:19:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:579:12:Return",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:580:8:For",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:580:12:Name"
+      },
+      {
+        "from": "source:2:581:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:581:12:Name"
+      },
+      {
+        "from": "source:2:580:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:581:12:Assign",
+        "variable": "key"
+      },
+      {
+        "from": "source:2:581:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:582:12:If",
+        "variable": "rv"
+      },
+      {
+        "from": "source:2:581:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:583:16:Return",
+        "variable": "rv"
+      },
+      {
+        "from": "source:2:589:8:For",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:589:12:Name"
+      },
+      {
+        "from": "source:2:589:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:590:12:If",
+        "variable": "editor"
+      },
+      {
+        "from": "source:2:589:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:591:16:Return",
+        "variable": "editor"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:600:11:Attribute",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:601:12:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:600:11:Attribute",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:602:12:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:611:15:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:612:16:Raise"
+      },
+      {
+        "from": "source:2:597:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:597:8:Name"
+      },
+      {
+        "from": "source:2:594:19:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:597:8:Assign",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:598:8:AnnAssign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:598:8:Name"
+      },
+      {
+        "from": "source:2:601:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:601:12:Name"
+      },
+      {
+        "from": "source:2:598:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:602:12:Expr",
+        "variable": "environ"
+      },
+      {
+        "from": "source:2:601:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:602:12:Expr",
+        "variable": "environ"
+      },
+      {
+        "from": "source:2:594:19:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:602:12:Expr",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:597:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:612:16:Raise",
+        "variable": "editor"
+      },
+      {
+        "from": "source:2:597:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:616:12:Raise",
+        "variable": "editor"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:631:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:632:12:AnnAssign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:633:13:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:634:12:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:636:15:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:637:16:AugAssign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:639:15:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:640:16:Assign"
+      },
+      {
+        "branch": "false",
+        "from": "source:2:639:15:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:642:16:Assign"
+      },
+      {
+        "field": "body",
+        "from": "source:2:649:16:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "source:2:648:12:With"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:662:15:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:663:16:Return"
+      },
+      {
+        "field": "body",
+        "from": "source:2:666:16:Assign",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "source:2:665:12:With"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:668:15:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:669:16:Return"
+      },
+      {
+        "from": "source:2:632:12:AnnAssign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:632:12:Name"
+      },
+      {
+        "from": "source:2:634:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:634:12:Name"
+      },
+      {
+        "from": "source:2:628:19:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:634:12:Assign",
+        "variable": "text"
+      },
+      {
+        "from": "source:2:637:16:AugAssign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:637:16:Name"
+      },
+      {
+        "from": "source:2:640:16:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:640:16:Name"
+      },
+      {
+        "from": "source:2:628:19:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:640:16:Assign",
+        "variable": "text"
+      },
+      {
+        "from": "source:2:637:16:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:640:16:Assign",
+        "variable": "text"
+      },
+      {
+        "from": "source:2:642:16:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:642:16:Name"
+      },
+      {
+        "from": "source:2:628:19:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:642:16:Assign",
+        "variable": "text"
+      },
+      {
+        "from": "source:2:637:16:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:642:16:Assign",
+        "variable": "text"
+      },
+      {
+        "from": "source:2:644:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:644:8:Name"
+      },
+      {
+        "from": "source:2:644:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:644:12:Name"
+      },
+      {
+        "from": "source:2:628:13:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:644:8:Assign",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:645:8:AnnAssign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:645:8:Name"
+      },
+      {
+        "from": "source:2:644:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:648:12:With",
+        "variable": "fd"
+      },
+      {
+        "from": "source:2:648:12:With",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:648:40:Name"
+      },
+      {
+        "from": "source:2:645:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:649:16:Expr",
+        "variable": "f"
+      },
+      {
+        "from": "source:2:648:40:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:649:16:Expr",
+        "variable": "f"
+      },
+      {
+        "from": "source:2:632:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:649:16:Expr",
+        "variable": "data"
+      },
+      {
+        "from": "source:2:634:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:649:16:Expr",
+        "variable": "data"
+      },
+      {
+        "from": "source:2:640:16:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:649:16:Expr",
+        "variable": "data"
+      },
+      {
+        "from": "source:2:642:16:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:649:16:Expr",
+        "variable": "data"
+      },
+      {
+        "from": "source:2:644:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:655:12:Expr",
+        "variable": "name"
+      },
+      {
+        "from": "source:2:628:13:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:660:12:Expr",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:644:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:660:12:Expr",
+        "variable": "name"
+      },
+      {
+        "from": "source:2:644:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:665:12:With",
+        "variable": "name"
+      },
+      {
+        "from": "source:2:665:12:With",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:665:37:Name"
+      },
+      {
+        "from": "source:2:666:16:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:666:16:Name"
+      },
+      {
+        "from": "source:2:645:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:666:16:Assign",
+        "variable": "f"
+      },
+      {
+        "from": "source:2:648:40:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:666:16:Assign",
+        "variable": "f"
+      },
+      {
+        "from": "source:2:665:37:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:666:16:Assign",
+        "variable": "f"
+      },
+      {
+        "from": "source:2:666:16:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:669:16:Return",
+        "variable": "rv"
+      },
+      {
+        "from": "source:2:666:16:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:671:12:Return",
+        "variable": "rv"
+      },
+      {
+        "from": "source:2:644:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:673:12:Expr",
+        "variable": "name"
+      },
+      {
+        "callee": "format_progress_line",
+        "from": "source:2:227:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:267:8:Assign"
+      },
+      {
+        "callee": "format_progress_line",
+        "from": "source:2:217:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:267:8:Assign"
+      },
+      {
+        "callee": "format_progress_line",
+        "from": "source:2:219:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:267:8:Assign"
+      },
+      {
+        "callee": "format_progress_line",
+        "from": "source:2:221:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:267:8:Assign"
+      },
+      {
+        "callee": "format_progress_line",
+        "from": "source:2:225:16:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:267:8:Assign"
+      },
+      {
+        "callee": "get_editor",
+        "from": "source:2:579:12:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:597:8:Assign"
+      },
+      {
+        "callee": "get_editor",
+        "from": "source:2:583:16:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:597:8:Assign"
+      },
+      {
+        "callee": "get_editor",
+        "from": "source:2:585:12:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:597:8:Assign"
+      },
+      {
+        "callee": "get_editor",
+        "from": "source:2:591:16:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:597:8:Assign"
+      },
+      {
+        "callee": "get_editor",
+        "from": "source:2:592:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:597:8:Assign"
+      },
+      {
+        "callee": "make_step",
+        "from": "source:2:288:12:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:326:12:Expr"
+      },
+      {
+        "callee": "render_progress",
+        "from": "source:2:238:12:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:327:12:Expr"
+      },
+      {
+        "callee": "render_progress",
+        "from": "source:2:245:12:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:327:12:Expr"
+      },
+      {
+        "callee": "render_progress",
+        "from": "source:2:244:16:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:327:12:Expr"
+      },
+      {
+        "callee": "render_progress",
+        "from": "source:2:257:16:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:327:12:Expr"
+      },
+      {
+        "callee": "render_progress",
+        "from": "source:2:258:16:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:327:12:Expr"
+      },
+      {
+        "callee": "render_progress",
+        "from": "source:2:266:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:327:12:Expr"
+      },
+      {
+        "callee": "render_progress",
+        "from": "source:2:272:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:327:12:Expr"
+      },
+      {
+        "callee": "render_progress",
+        "from": "source:2:273:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:327:12:Expr"
+      },
+      {
+        "callee": "render_progress",
+        "from": "source:2:279:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:327:12:Expr"
+      },
+      {
+        "callee": "render_progress",
+        "from": "source:2:280:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:327:12:Expr"
+      },
+      {
+        "callee": "update",
+        "from": "source:2:326:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:602:12:Expr"
+      },
+      {
+        "callee": "update",
+        "from": "source:2:327:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:602:12:Expr"
+      },
+      {
+        "callee": "edit_files",
+        "from": "source:2:602:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:660:12:Expr"
+      },
+      {
+        "callee": "edit_files",
+        "from": "source:2:612:16:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:660:12:Expr"
+      },
+      {
+        "callee": "edit_files",
+        "from": "source:2:616:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:660:12:Expr"
+      },
+      {
+        "callee": "format_pos",
+        "from": "source:2:185:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:217:12:Expr"
+      },
+      {
+        "callee": "format_pct",
+        "from": "source:2:188:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:219:12:Expr"
+      },
+      {
+        "callee": "format_eta",
+        "from": "source:2:176:16:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:221:12:Expr"
+      },
+      {
+        "callee": "format_eta",
+        "from": "source:2:178:16:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:221:12:Expr"
+      },
+      {
+        "callee": "format_eta",
+        "from": "source:2:179:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:221:12:Expr"
+      },
+      {
+        "callee": "format_bar",
+        "from": "source:2:207:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:227:8:Return"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "text: str | bytes | bytearray | None",
+        "end_line": 725,
+        "id": "source:1:725:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 725
+      },
+      {
+        "code": "editor: str | None",
+        "end_line": 726,
+        "id": "source:1:726:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 726
+      },
+      {
+        "code": "env: cabc.Mapping[str, str] | None",
+        "end_line": 727,
+        "id": "source:1:727:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 727
+      },
+      {
+        "code": "require_save: bool",
+        "end_line": 728,
+        "id": "source:1:728:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 728
+      },
+      {
+        "code": "extension: str",
+        "end_line": 729,
+        "id": "source:1:729:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 729
+      },
+      {
+        "code": "filename: str | cabc.Iterable[str] | None",
+        "end_line": 730,
+        "id": "source:1:730:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 730
+      },
+      {
+        "code": "ed = Editor(editor=editor, env=env, require_save=require_save, extension=extension)",
+        "contains_unresolved_call": true,
+        "end_line": 770,
+        "exception_possible": true,
+        "id": "source:1:770:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 770,
+        "unresolved_calls": [
+          "Editor(editor=editor, env=env, require_save=require_save, extension=extension)"
+        ]
+      },
+      {
+        "code": "ed",
+        "end_line": 770,
+        "id": "source:1:770:4:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 770
+      },
+      {
+        "code": "filename is None",
+        "end_line": 772,
+        "id": "source:1:772:7:Compare",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 772
+      },
+      {
+        "code": "return ed.edit(text)",
+        "end_line": 773,
+        "exception_possible": true,
+        "id": "source:1:773:8:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 773
+      },
+      {
+        "code": "isinstance(filename, str)",
+        "end_line": 775,
+        "id": "source:1:775:7:Call",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 775
+      },
+      {
+        "code": "filename = (filename,)",
+        "end_line": 776,
+        "id": "source:1:776:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 776
+      },
+      {
+        "code": "filename",
+        "end_line": 776,
+        "id": "source:1:776:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 776
+      },
+      {
+        "code": "ed.edit_files(filenames=filename)",
+        "end_line": 778,
+        "exception_possible": true,
+        "id": "source:1:778:4:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 778
+      },
+      {
+        "code": "return None",
+        "end_line": 779,
+        "id": "source:1:779:4:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 779
+      },
+      {
+        "code": "self",
+        "end_line": 166,
+        "id": "source:2:166:19:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 166
+      },
+      {
+        "code": "self.eta_known",
+        "end_line": 167,
+        "id": "source:2:167:11:Attribute",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 167
+      },
+      {
+        "code": "t = int(self.eta)",
+        "contains_unresolved_call": true,
+        "end_line": 168,
+        "exception_possible": true,
+        "id": "source:2:168:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 168,
+        "unresolved_calls": [
+          "int(self.eta)"
+        ]
+      },
+      {
+        "code": "t",
+        "end_line": 168,
+        "id": "source:2:168:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 168
+      },
+      {
+        "code": "seconds = t % 60",
+        "end_line": 169,
+        "id": "source:2:169:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 169
+      },
+      {
+        "code": "seconds",
+        "end_line": 169,
+        "id": "source:2:169:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 169
+      },
+      {
+        "code": "t //= 60",
+        "end_line": 170,
+        "id": "source:2:170:12:AugAssign",
+        "kind": "AugAssign",
+        "source_id": "source:2",
+        "start_line": 170
+      },
+      {
+        "code": "t",
+        "end_line": 170,
+        "id": "source:2:170:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 170
+      },
+      {
+        "code": "minutes = t % 60",
+        "end_line": 171,
+        "id": "source:2:171:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 171
+      },
+      {
+        "code": "minutes",
+        "end_line": 171,
+        "id": "source:2:171:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 171
+      },
+      {
+        "code": "t //= 60",
+        "end_line": 172,
+        "id": "source:2:172:12:AugAssign",
+        "kind": "AugAssign",
+        "source_id": "source:2",
+        "start_line": 172
+      },
+      {
+        "code": "t",
+        "end_line": 172,
+        "id": "source:2:172:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 172
+      },
+      {
+        "code": "hours = t % 24",
+        "end_line": 173,
+        "id": "source:2:173:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 173
+      },
+      {
+        "code": "hours",
+        "end_line": 173,
+        "id": "source:2:173:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 173
+      },
+      {
+        "code": "t //= 24",
+        "end_line": 174,
+        "id": "source:2:174:12:AugAssign",
+        "kind": "AugAssign",
+        "source_id": "source:2",
+        "start_line": 174
+      },
+      {
+        "code": "t",
+        "end_line": 174,
+        "id": "source:2:174:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 174
+      },
+      {
+        "code": "t > 0",
+        "end_line": 175,
+        "id": "source:2:175:15:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 175
+      },
+      {
+        "code": "return f'{t}d {hours:02}:{minutes:02}:{seconds:02}'",
+        "end_line": 176,
+        "id": "source:2:176:16:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 176
+      },
+      {
+        "code": "return f'{hours:02}:{minutes:02}:{seconds:02}'",
+        "end_line": 178,
+        "id": "source:2:178:16:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 178
+      },
+      {
+        "code": "return ''",
+        "end_line": 179,
+        "id": "source:2:179:8:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 179
+      },
+      {
+        "code": "self",
+        "end_line": 181,
+        "id": "source:2:181:19:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 181
+      },
+      {
+        "code": "pos = str(self.pos)",
+        "contains_unresolved_call": true,
+        "end_line": 182,
+        "exception_possible": true,
+        "id": "source:2:182:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 182,
+        "unresolved_calls": [
+          "str(self.pos)"
+        ]
+      },
+      {
+        "code": "pos",
+        "end_line": 182,
+        "id": "source:2:182:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 182
+      },
+      {
+        "code": "self.length is not None",
+        "end_line": 183,
+        "id": "source:2:183:11:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 183
+      },
+      {
+        "code": "pos += f'/{self.length}'",
+        "end_line": 184,
+        "id": "source:2:184:12:AugAssign",
+        "kind": "AugAssign",
+        "source_id": "source:2",
+        "start_line": 184
+      },
+      {
+        "code": "pos",
+        "end_line": 184,
+        "id": "source:2:184:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 184
+      },
+      {
+        "code": "return pos",
+        "end_line": 185,
+        "id": "source:2:185:8:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 185
+      },
+      {
+        "code": "self",
+        "end_line": 187,
+        "id": "source:2:187:19:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 187
+      },
+      {
+        "code": "return f'{int(self.pct * 100): 4}%'[1:]",
+        "contains_unresolved_call": true,
+        "end_line": 188,
+        "exception_possible": true,
+        "id": "source:2:188:8:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 188,
+        "unresolved_calls": [
+          "int(self.pct * 100)"
+        ]
+      },
+      {
+        "code": "self",
+        "end_line": 190,
+        "id": "source:2:190:19:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 190
+      },
+      {
+        "code": "self.length is not None",
+        "end_line": 191,
+        "id": "source:2:191:11:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 191
+      },
+      {
+        "code": "bar_length = int(self.pct * self.width)",
+        "contains_unresolved_call": true,
+        "end_line": 192,
+        "exception_possible": true,
+        "id": "source:2:192:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 192,
+        "unresolved_calls": [
+          "int(self.pct * self.width)"
+        ]
+      },
+      {
+        "code": "bar_length",
+        "end_line": 192,
+        "id": "source:2:192:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 192
+      },
+      {
+        "code": "bar = self.fill_char * bar_length",
+        "end_line": 193,
+        "id": "source:2:193:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 193
+      },
+      {
+        "code": "bar",
+        "end_line": 193,
+        "id": "source:2:193:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 193
+      },
+      {
+        "code": "bar += self.empty_char * (self.width - bar_length)",
+        "end_line": 194,
+        "id": "source:2:194:12:AugAssign",
+        "kind": "AugAssign",
+        "source_id": "source:2",
+        "start_line": 194
+      },
+      {
+        "code": "bar",
+        "end_line": 194,
+        "id": "source:2:194:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 194
+      },
+      {
+        "code": "self.finished",
+        "end_line": 195,
+        "id": "source:2:195:13:Attribute",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 195
+      },
+      {
+        "code": "bar = self.fill_char * self.width",
+        "end_line": 196,
+        "id": "source:2:196:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 196
+      },
+      {
+        "code": "bar",
+        "end_line": 196,
+        "id": "source:2:196:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 196
+      },
+      {
+        "code": "chars = list(self.empty_char * (self.width or 1))",
+        "contains_unresolved_call": true,
+        "end_line": 198,
+        "exception_possible": true,
+        "id": "source:2:198:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 198,
+        "unresolved_calls": [
+          "list(self.empty_char * (self.width or 1))"
+        ]
+      },
+      {
+        "code": "chars",
+        "end_line": 198,
+        "id": "source:2:198:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 198
+      },
+      {
+        "code": "bar = ''.join(chars)",
+        "contains_unresolved_call": true,
+        "end_line": 206,
+        "exception_possible": true,
+        "id": "source:2:206:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 206,
+        "unresolved_calls": [
+          "''.join(chars)"
+        ]
+      },
+      {
+        "code": "bar",
+        "end_line": 206,
+        "id": "source:2:206:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 206
+      },
+      {
+        "code": "return bar",
+        "end_line": 207,
+        "id": "source:2:207:8:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 207
+      },
+      {
+        "code": "self",
+        "end_line": 209,
+        "id": "source:2:209:29:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 209
+      },
+      {
+        "code": "info_bits = []",
+        "end_line": 212,
+        "id": "source:2:212:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 212
+      },
+      {
+        "code": "info_bits",
+        "end_line": 212,
+        "id": "source:2:212:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 212
+      },
+      {
+        "code": "self.show_pos",
+        "end_line": 216,
+        "id": "source:2:216:11:Attribute",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 216
+      },
+      {
+        "code": "info_bits.append(self.format_pos())",
+        "contains_unresolved_call": true,
+        "end_line": 217,
+        "exception_possible": true,
+        "id": "source:2:217:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 217,
+        "unresolved_calls": [
+          "info_bits.append(self.format_pos())"
+        ]
+      },
+      {
+        "code": "show_percent",
+        "end_line": 218,
+        "id": "source:2:218:11:Name",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 218
+      },
+      {
+        "code": "info_bits.append(self.format_pct())",
+        "contains_unresolved_call": true,
+        "end_line": 219,
+        "exception_possible": true,
+        "id": "source:2:219:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 219,
+        "unresolved_calls": [
+          "info_bits.append(self.format_pct())"
+        ]
+      },
+      {
+        "code": "self.show_eta and self.eta_known and (not self.finished)",
+        "end_line": 220,
+        "id": "source:2:220:11:BoolOp",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 220
+      },
+      {
+        "code": "info_bits.append(self.format_eta())",
+        "contains_unresolved_call": true,
+        "end_line": 221,
+        "exception_possible": true,
+        "id": "source:2:221:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 221,
+        "unresolved_calls": [
+          "info_bits.append(self.format_eta())"
+        ]
+      },
+      {
+        "code": "self.item_show_func is not None",
+        "end_line": 222,
+        "id": "source:2:222:11:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 222
+      },
+      {
+        "code": "item_info = self.item_show_func(self.current_item)",
+        "contains_unresolved_call": true,
+        "end_line": 223,
+        "exception_possible": true,
+        "id": "source:2:223:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 223,
+        "unresolved_calls": [
+          "self.item_show_func(self.current_item)"
+        ]
+      },
+      {
+        "code": "item_info",
+        "end_line": 223,
+        "id": "source:2:223:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 223
+      },
+      {
+        "code": "item_info is not None",
+        "end_line": 224,
+        "id": "source:2:224:15:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 224
+      },
+      {
+        "code": "info_bits.append(item_info)",
+        "contains_unresolved_call": true,
+        "end_line": 225,
+        "exception_possible": true,
+        "id": "source:2:225:16:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 225,
+        "unresolved_calls": [
+          "info_bits.append(item_info)"
+        ]
+      },
+      {
+        "code": "return (self.bar_template % {'label': self.label, 'bar': self.format_bar(), 'info': self.info_sep.join(info_bits)}).rstrip()",
+        "contains_unresolved_call": true,
+        "end_line": 234,
+        "exception_possible": true,
+        "id": "source:2:227:8:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 227,
+        "unresolved_calls": [
+          "(self.bar_template % {'label': self.label, 'bar': self.format_bar(), 'info': self.info_sep.join(info_bits)}).rstrip()",
+          "self.info_sep.join(info_bits)"
+        ]
+      },
+      {
+        "code": "self",
+        "end_line": 236,
+        "id": "source:2:236:24:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 236
+      },
+      {
+        "code": "self.hidden",
+        "end_line": 237,
+        "id": "source:2:237:11:Attribute",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 237
+      },
+      {
+        "code": "return",
+        "end_line": 238,
+        "id": "source:2:238:12:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 238
+      },
+      {
+        "code": "not self._is_atty",
+        "end_line": 240,
+        "id": "source:2:240:11:UnaryOp",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 240
+      },
+      {
+        "code": "self._last_line != self.label",
+        "end_line": 242,
+        "id": "source:2:242:15:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 242
+      },
+      {
+        "code": "echo(self.label, file=self.file, color=self.color)",
+        "contains_unresolved_call": true,
+        "end_line": 244,
+        "exception_possible": true,
+        "id": "source:2:244:16:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 244,
+        "unresolved_calls": [
+          "echo(self.label, file=self.file, color=self.color)"
+        ]
+      },
+      {
+        "code": "return",
+        "end_line": 245,
+        "id": "source:2:245:12:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 245
+      },
+      {
+        "code": "buf = []",
+        "end_line": 247,
+        "id": "source:2:247:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 247
+      },
+      {
+        "code": "buf",
+        "end_line": 247,
+        "id": "source:2:247:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 247
+      },
+      {
+        "code": "new_width < old_width and self.max_width is not None",
+        "end_line": 256,
+        "id": "source:2:256:15:BoolOp",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 256
+      },
+      {
+        "code": "buf.append(BEFORE_BAR)",
+        "contains_unresolved_call": true,
+        "end_line": 257,
+        "exception_possible": true,
+        "id": "source:2:257:16:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 257,
+        "unresolved_calls": [
+          "buf.append(BEFORE_BAR)"
+        ]
+      },
+      {
+        "code": "buf.append(' ' * self.max_width)",
+        "contains_unresolved_call": true,
+        "end_line": 258,
+        "exception_possible": true,
+        "id": "source:2:258:16:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 258,
+        "unresolved_calls": [
+          "buf.append(' ' * self.max_width)"
+        ]
+      },
+      {
+        "code": "clear_width = self.width",
+        "end_line": 262,
+        "id": "source:2:262:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 262
+      },
+      {
+        "code": "clear_width",
+        "end_line": 262,
+        "id": "source:2:262:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 262
+      },
+      {
+        "code": "self.max_width is not None",
+        "end_line": 263,
+        "id": "source:2:263:11:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 263
+      },
+      {
+        "code": "clear_width = self.max_width",
+        "end_line": 264,
+        "id": "source:2:264:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 264
+      },
+      {
+        "code": "clear_width",
+        "end_line": 264,
+        "id": "source:2:264:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 264
+      },
+      {
+        "code": "buf.append(BEFORE_BAR)",
+        "contains_unresolved_call": true,
+        "end_line": 266,
+        "exception_possible": true,
+        "id": "source:2:266:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 266,
+        "unresolved_calls": [
+          "buf.append(BEFORE_BAR)"
+        ]
+      },
+      {
+        "code": "line = self.format_progress_line()",
+        "end_line": 267,
+        "exception_possible": true,
+        "id": "source:2:267:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 267
+      },
+      {
+        "code": "line",
+        "end_line": 267,
+        "id": "source:2:267:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 267
+      },
+      {
+        "code": "line_len = term_len(line)",
+        "contains_unresolved_call": true,
+        "end_line": 268,
+        "exception_possible": true,
+        "id": "source:2:268:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 268,
+        "unresolved_calls": [
+          "term_len(line)"
+        ]
+      },
+      {
+        "code": "line_len",
+        "end_line": 268,
+        "id": "source:2:268:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 268
+      },
+      {
+        "code": "buf.append(line)",
+        "contains_unresolved_call": true,
+        "end_line": 272,
+        "exception_possible": true,
+        "id": "source:2:272:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 272,
+        "unresolved_calls": [
+          "buf.append(line)"
+        ]
+      },
+      {
+        "code": "buf.append(' ' * (clear_width - line_len))",
+        "contains_unresolved_call": true,
+        "end_line": 273,
+        "exception_possible": true,
+        "id": "source:2:273:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 273,
+        "unresolved_calls": [
+          "buf.append(' ' * (clear_width - line_len))"
+        ]
+      },
+      {
+        "code": "line = ''.join(buf)",
+        "contains_unresolved_call": true,
+        "end_line": 274,
+        "exception_possible": true,
+        "id": "source:2:274:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 274,
+        "unresolved_calls": [
+          "''.join(buf)"
+        ]
+      },
+      {
+        "code": "line",
+        "end_line": 274,
+        "id": "source:2:274:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 274
+      },
+      {
+        "code": "line != self._last_line",
+        "end_line": 277,
+        "id": "source:2:277:11:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 277
+      },
+      {
+        "code": "echo(line, file=self.file, color=self.color, nl=False)",
+        "contains_unresolved_call": true,
+        "end_line": 279,
+        "exception_possible": true,
+        "id": "source:2:279:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 279,
+        "unresolved_calls": [
+          "echo(line, file=self.file, color=self.color, nl=False)"
+        ]
+      },
+      {
+        "code": "self.file.flush()",
+        "contains_unresolved_call": true,
+        "end_line": 280,
+        "exception_possible": true,
+        "id": "source:2:280:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 280,
+        "unresolved_calls": [
+          "self.file.flush()"
+        ]
+      },
+      {
+        "code": "time.time() - self.last_eta < 1.0",
+        "end_line": 287,
+        "id": "source:2:287:11:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 287
+      },
+      {
+        "code": "return",
+        "end_line": 288,
+        "id": "source:2:288:12:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 288
+      },
+      {
+        "code": "self",
+        "end_line": 304,
+        "id": "source:2:304:15:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 304
+      },
+      {
+        "code": "self._completed_intervals >= self.update_min_steps",
+        "end_line": 325,
+        "id": "source:2:325:11:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 325
+      },
+      {
+        "code": "self.make_step(self._completed_intervals)",
+        "end_line": 326,
+        "exception_possible": true,
+        "id": "source:2:326:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 326
+      },
+      {
+        "code": "self.render_progress()",
+        "end_line": 327,
+        "exception_possible": true,
+        "id": "source:2:327:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 327
+      },
+      {
+        "code": "self",
+        "end_line": 577,
+        "id": "source:2:577:19:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 577
+      },
+      {
+        "code": "self.editor is not None",
+        "end_line": 578,
+        "id": "source:2:578:11:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 578
+      },
+      {
+        "code": "return self.editor",
+        "end_line": 579,
+        "id": "source:2:579:12:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 579
+      },
+      {
+        "code": "key",
+        "end_line": 580,
+        "id": "source:2:580:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 580
+      },
+      {
+        "code": "for key in ('VISUAL', 'EDITOR'):\n    rv = os.environ.get(key)\n    if rv:\n        return rv",
+        "end_line": 583,
+        "id": "source:2:580:8:For",
+        "kind": "For",
+        "source_id": "source:2",
+        "start_line": 580
+      },
+      {
+        "code": "rv = os.environ.get(key)",
+        "contains_unresolved_call": true,
+        "end_line": 581,
+        "exception_possible": true,
+        "id": "source:2:581:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 581,
+        "unresolved_calls": [
+          "os.environ.get(key)"
+        ]
+      },
+      {
+        "code": "rv",
+        "end_line": 581,
+        "id": "source:2:581:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 581
+      },
+      {
+        "code": "if rv:\n    return rv",
+        "end_line": 583,
+        "id": "source:2:582:12:If",
+        "kind": "If",
+        "source_id": "source:2",
+        "start_line": 582
+      },
+      {
+        "code": "rv",
+        "end_line": 582,
+        "id": "source:2:582:15:Name",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 582
+      },
+      {
+        "code": "return rv",
+        "end_line": 583,
+        "id": "source:2:583:16:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 583
+      },
+      {
+        "code": "WIN",
+        "end_line": 584,
+        "id": "source:2:584:11:Name",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 584
+      },
+      {
+        "code": "return 'notepad'",
+        "end_line": 585,
+        "id": "source:2:585:12:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 585
+      },
+      {
+        "code": "editor",
+        "end_line": 589,
+        "id": "source:2:589:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 589
+      },
+      {
+        "code": "for editor in ('sensible-editor', 'vim', 'nano'):\n    if which(editor) is not None:\n        return editor",
+        "end_line": 591,
+        "id": "source:2:589:8:For",
+        "kind": "For",
+        "source_id": "source:2",
+        "start_line": 589
+      },
+      {
+        "code": "if which(editor) is not None:\n    return editor",
+        "contains_unresolved_call": true,
+        "end_line": 591,
+        "exception_possible": true,
+        "id": "source:2:590:12:If",
+        "kind": "If",
+        "source_id": "source:2",
+        "start_line": 590,
+        "unresolved_calls": [
+          "which(editor)"
+        ]
+      },
+      {
+        "code": "which(editor) is not None",
+        "end_line": 590,
+        "id": "source:2:590:15:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 590
+      },
+      {
+        "code": "return editor",
+        "end_line": 591,
+        "id": "source:2:591:16:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 591
+      },
+      {
+        "code": "return 'vi'",
+        "end_line": 592,
+        "id": "source:2:592:8:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 592
+      },
+      {
+        "code": "self",
+        "end_line": 594,
+        "id": "source:2:594:19:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 594
+      },
+      {
+        "code": "editor = self.get_editor()",
+        "end_line": 597,
+        "exception_possible": true,
+        "id": "source:2:597:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 597
+      },
+      {
+        "code": "editor",
+        "end_line": 597,
+        "id": "source:2:597:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 597
+      },
+      {
+        "code": "environ: dict[str, str] | None = None",
+        "end_line": 598,
+        "id": "source:2:598:8:AnnAssign",
+        "kind": "AnnAssign",
+        "source_id": "source:2",
+        "start_line": 598
+      },
+      {
+        "code": "environ",
+        "end_line": 598,
+        "id": "source:2:598:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 598
+      },
+      {
+        "code": "self.env",
+        "end_line": 600,
+        "id": "source:2:600:11:Attribute",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 600
+      },
+      {
+        "code": "environ = os.environ.copy()",
+        "contains_unresolved_call": true,
+        "end_line": 601,
+        "exception_possible": true,
+        "id": "source:2:601:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 601,
+        "unresolved_calls": [
+          "os.environ.copy()"
+        ]
+      },
+      {
+        "code": "environ",
+        "end_line": 601,
+        "id": "source:2:601:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 601
+      },
+      {
+        "code": "environ.update(self.env)",
+        "end_line": 602,
+        "exception_possible": true,
+        "id": "source:2:602:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 602
+      },
+      {
+        "code": "exit_code != 0",
+        "end_line": 611,
+        "id": "source:2:611:15:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 611
+      },
+      {
+        "code": "raise ClickException(_('{editor}: Editing failed').format(editor=editor))",
+        "contains_unresolved_call": true,
+        "end_line": 614,
+        "exception_possible": true,
+        "id": "source:2:612:16:Raise",
+        "kind": "Raise",
+        "source_id": "source:2",
+        "start_line": 612,
+        "unresolved_calls": [
+          "ClickException(_('{editor}: Editing failed').format(editor=editor))",
+          "_('{editor}: Editing failed').format(editor=editor)",
+          "_('{editor}: Editing failed')"
+        ]
+      },
+      {
+        "code": "raise ClickException(_('{editor}: Editing failed: {e}').format(editor=editor, e=e)) from e",
+        "contains_unresolved_call": true,
+        "end_line": 618,
+        "exception_possible": true,
+        "id": "source:2:616:12:Raise",
+        "kind": "Raise",
+        "source_id": "source:2",
+        "start_line": 616,
+        "unresolved_calls": [
+          "ClickException(_('{editor}: Editing failed: {e}').format(editor=editor, e=e))",
+          "_('{editor}: Editing failed: {e}').format(editor=editor, e=e)",
+          "_('{editor}: Editing failed: {e}')"
+        ]
+      },
+      {
+        "code": "self",
+        "end_line": 628,
+        "id": "source:2:628:13:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 628
+      },
+      {
+        "code": "text: str | bytes | bytearray | None",
+        "end_line": 628,
+        "id": "source:2:628:19:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 628
+      },
+      {
+        "code": "text is None",
+        "end_line": 631,
+        "id": "source:2:631:11:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 631
+      },
+      {
+        "code": "data: bytes | bytearray = b''",
+        "end_line": 632,
+        "id": "source:2:632:12:AnnAssign",
+        "kind": "AnnAssign",
+        "source_id": "source:2",
+        "start_line": 632
+      },
+      {
+        "code": "data",
+        "end_line": 632,
+        "id": "source:2:632:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 632
+      },
+      {
+        "code": "isinstance(text, (bytes, bytearray))",
+        "end_line": 633,
+        "id": "source:2:633:13:Call",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 633
+      },
+      {
+        "code": "data = text",
+        "end_line": 634,
+        "id": "source:2:634:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 634
+      },
+      {
+        "code": "data",
+        "end_line": 634,
+        "id": "source:2:634:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 634
+      },
+      {
+        "code": "text and (not text.endswith('\\n'))",
+        "end_line": 636,
+        "id": "source:2:636:15:BoolOp",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 636
+      },
+      {
+        "code": "text += '\\n'",
+        "end_line": 637,
+        "id": "source:2:637:16:AugAssign",
+        "kind": "AugAssign",
+        "source_id": "source:2",
+        "start_line": 637
+      },
+      {
+        "code": "text",
+        "end_line": 637,
+        "id": "source:2:637:16:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 637
+      },
+      {
+        "code": "WIN",
+        "end_line": 639,
+        "id": "source:2:639:15:Name",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 639
+      },
+      {
+        "code": "data = text.replace('\\n', '\\r\\n').encode('utf-8-sig')",
+        "contains_unresolved_call": true,
+        "end_line": 640,
+        "exception_possible": true,
+        "id": "source:2:640:16:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 640,
+        "unresolved_calls": [
+          "text.replace('\\n', '\\r\\n').encode('utf-8-sig')",
+          "text.replace('\\n', '\\r\\n')"
+        ]
+      },
+      {
+        "code": "data",
+        "end_line": 640,
+        "id": "source:2:640:16:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 640
+      },
+      {
+        "code": "data = text.encode('utf-8')",
+        "contains_unresolved_call": true,
+        "end_line": 642,
+        "exception_possible": true,
+        "id": "source:2:642:16:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 642,
+        "unresolved_calls": [
+          "text.encode('utf-8')"
+        ]
+      },
+      {
+        "code": "data",
+        "end_line": 642,
+        "id": "source:2:642:16:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 642
+      },
+      {
+        "code": "name",
+        "end_line": 644,
+        "id": "source:2:644:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 644
+      },
+      {
+        "code": "fd, name = tempfile.mkstemp(prefix='editor-', suffix=self.extension)",
+        "contains_unresolved_call": true,
+        "end_line": 644,
+        "exception_possible": true,
+        "id": "source:2:644:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 644,
+        "unresolved_calls": [
+          "tempfile.mkstemp(prefix='editor-', suffix=self.extension)"
+        ]
+      },
+      {
+        "code": "fd",
+        "end_line": 644,
+        "id": "source:2:644:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 644
+      },
+      {
+        "code": "f: t.BinaryIO",
+        "end_line": 645,
+        "id": "source:2:645:8:AnnAssign",
+        "kind": "AnnAssign",
+        "source_id": "source:2",
+        "start_line": 645
+      },
+      {
+        "code": "f",
+        "end_line": 645,
+        "id": "source:2:645:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 645
+      },
+      {
+        "code": "with os.fdopen(fd, 'wb') as f:\n    f.write(data)",
+        "contains_unresolved_call": true,
+        "end_line": 649,
+        "exception_possible": true,
+        "id": "source:2:648:12:With",
+        "kind": "With",
+        "source_id": "source:2",
+        "start_line": 648,
+        "unresolved_calls": [
+          "os.fdopen(fd, 'wb')"
+        ]
+      },
+      {
+        "code": "f",
+        "end_line": 648,
+        "id": "source:2:648:40:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 648
+      },
+      {
+        "code": "f.write(data)",
+        "contains_unresolved_call": true,
+        "end_line": 649,
+        "exception_possible": true,
+        "id": "source:2:649:16:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 649,
+        "unresolved_calls": [
+          "f.write(data)"
+        ]
+      },
+      {
+        "code": "os.utime(name, (os.path.getatime(name), os.path.getmtime(name) - 2))",
+        "contains_unresolved_call": true,
+        "end_line": 655,
+        "exception_possible": true,
+        "id": "source:2:655:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 655,
+        "unresolved_calls": [
+          "os.utime(name, (os.path.getatime(name), os.path.getmtime(name) - 2))",
+          "os.path.getatime(name)",
+          "os.path.getmtime(name)"
+        ]
+      },
+      {
+        "code": "self.edit_files((name,))",
+        "end_line": 660,
+        "exception_possible": true,
+        "id": "source:2:660:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 660
+      },
+      {
+        "code": "self.require_save and os.path.getmtime(name) == timestamp",
+        "end_line": 662,
+        "id": "source:2:662:15:BoolOp",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 662
+      },
+      {
+        "code": "return None",
+        "end_line": 663,
+        "id": "source:2:663:16:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 663
+      },
+      {
+        "code": "with open(name, 'rb') as f:\n    rv = f.read()",
+        "contains_unresolved_call": true,
+        "end_line": 666,
+        "exception_possible": true,
+        "id": "source:2:665:12:With",
+        "kind": "With",
+        "source_id": "source:2",
+        "start_line": 665,
+        "unresolved_calls": [
+          "open(name, 'rb')"
+        ]
+      },
+      {
+        "code": "f",
+        "end_line": 665,
+        "id": "source:2:665:37:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 665
+      },
+      {
+        "code": "rv = f.read()",
+        "contains_unresolved_call": true,
+        "end_line": 666,
+        "exception_possible": true,
+        "id": "source:2:666:16:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 666,
+        "unresolved_calls": [
+          "f.read()"
+        ]
+      },
+      {
+        "code": "rv",
+        "end_line": 666,
+        "id": "source:2:666:16:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 666
+      },
+      {
+        "code": "isinstance(text, (bytes, bytearray))",
+        "end_line": 668,
+        "id": "source:2:668:15:Call",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 668
+      },
+      {
+        "code": "return rv",
+        "end_line": 669,
+        "id": "source:2:669:16:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 669
+      },
+      {
+        "code": "return rv.decode('utf-8-sig').replace('\\r\\n', '\\n')",
+        "contains_unresolved_call": true,
+        "end_line": 671,
+        "exception_possible": true,
+        "id": "source:2:671:12:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 671,
+        "unresolved_calls": [
+          "rv.decode('utf-8-sig').replace('\\r\\n', '\\n')",
+          "rv.decode('utf-8-sig')"
+        ]
+      },
+      {
+        "code": "os.unlink(name)",
+        "contains_unresolved_call": true,
+        "end_line": 673,
+        "exception_possible": true,
+        "id": "source:2:673:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 673,
+        "unresolved_calls": [
+          "os.unlink(name)"
+        ]
+      },
+      {
+        "code": "text",
+        "end_line": 15,
+        "id": "test:15:32:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 15
+      },
+      {
+        "code": "filename",
+        "end_line": 15,
+        "id": "test:15:38:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 15
+      },
+      {
+        "code": "expected_result",
+        "end_line": 15,
+        "id": "test:15:48:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 15
+      },
+      {
+        "code": "result = edit(text=text, editor='vi', env={'VISUAL': 'vi'}, require_save=False, extension='.md', filename=filename)",
+        "end_line": 39,
+        "exception_possible": true,
+        "id": "test:32:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 32
+      },
+      {
+        "code": "result",
+        "end_line": 32,
+        "id": "test:32:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 32
+      },
+      {
+        "code": "filename is None",
+        "end_line": 44,
+        "id": "test:44:7:Compare",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 44
+      },
+      {
+        "code": "assert result == expected_result",
+        "end_line": 45,
+        "id": "test:45:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 45
+      },
+      {
+        "code": "assert result is None",
+        "end_line": 50,
+        "id": "test:50:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 50
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:45:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:50:8:Assert"
+      }
+    ],
+    "seeds": [
+      "test:45:8:Assert",
+      "test:50:8:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 184,
+    "edges": 271,
+    "edge_kinds": {
+      "lexical_control": 50,
+      "definition_value_candidate": 43,
+      "data_candidate": 118,
+      "call_target_candidate": 24,
+      "call_event_candidate": 30,
+      "normal_body_exit": 4,
+      "normal_branch_exit": 2
+    },
+    "criteria": [
+      {
+        "seed": "test:45:8:Assert",
+        "node_ids": [
+          "source:1:725:4:arg",
+          "source:1:726:4:arg",
+          "source:1:727:4:arg",
+          "source:1:728:4:arg",
+          "source:1:729:4:arg",
+          "source:1:730:4:arg",
+          "source:1:770:4:Assign",
+          "source:1:770:4:Name",
+          "source:1:772:7:Compare",
+          "source:1:773:8:Return",
+          "source:1:775:7:Call",
+          "source:1:776:8:Assign",
+          "source:1:776:8:Name",
+          "source:1:778:4:Expr",
+          "source:1:779:4:Return",
+          "source:2:166:19:arg",
+          "source:2:167:11:Attribute",
+          "source:2:168:12:Assign",
+          "source:2:168:12:Name",
+          "source:2:169:12:Assign",
+          "source:2:169:12:Name",
+          "source:2:170:12:AugAssign",
+          "source:2:170:12:Name",
+          "source:2:171:12:Assign",
+          "source:2:171:12:Name",
+          "source:2:172:12:AugAssign",
+          "source:2:172:12:Name",
+          "source:2:173:12:Assign",
+          "source:2:173:12:Name",
+          "source:2:174:12:AugAssign",
+          "source:2:174:12:Name",
+          "source:2:175:15:Compare",
+          "source:2:176:16:Return",
+          "source:2:178:16:Return",
+          "source:2:179:8:Return",
+          "source:2:181:19:arg",
+          "source:2:182:8:Assign",
+          "source:2:182:8:Name",
+          "source:2:183:11:Compare",
+          "source:2:184:12:AugAssign",
+          "source:2:184:12:Name",
+          "source:2:185:8:Return",
+          "source:2:187:19:arg",
+          "source:2:188:8:Return",
+          "source:2:190:19:arg",
+          "source:2:191:11:Compare",
+          "source:2:192:12:Assign",
+          "source:2:192:12:Name",
+          "source:2:193:12:Assign",
+          "source:2:193:12:Name",
+          "source:2:194:12:AugAssign",
+          "source:2:194:12:Name",
+          "source:2:195:13:Attribute",
+          "source:2:196:12:Assign",
+          "source:2:196:12:Name",
+          "source:2:198:12:Assign",
+          "source:2:198:12:Name",
+          "source:2:206:12:Assign",
+          "source:2:206:12:Name",
+          "source:2:207:8:Return",
+          "source:2:209:29:arg",
+          "source:2:212:8:Assign",
+          "source:2:212:8:Name",
+          "source:2:216:11:Attribute",
+          "source:2:217:12:Expr",
+          "source:2:218:11:Name",
+          "source:2:219:12:Expr",
+          "source:2:220:11:BoolOp",
+          "source:2:221:12:Expr",
+          "source:2:222:11:Compare",
+          "source:2:223:12:Assign",
+          "source:2:223:12:Name",
+          "source:2:224:15:Compare",
+          "source:2:225:16:Expr",
+          "source:2:227:8:Return",
+          "source:2:236:24:arg",
+          "source:2:237:11:Attribute",
+          "source:2:238:12:Return",
+          "source:2:240:11:UnaryOp",
+          "source:2:242:15:Compare",
+          "source:2:244:16:Expr",
+          "source:2:245:12:Return",
+          "source:2:247:8:Assign",
+          "source:2:247:8:Name",
+          "source:2:256:15:BoolOp",
+          "source:2:257:16:Expr",
+          "source:2:258:16:Expr",
+          "source:2:262:8:Assign",
+          "source:2:262:8:Name",
+          "source:2:263:11:Compare",
+          "source:2:264:12:Assign",
+          "source:2:264:12:Name",
+          "source:2:266:8:Expr",
+          "source:2:267:8:Assign",
+          "source:2:267:8:Name",
+          "source:2:268:8:Assign",
+          "source:2:268:8:Name",
+          "source:2:272:8:Expr",
+          "source:2:273:8:Expr",
+          "source:2:274:8:Assign",
+          "source:2:274:8:Name",
+          "source:2:277:11:Compare",
+          "source:2:279:12:Expr",
+          "source:2:280:12:Expr",
+          "source:2:287:11:Compare",
+          "source:2:288:12:Return",
+          "source:2:304:15:arg",
+          "source:2:325:11:Compare",
+          "source:2:326:12:Expr",
+          "source:2:327:12:Expr",
+          "source:2:577:19:arg",
+          "source:2:578:11:Compare",
+          "source:2:579:12:Return",
+          "source:2:580:12:Name",
+          "source:2:580:8:For",
+          "source:2:581:12:Assign",
+          "source:2:581:12:Name",
+          "source:2:582:12:If",
+          "source:2:582:15:Name",
+          "source:2:583:16:Return",
+          "source:2:584:11:Name",
+          "source:2:585:12:Return",
+          "source:2:589:12:Name",
+          "source:2:589:8:For",
+          "source:2:590:12:If",
+          "source:2:590:15:Compare",
+          "source:2:591:16:Return",
+          "source:2:592:8:Return",
+          "source:2:594:19:arg",
+          "source:2:597:8:Assign",
+          "source:2:597:8:Name",
+          "source:2:598:8:AnnAssign",
+          "source:2:598:8:Name",
+          "source:2:600:11:Attribute",
+          "source:2:601:12:Assign",
+          "source:2:601:12:Name",
+          "source:2:602:12:Expr",
+          "source:2:611:15:Compare",
+          "source:2:612:16:Raise",
+          "source:2:616:12:Raise",
+          "source:2:628:13:arg",
+          "source:2:628:19:arg",
+          "source:2:631:11:Compare",
+          "source:2:632:12:AnnAssign",
+          "source:2:632:12:Name",
+          "source:2:633:13:Call",
+          "source:2:634:12:Assign",
+          "source:2:634:12:Name",
+          "source:2:636:15:BoolOp",
+          "source:2:637:16:AugAssign",
+          "source:2:637:16:Name",
+          "source:2:639:15:Name",
+          "source:2:640:16:Assign",
+          "source:2:640:16:Name",
+          "source:2:642:16:Assign",
+          "source:2:642:16:Name",
+          "source:2:644:12:Name",
+          "source:2:644:8:Assign",
+          "source:2:644:8:Name",
+          "source:2:645:8:AnnAssign",
+          "source:2:645:8:Name",
+          "source:2:648:12:With",
+          "source:2:648:40:Name",
+          "source:2:649:16:Expr",
+          "source:2:655:12:Expr",
+          "source:2:660:12:Expr",
+          "source:2:662:15:BoolOp",
+          "source:2:663:16:Return",
+          "source:2:665:12:With",
+          "source:2:665:37:Name",
+          "source:2:666:16:Assign",
+          "source:2:666:16:Name",
+          "source:2:668:15:Call",
+          "source:2:669:16:Return",
+          "source:2:671:12:Return",
+          "source:2:673:12:Expr",
+          "test:15:32:arg",
+          "test:15:38:arg",
+          "test:15:48:arg",
+          "test:32:4:Assign",
+          "test:32:4:Name",
+          "test:44:7:Compare",
+          "test:45:8:Assert"
+        ],
+        "product_source_candidates": [
+          "source:1",
+          "source:2"
+        ],
+        "unknown_call_nodes": [
+          "source:1:770:4:Assign",
+          "source:2:168:12:Assign",
+          "source:2:182:8:Assign",
+          "source:2:188:8:Return",
+          "source:2:192:12:Assign",
+          "source:2:198:12:Assign",
+          "source:2:206:12:Assign",
+          "source:2:217:12:Expr",
+          "source:2:219:12:Expr",
+          "source:2:221:12:Expr",
+          "source:2:223:12:Assign",
+          "source:2:225:16:Expr",
+          "source:2:227:8:Return",
+          "source:2:244:16:Expr",
+          "source:2:257:16:Expr",
+          "source:2:258:16:Expr",
+          "source:2:266:8:Expr",
+          "source:2:268:8:Assign",
+          "source:2:272:8:Expr",
+          "source:2:273:8:Expr",
+          "source:2:274:8:Assign",
+          "source:2:279:12:Expr",
+          "source:2:280:12:Expr",
+          "source:2:581:12:Assign",
+          "source:2:590:12:If",
+          "source:2:601:12:Assign",
+          "source:2:612:16:Raise",
+          "source:2:616:12:Raise",
+          "source:2:640:16:Assign",
+          "source:2:642:16:Assign",
+          "source:2:644:8:Assign",
+          "source:2:648:12:With",
+          "source:2:649:16:Expr",
+          "source:2:655:12:Expr",
+          "source:2:665:12:With",
+          "source:2:666:16:Assign",
+          "source:2:671:12:Return",
+          "source:2:673:12:Expr"
+        ]
+      },
+      {
+        "seed": "test:50:8:Assert",
+        "node_ids": [
+          "source:1:725:4:arg",
+          "source:1:726:4:arg",
+          "source:1:727:4:arg",
+          "source:1:728:4:arg",
+          "source:1:729:4:arg",
+          "source:1:730:4:arg",
+          "source:1:770:4:Assign",
+          "source:1:770:4:Name",
+          "source:1:772:7:Compare",
+          "source:1:773:8:Return",
+          "source:1:775:7:Call",
+          "source:1:776:8:Assign",
+          "source:1:776:8:Name",
+          "source:1:778:4:Expr",
+          "source:1:779:4:Return",
+          "source:2:166:19:arg",
+          "source:2:167:11:Attribute",
+          "source:2:168:12:Assign",
+          "source:2:168:12:Name",
+          "source:2:169:12:Assign",
+          "source:2:169:12:Name",
+          "source:2:170:12:AugAssign",
+          "source:2:170:12:Name",
+          "source:2:171:12:Assign",
+          "source:2:171:12:Name",
+          "source:2:172:12:AugAssign",
+          "source:2:172:12:Name",
+          "source:2:173:12:Assign",
+          "source:2:173:12:Name",
+          "source:2:174:12:AugAssign",
+          "source:2:174:12:Name",
+          "source:2:175:15:Compare",
+          "source:2:176:16:Return",
+          "source:2:178:16:Return",
+          "source:2:179:8:Return",
+          "source:2:181:19:arg",
+          "source:2:182:8:Assign",
+          "source:2:182:8:Name",
+          "source:2:183:11:Compare",
+          "source:2:184:12:AugAssign",
+          "source:2:184:12:Name",
+          "source:2:185:8:Return",
+          "source:2:187:19:arg",
+          "source:2:188:8:Return",
+          "source:2:190:19:arg",
+          "source:2:191:11:Compare",
+          "source:2:192:12:Assign",
+          "source:2:192:12:Name",
+          "source:2:193:12:Assign",
+          "source:2:193:12:Name",
+          "source:2:194:12:AugAssign",
+          "source:2:194:12:Name",
+          "source:2:195:13:Attribute",
+          "source:2:196:12:Assign",
+          "source:2:196:12:Name",
+          "source:2:198:12:Assign",
+          "source:2:198:12:Name",
+          "source:2:206:12:Assign",
+          "source:2:206:12:Name",
+          "source:2:207:8:Return",
+          "source:2:209:29:arg",
+          "source:2:212:8:Assign",
+          "source:2:212:8:Name",
+          "source:2:216:11:Attribute",
+          "source:2:217:12:Expr",
+          "source:2:218:11:Name",
+          "source:2:219:12:Expr",
+          "source:2:220:11:BoolOp",
+          "source:2:221:12:Expr",
+          "source:2:222:11:Compare",
+          "source:2:223:12:Assign",
+          "source:2:223:12:Name",
+          "source:2:224:15:Compare",
+          "source:2:225:16:Expr",
+          "source:2:227:8:Return",
+          "source:2:236:24:arg",
+          "source:2:237:11:Attribute",
+          "source:2:238:12:Return",
+          "source:2:240:11:UnaryOp",
+          "source:2:242:15:Compare",
+          "source:2:244:16:Expr",
+          "source:2:245:12:Return",
+          "source:2:247:8:Assign",
+          "source:2:247:8:Name",
+          "source:2:256:15:BoolOp",
+          "source:2:257:16:Expr",
+          "source:2:258:16:Expr",
+          "source:2:262:8:Assign",
+          "source:2:262:8:Name",
+          "source:2:263:11:Compare",
+          "source:2:264:12:Assign",
+          "source:2:264:12:Name",
+          "source:2:266:8:Expr",
+          "source:2:267:8:Assign",
+          "source:2:267:8:Name",
+          "source:2:268:8:Assign",
+          "source:2:268:8:Name",
+          "source:2:272:8:Expr",
+          "source:2:273:8:Expr",
+          "source:2:274:8:Assign",
+          "source:2:274:8:Name",
+          "source:2:277:11:Compare",
+          "source:2:279:12:Expr",
+          "source:2:280:12:Expr",
+          "source:2:287:11:Compare",
+          "source:2:288:12:Return",
+          "source:2:304:15:arg",
+          "source:2:325:11:Compare",
+          "source:2:326:12:Expr",
+          "source:2:327:12:Expr",
+          "source:2:577:19:arg",
+          "source:2:578:11:Compare",
+          "source:2:579:12:Return",
+          "source:2:580:12:Name",
+          "source:2:580:8:For",
+          "source:2:581:12:Assign",
+          "source:2:581:12:Name",
+          "source:2:582:12:If",
+          "source:2:582:15:Name",
+          "source:2:583:16:Return",
+          "source:2:584:11:Name",
+          "source:2:585:12:Return",
+          "source:2:589:12:Name",
+          "source:2:589:8:For",
+          "source:2:590:12:If",
+          "source:2:590:15:Compare",
+          "source:2:591:16:Return",
+          "source:2:592:8:Return",
+          "source:2:594:19:arg",
+          "source:2:597:8:Assign",
+          "source:2:597:8:Name",
+          "source:2:598:8:AnnAssign",
+          "source:2:598:8:Name",
+          "source:2:600:11:Attribute",
+          "source:2:601:12:Assign",
+          "source:2:601:12:Name",
+          "source:2:602:12:Expr",
+          "source:2:611:15:Compare",
+          "source:2:612:16:Raise",
+          "source:2:616:12:Raise",
+          "source:2:628:13:arg",
+          "source:2:628:19:arg",
+          "source:2:631:11:Compare",
+          "source:2:632:12:AnnAssign",
+          "source:2:632:12:Name",
+          "source:2:633:13:Call",
+          "source:2:634:12:Assign",
+          "source:2:634:12:Name",
+          "source:2:636:15:BoolOp",
+          "source:2:637:16:AugAssign",
+          "source:2:637:16:Name",
+          "source:2:639:15:Name",
+          "source:2:640:16:Assign",
+          "source:2:640:16:Name",
+          "source:2:642:16:Assign",
+          "source:2:642:16:Name",
+          "source:2:644:12:Name",
+          "source:2:644:8:Assign",
+          "source:2:644:8:Name",
+          "source:2:645:8:AnnAssign",
+          "source:2:645:8:Name",
+          "source:2:648:12:With",
+          "source:2:648:40:Name",
+          "source:2:649:16:Expr",
+          "source:2:655:12:Expr",
+          "source:2:660:12:Expr",
+          "source:2:662:15:BoolOp",
+          "source:2:663:16:Return",
+          "source:2:665:12:With",
+          "source:2:665:37:Name",
+          "source:2:666:16:Assign",
+          "source:2:666:16:Name",
+          "source:2:668:15:Call",
+          "source:2:669:16:Return",
+          "source:2:671:12:Return",
+          "source:2:673:12:Expr",
+          "test:15:32:arg",
+          "test:15:38:arg",
+          "test:32:4:Assign",
+          "test:32:4:Name",
+          "test:44:7:Compare",
+          "test:50:8:Assert"
+        ],
+        "product_source_candidates": [
+          "source:1",
+          "source:2"
+        ],
+        "unknown_call_nodes": [
+          "source:1:770:4:Assign",
+          "source:2:168:12:Assign",
+          "source:2:182:8:Assign",
+          "source:2:188:8:Return",
+          "source:2:192:12:Assign",
+          "source:2:198:12:Assign",
+          "source:2:206:12:Assign",
+          "source:2:217:12:Expr",
+          "source:2:219:12:Expr",
+          "source:2:221:12:Expr",
+          "source:2:223:12:Assign",
+          "source:2:225:16:Expr",
+          "source:2:227:8:Return",
+          "source:2:244:16:Expr",
+          "source:2:257:16:Expr",
+          "source:2:258:16:Expr",
+          "source:2:266:8:Expr",
+          "source:2:268:8:Assign",
+          "source:2:272:8:Expr",
+          "source:2:273:8:Expr",
+          "source:2:274:8:Assign",
+          "source:2:279:12:Expr",
+          "source:2:280:12:Expr",
+          "source:2:581:12:Assign",
+          "source:2:590:12:If",
+          "source:2:601:12:Assign",
+          "source:2:612:16:Raise",
+          "source:2:616:12:Raise",
+          "source:2:640:16:Assign",
+          "source:2:642:16:Assign",
+          "source:2:644:8:Assign",
+          "source:2:648:12:With",
+          "source:2:649:16:Expr",
+          "source:2:655:12:Expr",
+          "source:2:665:12:With",
+          "source:2:666:16:Assign",
+          "source:2:671:12:Return",
+          "source:2:673:12:Expr"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:45:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:50:8:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.2923,
+  "identity": {
+    "case_id": "click_422",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "a1f1d9b2e19741abb181fbdfc3d97abdd57d97c8e6d8f0383eb6470921c14223"
+  }
+}

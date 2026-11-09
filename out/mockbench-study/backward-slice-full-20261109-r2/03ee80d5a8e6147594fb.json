@@ -1,0 +1,542 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "source_budget",
+    "product_source_not_located",
+    "test_to_product_not_reached",
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "io.grpc.xds.internal.sds.SdsProtocolNegotiatorsTest#clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute",
+      "status": "located",
+      "precision": "java_lexical_method_scope",
+      "locations": [
+        {
+          "symbol": "clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute",
+          "start_line": 39,
+          "end_line": 53
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 48,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 49,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 50,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:2"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_import",
+        "hint": "io.envoyproxy.envoy.extensions.transport_sockets.tls.v3.CommonTlsContext",
+        "candidates": [
+          "src/main/java/io/envoyproxy/envoy/extensions/transport_sockets/tls/v3/CommonTlsContext.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [
+      "byte_budget_omitted:src/main/java/io/envoyproxy/envoy/extensions/transport_sockets/tls/v3/CommonTlsContext.java"
+    ],
+    "truncated": true,
+    "opaque_methods": [],
+    "selected_bytes": 2276,
+    "read_bytes": 360193,
+    "attempted_files": 1,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "src/test/java/io/grpc/xds/internal/sds/SdsProtocolNegotiatorsTest.java",
+      "sha256": "e1d7502ab78e7959e592a13fba681c5bffecb584d26d64684f5b06786f76b0ea",
+      "bytes": 2276
+    }
+  ],
+  "graph": {
+    "backend": "spoon-source-evidence-prototype",
+    "nodes": [
+      {
+        "id": "test:40:33:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 40,
+        "end_line": 40,
+        "kind": "CtLocalVariableImpl",
+        "code": "io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsProtocolNegotiator pn = new io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsProtocolNegotiator(io.grpc.netty.InternalProtocolNegotiators.plaintext())"
+      },
+      {
+        "id": "test:40:38:CtConstructorCallImpl",
+        "source_id": "test",
+        "start_line": 40,
+        "end_line": 40,
+        "kind": "CtConstructorCallImpl",
+        "code": "new io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsProtocolNegotiator(io.grpc.netty.InternalProtocolNegotiators.plaintext())",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "io.grpc.netty.InternalProtocolNegotiators.plaintext()"
+        ]
+      },
+      {
+        "id": "test:40:70:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 40,
+        "end_line": 40,
+        "kind": "CtInvocationImpl",
+        "code": "io.grpc.netty.InternalProtocolNegotiators.plaintext()"
+      },
+      {
+        "id": "test:40:70:CtTypeAccessImpl",
+        "source_id": "test",
+        "start_line": 40,
+        "end_line": 40,
+        "kind": "expression",
+        "code": "io.grpc.netty.InternalProtocolNegotiators"
+      },
+      {
+        "id": "test:47:20:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 47,
+        "end_line": 47,
+        "kind": "CtLocalVariableImpl",
+        "code": "// === MOCK-STUB-START === // === MOCK-STUB-END === io.netty.channel.ChannelHandler newHandler = pn.newHandler(mockHandler)",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "pn.newHandler(mockHandler)"
+        ]
+      },
+      {
+        "id": "test:47:33:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 47,
+        "end_line": 47,
+        "kind": "CtInvocationImpl",
+        "code": "pn.newHandler(mockHandler)"
+      },
+      {
+        "id": "test:47:33:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 47,
+        "end_line": 47,
+        "kind": "expression",
+        "code": "pn"
+      },
+      {
+        "id": "test:47:47:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 47,
+        "end_line": 47,
+        "kind": "expression",
+        "code": "mockHandler"
+      },
+      {
+        "id": "test:48:19:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 48,
+        "end_line": 48,
+        "kind": "expression",
+        "code": "newHandler"
+      },
+      {
+        "id": "test:48:5:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 48,
+        "end_line": 48,
+        "kind": "CtInvocationImpl",
+        "code": "assertNotNull(newHandler)"
+      },
+      {
+        "id": "test:49:16:CtBinaryOperatorImpl",
+        "source_id": "test",
+        "start_line": 49,
+        "end_line": 49,
+        "kind": "expression",
+        "code": "newHandler instanceof io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsHandler"
+      },
+      {
+        "id": "test:49:16:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 49,
+        "end_line": 49,
+        "kind": "expression",
+        "code": "newHandler"
+      },
+      {
+        "id": "test:49:38:CtTypeAccessImpl",
+        "source_id": "test",
+        "start_line": 49,
+        "end_line": 49,
+        "kind": "expression",
+        "code": "io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsHandler"
+      },
+      {
+        "id": "test:49:5:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 49,
+        "end_line": 49,
+        "kind": "CtInvocationImpl",
+        "code": "assertTrue(newHandler instanceof io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsHandler)"
+      },
+      {
+        "id": "test:50:16:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 50,
+        "end_line": 50,
+        "kind": "expression",
+        "code": "io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsHandler.class"
+      },
+      {
+        "id": "test:50:40:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 50,
+        "end_line": 50,
+        "kind": "CtInvocationImpl",
+        "code": "newHandler.getClass()"
+      },
+      {
+        "id": "test:50:40:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 50,
+        "end_line": 50,
+        "kind": "expression",
+        "code": "newHandler"
+      },
+      {
+        "id": "test:50:5:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 50,
+        "end_line": 50,
+        "kind": "CtInvocationImpl",
+        "code": "assertSame(io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsHandler.class, newHandler.getClass())",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "newHandler.getClass()"
+        ]
+      }
+    ],
+    "seeds": [
+      "test:48:5:CtInvocationImpl",
+      "test:49:5:CtInvocationImpl",
+      "test:50:5:CtInvocationImpl"
+    ],
+    "limitations": [
+      "data_candidate edges are conservative name/declaration candidates, not a sound reaching-def analysis",
+      "lexical_control edges describe AST ancestry, not post-dominator control dependence",
+      "call_return edges use no-classpath resolution plus name/arity virtual candidates and do not prove dispatch",
+      "expression_value_candidate edges preserve syntax containment, not runtime evaluation or value equality",
+      "heap aliasing, reflection, exceptions, concurrency, and path feasibility are not modeled",
+      "boundary calls are retained as nodes and are not traversed into dependency implementations"
+    ],
+    "status": "ok",
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:48:5:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:49:5:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:50:5:CtInvocationImpl"
+      }
+    ],
+    "edges": [
+      {
+        "from": "test:40:38:CtConstructorCallImpl",
+        "to": "test:40:33:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:40:70:CtInvocationImpl",
+        "to": "test:40:38:CtConstructorCallImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:40:70:CtTypeAccessImpl",
+        "to": "test:40:70:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:47:33:CtInvocationImpl",
+        "to": "test:47:20:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:47:33:CtVariableReadImpl",
+        "to": "test:47:33:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:47:47:CtFieldReadImpl",
+        "to": "test:47:33:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:48:19:CtVariableReadImpl",
+        "to": "test:48:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:49:16:CtBinaryOperatorImpl",
+        "to": "test:49:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:49:16:CtVariableReadImpl",
+        "to": "test:49:16:CtBinaryOperatorImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:49:38:CtTypeAccessImpl",
+        "to": "test:49:16:CtBinaryOperatorImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:50:16:CtFieldReadImpl",
+        "to": "test:50:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:50:40:CtInvocationImpl",
+        "to": "test:50:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:50:40:CtVariableReadImpl",
+        "to": "test:50:40:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:40:33:CtLocalVariableImpl",
+        "to": "test:47:20:CtLocalVariableImpl",
+        "kind": "data_candidate",
+        "precision": "resolved_declaration",
+        "variable": "pn"
+      },
+      {
+        "from": "test:40:33:CtLocalVariableImpl",
+        "to": "test:47:20:CtLocalVariableImpl",
+        "kind": "data_candidate",
+        "precision": "prior_write_same_method",
+        "variable": "pn"
+      },
+      {
+        "from": "test:40:33:CtLocalVariableImpl",
+        "to": "test:47:33:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "resolved_declaration",
+        "variable": "pn"
+      },
+      {
+        "from": "test:40:33:CtLocalVariableImpl",
+        "to": "test:47:33:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "prior_write_same_method",
+        "variable": "pn"
+      },
+      {
+        "from": "test:47:20:CtLocalVariableImpl",
+        "to": "test:48:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "resolved_declaration",
+        "variable": "newHandler"
+      },
+      {
+        "from": "test:47:20:CtLocalVariableImpl",
+        "to": "test:48:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "prior_write_same_method",
+        "variable": "newHandler"
+      },
+      {
+        "from": "test:47:20:CtLocalVariableImpl",
+        "to": "test:49:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "resolved_declaration",
+        "variable": "newHandler"
+      },
+      {
+        "from": "test:47:20:CtLocalVariableImpl",
+        "to": "test:49:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "prior_write_same_method",
+        "variable": "newHandler"
+      },
+      {
+        "from": "test:47:20:CtLocalVariableImpl",
+        "to": "test:50:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "resolved_declaration",
+        "variable": "newHandler"
+      },
+      {
+        "from": "test:47:20:CtLocalVariableImpl",
+        "to": "test:50:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "prior_write_same_method",
+        "variable": "newHandler"
+      },
+      {
+        "from": "test:47:20:CtLocalVariableImpl",
+        "to": "test:50:40:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "resolved_declaration",
+        "variable": "newHandler"
+      },
+      {
+        "from": "test:47:20:CtLocalVariableImpl",
+        "to": "test:50:40:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "prior_write_same_method",
+        "variable": "newHandler"
+      }
+    ]
+  },
+  "evidence": {
+    "nodes": 18,
+    "edges": 25,
+    "edge_kinds": {
+      "expression_value_candidate": 13,
+      "data_candidate": 12
+    },
+    "criteria": [
+      {
+        "seed": "test:48:5:CtInvocationImpl",
+        "node_ids": [
+          "test:40:33:CtLocalVariableImpl",
+          "test:40:38:CtConstructorCallImpl",
+          "test:40:70:CtInvocationImpl",
+          "test:40:70:CtTypeAccessImpl",
+          "test:47:20:CtLocalVariableImpl",
+          "test:47:33:CtInvocationImpl",
+          "test:47:33:CtVariableReadImpl",
+          "test:47:47:CtFieldReadImpl",
+          "test:48:19:CtVariableReadImpl",
+          "test:48:5:CtInvocationImpl"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:40:38:CtConstructorCallImpl",
+          "test:47:20:CtLocalVariableImpl"
+        ]
+      },
+      {
+        "seed": "test:49:5:CtInvocationImpl",
+        "node_ids": [
+          "test:40:33:CtLocalVariableImpl",
+          "test:40:38:CtConstructorCallImpl",
+          "test:40:70:CtInvocationImpl",
+          "test:40:70:CtTypeAccessImpl",
+          "test:47:20:CtLocalVariableImpl",
+          "test:47:33:CtInvocationImpl",
+          "test:47:33:CtVariableReadImpl",
+          "test:47:47:CtFieldReadImpl",
+          "test:49:16:CtBinaryOperatorImpl",
+          "test:49:16:CtVariableReadImpl",
+          "test:49:38:CtTypeAccessImpl",
+          "test:49:5:CtInvocationImpl"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:40:38:CtConstructorCallImpl",
+          "test:47:20:CtLocalVariableImpl"
+        ]
+      },
+      {
+        "seed": "test:50:5:CtInvocationImpl",
+        "node_ids": [
+          "test:40:33:CtLocalVariableImpl",
+          "test:40:38:CtConstructorCallImpl",
+          "test:40:70:CtInvocationImpl",
+          "test:40:70:CtTypeAccessImpl",
+          "test:47:20:CtLocalVariableImpl",
+          "test:47:33:CtInvocationImpl",
+          "test:47:33:CtVariableReadImpl",
+          "test:47:47:CtFieldReadImpl",
+          "test:50:16:CtFieldReadImpl",
+          "test:50:40:CtInvocationImpl",
+          "test:50:40:CtVariableReadImpl",
+          "test:50:5:CtInvocationImpl"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:40:38:CtConstructorCallImpl",
+          "test:47:20:CtLocalVariableImpl",
+          "test:50:5:CtInvocationImpl"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:48:5:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:49:5:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:50:5:CtInvocationImpl"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.9089,
+  "identity": {
+    "case_id": "io.grpc.xds.internal.sds.SdsProtocolNegotiatorsTest#clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute@9016cf55",
+    "dataset": "java-bechmark-strong",
+    "language": "java",
+    "snapshot_id": "414738c31dbe9c0c5d0b57b784f64f3c6bbf26f064c4e24ff0b4ee82f02705af"
+  }
+}

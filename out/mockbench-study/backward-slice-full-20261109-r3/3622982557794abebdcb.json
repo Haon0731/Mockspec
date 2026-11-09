@@ -1,0 +1,365 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "test_to_product_not_reached",
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_430copy.py::test_copy_dispatches_to_the_matching_storage_boundary",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_copy_dispatches_to_the_matching_storage_boundary",
+          "start_line": 51,
+          "end_line": 87
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 71,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 75,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "verl.utils",
+        "candidates": [
+          "src/verl/utils/__init__.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 3009,
+    "read_bytes": 3009,
+    "attempted_files": 1,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_430copy.py",
+      "sha256": "a051ab0afb2fe04eb75a7907e2087a4a350aecabfab0b4cfa1e34b35e21e1c2e",
+      "bytes": 2025
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/verl/utils/__init__.py",
+      "sha256": "823aba2128383ccc1c8c7720b56b834016ba1760444c1174c5a19ed717a7ecf2",
+      "bytes": 984
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "branch": "true",
+        "from": "test:70:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:71:8:With"
+      },
+      {
+        "field": "body",
+        "from": "test:72:12:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:71:8:With"
+      },
+      {
+        "branch": "false",
+        "from": "test:70:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:74:8:Assign"
+      },
+      {
+        "branch": "false",
+        "from": "test:70:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:75:8:Assert"
+      },
+      {
+        "from": "test:54:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:72:12:Expr",
+        "variable": "src"
+      },
+      {
+        "from": "test:55:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:72:12:Expr",
+        "variable": "dst"
+      },
+      {
+        "from": "test:57:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:72:12:Expr",
+        "variable": "kwargs"
+      },
+      {
+        "from": "test:74:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:74:8:Name"
+      },
+      {
+        "from": "test:54:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:74:8:Assign",
+        "variable": "src"
+      },
+      {
+        "from": "test:55:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:74:8:Assign",
+        "variable": "dst"
+      },
+      {
+        "from": "test:57:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:74:8:Assign",
+        "variable": "kwargs"
+      },
+      {
+        "from": "test:74:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:75:8:Assert",
+        "variable": "result"
+      },
+      {
+        "from": "test:59:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:75:8:Assert",
+        "variable": "expected"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "src",
+        "end_line": 54,
+        "id": "test:54:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 54
+      },
+      {
+        "code": "dst",
+        "end_line": 55,
+        "id": "test:55:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 55
+      },
+      {
+        "code": "kwargs",
+        "end_line": 57,
+        "id": "test:57:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 57
+      },
+      {
+        "code": "expected",
+        "end_line": 59,
+        "id": "test:59:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 59
+      },
+      {
+        "code": "error is not None",
+        "end_line": 70,
+        "id": "test:70:7:Compare",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 70
+      },
+      {
+        "code": "with pytest.raises(OSError, match='disk full'):\n    hdfs_io.copy(src, dst, **kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 72,
+        "exception_possible": true,
+        "id": "test:71:8:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 71,
+        "unresolved_calls": [
+          "pytest.raises(OSError, match='disk full')"
+        ]
+      },
+      {
+        "code": "hdfs_io.copy(src, dst, **kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 72,
+        "exception_possible": true,
+        "id": "test:72:12:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 72,
+        "unresolved_calls": [
+          "hdfs_io.copy(src, dst, **kwargs)"
+        ]
+      },
+      {
+        "code": "result = hdfs_io.copy(src, dst, **kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 74,
+        "exception_possible": true,
+        "id": "test:74:8:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 74,
+        "unresolved_calls": [
+          "hdfs_io.copy(src, dst, **kwargs)"
+        ]
+      },
+      {
+        "code": "result",
+        "end_line": 74,
+        "id": "test:74:8:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 74
+      },
+      {
+        "code": "assert result == expected",
+        "end_line": 75,
+        "id": "test:75:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 75
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:71:8:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:75:8:Assert"
+      }
+    ],
+    "seeds": [
+      "test:71:8:With",
+      "test:75:8:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 10,
+    "edges": 13,
+    "edge_kinds": {
+      "lexical_control": 3,
+      "normal_body_exit": 1,
+      "data_candidate": 8,
+      "definition_value_candidate": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:71:8:With",
+        "node_ids": [
+          "test:54:4:arg",
+          "test:55:4:arg",
+          "test:57:4:arg",
+          "test:70:7:Compare",
+          "test:71:8:With",
+          "test:72:12:Expr"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:71:8:With",
+          "test:72:12:Expr"
+        ]
+      },
+      {
+        "seed": "test:75:8:Assert",
+        "node_ids": [
+          "test:54:4:arg",
+          "test:55:4:arg",
+          "test:57:4:arg",
+          "test:59:4:arg",
+          "test:70:7:Compare",
+          "test:74:8:Assign",
+          "test:74:8:Name",
+          "test:75:8:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:74:8:Assign"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:71:8:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:75:8:Assert"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.0536,
+  "identity": {
+    "case_id": "verl_430",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "5325dbc67b3620d73dadc8f95b374f9b0c5216177296476bdec01b28f7ef2d45"
+  }
+}

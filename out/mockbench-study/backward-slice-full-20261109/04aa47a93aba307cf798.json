@@ -1,0 +1,387 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "test_to_product_not_reached",
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "com.netflix.netty.common.CloseOnIdleStateHandlerTest#incrementCounterOnIdleStateEvent",
+      "status": "located",
+      "precision": "java_lexical_method_scope",
+      "locations": [
+        {
+          "symbol": "incrementCounterOnIdleStateEvent",
+          "start_line": 38,
+          "end_line": 54
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 52,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope"
+      },
+      {
+        "line": 53,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_import",
+        "hint": "com.netflix.zuul.netty.server.http2.DummyChannelHandler",
+        "candidates": [
+          "src/main/java/com/netflix/zuul/netty/server/http2/DummyChannelHandler.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_same_package_type",
+        "hint": "com.netflix.netty.common.CloseOnIdleStateHandler",
+        "candidates": [
+          "src/main/java/com/netflix/netty/common/CloseOnIdleStateHandler.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 4996,
+    "read_bytes": 4996,
+    "attempted_files": 2,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "src/test/java/com/netflix/netty/common/CloseOnIdleStateHandlerTest.java",
+      "sha256": "eb7d9932ecba35fecfa2171661d6f2bfa6bd870b465e5f1a8c952d30f824c203",
+      "bytes": 2263
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/main/java/com/netflix/zuul/netty/server/http2/DummyChannelHandler.java",
+      "sha256": "93276a31cf6855bd58e37fffc4ff51015cd3c7aab69561013a7b5c59aed5b11f",
+      "bytes": 1225
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/main/java/com/netflix/netty/common/CloseOnIdleStateHandler.java",
+      "sha256": "4ae563b9f6767df106bb292c40d6e637e1d10d5b7bef7d87c4392cc76a4d4309",
+      "bytes": 1508
+    }
+  ],
+  "graph": {
+    "seeds": [
+      "test:52:5:CtInvocationImpl",
+      "test:53:5:CtInvocationImpl"
+    ],
+    "edges": [
+      {
+        "from": "test:41:37:CtConstructorCallImpl",
+        "to": "test:41:27:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:52:18:CtLiteralImpl",
+        "to": "test:52:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:52:21:CtInvocationImpl",
+        "to": "test:52:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:52:37:CtFieldReadImpl",
+        "to": "test:52:21:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:52:46:CtLiteralImpl",
+        "to": "test:52:21:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:53:17:CtInvocationImpl",
+        "to": "test:53:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:53:17:CtVariableReadImpl",
+        "to": "test:53:17:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:57:17:CtLiteralImpl",
+        "to": "test:57:9:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:63:12:CtVariableReadImpl",
+        "to": "test:63:5:CtReturnImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:41:27:CtLocalVariableImpl",
+        "to": "test:53:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "channel",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:41:27:CtLocalVariableImpl",
+        "to": "test:53:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "channel",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:41:27:CtLocalVariableImpl",
+        "to": "test:53:17:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "channel",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:41:27:CtLocalVariableImpl",
+        "to": "test:53:17:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "channel",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:57:9:CtLocalVariableImpl",
+        "to": "test:63:5:CtReturnImpl",
+        "kind": "data_candidate",
+        "variable": "count",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:57:9:CtLocalVariableImpl",
+        "to": "test:63:5:CtReturnImpl",
+        "kind": "data_candidate",
+        "variable": "count",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:63:5:CtReturnImpl",
+        "to": "test:52:5:CtInvocationImpl",
+        "kind": "call_return",
+        "callee": "com.netflix.netty.common.CloseOnIdleStateHandlerTest.invocationCount(java.lang.Object,java.lang.String)",
+        "precision": "single_source_candidate"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges are conservative name/declaration candidates, not a sound reaching-def analysis",
+      "lexical_control edges describe AST ancestry, not post-dominator control dependence",
+      "call_return edges use no-classpath resolution plus name/arity virtual candidates and do not prove dispatch",
+      "expression_value_candidate edges preserve syntax containment, not runtime evaluation or value equality",
+      "heap aliasing, reflection, exceptions, concurrency, and path feasibility are not modeled",
+      "boundary calls are retained as nodes and are not traversed into dependency implementations"
+    ],
+    "backend": "spoon-source-evidence-prototype",
+    "status": "ok",
+    "nodes": [
+      {
+        "id": "test:41:27:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 41,
+        "end_line": 41,
+        "kind": "CtLocalVariableImpl",
+        "code": "// === MOCK-STUB-START === // === MOCK-STUB-END === final io.netty.channel.embedded.EmbeddedChannel channel = new io.netty.channel.embedded.EmbeddedChannel()"
+      },
+      {
+        "id": "test:41:37:CtConstructorCallImpl",
+        "source_id": "test",
+        "start_line": 41,
+        "end_line": 41,
+        "kind": "CtConstructorCallImpl",
+        "code": "new io.netty.channel.embedded.EmbeddedChannel()"
+      },
+      {
+        "id": "test:52:18:CtLiteralImpl",
+        "source_id": "test",
+        "start_line": 52,
+        "end_line": 52,
+        "kind": "expression",
+        "code": "1"
+      },
+      {
+        "id": "test:52:21:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 52,
+        "end_line": 52,
+        "kind": "CtInvocationImpl",
+        "code": "com.netflix.netty.common.CloseOnIdleStateHandlerTest.invocationCount(counter, \"increment\")"
+      },
+      {
+        "id": "test:52:37:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 52,
+        "end_line": 52,
+        "kind": "expression",
+        "code": "counter"
+      },
+      {
+        "id": "test:52:46:CtLiteralImpl",
+        "source_id": "test",
+        "start_line": 52,
+        "end_line": 52,
+        "kind": "expression",
+        "code": "\"increment\""
+      },
+      {
+        "id": "test:52:5:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 52,
+        "end_line": 52,
+        "kind": "CtInvocationImpl",
+        "code": "// === VERIFY-START === // === VERIFY-END === org.junit.Assert.assertEquals(1, com.netflix.netty.common.CloseOnIdleStateHandlerTest.invocationCount(counter, \"increment\"))"
+      },
+      {
+        "id": "test:53:17:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 53,
+        "end_line": 53,
+        "kind": "CtInvocationImpl",
+        "code": "channel.isOpen()"
+      },
+      {
+        "id": "test:53:17:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 53,
+        "end_line": 53,
+        "kind": "expression",
+        "code": "channel"
+      },
+      {
+        "id": "test:53:5:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 53,
+        "end_line": 53,
+        "kind": "CtInvocationImpl",
+        "code": "org.junit.Assert.assertFalse(channel.isOpen())",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "channel.isOpen()"
+        ]
+      },
+      {
+        "id": "test:57:17:CtLiteralImpl",
+        "source_id": "test",
+        "start_line": 57,
+        "end_line": 57,
+        "kind": "expression",
+        "code": "0"
+      },
+      {
+        "id": "test:57:9:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 57,
+        "end_line": 57,
+        "kind": "CtLocalVariableImpl",
+        "code": "int count = 0"
+      },
+      {
+        "id": "test:63:12:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 63,
+        "end_line": 63,
+        "kind": "expression",
+        "code": "count"
+      },
+      {
+        "id": "test:63:5:CtReturnImpl",
+        "source_id": "test",
+        "start_line": 63,
+        "end_line": 63,
+        "kind": "CtReturnImpl",
+        "code": "return count"
+      }
+    ]
+  },
+  "evidence": {
+    "nodes": 14,
+    "edges": 16,
+    "edge_kinds": {
+      "expression_value_candidate": 9,
+      "data_candidate": 6,
+      "call_return": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:52:5:CtInvocationImpl",
+        "node_ids": [
+          "test:52:18:CtLiteralImpl",
+          "test:52:21:CtInvocationImpl",
+          "test:52:37:CtFieldReadImpl",
+          "test:52:46:CtLiteralImpl",
+          "test:52:5:CtInvocationImpl",
+          "test:57:17:CtLiteralImpl",
+          "test:57:9:CtLocalVariableImpl",
+          "test:63:12:CtVariableReadImpl",
+          "test:63:5:CtReturnImpl"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": []
+      },
+      {
+        "seed": "test:53:5:CtInvocationImpl",
+        "node_ids": [
+          "test:41:27:CtLocalVariableImpl",
+          "test:41:37:CtConstructorCallImpl",
+          "test:53:17:CtInvocationImpl",
+          "test:53:17:CtVariableReadImpl",
+          "test:53:5:CtInvocationImpl"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:53:5:CtInvocationImpl"
+        ]
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 1.0924,
+  "identity": {
+    "case_id": "com.netflix.netty.common.CloseOnIdleStateHandlerTest#incrementCounterOnIdleStateEvent@9f103844",
+    "dataset": "java-bechmark-strong",
+    "language": "java",
+    "snapshot_id": "6d3c0c78b8e8b58e3abb7a4f740a647f76964bbce4e5486d939ee4f3541aeec3"
+  }
+}

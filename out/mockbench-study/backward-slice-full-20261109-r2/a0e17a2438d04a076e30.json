@@ -1,0 +1,458 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "product_source_not_located",
+    "test_to_product_not_reached",
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_162handle_console_capture.py::test_handle_console_capture",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_handle_console_capture",
+          "start_line": 70,
+          "end_line": 139
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 130,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 132,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 133,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:2"
+      },
+      {
+        "line": 135,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:3"
+      },
+      {
+        "line": 137,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:4"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [],
+    "diagnostics": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 3490,
+    "read_bytes": 3490,
+    "attempted_files": 0,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_162handle_console_capture.py",
+      "sha256": "96dd683227dd1e108fb8534ec0c650824e44546ba6d03bc7c513a8f7009dc3a0",
+      "bytes": 3490
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "branch": "true",
+        "from": "test:134:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:135:8:Assert"
+      },
+      {
+        "branch": "false",
+        "from": "test:134:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:137:8:Assert"
+      },
+      {
+        "from": "test:103:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:103:4:Name"
+      },
+      {
+        "from": "test:77:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:103:4:Assign",
+        "variable": "container_factory"
+      },
+      {
+        "from": "test:103:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:130:4:Assert",
+        "variable": "captured_console"
+      },
+      {
+        "from": "test:131:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:131:4:Name"
+      },
+      {
+        "from": "test:103:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:131:4:Assign",
+        "variable": "captured_console"
+      },
+      {
+        "from": "test:131:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:132:4:Assert",
+        "variable": "entry"
+      },
+      {
+        "from": "test:78:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:132:4:Assert",
+        "variable": "expected_entry"
+      },
+      {
+        "from": "test:131:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:133:4:Assert",
+        "variable": "entry"
+      },
+      {
+        "from": "test:131:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:135:8:Assert",
+        "variable": "entry"
+      },
+      {
+        "from": "test:78:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:135:8:Assert",
+        "variable": "expected_entry"
+      },
+      {
+        "from": "test:131:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:137:8:Assert",
+        "variable": "entry"
+      },
+      {
+        "from": "test:78:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:137:8:Assert",
+        "variable": "expected_entry"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "captured_console = container_factory()",
+        "contains_unresolved_call": true,
+        "end_line": 103,
+        "exception_possible": true,
+        "id": "test:103:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 103,
+        "unresolved_calls": [
+          "container_factory()"
+        ]
+      },
+      {
+        "code": "captured_console",
+        "end_line": 103,
+        "id": "test:103:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 103
+      },
+      {
+        "code": "assert len(captured_console) == 1",
+        "contains_unresolved_call": true,
+        "end_line": 130,
+        "exception_possible": true,
+        "id": "test:130:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 130,
+        "unresolved_calls": [
+          "len(captured_console)"
+        ]
+      },
+      {
+        "code": "entry = captured_console[0]",
+        "end_line": 131,
+        "id": "test:131:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 131
+      },
+      {
+        "code": "entry",
+        "end_line": 131,
+        "id": "test:131:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 131
+      },
+      {
+        "code": "assert entry['type'] == expected_entry['type']",
+        "end_line": 132,
+        "id": "test:132:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 132
+      },
+      {
+        "code": "assert entry['timestamp'] == 123.456",
+        "end_line": 133,
+        "id": "test:133:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 133
+      },
+      {
+        "code": "scenario == 'append_failure_records_console_capture_error'",
+        "end_line": 134,
+        "id": "test:134:7:Compare",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 134
+      },
+      {
+        "code": "assert entry['error'] == expected_entry['error']",
+        "end_line": 135,
+        "id": "test:135:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 135
+      },
+      {
+        "code": "assert entry['text'] == expected_entry['text']",
+        "end_line": 137,
+        "id": "test:137:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 137
+      },
+      {
+        "code": "container_factory",
+        "end_line": 77,
+        "id": "test:77:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 77
+      },
+      {
+        "code": "expected_entry",
+        "end_line": 78,
+        "id": "test:78:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 78
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:130:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:132:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:133:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:3",
+        "seed": "test:135:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:4",
+        "seed": "test:137:8:Assert"
+      }
+    ],
+    "seeds": [
+      "test:130:4:Assert",
+      "test:132:4:Assert",
+      "test:133:4:Assert",
+      "test:135:8:Assert",
+      "test:137:8:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 12,
+    "edges": 14,
+    "edge_kinds": {
+      "lexical_control": 2,
+      "definition_value_candidate": 2,
+      "data_candidate": 10
+    },
+    "criteria": [
+      {
+        "seed": "test:130:4:Assert",
+        "node_ids": [
+          "test:103:4:Assign",
+          "test:103:4:Name",
+          "test:130:4:Assert",
+          "test:77:4:arg"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:103:4:Assign",
+          "test:130:4:Assert"
+        ]
+      },
+      {
+        "seed": "test:132:4:Assert",
+        "node_ids": [
+          "test:103:4:Assign",
+          "test:103:4:Name",
+          "test:131:4:Assign",
+          "test:131:4:Name",
+          "test:132:4:Assert",
+          "test:77:4:arg",
+          "test:78:4:arg"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:103:4:Assign"
+        ]
+      },
+      {
+        "seed": "test:133:4:Assert",
+        "node_ids": [
+          "test:103:4:Assign",
+          "test:103:4:Name",
+          "test:131:4:Assign",
+          "test:131:4:Name",
+          "test:133:4:Assert",
+          "test:77:4:arg"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:103:4:Assign"
+        ]
+      },
+      {
+        "seed": "test:135:8:Assert",
+        "node_ids": [
+          "test:103:4:Assign",
+          "test:103:4:Name",
+          "test:131:4:Assign",
+          "test:131:4:Name",
+          "test:134:7:Compare",
+          "test:135:8:Assert",
+          "test:77:4:arg",
+          "test:78:4:arg"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:103:4:Assign"
+        ]
+      },
+      {
+        "seed": "test:137:8:Assert",
+        "node_ids": [
+          "test:103:4:Assign",
+          "test:103:4:Name",
+          "test:131:4:Assign",
+          "test:131:4:Name",
+          "test:134:7:Compare",
+          "test:137:8:Assert",
+          "test:77:4:arg",
+          "test:78:4:arg"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:103:4:Assign"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:130:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:132:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:133:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:3",
+        "seed": "test:135:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:4",
+        "seed": "test:137:8:Assert"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.0539,
+  "identity": {
+    "case_id": "crawl4ai_162",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "d5615e0f2ebcf3a5b78d1f7df430b7d91e24bceb099677581df93487551375b6"
+  }
+}

@@ -1,0 +1,433 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "inferred_criterion_only",
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_313show_server_banner.py::test_show_server_banner_scenarios",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_show_server_banner_scenarios",
+          "start_line": 40,
+          "end_line": 84
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 69,
+        "kind": "candidate_event",
+        "confidence": "candidate",
+        "reason": "visible call in a selected test with no explicit observation; it is not an oracle",
+        "call": "show_server_banner",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 82,
+        "kind": "candidate_event",
+        "confidence": "candidate",
+        "reason": "visible call in a selected test with no explicit observation; it is not an oracle",
+        "call": "enumerate",
+        "criterion_id": "criterion:1"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": [
+      {
+        "code": "no_explicit_observation",
+        "message": "candidate events do not establish expected values, arguments, counts, or reachability"
+      }
+    ]
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "flask.cli",
+        "candidates": [
+          "src/src/flask/cli.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/flask/cli.py",
+        "hint_kind": "python_import",
+        "hint": "typing",
+        "candidates": [
+          "src/src/flask/typing.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 41973,
+    "read_bytes": 41973,
+    "attempted_files": 2,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_313show_server_banner.py",
+      "sha256": "cc8d258af21de6f123c3b3da7cfab0e250577c015f3307e41a554d6eec4265d6",
+      "bytes": 2051
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/src/flask/cli.py",
+      "sha256": "1f2e6624f5a34c86eb0e1928c6acb6b85297b19be0e039791bf0c065d2b2b7af",
+      "bytes": 36808
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/src/flask/typing.py",
+      "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+      "bytes": 3114
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "branch": "false",
+        "from": "test:72:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:82:8:For"
+      },
+      {
+        "field": "body",
+        "from": "test:84:12:Pass",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:82:8:For"
+      },
+      {
+        "from": "test:40:69:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:69:4:Expr",
+        "variable": "debug"
+      },
+      {
+        "from": "test:40:76:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:69:4:Expr",
+        "variable": "app_import_path"
+      },
+      {
+        "from": "test:40:93:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:82:8:For",
+        "variable": "expected_calls"
+      },
+      {
+        "callee": "show_server_banner",
+        "from": "source:1:771:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:69:4:Expr"
+      },
+      {
+        "callee": "show_server_banner",
+        "from": "source:1:774:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:69:4:Expr"
+      },
+      {
+        "callee": "show_server_banner",
+        "from": "source:1:777:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:69:4:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:770:7:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:771:8:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:773:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:774:8:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:776:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:777:8:Expr"
+      },
+      {
+        "from": "source:1:766:36:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:774:8:Expr",
+        "variable": "app_import_path"
+      },
+      {
+        "from": "source:1:766:23:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:777:8:Expr",
+        "variable": "debug"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "debug: bool",
+        "end_line": 766,
+        "id": "source:1:766:23:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 766
+      },
+      {
+        "code": "app_import_path: str | None",
+        "end_line": 766,
+        "id": "source:1:766:36:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 766
+      },
+      {
+        "code": "is_running_from_reloader()",
+        "end_line": 770,
+        "id": "source:1:770:7:Call",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 770
+      },
+      {
+        "code": "return",
+        "end_line": 771,
+        "id": "source:1:771:8:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 771
+      },
+      {
+        "code": "app_import_path is not None",
+        "end_line": 773,
+        "id": "source:1:773:7:Compare",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 773
+      },
+      {
+        "code": "click.echo(f\" * Serving Flask app '{app_import_path}'\")",
+        "contains_unresolved_call": true,
+        "end_line": 774,
+        "exception_possible": true,
+        "id": "source:1:774:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 774,
+        "unresolved_calls": [
+          "click.echo(f\" * Serving Flask app '{app_import_path}'\")"
+        ]
+      },
+      {
+        "code": "debug is not None",
+        "end_line": 776,
+        "id": "source:1:776:7:Compare",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 776
+      },
+      {
+        "code": "click.echo(f\" * Debug mode: {('on' if debug else 'off')}\")",
+        "contains_unresolved_call": true,
+        "end_line": 777,
+        "exception_possible": true,
+        "id": "source:1:777:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 777,
+        "unresolved_calls": [
+          "click.echo(f\" * Debug mode: {('on' if debug else 'off')}\")"
+        ]
+      },
+      {
+        "code": "debug",
+        "end_line": 40,
+        "id": "test:40:69:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 40
+      },
+      {
+        "code": "app_import_path",
+        "end_line": 40,
+        "id": "test:40:76:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 40
+      },
+      {
+        "code": "expected_calls",
+        "end_line": 40,
+        "id": "test:40:93:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 40
+      },
+      {
+        "code": "show_server_banner(debug, app_import_path)",
+        "end_line": 69,
+        "exception_possible": true,
+        "id": "test:69:4:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 69
+      },
+      {
+        "code": "is_reloader",
+        "end_line": 72,
+        "id": "test:72:7:Name",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 72
+      },
+      {
+        "code": "for i, expected_msg in enumerate(expected_calls):\n    pass",
+        "contains_unresolved_call": true,
+        "end_line": 84,
+        "exception_possible": true,
+        "id": "test:82:8:For",
+        "kind": "For",
+        "source_id": "test",
+        "start_line": 82,
+        "unresolved_calls": [
+          "enumerate(expected_calls)"
+        ]
+      },
+      {
+        "code": "pass",
+        "end_line": 84,
+        "id": "test:84:12:Pass",
+        "kind": "Pass",
+        "source_id": "test",
+        "start_line": 84
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:69:4:Expr"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:82:8:For"
+      }
+    ],
+    "seeds": [
+      "test:69:4:Expr",
+      "test:82:8:For"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 15,
+    "edges": 13,
+    "edge_kinds": {
+      "lexical_control": 4,
+      "normal_body_exit": 1,
+      "data_candidate": 5,
+      "call_target_candidate": 1,
+      "call_event_candidate": 2
+    },
+    "criteria": [
+      {
+        "seed": "test:69:4:Expr",
+        "node_ids": [
+          "source:1:766:23:arg",
+          "source:1:766:36:arg",
+          "source:1:770:7:Call",
+          "source:1:771:8:Return",
+          "source:1:773:7:Compare",
+          "source:1:774:8:Expr",
+          "source:1:776:7:Compare",
+          "source:1:777:8:Expr",
+          "test:40:69:arg",
+          "test:40:76:arg",
+          "test:69:4:Expr"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:774:8:Expr",
+          "source:1:777:8:Expr"
+        ]
+      },
+      {
+        "seed": "test:82:8:For",
+        "node_ids": [
+          "test:40:93:arg",
+          "test:72:7:Name",
+          "test:82:8:For",
+          "test:84:12:Pass"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:82:8:For"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:69:4:Expr"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:82:8:For"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.1733,
+  "identity": {
+    "case_id": "flask_313",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "dd0a8b4b48c62d666aacba622759d7f34ed836ec64f2fbc7f951a338bf35fb02"
+  }
+}

@@ -1,0 +1,443 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_301make_response.py::test_make_response_various_scenarios",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_make_response_various_scenarios",
+          "start_line": 37,
+          "end_line": 124
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 92,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 93,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 94,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:2"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "flask.helpers",
+        "candidates": [
+          "src/src/flask/helpers.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/flask/helpers.py",
+        "hint_kind": "python_import",
+        "hint": "typing",
+        "candidates": [
+          "src/src/flask/typing.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 29722,
+    "read_bytes": 29722,
+    "attempted_files": 2,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_301make_response.py",
+      "sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+      "bytes": 3544
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/src/flask/helpers.py",
+      "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+      "bytes": 23064
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/src/flask/typing.py",
+      "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+      "bytes": 3114
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "from": "test:89:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:89:4:Name"
+      },
+      {
+        "from": "test:37:59:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:89:4:Assign",
+        "variable": "args_input"
+      },
+      {
+        "from": "test:89:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:92:4:Assert",
+        "variable": "result"
+      },
+      {
+        "from": "test:89:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:93:4:Assert",
+        "variable": "result"
+      },
+      {
+        "from": "test:89:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:94:4:Assert",
+        "variable": "result"
+      },
+      {
+        "callee": "make_response",
+        "from": "source:1:181:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:89:4:Assign"
+      },
+      {
+        "callee": "make_response",
+        "from": "source:1:184:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:89:4:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:180:7:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:181:8:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:182:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:183:8:Assign"
+      },
+      {
+        "from": "source:1:183:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:183:8:Name"
+      },
+      {
+        "from": "source:1:183:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:183:8:Assign",
+        "variable": "args"
+      },
+      {
+        "from": "source:1:183:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:184:4:Return",
+        "variable": "args"
+      },
+      {
+        "callee": "make_response",
+        "from": "source:1:181:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:1:184:4:Return"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "not args",
+        "end_line": 180,
+        "id": "source:1:180:7:UnaryOp",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 180
+      },
+      {
+        "code": "return current_app.response_class()",
+        "contains_unresolved_call": true,
+        "end_line": 181,
+        "exception_possible": true,
+        "id": "source:1:181:8:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 181,
+        "unresolved_calls": [
+          "current_app.response_class()"
+        ]
+      },
+      {
+        "code": "len(args) == 1",
+        "end_line": 182,
+        "id": "source:1:182:7:Compare",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 182
+      },
+      {
+        "code": "args = args[0]",
+        "end_line": 183,
+        "id": "source:1:183:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 183
+      },
+      {
+        "code": "args",
+        "end_line": 183,
+        "id": "source:1:183:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 183
+      },
+      {
+        "code": "return current_app.make_response(args)",
+        "end_line": 184,
+        "exception_possible": true,
+        "id": "source:1:184:4:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 184
+      },
+      {
+        "code": "args_input",
+        "end_line": 37,
+        "id": "test:37:59:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 37
+      },
+      {
+        "code": "result = make_response(*args_input)",
+        "end_line": 89,
+        "exception_possible": true,
+        "id": "test:89:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 89
+      },
+      {
+        "code": "result",
+        "end_line": 89,
+        "id": "test:89:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 89
+      },
+      {
+        "code": "assert result is not None",
+        "end_line": 92,
+        "id": "test:92:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 92
+      },
+      {
+        "code": "assert hasattr(result, 'headers')",
+        "contains_unresolved_call": true,
+        "end_line": 93,
+        "exception_possible": true,
+        "id": "test:93:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 93,
+        "unresolved_calls": [
+          "hasattr(result, 'headers')"
+        ]
+      },
+      {
+        "code": "assert hasattr(result, 'status_code')",
+        "contains_unresolved_call": true,
+        "end_line": 94,
+        "exception_possible": true,
+        "id": "test:94:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 94,
+        "unresolved_calls": [
+          "hasattr(result, 'status_code')"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:92:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:93:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:94:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:92:4:Assert",
+      "test:93:4:Assert",
+      "test:94:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 12,
+    "edges": 13,
+    "edge_kinds": {
+      "definition_value_candidate": 2,
+      "data_candidate": 6,
+      "call_target_candidate": 3,
+      "lexical_control": 2
+    },
+    "criteria": [
+      {
+        "seed": "test:92:4:Assert",
+        "node_ids": [
+          "source:1:180:7:UnaryOp",
+          "source:1:181:8:Return",
+          "source:1:182:7:Compare",
+          "source:1:183:8:Assign",
+          "source:1:183:8:Name",
+          "source:1:184:4:Return",
+          "test:37:59:arg",
+          "test:89:4:Assign",
+          "test:89:4:Name",
+          "test:92:4:Assert"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:181:8:Return"
+        ]
+      },
+      {
+        "seed": "test:93:4:Assert",
+        "node_ids": [
+          "source:1:180:7:UnaryOp",
+          "source:1:181:8:Return",
+          "source:1:182:7:Compare",
+          "source:1:183:8:Assign",
+          "source:1:183:8:Name",
+          "source:1:184:4:Return",
+          "test:37:59:arg",
+          "test:89:4:Assign",
+          "test:89:4:Name",
+          "test:93:4:Assert"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:181:8:Return",
+          "test:93:4:Assert"
+        ]
+      },
+      {
+        "seed": "test:94:4:Assert",
+        "node_ids": [
+          "source:1:180:7:UnaryOp",
+          "source:1:181:8:Return",
+          "source:1:182:7:Compare",
+          "source:1:183:8:Assign",
+          "source:1:183:8:Name",
+          "source:1:184:4:Return",
+          "test:37:59:arg",
+          "test:89:4:Assign",
+          "test:89:4:Name",
+          "test:94:4:Assert"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:181:8:Return",
+          "test:94:4:Assert"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:92:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:93:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:94:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.1493,
+  "identity": {
+    "case_id": "flask_301",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "c453c24d83b12ba90fa4ca4f38b149166d417b1ad04fcd778ff6ad93fe764c44"
+  }
+}

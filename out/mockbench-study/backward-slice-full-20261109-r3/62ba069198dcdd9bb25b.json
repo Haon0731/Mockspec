@@ -1,0 +1,682 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "product_source_not_located",
+    "test_to_product_not_reached",
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_195check_developer_api_enabled.py::test_check_developer_api_enabled",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_check_developer_api_enabled",
+          "start_line": 56,
+          "end_line": 103
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 91,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 93,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 94,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:2"
+      },
+      {
+        "line": 100,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:3"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 2930,
+    "read_bytes": 2930,
+    "attempted_files": 0,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_195check_developer_api_enabled.py",
+      "sha256": "394ca7c93f7b60eb27ac4d198497d407de1e6c1643f75f4e1e3214145293ff65",
+      "bytes": 2930
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "from": "test:27:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:27:4:Name"
+      },
+      {
+        "from": "test:28:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:28:4:Name"
+      },
+      {
+        "from": "test:29:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:29:4:Name"
+      },
+      {
+        "from": "test:30:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:30:4:Name"
+      },
+      {
+        "from": "test:27:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:30:4:Assign",
+        "variable": "source_lines"
+      },
+      {
+        "from": "test:28:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:30:4:Assign",
+        "variable": "start_line"
+      },
+      {
+        "from": "test:29:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:30:4:Assign",
+        "variable": "end_line"
+      },
+      {
+        "from": "test:41:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:41:4:Name"
+      },
+      {
+        "from": "test:28:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:45:4:Expr",
+        "variable": "start_line"
+      },
+      {
+        "from": "test:30:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:45:4:Expr",
+        "variable": "function_source"
+      },
+      {
+        "from": "test:41:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:45:4:Expr",
+        "variable": "namespace"
+      },
+      {
+        "from": "test:41:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:46:4:Return",
+        "variable": "namespace"
+      },
+      {
+        "branch": "true",
+        "from": "test:90:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:91:8:With"
+      },
+      {
+        "branch": "true",
+        "from": "test:90:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:93:8:Assert"
+      },
+      {
+        "branch": "true",
+        "from": "test:90:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:94:8:Assert"
+      },
+      {
+        "field": "body",
+        "from": "test:92:12:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:91:8:With"
+      },
+      {
+        "branch": "false",
+        "from": "test:90:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:100:8:Assert"
+      },
+      {
+        "from": "test:70:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:70:4:Name"
+      },
+      {
+        "from": "test:70:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:70:33:Name"
+      },
+      {
+        "from": "test:70:33:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:91:8:With",
+        "variable": "http_exception_cls"
+      },
+      {
+        "from": "test:91:8:With",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:91:50:Name"
+      },
+      {
+        "from": "test:70:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:92:12:Expr",
+        "variable": "check_developer_api_enabled"
+      },
+      {
+        "from": "test:91:50:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:93:8:Assert",
+        "variable": "exc_info"
+      },
+      {
+        "from": "test:91:50:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:94:8:Assert",
+        "variable": "exc_info"
+      },
+      {
+        "from": "test:70:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:100:8:Assert",
+        "variable": "check_developer_api_enabled"
+      },
+      {
+        "callee": "load_check_developer_api_enabled",
+        "from": "test:46:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:70:4:Assign"
+      },
+      {
+        "callee": "load_check_developer_api_enabled",
+        "from": "test:45:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:70:4:Assign"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "assert check_developer_api_enabled() is None",
+        "contains_unresolved_call": true,
+        "end_line": 100,
+        "exception_possible": true,
+        "id": "test:100:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 100,
+        "unresolved_calls": [
+          "check_developer_api_enabled()"
+        ]
+      },
+      {
+        "code": "source_lines = MODULE_PATH.read_text(encoding='utf-8').splitlines()",
+        "contains_unresolved_call": true,
+        "end_line": 27,
+        "exception_possible": true,
+        "id": "test:27:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 27,
+        "unresolved_calls": [
+          "MODULE_PATH.read_text(encoding='utf-8').splitlines()",
+          "MODULE_PATH.read_text(encoding='utf-8')"
+        ]
+      },
+      {
+        "code": "source_lines",
+        "end_line": 27,
+        "id": "test:27:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 27
+      },
+      {
+        "code": "start_line = 71",
+        "end_line": 28,
+        "id": "test:28:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 28
+      },
+      {
+        "code": "start_line",
+        "end_line": 28,
+        "id": "test:28:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 28
+      },
+      {
+        "code": "end_line = 92",
+        "end_line": 29,
+        "id": "test:29:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 29
+      },
+      {
+        "code": "end_line",
+        "end_line": 29,
+        "id": "test:29:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 29
+      },
+      {
+        "code": "function_source = '\\n'.join(source_lines[start_line - 1:end_line])",
+        "contains_unresolved_call": true,
+        "end_line": 30,
+        "exception_possible": true,
+        "id": "test:30:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 30,
+        "unresolved_calls": [
+          "'\\n'.join(source_lines[start_line - 1:end_line])"
+        ]
+      },
+      {
+        "code": "function_source",
+        "end_line": 30,
+        "id": "test:30:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 30
+      },
+      {
+        "code": "namespace = {'HTTPException': LocalHTTPException, 'status': LocalStatus}",
+        "end_line": 44,
+        "id": "test:41:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 41
+      },
+      {
+        "code": "namespace",
+        "end_line": 41,
+        "id": "test:41:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 41
+      },
+      {
+        "code": "exec(compile('\\n' * (start_line - 1) + function_source, str(MODULE_PATH), 'exec'), namespace)",
+        "contains_unresolved_call": true,
+        "end_line": 45,
+        "exception_possible": true,
+        "id": "test:45:4:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 45,
+        "unresolved_calls": [
+          "exec(compile('\\n' * (start_line - 1) + function_source, str(MODULE_PATH), 'exec'), namespace)",
+          "compile('\\n' * (start_line - 1) + function_source, str(MODULE_PATH), 'exec')",
+          "str(MODULE_PATH)"
+        ]
+      },
+      {
+        "code": "return (namespace['check_developer_api_enabled'], LocalHTTPException)",
+        "end_line": 46,
+        "id": "test:46:4:Return",
+        "kind": "Return",
+        "source_id": "test",
+        "start_line": 46
+      },
+      {
+        "code": "http_exception_cls",
+        "end_line": 70,
+        "id": "test:70:33:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 70
+      },
+      {
+        "code": "check_developer_api_enabled, http_exception_cls = load_check_developer_api_enabled()",
+        "end_line": 70,
+        "exception_possible": true,
+        "id": "test:70:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 70
+      },
+      {
+        "code": "check_developer_api_enabled",
+        "end_line": 70,
+        "id": "test:70:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 70
+      },
+      {
+        "code": "should_raise",
+        "end_line": 90,
+        "id": "test:90:7:Name",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 90
+      },
+      {
+        "code": "exc_info",
+        "end_line": 91,
+        "id": "test:91:50:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 91
+      },
+      {
+        "code": "with pytest.raises(http_exception_cls) as exc_info:\n    check_developer_api_enabled()",
+        "contains_unresolved_call": true,
+        "end_line": 92,
+        "exception_possible": true,
+        "id": "test:91:8:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 91,
+        "unresolved_calls": [
+          "pytest.raises(http_exception_cls)"
+        ]
+      },
+      {
+        "code": "check_developer_api_enabled()",
+        "contains_unresolved_call": true,
+        "end_line": 92,
+        "exception_possible": true,
+        "id": "test:92:12:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 92,
+        "unresolved_calls": [
+          "check_developer_api_enabled()"
+        ]
+      },
+      {
+        "code": "assert exc_info.value.status_code == 403",
+        "end_line": 93,
+        "id": "test:93:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 93
+      },
+      {
+        "code": "assert exc_info.value.detail == {'error': 'Developer API disabled', 'code': 'DEVELOPER_API_DISABLED', 'message': 'Developer API is not enabled. Contact administrator to enable this feature.'}",
+        "end_line": 98,
+        "id": "test:94:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 94
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:91:8:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:93:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:94:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:3",
+        "seed": "test:100:8:Assert"
+      }
+    ],
+    "seeds": [
+      "test:91:8:With",
+      "test:93:8:Assert",
+      "test:94:8:Assert",
+      "test:100:8:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 22,
+    "edges": 27,
+    "edge_kinds": {
+      "definition_value_candidate": 8,
+      "data_candidate": 12,
+      "lexical_control": 4,
+      "normal_body_exit": 1,
+      "call_target_candidate": 1,
+      "call_event_candidate": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:91:8:With",
+        "node_ids": [
+          "test:27:4:Assign",
+          "test:27:4:Name",
+          "test:28:4:Assign",
+          "test:28:4:Name",
+          "test:29:4:Assign",
+          "test:29:4:Name",
+          "test:30:4:Assign",
+          "test:30:4:Name",
+          "test:41:4:Assign",
+          "test:41:4:Name",
+          "test:45:4:Expr",
+          "test:46:4:Return",
+          "test:70:33:Name",
+          "test:70:4:Assign",
+          "test:70:4:Name",
+          "test:90:7:Name",
+          "test:91:8:With",
+          "test:92:12:Expr"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:27:4:Assign",
+          "test:30:4:Assign",
+          "test:45:4:Expr",
+          "test:91:8:With",
+          "test:92:12:Expr"
+        ]
+      },
+      {
+        "seed": "test:93:8:Assert",
+        "node_ids": [
+          "test:27:4:Assign",
+          "test:27:4:Name",
+          "test:28:4:Assign",
+          "test:28:4:Name",
+          "test:29:4:Assign",
+          "test:29:4:Name",
+          "test:30:4:Assign",
+          "test:30:4:Name",
+          "test:41:4:Assign",
+          "test:41:4:Name",
+          "test:45:4:Expr",
+          "test:46:4:Return",
+          "test:70:33:Name",
+          "test:70:4:Assign",
+          "test:70:4:Name",
+          "test:90:7:Name",
+          "test:91:50:Name",
+          "test:91:8:With",
+          "test:92:12:Expr",
+          "test:93:8:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:27:4:Assign",
+          "test:30:4:Assign",
+          "test:45:4:Expr",
+          "test:91:8:With",
+          "test:92:12:Expr"
+        ]
+      },
+      {
+        "seed": "test:94:8:Assert",
+        "node_ids": [
+          "test:27:4:Assign",
+          "test:27:4:Name",
+          "test:28:4:Assign",
+          "test:28:4:Name",
+          "test:29:4:Assign",
+          "test:29:4:Name",
+          "test:30:4:Assign",
+          "test:30:4:Name",
+          "test:41:4:Assign",
+          "test:41:4:Name",
+          "test:45:4:Expr",
+          "test:46:4:Return",
+          "test:70:33:Name",
+          "test:70:4:Assign",
+          "test:70:4:Name",
+          "test:90:7:Name",
+          "test:91:50:Name",
+          "test:91:8:With",
+          "test:92:12:Expr",
+          "test:94:8:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:27:4:Assign",
+          "test:30:4:Assign",
+          "test:45:4:Expr",
+          "test:91:8:With",
+          "test:92:12:Expr"
+        ]
+      },
+      {
+        "seed": "test:100:8:Assert",
+        "node_ids": [
+          "test:100:8:Assert",
+          "test:27:4:Assign",
+          "test:27:4:Name",
+          "test:28:4:Assign",
+          "test:28:4:Name",
+          "test:29:4:Assign",
+          "test:29:4:Name",
+          "test:30:4:Assign",
+          "test:30:4:Name",
+          "test:41:4:Assign",
+          "test:41:4:Name",
+          "test:45:4:Expr",
+          "test:46:4:Return",
+          "test:70:4:Assign",
+          "test:70:4:Name",
+          "test:90:7:Name"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:100:8:Assert",
+          "test:27:4:Assign",
+          "test:30:4:Assign",
+          "test:45:4:Expr"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:91:8:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:93:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:94:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:3",
+        "seed": "test:100:8:Assert"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.056,
+  "identity": {
+    "case_id": "langflow_195",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "47ba5071c9b0b65fba968d96fe07462dc9d23b6e6adadfd72c75f8248829ba58"
+  }
+}

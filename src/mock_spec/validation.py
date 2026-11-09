@@ -35,8 +35,14 @@ def decode_json(text: str) -> object:
     return json.loads(text, object_pairs_hook=unique)
 
 
-def validate_python_mask(text: str, expected_slots: tuple[str, ...]) -> None:
-    """Require exact reviewed slots, each containing only a pass statement."""
+def validate_python_mask(
+    text: str, expected_slots: tuple[str, ...], *, reject_residual_behavior: bool = True,
+) -> None:
+    """Require exact empty slots; legacy policy also rejects fixed Mock context.
+
+    The frozen-agent adapter preserves hash-bound upstream context by setting
+    reject_residual_behavior=False. This never permits content inside slots.
+    """
     if not expected_slots or len(set(expected_slots)) != len(expected_slots):
         raise InputValidationError("Python masking requires unique reviewed slots")
     marker = re.compile(r"# === PY-SLOT-(START|END):([a-z0-9_]+) ===")
@@ -69,6 +75,8 @@ def validate_python_mask(text: str, expected_slots: tuple[str, ...]) -> None:
         tree = ast.parse(text)
     except (SyntaxError, tokenize.TokenError) as exc:
         raise InputValidationError(f"invalid masked Python syntax: {exc}") from exc
+    if not reject_residual_behavior:
+        return
     for node in ast.walk(tree):
         if isinstance(node, ast.Attribute) and (
             node.attr in {"return_value", "side_effect"}
@@ -85,8 +93,8 @@ def validate_python_mask(text: str, expected_slots: tuple[str, ...]) -> None:
                 raise InputValidationError(f"residual Python mock construction: {name}")
 
 
-def validate_java_mask(text: str) -> None:
-    """Check dual regions and reject residual Mockito behavior in this policy."""
+def validate_java_mask(text: str, *, reject_residual_behavior: bool = True) -> None:
+    """Check empty dual regions and, by default, residual Mockito behavior."""
     expected = (
         "// === MOCK-STUB-START ===", "// === MOCK-STUB-END ===",
         "// === VERIFY-START ===", "// === VERIFY-END ===",
@@ -103,6 +111,8 @@ def validate_java_mask(text: str) -> None:
     for start, end in (positions[:2], positions[2:]):
         if any(line.strip() for line in lines[start + 1:end]):
             raise InputValidationError("Java generated region is not empty")
+    if not reject_residual_behavior:
+        return
     # Ignore literals/comments for the residual-call check; these are not a Java parser.
     code = re.sub(r'//[^\n]*|/\*.*?\*/|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'',
                   " ", text, flags=re.DOTALL)

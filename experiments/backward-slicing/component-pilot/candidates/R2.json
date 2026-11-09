@@ -1,0 +1,8 @@
+{
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "CloudFoundryApplicationFactory.getServiceBaseUrl() prefixes the configured first URI with http://. The inherited createApplication() obtains healthUrl through getHealthUrl(), whose getHealthEndpointPath() first calls pathMappedEndpoints.getPath(EndpointId.of(\"health\")); returning \"health\" satisfies the hasText guard and appends that segment to the CloudFoundry-derived management base URL, producing the asserted http://application/Uppercase/actuator/health. The verification asserts the dependency interaction on the selected health-endpoint path.",
+    "unknowns": []
+  }
+}

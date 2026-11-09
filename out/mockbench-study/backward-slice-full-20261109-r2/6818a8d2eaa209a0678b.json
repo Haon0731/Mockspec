@@ -1,0 +1,416 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_316url_for.py::test_url_for_scenarios",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_url_for_scenarios",
+          "start_line": 62,
+          "end_line": 105
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 103,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "flask",
+        "candidates": [
+          "src/src/flask/__init__.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "flask.helpers",
+        "candidates": [
+          "src/src/flask/helpers.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/flask/helpers.py",
+        "hint_kind": "python_import",
+        "hint": "typing",
+        "candidates": [
+          "src/src/flask/typing.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 30311,
+    "read_bytes": 30311,
+    "attempted_files": 3,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_316url_for.py",
+      "sha256": "0b52a013d1b07570f07df99e7d022599d6b98dd28aaeb78beb30cc197d9ec0e1",
+      "bytes": 2061
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/src/flask/__init__.py",
+      "sha256": "2daebda4dc29fed5cb36c912a6115a234e9a4b5f9c33fd795e4bfeffd0cc9386",
+      "bytes": 2072
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/src/flask/helpers.py",
+      "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+      "bytes": 23064
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/src/flask/typing.py",
+      "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+      "bytes": 3114
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "from": "test:93:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:93:8:Name"
+      },
+      {
+        "from": "test:62:45:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:93:8:Assign",
+        "variable": "endpoint"
+      },
+      {
+        "from": "test:62:55:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:93:8:Assign",
+        "variable": "anchor"
+      },
+      {
+        "from": "test:62:63:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:93:8:Assign",
+        "variable": "method"
+      },
+      {
+        "from": "test:62:71:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:93:8:Assign",
+        "variable": "scheme"
+      },
+      {
+        "from": "test:62:79:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:93:8:Assign",
+        "variable": "external"
+      },
+      {
+        "from": "test:62:89:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:93:8:Assign",
+        "variable": "values"
+      },
+      {
+        "from": "test:93:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:103:4:Assert",
+        "variable": "result"
+      },
+      {
+        "from": "test:62:97:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:103:4:Assert",
+        "variable": "expected_url"
+      },
+      {
+        "callee": "url_for",
+        "from": "source:2:231:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:93:8:Assign"
+      },
+      {
+        "from": "source:2:188:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:231:4:Return",
+        "variable": "endpoint"
+      },
+      {
+        "from": "source:2:190:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:231:4:Return",
+        "variable": "_anchor"
+      },
+      {
+        "from": "source:2:191:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:231:4:Return",
+        "variable": "_method"
+      },
+      {
+        "from": "source:2:192:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:231:4:Return",
+        "variable": "_scheme"
+      },
+      {
+        "from": "source:2:193:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:231:4:Return",
+        "variable": "_external"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "endpoint: str",
+        "end_line": 188,
+        "id": "source:2:188:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 188
+      },
+      {
+        "code": "_anchor: str | None",
+        "end_line": 190,
+        "id": "source:2:190:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 190
+      },
+      {
+        "code": "_method: str | None",
+        "end_line": 191,
+        "id": "source:2:191:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 191
+      },
+      {
+        "code": "_scheme: str | None",
+        "end_line": 192,
+        "id": "source:2:192:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 192
+      },
+      {
+        "code": "_external: bool | None",
+        "end_line": 193,
+        "id": "source:2:193:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 193
+      },
+      {
+        "code": "return current_app.url_for(endpoint, _anchor=_anchor, _method=_method, _scheme=_scheme, _external=_external, **values)",
+        "end_line": 238,
+        "exception_possible": true,
+        "id": "source:2:231:4:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 231
+      },
+      {
+        "code": "assert result == expected_url",
+        "end_line": 103,
+        "id": "test:103:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 103
+      },
+      {
+        "code": "endpoint",
+        "end_line": 62,
+        "id": "test:62:45:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 62
+      },
+      {
+        "code": "anchor",
+        "end_line": 62,
+        "id": "test:62:55:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 62
+      },
+      {
+        "code": "method",
+        "end_line": 62,
+        "id": "test:62:63:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 62
+      },
+      {
+        "code": "scheme",
+        "end_line": 62,
+        "id": "test:62:71:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 62
+      },
+      {
+        "code": "external",
+        "end_line": 62,
+        "id": "test:62:79:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 62
+      },
+      {
+        "code": "values",
+        "end_line": 62,
+        "id": "test:62:89:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 62
+      },
+      {
+        "code": "expected_url",
+        "end_line": 62,
+        "id": "test:62:97:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 62
+      },
+      {
+        "code": "result = url_for(endpoint, _anchor=anchor, _method=method, _scheme=scheme, _external=external, **values)",
+        "end_line": 100,
+        "exception_possible": true,
+        "id": "test:93:8:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 93
+      },
+      {
+        "code": "result",
+        "end_line": 93,
+        "id": "test:93:8:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 93
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:103:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:103:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 16,
+    "edges": 15,
+    "edge_kinds": {
+      "definition_value_candidate": 1,
+      "data_candidate": 13,
+      "call_target_candidate": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:103:4:Assert",
+        "node_ids": [
+          "source:2:188:4:arg",
+          "source:2:190:4:arg",
+          "source:2:191:4:arg",
+          "source:2:192:4:arg",
+          "source:2:193:4:arg",
+          "source:2:231:4:Return",
+          "test:103:4:Assert",
+          "test:62:45:arg",
+          "test:62:55:arg",
+          "test:62:63:arg",
+          "test:62:71:arg",
+          "test:62:79:arg",
+          "test:62:89:arg",
+          "test:62:97:arg",
+          "test:93:8:Assign",
+          "test:93:8:Name"
+        ],
+        "product_source_candidates": [
+          "source:2"
+        ],
+        "unknown_call_nodes": []
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:103:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": false,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.1305,
+  "identity": {
+    "case_id": "flask_316",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "4c30989a8e0abccef1e5082ae26cc1991a47f7296f116afe0cfcb7e4152f8cd9"
+  }
+}

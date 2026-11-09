@@ -1,0 +1,37 @@
+{
+  "profile": "test-goal-backward-candidates/v1",
+  "configuration": {
+    "backend_timeout_seconds": 30,
+    "max_files": 8,
+    "max_bytes": 200000,
+    "case_ids": null,
+    "python_dependency_only": true,
+    "java_heap_mb": 768
+  },
+  "implementation_sha256": {
+    "experiments/backward-slicing/batch_slice.py": "3c8b378490110d198d519fb078a9e04d0e1a7f445ce3d20fd6ba331728fa178a",
+    "experiments/backward-slicing/criteria.py": "7c5372e54192b755850b9a8bd22804d09e9353b62dcbe9135882eb449f976469",
+    "experiments/backward-slicing/source_selection.py": "47d708d9db486e7b2c015b51fd1d3cb93d06296bd8cafd9b0c29e950cadf6d10",
+    "experiments/backward-slicing/survey_targets.py": "fd4b94294040df260a73ef657a4f81b25fbeadd7c29e3b484a925a80cdd0c1cc",
+    "experiments/backward-slicing/python_probe.py": "253a0389a65307039fe2a35b3142b0070bdc9ca51332899fc3baac71cc45a173",
+    "experiments/backward-slicing/SliceProbe.java": "01f4b3a51c9d9f237571abe3ed621127f32113704b414f7f8cd01a30a1b09ff2",
+    "src/mock_spec/adapters/frozen_dataset.py": "d34cf2d4f68e5cf03875305c64a43713df458af8f58c6558f030bd60ad549983",
+    "src/mock_spec/validation.py": "b5f7da1432467a7565cde15a390e0e5248e762685f46550a05bea1c06ff6ede6",
+    "src/mock_spec/analysis_process.py": "ed8186c9a6c2869c2a49309aa6a0eb8a9fff5bc9408c685775088f072fee14ac",
+    "src/mock_spec/java_analysis.py": "eaa2abd69230aaa902b0e3a9fb4e19c964fd4e7defe150abba0d01f84563b067"
+  },
+  "inventory_sha256": "d010fd04b774220f83917f75114699e01731f2f8b9e0d38fefcb22ffc57d8156",
+  "scope": "Read frozen sources through Adapter; run trusted parsers only; no target execution, model calls or dataset copy.",
+  "limitations": [
+    "Candidate source graph, not SDG or feasible path analysis.",
+    "No pointer/heap/exception-flow solver or reliable dynamic dispatch.",
+    "No confirmed test-to-MUT binding or confirmed Mock boundary classification.",
+    "Backend deadline excludes bounded adapter reads and source selection; peak memory not measured.",
+    "Input summaries and graph snippets are evidence; full source files are not persisted."
+  ],
+  "java_backend": {
+    "compiled": true,
+    "jar_sha256": "52ec4e8b874cb3f2b5a87a65ee7bf9da992a5175dcc66f539387dbb2c2053c7c",
+    "diagnostic": ""
+  }
+}

@@ -1,0 +1,455 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "test_to_product_not_reached",
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_431_make_request.py::test_make_request_handles_dispatch_retry_and_http_failures",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_make_request_handles_dispatch_retry_and_http_failures",
+          "start_line": 27,
+          "end_line": 112
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 106,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 108,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:1"
+      }
+    ],
+    "dynamic_loading": [
+      {
+        "line": 83,
+        "name": "load_function_from_source_ast",
+        "precision": "python_ast_call_name"
+      }
+    ],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_dynamic_path",
+        "hint": "src/verl/workers/rollout/sglang_rollout/http_server_engine.py",
+        "candidates": [
+          "src/verl/workers/rollout/sglang_rollout/http_server_engine.py"
+        ],
+        "precision": "exact_visible_path"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 43408,
+    "read_bytes": 43408,
+    "attempted_files": 1,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_431_make_request.py",
+      "sha256": "391dbef4de57c53c74b0b9edd88e1bcd1853b1b6cde257e2cc7b060b42c58ed1",
+      "bytes": 3766
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/verl/workers/rollout/sglang_rollout/http_server_engine.py",
+      "sha256": "f96471daa73b3096f15b029abb15f9fdff506be5817cfc6053c65f7f84fdb55d",
+      "bytes": 39642
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "branch": "true",
+        "from": "test:105:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:106:8:Assert"
+      },
+      {
+        "branch": "false",
+        "from": "test:105:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:108:8:With"
+      },
+      {
+        "field": "body",
+        "from": "test:109:12:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:108:8:With"
+      },
+      {
+        "from": "test:83:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:83:4:Name"
+      },
+      {
+        "from": "test:96:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:96:4:Name"
+      },
+      {
+        "from": "test:30:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:96:4:Assign",
+        "variable": "node_rank"
+      },
+      {
+        "from": "test:33:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:96:4:Assign",
+        "variable": "max_attempts"
+      },
+      {
+        "from": "test:83:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:106:8:Assert",
+        "variable": "make_request"
+      },
+      {
+        "from": "test:96:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:106:8:Assert",
+        "variable": "self"
+      },
+      {
+        "from": "test:32:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:106:8:Assert",
+        "variable": "payload"
+      },
+      {
+        "from": "test:31:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:106:8:Assert",
+        "variable": "method"
+      },
+      {
+        "from": "test:34:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:106:8:Assert",
+        "variable": "expected_result"
+      },
+      {
+        "from": "test:35:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:108:8:With",
+        "variable": "expected_error"
+      },
+      {
+        "from": "test:83:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:109:12:Expr",
+        "variable": "make_request"
+      },
+      {
+        "from": "test:96:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:109:12:Expr",
+        "variable": "self"
+      },
+      {
+        "from": "test:32:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:109:12:Expr",
+        "variable": "payload"
+      },
+      {
+        "from": "test:31:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:109:12:Expr",
+        "variable": "method"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "expected_error is None",
+        "end_line": 105,
+        "id": "test:105:7:Compare",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 105
+      },
+      {
+        "code": "assert make_request(self, 'health', payload=payload, method=method, only_master=True) == expected_result",
+        "contains_unresolved_call": true,
+        "end_line": 106,
+        "exception_possible": true,
+        "id": "test:106:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 106,
+        "unresolved_calls": [
+          "make_request(self, 'health', payload=payload, method=method, only_master=True)"
+        ]
+      },
+      {
+        "code": "with pytest.raises(expected_error):\n    make_request(self, 'health', payload=payload, method=method, only_master=True)",
+        "contains_unresolved_call": true,
+        "end_line": 109,
+        "exception_possible": true,
+        "id": "test:108:8:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 108,
+        "unresolved_calls": [
+          "pytest.raises(expected_error)"
+        ]
+      },
+      {
+        "code": "make_request(self, 'health', payload=payload, method=method, only_master=True)",
+        "contains_unresolved_call": true,
+        "end_line": 109,
+        "exception_possible": true,
+        "id": "test:109:12:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 109,
+        "unresolved_calls": [
+          "make_request(self, 'health', payload=payload, method=method, only_master=True)"
+        ]
+      },
+      {
+        "code": "node_rank",
+        "end_line": 30,
+        "id": "test:30:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 30
+      },
+      {
+        "code": "method",
+        "end_line": 31,
+        "id": "test:31:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 31
+      },
+      {
+        "code": "payload",
+        "end_line": 32,
+        "id": "test:32:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 32
+      },
+      {
+        "code": "max_attempts",
+        "end_line": 33,
+        "id": "test:33:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 33
+      },
+      {
+        "code": "expected_result",
+        "end_line": 34,
+        "id": "test:34:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 34
+      },
+      {
+        "code": "expected_error",
+        "end_line": 35,
+        "id": "test:35:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 35
+      },
+      {
+        "code": "make_request = load_function_from_source_ast(SRC_PATH, '_make_request', namespace={'Any': Any, 'Optional': Optional, 'DEFAULT_TIMEOUT': 30.0, 'requests': requests, '_read_response': read_response, 'time': SimpleNamespace(sleep=sleep), 'logger': logger})",
+        "contains_unresolved_call": true,
+        "end_line": 95,
+        "exception_possible": true,
+        "id": "test:83:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 83,
+        "unresolved_calls": [
+          "load_function_from_source_ast(SRC_PATH, '_make_request', namespace={'Any': Any, 'Optional': Optional, 'DEFAULT_TIMEOUT': 30.0, 'requests': requests, '_read_response': read_response, 'time': SimpleNamespace(sleep=sleep), 'logger': logger})",
+          "SimpleNamespace(sleep=sleep)"
+        ]
+      },
+      {
+        "code": "make_request",
+        "end_line": 83,
+        "id": "test:83:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 83
+      },
+      {
+        "code": "self = SimpleNamespace(node_rank=node_rank, server_args=SimpleNamespace(host='127.0.0.1', port=18080), timeout=1.75, max_attempts=max_attempts, retry_delay=0.25)",
+        "contains_unresolved_call": true,
+        "end_line": 102,
+        "exception_possible": true,
+        "id": "test:96:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 96,
+        "unresolved_calls": [
+          "SimpleNamespace(node_rank=node_rank, server_args=SimpleNamespace(host='127.0.0.1', port=18080), timeout=1.75, max_attempts=max_attempts, retry_delay=0.25)",
+          "SimpleNamespace(host='127.0.0.1', port=18080)"
+        ]
+      },
+      {
+        "code": "self",
+        "end_line": 96,
+        "id": "test:96:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 96
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:106:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:108:8:With"
+      }
+    ],
+    "seeds": [
+      "test:106:8:Assert",
+      "test:108:8:With"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 14,
+    "edges": 17,
+    "edge_kinds": {
+      "lexical_control": 2,
+      "normal_body_exit": 1,
+      "definition_value_candidate": 2,
+      "data_candidate": 12
+    },
+    "criteria": [
+      {
+        "seed": "test:106:8:Assert",
+        "node_ids": [
+          "test:105:7:Compare",
+          "test:106:8:Assert",
+          "test:30:4:arg",
+          "test:31:4:arg",
+          "test:32:4:arg",
+          "test:33:4:arg",
+          "test:34:4:arg",
+          "test:83:4:Assign",
+          "test:83:4:Name",
+          "test:96:4:Assign",
+          "test:96:4:Name"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:106:8:Assert",
+          "test:83:4:Assign",
+          "test:96:4:Assign"
+        ]
+      },
+      {
+        "seed": "test:108:8:With",
+        "node_ids": [
+          "test:105:7:Compare",
+          "test:108:8:With",
+          "test:109:12:Expr",
+          "test:30:4:arg",
+          "test:31:4:arg",
+          "test:32:4:arg",
+          "test:33:4:arg",
+          "test:35:4:arg",
+          "test:83:4:Assign",
+          "test:83:4:Name",
+          "test:96:4:Assign",
+          "test:96:4:Name"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:108:8:With",
+          "test:109:12:Expr",
+          "test:83:4:Assign",
+          "test:96:4:Assign"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:106:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:108:8:With"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.1207,
+  "identity": {
+    "case_id": "verl_431",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "98df736258c888106d8ee73403de2e60d2a85cafa42ad1ca1762b33083139243"
+  }
+}

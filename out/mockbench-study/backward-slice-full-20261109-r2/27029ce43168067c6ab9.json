@@ -1,0 +1,114 @@
+{
+  "status": "failed",
+  "failure_categories": [
+    "inferred_criterion_only",
+    "analysis_error"
+  ],
+  "stage": "backward_graph",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_313show_server_banner.py::test_show_server_banner_scenarios",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_show_server_banner_scenarios",
+          "start_line": 40,
+          "end_line": 84
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 69,
+        "kind": "candidate_event",
+        "confidence": "candidate",
+        "reason": "visible call in a selected test with no explicit observation; it is not an oracle",
+        "call": "show_server_banner",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 82,
+        "kind": "candidate_event",
+        "confidence": "candidate",
+        "reason": "visible call in a selected test with no explicit observation; it is not an oracle",
+        "call": "enumerate",
+        "criterion_id": "criterion:1"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": [
+      {
+        "code": "no_explicit_observation",
+        "message": "candidate events do not establish expected values, arguments, counts, or reachability"
+      }
+    ]
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "flask.cli",
+        "candidates": [
+          "src/src/flask/cli.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/flask/cli.py",
+        "hint_kind": "python_import",
+        "hint": "typing",
+        "candidates": [
+          "src/src/flask/typing.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 41973,
+    "read_bytes": 41973,
+    "attempted_files": 2,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_313show_server_banner.py",
+      "sha256": "cc8d258af21de6f123c3b3da7cfab0e250577c015f3307e41a554d6eec4265d6",
+      "bytes": 2051
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/src/flask/cli.py",
+      "sha256": "1f2e6624f5a34c86eb0e1928c6acb6b85297b19be0e039791bf0c065d2b2b7af",
+      "bytes": 36808
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/src/flask/typing.py",
+      "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+      "bytes": 3114
+    }
+  ],
+  "error": {
+    "type": "RuntimeError",
+    "message": "backend_exit_1: Traceback (most recent call last):\n  File \"/home/haon/projects/Mockspec/experiments/backward-slicing/python_probe.py\", line 283, in <module>\n    main()\n  File \"/home/haon/projects/Mockspec/experiments/backward-slicing/python_probe.py\", line 279, in main\n    json.dump(Probe(request).run(), sys.stdout, ensure_ascii=False, sort_keys=True)\n              ^^^^^^^^^^^^^^^^^^^^\n  File \"/home/haon/projects/Mockspec/experiments/backward-slicing/python_probe.py\", line 91, in run\n    seeds = self.resolve_seeds()\n            ^^^^^^^^^^^^^^^^^^^^\n  File \"/home/haon/projects/Mockspec/experiments/backward-slicing/python_probe.py\", line 222, in resolve_seeds\n    raise ValueError(\"ambiguous criterion line: multiple candidate statements\")\nValueError: ambiguous criterion line: multiple candidate statements\n"
+  },
+  "elapsed_seconds": 0.2066,
+  "identity": {
+    "case_id": "flask_313",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "dd0a8b4b48c62d666aacba622759d7f34ed836ec64f2fbc7f951a338bf35fb02"
+  }
+}

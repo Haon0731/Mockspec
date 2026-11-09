@@ -1,0 +1,712 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_439get_github_assets.py::test_get_github_assets_handles_versions_retries_and_failures",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_get_github_assets_handles_versions_retries_and_failures",
+          "start_line": 52,
+          "end_line": 92
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 80,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [
+      {
+        "line": 72,
+        "name": "load_function_from_source_ast",
+        "precision": "python_ast_call_name"
+      }
+    ],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_dynamic_path",
+        "hint": "src/ultralytics/utils/downloads.py",
+        "candidates": [
+          "src/ultralytics/utils/downloads.py"
+        ],
+        "precision": "exact_visible_path"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/ultralytics/utils/downloads.py",
+        "hint_kind": "python_import",
+        "hint": "ultralytics.utils",
+        "candidates": [
+          "src/ultralytics/utils/__init__.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 80752,
+    "read_bytes": 80752,
+    "attempted_files": 2,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_439get_github_assets.py",
+      "sha256": "697fe66fe2a483f81fcf141711bdc72d2e1a95636b0939e456fbe164dc420ea0",
+      "bytes": 2538
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/ultralytics/utils/downloads.py",
+      "sha256": "4d65e4630479844a553162fa7db8ddcb00e665ed365a1c8bffc62e2d571efae3",
+      "bytes": 23069
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/ultralytics/utils/__init__.py",
+      "sha256": "5cb10afe9be9b7335684968ef31d0c5a0851108c840de8b42ce1a7527994d4a8",
+      "bytes": 55145
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "from": "test:72:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:72:4:Name"
+      },
+      {
+        "from": "test:78:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:78:4:Name"
+      },
+      {
+        "from": "test:72:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:78:4:Assign",
+        "variable": "get_github_assets"
+      },
+      {
+        "from": "test:53:22:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:78:4:Assign",
+        "variable": "version"
+      },
+      {
+        "from": "test:53:31:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:78:4:Assign",
+        "variable": "retry"
+      },
+      {
+        "from": "test:78:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:80:4:Assert",
+        "variable": "result"
+      },
+      {
+        "from": "test:53:49:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:80:4:Assert",
+        "variable": "expected"
+      },
+      {
+        "callee": "get_github_assets",
+        "from": "source:1:421:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:78:4:Assign"
+      },
+      {
+        "callee": "get_github_assets",
+        "from": "source:1:423:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:78:4:Assign"
+      },
+      {
+        "callee": "get_github_assets",
+        "from": "source:1:420:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:78:4:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:413:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:414:8:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:417:7:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:418:8:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:419:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:420:8:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:419:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:421:8:Return"
+      },
+      {
+        "from": "source:1:414:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:414:8:Name"
+      },
+      {
+        "from": "source:1:392:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:414:8:Assign",
+        "variable": "version"
+      },
+      {
+        "from": "source:1:414:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:414:8:Assign",
+        "variable": "version"
+      },
+      {
+        "from": "source:1:415:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:415:4:Name"
+      },
+      {
+        "from": "source:1:391:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:415:4:Assign",
+        "variable": "repo"
+      },
+      {
+        "from": "source:1:392:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:415:4:Assign",
+        "variable": "version"
+      },
+      {
+        "from": "source:1:414:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:415:4:Assign",
+        "variable": "version"
+      },
+      {
+        "from": "source:1:416:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:416:4:Name"
+      },
+      {
+        "from": "source:1:415:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:416:4:Assign",
+        "variable": "url"
+      },
+      {
+        "from": "source:1:418:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:418:8:Name"
+      },
+      {
+        "from": "source:1:415:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:418:8:Assign",
+        "variable": "url"
+      },
+      {
+        "from": "source:1:415:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:420:8:Expr",
+        "variable": "url"
+      },
+      {
+        "from": "source:1:416:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:420:8:Expr",
+        "variable": "r"
+      },
+      {
+        "from": "source:1:418:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:420:8:Expr",
+        "variable": "r"
+      },
+      {
+        "from": "source:1:422:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:422:4:Name"
+      },
+      {
+        "from": "source:1:416:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:422:4:Assign",
+        "variable": "r"
+      },
+      {
+        "from": "source:1:418:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:422:4:Assign",
+        "variable": "r"
+      },
+      {
+        "from": "source:1:422:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:423:4:Return",
+        "variable": "data"
+      },
+      {
+        "callee": "get",
+        "from": "source:2:338:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:1:416:4:Assign"
+      },
+      {
+        "callee": "get",
+        "from": "source:2:338:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:1:418:8:Assign"
+      },
+      {
+        "from": "source:2:336:12:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:338:8:Return",
+        "variable": "self"
+      },
+      {
+        "from": "source:2:336:18:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:338:8:Return",
+        "variable": "key"
+      },
+      {
+        "from": "source:2:336:23:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:338:8:Return",
+        "variable": "default"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "repo: str",
+        "end_line": 391,
+        "id": "source:1:391:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 391
+      },
+      {
+        "code": "version: str",
+        "end_line": 392,
+        "id": "source:1:392:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 392
+      },
+      {
+        "code": "version != 'latest'",
+        "end_line": 413,
+        "id": "source:1:413:7:Compare",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 413
+      },
+      {
+        "code": "version = f'tags/{version}'",
+        "end_line": 414,
+        "id": "source:1:414:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 414
+      },
+      {
+        "code": "version",
+        "end_line": 414,
+        "id": "source:1:414:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 414
+      },
+      {
+        "code": "url = f'https://api.github.com/repos/{repo}/releases/{version}'",
+        "end_line": 415,
+        "id": "source:1:415:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 415
+      },
+      {
+        "code": "url",
+        "end_line": 415,
+        "id": "source:1:415:4:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 415
+      },
+      {
+        "code": "r = requests.get(url)",
+        "end_line": 416,
+        "exception_possible": true,
+        "id": "source:1:416:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 416
+      },
+      {
+        "code": "r",
+        "end_line": 416,
+        "id": "source:1:416:4:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 416
+      },
+      {
+        "code": "r.status_code != 200 and r.reason != 'rate limit exceeded' and retry",
+        "end_line": 417,
+        "id": "source:1:417:7:BoolOp",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 417
+      },
+      {
+        "code": "r = requests.get(url)",
+        "end_line": 418,
+        "exception_possible": true,
+        "id": "source:1:418:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 418
+      },
+      {
+        "code": "r",
+        "end_line": 418,
+        "id": "source:1:418:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 418
+      },
+      {
+        "code": "r.status_code != 200",
+        "end_line": 419,
+        "id": "source:1:419:7:Compare",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 419
+      },
+      {
+        "code": "LOGGER.warning(f'GitHub assets check failure for {url}: {r.status_code} {r.reason}')",
+        "contains_unresolved_call": true,
+        "end_line": 420,
+        "exception_possible": true,
+        "id": "source:1:420:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 420,
+        "unresolved_calls": [
+          "LOGGER.warning(f'GitHub assets check failure for {url}: {r.status_code} {r.reason}')"
+        ]
+      },
+      {
+        "code": "return ('', [])",
+        "end_line": 421,
+        "id": "source:1:421:8:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 421
+      },
+      {
+        "code": "data = r.json()",
+        "contains_unresolved_call": true,
+        "end_line": 422,
+        "exception_possible": true,
+        "id": "source:1:422:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 422,
+        "unresolved_calls": [
+          "r.json()"
+        ]
+      },
+      {
+        "code": "data",
+        "end_line": 422,
+        "id": "source:1:422:4:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 422
+      },
+      {
+        "code": "return (data['tag_name'], [x['name'] for x in data['assets']])",
+        "end_line": 423,
+        "id": "source:1:423:4:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 423
+      },
+      {
+        "code": "self",
+        "end_line": 336,
+        "id": "source:2:336:12:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 336
+      },
+      {
+        "code": "key",
+        "end_line": 336,
+        "id": "source:2:336:18:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 336
+      },
+      {
+        "code": "default",
+        "end_line": 336,
+        "id": "source:2:336:23:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 336
+      },
+      {
+        "code": "return getattr(self, key, default)",
+        "contains_unresolved_call": true,
+        "end_line": 338,
+        "exception_possible": true,
+        "id": "source:2:338:8:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 338,
+        "unresolved_calls": [
+          "getattr(self, key, default)"
+        ]
+      },
+      {
+        "code": "version",
+        "end_line": 53,
+        "id": "test:53:22:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 53
+      },
+      {
+        "code": "retry",
+        "end_line": 53,
+        "id": "test:53:31:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 53
+      },
+      {
+        "code": "expected",
+        "end_line": 53,
+        "id": "test:53:49:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 53
+      },
+      {
+        "code": "get_github_assets = load_function_from_source_ast(SRC_PATH, 'get_github_assets', namespace={'LOGGER': logger})",
+        "contains_unresolved_call": true,
+        "end_line": 76,
+        "exception_possible": true,
+        "id": "test:72:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 72,
+        "unresolved_calls": [
+          "load_function_from_source_ast(SRC_PATH, 'get_github_assets', namespace={'LOGGER': logger})"
+        ]
+      },
+      {
+        "code": "get_github_assets",
+        "end_line": 72,
+        "id": "test:72:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 72
+      },
+      {
+        "code": "result = get_github_assets('owner/repository', version, retry)",
+        "end_line": 78,
+        "exception_possible": true,
+        "id": "test:78:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 78
+      },
+      {
+        "code": "result",
+        "end_line": 78,
+        "id": "test:78:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 78
+      },
+      {
+        "code": "assert result == expected",
+        "end_line": 80,
+        "id": "test:80:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 80
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:80:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:80:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 30,
+    "edges": 37,
+    "edge_kinds": {
+      "definition_value_candidate": 7,
+      "data_candidate": 21,
+      "call_target_candidate": 4,
+      "call_event_candidate": 1,
+      "lexical_control": 4
+    },
+    "criteria": [
+      {
+        "seed": "test:80:4:Assert",
+        "node_ids": [
+          "source:1:391:4:arg",
+          "source:1:392:4:arg",
+          "source:1:413:7:Compare",
+          "source:1:414:8:Assign",
+          "source:1:414:8:Name",
+          "source:1:415:4:Assign",
+          "source:1:415:4:Name",
+          "source:1:416:4:Assign",
+          "source:1:416:4:Name",
+          "source:1:417:7:BoolOp",
+          "source:1:418:8:Assign",
+          "source:1:418:8:Name",
+          "source:1:419:7:Compare",
+          "source:1:420:8:Expr",
+          "source:1:421:8:Return",
+          "source:1:422:4:Assign",
+          "source:1:422:4:Name",
+          "source:1:423:4:Return",
+          "source:2:336:12:arg",
+          "source:2:336:18:arg",
+          "source:2:336:23:arg",
+          "source:2:338:8:Return",
+          "test:53:22:arg",
+          "test:53:31:arg",
+          "test:53:49:arg",
+          "test:72:4:Assign",
+          "test:72:4:Name",
+          "test:78:4:Assign",
+          "test:78:4:Name",
+          "test:80:4:Assert"
+        ],
+        "product_source_candidates": [
+          "source:1",
+          "source:2"
+        ],
+        "unknown_call_nodes": [
+          "source:1:420:8:Expr",
+          "source:1:422:4:Assign",
+          "source:2:338:8:Return",
+          "test:72:4:Assign"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:80:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.2768,
+  "identity": {
+    "case_id": "ultralytics_439",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "5806928c2b9e92da38db78541deeda50f85bb802c5570505812692cb572fac85"
+  }
+}

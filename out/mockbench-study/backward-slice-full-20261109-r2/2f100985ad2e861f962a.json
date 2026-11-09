@@ -1,0 +1,230 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "product_source_not_located",
+    "test_to_product_not_reached",
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_455commit_hash.py::test_commit_hash_reads_git_revision_and_falls_back_on_error",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_commit_hash_reads_git_revision_and_falls_back_on_error",
+          "start_line": 10,
+          "end_line": 31
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 29,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [
+      {
+        "line": 26,
+        "name": "exec",
+        "precision": "python_ast_call_name"
+      },
+      {
+        "line": 26,
+        "name": "compile",
+        "precision": "python_ast_call_name"
+      }
+    ],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [],
+    "diagnostics": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 1088,
+    "read_bytes": 1088,
+    "attempted_files": 0,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_455commit_hash.py",
+      "sha256": "67094cdadfc01b75580884a29eed4bca468490a3f5d98bdf31a95a0b052a355c",
+      "bytes": 1088
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "from": "test:18:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:18:4:Name"
+      },
+      {
+        "from": "test:28:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:28:4:Name"
+      },
+      {
+        "from": "test:18:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:28:4:Assign",
+        "variable": "namespace"
+      },
+      {
+        "from": "test:28:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:29:4:Assert",
+        "variable": "commit_hash"
+      },
+      {
+        "from": "test:10:72:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:29:4:Assert",
+        "variable": "scenario"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "scenario",
+        "end_line": 10,
+        "id": "test:10:72:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 10
+      },
+      {
+        "code": "namespace = {'lru_cache': lambda: lambda function: function, 'subprocess': SimpleNamespace(check_output=check_output), 'git': 'git', 'script_path': '/workspace/webui'}",
+        "contains_unresolved_call": true,
+        "end_line": 23,
+        "exception_possible": true,
+        "id": "test:18:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 18,
+        "unresolved_calls": [
+          "SimpleNamespace(check_output=check_output)"
+        ]
+      },
+      {
+        "code": "namespace",
+        "end_line": 18,
+        "id": "test:18:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 18
+      },
+      {
+        "code": "commit_hash = namespace['commit_hash']",
+        "end_line": 28,
+        "id": "test:28:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 28
+      },
+      {
+        "code": "commit_hash",
+        "end_line": 28,
+        "id": "test:28:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 28
+      },
+      {
+        "code": "assert commit_hash() == ('abc123' if scenario == 'git_success' else '<none>')",
+        "contains_unresolved_call": true,
+        "end_line": 29,
+        "exception_possible": true,
+        "id": "test:29:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 29,
+        "unresolved_calls": [
+          "commit_hash()"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:29:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:29:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 6,
+    "edges": 5,
+    "edge_kinds": {
+      "definition_value_candidate": 2,
+      "data_candidate": 3
+    },
+    "criteria": [
+      {
+        "seed": "test:29:4:Assert",
+        "node_ids": [
+          "test:10:72:arg",
+          "test:18:4:Assign",
+          "test:18:4:Name",
+          "test:28:4:Assign",
+          "test:28:4:Name",
+          "test:29:4:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:18:4:Assign",
+          "test:29:4:Assert"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:29:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.0528,
+  "identity": {
+    "case_id": "stable-diffusion-webui_455",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "879a11ab6f029ee47b277db934ee4ebdb902c2ca745dd2b6bc75401452bdcef8"
+  }
+}

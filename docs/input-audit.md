@@ -1,5 +1,7 @@
 # Step 2 输入审查记录
 
+当前全量接入另见本文末尾“完整冻结 agent 数据接入”；以下 Step 2、#13–#17 记录保留其历史范围。
+
 审查日期：2026-10-20。来源主机：home-ts；旧仓库：
 `/home/haon/projects/Stub-Tester`。只读审查，无实验、注入或依赖扫描。
 
@@ -151,3 +153,32 @@ Adapter 仍先核对既有控制身份、选定文件及 masking，并确认逻�
 
 搜索、直接读取、分析和分页均执行相同排除约束。宿主评阅问题、答案位置、排除配置和
 准备侧工具观察不进入模型初始输入或真实运行 Store。准入及适用性通过不等于真实 M2 通过。
+
+## 完整冻结 agent 数据接入（2026-11-09）
+
+用户明确要求直接复用 Stub-Tester 已用于 Java/Python agent 实验的数据。
+新增 `stub-tester-frozen-agent/v1` 策略信任宿主选定的上游冻结准备协议；它不把旧
+`reviewed_inputs.json` 扩成逐例人工签名表，也不把历史三例策略作为完整数据的准入条件。
+旧三例身份与历史试验原样保留，尤其不把 flask 的 fix23 版本静默替换成主 registry 版本。
+全量研究显式使用主 registry 索引中的版本。
+
+接入对照了上游 `developer_realistic/snapshot.py` 的索引与 descriptor 加载协议，以及
+`workspace.py` 的准备侧脱敏布局。这里只在 MockSpec 中解析既有文件，不执行/导入旧项目脚本。
+校验链为：readiness 报告与索引成员关系 → snapshot-ref 身份 → runtime/manifest 元数据摘要
+→ masked target 和 injector 的已有文件摘要 → Java 空区域 / Python 空 slot。
+Python slot ID 来自冻结 injector 的 `MOCK_EXPECTED` / `VERIFY_EXPECTED` 字面量，解析但不执行。
+`slot_contract_digest` 保留为上游控制身份；不声称重建了未公开的完整 semantic slot contract。
+
+实际读取才核对选中文件内容，不重新哈希依赖实体或扫描全树，不读取原测试、gold、
+private semantic IR 或生成后的归档模板。源码接口仅暴露受限的冻结源码路径及内容，拒绝
+越界、控制目录、依赖环境、符号链接与内容变化。没有新实验、目标程序执行或模型调用。
+
+上游的固定上下文并非“所有 Mock 语句都删除”：全量 masked target 核对发现，Dubbo Ls 的
+Act 中保留 `mock(CommandContext.class)`；Druid KillCompaction 的普通 oracle 保留
+`verifyZeroInteractions`；Neo4j Operations 保留 `InOrder` 构造；`ansible_121` 的加载
+namespace 保留 `mocker.Mock()`。新策略保持这些冻结内容，检查待生成区域为空；不逐例硬编码
+放行、不删改 oracle。旧策略默认的全局 residual 检查保持不变。
+
+数据加载与方法定位分开：`FrozenCase` 提供目标测试及可读取源码列表；`to_task(mut_path=...)`
+在调用者选择实际源码后构造 `UnifiedTask`，不伪造 MUT、不用 gold 定位答案。
+完整加载验证只能证明接入与选定输入核验完成，不证明全仓无泄漏或关系恢复正确。

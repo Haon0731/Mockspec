@@ -1,0 +1,1148 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_295vllm_stateless_init_process_group.py::test_vllm_stateless_init_process_group",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_vllm_stateless_init_process_group",
+          "start_line": 24,
+          "end_line": 103
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 94,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "verl.experimental.one_step_off_policy.distributed_utils",
+        "candidates": [
+          "src/verl/experimental/one_step_off_policy/distributed_utils.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/verl/experimental/one_step_off_policy/distributed_utils.py",
+        "hint_kind": "python_import",
+        "hint": "vllm",
+        "candidates": [
+          "src/verl/third_party/vllm/__init__.py",
+          "src/verl/utils/vllm/__init__.py"
+        ],
+        "precision": "candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/verl/experimental/one_step_off_policy/distributed_utils.py",
+        "hint_kind": "python_import",
+        "hint": "torch.distributed",
+        "candidates": [
+          "src/verl/third_party/torch/distributed/__init__.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/verl/experimental/one_step_off_policy/distributed_utils.py",
+        "hint_kind": "python_import",
+        "hint": "verl.utils.device",
+        "candidates": [
+          "src/verl/utils/device.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 21291,
+    "read_bytes": 21291,
+    "attempted_files": 5,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_295vllm_stateless_init_process_group.py",
+      "sha256": "018452f4744c224649a2ab3dcc95366e530c16469afac1260e8e1b9f500efd17",
+      "bytes": 3175
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/verl/experimental/one_step_off_policy/distributed_utils.py",
+      "sha256": "f3a5d8c72436d517575d7cc26a0f46137fdf09e65c6ef1a33cc1e7552af64fdb",
+      "bytes": 5505
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/verl/third_party/vllm/__init__.py",
+      "sha256": "4e357b02aaa319b2373c46d79d5675ea1c62e2f17786af72b12834f8b81b7a9a",
+      "bytes": 2295
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/verl/utils/vllm/__init__.py",
+      "sha256": "302d23a783660262dff139423467ea61ae972c1d15dc598d63830aeb7afa348f",
+      "bytes": 1008
+    },
+    {
+      "source_id": "source:4",
+      "logical_path": "src/verl/third_party/torch/distributed/__init__.py",
+      "sha256": "0f05da82d47d83fc7f345b28278a44d925994b4357044c58cdf585229d3f8ad7",
+      "bytes": 3722
+    },
+    {
+      "source_id": "source:5",
+      "logical_path": "src/verl/utils/device.py",
+      "sha256": "c4b8b71a4efad64415451e11ac159698a57cb2d04adc5f4519f8af6b7d6da2db",
+      "bytes": 5586
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "from": "test:91:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:91:4:Name"
+      },
+      {
+        "from": "test:24:69:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:91:4:Assign",
+        "variable": "master_address"
+      },
+      {
+        "from": "test:24:85:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:91:4:Assign",
+        "variable": "master_port"
+      },
+      {
+        "from": "test:24:98:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:91:4:Assign",
+        "variable": "rank"
+      },
+      {
+        "from": "test:24:104:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:91:4:Assign",
+        "variable": "world_size"
+      },
+      {
+        "from": "test:24:116:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:91:4:Assign",
+        "variable": "device"
+      },
+      {
+        "from": "test:91:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:94:4:Assert",
+        "variable": "result"
+      },
+      {
+        "callee": "vllm_stateless_init_process_group",
+        "from": "source:1:137:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:91:4:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:71:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:73:8:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:71:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:74:8:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:71:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:86:8:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:71:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:87:8:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:71:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:88:8:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:71:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:89:8:Assign"
+      },
+      {
+        "branch": "false",
+        "from": "source:1:71:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:91:8:Assign"
+      },
+      {
+        "branch": "false",
+        "from": "source:1:71:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:92:8:Assign"
+      },
+      {
+        "from": "source:1:29:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:65:8:Expr",
+        "variable": "host"
+      },
+      {
+        "from": "source:1:66:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:66:8:Name"
+      },
+      {
+        "from": "source:1:68:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:68:8:Name"
+      },
+      {
+        "from": "source:1:70:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:70:4:Name"
+      },
+      {
+        "from": "source:1:31:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:70:4:Assign",
+        "variable": "rank"
+      },
+      {
+        "from": "source:1:73:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:73:8:Name"
+      },
+      {
+        "from": "source:1:66:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:73:8:Assign",
+        "variable": "address_family"
+      },
+      {
+        "from": "source:1:68:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:73:8:Assign",
+        "variable": "address_family"
+      },
+      {
+        "from": "source:1:73:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:74:8:Expr",
+        "variable": "listen_socket"
+      },
+      {
+        "from": "source:1:73:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:80:16:Expr",
+        "variable": "listen_socket"
+      },
+      {
+        "from": "source:1:86:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:86:8:Name"
+      },
+      {
+        "from": "source:1:29:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:86:8:Assign",
+        "variable": "host"
+      },
+      {
+        "from": "source:1:73:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:87:8:Expr",
+        "variable": "listen_socket"
+      },
+      {
+        "from": "source:1:86:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:87:8:Expr",
+        "variable": "bind_host"
+      },
+      {
+        "from": "source:1:30:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:87:8:Expr",
+        "variable": "port"
+      },
+      {
+        "from": "source:1:73:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:88:8:Expr",
+        "variable": "listen_socket"
+      },
+      {
+        "from": "source:1:89:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:89:8:Name"
+      },
+      {
+        "from": "source:1:73:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:89:8:Assign",
+        "variable": "listen_socket"
+      },
+      {
+        "from": "source:1:91:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:91:8:Name"
+      },
+      {
+        "from": "source:1:92:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:92:8:Name"
+      },
+      {
+        "from": "source:1:94:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:94:4:Name"
+      },
+      {
+        "from": "source:1:29:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:94:4:Assign",
+        "variable": "host"
+      },
+      {
+        "from": "source:1:30:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:94:4:Assign",
+        "variable": "port"
+      },
+      {
+        "from": "source:1:32:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:94:4:Assign",
+        "variable": "world_size"
+      },
+      {
+        "from": "source:1:70:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:94:4:Assign",
+        "variable": "launch_server"
+      },
+      {
+        "from": "source:1:34:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:94:4:Assign",
+        "variable": "store_timeout"
+      },
+      {
+        "from": "source:1:89:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:94:4:Assign",
+        "variable": "listen_fd"
+      },
+      {
+        "from": "source:1:92:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:94:4:Assign",
+        "variable": "listen_fd"
+      },
+      {
+        "from": "source:1:31:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:104:4:Return",
+        "variable": "rank"
+      },
+      {
+        "from": "source:1:32:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:104:4:Return",
+        "variable": "world_size"
+      },
+      {
+        "from": "source:1:94:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:104:4:Return",
+        "variable": "store"
+      },
+      {
+        "from": "source:1:73:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:104:4:Return",
+        "variable": "listen_socket"
+      },
+      {
+        "from": "source:1:91:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:104:4:Return",
+        "variable": "listen_socket"
+      },
+      {
+        "from": "source:1:33:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:104:4:Return",
+        "variable": "data_expiration_seconds"
+      },
+      {
+        "from": "source:1:135:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:135:4:Name"
+      },
+      {
+        "from": "source:1:116:38:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:135:4:Assign",
+        "variable": "master_address"
+      },
+      {
+        "from": "source:1:116:54:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:135:4:Assign",
+        "variable": "master_port"
+      },
+      {
+        "from": "source:1:116:67:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:135:4:Assign",
+        "variable": "rank"
+      },
+      {
+        "from": "source:1:116:73:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:135:4:Assign",
+        "variable": "world_size"
+      },
+      {
+        "from": "source:1:136:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:136:4:Name"
+      },
+      {
+        "from": "source:1:135:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:136:4:Assign",
+        "variable": "pg"
+      },
+      {
+        "from": "source:1:116:85:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:136:4:Assign",
+        "variable": "device"
+      },
+      {
+        "from": "source:1:136:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:137:4:Return",
+        "variable": "pynccl"
+      },
+      {
+        "callee": "create",
+        "from": "source:1:104:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:1:135:4:Assign"
+      },
+      {
+        "callee": "create",
+        "from": "source:1:65:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:135:4:Assign"
+      },
+      {
+        "callee": "create",
+        "from": "source:1:74:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:135:4:Assign"
+      },
+      {
+        "callee": "create",
+        "from": "source:1:80:16:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:135:4:Assign"
+      },
+      {
+        "callee": "create",
+        "from": "source:1:87:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:135:4:Assign"
+      },
+      {
+        "callee": "create",
+        "from": "source:1:88:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:135:4:Assign"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "return StatelessProcessGroup(rank=rank, world_size=world_size, store=store, socket=listen_socket, data_expiration_seconds=data_expiration_seconds)",
+        "contains_unresolved_call": true,
+        "end_line": 110,
+        "exception_possible": true,
+        "id": "source:1:104:4:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 104,
+        "unresolved_calls": [
+          "StatelessProcessGroup(rank=rank, world_size=world_size, store=store, socket=listen_socket, data_expiration_seconds=data_expiration_seconds)"
+        ]
+      },
+      {
+        "code": "master_address",
+        "end_line": 116,
+        "id": "source:1:116:38:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 116
+      },
+      {
+        "code": "master_port",
+        "end_line": 116,
+        "id": "source:1:116:54:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 116
+      },
+      {
+        "code": "rank",
+        "end_line": 116,
+        "id": "source:1:116:67:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 116
+      },
+      {
+        "code": "world_size",
+        "end_line": 116,
+        "id": "source:1:116:73:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 116
+      },
+      {
+        "code": "device",
+        "end_line": 116,
+        "id": "source:1:116:85:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 116
+      },
+      {
+        "code": "pg = StatelessProcessGroup.create(host=master_address, port=master_port, rank=rank, world_size=world_size)",
+        "end_line": 135,
+        "exception_possible": true,
+        "id": "source:1:135:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 135
+      },
+      {
+        "code": "pg",
+        "end_line": 135,
+        "id": "source:1:135:4:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 135
+      },
+      {
+        "code": "pynccl = PyNcclCommunicator(pg, device=device)",
+        "contains_unresolved_call": true,
+        "end_line": 136,
+        "exception_possible": true,
+        "id": "source:1:136:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 136,
+        "unresolved_calls": [
+          "PyNcclCommunicator(pg, device=device)"
+        ]
+      },
+      {
+        "code": "pynccl",
+        "end_line": 136,
+        "id": "source:1:136:4:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 136
+      },
+      {
+        "code": "return pynccl",
+        "end_line": 137,
+        "id": "source:1:137:4:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 137
+      },
+      {
+        "code": "host: str",
+        "end_line": 29,
+        "id": "source:1:29:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 29
+      },
+      {
+        "code": "port: int",
+        "end_line": 30,
+        "id": "source:1:30:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 30
+      },
+      {
+        "code": "rank: int",
+        "end_line": 31,
+        "id": "source:1:31:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 31
+      },
+      {
+        "code": "world_size: int",
+        "end_line": 32,
+        "id": "source:1:32:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 32
+      },
+      {
+        "code": "data_expiration_seconds: int",
+        "end_line": 33,
+        "id": "source:1:33:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 33
+      },
+      {
+        "code": "store_timeout: int",
+        "end_line": 34,
+        "id": "source:1:34:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 34
+      },
+      {
+        "code": "ipaddress.IPv6Address(host.strip('[]'))",
+        "contains_unresolved_call": true,
+        "end_line": 65,
+        "exception_possible": true,
+        "id": "source:1:65:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 65,
+        "unresolved_calls": [
+          "ipaddress.IPv6Address(host.strip('[]'))",
+          "host.strip('[]')"
+        ]
+      },
+      {
+        "code": "address_family = socket.AF_INET6",
+        "end_line": 66,
+        "id": "source:1:66:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 66
+      },
+      {
+        "code": "address_family",
+        "end_line": 66,
+        "id": "source:1:66:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 66
+      },
+      {
+        "code": "address_family = socket.AF_INET",
+        "end_line": 68,
+        "id": "source:1:68:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 68
+      },
+      {
+        "code": "address_family",
+        "end_line": 68,
+        "id": "source:1:68:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 68
+      },
+      {
+        "code": "launch_server = rank == 0",
+        "end_line": 70,
+        "id": "source:1:70:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 70
+      },
+      {
+        "code": "launch_server",
+        "end_line": 70,
+        "id": "source:1:70:4:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 70
+      },
+      {
+        "code": "launch_server",
+        "end_line": 71,
+        "id": "source:1:71:7:Name",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 71
+      },
+      {
+        "code": "listen_socket = socket.socket(address_family, socket.SOCK_STREAM)",
+        "contains_unresolved_call": true,
+        "end_line": 73,
+        "exception_possible": true,
+        "id": "source:1:73:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 73,
+        "unresolved_calls": [
+          "socket.socket(address_family, socket.SOCK_STREAM)"
+        ]
+      },
+      {
+        "code": "listen_socket",
+        "end_line": 73,
+        "id": "source:1:73:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 73
+      },
+      {
+        "code": "listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)",
+        "contains_unresolved_call": true,
+        "end_line": 74,
+        "exception_possible": true,
+        "id": "source:1:74:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 74,
+        "unresolved_calls": [
+          "listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)"
+        ]
+      },
+      {
+        "code": "listen_socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 1)",
+        "contains_unresolved_call": true,
+        "end_line": 80,
+        "exception_possible": true,
+        "id": "source:1:80:16:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 80,
+        "unresolved_calls": [
+          "listen_socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 1)"
+        ]
+      },
+      {
+        "code": "bind_host = host.strip('[]')",
+        "contains_unresolved_call": true,
+        "end_line": 86,
+        "exception_possible": true,
+        "id": "source:1:86:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 86,
+        "unresolved_calls": [
+          "host.strip('[]')"
+        ]
+      },
+      {
+        "code": "bind_host",
+        "end_line": 86,
+        "id": "source:1:86:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 86
+      },
+      {
+        "code": "listen_socket.bind((bind_host, port))",
+        "contains_unresolved_call": true,
+        "end_line": 87,
+        "exception_possible": true,
+        "id": "source:1:87:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 87,
+        "unresolved_calls": [
+          "listen_socket.bind((bind_host, port))"
+        ]
+      },
+      {
+        "code": "listen_socket.listen()",
+        "contains_unresolved_call": true,
+        "end_line": 88,
+        "exception_possible": true,
+        "id": "source:1:88:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 88,
+        "unresolved_calls": [
+          "listen_socket.listen()"
+        ]
+      },
+      {
+        "code": "listen_fd = listen_socket.fileno()",
+        "contains_unresolved_call": true,
+        "end_line": 89,
+        "exception_possible": true,
+        "id": "source:1:89:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 89,
+        "unresolved_calls": [
+          "listen_socket.fileno()"
+        ]
+      },
+      {
+        "code": "listen_fd",
+        "end_line": 89,
+        "id": "source:1:89:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 89
+      },
+      {
+        "code": "listen_socket = None",
+        "end_line": 91,
+        "id": "source:1:91:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 91
+      },
+      {
+        "code": "listen_socket",
+        "end_line": 91,
+        "id": "source:1:91:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 91
+      },
+      {
+        "code": "listen_fd = None",
+        "end_line": 92,
+        "id": "source:1:92:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 92
+      },
+      {
+        "code": "listen_fd",
+        "end_line": 92,
+        "id": "source:1:92:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 92
+      },
+      {
+        "code": "store = TCPStore(host_name=host, port=port, world_size=world_size, is_master=launch_server, timeout=timedelta(seconds=store_timeout), use_libuv=False, master_listen_fd=listen_fd)",
+        "contains_unresolved_call": true,
+        "end_line": 102,
+        "exception_possible": true,
+        "id": "source:1:94:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 94,
+        "unresolved_calls": [
+          "TCPStore(host_name=host, port=port, world_size=world_size, is_master=launch_server, timeout=timedelta(seconds=store_timeout), use_libuv=False, master_listen_fd=listen_fd)",
+          "timedelta(seconds=store_timeout)"
+        ]
+      },
+      {
+        "code": "store",
+        "end_line": 94,
+        "id": "source:1:94:4:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 94
+      },
+      {
+        "code": "world_size",
+        "end_line": 24,
+        "id": "test:24:104:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 24
+      },
+      {
+        "code": "device",
+        "end_line": 24,
+        "id": "test:24:116:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 24
+      },
+      {
+        "code": "master_address",
+        "end_line": 24,
+        "id": "test:24:69:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 24
+      },
+      {
+        "code": "master_port",
+        "end_line": 24,
+        "id": "test:24:85:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 24
+      },
+      {
+        "code": "rank",
+        "end_line": 24,
+        "id": "test:24:98:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 24
+      },
+      {
+        "code": "result = vllm_stateless_init_process_group(master_address, master_port, rank, world_size, device)",
+        "end_line": 91,
+        "exception_possible": true,
+        "id": "test:91:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 91
+      },
+      {
+        "code": "result",
+        "end_line": 91,
+        "id": "test:91:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 91
+      },
+      {
+        "code": "assert result == mock_communicator",
+        "end_line": 94,
+        "id": "test:94:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 94
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:94:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:94:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 49,
+    "edges": 65,
+    "edge_kinds": {
+      "definition_value_candidate": 12,
+      "data_candidate": 38,
+      "call_target_candidate": 2,
+      "lexical_control": 8,
+      "call_event_candidate": 5
+    },
+    "criteria": [
+      {
+        "seed": "test:94:4:Assert",
+        "node_ids": [
+          "source:1:104:4:Return",
+          "source:1:116:38:arg",
+          "source:1:116:54:arg",
+          "source:1:116:67:arg",
+          "source:1:116:73:arg",
+          "source:1:116:85:arg",
+          "source:1:135:4:Assign",
+          "source:1:135:4:Name",
+          "source:1:136:4:Assign",
+          "source:1:136:4:Name",
+          "source:1:137:4:Return",
+          "source:1:29:4:arg",
+          "source:1:30:4:arg",
+          "source:1:31:4:arg",
+          "source:1:32:4:arg",
+          "source:1:33:4:arg",
+          "source:1:34:4:arg",
+          "source:1:65:8:Expr",
+          "source:1:66:8:Assign",
+          "source:1:66:8:Name",
+          "source:1:68:8:Assign",
+          "source:1:68:8:Name",
+          "source:1:70:4:Assign",
+          "source:1:70:4:Name",
+          "source:1:71:7:Name",
+          "source:1:73:8:Assign",
+          "source:1:73:8:Name",
+          "source:1:74:8:Expr",
+          "source:1:80:16:Expr",
+          "source:1:86:8:Assign",
+          "source:1:86:8:Name",
+          "source:1:87:8:Expr",
+          "source:1:88:8:Expr",
+          "source:1:89:8:Assign",
+          "source:1:89:8:Name",
+          "source:1:91:8:Assign",
+          "source:1:91:8:Name",
+          "source:1:92:8:Assign",
+          "source:1:92:8:Name",
+          "source:1:94:4:Assign",
+          "source:1:94:4:Name",
+          "test:24:104:arg",
+          "test:24:116:arg",
+          "test:24:69:arg",
+          "test:24:85:arg",
+          "test:24:98:arg",
+          "test:91:4:Assign",
+          "test:91:4:Name",
+          "test:94:4:Assert"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:104:4:Return",
+          "source:1:136:4:Assign",
+          "source:1:65:8:Expr",
+          "source:1:73:8:Assign",
+          "source:1:74:8:Expr",
+          "source:1:80:16:Expr",
+          "source:1:86:8:Assign",
+          "source:1:87:8:Expr",
+          "source:1:88:8:Expr",
+          "source:1:89:8:Assign",
+          "source:1:94:4:Assign"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:94:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.1644,
+  "identity": {
+    "case_id": "verl_295",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "0ba5c2ef0ff57688c71a8b82fe14b019471dfda66e9f8fdeed36fb83d134d689"
+  }
+}

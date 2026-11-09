@@ -1,0 +1,8 @@
+{
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"actuator/health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "The visible inherited getHealthUrl() starts from getManagementBaseUrl(), which resolves through getServiceUrl() to http://application/Uppercase/, then appends '/' and getHealthEndpointPath(). It does not append webEndpoint.getBasePath(); that base path is used separately by getManagementUrl(). Therefore returning actuator/health from the first-choice health PathMappedEndpoints lookup produces the asserted http://application/Uppercase/actuator/health value. Because the returned text is non-empty, the status fallback is not reached, and verifying the health lookup is supported by the visible call chain.",
+    "unknowns": []
+  }
+}

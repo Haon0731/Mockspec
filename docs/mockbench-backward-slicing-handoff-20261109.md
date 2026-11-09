@@ -4,7 +4,14 @@
 
 **核心结论：完整数据已经接入，165例均已运行目标导向的后向候选图。155例取得候选图、10例构图失败，但尚未建立可靠的语义恢复成功率。当前主要障碍包括源码入口与调用绑定、图规模，以及缺失的对象状态／异常依赖分析。**
 
-本文自包含，不要求读者访问原始聊天或本地数据。此次发布的是交接总结；本轮研究代码与逐例完整产物仍在本地工作区，未随这个文档提交。因此，不能把远程其他源码的当前版本当作下述 r3 实现，也不能把文中的本地路径当作已经发布的附件。
+本文自包含，不要求读者访问原始聊天。研究代码、相关测试、历史探索材料与逐例实验产物现已一并发布；原始冻结数据集和外部分析工具环境仍位于宿主，不随仓库复制。以下入口可直接用于网页版研究：
+
+- [全量切片代码与协议](../experiments/backward-slicing/README.md)、[批量入口](../experiments/backward-slicing/batch_slice.py)
+- [完整数据接入框架](../experiments/mockbench-study/README.md)、[冻结输入Adapter](../src/mock_spec/adapters/frozen_dataset.py)
+- [r3全量报告](../out/mockbench-study/backward-slice-full-20261109-r3/report.md)、[汇总](../out/mockbench-study/backward-slice-full-20261109-r3/summary.json)、[逐例完整结果](../out/mockbench-study/backward-slice-full-20261109-r3/results.json)
+- [固定实现与配置](../out/mockbench-study/backward-slice-full-20261109-r3/run-manifest.json)、[结构核验](../out/mockbench-study/backward-slice-full-20261109-r3/verification.json)
+
+逐例结果也保存为同目录的独立JSON，便于按案例读取，避免一次加载整份大结果。历史goal/component/path pilot材料保留其原时点与范围，不代表本轮运行了这些方法。
 
 ## 1. 用户真正希望研究什么
 
@@ -264,6 +271,8 @@ def test_value(box):
 
 这些是工程与结构验证，**不证明关系语义正确，也不证明所有Mock替换边界已识别**。本轮未执行目标测试、模型生成、缺陷变异或合法替代对照。
 
+代码与产物发布时，另从Git暂存内容导出独立临时副本，运行输入接入、mask策略、schema、Adapter及当前切片相关测试：155项通过，Ruff通过；复核r3实现摘要、案例身份、图结构和关键文档链接。没有依赖工作区未提交的staged-inference改动。历史日志与生成候选保留原始空白格式，未为格式检查改写实验原件。
+
 ## 9. 探索过的技术方向，尚未做出的选择
 
 目前较有依据的方向是：**薄的测试入口适配层＋成熟依赖分析＋显式未知边界**。
@@ -303,9 +312,9 @@ def test_value(box):
 
 希望得到：按证据排序的根因判断、可行架构备选及取舍、最小判别实验、必须保持的unknown边界，以及哪些结论当前仍无法作出。不要只列工具名，也不要把完整符号执行作为默认答案。
 
-## 11. 本地证据索引（未作为远程附件发布）
+## 11. 已发布代码与证据索引
 
-以下路径相对MockSpec仓库，仅供有本地工作区的协作者复现：
+以下路径相对MockSpec仓库，代码与证据均已发布。完整重新执行仍需要宿主上的原始冻结输入和固定工具：
 
 ```text
 src/mock_spec/adapters/frozen_dataset.py
@@ -336,4 +345,4 @@ PYTHONPATH=src .venv/bin/python experiments/backward-slicing/batch_slice.py \
   --output /tmp/mockbench-backward-slice-reproduction
 ```
 
-上述复现依赖尚未随本总结发布的本地代码与外部数据。网页版阅读者可先依据本文分析；不能声称已经独立重现运行或审核全部逐例关系。
+上述复现依赖仓库中已发布的代码，以及未打包的外部冻结数据和工具环境。网页版阅读者可以审查代码、逐例图与失败记录；仅阅读这些材料不等于独立重现运行或审核全部关系语义。

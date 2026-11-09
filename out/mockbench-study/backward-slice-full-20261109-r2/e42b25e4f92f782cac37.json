@@ -1,0 +1,562 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_308abort.py::test_abort_scenarios",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_abort_scenarios",
+          "start_line": 48,
+          "end_line": 126
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 102,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 120,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 126,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:2"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "flask.helpers",
+        "candidates": [
+          "src/src/flask/helpers.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/flask/helpers.py",
+        "hint_kind": "python_import",
+        "hint": "typing",
+        "candidates": [
+          "src/src/flask/typing.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 29222,
+    "read_bytes": 29222,
+    "attempted_files": 2,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_308abort.py",
+      "sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+      "bytes": 3044
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/src/flask/helpers.py",
+      "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+      "bytes": 23064
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/src/flask/typing.py",
+      "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+      "bytes": 3114
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "field": "body",
+        "from": "test:103:8:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:102:4:With"
+      },
+      {
+        "branch": "true",
+        "from": "test:111:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:120:8:Assert"
+      },
+      {
+        "branch": "false",
+        "from": "test:111:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:126:8:Assert"
+      },
+      {
+        "from": "test:102:4:With",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:102:37:Name"
+      },
+      {
+        "from": "test:48:60:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:103:8:Expr",
+        "variable": "code"
+      },
+      {
+        "from": "test:48:66:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:103:8:Expr",
+        "variable": "args"
+      },
+      {
+        "from": "test:48:72:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:103:8:Expr",
+        "variable": "kwargs"
+      },
+      {
+        "from": "test:48:60:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:120:8:Assert",
+        "variable": "code"
+      },
+      {
+        "from": "test:102:37:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:120:8:Assert",
+        "variable": "exc_info"
+      },
+      {
+        "from": "test:48:60:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:126:8:Assert",
+        "variable": "code"
+      },
+      {
+        "from": "test:102:37:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:126:8:Assert",
+        "variable": "exc_info"
+      },
+      {
+        "callee": "abort",
+        "from": "source:1:283:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:103:8:Expr"
+      },
+      {
+        "callee": "abort",
+        "from": "source:1:285:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:103:8:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:282:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:283:8:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:283:8:Expr",
+        "kind": "normal_branch_exit",
+        "precision": "possible_only_if_branch_completes_normally",
+        "to": "source:1:282:4:If"
+      },
+      {
+        "from": "source:1:282:4:If",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:282:8:Name"
+      },
+      {
+        "from": "source:1:282:8:NamedExpr",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:283:8:Expr",
+        "variable": "ctx"
+      },
+      {
+        "from": "source:1:282:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:283:8:Expr",
+        "variable": "ctx"
+      },
+      {
+        "from": "source:1:265:10:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:283:8:Expr",
+        "variable": "code"
+      },
+      {
+        "from": "source:1:265:10:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:285:4:Expr",
+        "variable": "code"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "code: int | BaseResponse",
+        "end_line": 265,
+        "id": "source:1:265:10:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 265
+      },
+      {
+        "code": "if (ctx := _cv_app.get(None)) is not None:\n    ctx.app.aborter(code, *args, **kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 283,
+        "exception_possible": true,
+        "id": "source:1:282:4:If",
+        "kind": "If",
+        "source_id": "source:1",
+        "start_line": 282,
+        "unresolved_calls": [
+          "_cv_app.get(None)"
+        ]
+      },
+      {
+        "code": "(ctx := _cv_app.get(None)) is not None",
+        "end_line": 282,
+        "id": "source:1:282:7:Compare",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 282
+      },
+      {
+        "code": "ctx",
+        "end_line": 282,
+        "id": "source:1:282:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 282
+      },
+      {
+        "code": "(ctx := _cv_app.get(None))",
+        "end_line": 282,
+        "id": "source:1:282:8:NamedExpr",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 282
+      },
+      {
+        "code": "ctx.app.aborter(code, *args, **kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 283,
+        "exception_possible": true,
+        "id": "source:1:283:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 283,
+        "unresolved_calls": [
+          "ctx.app.aborter(code, *args, **kwargs)"
+        ]
+      },
+      {
+        "code": "_wz_abort(code, *args, **kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 285,
+        "exception_possible": true,
+        "id": "source:1:285:4:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 285,
+        "unresolved_calls": [
+          "_wz_abort(code, *args, **kwargs)"
+        ]
+      },
+      {
+        "code": "exc_info",
+        "end_line": 102,
+        "id": "test:102:37:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 102
+      },
+      {
+        "code": "with pytest.raises(Exception) as exc_info:\n    abort(code, *args, **kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 103,
+        "exception_possible": true,
+        "id": "test:102:4:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 102,
+        "unresolved_calls": [
+          "pytest.raises(Exception)"
+        ]
+      },
+      {
+        "code": "abort(code, *args, **kwargs)",
+        "end_line": 103,
+        "exception_possible": true,
+        "id": "test:103:8:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 103
+      },
+      {
+        "code": "has_app_context",
+        "end_line": 111,
+        "id": "test:111:7:Name",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 111
+      },
+      {
+        "code": "assert f'Aborted with {code}' in str(exc_info.value)",
+        "contains_unresolved_call": true,
+        "end_line": 120,
+        "exception_possible": true,
+        "id": "test:120:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 120,
+        "unresolved_calls": [
+          "str(exc_info.value)"
+        ]
+      },
+      {
+        "code": "assert f'Werkzeug abort {code}' in str(exc_info.value)",
+        "contains_unresolved_call": true,
+        "end_line": 126,
+        "exception_possible": true,
+        "id": "test:126:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 126,
+        "unresolved_calls": [
+          "str(exc_info.value)"
+        ]
+      },
+      {
+        "code": "code",
+        "end_line": 48,
+        "id": "test:48:60:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 48
+      },
+      {
+        "code": "args",
+        "end_line": 48,
+        "id": "test:48:66:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 48
+      },
+      {
+        "code": "kwargs",
+        "end_line": 48,
+        "id": "test:48:72:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 48
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:102:4:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:120:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:126:8:Assert"
+      }
+    ],
+    "seeds": [
+      "test:102:4:With",
+      "test:120:8:Assert",
+      "test:126:8:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 16,
+    "edges": 20,
+    "edge_kinds": {
+      "normal_body_exit": 1,
+      "lexical_control": 3,
+      "definition_value_candidate": 2,
+      "data_candidate": 11,
+      "call_event_candidate": 2,
+      "normal_branch_exit": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:102:4:With",
+        "node_ids": [
+          "source:1:265:10:arg",
+          "source:1:282:4:If",
+          "source:1:282:7:Compare",
+          "source:1:282:8:Name",
+          "source:1:282:8:NamedExpr",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:4:With",
+          "test:103:8:Expr",
+          "test:48:60:arg",
+          "test:48:66:arg",
+          "test:48:72:arg"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:282:4:If",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:4:With"
+        ]
+      },
+      {
+        "seed": "test:120:8:Assert",
+        "node_ids": [
+          "source:1:265:10:arg",
+          "source:1:282:4:If",
+          "source:1:282:7:Compare",
+          "source:1:282:8:Name",
+          "source:1:282:8:NamedExpr",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:37:Name",
+          "test:102:4:With",
+          "test:103:8:Expr",
+          "test:111:7:Name",
+          "test:120:8:Assert",
+          "test:48:60:arg",
+          "test:48:66:arg",
+          "test:48:72:arg"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:282:4:If",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:4:With",
+          "test:120:8:Assert"
+        ]
+      },
+      {
+        "seed": "test:126:8:Assert",
+        "node_ids": [
+          "source:1:265:10:arg",
+          "source:1:282:4:If",
+          "source:1:282:7:Compare",
+          "source:1:282:8:Name",
+          "source:1:282:8:NamedExpr",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:37:Name",
+          "test:102:4:With",
+          "test:103:8:Expr",
+          "test:111:7:Name",
+          "test:126:8:Assert",
+          "test:48:60:arg",
+          "test:48:66:arg",
+          "test:48:72:arg"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:282:4:If",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:4:With",
+          "test:126:8:Assert"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:102:4:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:120:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:126:8:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.1115,
+  "identity": {
+    "case_id": "flask_308",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c"
+  }
+}

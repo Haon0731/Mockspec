@@ -1,0 +1,222 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "source_budget",
+    "test_to_product_not_reached",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_404argument.py::test_argument",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_argument",
+          "start_line": 69,
+          "end_line": 144
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 144,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "click.decorators",
+        "candidates": [
+          "src/click/decorators.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "click.core",
+        "candidates": [
+          "src/click/core.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/click/core.py",
+        "hint_kind": "python_import",
+        "hint": "types",
+        "candidates": [
+          "src/click/types.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/click/core.py",
+        "hint_kind": "python_import",
+        "hint": "click.shell_completion",
+        "candidates": [
+          "src/click/shell_completion.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/click/core.py",
+        "hint_kind": "python_import",
+        "hint": "click.shell_completion",
+        "candidates": [
+          "src/click/shell_completion.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/click/core.py",
+        "hint_kind": "python_import",
+        "hint": "click.shell_completion",
+        "candidates": [
+          "src/click/shell_completion.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [
+      "byte_budget_omitted:src/click/shell_completion.py"
+    ],
+    "source_rejections": [],
+    "truncated": true,
+    "opaque_methods": [
+      {
+        "source_id": "source:2",
+        "name": "_parse_decls",
+        "start_line": 2222,
+        "end_line": 2225
+      },
+      {
+        "source_id": "source:2",
+        "name": "add_to_parser",
+        "start_line": 2291,
+        "end_line": 2292
+      },
+      {
+        "source_id": "source:3",
+        "name": "arity",
+        "start_line": 167,
+        "end_line": 168
+      }
+    ],
+    "selected_bytes": 193784,
+    "read_bytes": 214778,
+    "attempted_files": 4,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_404argument.py",
+      "sha256": "5aae8a77ec3699235e8436127f8fbd681f06b29b29a1a9c885b07943cf9df730",
+      "bytes": 3164
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/click/decorators.py",
+      "sha256": "e4feda6e126d010629fca1e08d4be132fe3ae044703b3aefd9e9cd9279701f24",
+      "bytes": 18461
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/click/core.py",
+      "sha256": "457921b4a8b4cbfa33096b435b27794268291fd3e9f52db93e0d9e260c0b6389",
+      "bytes": 132232
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/click/types.py",
+      "sha256": "7a4e7804d485c0f2acaad7d3ee3b2a71ce161ee8bc00815530a338a156485e17",
+      "bytes": 39927
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "assert dummy_function is not None",
+        "end_line": 144,
+        "id": "test:144:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 144
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:144:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:144:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 1,
+    "edges": 0,
+    "edge_kinds": {},
+    "criteria": [
+      {
+        "seed": "test:144:4:Assert",
+        "node_ids": [
+          "test:144:4:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": []
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:144:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": false,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.5745,
+  "identity": {
+    "case_id": "click_404",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "e23711f2e0120f9015c06ba735ed3f0a05bcce40c2f9a286d66cd8bf32d436c4"
+  }
+}

@@ -1,0 +1,313 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_317get_template_attribute.py::test_get_template_attribute_scenarios",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_get_template_attribute_scenarios",
+          "start_line": 33,
+          "end_line": 74
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 72,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "flask",
+        "candidates": [
+          "src/src/flask/__init__.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "flask.helpers",
+        "candidates": [
+          "src/src/flask/helpers.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/flask/helpers.py",
+        "hint_kind": "python_import",
+        "hint": "typing",
+        "candidates": [
+          "src/src/flask/typing.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 30110,
+    "read_bytes": 30110,
+    "attempted_files": 3,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_317get_template_attribute.py",
+      "sha256": "e22b070e6fdf58116477a751a7a1edb32a9d02a6ff2632c8bb7acca41bb65ca7",
+      "bytes": 1860
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/src/flask/__init__.py",
+      "sha256": "2daebda4dc29fed5cb36c912a6115a234e9a4b5f9c33fd795e4bfeffd0cc9386",
+      "bytes": 2072
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/src/flask/helpers.py",
+      "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+      "bytes": 23064
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/src/flask/typing.py",
+      "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+      "bytes": 3114
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "from": "test:69:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:69:8:Name"
+      },
+      {
+        "from": "test:33:60:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:69:8:Assign",
+        "variable": "template_name"
+      },
+      {
+        "from": "test:33:75:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:69:8:Assign",
+        "variable": "attribute"
+      },
+      {
+        "from": "test:69:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:72:4:Assert",
+        "variable": "result"
+      },
+      {
+        "from": "test:33:109:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:72:4:Assert",
+        "variable": "expected_result"
+      },
+      {
+        "callee": "get_template_attribute",
+        "from": "source:2:307:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:69:8:Assign"
+      },
+      {
+        "from": "source:2:288:27:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:307:4:Return",
+        "variable": "template_name"
+      },
+      {
+        "from": "source:2:288:47:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:307:4:Return",
+        "variable": "attribute"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "template_name: str",
+        "end_line": 288,
+        "id": "source:2:288:27:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 288
+      },
+      {
+        "code": "attribute: str",
+        "end_line": 288,
+        "id": "source:2:288:47:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 288
+      },
+      {
+        "code": "return getattr(current_app.jinja_env.get_template(template_name).module, attribute)",
+        "contains_unresolved_call": true,
+        "end_line": 307,
+        "exception_possible": true,
+        "id": "source:2:307:4:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 307,
+        "unresolved_calls": [
+          "getattr(current_app.jinja_env.get_template(template_name).module, attribute)",
+          "current_app.jinja_env.get_template(template_name)"
+        ]
+      },
+      {
+        "code": "expected_result",
+        "end_line": 33,
+        "id": "test:33:109:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 33
+      },
+      {
+        "code": "template_name",
+        "end_line": 33,
+        "id": "test:33:60:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 33
+      },
+      {
+        "code": "attribute",
+        "end_line": 33,
+        "id": "test:33:75:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 33
+      },
+      {
+        "code": "result = get_template_attribute(template_name, attribute)",
+        "end_line": 69,
+        "exception_possible": true,
+        "id": "test:69:8:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 69
+      },
+      {
+        "code": "result",
+        "end_line": 69,
+        "id": "test:69:8:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 69
+      },
+      {
+        "code": "assert result == expected_result",
+        "end_line": 72,
+        "id": "test:72:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 72
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:72:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:72:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 9,
+    "edges": 8,
+    "edge_kinds": {
+      "definition_value_candidate": 1,
+      "data_candidate": 6,
+      "call_target_candidate": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:72:4:Assert",
+        "node_ids": [
+          "source:2:288:27:arg",
+          "source:2:288:47:arg",
+          "source:2:307:4:Return",
+          "test:33:109:arg",
+          "test:33:60:arg",
+          "test:33:75:arg",
+          "test:69:8:Assign",
+          "test:69:8:Name",
+          "test:72:4:Assert"
+        ],
+        "product_source_candidates": [
+          "source:2"
+        ],
+        "unknown_call_nodes": [
+          "source:2:307:4:Return"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:72:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.1123,
+  "identity": {
+    "case_id": "flask_317",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "08aebfa40bd6517d777ac7cbcadbafe64a707c0373c010c43d951e455a4dc1a0"
+  }
+}

@@ -1,0 +1,1144 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_449set_nstproxy.py::test_set_nstproxy_validates_requests_and_updates_proxy_config",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_set_nstproxy_validates_requests_and_updates_proxy_config",
+          "start_line": 30,
+          "end_line": 80
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 57,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 58,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 65,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:2"
+      },
+      {
+        "line": 67,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:3"
+      }
+    ],
+    "dynamic_loading": [
+      {
+        "line": 47,
+        "name": "load_function_from_source_ast",
+        "precision": "python_ast_call_name"
+      }
+    ],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "types",
+        "candidates": [
+          "src/crawl4ai/types.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_dynamic_path",
+        "hint": "src/crawl4ai/async_configs.py",
+        "candidates": [
+          "src/crawl4ai/async_configs.py"
+        ],
+        "precision": "exact_visible_path"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/crawl4ai/async_configs.py",
+        "hint_kind": "python_import",
+        "hint": "crawl4ai.script",
+        "candidates": [
+          "src/crawl4ai/script/__init__.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 106960,
+    "read_bytes": 106960,
+    "attempted_files": 3,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_449set_nstproxy.py",
+      "sha256": "f3c06cce107f7eeacac67808fdedc5d5ce15e10c6d5b5c12b3fe3e5576479cce",
+      "bytes": 2767
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/crawl4ai/types.py",
+      "sha256": "08aa497c55c461d46094b690733e80c52c52752590f6b496230f36f23fc9a7b3",
+      "bytes": 7284
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/crawl4ai/async_configs.py",
+      "sha256": "4a118647d77b90d347aea0571292f57afc39e06804d1ccc70c4b8fbce98ff074",
+      "bytes": 96284
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/crawl4ai/script/__init__.py",
+      "sha256": "51516fe491a7e543d4c0adb0ac306e24c5b9d72fcf65d94649e265f155901c27",
+      "bytes": 625
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "branch": "true",
+        "from": "test:56:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:57:8:Assert"
+      },
+      {
+        "branch": "true",
+        "from": "test:56:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:58:8:Assert"
+      },
+      {
+        "branch": "false",
+        "from": "test:56:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:64:8:Assign"
+      },
+      {
+        "branch": "false",
+        "from": "test:56:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:65:8:With"
+      },
+      {
+        "branch": "false",
+        "from": "test:56:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:67:8:Assert"
+      },
+      {
+        "field": "body",
+        "from": "test:66:12:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:65:8:With"
+      },
+      {
+        "from": "test:46:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:46:4:Name"
+      },
+      {
+        "from": "test:47:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:47:4:Name"
+      },
+      {
+        "from": "test:53:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:53:4:Name"
+      },
+      {
+        "from": "test:31:12:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:53:4:Assign",
+        "variable": "scenario"
+      },
+      {
+        "from": "test:54:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:54:4:Name"
+      },
+      {
+        "from": "test:31:12:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:54:4:Assign",
+        "variable": "scenario"
+      },
+      {
+        "from": "test:47:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:57:8:Assert",
+        "variable": "set_nstproxy"
+      },
+      {
+        "from": "test:46:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:57:8:Assert",
+        "variable": "owner"
+      },
+      {
+        "from": "test:53:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:57:8:Assert",
+        "variable": "token"
+      },
+      {
+        "from": "test:54:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:57:8:Assert",
+        "variable": "protocol"
+      },
+      {
+        "from": "test:46:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:58:8:Assert",
+        "variable": "owner"
+      },
+      {
+        "from": "test:64:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:64:8:Name"
+      },
+      {
+        "from": "test:31:12:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:64:8:Assign",
+        "variable": "scenario"
+      },
+      {
+        "from": "test:64:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:65:8:With",
+        "variable": "expected"
+      },
+      {
+        "from": "test:47:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:66:12:Expr",
+        "variable": "set_nstproxy"
+      },
+      {
+        "from": "test:46:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:66:12:Expr",
+        "variable": "owner"
+      },
+      {
+        "from": "test:53:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:66:12:Expr",
+        "variable": "token"
+      },
+      {
+        "from": "test:54:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:66:12:Expr",
+        "variable": "protocol"
+      },
+      {
+        "from": "test:46:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:67:8:Assert",
+        "variable": "owner"
+      },
+      {
+        "callee": "set_nstproxy",
+        "from": "source:2:723:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:57:8:Assert"
+      },
+      {
+        "callee": "set_nstproxy",
+        "from": "source:2:726:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:57:8:Assert"
+      },
+      {
+        "callee": "set_nstproxy",
+        "from": "source:2:747:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:57:8:Assert"
+      },
+      {
+        "callee": "set_nstproxy",
+        "from": "source:2:753:16:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:57:8:Assert"
+      },
+      {
+        "callee": "set_nstproxy",
+        "from": "source:2:756:16:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:57:8:Assert"
+      },
+      {
+        "callee": "set_nstproxy",
+        "from": "source:2:768:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:57:8:Assert"
+      },
+      {
+        "callee": "set_nstproxy",
+        "from": "source:2:769:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:57:8:Assert"
+      },
+      {
+        "callee": "set_nstproxy",
+        "from": "source:2:723:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:66:12:Expr"
+      },
+      {
+        "callee": "set_nstproxy",
+        "from": "source:2:726:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:66:12:Expr"
+      },
+      {
+        "callee": "set_nstproxy",
+        "from": "source:2:747:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:66:12:Expr"
+      },
+      {
+        "callee": "set_nstproxy",
+        "from": "source:2:753:16:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:66:12:Expr"
+      },
+      {
+        "callee": "set_nstproxy",
+        "from": "source:2:756:16:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:66:12:Expr"
+      },
+      {
+        "callee": "set_nstproxy",
+        "from": "source:2:768:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:66:12:Expr"
+      },
+      {
+        "callee": "set_nstproxy",
+        "from": "source:2:769:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:66:12:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:722:11:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:723:12:Raise"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:725:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:726:12:Raise"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:752:15:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:753:16:Raise"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:755:15:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:756:16:Raise"
+      },
+      {
+        "from": "source:2:699:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:726:12:Raise",
+        "variable": "protocol"
+      },
+      {
+        "from": "source:2:729:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:729:8:Name"
+      },
+      {
+        "from": "source:2:695:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:729:8:Assign",
+        "variable": "channel_id"
+      },
+      {
+        "from": "source:2:696:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:729:8:Assign",
+        "variable": "country"
+      },
+      {
+        "from": "source:2:699:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:729:8:Assign",
+        "variable": "protocol"
+      },
+      {
+        "from": "source:2:700:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:729:8:Assign",
+        "variable": "session_duration"
+      },
+      {
+        "from": "source:2:694:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:729:8:Assign",
+        "variable": "token"
+      },
+      {
+        "from": "source:2:743:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:743:8:Name"
+      },
+      {
+        "from": "source:2:746:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:746:12:Name"
+      },
+      {
+        "from": "source:2:743:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:746:12:Assign",
+        "variable": "url"
+      },
+      {
+        "from": "source:2:729:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:746:12:Assign",
+        "variable": "params"
+      },
+      {
+        "from": "source:2:746:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:747:12:Expr",
+        "variable": "response"
+      },
+      {
+        "from": "source:2:749:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:749:12:Name"
+      },
+      {
+        "from": "source:2:746:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:749:12:Assign",
+        "variable": "response"
+      },
+      {
+        "from": "source:2:749:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:753:16:Raise",
+        "variable": "data"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "token: str",
+        "end_line": 694,
+        "id": "source:2:694:8:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 694
+      },
+      {
+        "code": "channel_id: str",
+        "end_line": 695,
+        "id": "source:2:695:8:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 695
+      },
+      {
+        "code": "country: str",
+        "end_line": 696,
+        "id": "source:2:696:8:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 696
+      },
+      {
+        "code": "protocol: str",
+        "end_line": 699,
+        "id": "source:2:699:8:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 699
+      },
+      {
+        "code": "session_duration: int",
+        "end_line": 700,
+        "id": "source:2:700:8:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 700
+      },
+      {
+        "code": "not token or not channel_id",
+        "end_line": 722,
+        "id": "source:2:722:11:BoolOp",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 722
+      },
+      {
+        "code": "raise ValueError('[NSTProxy] token and channel_id are required')",
+        "contains_unresolved_call": true,
+        "end_line": 723,
+        "exception_possible": true,
+        "id": "source:2:723:12:Raise",
+        "kind": "Raise",
+        "source_id": "source:2",
+        "start_line": 723,
+        "unresolved_calls": [
+          "ValueError('[NSTProxy] token and channel_id are required')"
+        ]
+      },
+      {
+        "code": "protocol not in ('http', 'socks5')",
+        "end_line": 725,
+        "id": "source:2:725:11:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 725
+      },
+      {
+        "code": "raise ValueError(f'[NSTProxy] Invalid protocol: {protocol}')",
+        "contains_unresolved_call": true,
+        "end_line": 726,
+        "exception_possible": true,
+        "id": "source:2:726:12:Raise",
+        "kind": "Raise",
+        "source_id": "source:2",
+        "start_line": 726,
+        "unresolved_calls": [
+          "ValueError(f'[NSTProxy] Invalid protocol: {protocol}')"
+        ]
+      },
+      {
+        "code": "params = {'fType': 2, 'count': 1, 'channelId': channel_id, 'country': country, 'protocol': protocol, 'sessionDuration': session_duration, 'token': token}",
+        "end_line": 737,
+        "id": "source:2:729:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 729
+      },
+      {
+        "code": "params",
+        "end_line": 729,
+        "id": "source:2:729:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 729
+      },
+      {
+        "code": "url = 'https://api.nstproxy.com/api/v1/generate/apiproxies'",
+        "end_line": 743,
+        "id": "source:2:743:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 743
+      },
+      {
+        "code": "url",
+        "end_line": 743,
+        "id": "source:2:743:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 743
+      },
+      {
+        "code": "response = requests.get(url, params=params, timeout=10)",
+        "contains_unresolved_call": true,
+        "end_line": 746,
+        "exception_possible": true,
+        "id": "source:2:746:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 746,
+        "unresolved_calls": [
+          "requests.get(url, params=params, timeout=10)"
+        ]
+      },
+      {
+        "code": "response",
+        "end_line": 746,
+        "id": "source:2:746:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 746
+      },
+      {
+        "code": "response.raise_for_status()",
+        "contains_unresolved_call": true,
+        "end_line": 747,
+        "exception_possible": true,
+        "id": "source:2:747:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 747,
+        "unresolved_calls": [
+          "response.raise_for_status()"
+        ]
+      },
+      {
+        "code": "data = response.json()",
+        "contains_unresolved_call": true,
+        "end_line": 749,
+        "exception_possible": true,
+        "id": "source:2:749:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 749,
+        "unresolved_calls": [
+          "response.json()"
+        ]
+      },
+      {
+        "code": "data",
+        "end_line": 749,
+        "id": "source:2:749:12:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 749
+      },
+      {
+        "code": "isinstance(data, dict) and data.get('err')",
+        "end_line": 752,
+        "id": "source:2:752:15:BoolOp",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 752
+      },
+      {
+        "code": "raise PermissionError(f\"[NSTProxy] API Error: {data.get('msg', 'Unknown error')}\")",
+        "contains_unresolved_call": true,
+        "end_line": 753,
+        "exception_possible": true,
+        "id": "source:2:753:16:Raise",
+        "kind": "Raise",
+        "source_id": "source:2",
+        "start_line": 753,
+        "unresolved_calls": [
+          "PermissionError(f\"[NSTProxy] API Error: {data.get('msg', 'Unknown error')}\")",
+          "data.get('msg', 'Unknown error')"
+        ]
+      },
+      {
+        "code": "not isinstance(data, list) or not data",
+        "end_line": 755,
+        "id": "source:2:755:15:BoolOp",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 755
+      },
+      {
+        "code": "raise ValueError('[NSTProxy] Invalid API response — expected a non-empty list')",
+        "contains_unresolved_call": true,
+        "end_line": 756,
+        "exception_possible": true,
+        "id": "source:2:756:16:Raise",
+        "kind": "Raise",
+        "source_id": "source:2",
+        "start_line": 756,
+        "unresolved_calls": [
+          "ValueError('[NSTProxy] Invalid API response — expected a non-empty list')"
+        ]
+      },
+      {
+        "code": "print(f'[NSTProxy] ❌ Failed to set proxy: {e}')",
+        "contains_unresolved_call": true,
+        "end_line": 768,
+        "exception_possible": true,
+        "id": "source:2:768:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 768,
+        "unresolved_calls": [
+          "print(f'[NSTProxy] ❌ Failed to set proxy: {e}')"
+        ]
+      },
+      {
+        "code": "raise",
+        "end_line": 769,
+        "id": "source:2:769:12:Raise",
+        "kind": "Raise",
+        "source_id": "source:2",
+        "start_line": 769
+      },
+      {
+        "code": "scenario",
+        "end_line": 31,
+        "id": "test:31:12:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 31
+      },
+      {
+        "code": "owner = SimpleNamespace(proxy_config=None)",
+        "contains_unresolved_call": true,
+        "end_line": 46,
+        "exception_possible": true,
+        "id": "test:46:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 46,
+        "unresolved_calls": [
+          "SimpleNamespace(proxy_config=None)"
+        ]
+      },
+      {
+        "code": "owner",
+        "end_line": 46,
+        "id": "test:46:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 46
+      },
+      {
+        "code": "set_nstproxy = load_function_from_source_ast(SRC_PATH, 'set_nstproxy', namespace={'requests': requests, 'ProxyConfig': ProxyConfig}, start_line=692)",
+        "contains_unresolved_call": true,
+        "end_line": 52,
+        "exception_possible": true,
+        "id": "test:47:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 47,
+        "unresolved_calls": [
+          "load_function_from_source_ast(SRC_PATH, 'set_nstproxy', namespace={'requests': requests, 'ProxyConfig': ProxyConfig}, start_line=692)"
+        ]
+      },
+      {
+        "code": "set_nstproxy",
+        "end_line": 47,
+        "id": "test:47:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 47
+      },
+      {
+        "code": "token = '' if scenario == 'missing_credentials' else 'token'",
+        "end_line": 53,
+        "id": "test:53:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 53
+      },
+      {
+        "code": "token",
+        "end_line": 53,
+        "id": "test:53:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 53
+      },
+      {
+        "code": "protocol = 'ftp' if scenario == 'invalid_protocol' else 'socks5'",
+        "end_line": 54,
+        "id": "test:54:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 54
+      },
+      {
+        "code": "protocol",
+        "end_line": 54,
+        "id": "test:54:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 54
+      },
+      {
+        "code": "scenario == 'successful_proxy'",
+        "end_line": 56,
+        "id": "test:56:7:Compare",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 56
+      },
+      {
+        "code": "assert set_nstproxy(owner, token, 'channel', state='CA', city='LA', protocol=protocol) is None",
+        "end_line": 57,
+        "exception_possible": true,
+        "id": "test:57:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 57
+      },
+      {
+        "code": "assert vars(owner.proxy_config) == {'server': 'socks5://10.0.0.8:8080', 'username': 'user', 'password': 'pass'}",
+        "contains_unresolved_call": true,
+        "end_line": 62,
+        "exception_possible": true,
+        "id": "test:58:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 58,
+        "unresolved_calls": [
+          "vars(owner.proxy_config)"
+        ]
+      },
+      {
+        "code": "expected = ValueError if scenario in {'missing_credentials', 'invalid_protocol', 'empty_response'} else PermissionError if scenario == 'api_error' else requests.HTTPError",
+        "end_line": 64,
+        "id": "test:64:8:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 64
+      },
+      {
+        "code": "expected",
+        "end_line": 64,
+        "id": "test:64:8:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 64
+      },
+      {
+        "code": "with pytest.raises(expected):\n    set_nstproxy(owner, token, 'channel', protocol=protocol)",
+        "contains_unresolved_call": true,
+        "end_line": 66,
+        "exception_possible": true,
+        "id": "test:65:8:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 65,
+        "unresolved_calls": [
+          "pytest.raises(expected)"
+        ]
+      },
+      {
+        "code": "set_nstproxy(owner, token, 'channel', protocol=protocol)",
+        "end_line": 66,
+        "exception_possible": true,
+        "id": "test:66:12:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 66
+      },
+      {
+        "code": "assert owner.proxy_config is None",
+        "end_line": 67,
+        "id": "test:67:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 67
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:57:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:58:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:65:8:With"
+      },
+      {
+        "criterion_id": "criterion:3",
+        "seed": "test:67:8:Assert"
+      }
+    ],
+    "seeds": [
+      "test:57:8:Assert",
+      "test:58:8:Assert",
+      "test:65:8:With",
+      "test:67:8:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 41,
+    "edges": 58,
+    "edge_kinds": {
+      "lexical_control": 9,
+      "normal_body_exit": 1,
+      "definition_value_candidate": 9,
+      "data_candidate": 25,
+      "call_event_candidate": 14
+    },
+    "criteria": [
+      {
+        "seed": "test:57:8:Assert",
+        "node_ids": [
+          "source:2:694:8:arg",
+          "source:2:695:8:arg",
+          "source:2:696:8:arg",
+          "source:2:699:8:arg",
+          "source:2:700:8:arg",
+          "source:2:722:11:BoolOp",
+          "source:2:723:12:Raise",
+          "source:2:725:11:Compare",
+          "source:2:726:12:Raise",
+          "source:2:729:8:Assign",
+          "source:2:729:8:Name",
+          "source:2:743:8:Assign",
+          "source:2:743:8:Name",
+          "source:2:746:12:Assign",
+          "source:2:746:12:Name",
+          "source:2:747:12:Expr",
+          "source:2:749:12:Assign",
+          "source:2:749:12:Name",
+          "source:2:752:15:BoolOp",
+          "source:2:753:16:Raise",
+          "source:2:755:15:BoolOp",
+          "source:2:756:16:Raise",
+          "source:2:768:12:Expr",
+          "source:2:769:12:Raise",
+          "test:31:12:arg",
+          "test:46:4:Assign",
+          "test:46:4:Name",
+          "test:47:4:Assign",
+          "test:47:4:Name",
+          "test:53:4:Assign",
+          "test:53:4:Name",
+          "test:54:4:Assign",
+          "test:54:4:Name",
+          "test:56:7:Compare",
+          "test:57:8:Assert"
+        ],
+        "product_source_candidates": [
+          "source:2"
+        ],
+        "unknown_call_nodes": [
+          "source:2:723:12:Raise",
+          "source:2:726:12:Raise",
+          "source:2:746:12:Assign",
+          "source:2:747:12:Expr",
+          "source:2:749:12:Assign",
+          "source:2:753:16:Raise",
+          "source:2:756:16:Raise",
+          "source:2:768:12:Expr",
+          "test:46:4:Assign",
+          "test:47:4:Assign"
+        ]
+      },
+      {
+        "seed": "test:58:8:Assert",
+        "node_ids": [
+          "test:46:4:Assign",
+          "test:46:4:Name",
+          "test:56:7:Compare",
+          "test:58:8:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:46:4:Assign",
+          "test:58:8:Assert"
+        ]
+      },
+      {
+        "seed": "test:65:8:With",
+        "node_ids": [
+          "source:2:694:8:arg",
+          "source:2:695:8:arg",
+          "source:2:696:8:arg",
+          "source:2:699:8:arg",
+          "source:2:700:8:arg",
+          "source:2:722:11:BoolOp",
+          "source:2:723:12:Raise",
+          "source:2:725:11:Compare",
+          "source:2:726:12:Raise",
+          "source:2:729:8:Assign",
+          "source:2:729:8:Name",
+          "source:2:743:8:Assign",
+          "source:2:743:8:Name",
+          "source:2:746:12:Assign",
+          "source:2:746:12:Name",
+          "source:2:747:12:Expr",
+          "source:2:749:12:Assign",
+          "source:2:749:12:Name",
+          "source:2:752:15:BoolOp",
+          "source:2:753:16:Raise",
+          "source:2:755:15:BoolOp",
+          "source:2:756:16:Raise",
+          "source:2:768:12:Expr",
+          "source:2:769:12:Raise",
+          "test:31:12:arg",
+          "test:46:4:Assign",
+          "test:46:4:Name",
+          "test:47:4:Assign",
+          "test:47:4:Name",
+          "test:53:4:Assign",
+          "test:53:4:Name",
+          "test:54:4:Assign",
+          "test:54:4:Name",
+          "test:56:7:Compare",
+          "test:64:8:Assign",
+          "test:64:8:Name",
+          "test:65:8:With",
+          "test:66:12:Expr"
+        ],
+        "product_source_candidates": [
+          "source:2"
+        ],
+        "unknown_call_nodes": [
+          "source:2:723:12:Raise",
+          "source:2:726:12:Raise",
+          "source:2:746:12:Assign",
+          "source:2:747:12:Expr",
+          "source:2:749:12:Assign",
+          "source:2:753:16:Raise",
+          "source:2:756:16:Raise",
+          "source:2:768:12:Expr",
+          "test:46:4:Assign",
+          "test:47:4:Assign",
+          "test:65:8:With"
+        ]
+      },
+      {
+        "seed": "test:67:8:Assert",
+        "node_ids": [
+          "test:46:4:Assign",
+          "test:46:4:Name",
+          "test:56:7:Compare",
+          "test:67:8:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:46:4:Assign"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:57:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:58:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:65:8:With"
+      },
+      {
+        "criterion_id": "criterion:3",
+        "seed": "test:67:8:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.4264,
+  "identity": {
+    "case_id": "crawl4ai_449",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "3246a45beb930d890f6e2eddc66fd66c3b5e89205728e961e7e602117c50d53d"
+  }
+}

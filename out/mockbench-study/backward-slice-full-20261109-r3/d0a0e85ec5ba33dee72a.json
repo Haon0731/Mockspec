@@ -1,0 +1,335 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_321get_load_dotenv.py::test_get_load_dotenv_scenarios",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_get_load_dotenv_scenarios",
+          "start_line": 60,
+          "end_line": 98
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 96,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "flask.helpers",
+        "candidates": [
+          "src/src/flask/helpers.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/flask/helpers.py",
+        "hint_kind": "python_import",
+        "hint": "typing",
+        "candidates": [
+          "src/src/flask/typing.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 28183,
+    "read_bytes": 28183,
+    "attempted_files": 2,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_321get_load_dotenv.py",
+      "sha256": "93eb7a91141c25aa37c5ea7867f46b2d9865052ce9ddaeeb1434cca874ee0da7",
+      "bytes": 2005
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/src/flask/helpers.py",
+      "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+      "bytes": 23064
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/src/flask/typing.py",
+      "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+      "bytes": 3114
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "from": "test:93:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:93:4:Name"
+      },
+      {
+        "from": "test:60:64:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:93:4:Assign",
+        "variable": "default_param"
+      },
+      {
+        "from": "test:93:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:96:4:Assert",
+        "variable": "result"
+      },
+      {
+        "from": "test:60:79:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:96:4:Assert",
+        "variable": "expected_result"
+      },
+      {
+        "callee": "get_load_dotenv",
+        "from": "source:1:45:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:93:4:Assign"
+      },
+      {
+        "callee": "get_load_dotenv",
+        "from": "source:1:47:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:93:4:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:44:7:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:45:8:Return"
+      },
+      {
+        "from": "source:1:42:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:42:4:Name"
+      },
+      {
+        "from": "source:1:35:20:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:45:8:Return",
+        "variable": "default"
+      },
+      {
+        "from": "source:1:42:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:47:4:Return",
+        "variable": "val"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "default: bool",
+        "end_line": 35,
+        "id": "source:1:35:20:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 35
+      },
+      {
+        "code": "val = os.environ.get('FLASK_SKIP_DOTENV')",
+        "contains_unresolved_call": true,
+        "end_line": 42,
+        "exception_possible": true,
+        "id": "source:1:42:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 42,
+        "unresolved_calls": [
+          "os.environ.get('FLASK_SKIP_DOTENV')"
+        ]
+      },
+      {
+        "code": "val",
+        "end_line": 42,
+        "id": "source:1:42:4:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 42
+      },
+      {
+        "code": "not val",
+        "end_line": 44,
+        "id": "source:1:44:7:UnaryOp",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 44
+      },
+      {
+        "code": "return default",
+        "end_line": 45,
+        "id": "source:1:45:8:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 45
+      },
+      {
+        "code": "return val.lower() in ('0', 'false', 'no')",
+        "contains_unresolved_call": true,
+        "end_line": 47,
+        "exception_possible": true,
+        "id": "source:1:47:4:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 47,
+        "unresolved_calls": [
+          "val.lower()"
+        ]
+      },
+      {
+        "code": "default_param",
+        "end_line": 60,
+        "id": "test:60:64:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 60
+      },
+      {
+        "code": "expected_result",
+        "end_line": 60,
+        "id": "test:60:79:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 60
+      },
+      {
+        "code": "result = get_load_dotenv(default=default_param)",
+        "end_line": 93,
+        "exception_possible": true,
+        "id": "test:93:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 93
+      },
+      {
+        "code": "result",
+        "end_line": 93,
+        "id": "test:93:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 93
+      },
+      {
+        "code": "assert result == expected_result",
+        "end_line": 96,
+        "id": "test:96:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 96
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:96:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:96:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 11,
+    "edges": 10,
+    "edge_kinds": {
+      "definition_value_candidate": 2,
+      "data_candidate": 5,
+      "call_target_candidate": 2,
+      "lexical_control": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:96:4:Assert",
+        "node_ids": [
+          "source:1:35:20:arg",
+          "source:1:42:4:Assign",
+          "source:1:42:4:Name",
+          "source:1:44:7:UnaryOp",
+          "source:1:45:8:Return",
+          "source:1:47:4:Return",
+          "test:60:64:arg",
+          "test:60:79:arg",
+          "test:93:4:Assign",
+          "test:93:4:Name",
+          "test:96:4:Assert"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:42:4:Assign",
+          "source:1:47:4:Return"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:96:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.1095,
+  "identity": {
+    "case_id": "flask_321",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "44c7ac035393e1151a1ea4012a371d74ac28b49781dacbbf28b849a50006ad03"
+  }
+}

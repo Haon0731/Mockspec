@@ -1,0 +1,1478 @@
+{
+  "candidate": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "The visible factory builds the health URL from the management base URL and PathMappedEndpoints.getPath for the health endpoint. Returning health selects the normal first-choice endpoint path and yields the asserted /actuator/health URL; verification checks that dependency interaction.",
+    "unknowns": []
+  },
+  "extra_evidence": {
+    "goals": [
+      {
+        "expected": "http://application/Uppercase/actuator/health",
+        "assertion_location": {
+          "source_id": "test",
+          "start_line": 54,
+          "end_line": 54,
+          "start_column": 9,
+          "end_column": 89
+        },
+        "projection": {
+          "property": "healthUrl",
+          "getter": "getHealthUrl",
+          "getter_location": {
+            "source_id": "test",
+            "start_line": 54,
+            "end_line": 54,
+            "start_column": 70,
+            "end_column": 87
+          },
+          "test_method": "de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest.should_use_application_uri()",
+          "kind": "lombok_data_builder_property",
+          "producer": "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.createApplication()",
+          "producer_location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "start_line": 70,
+            "end_line": 77,
+            "start_column": 24,
+            "end_column": 5
+          },
+          "field_location": {
+            "source_id": "repository:2556b9d782d3af2b11db6629",
+            "start_line": 34,
+            "end_line": 34,
+            "start_column": 26,
+            "end_column": 35
+          },
+          "selected_expression_location": {
+            "source_id": "repository:f1cbe4e7534b595de231fa4a",
+            "start_line": 72,
+            "end_line": 72,
+            "start_column": 38,
+            "end_column": 51
+          },
+          "sibling_builder_arguments_executed": false
+        },
+        "truncated": false,
+        "goal_id": "test:54:9:healthUrl:1",
+        "paths": [
+          {
+            "path_id": "p1",
+            "guards": [],
+            "value": {
+              "kind": "symbol",
+              "id": "exception:repository:f1cbe4e7534b595de231fa4a:197:25#1"
+            },
+            "events": [
+              {
+                "call_id": "repository:f1cbe4e7534b595de231fa4a:197:25#1",
+                "receiver": "pathMappedEndpoints",
+                "name": "getPath",
+                "arguments": [
+                  {
+                    "kind": "call",
+                    "owner": "org.springframework.boot.actuate.endpoint.EndpointId",
+                    "name": "of",
+                    "target": null,
+                    "arguments": [
+                      {
+                        "kind": "literal",
+                        "value": "health"
+                      }
+                    ]
+                  }
+                ],
+                "outcome": "raise",
+                "result_symbol": "exception:repository:f1cbe4e7534b595de231fa4a:197:25#1",
+                "location": {
+                  "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                  "start_line": 197,
+                  "end_line": 197,
+                  "start_column": 25,
+                  "end_column": 76
+                }
+              }
+            ],
+            "outcome": "raise",
+            "unknowns": [],
+            "evidence_refs": [
+              "ev1",
+              "ev2",
+              "ev3",
+              "ev4",
+              "ev5",
+              "ev6",
+              "ev7",
+              "ev8",
+              "ev9",
+              "ev10",
+              "ev11",
+              "ev12",
+              "ev13",
+              "ev14",
+              "ev15",
+              "ev16",
+              "ev17",
+              "ev18",
+              "ev19",
+              "ev20",
+              "ev21",
+              "ev22",
+              "ev23",
+              "ev24",
+              "ev25",
+              "ev26",
+              "ev27",
+              "ev28",
+              "ev29",
+              "ev30",
+              "ev31",
+              "ev32",
+              "ev33",
+              "ev34",
+              "ev35",
+              "ev36",
+              "ev37",
+              "ev38",
+              "ev39",
+              "ev40",
+              "ev41",
+              "ev42",
+              "ev43",
+              "ev44",
+              "ev45",
+              "ev46",
+              "ev47",
+              "ev48",
+              "ev49",
+              "ev50"
+            ],
+            "assumption_refs": [
+              "a1",
+              "a1",
+              "a1",
+              "a2",
+              "a3",
+              "a4",
+              "a5",
+              "a6",
+              "a7",
+              "a8",
+              "a9",
+              "a10"
+            ]
+          },
+          {
+            "path_id": "p2",
+            "guards": [
+              {
+                "condition": {
+                  "kind": "call",
+                  "owner": "org.springframework.util.StringUtils",
+                  "name": "hasText",
+                  "target": null,
+                  "arguments": [
+                    {
+                      "kind": "symbol",
+                      "id": "result:repository:f1cbe4e7534b595de231fa4a:197:25#1"
+                    }
+                  ]
+                },
+                "polarity": false
+              }
+            ],
+            "value": {
+              "kind": "symbol",
+              "id": "exception:repository:f1cbe4e7534b595de231fa4a:201:25#1"
+            },
+            "events": [
+              {
+                "call_id": "repository:f1cbe4e7534b595de231fa4a:197:25#1",
+                "receiver": "pathMappedEndpoints",
+                "name": "getPath",
+                "arguments": [
+                  {
+                    "kind": "call",
+                    "owner": "org.springframework.boot.actuate.endpoint.EndpointId",
+                    "name": "of",
+                    "target": null,
+                    "arguments": [
+                      {
+                        "kind": "literal",
+                        "value": "health"
+                      }
+                    ]
+                  }
+                ],
+                "outcome": "normal",
+                "result_symbol": "result:repository:f1cbe4e7534b595de231fa4a:197:25#1",
+                "location": {
+                  "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                  "start_line": 197,
+                  "end_line": 197,
+                  "start_column": 25,
+                  "end_column": 76
+                }
+              },
+              {
+                "call_id": "repository:f1cbe4e7534b595de231fa4a:201:25#1",
+                "receiver": "pathMappedEndpoints",
+                "name": "getPath",
+                "arguments": [
+                  {
+                    "kind": "call",
+                    "owner": "org.springframework.boot.actuate.endpoint.EndpointId",
+                    "name": "of",
+                    "target": null,
+                    "arguments": [
+                      {
+                        "kind": "literal",
+                        "value": "status"
+                      }
+                    ]
+                  }
+                ],
+                "outcome": "raise",
+                "result_symbol": "exception:repository:f1cbe4e7534b595de231fa4a:201:25#1",
+                "location": {
+                  "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                  "start_line": 201,
+                  "end_line": 201,
+                  "start_column": 25,
+                  "end_column": 76
+                }
+              }
+            ],
+            "outcome": "raise",
+            "unknowns": [],
+            "evidence_refs": [
+              "ev1",
+              "ev2",
+              "ev3",
+              "ev4",
+              "ev5",
+              "ev6",
+              "ev7",
+              "ev8",
+              "ev9",
+              "ev10",
+              "ev11",
+              "ev12",
+              "ev13",
+              "ev14",
+              "ev15",
+              "ev16",
+              "ev17",
+              "ev18",
+              "ev19",
+              "ev20",
+              "ev21",
+              "ev22",
+              "ev23",
+              "ev24",
+              "ev25",
+              "ev26",
+              "ev27",
+              "ev28",
+              "ev29",
+              "ev30",
+              "ev31",
+              "ev32",
+              "ev33",
+              "ev34",
+              "ev35",
+              "ev36",
+              "ev37",
+              "ev38",
+              "ev39",
+              "ev40",
+              "ev41",
+              "ev42",
+              "ev43",
+              "ev44",
+              "ev45",
+              "ev46",
+              "ev47",
+              "ev48",
+              "ev49",
+              "ev50"
+            ],
+            "assumption_refs": [
+              "a1",
+              "a1",
+              "a1",
+              "a2",
+              "a3",
+              "a4",
+              "a5",
+              "a6",
+              "a7",
+              "a8",
+              "a9",
+              "a10",
+              "a11",
+              "a12",
+              "a13"
+            ]
+          },
+          {
+            "path_id": "p3",
+            "guards": [
+              {
+                "condition": {
+                  "kind": "call",
+                  "owner": "org.springframework.util.StringUtils",
+                  "name": "hasText",
+                  "target": null,
+                  "arguments": [
+                    {
+                      "kind": "symbol",
+                      "id": "result:repository:f1cbe4e7534b595de231fa4a:197:25#1"
+                    }
+                  ]
+                },
+                "polarity": false
+              },
+              {
+                "condition": {
+                  "kind": "call",
+                  "owner": "org.springframework.util.StringUtils",
+                  "name": "hasText",
+                  "target": null,
+                  "arguments": [
+                    {
+                      "kind": "symbol",
+                      "id": "result:repository:f1cbe4e7534b595de231fa4a:201:25#1"
+                    }
+                  ]
+                },
+                "polarity": false
+              }
+            ],
+            "value": {
+              "kind": "symbol",
+              "id": "object:o7"
+            },
+            "events": [
+              {
+                "call_id": "repository:f1cbe4e7534b595de231fa4a:197:25#1",
+                "receiver": "pathMappedEndpoints",
+                "name": "getPath",
+                "arguments": [
+                  {
+                    "kind": "call",
+                    "owner": "org.springframework.boot.actuate.endpoint.EndpointId",
+                    "name": "of",
+                    "target": null,
+                    "arguments": [
+                      {
+                        "kind": "literal",
+                        "value": "health"
+                      }
+                    ]
+                  }
+                ],
+                "outcome": "normal",
+                "result_symbol": "result:repository:f1cbe4e7534b595de231fa4a:197:25#1",
+                "location": {
+                  "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                  "start_line": 197,
+                  "end_line": 197,
+                  "start_column": 25,
+                  "end_column": 76
+                }
+              },
+              {
+                "call_id": "repository:f1cbe4e7534b595de231fa4a:201:25#1",
+                "receiver": "pathMappedEndpoints",
+                "name": "getPath",
+                "arguments": [
+                  {
+                    "kind": "call",
+                    "owner": "org.springframework.boot.actuate.endpoint.EndpointId",
+                    "name": "of",
+                    "target": null,
+                    "arguments": [
+                      {
+                        "kind": "literal",
+                        "value": "status"
+                      }
+                    ]
+                  }
+                ],
+                "outcome": "normal",
+                "result_symbol": "result:repository:f1cbe4e7534b595de231fa4a:201:25#1",
+                "location": {
+                  "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                  "start_line": 201,
+                  "end_line": 201,
+                  "start_column": 25,
+                  "end_column": 76
+                }
+              }
+            ],
+            "outcome": "raise",
+            "unknowns": [],
+            "evidence_refs": [
+              "ev1",
+              "ev2",
+              "ev3",
+              "ev4",
+              "ev5",
+              "ev6",
+              "ev7",
+              "ev8",
+              "ev9",
+              "ev10",
+              "ev11",
+              "ev12",
+              "ev13",
+              "ev14",
+              "ev15",
+              "ev16",
+              "ev17",
+              "ev18",
+              "ev19",
+              "ev20",
+              "ev21",
+              "ev22",
+              "ev23",
+              "ev24",
+              "ev25",
+              "ev26",
+              "ev27",
+              "ev28",
+              "ev29",
+              "ev30",
+              "ev31",
+              "ev32",
+              "ev33",
+              "ev34",
+              "ev35",
+              "ev36",
+              "ev37",
+              "ev38",
+              "ev39",
+              "ev40",
+              "ev41",
+              "ev42",
+              "ev43",
+              "ev44",
+              "ev45",
+              "ev46",
+              "ev47",
+              "ev48",
+              "ev49",
+              "ev50"
+            ],
+            "assumption_refs": [
+              "a1",
+              "a1",
+              "a1",
+              "a2",
+              "a3",
+              "a4",
+              "a5",
+              "a6",
+              "a7",
+              "a8",
+              "a9",
+              "a10",
+              "a11",
+              "a12",
+              "a13",
+              "a14",
+              "a15"
+            ]
+          },
+          {
+            "path_id": "p4",
+            "guards": [
+              {
+                "condition": {
+                  "kind": "call",
+                  "owner": "org.springframework.util.StringUtils",
+                  "name": "hasText",
+                  "target": null,
+                  "arguments": [
+                    {
+                      "kind": "symbol",
+                      "id": "result:repository:f1cbe4e7534b595de231fa4a:197:25#1"
+                    }
+                  ]
+                },
+                "polarity": true
+              }
+            ],
+            "value": {
+              "kind": "call",
+              "owner": "org.springframework.web.util.UriComponentsBuilder",
+              "name": "toUriString",
+              "target": {
+                "kind": "call",
+                "owner": "org.springframework.web.util.UriComponentsBuilder",
+                "name": "path",
+                "target": {
+                  "kind": "call",
+                  "owner": "org.springframework.web.util.UriComponentsBuilder",
+                  "name": "path",
+                  "target": {
+                    "kind": "call",
+                    "owner": "org.springframework.web.util.UriComponentsBuilder",
+                    "name": "fromHttpUrl",
+                    "target": null,
+                    "arguments": [
+                      {
+                        "kind": "literal",
+                        "value": "http://application/Uppercase/"
+                      }
+                    ]
+                  },
+                  "arguments": [
+                    {
+                      "kind": "literal",
+                      "value": "/"
+                    }
+                  ]
+                },
+                "arguments": [
+                  {
+                    "kind": "symbol",
+                    "id": "result:repository:f1cbe4e7534b595de231fa4a:197:25#1"
+                  }
+                ]
+              },
+              "arguments": []
+            },
+            "events": [
+              {
+                "call_id": "repository:f1cbe4e7534b595de231fa4a:197:25#1",
+                "receiver": "pathMappedEndpoints",
+                "name": "getPath",
+                "arguments": [
+                  {
+                    "kind": "call",
+                    "owner": "org.springframework.boot.actuate.endpoint.EndpointId",
+                    "name": "of",
+                    "target": null,
+                    "arguments": [
+                      {
+                        "kind": "literal",
+                        "value": "health"
+                      }
+                    ]
+                  }
+                ],
+                "outcome": "normal",
+                "result_symbol": "result:repository:f1cbe4e7534b595de231fa4a:197:25#1",
+                "location": {
+                  "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                  "start_line": 197,
+                  "end_line": 197,
+                  "start_column": 25,
+                  "end_column": 76
+                }
+              }
+            ],
+            "outcome": "return",
+            "unknowns": [],
+            "evidence_refs": [
+              "ev1",
+              "ev2",
+              "ev3",
+              "ev4",
+              "ev5",
+              "ev6",
+              "ev7",
+              "ev8",
+              "ev9",
+              "ev10",
+              "ev11",
+              "ev12",
+              "ev13",
+              "ev14",
+              "ev15",
+              "ev16",
+              "ev17",
+              "ev18",
+              "ev19",
+              "ev20",
+              "ev21",
+              "ev22",
+              "ev23",
+              "ev24",
+              "ev25",
+              "ev26",
+              "ev27",
+              "ev28",
+              "ev29",
+              "ev30",
+              "ev31",
+              "ev32",
+              "ev33",
+              "ev34",
+              "ev35",
+              "ev36",
+              "ev37",
+              "ev38",
+              "ev39",
+              "ev40",
+              "ev41",
+              "ev42",
+              "ev43",
+              "ev44",
+              "ev45",
+              "ev46",
+              "ev47",
+              "ev48",
+              "ev49",
+              "ev50"
+            ],
+            "assumption_refs": [
+              "a1",
+              "a1",
+              "a1",
+              "a2",
+              "a3",
+              "a4",
+              "a5",
+              "a6",
+              "a7",
+              "a8",
+              "a9",
+              "a10",
+              "a11",
+              "a12",
+              "a16",
+              "a17"
+            ]
+          },
+          {
+            "path_id": "p5",
+            "guards": [
+              {
+                "condition": {
+                  "kind": "call",
+                  "owner": "org.springframework.util.StringUtils",
+                  "name": "hasText",
+                  "target": null,
+                  "arguments": [
+                    {
+                      "kind": "symbol",
+                      "id": "result:repository:f1cbe4e7534b595de231fa4a:197:25#1"
+                    }
+                  ]
+                },
+                "polarity": false
+              },
+              {
+                "condition": {
+                  "kind": "call",
+                  "owner": "org.springframework.util.StringUtils",
+                  "name": "hasText",
+                  "target": null,
+                  "arguments": [
+                    {
+                      "kind": "symbol",
+                      "id": "result:repository:f1cbe4e7534b595de231fa4a:201:25#1"
+                    }
+                  ]
+                },
+                "polarity": true
+              }
+            ],
+            "value": {
+              "kind": "call",
+              "owner": "org.springframework.web.util.UriComponentsBuilder",
+              "name": "toUriString",
+              "target": {
+                "kind": "call",
+                "owner": "org.springframework.web.util.UriComponentsBuilder",
+                "name": "path",
+                "target": {
+                  "kind": "call",
+                  "owner": "org.springframework.web.util.UriComponentsBuilder",
+                  "name": "path",
+                  "target": {
+                    "kind": "call",
+                    "owner": "org.springframework.web.util.UriComponentsBuilder",
+                    "name": "fromHttpUrl",
+                    "target": null,
+                    "arguments": [
+                      {
+                        "kind": "literal",
+                        "value": "http://application/Uppercase/"
+                      }
+                    ]
+                  },
+                  "arguments": [
+                    {
+                      "kind": "literal",
+                      "value": "/"
+                    }
+                  ]
+                },
+                "arguments": [
+                  {
+                    "kind": "symbol",
+                    "id": "result:repository:f1cbe4e7534b595de231fa4a:201:25#1"
+                  }
+                ]
+              },
+              "arguments": []
+            },
+            "events": [
+              {
+                "call_id": "repository:f1cbe4e7534b595de231fa4a:197:25#1",
+                "receiver": "pathMappedEndpoints",
+                "name": "getPath",
+                "arguments": [
+                  {
+                    "kind": "call",
+                    "owner": "org.springframework.boot.actuate.endpoint.EndpointId",
+                    "name": "of",
+                    "target": null,
+                    "arguments": [
+                      {
+                        "kind": "literal",
+                        "value": "health"
+                      }
+                    ]
+                  }
+                ],
+                "outcome": "normal",
+                "result_symbol": "result:repository:f1cbe4e7534b595de231fa4a:197:25#1",
+                "location": {
+                  "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                  "start_line": 197,
+                  "end_line": 197,
+                  "start_column": 25,
+                  "end_column": 76
+                }
+              },
+              {
+                "call_id": "repository:f1cbe4e7534b595de231fa4a:201:25#1",
+                "receiver": "pathMappedEndpoints",
+                "name": "getPath",
+                "arguments": [
+                  {
+                    "kind": "call",
+                    "owner": "org.springframework.boot.actuate.endpoint.EndpointId",
+                    "name": "of",
+                    "target": null,
+                    "arguments": [
+                      {
+                        "kind": "literal",
+                        "value": "status"
+                      }
+                    ]
+                  }
+                ],
+                "outcome": "normal",
+                "result_symbol": "result:repository:f1cbe4e7534b595de231fa4a:201:25#1",
+                "location": {
+                  "source_id": "repository:f1cbe4e7534b595de231fa4a",
+                  "start_line": 201,
+                  "end_line": 201,
+                  "start_column": 25,
+                  "end_column": 76
+                }
+              }
+            ],
+            "outcome": "return",
+            "unknowns": [],
+            "evidence_refs": [
+              "ev1",
+              "ev2",
+              "ev3",
+              "ev4",
+              "ev5",
+              "ev6",
+              "ev7",
+              "ev8",
+              "ev9",
+              "ev10",
+              "ev11",
+              "ev12",
+              "ev13",
+              "ev14",
+              "ev15",
+              "ev16",
+              "ev17",
+              "ev18",
+              "ev19",
+              "ev20",
+              "ev21",
+              "ev22",
+              "ev23",
+              "ev24",
+              "ev25",
+              "ev26",
+              "ev27",
+              "ev28",
+              "ev29",
+              "ev30",
+              "ev31",
+              "ev32",
+              "ev33",
+              "ev34",
+              "ev35",
+              "ev36",
+              "ev37",
+              "ev38",
+              "ev39",
+              "ev40",
+              "ev41",
+              "ev42",
+              "ev43",
+              "ev44",
+              "ev45",
+              "ev46",
+              "ev47",
+              "ev48",
+              "ev49",
+              "ev50"
+            ],
+            "assumption_refs": [
+              "a1",
+              "a1",
+              "a1",
+              "a2",
+              "a3",
+              "a4",
+              "a5",
+              "a6",
+              "a7",
+              "a8",
+              "a9",
+              "a10",
+              "a11",
+              "a12",
+              "a13",
+              "a14",
+              "a15",
+              "a16",
+              "a17"
+            ]
+          }
+        ]
+      }
+    ],
+    "evidence_catalog": {
+      "ev1": {
+        "source_id": "repository:4826eaf30d4e8484df5263f5",
+        "start_line": 53,
+        "end_line": 53,
+        "start_column": 20,
+        "end_column": 29
+      },
+      "ev2": {
+        "source_id": "repository:4826eaf30d4e8484df5263f5",
+        "start_line": 36,
+        "end_line": 36,
+        "start_column": 20,
+        "end_column": 37
+      },
+      "ev3": {
+        "source_id": "repository:4826eaf30d4e8484df5263f5",
+        "start_line": 31,
+        "end_line": 31,
+        "start_column": 20,
+        "end_column": 33
+      },
+      "ev4": {
+        "source_id": "repository:4826eaf30d4e8484df5263f5",
+        "start_line": 69,
+        "end_line": 69,
+        "start_column": 33,
+        "end_column": 65
+      },
+      "ev5": {
+        "source_id": "repository:4826eaf30d4e8484df5263f5",
+        "start_line": 59,
+        "end_line": 59,
+        "start_column": 20,
+        "end_column": 24
+      },
+      "ev6": {
+        "source_id": "repository:4826eaf30d4e8484df5263f5",
+        "start_line": 64,
+        "end_line": 64,
+        "start_column": 21,
+        "end_column": 37
+      },
+      "ev7": {
+        "source_id": "repository:4826eaf30d4e8484df5263f5",
+        "start_line": 47,
+        "end_line": 47,
+        "start_column": 20,
+        "end_column": 34
+      },
+      "ev8": {
+        "source_id": "repository:4826eaf30d4e8484df5263f5",
+        "start_line": 42,
+        "end_line": 42,
+        "start_column": 20,
+        "end_column": 30
+      },
+      "ev9": {
+        "source_id": "test",
+        "start_line": 40,
+        "end_line": 40,
+        "start_column": 9,
+        "end_column": 43
+      },
+      "ev10": {
+        "source_id": "repository:c4191507182e717b4230cd65",
+        "start_line": 26,
+        "end_line": 26,
+        "start_column": 20,
+        "end_column": 33
+      },
+      "ev11": {
+        "source_id": "repository:c4191507182e717b4230cd65",
+        "start_line": 27,
+        "end_line": 27,
+        "start_column": 20,
+        "end_column": 33
+      },
+      "ev12": {
+        "source_id": "repository:c4191507182e717b4230cd65",
+        "start_line": 28,
+        "end_line": 28,
+        "start_column": 26,
+        "end_column": 50
+      },
+      "ev13": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 45,
+        "end_line": 45,
+        "start_column": 38,
+        "end_column": 46
+      },
+      "ev14": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 52,
+        "end_line": 52,
+        "start_column": 21,
+        "end_column": 40
+      },
+      "ev15": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 51,
+        "end_line": 51,
+        "start_column": 21,
+        "end_column": 36
+      },
+      "ev16": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 47,
+        "end_line": 47,
+        "start_column": 46,
+        "end_column": 56
+      },
+      "ev17": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 50,
+        "end_line": 50,
+        "start_column": 39,
+        "end_column": 58
+      },
+      "ev18": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 48,
+        "end_line": 48,
+        "start_column": 39,
+        "end_column": 58
+      },
+      "ev19": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 46,
+        "end_line": 46,
+        "start_column": 36,
+        "end_column": 42
+      },
+      "ev20": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 49,
+        "end_line": 49,
+        "start_column": 41,
+        "end_column": 52
+      },
+      "ev21": {
+        "source_id": "mut",
+        "start_line": 29,
+        "end_line": 29,
+        "start_column": 53,
+        "end_column": 76
+      },
+      "ev22": {
+        "source_id": "mut",
+        "start_line": 31,
+        "end_line": 40,
+        "start_column": 12,
+        "end_column": 5
+      },
+      "ev23": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 55,
+        "end_line": 67,
+        "start_column": 12,
+        "end_column": 5
+      },
+      "ev24": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 61,
+        "end_line": 61,
+        "start_column": 9,
+        "end_column": 33
+      },
+      "ev25": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 62,
+        "end_line": 62,
+        "start_column": 9,
+        "end_column": 37
+      },
+      "ev26": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 63,
+        "end_line": 63,
+        "start_column": 9,
+        "end_column": 29
+      },
+      "ev27": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 64,
+        "end_line": 64,
+        "start_column": 9,
+        "end_column": 55
+      },
+      "ev28": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 65,
+        "end_line": 65,
+        "start_column": 9,
+        "end_column": 39
+      },
+      "ev29": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 66,
+        "end_line": 66,
+        "start_column": 9,
+        "end_column": 55
+      },
+      "ev30": {
+        "source_id": "mut",
+        "start_line": 39,
+        "end_line": 39,
+        "start_column": 9,
+        "end_column": 63
+      },
+      "ev31": {
+        "source_id": "test",
+        "start_line": 49,
+        "end_line": 49,
+        "start_column": 9,
+        "end_column": 80
+      },
+      "ev32": {
+        "source_id": "test",
+        "start_line": 51,
+        "end_line": 51,
+        "start_column": 21,
+        "end_column": 54
+      },
+      "ev33": {
+        "source_id": "repository:2556b9d782d3af2b11db6629",
+        "start_line": 34,
+        "end_line": 34,
+        "start_column": 26,
+        "end_column": 35
+      },
+      "ev34": {
+        "source_id": "repository:2556b9d782d3af2b11db6629",
+        "start_line": 39,
+        "end_line": 51,
+        "start_column": 15,
+        "end_column": 5
+      },
+      "ev35": {
+        "source_id": "repository:2556b9d782d3af2b11db6629",
+        "start_line": 48,
+        "end_line": 48,
+        "start_column": 9,
+        "end_column": 35
+      },
+      "ev36": {
+        "source_id": "test",
+        "start_line": 54,
+        "end_line": 54,
+        "start_column": 70,
+        "end_column": 87
+      },
+      "ev37": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 70,
+        "end_line": 77,
+        "start_column": 24,
+        "end_column": 5
+      },
+      "ev38": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 72,
+        "end_line": 72,
+        "start_column": 38,
+        "end_column": 51
+      },
+      "ev39": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 147,
+        "end_line": 155,
+        "start_column": 22,
+        "end_column": 5
+      },
+      "ev40": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 148,
+        "end_line": 148,
+        "start_column": 13,
+        "end_column": 35
+      },
+      "ev41": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 120,
+        "end_line": 137,
+        "start_column": 22,
+        "end_column": 5
+      },
+      "ev42": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 121,
+        "end_line": 121,
+        "start_column": 26,
+        "end_column": 56
+      },
+      "ev43": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 139,
+        "end_line": 141,
+        "start_column": 23,
+        "end_column": 5
+      },
+      "ev44": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 192,
+        "end_line": 194,
+        "start_column": 23,
+        "end_column": 5
+      },
+      "ev45": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 83,
+        "end_line": 89,
+        "start_column": 22,
+        "end_column": 5
+      },
+      "ev46": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 84,
+        "end_line": 84,
+        "start_column": 13,
+        "end_column": 36
+      },
+      "ev47": {
+        "source_id": "mut",
+        "start_line": 43,
+        "end_line": 50,
+        "start_column": 22,
+        "end_column": 5
+      },
+      "ev48": {
+        "source_id": "mut",
+        "start_line": 44,
+        "end_line": 44,
+        "start_column": 13,
+        "end_column": 45
+      },
+      "ev49": {
+        "source_id": "mut",
+        "start_line": 48,
+        "end_line": 48,
+        "start_column": 22,
+        "end_column": 54
+      },
+      "ev50": {
+        "source_id": "repository:f1cbe4e7534b595de231fa4a",
+        "start_line": 196,
+        "end_line": 206,
+        "start_column": 22,
+        "end_column": 5
+      }
+    },
+    "assumption_catalog": {
+      "a1": {
+        "kind": "java_object_constructor",
+        "location": {}
+      },
+      "a2": {
+        "kind": "supported_library_summary",
+        "owner": "org.springframework.util.StringUtils",
+        "name": "isEmpty",
+        "location": {
+          "source_id": "repository:f1cbe4e7534b595de231fa4a",
+          "start_line": 123,
+          "end_line": 123,
+          "start_column": 14,
+          "end_column": 41
+        },
+        "normal_completion": true
+      },
+      "a3": {
+        "kind": "supported_library_summary",
+        "owner": "java.util.List",
+        "name": "isEmpty",
+        "location": {
+          "source_id": "mut",
+          "start_line": 44,
+          "end_line": 44,
+          "start_column": 13,
+          "end_column": 55
+        },
+        "normal_completion": true
+      },
+      "a4": {
+        "kind": "supported_library_summary",
+        "owner": "java.util.List",
+        "name": "get",
+        "location": {
+          "source_id": "mut",
+          "start_line": 48,
+          "end_line": 48,
+          "start_column": 22,
+          "end_column": 61
+        },
+        "normal_completion": true
+      },
+      "a5": {
+        "kind": "supported_library_summary",
+        "owner": "org.springframework.web.util.UriComponentsBuilder",
+        "name": "fromUriString",
+        "location": {
+          "source_id": "repository:f1cbe4e7534b595de231fa4a",
+          "start_line": 88,
+          "end_line": 88,
+          "start_column": 16,
+          "end_column": 70
+        },
+        "normal_completion": true
+      },
+      "a6": {
+        "kind": "supported_library_summary",
+        "owner": "org.springframework.web.util.UriComponentsBuilder",
+        "name": "path",
+        "location": {
+          "source_id": "repository:f1cbe4e7534b595de231fa4a",
+          "start_line": 88,
+          "end_line": 88,
+          "start_column": 16,
+          "end_column": 80
+        },
+        "normal_completion": true
+      },
+      "a7": {
+        "kind": "supported_library_summary",
+        "owner": "org.springframework.web.util.UriComponentsBuilder",
+        "name": "toUriString",
+        "location": {
+          "source_id": "repository:f1cbe4e7534b595de231fa4a",
+          "start_line": 88,
+          "end_line": 88,
+          "start_column": 16,
+          "end_column": 94
+        },
+        "normal_completion": true
+      },
+      "a8": {
+        "kind": "supported_library_summary",
+        "owner": "org.springframework.web.util.UriComponentsBuilder",
+        "name": "fromHttpUrl",
+        "location": {
+          "source_id": "repository:f1cbe4e7534b595de231fa4a",
+          "start_line": 151,
+          "end_line": 151,
+          "start_column": 16,
+          "end_column": 71
+        },
+        "normal_completion": true
+      },
+      "a9": {
+        "kind": "supported_library_summary",
+        "owner": "org.springframework.web.util.UriComponentsBuilder",
+        "name": "path",
+        "location": {
+          "source_id": "repository:f1cbe4e7534b595de231fa4a",
+          "start_line": 151,
+          "end_line": 152,
+          "start_column": 16,
+          "end_column": 45
+        },
+        "normal_completion": true
+      },
+      "a10": {
+        "kind": "supported_library_summary",
+        "owner": "org.springframework.boot.actuate.endpoint.EndpointId",
+        "name": "of",
+        "location": {
+          "source_id": "repository:f1cbe4e7534b595de231fa4a",
+          "start_line": 197,
+          "end_line": 197,
+          "start_column": 53,
+          "end_column": 75
+        },
+        "normal_completion": true
+      },
+      "a11": {
+        "kind": "mock_boundary_response",
+        "call_id": "repository:f1cbe4e7534b595de231fa4a:197:25#1",
+        "receiver": "pathMappedEndpoints",
+        "normal_completion": true,
+        "heap_writes": "unknown_not_modeled",
+        "location": {
+          "source_id": "repository:f1cbe4e7534b595de231fa4a",
+          "start_line": 197,
+          "end_line": 197,
+          "start_column": 25,
+          "end_column": 76
+        }
+      },
+      "a12": {
+        "kind": "supported_library_summary",
+        "owner": "org.springframework.util.StringUtils",
+        "name": "hasText",
+        "location": {
+          "source_id": "repository:f1cbe4e7534b595de231fa4a",
+          "start_line": 198,
+          "end_line": 198,
+          "start_column": 13,
+          "end_column": 39
+        },
+        "normal_completion": true
+      },
+      "a13": {
+        "kind": "supported_library_summary",
+        "owner": "org.springframework.boot.actuate.endpoint.EndpointId",
+        "name": "of",
+        "location": {
+          "source_id": "repository:f1cbe4e7534b595de231fa4a",
+          "start_line": 201,
+          "end_line": 201,
+          "start_column": 53,
+          "end_column": 75
+        },
+        "normal_completion": true
+      },
+      "a14": {
+        "kind": "mock_boundary_response",
+        "call_id": "repository:f1cbe4e7534b595de231fa4a:201:25#1",
+        "receiver": "pathMappedEndpoints",
+        "normal_completion": true,
+        "heap_writes": "unknown_not_modeled",
+        "location": {
+          "source_id": "repository:f1cbe4e7534b595de231fa4a",
+          "start_line": 201,
+          "end_line": 201,
+          "start_column": 25,
+          "end_column": 76
+        }
+      },
+      "a15": {
+        "kind": "supported_library_summary",
+        "owner": "org.springframework.util.StringUtils",
+        "name": "hasText",
+        "location": {
+          "source_id": "repository:f1cbe4e7534b595de231fa4a",
+          "start_line": 202,
+          "end_line": 202,
+          "start_column": 13,
+          "end_column": 39
+        },
+        "normal_completion": true
+      },
+      "a16": {
+        "kind": "supported_library_summary",
+        "owner": "org.springframework.web.util.UriComponentsBuilder",
+        "name": "path",
+        "location": {
+          "source_id": "repository:f1cbe4e7534b595de231fa4a",
+          "start_line": 151,
+          "end_line": 153,
+          "start_column": 16,
+          "end_column": 65
+        },
+        "normal_completion": true
+      },
+      "a17": {
+        "kind": "supported_library_summary",
+        "owner": "org.springframework.web.util.UriComponentsBuilder",
+        "name": "toUriString",
+        "location": {
+          "source_id": "repository:f1cbe4e7534b595de231fa4a",
+          "start_line": 151,
+          "end_line": 154,
+          "start_column": 16,
+          "end_column": 49
+        },
+        "normal_completion": true
+      }
+    },
+    "analysis_limitations": [
+      "Only literal-first assertEquals observations are selected.",
+      "Setup interpretation is bounded to local construction and explicit/Lombok field setters.",
+      "Lombok Data getter/setter and Builder projection are syntax-backed assumptions.",
+      "Only the selected property is expanded; sibling builder arguments are not executed.",
+      "Library calls remain call terms and may return normally or raise.",
+      "No SAT, heap-alias proof, or complete Java exception semantics is provided."
+    ],
+    "check_of_supplied_candidate": [
+      {
+        "verdict": "conflict",
+        "goal_id": "test:54:9:healthUrl:1",
+        "paths": [
+          {
+            "path_id": "p1",
+            "verdict": "excluded",
+            "reason": "configured normal return excludes this exception exit"
+          },
+          {
+            "path_id": "p2",
+            "verdict": "excluded",
+            "reason": "prefix guard false before next event"
+          },
+          {
+            "path_id": "p3",
+            "verdict": "excluded",
+            "reason": "prefix guard false before next event"
+          },
+          {
+            "path_id": "p4",
+            "actual": "http://application/Uppercase/health",
+            "expected": "http://application/Uppercase/actuator/health",
+            "response_symbols": {
+              "result:repository:f1cbe4e7534b595de231fa4a:197:25#1": "health"
+            },
+            "verdict": "conflict",
+            "reason": "constructed value differs from original assertion"
+          },
+          {
+            "path_id": "p5",
+            "verdict": "excluded",
+            "reason": "prefix guard false before next event"
+          }
+        ],
+        "scope": "projected goal under recorded normal-completion and library-summary assumptions; not whole-test validity"
+      }
+    ],
+    "library_summary_scope": "Spring 5.1.2.RELEASE; null/ASCII predicates and restricted HTTP(S) URI path construction; no query/fragment/templates/percent-encoding/dot segments",
+    "checker_scope": "one projected property with recorded normal-completion obligations, not complete test correctness"
+  }
+}

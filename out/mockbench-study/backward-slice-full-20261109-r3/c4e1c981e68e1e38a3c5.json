@@ -1,0 +1,1286 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "product_source_not_located",
+    "test_to_product_not_reached",
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_267load_with_extra.py::test_load_with_extra",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_load_with_extra",
+          "start_line": 107,
+          "end_line": 223
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 223,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 6677,
+    "read_bytes": 6677,
+    "attempted_files": 0,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_267load_with_extra.py",
+      "sha256": "f40fc733e624bc1e40dcb6b0ebf0d644dd1dd455c0d447d9856dee308986627c",
+      "bytes": 6677
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "field": "body",
+        "from": "test:45:8:Assign",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:44:4:With"
+      },
+      {
+        "field": "body",
+        "from": "test:53:8:If",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:52:4:For"
+      },
+      {
+        "branch": "true",
+        "from": "test:53:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:54:12:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "test:53:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:56:12:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "test:53:11:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:57:12:Break"
+      },
+      {
+        "branch": "true",
+        "from": "test:57:12:Break",
+        "kind": "normal_branch_exit",
+        "precision": "possible_only_if_branch_completes_normally",
+        "to": "test:53:8:If"
+      },
+      {
+        "branch": "true",
+        "from": "test:59:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:60:8:Raise"
+      },
+      {
+        "field": "body",
+        "from": "test:67:8:If",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:64:4:For"
+      },
+      {
+        "branch": "true",
+        "from": "test:67:11:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:68:12:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "test:68:12:Expr",
+        "kind": "normal_branch_exit",
+        "precision": "possible_only_if_branch_completes_normally",
+        "to": "test:67:8:If"
+      },
+      {
+        "branch": "false",
+        "from": "test:67:11:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:71:12:Break"
+      },
+      {
+        "branch": "false",
+        "from": "test:71:12:Break",
+        "kind": "normal_branch_exit",
+        "precision": "possible_only_if_branch_completes_normally",
+        "to": "test:67:8:If"
+      },
+      {
+        "from": "test:26:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:44:4:With",
+        "variable": "module_path"
+      },
+      {
+        "from": "test:44:4:With",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:44:35:Name"
+      },
+      {
+        "from": "test:45:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:45:8:Name"
+      },
+      {
+        "from": "test:44:35:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:45:8:Assign",
+        "variable": "f"
+      },
+      {
+        "from": "test:48:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:48:4:Name"
+      },
+      {
+        "from": "test:45:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:48:4:Assign",
+        "variable": "source_code"
+      },
+      {
+        "from": "test:49:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:49:4:Name"
+      },
+      {
+        "from": "test:50:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:50:4:Name"
+      },
+      {
+        "from": "test:52:4:For",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:52:8:Name"
+      },
+      {
+        "from": "test:52:4:For",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:52:11:Name"
+      },
+      {
+        "from": "test:48:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:52:4:For",
+        "variable": "lines"
+      },
+      {
+        "from": "test:27:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:53:8:If",
+        "variable": "function_name"
+      },
+      {
+        "from": "test:52:11:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:53:8:If",
+        "variable": "line"
+      },
+      {
+        "from": "test:54:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:54:12:Name"
+      },
+      {
+        "from": "test:52:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:54:12:Assign",
+        "variable": "i"
+      },
+      {
+        "from": "test:56:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:56:12:Name"
+      },
+      {
+        "from": "test:52:11:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:56:12:Assign",
+        "variable": "line"
+      },
+      {
+        "from": "test:27:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:60:8:Raise",
+        "variable": "function_name"
+      },
+      {
+        "from": "test:26:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:60:8:Raise",
+        "variable": "module_path"
+      },
+      {
+        "from": "test:63:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:63:4:Name"
+      },
+      {
+        "from": "test:48:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:63:4:Assign",
+        "variable": "lines"
+      },
+      {
+        "from": "test:49:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:63:4:Assign",
+        "variable": "func_start"
+      },
+      {
+        "from": "test:54:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:63:4:Assign",
+        "variable": "func_start"
+      },
+      {
+        "from": "test:64:4:For",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:64:8:Name"
+      },
+      {
+        "from": "test:49:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:64:4:For",
+        "variable": "func_start"
+      },
+      {
+        "from": "test:54:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:64:4:For",
+        "variable": "func_start"
+      },
+      {
+        "from": "test:48:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:64:4:For",
+        "variable": "lines"
+      },
+      {
+        "from": "test:65:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:65:8:Name"
+      },
+      {
+        "from": "test:48:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:65:8:Assign",
+        "variable": "lines"
+      },
+      {
+        "from": "test:52:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:65:8:Assign",
+        "variable": "i"
+      },
+      {
+        "from": "test:64:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:65:8:Assign",
+        "variable": "i"
+      },
+      {
+        "from": "test:52:11:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:67:8:If",
+        "variable": "line"
+      },
+      {
+        "from": "test:65:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:67:8:If",
+        "variable": "line"
+      },
+      {
+        "from": "test:50:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:67:8:If",
+        "variable": "indent_level"
+      },
+      {
+        "from": "test:56:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:67:8:If",
+        "variable": "indent_level"
+      },
+      {
+        "from": "test:63:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:68:12:Expr",
+        "variable": "func_lines"
+      },
+      {
+        "from": "test:52:11:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:68:12:Expr",
+        "variable": "line"
+      },
+      {
+        "from": "test:65:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:68:12:Expr",
+        "variable": "line"
+      },
+      {
+        "from": "test:73:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:73:4:Name"
+      },
+      {
+        "from": "test:49:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:73:4:Assign",
+        "variable": "func_start"
+      },
+      {
+        "from": "test:54:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:73:4:Assign",
+        "variable": "func_start"
+      },
+      {
+        "from": "test:63:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:73:4:Assign",
+        "variable": "func_lines"
+      },
+      {
+        "from": "test:77:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:77:4:Name"
+      },
+      {
+        "from": "test:73:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:77:4:Assign",
+        "variable": "func_code"
+      },
+      {
+        "from": "test:77:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:77:4:Assign",
+        "variable": "func_code"
+      },
+      {
+        "from": "test:82:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:82:4:Name"
+      },
+      {
+        "from": "test:28:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:82:4:Assign",
+        "variable": "mock_shared"
+      },
+      {
+        "from": "test:29:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:82:4:Assign",
+        "variable": "mock_check_pt"
+      },
+      {
+        "from": "test:30:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:82:4:Assign",
+        "variable": "mock_errors_report"
+      },
+      {
+        "from": "test:31:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:82:4:Assign",
+        "variable": "mock_unsafe_torch_load"
+      },
+      {
+        "from": "test:73:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:91:4:Expr",
+        "variable": "func_code"
+      },
+      {
+        "from": "test:77:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:91:4:Expr",
+        "variable": "func_code"
+      },
+      {
+        "from": "test:26:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:91:4:Expr",
+        "variable": "module_path"
+      },
+      {
+        "from": "test:82:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:91:4:Expr",
+        "variable": "func_namespace"
+      },
+      {
+        "from": "test:82:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:93:4:Return",
+        "variable": "func_namespace"
+      },
+      {
+        "from": "test:27:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:93:4:Return",
+        "variable": "function_name"
+      },
+      {
+        "branch": "true",
+        "from": "test:169:7:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:176:8:Assign"
+      },
+      {
+        "from": "test:129:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:129:4:Name"
+      },
+      {
+        "from": "test:163:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:163:4:Name"
+      },
+      {
+        "from": "test:176:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:176:8:Name"
+      },
+      {
+        "from": "test:180:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:180:4:Name"
+      },
+      {
+        "from": "test:129:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:180:4:Assign",
+        "variable": "load_with_extra"
+      },
+      {
+        "from": "test:163:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:180:4:Assign",
+        "variable": "filename"
+      },
+      {
+        "from": "test:176:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:180:4:Assign",
+        "variable": "extra_handler"
+      },
+      {
+        "from": "test:180:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:223:4:Assert",
+        "variable": "result"
+      },
+      {
+        "from": "test:107:110:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:223:4:Assert",
+        "variable": "expected_return"
+      },
+      {
+        "callee": "load_function_from_source",
+        "from": "test:93:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:129:4:Assign"
+      },
+      {
+        "callee": "load_function_from_source",
+        "from": "test:60:8:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:129:4:Assign"
+      },
+      {
+        "callee": "load_function_from_source",
+        "from": "test:68:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:129:4:Assign"
+      },
+      {
+        "callee": "load_function_from_source",
+        "from": "test:91:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:129:4:Assign"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "expected_return",
+        "end_line": 107,
+        "id": "test:107:110:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 107
+      },
+      {
+        "code": "load_with_extra = load_function_from_source(f'{src_path}/modules/safe.py', 'load_with_extra', mock_shared, mock_check_pt, mock_errors_report, mock_unsafe_torch_load)",
+        "end_line": 136,
+        "exception_possible": true,
+        "id": "test:129:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 129
+      },
+      {
+        "code": "load_with_extra",
+        "end_line": 129,
+        "id": "test:129:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 129
+      },
+      {
+        "code": "filename = 'test_model.pt'",
+        "end_line": 163,
+        "id": "test:163:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 163
+      },
+      {
+        "code": "filename",
+        "end_line": 163,
+        "id": "test:163:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 163
+      },
+      {
+        "code": "test_args_kwargs and test_args_kwargs.get('handler_type') == 'custom'",
+        "end_line": 169,
+        "id": "test:169:7:BoolOp",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 169
+      },
+      {
+        "code": "extra_handler = custom_handler",
+        "end_line": 176,
+        "id": "test:176:8:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 176
+      },
+      {
+        "code": "extra_handler",
+        "end_line": 176,
+        "id": "test:176:8:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 176
+      },
+      {
+        "code": "result = load_with_extra(filename, extra_handler=extra_handler)",
+        "contains_unresolved_call": true,
+        "end_line": 180,
+        "exception_possible": true,
+        "id": "test:180:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 180,
+        "unresolved_calls": [
+          "load_with_extra(filename, extra_handler=extra_handler)"
+        ]
+      },
+      {
+        "code": "result",
+        "end_line": 180,
+        "id": "test:180:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 180
+      },
+      {
+        "code": "assert result == expected_return",
+        "end_line": 223,
+        "id": "test:223:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 223
+      },
+      {
+        "code": "module_path",
+        "end_line": 26,
+        "id": "test:26:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 26
+      },
+      {
+        "code": "function_name",
+        "end_line": 27,
+        "id": "test:27:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 27
+      },
+      {
+        "code": "mock_shared",
+        "end_line": 28,
+        "id": "test:28:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 28
+      },
+      {
+        "code": "mock_check_pt",
+        "end_line": 29,
+        "id": "test:29:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 29
+      },
+      {
+        "code": "mock_errors_report",
+        "end_line": 30,
+        "id": "test:30:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 30
+      },
+      {
+        "code": "mock_unsafe_torch_load",
+        "end_line": 31,
+        "id": "test:31:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 31
+      },
+      {
+        "code": "f",
+        "end_line": 44,
+        "id": "test:44:35:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 44
+      },
+      {
+        "code": "with open(module_path, 'r') as f:\n    source_code = f.read()",
+        "contains_unresolved_call": true,
+        "end_line": 45,
+        "exception_possible": true,
+        "id": "test:44:4:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 44,
+        "unresolved_calls": [
+          "open(module_path, 'r')"
+        ]
+      },
+      {
+        "code": "source_code = f.read()",
+        "contains_unresolved_call": true,
+        "end_line": 45,
+        "exception_possible": true,
+        "id": "test:45:8:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 45,
+        "unresolved_calls": [
+          "f.read()"
+        ]
+      },
+      {
+        "code": "source_code",
+        "end_line": 45,
+        "id": "test:45:8:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 45
+      },
+      {
+        "code": "lines = source_code.split('\\n')",
+        "contains_unresolved_call": true,
+        "end_line": 48,
+        "exception_possible": true,
+        "id": "test:48:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 48,
+        "unresolved_calls": [
+          "source_code.split('\\n')"
+        ]
+      },
+      {
+        "code": "lines",
+        "end_line": 48,
+        "id": "test:48:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 48
+      },
+      {
+        "code": "func_start = None",
+        "end_line": 49,
+        "id": "test:49:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 49
+      },
+      {
+        "code": "func_start",
+        "end_line": 49,
+        "id": "test:49:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 49
+      },
+      {
+        "code": "indent_level = None",
+        "end_line": 50,
+        "id": "test:50:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 50
+      },
+      {
+        "code": "indent_level",
+        "end_line": 50,
+        "id": "test:50:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 50
+      },
+      {
+        "code": "line",
+        "end_line": 52,
+        "id": "test:52:11:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 52
+      },
+      {
+        "code": "for i, line in enumerate(lines):\n    if f'def {function_name}(' in line:\n        func_start = i\n        indent_level = len(line) - len(line.lstrip())\n        break",
+        "contains_unresolved_call": true,
+        "end_line": 57,
+        "exception_possible": true,
+        "id": "test:52:4:For",
+        "kind": "For",
+        "source_id": "test",
+        "start_line": 52,
+        "unresolved_calls": [
+          "enumerate(lines)"
+        ]
+      },
+      {
+        "code": "i",
+        "end_line": 52,
+        "id": "test:52:8:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 52
+      },
+      {
+        "code": "f'def {function_name}(' in line",
+        "end_line": 53,
+        "id": "test:53:11:Compare",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 53
+      },
+      {
+        "code": "if f'def {function_name}(' in line:\n    func_start = i\n    indent_level = len(line) - len(line.lstrip())\n    break",
+        "end_line": 57,
+        "id": "test:53:8:If",
+        "kind": "If",
+        "source_id": "test",
+        "start_line": 53
+      },
+      {
+        "code": "func_start = i",
+        "end_line": 54,
+        "id": "test:54:12:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 54
+      },
+      {
+        "code": "func_start",
+        "end_line": 54,
+        "id": "test:54:12:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 54
+      },
+      {
+        "code": "indent_level = len(line) - len(line.lstrip())",
+        "contains_unresolved_call": true,
+        "end_line": 56,
+        "exception_possible": true,
+        "id": "test:56:12:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 56,
+        "unresolved_calls": [
+          "len(line)",
+          "len(line.lstrip())",
+          "line.lstrip()"
+        ]
+      },
+      {
+        "code": "indent_level",
+        "end_line": 56,
+        "id": "test:56:12:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 56
+      },
+      {
+        "code": "break",
+        "end_line": 57,
+        "id": "test:57:12:Break",
+        "kind": "Break",
+        "source_id": "test",
+        "start_line": 57
+      },
+      {
+        "code": "func_start is None",
+        "end_line": 59,
+        "id": "test:59:7:Compare",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 59
+      },
+      {
+        "code": "raise ValueError(f'Function {function_name} not found in {module_path}')",
+        "contains_unresolved_call": true,
+        "end_line": 60,
+        "exception_possible": true,
+        "id": "test:60:8:Raise",
+        "kind": "Raise",
+        "source_id": "test",
+        "start_line": 60,
+        "unresolved_calls": [
+          "ValueError(f'Function {function_name} not found in {module_path}')"
+        ]
+      },
+      {
+        "code": "func_lines = [lines[func_start]]",
+        "end_line": 63,
+        "id": "test:63:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 63
+      },
+      {
+        "code": "func_lines",
+        "end_line": 63,
+        "id": "test:63:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 63
+      },
+      {
+        "code": "for i in range(func_start + 1, len(lines)):\n    line = lines[i]\n    if line.strip() == '' or len(line) - len(line.lstrip()) > indent_level:\n        func_lines.append(line)\n    else:\n        break",
+        "contains_unresolved_call": true,
+        "end_line": 71,
+        "exception_possible": true,
+        "id": "test:64:4:For",
+        "kind": "For",
+        "source_id": "test",
+        "start_line": 64,
+        "unresolved_calls": [
+          "range(func_start + 1, len(lines))",
+          "len(lines)"
+        ]
+      },
+      {
+        "code": "i",
+        "end_line": 64,
+        "id": "test:64:8:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 64
+      },
+      {
+        "code": "line = lines[i]",
+        "end_line": 65,
+        "id": "test:65:8:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 65
+      },
+      {
+        "code": "line",
+        "end_line": 65,
+        "id": "test:65:8:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 65
+      },
+      {
+        "code": "line.strip() == '' or len(line) - len(line.lstrip()) > indent_level",
+        "end_line": 67,
+        "id": "test:67:11:BoolOp",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 67
+      },
+      {
+        "code": "if line.strip() == '' or len(line) - len(line.lstrip()) > indent_level:\n    func_lines.append(line)\nelse:\n    break",
+        "contains_unresolved_call": true,
+        "end_line": 71,
+        "exception_possible": true,
+        "id": "test:67:8:If",
+        "kind": "If",
+        "source_id": "test",
+        "start_line": 67,
+        "unresolved_calls": [
+          "line.strip()",
+          "len(line)",
+          "len(line.lstrip())",
+          "line.lstrip()"
+        ]
+      },
+      {
+        "code": "func_lines.append(line)",
+        "contains_unresolved_call": true,
+        "end_line": 68,
+        "exception_possible": true,
+        "id": "test:68:12:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 68,
+        "unresolved_calls": [
+          "func_lines.append(line)"
+        ]
+      },
+      {
+        "code": "break",
+        "end_line": 71,
+        "id": "test:71:12:Break",
+        "kind": "Break",
+        "source_id": "test",
+        "start_line": 71
+      },
+      {
+        "code": "func_code = '\\n' * func_start + '\\n'.join(func_lines)",
+        "contains_unresolved_call": true,
+        "end_line": 73,
+        "exception_possible": true,
+        "id": "test:73:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 73,
+        "unresolved_calls": [
+          "'\\n'.join(func_lines)"
+        ]
+      },
+      {
+        "code": "func_code",
+        "end_line": 73,
+        "id": "test:73:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 73
+      },
+      {
+        "code": "func_code = func_code.replace('from modules import shared', 'pass  # shared provided via namespace')",
+        "contains_unresolved_call": true,
+        "end_line": 77,
+        "exception_possible": true,
+        "id": "test:77:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 77,
+        "unresolved_calls": [
+          "func_code.replace('from modules import shared', 'pass  # shared provided via namespace')"
+        ]
+      },
+      {
+        "code": "func_code",
+        "end_line": 77,
+        "id": "test:77:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 77
+      },
+      {
+        "code": "func_namespace = {'__name__': 'test_module', 'shared': mock_shared, 'check_pt': mock_check_pt, 'errors': type('obj', (object,), {'report': mock_errors_report}), 'unsafe_torch_load': mock_unsafe_torch_load, 'pickle': pickle}",
+        "contains_unresolved_call": true,
+        "end_line": 89,
+        "exception_possible": true,
+        "id": "test:82:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 82,
+        "unresolved_calls": [
+          "type('obj', (object,), {'report': mock_errors_report})"
+        ]
+      },
+      {
+        "code": "func_namespace",
+        "end_line": 82,
+        "id": "test:82:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 82
+      },
+      {
+        "code": "exec(compile(func_code, module_path, 'exec'), func_namespace)",
+        "contains_unresolved_call": true,
+        "end_line": 91,
+        "exception_possible": true,
+        "id": "test:91:4:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 91,
+        "unresolved_calls": [
+          "exec(compile(func_code, module_path, 'exec'), func_namespace)",
+          "compile(func_code, module_path, 'exec')"
+        ]
+      },
+      {
+        "code": "return func_namespace[function_name]",
+        "end_line": 93,
+        "id": "test:93:4:Return",
+        "kind": "Return",
+        "source_id": "test",
+        "start_line": 93
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:223:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:223:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 57,
+    "edges": 82,
+    "edge_kinds": {
+      "normal_body_exit": 3,
+      "lexical_control": 7,
+      "normal_branch_exit": 3,
+      "data_candidate": 46,
+      "definition_value_candidate": 19,
+      "call_target_candidate": 1,
+      "call_event_candidate": 3
+    },
+    "criteria": [
+      {
+        "seed": "test:223:4:Assert",
+        "node_ids": [
+          "test:107:110:arg",
+          "test:129:4:Assign",
+          "test:129:4:Name",
+          "test:163:4:Assign",
+          "test:163:4:Name",
+          "test:169:7:BoolOp",
+          "test:176:8:Assign",
+          "test:176:8:Name",
+          "test:180:4:Assign",
+          "test:180:4:Name",
+          "test:223:4:Assert",
+          "test:26:4:arg",
+          "test:27:4:arg",
+          "test:28:4:arg",
+          "test:29:4:arg",
+          "test:30:4:arg",
+          "test:31:4:arg",
+          "test:44:35:Name",
+          "test:44:4:With",
+          "test:45:8:Assign",
+          "test:45:8:Name",
+          "test:48:4:Assign",
+          "test:48:4:Name",
+          "test:49:4:Assign",
+          "test:49:4:Name",
+          "test:50:4:Assign",
+          "test:50:4:Name",
+          "test:52:11:Name",
+          "test:52:4:For",
+          "test:52:8:Name",
+          "test:53:11:Compare",
+          "test:53:8:If",
+          "test:54:12:Assign",
+          "test:54:12:Name",
+          "test:56:12:Assign",
+          "test:56:12:Name",
+          "test:57:12:Break",
+          "test:59:7:Compare",
+          "test:60:8:Raise",
+          "test:63:4:Assign",
+          "test:63:4:Name",
+          "test:64:4:For",
+          "test:64:8:Name",
+          "test:65:8:Assign",
+          "test:65:8:Name",
+          "test:67:11:BoolOp",
+          "test:67:8:If",
+          "test:68:12:Expr",
+          "test:71:12:Break",
+          "test:73:4:Assign",
+          "test:73:4:Name",
+          "test:77:4:Assign",
+          "test:77:4:Name",
+          "test:82:4:Assign",
+          "test:82:4:Name",
+          "test:91:4:Expr",
+          "test:93:4:Return"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:180:4:Assign",
+          "test:44:4:With",
+          "test:45:8:Assign",
+          "test:48:4:Assign",
+          "test:52:4:For",
+          "test:56:12:Assign",
+          "test:60:8:Raise",
+          "test:64:4:For",
+          "test:67:8:If",
+          "test:68:12:Expr",
+          "test:73:4:Assign",
+          "test:77:4:Assign",
+          "test:82:4:Assign",
+          "test:91:4:Expr"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:223:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.055,
+  "identity": {
+    "case_id": "stable-diffusion-webui_267",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "38c87c012290eaa46da66ece037b6e8704868f25a03ca139f1c65e93f58f3a24"
+  }
+}

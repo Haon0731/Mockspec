@@ -1,0 +1,559 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "zipkin2.storage.cassandra.SchemaTest#getKeyspaceMetadata_passesWhenVersion3_11_4AndKeyspaceMetadataIsNotNull",
+      "status": "located",
+      "precision": "java_lexical_method_scope",
+      "locations": [
+        {
+          "symbol": "getKeyspaceMetadata_passesWhenVersion3_11_4AndKeyspaceMetadataIsNotNull",
+          "start_line": 34,
+          "end_line": 43
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 39,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 40,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:1"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_same_package_type",
+        "hint": "zipkin2.storage.cassandra.Schema",
+        "candidates": [
+          "src/main/java/zipkin2/storage/cassandra/Schema.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 7728,
+    "read_bytes": 7728,
+    "attempted_files": 1,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "src/test/java/zipkin2/storage/cassandra/SchemaTest.java",
+      "sha256": "2496577b1d5c20c3ba97d103d418fe987e9c7ec6030dfde4e386f342b33e27ac",
+      "bytes": 1552
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/main/java/zipkin2/storage/cassandra/Schema.java",
+      "sha256": "ccb4fc5d56e1654d91e4b2d9092ab71b2da8a229c61298e335713bf33862f38c",
+      "bytes": 6176
+    }
+  ],
+  "graph": {
+    "seeds": [
+      "test:39:5:CtInvocationImpl",
+      "test:40:5:CtInvocationImpl"
+    ],
+    "limitations": [
+      "data_candidate edges are conservative name/declaration candidates, not a sound reaching-def analysis",
+      "lexical_control edges describe AST ancestry, not post-dominator control dependence",
+      "call_return edges use no-classpath resolution plus name/arity virtual candidates and do not prove dispatch",
+      "expression_value_candidate edges preserve syntax containment, not runtime evaluation or value equality",
+      "heap aliasing, reflection, exceptions, concurrency, and path feasibility are not modeled",
+      "boundary calls are retained as nodes and are not traversed into dependency implementations"
+    ],
+    "status": "ok",
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:39:5:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:40:5:CtInvocationImpl"
+      }
+    ],
+    "edges": [
+      {
+        "from": "source:1:93:67:CtInvocationImpl",
+        "to": "source:1:93:56:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:1:93:67:CtVariableReadImpl",
+        "to": "source:1:93:67:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:1:103:12:CtInvocationImpl",
+        "to": "source:1:103:5:CtReturnImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:1:103:12:CtVariableReadImpl",
+        "to": "source:1:103:12:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:1:103:33:CtVariableReadImpl",
+        "to": "source:1:103:12:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:1:103:50:CtLiteralImpl",
+        "to": "source:1:103:12:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:39:16:CtFieldReadImpl",
+        "to": "test:39:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:39:34:CtInvocationImpl",
+        "to": "test:39:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:39:34:CtTypeAccessImpl",
+        "to": "test:39:34:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:39:61:CtFieldReadImpl",
+        "to": "test:39:34:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:39:70:CtLiteralImpl",
+        "to": "test:39:34:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:40:19:CtFieldReadImpl",
+        "to": "test:40:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "source:1:92:68:CtParameterImpl",
+        "to": "source:1:93:56:CtLocalVariableImpl",
+        "kind": "data_candidate",
+        "variable": "session",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "source:1:92:68:CtParameterImpl",
+        "to": "source:1:93:67:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "session",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "source:1:93:56:CtLocalVariableImpl",
+        "to": "source:1:103:5:CtReturnImpl",
+        "kind": "data_candidate",
+        "variable": "metadata",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "source:1:93:56:CtLocalVariableImpl",
+        "to": "source:1:103:5:CtReturnImpl",
+        "kind": "data_candidate",
+        "variable": "metadata",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "source:1:92:84:CtParameterImpl",
+        "to": "source:1:103:5:CtReturnImpl",
+        "kind": "data_candidate",
+        "variable": "keyspace",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "source:1:93:56:CtLocalVariableImpl",
+        "to": "source:1:103:12:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "metadata",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "source:1:93:56:CtLocalVariableImpl",
+        "to": "source:1:103:12:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "metadata",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "source:1:92:84:CtParameterImpl",
+        "to": "source:1:103:12:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "keyspace",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "source:1:82:61:CtVariableReadImpl",
+        "to": "source:1:92:68:CtParameterImpl",
+        "kind": "argument_binding_candidate",
+        "callee": "zipkin2.storage.cassandra.Schema.getKeyspaceMetadata(com.datastax.oss.driver.api.core.CqlSession,java.lang.String)",
+        "parameter": "session",
+        "precision": "single_source_candidate"
+      },
+      {
+        "from": "source:1:82:70:CtVariableReadImpl",
+        "to": "source:1:92:84:CtParameterImpl",
+        "kind": "argument_binding_candidate",
+        "callee": "zipkin2.storage.cassandra.Schema.getKeyspaceMetadata(com.datastax.oss.driver.api.core.CqlSession,java.lang.String)",
+        "parameter": "keyspace",
+        "precision": "single_source_candidate"
+      },
+      {
+        "from": "source:1:107:51:CtVariableReadImpl",
+        "to": "source:1:92:68:CtParameterImpl",
+        "kind": "argument_binding_candidate",
+        "callee": "zipkin2.storage.cassandra.Schema.getKeyspaceMetadata(com.datastax.oss.driver.api.core.CqlSession,java.lang.String)",
+        "parameter": "session",
+        "precision": "single_source_candidate"
+      },
+      {
+        "from": "source:1:107:60:CtVariableReadImpl",
+        "to": "source:1:92:84:CtParameterImpl",
+        "kind": "argument_binding_candidate",
+        "callee": "zipkin2.storage.cassandra.Schema.getKeyspaceMetadata(com.datastax.oss.driver.api.core.CqlSession,java.lang.String)",
+        "parameter": "keyspace",
+        "precision": "single_source_candidate"
+      },
+      {
+        "from": "source:1:103:5:CtReturnImpl",
+        "to": "test:39:5:CtInvocationImpl",
+        "kind": "call_return",
+        "precision": "single_source_candidate",
+        "callee": "zipkin2.storage.cassandra.Schema.getKeyspaceMetadata(com.datastax.oss.driver.api.core.CqlSession,java.lang.String)"
+      },
+      {
+        "from": "test:39:61:CtFieldReadImpl",
+        "to": "source:1:92:68:CtParameterImpl",
+        "kind": "argument_binding_candidate",
+        "callee": "zipkin2.storage.cassandra.Schema.getKeyspaceMetadata(com.datastax.oss.driver.api.core.CqlSession,java.lang.String)",
+        "parameter": "session",
+        "precision": "single_source_candidate"
+      },
+      {
+        "from": "test:39:70:CtLiteralImpl",
+        "to": "source:1:92:84:CtParameterImpl",
+        "kind": "argument_binding_candidate",
+        "callee": "zipkin2.storage.cassandra.Schema.getKeyspaceMetadata(com.datastax.oss.driver.api.core.CqlSession,java.lang.String)",
+        "parameter": "keyspace",
+        "precision": "single_source_candidate"
+      }
+    ],
+    "backend": "spoon-source-evidence-prototype",
+    "nodes": [
+      {
+        "id": "source:1:103:12:CtInvocationImpl",
+        "source_id": "source:1",
+        "start_line": 103,
+        "end_line": 103,
+        "kind": "CtInvocationImpl",
+        "code": "metadata.getKeyspace(keyspace).orElse(null)",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "metadata.getKeyspace(keyspace)"
+        ]
+      },
+      {
+        "id": "source:1:103:12:CtVariableReadImpl",
+        "source_id": "source:1",
+        "start_line": 103,
+        "end_line": 103,
+        "kind": "expression",
+        "code": "metadata"
+      },
+      {
+        "id": "source:1:103:33:CtVariableReadImpl",
+        "source_id": "source:1",
+        "start_line": 103,
+        "end_line": 103,
+        "kind": "expression",
+        "code": "keyspace"
+      },
+      {
+        "id": "source:1:103:50:CtLiteralImpl",
+        "source_id": "source:1",
+        "start_line": 103,
+        "end_line": 103,
+        "kind": "expression",
+        "code": "null"
+      },
+      {
+        "id": "source:1:103:5:CtReturnImpl",
+        "source_id": "source:1",
+        "start_line": 103,
+        "end_line": 103,
+        "kind": "CtReturnImpl",
+        "code": "return metadata.getKeyspace(keyspace).orElse(null)",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "metadata.getKeyspace(keyspace).orElse(null)"
+        ]
+      },
+      {
+        "id": "source:1:107:51:CtVariableReadImpl",
+        "source_id": "source:1",
+        "start_line": 107,
+        "end_line": 107,
+        "kind": "expression",
+        "code": "session"
+      },
+      {
+        "id": "source:1:107:60:CtVariableReadImpl",
+        "source_id": "source:1",
+        "start_line": 107,
+        "end_line": 107,
+        "kind": "expression",
+        "code": "keyspace"
+      },
+      {
+        "id": "source:1:82:61:CtVariableReadImpl",
+        "source_id": "source:1",
+        "start_line": 82,
+        "end_line": 82,
+        "kind": "expression",
+        "code": "session"
+      },
+      {
+        "id": "source:1:82:70:CtVariableReadImpl",
+        "source_id": "source:1",
+        "start_line": 82,
+        "end_line": 82,
+        "kind": "expression",
+        "code": "keyspace"
+      },
+      {
+        "id": "source:1:92:68:CtParameterImpl",
+        "source_id": "source:1",
+        "start_line": 92,
+        "end_line": 92,
+        "kind": "CtParameterImpl",
+        "code": "com.datastax.oss.driver.api.core.CqlSession session"
+      },
+      {
+        "id": "source:1:92:84:CtParameterImpl",
+        "source_id": "source:1",
+        "start_line": 92,
+        "end_line": 92,
+        "kind": "CtParameterImpl",
+        "code": "java.lang.String keyspace"
+      },
+      {
+        "id": "source:1:93:56:CtLocalVariableImpl",
+        "source_id": "source:1",
+        "start_line": 93,
+        "end_line": 93,
+        "kind": "CtLocalVariableImpl",
+        "code": "com.datastax.oss.driver.api.core.metadata.Metadata metadata = session.getMetadata()",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "session.getMetadata()"
+        ]
+      },
+      {
+        "id": "source:1:93:67:CtInvocationImpl",
+        "source_id": "source:1",
+        "start_line": 93,
+        "end_line": 93,
+        "kind": "CtInvocationImpl",
+        "code": "session.getMetadata()"
+      },
+      {
+        "id": "source:1:93:67:CtVariableReadImpl",
+        "source_id": "source:1",
+        "start_line": 93,
+        "end_line": 93,
+        "kind": "expression",
+        "code": "session"
+      },
+      {
+        "id": "test:39:16:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 39,
+        "end_line": 39,
+        "kind": "expression",
+        "code": "keyspaceMetadata"
+      },
+      {
+        "id": "test:39:34:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 39,
+        "end_line": 39,
+        "kind": "CtInvocationImpl",
+        "code": "zipkin2.storage.cassandra.Schema.getKeyspaceMetadata(session, \"zipkin2\")"
+      },
+      {
+        "id": "test:39:34:CtTypeAccessImpl",
+        "source_id": "test",
+        "start_line": 39,
+        "end_line": 39,
+        "kind": "expression",
+        "code": "zipkin2.storage.cassandra.Schema"
+      },
+      {
+        "id": "test:39:5:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 39,
+        "end_line": 39,
+        "kind": "CtInvocationImpl",
+        "code": "// === MOCK-STUB-START === // === MOCK-STUB-END === assertSame(keyspaceMetadata, zipkin2.storage.cassandra.Schema.getKeyspaceMetadata(session, \"zipkin2\"))"
+      },
+      {
+        "id": "test:39:61:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 39,
+        "end_line": 39,
+        "kind": "expression",
+        "code": "session"
+      },
+      {
+        "id": "test:39:70:CtLiteralImpl",
+        "source_id": "test",
+        "start_line": 39,
+        "end_line": 39,
+        "kind": "expression",
+        "code": "\"zipkin2\""
+      },
+      {
+        "id": "test:40:19:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 40,
+        "end_line": 40,
+        "kind": "expression",
+        "code": "keyspaceMetadata"
+      },
+      {
+        "id": "test:40:5:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 40,
+        "end_line": 40,
+        "kind": "CtInvocationImpl",
+        "code": "assertNotNull(keyspaceMetadata)"
+      }
+    ]
+  },
+  "evidence": {
+    "nodes": 22,
+    "edges": 27,
+    "edge_kinds": {
+      "expression_value_candidate": 12,
+      "data_candidate": 8,
+      "argument_binding_candidate": 6,
+      "call_return": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:39:5:CtInvocationImpl",
+        "node_ids": [
+          "source:1:103:12:CtInvocationImpl",
+          "source:1:103:12:CtVariableReadImpl",
+          "source:1:103:33:CtVariableReadImpl",
+          "source:1:103:50:CtLiteralImpl",
+          "source:1:103:5:CtReturnImpl",
+          "source:1:107:51:CtVariableReadImpl",
+          "source:1:107:60:CtVariableReadImpl",
+          "source:1:82:61:CtVariableReadImpl",
+          "source:1:82:70:CtVariableReadImpl",
+          "source:1:92:68:CtParameterImpl",
+          "source:1:92:84:CtParameterImpl",
+          "source:1:93:56:CtLocalVariableImpl",
+          "source:1:93:67:CtInvocationImpl",
+          "source:1:93:67:CtVariableReadImpl",
+          "test:39:16:CtFieldReadImpl",
+          "test:39:34:CtInvocationImpl",
+          "test:39:34:CtTypeAccessImpl",
+          "test:39:5:CtInvocationImpl",
+          "test:39:61:CtFieldReadImpl",
+          "test:39:70:CtLiteralImpl"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:103:12:CtInvocationImpl",
+          "source:1:103:5:CtReturnImpl",
+          "source:1:93:56:CtLocalVariableImpl"
+        ]
+      },
+      {
+        "seed": "test:40:5:CtInvocationImpl",
+        "node_ids": [
+          "test:40:19:CtFieldReadImpl",
+          "test:40:5:CtInvocationImpl"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": []
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:39:5:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:40:5:CtInvocationImpl"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 1.42,
+  "identity": {
+    "case_id": "zipkin2.storage.cassandra.SchemaTest#getKeyspaceMetadata_passesWhenVersion3_11_4AndKeyspaceMetadataIsNotNull@9674c46f",
+    "dataset": "java-bechmark-strong",
+    "language": "java",
+    "snapshot_id": "200a12f4d1492aa2bdac2820f358950a63fdfc0479d7924fa8bd93ec5b29a9a4"
+  }
+}

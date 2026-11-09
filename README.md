@@ -9,6 +9,7 @@ Scenario Agent 输出约束，不生成 Mock 代码、不执行目标测试、�
 - **想运行或开发**：[运行与开发](docs/usage.md)，区分普通推断、离线回放和完整留证。
 - **想理解输出**：[Scenario Contract](docs/scenario-inference.md)，说明约束字段和验证范围。
 - **想查研究及历史**：[文档目录](docs/README.md)，区分当前能力、研究验证与阶段记录。
+- **想加载完整 MockBench**：[冻结数据接入](docs/usage.md#完整-mockbench-研究框架)，直接复用 Stub-Tester 的 Java/Python agent 输入。
 
 ## 当前主链路
 
@@ -37,12 +38,21 @@ CLI 默认仍为 V0.1，显式传 `--agent-version v0.2` 选择 V0.2。
 
 ## 信任边界
 
+完整数据接入使用 `mock_spec.adapters.frozen_dataset.FrozenDataset`，沿用用户指定的
+Stub-Tester 冻结准备协议，读取目标测试及按需源码；不要求先注册到历史三例目录。
+它校验索引、控制身份、manifest 和实际读取文件，保留上游固定测试上下文及空的待生成区域。
+这是独立于历史逐例审核的输入策略 `stub-tester-frozen-agent/v1`，不是重新计算哈希后自动
+批准任意目录。宿主选择可信 registry；模型不接收控制记录或物理目录。
+完整冻结案例先以“目标测试＋源码访问接口”加载；明确选择 MUT 文件后可转换为现有 `UnifiedTask`。
+旧 `java.load_task` / `python.load_task` 继续使用原三例审核和原 masking 策略。
+
 1. **准备侧**维护已审查输入记录：案例身份、冻结 ref/runtime/injector 身份、允许源码、
    来源范围与 masking 约定。这些私有记录不属于 Agent payload。
 2. **Adapter**只读核对有限的已选文件。只校验所选源码和控制文件，不扫描或哈希 JAR、
    site-packages、依赖树，也不执行 Stub-Tester 的 loader、injector 或其他脚本。
-3. **Masking 检查**要求 Java 双区域为空、Python slot 集合和顺序一致且内容仅为 `pass`，
-   同时拒绝本策略下的残留 mock 配置与验证。文件身份检查覆盖区域外的上下文。
+3. **Masking 检查**要求 Java 双区域为空、Python slot 集合和顺序一致且内容仅为 `pass`。
+   旧三例策略还拒绝区域外残留 mock；全量冻结策略保留上游固定上下文。
+   文件身份检查覆盖区域外的上下文。
 4. **Agent 边界**初始仅传递 `task.to_dict()`。默认仍为内存片段模式；V0.2 显式开启
    `--repository-read` 时，宿主 Adapter 另行返回 `ReviewedRepository`，绑定该任务已脱敏冻结项目的
    `tree/repo`，支持有界发现与读取。绑定及物理目录不进入 payload，也不能由模型更换。

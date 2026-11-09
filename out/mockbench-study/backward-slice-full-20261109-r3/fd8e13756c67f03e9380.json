@@ -1,0 +1,1244 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "inferred_criterion_only",
+    "unresolved_calls",
+    "semantic_analysis_gap"
+  ],
+  "stage": "complete",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_423echo_via_pager.py::test_echo_via_pager",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_echo_via_pager",
+          "start_line": 21,
+          "end_line": 38
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 29,
+        "kind": "candidate_event",
+        "confidence": "candidate",
+        "reason": "visible call in a selected test with no explicit observation; it is not an oracle",
+        "call": "echo_via_pager",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": [
+      {
+        "code": "no_explicit_observation",
+        "message": "candidate events do not establish expected values, arguments, counts, or reachability"
+      }
+    ]
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "types",
+        "candidates": [
+          "src/click/types.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "click.termui",
+        "candidates": [
+          "src/click/termui.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "click._termui_impl",
+        "candidates": [
+          "src/click/_termui_impl.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/click/types.py",
+        "hint_kind": "python_import",
+        "hint": "click.shell_completion",
+        "candidates": [
+          "src/click/shell_completion.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "truncated": false,
+    "opaque_methods": [
+      {
+        "source_id": "source:1",
+        "name": "arity",
+        "start_line": 167,
+        "end_line": 168
+      }
+    ],
+    "selected_bytes": 120039,
+    "read_bytes": 120039,
+    "attempted_files": 4,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_423echo_via_pager.py",
+      "sha256": "9df053d4aac8b0eb058a94cc538fb086723b5f68dc853bc0086dad1d78f2aea2",
+      "bytes": 988
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/click/types.py",
+      "sha256": "7a4e7804d485c0f2acaad7d3ee3b2a71ce161ee8bc00815530a338a156485e17",
+      "bytes": 39927
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/click/termui.py",
+      "sha256": "86a0848cd9dd53e9f35b4f2744090169581f669fc574203d2b17c85a529868c7",
+      "bytes": 31037
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/click/_termui_impl.py",
+      "sha256": "ae009bdce9fc5f9038db4d2b0392fa8b5deee626a99857abeecaeee7b272eb30",
+      "bytes": 27093
+    },
+    {
+      "source_id": "source:4",
+      "logical_path": "src/click/shell_completion.py",
+      "sha256": "09ce0641416e5a97d005af6c179a9779e608ee7ded23fd64e997529f80596d3d",
+      "bytes": 20994
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "edges": [
+      {
+        "from": "test:21:42:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:29:4:Expr",
+        "variable": "value"
+      },
+      {
+        "from": "test:21:49:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:29:4:Expr",
+        "variable": "color"
+      },
+      {
+        "callee": "echo_via_pager",
+        "from": "source:2:290:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:29:4:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:278:7:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:279:8:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:280:9:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:281:8:Assign"
+      },
+      {
+        "branch": "false",
+        "from": "source:2:280:9:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:283:8:Assign"
+      },
+      {
+        "from": "source:2:276:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:276:4:Name"
+      },
+      {
+        "from": "source:2:263:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:276:4:Assign",
+        "variable": "color"
+      },
+      {
+        "from": "source:2:276:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:276:4:Assign",
+        "variable": "color"
+      },
+      {
+        "from": "source:2:279:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:279:8:Name"
+      },
+      {
+        "from": "source:2:262:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:279:8:Assign",
+        "variable": "text_or_generator"
+      },
+      {
+        "from": "source:2:281:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:281:8:Name"
+      },
+      {
+        "from": "source:2:262:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:281:8:Assign",
+        "variable": "text_or_generator"
+      },
+      {
+        "from": "source:2:283:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:283:8:Name"
+      },
+      {
+        "from": "source:2:262:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:283:8:Assign",
+        "variable": "text_or_generator"
+      },
+      {
+        "from": "source:2:286:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:286:4:Name"
+      },
+      {
+        "from": "source:2:279:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:286:4:Assign",
+        "variable": "i"
+      },
+      {
+        "from": "source:2:281:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:286:4:Assign",
+        "variable": "i"
+      },
+      {
+        "from": "source:2:283:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:286:4:Assign",
+        "variable": "i"
+      },
+      {
+        "from": "source:2:286:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:290:4:Return",
+        "variable": "text_generator"
+      },
+      {
+        "from": "source:2:263:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:290:4:Return",
+        "variable": "color"
+      },
+      {
+        "from": "source:2:276:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:290:4:Return",
+        "variable": "color"
+      },
+      {
+        "callee": "pager",
+        "from": "source:3:379:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:290:4:Return"
+      },
+      {
+        "callee": "pager",
+        "from": "source:3:386:16:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:290:4:Return"
+      },
+      {
+        "callee": "pager",
+        "from": "source:3:388:12:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:290:4:Return"
+      },
+      {
+        "callee": "pager",
+        "from": "source:3:391:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:290:4:Return"
+      },
+      {
+        "callee": "pager",
+        "from": "source:3:395:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:290:4:Return"
+      },
+      {
+        "callee": "pager",
+        "from": "source:3:397:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:290:4:Return"
+      },
+      {
+        "callee": "pager",
+        "from": "source:3:405:12:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:290:4:Return"
+      },
+      {
+        "callee": "pager",
+        "from": "source:3:406:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:290:4:Return"
+      },
+      {
+        "callee": "pager",
+        "from": "source:3:402:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:290:4:Return"
+      },
+      {
+        "callee": "pager",
+        "from": "source:3:408:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:290:4:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:3:375:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:3:376:8:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:3:378:7:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:3:379:8:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:3:385:15:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:3:386:16:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:3:387:13:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:3:388:12:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:3:390:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:3:391:8:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:3:392:7:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:3:395:8:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:3:396:7:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:3:397:8:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:3:404:11:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:3:405:12:Return"
+      },
+      {
+        "from": "source:3:371:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:3:371:4:Name"
+      },
+      {
+        "from": "source:3:376:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:3:376:8:Name"
+      },
+      {
+        "from": "source:3:371:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:379:8:Return",
+        "variable": "stdout"
+      },
+      {
+        "from": "source:3:376:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:379:8:Return",
+        "variable": "stdout"
+      },
+      {
+        "from": "source:3:369:10:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:379:8:Return",
+        "variable": "generator"
+      },
+      {
+        "from": "source:3:369:41:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:379:8:Return",
+        "variable": "color"
+      },
+      {
+        "from": "source:3:371:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:391:8:Return",
+        "variable": "stdout"
+      },
+      {
+        "from": "source:3:376:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:391:8:Return",
+        "variable": "stdout"
+      },
+      {
+        "from": "source:3:369:10:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:391:8:Return",
+        "variable": "generator"
+      },
+      {
+        "from": "source:3:369:41:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:391:8:Return",
+        "variable": "color"
+      },
+      {
+        "from": "source:3:401:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:3:401:4:Name"
+      },
+      {
+        "from": "source:3:401:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:3:401:8:Name"
+      },
+      {
+        "from": "source:3:401:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:402:4:Expr",
+        "variable": "fd"
+      },
+      {
+        "from": "source:3:371:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:406:8:Return",
+        "variable": "stdout"
+      },
+      {
+        "from": "source:3:376:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:406:8:Return",
+        "variable": "stdout"
+      },
+      {
+        "from": "source:3:369:10:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:406:8:Return",
+        "variable": "generator"
+      },
+      {
+        "from": "source:3:369:41:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:406:8:Return",
+        "variable": "color"
+      },
+      {
+        "from": "source:3:401:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:408:8:Expr",
+        "variable": "filename"
+      },
+      {
+        "field": "body",
+        "from": "source:3:561:8:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "source:3:558:4:For"
+      },
+      {
+        "branch": "true",
+        "from": "source:3:559:11:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:3:560:12:Assign"
+      },
+      {
+        "from": "source:3:558:4:For",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:3:558:8:Name"
+      },
+      {
+        "from": "source:3:555:22:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:558:4:For",
+        "variable": "generator"
+      },
+      {
+        "from": "source:3:560:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:3:560:12:Name"
+      },
+      {
+        "from": "source:3:558:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:560:12:Assign",
+        "variable": "text"
+      },
+      {
+        "from": "source:3:560:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:560:12:Assign",
+        "variable": "text"
+      },
+      {
+        "from": "source:3:555:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:561:8:Expr",
+        "variable": "stream"
+      },
+      {
+        "from": "source:3:558:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:561:8:Expr",
+        "variable": "text"
+      },
+      {
+        "from": "source:3:560:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:561:8:Expr",
+        "variable": "text"
+      },
+      {
+        "callee": "_nullpager",
+        "from": "source:3:561:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:3:379:8:Return"
+      },
+      {
+        "callee": "_nullpager",
+        "from": "source:3:561:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:3:391:8:Return"
+      },
+      {
+        "callee": "_nullpager",
+        "from": "source:3:561:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:3:406:8:Return"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected"
+    ],
+    "nodes": [
+      {
+        "code": "text_or_generator: cabc.Iterable[str] | t.Callable[[], cabc.Iterable[str]] | str",
+        "end_line": 262,
+        "id": "source:2:262:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 262
+      },
+      {
+        "code": "color: bool | None",
+        "end_line": 263,
+        "id": "source:2:263:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:2",
+        "start_line": 263
+      },
+      {
+        "code": "color = resolve_color_default(color)",
+        "contains_unresolved_call": true,
+        "end_line": 276,
+        "exception_possible": true,
+        "id": "source:2:276:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 276,
+        "unresolved_calls": [
+          "resolve_color_default(color)"
+        ]
+      },
+      {
+        "code": "color",
+        "end_line": 276,
+        "id": "source:2:276:4:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 276
+      },
+      {
+        "code": "inspect.isgeneratorfunction(text_or_generator)",
+        "end_line": 278,
+        "id": "source:2:278:7:Call",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 278
+      },
+      {
+        "code": "i = t.cast('t.Callable[[], cabc.Iterable[str]]', text_or_generator)()",
+        "contains_unresolved_call": true,
+        "end_line": 279,
+        "exception_possible": true,
+        "id": "source:2:279:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 279,
+        "unresolved_calls": [
+          "t.cast('t.Callable[[], cabc.Iterable[str]]', text_or_generator)()",
+          "t.cast('t.Callable[[], cabc.Iterable[str]]', text_or_generator)"
+        ]
+      },
+      {
+        "code": "i",
+        "end_line": 279,
+        "id": "source:2:279:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 279
+      },
+      {
+        "code": "isinstance(text_or_generator, str)",
+        "end_line": 280,
+        "id": "source:2:280:9:Call",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 280
+      },
+      {
+        "code": "i = [text_or_generator]",
+        "end_line": 281,
+        "id": "source:2:281:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 281
+      },
+      {
+        "code": "i",
+        "end_line": 281,
+        "id": "source:2:281:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 281
+      },
+      {
+        "code": "i = iter(t.cast('cabc.Iterable[str]', text_or_generator))",
+        "contains_unresolved_call": true,
+        "end_line": 283,
+        "exception_possible": true,
+        "id": "source:2:283:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 283,
+        "unresolved_calls": [
+          "iter(t.cast('cabc.Iterable[str]', text_or_generator))",
+          "t.cast('cabc.Iterable[str]', text_or_generator)"
+        ]
+      },
+      {
+        "code": "i",
+        "end_line": 283,
+        "id": "source:2:283:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 283
+      },
+      {
+        "code": "text_generator = (el if isinstance(el, str) else str(el) for el in i)",
+        "contains_unresolved_call": true,
+        "end_line": 286,
+        "exception_possible": true,
+        "id": "source:2:286:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 286,
+        "unresolved_calls": [
+          "isinstance(el, str)",
+          "str(el)"
+        ]
+      },
+      {
+        "code": "text_generator",
+        "end_line": 286,
+        "id": "source:2:286:4:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 286
+      },
+      {
+        "code": "return pager(itertools.chain(text_generator, '\\n'), color)",
+        "contains_unresolved_call": true,
+        "end_line": 290,
+        "exception_possible": true,
+        "id": "source:2:290:4:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 290,
+        "unresolved_calls": [
+          "itertools.chain(text_generator, '\\n')"
+        ]
+      },
+      {
+        "code": "generator: cabc.Iterable[str]",
+        "end_line": 369,
+        "id": "source:3:369:10:arg",
+        "kind": "name_definition",
+        "source_id": "source:3",
+        "start_line": 369
+      },
+      {
+        "code": "color: bool | None",
+        "end_line": 369,
+        "id": "source:3:369:41:arg",
+        "kind": "name_definition",
+        "source_id": "source:3",
+        "start_line": 369
+      },
+      {
+        "code": "stdout = _default_text_stdout()",
+        "contains_unresolved_call": true,
+        "end_line": 371,
+        "exception_possible": true,
+        "id": "source:3:371:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:3",
+        "start_line": 371,
+        "unresolved_calls": [
+          "_default_text_stdout()"
+        ]
+      },
+      {
+        "code": "stdout",
+        "end_line": 371,
+        "id": "source:3:371:4:Name",
+        "kind": "Name",
+        "source_id": "source:3",
+        "start_line": 371
+      },
+      {
+        "code": "stdout is None",
+        "end_line": 375,
+        "id": "source:3:375:7:Compare",
+        "kind": "if_condition",
+        "source_id": "source:3",
+        "start_line": 375
+      },
+      {
+        "code": "stdout = StringIO()",
+        "contains_unresolved_call": true,
+        "end_line": 376,
+        "exception_possible": true,
+        "id": "source:3:376:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:3",
+        "start_line": 376,
+        "unresolved_calls": [
+          "StringIO()"
+        ]
+      },
+      {
+        "code": "stdout",
+        "end_line": 376,
+        "id": "source:3:376:8:Name",
+        "kind": "Name",
+        "source_id": "source:3",
+        "start_line": 376
+      },
+      {
+        "code": "not isatty(sys.stdin) or not isatty(stdout)",
+        "end_line": 378,
+        "id": "source:3:378:7:BoolOp",
+        "kind": "if_condition",
+        "source_id": "source:3",
+        "start_line": 378
+      },
+      {
+        "code": "return _nullpager(stdout, generator, color)",
+        "end_line": 379,
+        "exception_possible": true,
+        "id": "source:3:379:8:Return",
+        "kind": "Return",
+        "source_id": "source:3",
+        "start_line": 379
+      },
+      {
+        "code": "_tempfilepager(generator, pager_cmd_parts, color)",
+        "end_line": 385,
+        "id": "source:3:385:15:Call",
+        "kind": "if_condition",
+        "source_id": "source:3",
+        "start_line": 385
+      },
+      {
+        "code": "return",
+        "end_line": 386,
+        "id": "source:3:386:16:Return",
+        "kind": "Return",
+        "source_id": "source:3",
+        "start_line": 386
+      },
+      {
+        "code": "_pipepager(generator, pager_cmd_parts, color)",
+        "end_line": 387,
+        "id": "source:3:387:13:Call",
+        "kind": "if_condition",
+        "source_id": "source:3",
+        "start_line": 387
+      },
+      {
+        "code": "return",
+        "end_line": 388,
+        "id": "source:3:388:12:Return",
+        "kind": "Return",
+        "source_id": "source:3",
+        "start_line": 388
+      },
+      {
+        "code": "os.environ.get('TERM') in ('dumb', 'emacs')",
+        "end_line": 390,
+        "id": "source:3:390:7:Compare",
+        "kind": "if_condition",
+        "source_id": "source:3",
+        "start_line": 390
+      },
+      {
+        "code": "return _nullpager(stdout, generator, color)",
+        "end_line": 391,
+        "exception_possible": true,
+        "id": "source:3:391:8:Return",
+        "kind": "Return",
+        "source_id": "source:3",
+        "start_line": 391
+      },
+      {
+        "code": "(WIN or sys.platform.startswith('os2')) and _tempfilepager(generator, ['more'], color)",
+        "end_line": 394,
+        "id": "source:3:392:7:BoolOp",
+        "kind": "if_condition",
+        "source_id": "source:3",
+        "start_line": 392
+      },
+      {
+        "code": "return",
+        "end_line": 395,
+        "id": "source:3:395:8:Return",
+        "kind": "Return",
+        "source_id": "source:3",
+        "start_line": 395
+      },
+      {
+        "code": "_pipepager(generator, ['less'], color)",
+        "end_line": 396,
+        "id": "source:3:396:7:Call",
+        "kind": "if_condition",
+        "source_id": "source:3",
+        "start_line": 396
+      },
+      {
+        "code": "return",
+        "end_line": 397,
+        "id": "source:3:397:8:Return",
+        "kind": "Return",
+        "source_id": "source:3",
+        "start_line": 397
+      },
+      {
+        "code": "fd, filename = tempfile.mkstemp()",
+        "contains_unresolved_call": true,
+        "end_line": 401,
+        "exception_possible": true,
+        "id": "source:3:401:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:3",
+        "start_line": 401,
+        "unresolved_calls": [
+          "tempfile.mkstemp()"
+        ]
+      },
+      {
+        "code": "fd",
+        "end_line": 401,
+        "id": "source:3:401:4:Name",
+        "kind": "Name",
+        "source_id": "source:3",
+        "start_line": 401
+      },
+      {
+        "code": "filename",
+        "end_line": 401,
+        "id": "source:3:401:8:Name",
+        "kind": "Name",
+        "source_id": "source:3",
+        "start_line": 401
+      },
+      {
+        "code": "os.close(fd)",
+        "contains_unresolved_call": true,
+        "end_line": 402,
+        "exception_possible": true,
+        "id": "source:3:402:4:Expr",
+        "kind": "Expr",
+        "source_id": "source:3",
+        "start_line": 402,
+        "unresolved_calls": [
+          "os.close(fd)"
+        ]
+      },
+      {
+        "code": "_pipepager(generator, ['more'], color)",
+        "end_line": 404,
+        "id": "source:3:404:11:Call",
+        "kind": "if_condition",
+        "source_id": "source:3",
+        "start_line": 404
+      },
+      {
+        "code": "return",
+        "end_line": 405,
+        "id": "source:3:405:12:Return",
+        "kind": "Return",
+        "source_id": "source:3",
+        "start_line": 405
+      },
+      {
+        "code": "return _nullpager(stdout, generator, color)",
+        "end_line": 406,
+        "exception_possible": true,
+        "id": "source:3:406:8:Return",
+        "kind": "Return",
+        "source_id": "source:3",
+        "start_line": 406
+      },
+      {
+        "code": "os.unlink(filename)",
+        "contains_unresolved_call": true,
+        "end_line": 408,
+        "exception_possible": true,
+        "id": "source:3:408:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:3",
+        "start_line": 408,
+        "unresolved_calls": [
+          "os.unlink(filename)"
+        ]
+      },
+      {
+        "code": "generator: cabc.Iterable[str]",
+        "end_line": 555,
+        "id": "source:3:555:22:arg",
+        "kind": "name_definition",
+        "source_id": "source:3",
+        "start_line": 555
+      },
+      {
+        "code": "stream: t.TextIO",
+        "end_line": 555,
+        "id": "source:3:555:4:arg",
+        "kind": "name_definition",
+        "source_id": "source:3",
+        "start_line": 555
+      },
+      {
+        "code": "for text in generator:\n    if not color:\n        text = strip_ansi(text)\n    stream.write(text)",
+        "end_line": 561,
+        "id": "source:3:558:4:For",
+        "kind": "For",
+        "source_id": "source:3",
+        "start_line": 558
+      },
+      {
+        "code": "text",
+        "end_line": 558,
+        "id": "source:3:558:8:Name",
+        "kind": "Name",
+        "source_id": "source:3",
+        "start_line": 558
+      },
+      {
+        "code": "not color",
+        "end_line": 559,
+        "id": "source:3:559:11:UnaryOp",
+        "kind": "if_condition",
+        "source_id": "source:3",
+        "start_line": 559
+      },
+      {
+        "code": "text = strip_ansi(text)",
+        "contains_unresolved_call": true,
+        "end_line": 560,
+        "exception_possible": true,
+        "id": "source:3:560:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:3",
+        "start_line": 560,
+        "unresolved_calls": [
+          "strip_ansi(text)"
+        ]
+      },
+      {
+        "code": "text",
+        "end_line": 560,
+        "id": "source:3:560:12:Name",
+        "kind": "Name",
+        "source_id": "source:3",
+        "start_line": 560
+      },
+      {
+        "code": "stream.write(text)",
+        "contains_unresolved_call": true,
+        "end_line": 561,
+        "exception_possible": true,
+        "id": "source:3:561:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:3",
+        "start_line": 561,
+        "unresolved_calls": [
+          "stream.write(text)"
+        ]
+      },
+      {
+        "code": "value",
+        "end_line": 21,
+        "id": "test:21:42:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 21
+      },
+      {
+        "code": "color",
+        "end_line": 21,
+        "id": "test:21:49:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 21
+      },
+      {
+        "code": "echo_via_pager(value, color=color)",
+        "end_line": 29,
+        "exception_possible": true,
+        "id": "test:29:4:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 29
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:29:4:Expr"
+      }
+    ],
+    "seeds": [
+      "test:29:4:Expr"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 53,
+    "edges": 71,
+    "edge_kinds": {
+      "data_candidate": 33,
+      "call_target_candidate": 9,
+      "lexical_control": 12,
+      "definition_value_candidate": 11,
+      "call_event_candidate": 5,
+      "normal_body_exit": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:29:4:Expr",
+        "node_ids": [
+          "source:2:262:4:arg",
+          "source:2:263:4:arg",
+          "source:2:276:4:Assign",
+          "source:2:276:4:Name",
+          "source:2:278:7:Call",
+          "source:2:279:8:Assign",
+          "source:2:279:8:Name",
+          "source:2:280:9:Call",
+          "source:2:281:8:Assign",
+          "source:2:281:8:Name",
+          "source:2:283:8:Assign",
+          "source:2:283:8:Name",
+          "source:2:286:4:Assign",
+          "source:2:286:4:Name",
+          "source:2:290:4:Return",
+          "source:3:369:10:arg",
+          "source:3:369:41:arg",
+          "source:3:371:4:Assign",
+          "source:3:371:4:Name",
+          "source:3:375:7:Compare",
+          "source:3:376:8:Assign",
+          "source:3:376:8:Name",
+          "source:3:378:7:BoolOp",
+          "source:3:379:8:Return",
+          "source:3:385:15:Call",
+          "source:3:386:16:Return",
+          "source:3:387:13:Call",
+          "source:3:388:12:Return",
+          "source:3:390:7:Compare",
+          "source:3:391:8:Return",
+          "source:3:392:7:BoolOp",
+          "source:3:395:8:Return",
+          "source:3:396:7:Call",
+          "source:3:397:8:Return",
+          "source:3:401:4:Assign",
+          "source:3:401:4:Name",
+          "source:3:401:8:Name",
+          "source:3:402:4:Expr",
+          "source:3:404:11:Call",
+          "source:3:405:12:Return",
+          "source:3:406:8:Return",
+          "source:3:408:8:Expr",
+          "source:3:555:22:arg",
+          "source:3:555:4:arg",
+          "source:3:558:4:For",
+          "source:3:558:8:Name",
+          "source:3:559:11:UnaryOp",
+          "source:3:560:12:Assign",
+          "source:3:560:12:Name",
+          "source:3:561:8:Expr",
+          "test:21:42:arg",
+          "test:21:49:arg",
+          "test:29:4:Expr"
+        ],
+        "product_source_candidates": [
+          "source:2",
+          "source:3"
+        ],
+        "unknown_call_nodes": [
+          "source:2:276:4:Assign",
+          "source:2:279:8:Assign",
+          "source:2:283:8:Assign",
+          "source:2:286:4:Assign",
+          "source:2:290:4:Return",
+          "source:3:371:4:Assign",
+          "source:3:376:8:Assign",
+          "source:3:401:4:Assign",
+          "source:3:402:4:Expr",
+          "source:3:408:8:Expr",
+          "source:3:560:12:Assign",
+          "source:3:561:8:Expr"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:29:4:Expr"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.3569,
+  "identity": {
+    "case_id": "click_423",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "9a1881db176077134ecd303701e9a775d660aad1e9845e3d06145c419deaec90"
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "status": "failed",
+  "failure_categories": [
+    "analysis_error"
+  ],
+  "stage": "backward_graph",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "com.ctrip.framework.apollo.configservice.service.config.DefaultConfigServiceTest#testLoadConfigWithGrayRelease",
+      "status": "located",
+      "precision": "java_lexical_method_scope",
+      "locations": [
+        {
+          "symbol": "testLoadConfigWithGrayRelease",
+          "start_line": 39,
+          "end_line": 73
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 72,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_same_package_type",
+        "hint": "com.ctrip.framework.apollo.configservice.service.config.DefaultConfigService",
+        "candidates": [
+          "DefaultConfigServiceTest_setUp_67a78efb0f109cc0c8086a8fa2218bf6f03b00ae/src/main/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigService.java",
+          "src/main/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigService.java"
+        ],
+        "precision": "candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "DefaultConfigServiceTest_setUp_67a78efb0f109cc0c8086a8fa2218bf6f03b00ae/src/main/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigService.java",
+        "hint_kind": "java_same_package_type",
+        "hint": "com.ctrip.framework.apollo.configservice.service.config.AbstractConfigService",
+        "candidates": [
+          "DefaultConfigServiceTest_setUp_67a78efb0f109cc0c8086a8fa2218bf6f03b00ae/src/main/java/com/ctrip/framework/apollo/configservice/service/config/AbstractConfigService.java",
+          "src/main/java/com/ctrip/framework/apollo/configservice/service/config/AbstractConfigService.java"
+        ],
+        "precision": "candidate"
+      }
+    ],
+    "diagnostics": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 14075,
+    "read_bytes": 14075,
+    "attempted_files": 4,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and literal dynamic loader paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "src/test/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigServiceTest.java",
+      "sha256": "6f951bf35e7b43ddb332d2f1758d259da69804ec9a09dfbe2b9a099a02e0737a",
+      "bytes": 2643
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "DefaultConfigServiceTest_setUp_67a78efb0f109cc0c8086a8fa2218bf6f03b00ae/src/main/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigService.java",
+      "sha256": "ccf872725054ceccff986794d3f757f988c9957e5fac8ee0deb143548434f658",
+      "bytes": 1793
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigService.java",
+      "sha256": "ccf872725054ceccff986794d3f757f988c9957e5fac8ee0deb143548434f658",
+      "bytes": 1793
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "DefaultConfigServiceTest_setUp_67a78efb0f109cc0c8086a8fa2218bf6f03b00ae/src/main/java/com/ctrip/framework/apollo/configservice/service/config/AbstractConfigService.java",
+      "sha256": "8b06fb1864593073248c9ce2eebd3fdc90c64b5a03356bb506562eb20a6bf304",
+      "bytes": 3923
+    },
+    {
+      "source_id": "source:4",
+      "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/service/config/AbstractConfigService.java",
+      "sha256": "8b06fb1864593073248c9ce2eebd3fdc90c64b5a03356bb506562eb20a6bf304",
+      "bytes": 3923
+    }
+  ],
+  "error": {
+    "type": "RuntimeError",
+    "message": "backend_exit_1: SLF4J(W): No SLF4J providers were found.\nSLF4J(W): Defaulting to no-operation (NOP) logger implementation\nSLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.\nException in thread \"main\" spoon.compiler.ModelBuildingException: The type DefaultConfigService is already defined\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.reportProblem(JDTBasedSpoonCompiler.java:615)\n\tat spoon.support.compiler.jdt.TreeBuilderRequestor.acceptResult(TreeBuilderRequestor.java:29)\n\tat spoon.support.compiler.jdt.TreeBuilderCompiler.buildUnits(TreeBuilderCompiler.java:110)\n\tat spoon.support.compiler.jdt.JDTBatchCompiler.getUnits(JDTBatchCompiler.java:282)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.buildUnits(JDTBasedSpoonCompiler.java:442)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.buildUnitsAndModel(JDTBasedSpoonCompiler.java:386)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.buildSources(JDTBasedSpoonCompiler.java:347)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.build(JDTBasedSpoonCompiler.java:118)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.build(JDTBasedSpoonCompiler.java:101)\n\tat spoon.Launcher.buildModel(Launcher.java:781)\n\tat SliceProbe.run(SliceProbe.java:75)\n\tat SliceProbe.main(SliceProbe.java:51)\n"
+  },
+  "elapsed_seconds": 0.7895,
+  "identity": {
+    "case_id": "com.ctrip.framework.apollo.configservice.service.config.DefaultConfigServiceTest#testLoadConfigWithGrayRelease@67a78efb",
+    "dataset": "java-bechmark-strong",
+    "language": "java",
+    "snapshot_id": "7d314185ed28eb0436048df23ac0ddc202fdc3ed4993cb1af730c38efddc3622"
+  }
+}

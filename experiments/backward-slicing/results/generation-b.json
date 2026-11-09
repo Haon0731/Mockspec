@@ -1,0 +1,27 @@
+{
+  "flask": {
+    "slots": {
+      "mock_stub_001": "mock_ctx = mocker.MagicMock()",
+      "mock_stub_002": "mock_app = mocker.MagicMock()",
+      "mock_stub_003": "mock_aborter = mocker.Mock(side_effect=Exception(f\"Aborted with {code}\"))",
+      "mock_stub_004": "mock_cv_app = mocker.patch(\"flask.helpers._cv_app\")\nmock_cv_app.get.return_value = None",
+      "mock_stub_005": "mock_cv_app.get.return_value = mock_ctx",
+      "mock_stub_006": "mock_wz_abort = mocker.patch(\"flask.helpers._wz_abort\", side_effect=Exception(f\"Werkzeug abort {code}\"))",
+      "verify_001": "mock_cv_app.get.assert_called_once_with(None)",
+      "verify_002": "mock_aborter.assert_called_once_with(code, *args, **kwargs)",
+      "verify_003": "mock_wz_abort.assert_not_called()",
+      "verify_004": "mock_wz_abort.assert_called_once_with(code, *args, **kwargs)"
+    },
+    "reasoning": "Patch the two call boundaries visible in flask.helpers.abort. The context variable returns None by default and is switched to a configured context only for app-context scenarios. The app aborter raises first, so Werkzeug must remain untouched on that branch; without a context, the Werkzeug abort function raises and receives the original positional and keyword arguments. The candidate graph is explicitly approximate, so these assertions cover only the directly evidenced routing and argument forwarding and do not assert exception types or unrelated mock interactions."
+  },
+  "cloudfoundry": {
+    "mock_stub": "PathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"health\");",
+    "verify": "verify(pathMappedEndpoints).getPath(EndpointId.of(\"health\"));",
+    "reasoning": "The factory's application creation path derives the health URL through PathMappedEndpoints. Returning the non-empty mapped path 'health' selects the directly evidenced health branch, while the existing WebEndpointProperties default supplies the asserted actuator base path and the configured Cloud Foundry URI supplies the host/base URL. Verification is limited to the health lookup needed for the asserted URL.",
+    "unknowns": [
+      "The evidence graph uses no-classpath name/arity candidates and is not a proof of runtime dispatch.",
+      "EndpointId value equality and the default WebEndpointProperties base path are inferred from the supplied test shape rather than resolved dependency implementations.",
+      "The status fallback is intentionally unstubbed because a non-empty health mapping should make it unnecessary."
+    ]
+  }
+}

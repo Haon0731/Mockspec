@@ -13,6 +13,17 @@
 
 ## 独立研究验证
 
+当前后向切片方案调研：[完整 MockBench 上的研究结论](../experiments/backward-slicing/full-benchmark-research.md)。
+包含主源文献、后端能力边界、165例目标测试结构盘点与验证设计；尚未报告全量切片成功率。
+实现入口：[目标导向候选切片批处理](../experiments/backward-slicing/README.md#全量候选切片入口2026-11-09)，
+从目标测试准则到有界选源、后向候选图和逐例失败；不把构图完成当作语义恢复成功。
+[首次全量执行结果](../out/mockbench-study/backward-slice-full-20261109-r3/report.md)：
+165例全部尝试，155例候选图、10例构图失败，包含逐准则证据与具体失败归因。
+
+全量研究入口：[完整 MockBench 研究框架](../experiments/mockbench-study/README.md)。
+覆盖冻结 Java/Python 案例清单、实际加载检查、源码读取接口、历史语法基线和失败记录；
+数据接入与关系恢复质量分别验证。
+
 需求基线：[冻结仓库主动只读探索 PRD](workspace-exploration-prd.md)。工程切片 #13–#16 已交付，
 真实 M2 仍未通过，见 [#17 验收尝试](../out/staged-inference/issue17-m2-20261026/report.md)；
 PRD 不作为当前能力或已通过验收的说明。
@@ -36,6 +47,7 @@ PRD 不作为当前能力或已通过验收的说明。
 
 | 材料 | 已验证的范围 | 复现入口 |
 | --- | --- | --- |
+| [后向切片与 Mock 生成探索](../experiments/backward-slicing/README.md) | 三个审核案例的候选证据图、一次A/B生成、Flask原测试与交互变异；含失败与未验证范围 | [协议与复现](../experiments/backward-slicing/README.md#7-复现与工程验证) |
 | [M1-5 集成验收](../experiments/staged-inference/acceptance-report.md) | B/C 四状态、静态对照、有界修订修复、定向查询与共享预算；真实检查状态及需求映射见验收记录 | [运行说明](usage.md#分阶段研究回放m1-1--m1-4)；[架构边界](architecture.md#研究路径) |
 | [Scenario Contract Research](scenario-research/decision.md) | 人工契约及有限模型 PoC；Limited-Go | [复现说明](scenario-research/reproduce.md) |
 | [源码绑定局部检查](source-bound-local/report.md) | 可见源码的受支持局部返回值条件；未接入 Agent | [run_local.py](../experiments/scenario-research/run_local.py)；命令和限制见报告 |
