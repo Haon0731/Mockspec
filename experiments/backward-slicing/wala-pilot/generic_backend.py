@@ -32,7 +32,11 @@ from mock_spec.adapters.frozen_dataset import FrozenDataset  # noqa: E402
 
 SCHEMA = "mockspec.generic-java-wala-backend/v1"
 BACKEND_SOURCE = HERE / "backend/src/main/java/org/mockspec/research/WalaSliceProbe.java"
+TYPE_CONSTRAINT_SOURCE = HERE / "backend/src/main/java/org/mockspec/research/JavaTypeConstraints.java"
+TYPE_CONSTRAINT_CLASS = "org.mockspec.research.JavaTypeConstraints"
 MAX_RELATIONS = 1000
+MAX_RELATION_PATH_EDGES = 5_000
+MAX_OBSERVATION_PROJECTED_EDGES = 50_000
 DEFAULT_MAX_FILES = 8
 DEFAULT_MAX_BYTES = 200_000
 DEFAULT_COMPILE_MAX_FILES = 400
@@ -61,6 +65,186 @@ def _sha256(text: str) -> str:
 
 def _write(path: Path, value: Any) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n")
+
+
+def _read_root_checkpoints(
+        directory: Path, queries: list[str],
+        manifest: list[dict[str, Any]] | None = None) -> dict[str, dict[str, Any]]:
+    expected = set(queries)
+    if len(expected) != len(queries):
+        raise ValueError("checkpoint query identities must be unique")
+    returned: dict[str, dict[str, Any]] = {}
+    indexes: set[int] = set()
+    manifest_by_query: dict[str, dict[str, Any]] | None = None
+    if manifest is not None:
+        manifest_by_query = {}
+        for item in manifest:
+            if not isinstance(item, dict):
+                raise ValueError("WALA root manifest contains a malformed entry")
+            index = item.get("root_index")
+            query = item.get("criterion_query")
+            expected_file = f"root-{index:05d}.json" if type(index) is int else None
+            if (type(index) is not int or not 0 <= index < len(queries)
+                    or queries[index] != query or item.get("checkpoint_file") != expected_file
+                    or query in manifest_by_query):
+                raise ValueError("WALA root manifest duplicated or substituted a criterion")
+            manifest_by_query[query] = item
+        if set(manifest_by_query) != expected:
+            raise ValueError("WALA root manifest omitted a criterion")
+    for path in sorted(directory.glob("root-*.json")):
+        checkpoint = json.loads(path.read_text())
+        if checkpoint.get("schema_version") != "mockspec.wala-root-checkpoint/v1":
+            raise ValueError(f"WALA root checkpoint schema differs: {path.name}")
+        index = checkpoint.get("root_index")
+        query = checkpoint.get("criterion_query")
+        root = checkpoint.get("root")
+        if type(index) is not int or not 0 <= index < len(queries) or queries[index] != query:
+            raise ValueError(f"WALA root checkpoint index/query identity differs: {path.name}")
+        if query not in expected or not isinstance(root, dict):
+            raise ValueError(f"WALA root checkpoint is malformed or substituted: {path.name}")
+        if index in indexes or query in returned:
+            raise ValueError(f"duplicate WALA root checkpoint: {path.name}")
+        if manifest_by_query is not None:
+            item = manifest_by_query[query]
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            expected_status = "error" if root.get("error") else "complete"
+            if item.get("checkpoint_sha256") != digest or item.get("status") != expected_status:
+                raise ValueError(f"WALA root checkpoint hash/status differs: {path.name}")
+        indexes.add(index)
+        returned[query] = root
+    if manifest_by_query is not None and set(returned) != expected:
+        raise ValueError("WALA root checkpoints omitted a manifested criterion")
+    return returned
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _load_checkpoint_root(path: Path) -> dict[str, Any]:
+    with path.open(encoding="utf-8") as stream:
+        checkpoint = json.load(stream)
+    root = checkpoint.get("root")
+    if not isinstance(root, dict):
+        raise ValueError(f"WALA root checkpoint lacks a root object: {path.name}")
+    return root
+
+
+def _validated_root_checkpoint_paths(
+        directory: Path, queries: list[str],
+        manifest: list[dict[str, Any]] | None = None) -> dict[str, Path]:
+    # Reuse the strict identity/status/hash validation without retaining its full roots.
+    expected = set(queries)
+    manifest_by_query = ({item["criterion_query"]: item for item in manifest}
+                         if manifest is not None else None)
+    paths: dict[str, Path] = {}
+    for path in sorted(directory.glob("root-*.json")):
+        with path.open(encoding="utf-8") as stream:
+            checkpoint = json.load(stream)
+        if checkpoint.get("schema_version") != "mockspec.wala-root-checkpoint/v1":
+            raise ValueError(f"WALA root checkpoint schema differs: {path.name}")
+        index = checkpoint.get("root_index")
+        query = checkpoint.get("criterion_query")
+        root = checkpoint.get("root")
+        if (type(index) is not int or not 0 <= index < len(queries) or queries[index] != query
+                or query not in expected or query in paths or not isinstance(root, dict)):
+            raise ValueError(f"WALA root checkpoint identity differs or duplicates: {path.name}")
+        if manifest_by_query is not None:
+            item = manifest_by_query.get(query)
+            expected_name = f"root-{index:05d}.json"
+            expected_status = "error" if root.get("error") else "complete"
+            if (item is None or item.get("root_index") != index
+                    or item.get("checkpoint_file") != expected_name
+                    or item.get("status") != expected_status
+                    or item.get("checkpoint_sha256") != _sha256_file(path)):
+                raise ValueError(f"WALA root manifest differs from checkpoint: {path.name}")
+        paths[query] = path
+        del checkpoint, root
+    if manifest_by_query is not None:
+        if len(manifest_by_query) != len(manifest) or set(manifest_by_query) != expected:
+            raise ValueError("WALA root manifest duplicated, omitted or substituted a criterion")
+        if set(paths) != expected:
+            raise ValueError("WALA root checkpoints omitted a manifested criterion")
+    return paths
+
+
+def _analysis_raw(analysis: dict[str, Any]) -> dict[str, Any] | None:
+    raw = analysis.get("raw")
+    if isinstance(raw, dict):
+        return raw
+    raw_path = analysis.get("raw_path")
+    return _load_checkpoint_root(Path(raw_path)) if isinstance(raw_path, str) else None
+
+
+def _analysis_boundaries(analyses: list[dict[str, Any]],
+                         closure_evidence: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    boundaries = [{"scope": item["observation_id"], "reason": item["error"]}
+                  for item in analyses if item.get("raw") is None and not item.get("raw_path")]
+    boundaries.extend({"scope": "source_closure", "reason": item["status"], "details": item}
+                      for item in closure_evidence
+                      if item["status"] != "selected_unique_visible_type")
+    boundaries.extend({"scope": item["observation_id"],
+                       "reason": "statement_budget_frontier",
+                       "frontier_count": item.get("traversal_frontier_count")}
+                      for item in analyses if item.get("traversal_truncated"))
+    return boundaries
+
+
+def _recover_checkpoint_analyses(
+        queries: list[str], query_by_text: dict[str, dict[str, Any]],
+        completed_roots: dict[str, dict[str, Any]], *, missing_error: str,
+        graph_created: bool) -> list[dict[str, Any]]:
+    analyses: list[dict[str, Any]] = []
+    for root_index, query in enumerate(queries):
+        criterion = query_by_text[query]
+        root = completed_roots.get(query)
+        if root is not None and not root.get("error"):
+            analyses.append({"observation_id": criterion["criterion_id"], "raw": root,
+                             "graph_created": True, "root_mapped": True,
+                             "checkpoint_recovered": True})
+        else:
+            analyses.append({"observation_id": criterion["criterion_id"], "raw": None,
+                             "error": root.get("error") if root else missing_error,
+                             "graph_created": graph_created, "root_mapped": False})
+    return analyses
+
+
+def _checkpoint_path_analyses(
+        queries: list[str], query_by_text: dict[str, dict[str, Any]],
+        checkpoint_paths: dict[str, Path], *, missing_error: str,
+        graph_created: bool) -> list[dict[str, Any]]:
+    analyses: list[dict[str, Any]] = []
+    for root_index, query in enumerate(queries):
+        criterion = query_by_text[query]
+        path = checkpoint_paths.get(query)
+        if path is None:
+            analyses.append({"observation_id": criterion["criterion_id"], "raw": None,
+                             "error": missing_error, "graph_created": graph_created,
+                             "root_mapped": False})
+            continue
+        root = _load_checkpoint_root(path)
+        if root.get("error"):
+            analyses.append({"observation_id": criterion["criterion_id"], "raw": None,
+                             "error": root["error"], "graph_created": True,
+                             "root_mapped": False,
+                             "raw_checkpoint_sha256": _sha256_file(path),
+                             "checkpoint_root_index": root_index,
+                             "checkpoint_query": query})
+        else:
+            analyses.append({"observation_id": criterion["criterion_id"],
+                             "raw_path": str(path), "graph_created": True,
+                             "root_mapped": True, "checkpoint_recovered": True,
+                             "raw_checkpoint_sha256": _sha256_file(path),
+                             "checkpoint_root_index": root_index,
+                             "checkpoint_query": query,
+                             "traversal_truncated": root.get("traversal_truncated", False),
+                             "traversal_frontier_count": root.get("traversal_frontier_count", 0)})
+        del root
+    return analyses
 
 
 def _run(command: list[str], *, cwd: Path, timeout: int) -> tuple[subprocess.CompletedProcess[str], float]:
@@ -112,33 +296,6 @@ def _missing_variables(stderr: str, *, test_path: str | None = None,
     return values
 
 
-def _type_updates(stderr: str, missing: list[str]) -> dict[str, str]:
-    """Recover only javac constraints whose caret identifies one missing name."""
-    updates: dict[str, str] = {}
-    pattern = re.compile(
-        r"(?m)^.*?:(\d+): error: incompatible types: .*? cannot be converted to ([^\n]+)\n"
-        r"([^\n]*)\n([ ]*)\^"
-    )
-    for match in pattern.finditer(stderr):
-        required = match.group(2).strip()
-        source_line, caret = match.group(3), len(match.group(4))
-        candidates = []
-        for name in missing:
-            for occurrence in re.finditer(rf"\b{re.escape(name)}\b", source_line):
-                if occurrence.start() <= caret <= occurrence.end():
-                    candidates.append(name)
-        if not candidates:
-            present = [name for name in missing if re.search(rf"\b{re.escape(name)}\b", source_line)]
-            if len(present) == 1:
-                candidates = present
-        if len(set(candidates)) == 1 and re.fullmatch(r"[A-Za-z_$][\w$]*(?:\[\])?", required):
-            name = candidates[0]
-            if name in updates and updates[name] != required:
-                raise ValueError(f"conflicting visible type constraints for {name}")
-            updates[name] = required
-    return updates
-
-
 def _compile(source_root: Path, classes: Path, sources: list[Path], classpath: str,
              *, timeout: int) -> tuple[subprocess.CompletedProcess[str], float]:
     if classes.exists():
@@ -150,9 +307,9 @@ def _compile(source_root: Path, classes: Path, sources: list[Path], classpath: s
 
 def _prepare_harness(test_text: str, method: str, write_test, compile_once,
                      *, test_path: str | None = None, start_line: int | None = None,
-                     end_line: int | None = None, max_rounds: int = 12,
-                     record_attempts=None,
-                     ) -> tuple[str, list[dict[str, str]], list[dict[str, Any]]]:
+                     end_line: int | None = None, record_attempts=None,
+                     constraint_resolver=None,
+                     ) -> tuple[str, list[dict[str, Any]], list[dict[str, Any]]]:
     """Compile raw input, then add only structurally constrained unknown parameters."""
     attempts: list[dict[str, Any]] = []
     write_test(test_text)
@@ -167,26 +324,61 @@ def _prepare_harness(test_text: str, method: str, write_test, compile_once,
                                  start_line=start_line, end_line=end_line)
     if not missing:
         raise ValueError("masked Java input does not compile and no deleted variable is identifiable")
-    types = {name: "Object" for name in missing}
-    for round_index in range(max_rounds):
-        parameters = [(name, types[name]) for name in missing]
-        harness = _replace_entry(test_text, method, parameters)
-        write_test(harness)
-        result, seconds = compile_once()
-        attempts.append({"kind": "structural_parameter_harness", "round": round_index,
-                         "parameters": [{"name": name, "type": types[name]} for name in missing],
-                         "exit_code": result.returncode, "seconds": seconds,
-                         "stderr": result.stderr[-6000:]})
-        if record_attempts is not None:
-            record_attempts(attempts)
-        if result.returncode == 0:
-            return harness, attempts[-1]["parameters"], attempts
-        updates = _type_updates(result.stderr, missing)
-        changed = {name: required for name, required in updates.items() if types[name] != required}
-        if not changed:
-            raise ValueError("deleted Java declaration types are not uniquely constrained by visible usage")
-        types.update(changed)
-    raise ValueError("structural Java harness did not converge within its round budget")
+    if constraint_resolver is None:
+        raise ValueError("deleted Java declarations require source-attributed type constraints")
+    resolution = constraint_resolver(missing)
+    parameters = resolution.get("parameters")
+    unresolved = resolution.get("unresolved")
+    if not isinstance(parameters, list) or not isinstance(unresolved, list):
+        raise ValueError("structural type constraint helper returned malformed output")
+    resolved = {item.get("name"): item for item in parameters if isinstance(item, dict)}
+    if set(resolved) != set(missing) or unresolved:
+        reasons = {item.get("name"): item.get("reason") for item in unresolved
+                   if isinstance(item, dict)}
+        raise ValueError(f"deleted Java declaration types are not uniquely constrained: {reasons}")
+    ordered = [resolved[name] for name in missing]
+    if any(not isinstance(item.get("type"), str) or not item.get("evidence") for item in ordered):
+        raise ValueError("structural type constraint lacks declared type or source evidence")
+    harness = _replace_entry(test_text, method,
+                             [(item["name"], item["type"]) for item in ordered])
+    write_test(harness)
+    result, seconds = compile_once()
+    attempts.append({"kind": "source_attributed_structural_parameter_harness",
+                     "parameters": ordered, "exit_code": result.returncode,
+                     "seconds": seconds, "stderr": result.stderr[-6000:]})
+    if record_attempts is not None:
+        record_attempts(attempts)
+    if result.returncode:
+        raise ValueError("source-attributed structural Java harness does not compile; source closure or compiler issue remains")
+    return harness, ordered, attempts
+
+
+def _compile_type_constraint_helper(classes: Path, *, cwd: Path, timeout: int) -> float:
+    result, seconds = _run(
+        ["javac", "-proc:none", "-g", "-d", str(classes), str(TYPE_CONSTRAINT_SOURCE)],
+        cwd=cwd, timeout=timeout)
+    if result.returncode:
+        raise RuntimeError("Java structural type constraint helper compilation failed: "
+                           + result.stderr[-3000:])
+    return seconds
+
+
+def _resolve_structural_types(source_root: Path, helper_classes: Path, classpath: str,
+                              test_path: str, method: str, start_line: int, end_line: int,
+                              missing: list[str], *, timeout: int) -> tuple[dict[str, Any], float]:
+    command = ["java", "-cp", str(helper_classes), TYPE_CONSTRAINT_CLASS,
+               str(source_root), classpath or "-", test_path, method,
+               str(start_line), str(end_line), *missing]
+    result, seconds = _run(command, cwd=source_root, timeout=timeout)
+    if result.returncode:
+        raise RuntimeError("Java structural type constraint helper failed: " + result.stderr[-3000:])
+    try:
+        value = json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise ValueError("Java structural type constraint helper returned invalid JSON") from exc
+    if value.get("schema") != "mock-spec.java-type-constraints/v1":
+        raise ValueError("Java structural type constraint helper schema mismatch")
+    return value, seconds
 
 
 def _java_code(text: str) -> str:
@@ -360,8 +552,114 @@ def _homogeneous_dependency_path(raw: dict[str, Any], start: int, end: int,
     return None
 
 
+def _reverse_path_index(raw: dict[str, Any], allowed_labels: set[str]
+                        ) -> tuple[dict[int, dict[str, Any]], dict[int, int]]:
+    seed = raw.get("seed_index")
+    if type(seed) is not int:
+        return {}, {}
+    incoming: dict[int, list[dict[str, Any]]] = {}
+    for edge in raw.get("slice_edges", []):
+        labels = set(edge.get("labels", []))
+        if labels and labels <= allowed_labels:
+            incoming.setdefault(int(edge["to"]), []).append(edge)
+    toward_seed: dict[int, dict[str, Any]] = {}
+    distances = {seed: 0}
+    queue = [seed]
+    for target in queue:
+        for edge in incoming.get(target, []):
+            source = int(edge["from"])
+            if source not in distances:
+                distances[source] = distances[target] + 1
+                toward_seed[source] = edge
+                queue.append(source)
+    return toward_seed, distances
+
+
+def _indexed_dependency_path(toward_seed: dict[int, dict[str, Any]], distances: dict[int, int],
+                             start: int, seed: int, max_edges: int) -> list[dict[str, Any]] | None:
+    distance = distances.get(start)
+    if distance is None or distance == 0 or distance > max_edges:
+        return None
+    path = []
+    current = start
+    while current != seed:
+        edge = toward_seed.get(current)
+        if edge is None:
+            return None
+        path.append(edge)
+        current = int(edge["to"])
+    return path
+
+
+def _path_indexes(raw: dict[str, Any]) -> dict[str, tuple[dict[int, dict[str, Any]], dict[int, int]]]:
+    return {
+        "data": _reverse_path_index(raw, {"DATA_DEP", "HEAP_DATA_DEP"}),
+        "control": _reverse_path_index(raw, {"CONTROL_DEP"}),
+        "mixed": _reverse_path_index(raw, {"DATA_DEP", "CONTROL_DEP"}),
+    }
+
+
+def _consume_indexed_path(indexes: dict[str, tuple[dict[int, dict[str, Any]], dict[int, int]]],
+                          family: str, start: int, seed: int,
+                          budget: dict[str, int]) -> list[dict[str, Any]] | None:
+    if budget["relations"] <= 0:
+        budget["omitted_relations"] += 1
+        return None
+    toward_seed, distances = indexes[family]
+    distance = distances.get(start)
+    if distance is None or distance == 0:
+        return None
+    if distance > MAX_RELATION_PATH_EDGES or distance > budget["edges"]:
+        budget["omitted_path_edges"] += distance
+        budget["omitted_relations"] += 1
+        return None
+    path = _indexed_dependency_path(toward_seed, distances, start, seed, distance)
+    if path:
+        budget["relations"] -= 1
+        budget["edges"] -= len(path)
+    return path
+
+
+def _outgoing_index(raw: dict[str, Any], allowed_labels: set[str]
+                    ) -> dict[int, list[dict[str, Any]]]:
+    outgoing: dict[int, list[dict[str, Any]]] = {}
+    for edge in raw.get("slice_edges", []):
+        labels = set(edge.get("labels", []))
+        if labels and labels <= allowed_labels:
+            outgoing.setdefault(int(edge["from"]), []).append(edge)
+    return outgoing
+
+
+def _indexed_path_between(outgoing: dict[int, list[dict[str, Any]]], start: int, target: int,
+                          max_edges: int) -> list[dict[str, Any]] | None:
+    queue: list[int] = [start]
+    parent: dict[int, dict[str, Any]] = {}
+    distances = {start: 0}
+    for current in queue:
+        if distances[current] >= max_edges:
+            continue
+        for edge in outgoing.get(current, []):
+            reached = int(edge["to"])
+            if reached in distances:
+                continue
+            parent[reached] = edge
+            distances[reached] = distances[current] + 1
+            if reached == target:
+                path = []
+                cursor = target
+                while cursor != start:
+                    step = parent[cursor]
+                    path.append(step)
+                    cursor = int(step["from"])
+                return list(reversed(path))
+            queue.append(reached)
+    return None
+
+
 def _typed_product_paths(raw: dict[str, Any], classes: dict[str, str],
-                         opaque_by_path: dict[str, list[dict[str, Any]]]
+                         opaque_by_path: dict[str, list[dict[str, Any]]],
+                         indexes: dict[str, tuple[dict[int, dict[str, Any]], dict[int, int]]] | None = None,
+                         budget: dict[str, int] | None = None,
                          ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     statements = raw.get("slice_statements", [])
     seed = raw.get("seed_index")
@@ -369,15 +667,17 @@ def _typed_product_paths(raw: dict[str, Any], classes: dict[str, str],
         return [], []
     results = []
     suppressed = []
-    families = (("value_flow", {"DATA_DEP", "HEAP_DATA_DEP"}),
-                ("control_dependence", {"CONTROL_DEP"}))
+    indexes = indexes or _path_indexes(raw)
+    budget = budget or {"relations": MAX_RELATIONS, "edges": MAX_OBSERVATION_PROJECTED_EDGES,
+                        "omitted_relations": 0, "omitted_path_edges": 0}
+    families = (("value_flow", "data"), ("control_dependence", "control"))
     for index, statement in enumerate(statements):
         path = _source_for_signature(statement.get("method"), classes)
         line = statement.get("line")
         if path is None or type(line) is not int or line < 1:
             continue
-        for relation_kind, labels in families:
-            dependency_path = _homogeneous_dependency_path(raw, index, seed, labels)
+        for relation_kind, family in families:
+            dependency_path = _consume_indexed_path(indexes, family, index, seed, budget)
             if dependency_path:
                 statement_indexes = [index, *(int(edge["to"]) for edge in dependency_path)]
                 opaque_hits: list[dict[str, Any]] = []
@@ -401,10 +701,229 @@ def _typed_product_paths(raw: dict[str, Any], classes: dict[str, str],
     return results, suppressed
 
 
+def _product_body_paths(raw: dict[str, Any], classes: dict[str, str],
+                        indexes: dict[str, tuple[dict[int, dict[str, Any]], dict[int, int]]] | None = None,
+                        budget: dict[str, int] | None = None,
+                        ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    statements = raw.get("slice_statements", [])
+    seed = raw.get("seed_index")
+    if type(seed) is not int or not 0 <= seed < len(statements):
+        return [], []
+    indexed: dict[tuple[str, str, int], int] = {}
+    for index, statement in enumerate(statements):
+        instruction_index = statement.get("instruction_index")
+        if type(instruction_index) is int:
+            indexed[(statement.get("method"), statement.get("context"), instruction_index)] = index
+    relations: list[dict[str, Any]] = []
+    boundaries: list[dict[str, Any]] = []
+    indexes = indexes or _path_indexes(raw)
+    budget = budget or {"relations": MAX_RELATIONS, "edges": MAX_OBSERVATION_PROJECTED_EDGES,
+                        "omitted_relations": 0, "omitted_path_edges": 0}
+    control_outgoing = _outgoing_index(raw, {"CONTROL_DEP"})
+    for evidence in raw.get("product_body_evidence", []):
+        method = evidence.get("method")
+        path = _source_for_signature(method, classes)
+        line = evidence.get("line")
+        statement_index = indexed.get((method, evidence.get("context"),
+                                       evidence.get("instruction_index")))
+        if path is None or type(line) is not int or line < 1 or statement_index is None:
+            continue
+        kind = evidence.get("kind")
+        if kind == "retained_state_write_witness":
+            boundaries.append({"source_path": path, "source_line": line,
+                               "reason": "retained_state_write_without_heap_dependency_path",
+                               "evidence": evidence})
+            continue
+        if kind == "value_return":
+            dependency_path = _consume_indexed_path(indexes, "data", statement_index, seed, budget)
+            if dependency_path:
+                relations.append({"kind": "normal_return_dependence", "source_path": path,
+                                  "source_line": line, "source_statement": statement_index,
+                                  "seed_statement": seed, "dependency_path": dependency_path,
+                                  "product_body_evidence": evidence})
+            continue
+        if kind == "exceptional_exit":
+            dependency_path = _consume_indexed_path(
+                indexes, "mixed", statement_index, seed, budget)
+            if dependency_path and any("CONTROL_DEP" in edge["labels"]
+                                       for edge in dependency_path):
+                relations.append({"kind": "exception_dependence", "source_path": path,
+                                  "source_line": line, "source_statement": statement_index,
+                                  "seed_statement": seed, "dependency_path": dependency_path,
+                                  "product_body_evidence": evidence})
+            continue
+        if kind == "control_guard":
+            controlled_index = indexed.get((method, evidence.get("context"),
+                                            evidence.get("retained_instruction_index")))
+            if controlled_index is None or controlled_index == statement_index:
+                continue
+            downstream = _consume_indexed_path(indexes, "mixed", controlled_index, seed, budget)
+            control_path = _indexed_path_between(
+                control_outgoing, statement_index, controlled_index, MAX_RELATION_PATH_EDGES)
+            if control_path and downstream is not None:
+                relations.append({"kind": "control_dependence", "source_path": path,
+                                  "source_line": line, "source_statement": statement_index,
+                                  "seed_statement": seed,
+                                  "dependency_path": [*control_path, *downstream],
+                                  "product_body_evidence": evidence})
+    return relations, boundaries
+
+
+def _write_root_evidence_projection(
+        path: Path, analysis: dict[str, Any], raw: dict[str, Any] | None,
+        published_relations: list[dict[str, Any]], unknown_boundaries: list[dict[str, Any]]) -> None:
+    if raw is None:
+        _write(path, {
+            "schema": "mockspec.wala-root-evidence/v1",
+            "observation_id": analysis["observation_id"],
+            "status": "failed",
+            "error": analysis.get("error", "root analysis unavailable"),
+            "graph_created": analysis.get("graph_created", False),
+            "root_mapped": False,
+            "raw_checkpoint_sha256": analysis.get("raw_checkpoint_sha256"),
+            "checkpoint_identity": {"root_index": analysis.get("checkpoint_root_index"),
+                                    "query": analysis.get("checkpoint_query")},
+            "unknown_boundaries": unknown_boundaries,
+        })
+        return
+    statements = raw.get("slice_statements", [])
+    used_indexes: set[int] = set()
+    used_edges: dict[tuple[int, int, tuple[str, ...]], dict[str, Any]] = {}
+    for relation in published_relations:
+        provenance = relation.get("provenance", {})
+        for name in ("source_statement", "seed_statement"):
+            index = provenance.get(name)
+            if type(index) is int:
+                used_indexes.add(index)
+        for edge in provenance.get("dependency_path", []):
+            source, target = int(edge["from"]), int(edge["to"])
+            labels = tuple(edge.get("labels", []))
+            used_indexes.update((source, target))
+            used_edges[(source, target, labels)] = edge
+    for boundary in unknown_boundaries:
+        evidence = boundary.get("evidence")
+        if isinstance(evidence, dict):
+            for index, statement in enumerate(statements):
+                if (statement.get("method") == evidence.get("method")
+                        and statement.get("context") == evidence.get("context")
+                        and statement.get("instruction_index") == evidence.get("instruction_index")):
+                    used_indexes.add(index)
+        details = boundary.get("details")
+        if isinstance(details, dict):
+            for hit in details.get("opaque_hits", []):
+                if type(hit.get("statement_index")) is int:
+                    used_indexes.add(hit["statement_index"])
+    projected_statements = [{"original_index": index, "statement": statements[index]}
+                            for index in sorted(used_indexes) if 0 <= index < len(statements)]
+    total_edges = int(raw.get("slice_edge_count", len(raw.get("slice_edges", []))))
+    projection = {
+        "schema": "mockspec.wala-root-evidence/v1",
+        "observation_id": analysis["observation_id"],
+        "status": "projected_not_evaluated",
+        "criterion": raw.get("criterion"),
+        "checkpoint_identity": {"root_index": analysis.get("checkpoint_root_index"),
+                                "query": analysis.get("checkpoint_query")},
+        "seed_original_index": raw.get("seed_index"),
+        "raw_checkpoint_sha256": analysis.get("raw_checkpoint_sha256"),
+        "full_counts": {"statements": len(statements), "edges": total_edges},
+        "projected_counts": {"statements": len(projected_statements),
+                             "edges": len(used_edges),
+                             "relations": len(published_relations)},
+        "omitted_counts": {"statements": max(0, len(statements) - len(projected_statements)),
+                           "edges": max(0, total_edges - len(used_edges))},
+        "statements": projected_statements,
+        "edges": list(used_edges.values()),
+        "relations": published_relations,
+        "unknown_boundaries": unknown_boundaries,
+        "frontier": {"truncated": raw.get("traversal_truncated", False),
+                     "frontier_count": raw.get("traversal_frontier_count", 0)},
+        "interpretation": "Omitted statements and edges were outside published relation witnesses; omission is not evidence of no influence.",
+    }
+    _write(path, projection)
+
+
+def _write_shared_evidence(path: Path, contract: dict[str, Any], costs: dict[str, Any],
+                           shared_backend: dict[str, Any]) -> None:
+    _write(path, {
+        "schema": "mockspec.wala-shared-evidence/v1",
+        "identity": contract["identity"],
+        "source_scope": contract["source_scope"],
+        "entry_point": contract["entry_point"],
+        "analysis_assumptions": contract["analysis_boundaries"]["assumptions"],
+        "shared_unknown_effects": contract["analysis_boundaries"]["unknown_effects"],
+        "cost": costs,
+        "backend": {key: shared_backend.get(key) for key in (
+            "schema_version", "wala_version", "configuration", "entry",
+            "class_hierarchy_classes", "unresolved_classes", "call_graph_nodes",
+            "application_call_graph_nodes", "call_graph_contexts", "pointer_instance_keys",
+            "timings_millis", "limitations", "generic_mode_boundary")},
+        "semantic_validation": contract["semantic_validation"],
+    })
+
+
+def _observed_opaque_unknown_effects(boundaries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    effects: list[dict[str, Any]] = []
+    by_identity: dict[tuple[Any, ...], dict[str, Any]] = {}
+    for boundary in boundaries:
+        if boundary.get("reason") != "typed_path_crosses_opaque_placeholder":
+            continue
+        observation_id = boundary.get("scope")
+        details = boundary.get("details", {})
+        for hit in details.get("opaque_hits", []):
+            key = (observation_id, hit.get("source_id"), hit.get("start_line"),
+                   hit.get("end_line"), hit.get("name"))
+            path_candidate = {"kind": details.get("kind"),
+                              "source_path": details.get("source_path"),
+                              "source_line": details.get("source_line")}
+            existing = by_identity.get(key)
+            if existing is not None:
+                statement_index = hit.get("statement_index")
+                indexes = existing["scope"]["observation_statement_indexes"]
+                if type(statement_index) is int and statement_index not in indexes:
+                    indexes.append(statement_index)
+                candidates = existing["scope"]["suppressed_path_candidates"]
+                if path_candidate not in candidates:
+                    candidates.append(path_candidate)
+                continue
+            placeholder = {name: value for name, value in hit.items()
+                           if name != "statement_index"}
+            statement_index = hit.get("statement_index")
+            effect = {
+                "boundary_id": (f"opaque:{observation_id}:{hit.get('source_id')}:"
+                                f"{hit.get('start_line')}:{hit.get('name')}"),
+                "effect": "placeholder_method_body_does_not_provide_product_semantics",
+                "scope": {"observation_id": observation_id, "placeholder": placeholder,
+                          "observation_statement_indexes": (
+                              [statement_index] if type(statement_index) is int else []),
+                          "suppressed_path_candidates": [path_candidate]},
+                "provenance": "typed observation dependency path suppression",
+                "precision": "unknown_effect",
+                "assumptions": [],
+            }
+            by_identity[key] = effect
+            effects.append(effect)
+    return effects
+
+
+def _finalize_mapping_costs(costs: dict[str, Any], contract: dict[str, Any], *,
+                            started: float, mapping_started: float) -> None:
+    finished = time.monotonic()
+    costs["timings_seconds"]["relationship_mapping_and_projection"] = finished - mapping_started
+    costs["total_seconds"] = finished - started
+    costs["total_scope"] = (
+        "adapter admission, bounded source compilation, bytecode packaging, WALA CG/SDG, "
+        "relationship mapping and per-root evidence projection; excludes shared and final result JSON serialization")
+    contract["cost"].update({
+        "timings_seconds": dict(costs["timings_seconds"]),
+        "total_seconds": costs["total_seconds"],
+        "total_scope": costs["total_scope"],
+    })
+
+
 def _contract(entry: dict[str, Any], context: dict[str, Any], sources: list[dict[str, Any]],
               criteria: list[dict[str, Any]], analyses: list[dict[str, Any]], costs: dict[str, Any],
               harness_parameters: list[dict[str, str]], boundaries: list[dict[str, Any]],
-              opaque_methods: list[dict[str, Any]]) -> tuple[dict, dict]:
+              opaque_methods: list[dict[str, Any]], evidence_output: Path | None = None) -> tuple[dict, dict]:
     observations = [{"observation_id": item["criterion_id"],
                      "location": {"source_id": "test", "start_line": item["line"],
                                   "end_line": item["line"]},
@@ -424,23 +943,60 @@ def _contract(entry: dict[str, Any], context: dict[str, Any], sources: list[dict
     mapped_ids = set()
     graph_nodes = graph_edges = raw_cross_source = typed_cross_source = 0
     for analysis in analyses:
-        observation_id, raw = analysis["observation_id"], analysis.get("raw")
+        observation_id = analysis["observation_id"]
+        raw = _analysis_raw(analysis)
         if raw is None:
+            if evidence_output is not None:
+                _write_root_evidence_projection(
+                    evidence_output / f"{observation_id}.json", analysis, None, [],
+                    [{"scope": observation_id, "reason": analysis.get("error", "root unavailable")}])
             continue
+        relation_start = len(relations)
+        boundary_start = len(boundaries)
+        projected_path_edges = 0
         mapped_ids.add(observation_id)
         graph_nodes += int(raw.get("slice_statement_count", 0))
         graph_edges += int(raw.get("slice_edge_count", 0))
         observation = next(item for item in observations if item["observation_id"] == observation_id)
         observation_endpoint = _endpoint(context["test_path"], observation["location"]["start_line"])
-        typed_paths, suppressed_paths = _typed_product_paths(raw, classes, opaque_by_path)
+        path_indexes = _path_indexes(raw)
+        path_budget = {"relations": MAX_RELATIONS, "edges": MAX_OBSERVATION_PROJECTED_EDGES,
+                       "omitted_relations": 0, "omitted_path_edges": 0}
+        body_paths, body_boundaries = _product_body_paths(
+            raw, classes, path_indexes, path_budget)
+        typed_paths, suppressed_paths = _typed_product_paths(
+            raw, classes, opaque_by_path, path_indexes, path_budget)
+        typed_paths = [*body_paths, *typed_paths]
         boundaries.extend({"scope": observation_id,
                            "reason": "typed_path_crosses_opaque_placeholder",
                            "details": suppressed} for suppressed in suppressed_paths)
+        boundaries.extend({"scope": observation_id, **boundary}
+                          for boundary in body_boundaries)
+        if path_budget["omitted_relations"]:
+            boundaries.append({"scope": observation_id,
+                               "reason": "dependency_path_discovery_budget",
+                               "omitted_relation_candidates": path_budget["omitted_relations"],
+                               "omitted_path_edges": path_budget["omitted_path_edges"],
+                               "relation_limit": MAX_RELATIONS,
+                               "edge_limit": MAX_OBSERVATION_PROJECTED_EDGES,
+                               "per_relation_edge_limit": MAX_RELATION_PATH_EDGES})
         for path in typed_paths:
             rkey = (path["kind"], path["source_path"], path["source_line"], observation_id)
             if rkey in relation_keys or len(relations) >= MAX_RELATIONS:
                 continue
+            path_edges = len(path["dependency_path"])
+            if (path_edges > MAX_RELATION_PATH_EDGES
+                    or projected_path_edges + path_edges > MAX_OBSERVATION_PROJECTED_EDGES):
+                boundaries.append({"scope": observation_id,
+                                   "reason": "dependency_path_projection_budget",
+                                   "source_path": path["source_path"],
+                                   "source_line": path["source_line"],
+                                   "path_edges": path_edges,
+                                   "per_relation_limit": MAX_RELATION_PATH_EDGES,
+                                   "per_observation_limit": MAX_OBSERVATION_PROJECTED_EDGES})
+                continue
             relation_keys.add(rkey)
+            projected_path_edges += path_edges
             typed_cross_source += 1
             relations.append({"kind": path["kind"], "modality": "analysis_may",
                               "from": _endpoint(path["source_path"], path["source_line"]),
@@ -448,11 +1004,14 @@ def _contract(entry: dict[str, Any], context: dict[str, Any], sources: list[dict
                               "provenance": {"backend": "WALA 1.7.2 0-1-CFA + backward SDG",
                                              "source_statement": path["source_statement"],
                                              "seed_statement": path["seed_statement"],
-                                             "dependency_path": path["dependency_path"]},
-                              "precision": "homogeneous typed NO_HEAP SDG dependency path to exact observation seed",
+                                             "dependency_path": path["dependency_path"],
+                                             "product_body_evidence": path.get("product_body_evidence")},
+                              "precision": ("product-body endpoint plus typed NO_HEAP SDG path to exact observation seed"
+                                            if path.get("product_body_evidence") else
+                                            "homogeneous typed NO_HEAP SDG dependency path to exact observation seed"),
                               "observation_ids": [observation_id],
                               "assumptions": ["context-insensitive predecessor traversal does not enforce matched calls"]})
-        for statement in raw.get("slice_statements", []):
+        for statement_index, statement in enumerate(raw.get("slice_statements", [])):
             product_path = _source_for_signature(statement.get("method"), classes)
             line = statement.get("line")
             if product_path and isinstance(line, int):
@@ -476,9 +1035,15 @@ def _contract(entry: dict[str, Any], context: dict[str, Any], sources: list[dict
                                                             symbol=context["entry_signature"]),
                                           "to": _endpoint(target_path, None, symbol=target),
                                           "provenance": {"backend": "WALA 1.7.2 0-1-CFA + backward SDG",
+                                                         "source_statement": statement_index,
                                                          "ssa_instruction": statement.get("instruction")},
                                           "precision": "entry SSA call retained in exact observation slice",
                                           "observation_ids": [observation_id], "assumptions": []})
+        if evidence_output is not None:
+            _write_root_evidence_projection(
+                evidence_output / f"{observation_id}.json", analysis, raw,
+                relations[relation_start:], boundaries[boundary_start:])
+        del raw
     candidate_values = list(candidates.values())
     binding_status = "unique" if len(candidate_values) == 1 else "ambiguous" if candidate_values else "unresolved"
     missing = [item["observation_id"] for item in observations if item["observation_id"] not in mapped_ids]
@@ -495,12 +1060,7 @@ def _contract(entry: dict[str, Any], context: dict[str, Any], sources: list[dict
                         "scope": {"entry_parameter": item}, "provenance": "structural parameter harness",
                         "precision": "unknown_effect", "assumptions": []}
                        for item in harness_parameters]
-    unknown_effects.extend({
-        "boundary_id": f"opaque:{item['source_id']}:{item['start_line']}:{item['name']}",
-        "effect": "placeholder_method_body_does_not_provide_product_semantics",
-        "scope": item, "provenance": "visible admitted source placeholder detection",
-        "precision": "unknown_effect", "assumptions": [],
-    } for item in opaque_methods)
+    unknown_effects.extend(_observed_opaque_unknown_effects(boundaries))
     contract = {
         "schema_version": RESULT_SCHEMA_VERSION,
         "identity": {"case_id": entry["case_id"], "dataset": entry["dataset"], "language": "java",
@@ -532,7 +1092,7 @@ def _contract(entry: dict[str, Any], context: dict[str, Any], sources: list[dict
                 "scope": "product_slice_membership",
                 "reason": "raw WALA slice membership retained without inventing data/control/state edge types"}, {
                 "scope": "heap_and_matched_call_precision",
-                "reason": "GENERIC_NO_HEAP omits heap and control dependencies; hash-backed predecessor traversal does not enforce matched call/return contexts"}]},
+                "reason": "GENERIC_NO_HEAP omits heap dependencies; FULL control/exception dependencies are retained, while hash-backed predecessor traversal does not enforce matched call/return contexts"}]},
         "completion": {"status": "partial", "stage": "generic_wala_observation_mapping",
                        "failure_categories": failures, "error": None},
         "semantic_validation": {"status": "not_evaluated", "reviewer": None, "evidence": [],
@@ -576,7 +1136,8 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
         "graph_created": False, "observations_total": 0, "observations_mapped": 0,
         "product_call_bindings": 0, "product_slice_memberships": 0, "cross_source_relations": 0,
         "observation_linked_cross_source_relations": 0, "missing_observations": [],
-        "analysis_entry_status": "not_started", "current_stage": "admission"}
+        "analysis_entry_status": "not_started", "type_constraint_status": "not_needed_or_not_started",
+        "current_stage": "admission"}
     try:
         if entry.get("language") != "java":
             raise ValueError("generic WALA backend requires a Java inventory entry")
@@ -625,6 +1186,7 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
             "closure_evidence": closure_evidence, "opaque_methods": opaque_methods,
             "driver_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             "probe_sha256": hashlib.sha256(BACKEND_SOURCE.read_bytes()).hexdigest(),
+            "type_constraint_helper_sha256": hashlib.sha256(TYPE_CONSTRAINT_SOURCE.read_bytes()).hexdigest(),
             "target_executed": False, "source_text_persisted": False,
         })
         snapshot = registry_root / "formal-snapshots" / entry["dataset"] / entry["snapshot_id"]
@@ -644,18 +1206,39 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
                 target.parent.mkdir(parents=True, exist_ok=True); target.write_text(row["text"]); paths.append(target)
             test_path = paths[0]
             classpath = os.pathsep.join(map(str, dependencies))
+            timings["type_constraint_helper_compilation"] = 0.0
+            constraint_seconds = 0.0
             def write_test(text): test_path.write_text(text)
             def compile_once():
                 return _compile(source_root, classes, paths, classpath,
                                 timeout=_remaining(deadline, compile_timeout))
+            def resolve_constraints(missing):
+                nonlocal constraint_seconds
+                entry_evidence["type_constraint_status"] = "running"
+                if not timings["type_constraint_helper_compilation"]:
+                    timings["type_constraint_helper_compilation"] = _compile_type_constraint_helper(
+                        backend_classes, cwd=work,
+                        timeout=_remaining(deadline, compile_timeout))
+                value, seconds = _resolve_structural_types(
+                    source_root, backend_classes, classpath, context["test_path"], method,
+                    context["target_scope"][0]["start_line"],
+                    context["target_scope"][0]["end_line"], missing,
+                    timeout=_remaining(deadline, compile_timeout))
+                constraint_seconds += seconds
+                entry_evidence["type_constraint_status"] = (
+                    "resolved" if not value.get("unresolved") else "ambiguous_or_unsupported")
+                entry_evidence["type_constraint_unresolved"] = value.get("unresolved", [])
+                return value
             harness, harness_parameters, attempts = _prepare_harness(
                 source_rows[0]["text"], method, write_test, compile_once,
                 test_path=context["test_path"],
                 start_line=context["target_scope"][0]["start_line"],
                 end_line=context["target_scope"][0]["end_line"],
-                record_attempts=lambda value: _write(output / "compile-attempts.json", value))
+                record_attempts=lambda value: _write(output / "compile-attempts.json", value),
+                constraint_resolver=resolve_constraints)
             _write(output / "compile-attempts.json", attempts)
             timings["source_compilation"] = sum(item["seconds"] for item in attempts)
+            timings["type_constraint_analysis"] = constraint_seconds
             entry_evidence["bytecode_compiled"] = True
             entry_evidence["current_stage"] = "backend_compilation"
             entry_selector = _entry_descriptor(classes, entry_class, method)
@@ -678,70 +1261,88 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
             analyses: list[dict[str, Any]] = []
             library_cp = os.pathsep.join(map(str, dependencies))
             analysis_seconds = 0.0
-            for criterion_index, criterion in enumerate(criteria):
-                if time.monotonic() >= deadline:
-                    analyses.extend({"observation_id": pending["criterion_id"], "raw": None,
-                                     "error": "generic Java backend total deadline exhausted before observation"}
-                                    for pending in criteria[criterion_index:])
-                    break
-                try:
-                    fragment = _assertion_fragment(harness, criterion["line"])
-                    query = f"SOURCE_LINE:{criterion['line']}:-1:{fragment}"
-                    command = ["java", "-Xmx2g", "-cp", str(backend_classes) + os.pathsep + wala_cp,
-                               "org.mockspec.research.WalaSliceProbe", str(application), library_cp,
-                               entry_class, entry_selector, query, "OPAQUE_SUMMARIES", "GENERIC_NO_HEAP"]
-                    completed, seconds = _run(
-                        command, cwd=work, timeout=_remaining(deadline, analysis_timeout))
-                    analysis_seconds += seconds
+            queries = [f"SOURCE_LINE:{criterion['line']}:-1:"
+                       f"{_assertion_fragment(harness, criterion['line'])}"
+                       for criterion in criteria]
+            query_by_text = dict(zip(queries, criteria, strict=True))
+            if len(query_by_text) != len(criteria):
+                raise ValueError("multiple observations resolved to the same WALA criterion")
+            _write(output / "criteria-request.json", {
+                "schema": "mockspec.wala-multi-root-request/v1",
+                "criteria": [{"observation_id": criterion["criterion_id"], "query": query}
+                             for query, criterion in query_by_text.items()],
+            })
+            criteria_file = work / "criteria-request.json"
+            criteria_file.write_text(json.dumps(queries))
+            checkpoint_directory = work / "root-checkpoints"
+            checkpoint_directory.mkdir()
+            command = ["java", "-Xmx2g", "-cp", str(backend_classes) + os.pathsep + wala_cp,
+                       "org.mockspec.research.WalaSliceProbe", str(application), library_cp,
+                       entry_class, entry_selector, "CRITERIA_FILE:" + str(criteria_file),
+                       "OPAQUE_SUMMARIES", "GENERIC_NO_HEAP",
+                       "ROOT_OUTPUT_DIR:" + str(checkpoint_directory)]
+            analysis_started = time.monotonic()
+            try:
+                completed, _ = _run(
+                    command, cwd=work,
+                    timeout=_remaining(deadline, analysis_timeout * len(criteria)))
+                analysis_seconds = time.monotonic() - analysis_started
+                for criterion in criteria:
                     (output / f"{criterion['criterion_id']}.stderr").write_text(completed.stderr)
-                    if completed.returncode:
-                        analyses.append({"observation_id": criterion["criterion_id"], "raw": None,
-                                         "error": completed.stderr[-3000:],
-                                         "graph_created": "WALA_STAGE call_graph_complete" in completed.stderr,
-                                         "root_mapped": "WALA_STAGE sdg_initialized" in completed.stderr})
-                    else:
-                        raw = json.loads(completed.stdout)
-                        _write(output / f"{criterion['criterion_id']}.json", raw)
-                        analyses.append({"observation_id": criterion["criterion_id"], "raw": raw,
-                                         "graph_created": True, "root_mapped": True})
-                except subprocess.TimeoutExpired as exc:
-                    stderr = exc.stderr or ""
-                    if isinstance(stderr, bytes):
-                        stderr = stderr.decode("utf-8", "replace")
+                shared: dict[str, Any] = {}
+                checkpoint_paths: dict[str, Path]
+                if not completed.returncode:
+                    multi = json.loads(completed.stdout)
+                    if multi.get("schema_version") != "mockspec.wala-multi-root/v2":
+                        raise ValueError("WALA multi-root response schema differs")
+                    shared = multi.get("shared")
+                    manifest = multi.get("root_manifest")
+                    if not isinstance(shared, dict) or not isinstance(manifest, list):
+                        raise ValueError("WALA multi-root response is malformed")
+                    checkpoint_paths = _validated_root_checkpoint_paths(
+                        checkpoint_directory, queries, manifest)
+                else:
+                    checkpoint_paths = _validated_root_checkpoint_paths(
+                        checkpoint_directory, queries)
+                analyses = _checkpoint_path_analyses(
+                    queries, query_by_text, checkpoint_paths,
+                    missing_error="WALA process failed before root checkpoint\n"
+                                  + completed.stderr[-3000:],
+                    graph_created="WALA_STAGE call_graph_complete" in completed.stderr)
+            except subprocess.TimeoutExpired as exc:
+                analysis_seconds = time.monotonic() - analysis_started
+                stderr = exc.stderr or ""
+                if isinstance(stderr, bytes):
+                    stderr = stderr.decode("utf-8", "replace")
+                for criterion in criteria:
                     (output / f"{criterion['criterion_id']}.stderr").write_text(stderr)
-                    analyses.append({"observation_id": criterion["criterion_id"], "raw": None,
-                                     "error": "WALA observation timeout\n" + stderr[-3000:],
-                                     "graph_created": "WALA_STAGE call_graph_complete" in stderr,
-                                     "root_mapped": "WALA_STAGE sdg_initialized" in stderr})
-                except Exception as exc:
-                    analyses.append({"observation_id": criterion["criterion_id"], "raw": None,
-                                     "error": f"{type(exc).__name__}: {exc}"})
+                checkpoint_paths = _validated_root_checkpoint_paths(checkpoint_directory, queries)
+                analyses = _checkpoint_path_analyses(
+                    queries, query_by_text, checkpoint_paths,
+                    missing_error="WALA shared multi-root timeout before root checkpoint\n"
+                                  + stderr[-3000:],
+                    graph_created="WALA_STAGE call_graph_complete" in stderr)
             timings["wala_analysis"] = analysis_seconds
-        entry_evidence["graph_created"] = any(item.get("graph_created") for item in analyses)
-        entry_evidence["observation_roots_mapped"] = sum(
-            item.get("root_mapped") is True for item in analyses)
-        boundaries = [{"scope": item["observation_id"], "reason": item["error"]}
-                      for item in analyses if item["raw"] is None]
-        boundaries.extend({"scope": "source_closure", "reason": item["status"], "details": item}
-                          for item in closure_evidence
-                          if item["status"] != "selected_unique_visible_type")
-        for item in analyses:
-            raw = item.get("raw")
-            if raw and raw.get("traversal_truncated"):
-                boundaries.append({"scope": item["observation_id"],
-                                   "reason": "statement_budget_frontier",
-                                   "frontier_count": raw.get("traversal_frontier_count")})
-        costs = {"timings_seconds": timings, "total_seconds": time.monotonic() - started,
-                 "total_scope": "adapter admission, bounded source compilation, bytecode packaging, WALA CG/SDG and mapping",
-                 "peak_memory": {"status": "unavailable", "bytes": None,
-                                 "reason": "runner enforces -Xmx2g but does not collect child peak RSS"},
-                 "cache_state": {"status": "cold", "reason": "fresh source/classes/application and WALA process per observation"},
-                 "input_size": {"files": len(source_rows), "bytes": total_bytes},
-                 "unavailable_phases": [{"phase": "semantic_validation", "reason": "not performed"}]}
-        contract, evidence = _contract(entry, context, source_records, criteria, analyses, costs,
-                                       harness_parameters, boundaries, opaque_methods)
-        entry_evidence.update(evidence)
-        entry_evidence["current_stage"] = "mapped"
+            entry_evidence["graph_created"] = any(item.get("graph_created") for item in analyses)
+            entry_evidence["observation_roots_mapped"] = sum(
+                item.get("root_mapped") is True for item in analyses)
+            mapping_started = time.monotonic()
+            boundaries = _analysis_boundaries(analyses, closure_evidence)
+            costs = {"timings_seconds": timings, "total_seconds": time.monotonic() - started,
+                     "total_scope": "provisional through WALA analysis; finalized after relationship mapping and evidence projection",
+                     "peak_memory": {"status": "unavailable", "bytes": None,
+                                     "reason": "runner enforces -Xmx2g but does not collect child peak RSS"},
+                     "cache_state": {"status": "cold", "reason": "fresh source/classes/application and one shared WALA process per case; CG/PA/SDG reused across observation roots"},
+                     "input_size": {"files": len(source_rows), "bytes": total_bytes},
+                     "unavailable_phases": [{"phase": "semantic_validation", "reason": "not performed"}]}
+            contract, evidence = _contract(
+                entry, context, source_records, criteria, analyses, costs,
+                harness_parameters, boundaries, opaque_methods, evidence_output=output)
+            _finalize_mapping_costs(
+                costs, contract, started=started, mapping_started=mapping_started)
+            _write_shared_evidence(output / "evidence-shared.json", contract, costs, shared)
+            entry_evidence.update(evidence)
+            entry_evidence["current_stage"] = "mapped"
         result = {"schema": SCHEMA, "status": "complete", "backend": "generic_wala_java",
                   "identity": contract["identity"], "result_contract": contract,
                   "entry_evidence": entry_evidence,
@@ -761,6 +1362,7 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
                                  "entry_selector": entry_selector, "runtime_lock_digest": runtime["digest"],
                                  "driver_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                                  "probe_sha256": hashlib.sha256(BACKEND_SOURCE.read_bytes()).hexdigest(),
+                                 "type_constraint_helper_sha256": hashlib.sha256(TYPE_CONSTRAINT_SOURCE.read_bytes()).hexdigest(),
                                  "dependency_count": len(dependencies), "dependency_rehash": False,
                                  "target_executed": False, "selection": "no case allow-list"}}
     except Exception as exc:
@@ -770,7 +1372,8 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
                   "entry_evidence": entry_evidence,
                   "provenance": {"target_executed": False, "dependency_rehash": False,
                                  "driver_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-                                 "probe_sha256": hashlib.sha256(BACKEND_SOURCE.read_bytes()).hexdigest()},
+                                 "probe_sha256": hashlib.sha256(BACKEND_SOURCE.read_bytes()).hexdigest(),
+                                 "type_constraint_helper_sha256": hashlib.sha256(TYPE_CONSTRAINT_SOURCE.read_bytes()).hexdigest()},
                   "elapsed_seconds": time.monotonic() - started}
     _write(output / "batch-result.json", result)
     return result

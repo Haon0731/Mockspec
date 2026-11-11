@@ -13,8 +13,11 @@ import posixpath
 import re
 from typing import Any
 
+from criteria import extract_criteria
 from mock_spec.validation import InputValidationError
 
+PYTHON_FOCAL_FILE_BYTES = 512_000
+PYTHON_LOADER_SUPPORT_FILE_BYTES = 32_000
 
 _PYTHON_LOADER_NAMES = {
     "load_function_from_source_ast",
@@ -155,7 +158,8 @@ def _path_bindings(tree: ast.Module, logical_path: str) -> tuple[dict[str, str],
     return values, lines
 
 
-def _python_hints(text: str, logical_path: str = "test.py") -> tuple[list[dict[str, str]], list[str]]:
+def _python_hints(text: str, logical_path: str = "test.py", *,
+                  target_symbol: str | None = None) -> tuple[list[dict[str, str]], list[str]]:
     diagnostics: list[str] = []
     try:
         tree = ast.parse(text)
@@ -163,13 +167,95 @@ def _python_hints(text: str, logical_path: str = "test.py") -> tuple[list[dict[s
         return [], [f"python_parse_error:{exc.lineno}"]
     bindings = _literal_bindings(tree)
     path_bindings, _ = _path_bindings(tree, logical_path)
-    hints: list[dict[str, str]] = []
+    relevant_names: set[str] = set()
+    rebound_names: set[str] = set()
+    relevant_helpers: set[str] = set()
+    observation_names: set[str] = set()
+    observation_node_ids: set[int] = set()
+    containing_function: dict[int, str] = {}
+    if target_symbol is not None:
+        targets = [node for node in ast.walk(tree)
+                   if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+                   and node.name == target_symbol]
+        if len(targets) == 1:
+            relevant_names = {node.id for node in ast.walk(targets[0])
+                              if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load)}
+            rebound_names = {node.id for node in ast.walk(targets[0])
+                             if isinstance(node, ast.Name)
+                             and isinstance(node.ctx, (ast.Store, ast.Del))}
+            observation_lines = {item["line"] for item in extract_criteria(
+                text, "python", f"{logical_path}::{target_symbol}")["criteria"]}
+            observation_names = {name.id for node in ast.walk(targets[0])
+                                 if getattr(node, "lineno", None) in observation_lines
+                                 for name in ast.walk(node)
+                                 if isinstance(name, ast.Name) and isinstance(name.ctx, ast.Load)}
+            # Ranking only: follow visible assignments back from the observations.
+            # This is not a call binding or a proof that a value survives a write.
+            assignments = [node for node in [*tree.body, *ast.walk(targets[0])]
+                           if isinstance(node, (ast.Assign, ast.AnnAssign))]
+            changed = True
+            while changed:
+                before = len(observation_names)
+                for assignment in assignments:
+                    assigned = {name.id for target in (
+                        assignment.targets if isinstance(assignment, ast.Assign)
+                        else [assignment.target]) for name in ast.walk(target)
+                        if isinstance(name, ast.Name)}
+                    if assigned & observation_names and assignment.value is not None:
+                        observation_names.update(name.id for name in ast.walk(assignment.value)
+                                                 if isinstance(name, ast.Name)
+                                                 and isinstance(name.ctx, ast.Load))
+                changed = len(observation_names) != before
+            # Only observation expressions and their assignment dependencies receive
+            # the focal-path priority/allowance. Mere presence in the test is not
+            # evidence: setup may read an unrelated large file before the assertion.
+            observation_node_ids.update(
+                id(child) for node in ast.walk(targets[0])
+                if getattr(node, "lineno", None) in observation_lines
+                for child in ast.walk(node))
+            for assignment in assignments:
+                assigned = {name.id for target in (
+                    assignment.targets if isinstance(assignment, ast.Assign)
+                    else [assignment.target]) for name in ast.walk(target)
+                    if isinstance(name, ast.Name)}
+                if assigned & observation_names and assignment.value is not None:
+                    observation_node_ids.update(id(node) for node in ast.walk(assignment.value))
+            relevant_helpers.update(observation_names)
+            for statement in tree.body:
+                if not isinstance(statement, (ast.Assign, ast.AnnAssign)):
+                    continue
+                assigned = {node.id for target in (
+                    statement.targets if isinstance(statement, ast.Assign) else [statement.target]
+                ) for node in ast.walk(target) if isinstance(node, ast.Name)}
+                value = statement.value
+                if assigned & observation_names and isinstance(value, ast.Call):
+                    helper = (value.func.id if isinstance(value.func, ast.Name) else
+                              value.func.attr if isinstance(value.func, ast.Attribute) else None)
+                    if helper is not None:
+                        relevant_helpers.add(helper)
+        for statement in tree.body:
+            if isinstance(statement, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                for descendant in ast.walk(statement):
+                    containing_function[id(descendant)] = statement.name
+    ranked_hints: list[tuple[int, int, dict[str, str]]] = []
+    ordinal = 0
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for alias in node.names:
-                hints.append({"kind": "python_import", "value": alias.name})
+                bound = alias.asname or alias.name.split(".", 1)[0]
+                priority = (0 if bound in observation_names else 1) if (
+                    bound in relevant_names and bound not in rebound_names) else 2
+                ranked_hints.append((priority, ordinal,
+                                     {"kind": "python_import", "value": alias.name}))
+                ordinal += 1
         elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
-            hints.append({"kind": "python_import", "value": node.module})
+            imported = {alias.asname or alias.name for alias in node.names}
+            priority = (0 if any(name in observation_names and name not in rebound_names
+                                for name in imported) else 1) if any(
+                name in relevant_names and name not in rebound_names for name in imported) else 2
+            ranked_hints.append((priority, ordinal,
+                                 {"kind": "python_import", "value": node.module}))
+            ordinal += 1
         elif isinstance(node, ast.Call):
             name = node.func.attr if isinstance(node.func, ast.Attribute) else (
                 node.func.id if isinstance(node.func, ast.Name) else ""
@@ -178,16 +264,26 @@ def _python_hints(text: str, logical_path: str = "test.py") -> tuple[list[dict[s
                 path = (_path_value(node.args[0], path_bindings, logical_path)
                         or _string_value(node.args[0], bindings))
                 if path is not None:
-                    hints.append({"kind": "python_dynamic_path", "value": path})
+                    priority = (-1 if id(node) in observation_node_ids
+                                or containing_function.get(id(node)) in relevant_helpers else 3)
+                    ranked_hints.append((priority, ordinal,
+                                         {"kind": "python_dynamic_path", "value": path,
+                                          "focal": str(priority == -1)}))
+                    ordinal += 1
                 else:
                     diagnostics.append(f"unresolved_dynamic_path:{getattr(node, 'lineno', 0)}")
             elif isinstance(node.func, ast.Attribute) and node.func.attr in {"read_text", "read_bytes"}:
                 path = _path_value(node.func.value, path_bindings, logical_path)
                 if path is not None:
-                    hints.append({"kind": "python_visible_source_path", "value": path})
+                    priority = (-1 if id(node) in observation_node_ids
+                                or containing_function.get(id(node)) in relevant_helpers else 3)
+                    ranked_hints.append((priority, ordinal,
+                                         {"kind": "python_visible_source_path", "value": path,
+                                          "focal": str(priority == -1)}))
+                    ordinal += 1
                 else:
                     diagnostics.append(f"unresolved_visible_source_path:{getattr(node, 'lineno', 0)}")
-    return hints, diagnostics
+    return [hint for _, _, hint in sorted(ranked_hints)], diagnostics
 
 
 def _java_hints(text: str) -> tuple[list[dict[str, str]], list[str]]:
@@ -248,15 +344,35 @@ def _python_opaque(source_id: str, text: str) -> list[dict[str, Any]]:
 
 
 def _java_opaque(source_id: str, text: str) -> list[dict[str, Any]]:
-    pattern = re.compile(
-        r"(?ms)(?:public|protected|private|static|final|synchronized|native|abstract|\s)+"
-        r"[\w<>?,.\[\]\s]+\s+(\w+)\s*\([^{};]*\)\s*(?:throws\s+[^{}]+)?\{\s*"
-        r"throw\s+new\s+(?:UnsupportedOperationException|NotImplementedException)\s*\([^;]*\);\s*\}"
-    )
-    return [{"source_id": source_id, "name": match.group(1),
-             "start_line": text.count("\n", 0, match.start()) + 1,
-             "end_line": text.count("\n", 0, match.end()) + 1}
-            for match in pattern.finditer(text)]
+    # Find the small throw-only body first; do not apply a permissive declaration
+    # regex across the whole file (overlapping whitespace can backtrack badly).
+    code = _strip_java_comments_and_literals(text)
+    bodies = re.compile(
+        r"\{\s*throw\s+new\s+(?:UnsupportedOperationException|NotImplementedException)"
+        r"\s*\([^;{}]*\)\s*;\s*\}")
+    headers = re.compile(
+        r"([A-Za-z_$][\w$]*)\s*\([^()]*\)\s*(?:throws\s+[\w.$,\s]+)?$")
+    found = []
+    for body in bodies.finditer(code):
+        # Only inspect the bounded declaration segment after the preceding Java
+        # statement/body delimiter. Unsupported signatures remain unclassified.
+        start = max(code.rfind(delimiter, max(0, body.start() - 2000), body.start())
+                    for delimiter in ";{}") + 1
+        start = max(start, body.start() - 2000)
+        header = code[start:body.start()].strip()
+        signature = headers.search(header)
+        if signature is None:
+            continue
+        name = signature.group(1)
+        prefix = header[:signature.start()].strip()
+        if (name in {"if", "for", "while", "switch", "catch", "synchronized"}
+                or not prefix or re.search(r"[^\w$<>?,.\[\]\s@]", prefix)):
+            continue
+        declaration_start = start + len(code[start:body.start()]) - len(code[start:body.start()].lstrip())
+        found.append({"source_id": source_id, "name": name,
+                      "start_line": text.count("\n", 0, declaration_start) + 1,
+                      "end_line": text.count("\n", 0, body.end()) + 1})
+    return found
 
 
 def _call_name(node: ast.Call) -> str | None:
@@ -529,11 +645,54 @@ def python_dynamic_loader_evidence(sources: list[dict[str, Any]]) -> list[dict[s
                                             row.get("function_key", "")))
 
 
-def select_sources(case: Any, *, max_files: int = 8, max_bytes: int = 200_000) -> dict[str, Any]:
+def _python_loader_support_paths(text: str, logical_path: str, paths: tuple[str, ...],
+                                 target_symbol: str | None
+                                 ) -> list[str]:
+    """Find explicitly imported local loader helpers, without scanning other tests."""
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return []
+    targets = [node for node in ast.walk(tree)
+               if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+               and node.name == target_symbol]
+    if len(targets) != 1:
+        return []
+    relevant_nodes = list(ast.walk(targets[0]))
+    names = {node.id for node in relevant_nodes if isinstance(node, ast.Name)}
+    for statement in tree.body:
+        if isinstance(statement, (ast.Assign, ast.AnnAssign)):
+            assigned = {name.id for target in (
+                statement.targets if isinstance(statement, ast.Assign) else [statement.target])
+                for name in ast.walk(target) if isinstance(name, ast.Name)}
+            if assigned & names:
+                relevant_nodes.extend(ast.walk(statement))
+    calls = {node.func.id for node in relevant_nodes
+             if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)}
+    results = []
+    for node in tree.body:
+        if not isinstance(node, ast.ImportFrom) or not node.module or node.level < 1:
+            continue
+        if not any(alias.name in _PYTHON_LOADER_NAMES and (alias.asname or alias.name) in calls
+                   for alias in node.names):
+            continue
+        directory = posixpath.dirname(logical_path)
+        for _ in range(node.level - 1):
+            directory = posixpath.dirname(directory)
+        candidate = posixpath.normpath(posixpath.join(directory, node.module.replace(".", "/") + ".py"))
+        if candidate in paths and candidate != logical_path and candidate not in results:
+            results.append(candidate)
+    return results
+
+
+def select_sources(case: Any, *, max_files: int = 8, max_bytes: int = 200_000,
+                   focal_file_bytes: int = PYTHON_FOCAL_FILE_BYTES) -> dict[str, Any]:
     """Select bounded source candidates using only evidence visible in admitted sources.
 
     ``max_files`` includes the masked test.  Files are atomic: a candidate that
-    would exceed ``max_bytes`` is omitted rather than truncated.  Because the
+    would exceed ``max_bytes`` is omitted rather than truncated, except for one
+    Python exact focal path within the separately recorded ``focal_file_bytes``
+    allowance. Further expansion stops after that allowance is used. Because the
     FrozenCase API intentionally exposes no pre-read size, that atomic candidate
     is authenticated and read before the output budget decision.
     """
@@ -541,6 +700,8 @@ def select_sources(case: Any, *, max_files: int = 8, max_bytes: int = 200_000) -
         raise ValueError("max_files must be a positive integer")
     if type(max_bytes) is not int or max_bytes < 1:
         raise ValueError("max_bytes must be a positive integer")
+    if type(focal_file_bytes) is not int or focal_file_bytes < 0:
+        raise ValueError("focal_file_bytes must be a nonnegative integer")
     if case.language not in {"python", "java"}:
         raise ValueError("case language must be python or java")
 
@@ -556,17 +717,51 @@ def select_sources(case: Any, *, max_files: int = 8, max_bytes: int = 200_000) -
     used_bytes = test_bytes
     read_bytes = test_bytes
     attempted_files = 0
+    focal_allowance: dict[str, Any] | None = None
     budget_stopped = truncated
     if truncated:
         diagnostics.append("masked_test_exceeds_byte_budget_but_is_required")
 
+    support_paths: set[str] = set()
+    if case.language == "python" and not budget_stopped:
+        selector = getattr(case, "target_selector", None)
+        for path in _python_loader_support_paths(
+                test.text, test.logical_path, case.source_paths,
+                selector.rsplit("::", 1)[-1] if selector else None):
+            if attempted_files >= max_files - 1:
+                diagnostics.append("loader_support_file_budget_exhausted")
+                truncated = True
+                break
+            attempted_files += 1
+            source = case.read_source(path)
+            size = len(source.text.encode("utf-8"))
+            read_bytes += size
+            if size > PYTHON_LOADER_SUPPORT_FILE_BYTES or used_bytes + size > max_bytes:
+                diagnostics.append(f"loader_support_byte_budget_omitted:{path}")
+                truncated = True
+                continue
+            sources.append({"source_id": f"source:{len(sources)}", "logical_path": path,
+                            "text": source.text, "start_line": source.start_line,
+                            "selection_role": "loader_support"})
+            used_bytes += size
+            support_paths.add(path)
+            evidence.append({"stage": "loader_support", "hint_kind": "explicit_relative_import",
+                             "hint": path, "candidates": [path],
+                             "precision": "support_source_only_not_product_binding"})
+
     available = tuple(path for path in case.source_paths
-                      if _is_product_source(path, test.logical_path))
+                      if _is_product_source(path, test.logical_path) and path not in support_paths)
     def extract(text: str, logical_path: str):
         return (_python_hints(text, logical_path) if case.language == "python"
                 else _java_hints(text))
 
-    initial_hints, initial_diagnostics = extract(test.text, test.logical_path)
+    if case.language == "python":
+        selector = getattr(case, "target_selector", None)
+        initial_hints, initial_diagnostics = _python_hints(
+            test.text, test.logical_path,
+            target_symbol=selector.rsplit("::", 1)[-1] if selector else None)
+    else:
+        initial_hints, initial_diagnostics = extract(test.text, test.logical_path)
     diagnostics.extend(initial_diagnostics)
     queue = deque((hint, "masked_test") for hint in initial_hints)
     considered: set[tuple[str, str]] = set()
@@ -607,10 +802,22 @@ def select_sources(case: Any, *, max_files: int = 8, max_bytes: int = 200_000) -
             size = len(source.text.encode("utf-8"))
             read_bytes += size
             if used_bytes + size > max_bytes:
+                focal = (case.language == "python" and stage == "masked_test"
+                         and hint.get("focal") == "True" and len(candidates) == 1
+                         and _precision(hint, candidates) == "exact_visible_path")
+                if not focal or size > focal_file_bytes:
+                    truncated = True
+                    diagnostics.append(f"byte_budget_omitted:{path}")
+                    if focal:
+                        diagnostics.append(f"focal_file_cap_exceeded:{path}")
+                    budget_stopped = True
+                    break
+                focal_allowance = {"logical_path": path, "bytes": size,
+                                   "limit_bytes": focal_file_bytes,
+                                   "reason": "unique exact path in selected test or relevant helper"}
+                diagnostics.append(f"focal_file_allowance_used:{path}")
                 truncated = True
-                diagnostics.append(f"byte_budget_omitted:{path}")
                 budget_stopped = True
-                break
             source_id = f"source:{len(sources)}"
             sources.append({"source_id": source_id, "logical_path": path,
                             "text": source.text, "start_line": source.start_line})
@@ -682,10 +889,17 @@ def select_sources(case: Any, *, max_files: int = 8, max_bytes: int = 200_000) -
             "truncated": truncated, "opaque_methods": opaque_methods,
             "selected_bytes": used_bytes, "read_bytes": read_bytes,
             "attempted_files": attempted_files,
+            "budgets": {"max_files": max_files, "max_bytes": max_bytes,
+                        "focal_file_bytes": focal_file_bytes if case.language == "python" else 0,
+                        "loader_support_file_bytes": PYTHON_LOADER_SUPPORT_FILE_BYTES
+                        if case.language == "python" else 0},
+            "focal_file_allowance": focal_allowance,
             "limitations": [
                 "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
                 "A matching path is a source candidate, not proof that it is the MUT or reachable.",
                 "Only one import hop from masked-test-selected product sources is considered.",
+                "A Python exact focal file may use a separate finite allowance; its size and cap are recorded and further expansion stops.",
+                "Explicit local loader imports may supply bounded support source; selection alone does not authenticate the loader semantics.",
                 "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
                 "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes.",
             ]}

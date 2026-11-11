@@ -13,9 +13,11 @@
 
 ## 独立研究验证
 
-[#32 通用成熟后端接入](../experiments/backward-slicing/README.md)正在扩展原完整分母：
-按语言分派而非三个 Case ID 白名单，分别核验输入、真实后端、原观察及跨源影响。
-新关系保持未核验；定向门禁与最终全量结果按研究入口记录，不计入生产能力。
+[#32 通用成熟后端接入全量报告](https://github.com/Haon0731/Mockspec/blob/41e4fab/out/mockbench-study/generic-entry-full165-20261111-r1/report.md)
+已保留原165例：124例驱动完成、120例全部原观察映射、26例有观察关联跨源候选，
+全部新语义仍未核验。后续[#33 观察关系修复](../experiments/backward-slicing/README.md)
+分别修复结构类型、观察导向选源、实际调用绑定及产品体证据；预算、失败和未知继续单列。
+这些研究结果不计入生产能力。
 
 前轮已完成[后向分析修复与165例正式对照](../out/mockbench-study/backward-slice-formal165-20261111-r3/report.md)：
 Jib、Flask、langflow三例实际后端重跑并保留已核验的部分关系；162例仍超出成熟后端输入适配范围。

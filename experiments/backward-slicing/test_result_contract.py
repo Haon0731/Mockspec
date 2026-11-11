@@ -182,3 +182,15 @@ def test_relation_accepts_registered_or_unassociated_observation_references(obse
     }]
     result_contract.validate_result_contract(contract)
     assert contract["semantic_validation"]["status"] == "not_evaluated"
+
+
+def test_unknown_effect_observation_references_are_optional_but_authenticated():
+    contract = result_contract.build_result_contract(_partial_result(), IDENTITY)
+    effect = contract["analysis_boundaries"]["unknown_effects"][0]
+    result_contract.validate_result_contract(contract)  # Legacy boundary has no references.
+    effect["observation_ids"] = ["criterion:0"]
+    result_contract.validate_result_contract(contract)
+    for invalid in ([], ["criterion:missing"], ["criterion:0", "criterion:0"], "criterion:0", [None]):
+        effect["observation_ids"] = invalid
+        with pytest.raises(result_contract.ResultContractError, match="unknown_effect"):
+            result_contract.validate_result_contract(contract)

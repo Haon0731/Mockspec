@@ -282,6 +282,76 @@ def test_ambiguous_import_preserved_and_file_budget_stops_further_reads():
     assert "file_budget_exhausted" in result["diagnostics"]
 
 
+def test_target_used_import_precedes_unrelated_import_under_file_budget():
+    test_text = """\
+import pkg.unrelated
+from pkg.feature import feature
+
+def test_feature():
+    assert feature("value")
+"""
+    case = Case("python", "tests/test_feature.py", test_text, {
+        "src/pkg/unrelated.py": "UNRELATED = True\n",
+        "src/pkg/feature.py": "def feature(value):\n    return value\n",
+    })
+    case.target_selector = "tests/test_feature.py::test_feature"
+
+    result = select_sources(case, max_files=2)
+
+    assert case.reads == ["src/pkg/feature.py"]
+    assert [item["logical_path"] for item in result["sources"]] == [
+        "tests/test_feature.py", "src/pkg/feature.py"]
+    assert result["evidence"][0]["hint"] == "pkg.feature"
+    assert result["selected_bytes"] <= 200_000
+    assert "file_budget_exhausted" in result["diagnostics"]
+
+
+def test_rebound_import_is_not_prioritized_over_stable_import():
+    test_text = """\
+from pkg.stable import stable
+from pkg.rebound import rebound
+
+def test_feature():
+    rebound = lambda: False
+    assert stable()
+    assert rebound()
+"""
+    case = Case("python", "tests/test_feature.py", test_text, {
+        "src/pkg/stable.py": "def stable():\n    return True\n",
+        "src/pkg/rebound.py": "def rebound():\n    return True\n",
+    })
+    case.target_selector = "tests/test_feature.py::test_feature"
+
+    result = select_sources(case, max_files=2)
+
+    assert case.reads == ["src/pkg/stable.py"]
+    assert result["evidence"][0]["hint"] == "pkg.stable"
+
+
+def test_unrelated_dynamic_path_does_not_preempt_target_used_import():
+    test_text = """\
+from pathlib import Path
+from pkg.feature import feature
+OTHER = Path("src/pkg/unrelated.py")
+
+def unused_helper():
+    return OTHER.read_text()
+
+def test_feature():
+    assert feature()
+"""
+    case = Case("python", "tests/test_feature.py", test_text, {
+        "src/pkg/unrelated.py": "UNRELATED = True\n",
+        "src/pkg/feature.py": "def feature():\n    return True\n",
+    })
+    case.target_selector = "tests/test_feature.py::test_feature"
+
+    result = select_sources(case, max_files=2)
+
+    assert case.reads == ["src/pkg/feature.py"]
+    assert result["evidence"][0]["hint"] == "pkg.feature"
+
+
 def test_byte_budget_omits_whole_source_without_truncation():
     test_text = "import feature\n"
     product = "VALUE = 'complete-file'\n"
@@ -357,3 +427,146 @@ def test_input_identity_failure_is_not_swallowed():
 
     with pytest.raises(InputValidationError, match="differs from manifest"):
         select_sources(case)
+
+
+def test_observation_assignment_chain_precedes_unrelated_test_call():
+    case = Case('python', 'tests/test_feature.py', '''from pkg.setup import setup
+from pkg.feature import feature
+
+def test_feature():
+    setup()
+    intermediate = feature()
+    result = intermediate
+    assert result
+''', {'src/pkg/setup.py': 'def setup(): pass\n',
+      'src/pkg/feature.py': 'def feature(): return 1\n'})
+    case.target_selector = 'tests/test_feature.py::test_feature'
+    result = select_sources(case, max_files=2)
+    assert case.reads == ['src/pkg/feature.py']
+    assert result['evidence'][0]['hint'] == 'pkg.feature'
+
+
+@pytest.mark.parametrize('cap,admitted', [(512_000, True), (210_000, False), (0, False)])
+def test_large_focal_file_has_separate_finite_allowance(cap, admitted):
+    test = '''from pathlib import Path
+SOURCE = Path("src/pkg/feature.py")
+def load_target():
+    return SOURCE.read_text()
+def test_feature():
+    result = load_target()
+    assert result
+'''
+    product = '# ' + 'x' * 225_000 + '\n'
+    case = Case('python', 'tests/test_feature.py', test, {
+        'src/pkg/feature.py': product,
+        'src/pkg/unrelated.py': 'UNRELATED = True\n'})
+    case.target_selector = 'tests/test_feature.py::test_feature'
+    result = select_sources(case, focal_file_bytes=cap)
+    assert result['budgets'] == {'max_files': 8, 'max_bytes': 200_000, 'focal_file_bytes': cap, 'loader_support_file_bytes': 32_000}
+    assert result['truncated']
+    assert case.reads == ['src/pkg/feature.py']
+    assert len(result['sources']) == (2 if admitted else 1)
+    if admitted:
+        assert result['sources'][1]['text'] == product
+        assert result['focal_file_allowance']['bytes'] == len(product.encode())
+        assert result['focal_file_allowance']['limit_bytes'] == cap
+        assert result['selected_bytes'] > result['budgets']['max_bytes']
+    else:
+        assert result['focal_file_allowance'] is None
+        assert 'focal_file_cap_exceeded:src/pkg/feature.py' in result['diagnostics']
+
+
+def test_unrelated_exact_path_does_not_get_focal_allowance():
+    case = Case('python', 'tests/test_feature.py', '''from pathlib import Path
+SOURCE = Path("src/pkg/unrelated.py")
+def unused():
+    return SOURCE.read_text()
+def test_feature():
+    assert True
+''', {'src/pkg/unrelated.py': '# ' + 'x' * 225_000 + '\n'})
+    case.target_selector = 'tests/test_feature.py::test_feature'
+    result = select_sources(case)
+    assert len(result['sources']) == 1
+    assert result['focal_file_allowance'] is None
+    assert 'byte_budget_omitted:src/pkg/unrelated.py' in result['diagnostics']
+
+
+def test_relative_loader_helper_is_bounded_support_not_product_source():
+    case = Case('python', 'tests/test_feature.py', '''from .helpers import load_function_from_source_ast
+SRC = "src/pkg/feature.py"
+def test_feature():
+    target = load_function_from_source_ast(SRC, "target")
+    assert target()
+''', {'tests/helpers.py': 'def load_function_from_source_ast(*args): return None\n',
+      'tests/test_other.py': 'def test_hidden(): assert False\n',
+      'src/pkg/feature.py': 'def target(): return True\n'})
+    case.target_selector = 'tests/test_feature.py::test_feature'
+    result = select_sources(case, max_files=3)
+    assert case.reads == ['tests/helpers.py', 'src/pkg/feature.py']
+    assert result['sources'][1]['selection_role'] == 'loader_support'
+    assert result['evidence'][0]['precision'] == 'support_source_only_not_product_binding'
+    assert not result['dynamic_loader_bindings']
+
+
+def test_loader_helper_cap_does_not_admit_large_support_source():
+    case = Case('python', 'tests/test_feature.py', '''from .helpers import load_function_from_source_ast
+def test_feature():
+    assert load_function_from_source_ast("src/feature.py", "feature")
+''', {'tests/helpers.py': '# ' + 'x' * 32_000,
+      'src/feature.py': 'def feature(): return True\n'})
+    case.target_selector = 'tests/test_feature.py::test_feature'
+    result = select_sources(case)
+    assert all(s['logical_path'] != 'tests/helpers.py' for s in result['sources'])
+    assert 'loader_support_byte_budget_omitted:tests/helpers.py' in result['diagnostics']
+
+
+@pytest.mark.parametrize("via_helper", [False, True])
+def test_unrelated_target_read_does_not_preempt_observation_import(via_helper):
+    setup = "unrelated()" if via_helper else "SOURCE.read_text()"
+    case = Case("python", "tests/test_feature.py", f'''from pathlib import Path
+from pkg.feature import feature
+SOURCE = Path("src/pkg/unrelated.py")
+def unrelated():
+    return SOURCE.read_text()
+def test_feature():
+    {setup}
+    result = feature()
+    assert result
+''', {"src/pkg/unrelated.py": "# " + "x" * 225_000 + "\n",
+       "src/pkg/feature.py": "def feature(): return True\n"})
+    case.target_selector = "tests/test_feature.py::test_feature"
+    result = select_sources(case, max_files=2)
+    assert case.reads == ["src/pkg/feature.py"]
+    assert result["focal_file_allowance"] is None
+
+
+def test_java_opaque_detector_excludes_control_flow_and_comments():
+    from source_selection import _java_opaque
+
+    text = '''class Example {
+  void ordinary(boolean flag) {
+    if (flag) { throw new UnsupportedOperationException("conditional"); }
+    while (flag) { throw new UnsupportedOperationException(); }
+  }
+  // public void commented() { throw new UnsupportedOperationException(); }
+  public void placeholder() { throw new UnsupportedOperationException("stub"); }
+}
+'''
+    found = _java_opaque("source:1", text)
+    assert [item["name"] for item in found] == ["placeholder"]
+    assert found[0]["end_line"] == 7
+
+
+def test_java_opaque_conditional_scan_is_bounded():
+    from source_selection import _java_opaque
+    import time
+
+    text = "class Layers {\n" + ("  // documentation\n" * 500) + '''  void check(boolean flag) {
+    if (flag) { throw new UnsupportedOperationException("ordinary branch"); }
+  }
+  public void unavailable() { throw new UnsupportedOperationException(); }
+}
+'''
+    started = time.monotonic()
+    assert [item["name"] for item in _java_opaque("source:1", text)] == ["unavailable"]
+    assert time.monotonic() - started < 1

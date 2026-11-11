@@ -6,23 +6,35 @@
  */
 import python
 import semmle.python.GuardedControlFlow
+import semmle.python.ApiGraphs
 import semmle.python.types.FunctionObject
+import semmle.python.types.Exceptions
 import semmle.python.dataflow.new.DataFlow
+import semmle.python.dataflow.new.internal.Attributes
 
 external string selectedTestPathFact();
 external string selectedTestFunctionFact();
+external int selectedTestStartLineFact();
 external int selectedObservationLineFact();
+external predicate selectedSupportPathFact(string path);
 external predicate selectedObservationExprFact(int originalLine, int expressionLine, int column, string kind);
 external predicate visibleLoaderBindingFact(int callLine, string name, string productPath,
-                                            int functionLine, string functionName, int functionEnd);
+                                            int functionLine, string functionName, int functionEnd,
+                                            int resultMode, string runnerName);
+external predicate visibleImportBindingFact(int callLine, string name, string productPath,
+                                            int functionLine, string functionName, int functionEnd,
+                                            int resultMode, string runnerName);
 
 predicate selectedTestPath(string path) { path = selectedTestPathFact() }
 predicate selectedTestFunction(string name) { name = selectedTestFunctionFact() }
+predicate selectedTestStartLine(int line) { line = selectedTestStartLineFact() }
 predicate selectedObservationLine(int line) { line = selectedObservationLineFact() }
+predicate selectedSupportPath(string path) { selectedSupportPathFact(path) }
 
 predicate inSelectedTest(AstNode node) {
   selectedTestPath(node.getLocation().getFile().getRelativePath()) and
-  selectedTestFunction(node.getScope().(Function).getName())
+  selectedTestFunction(node.getScope().(Function).getName()) and
+  selectedTestStartLine(node.getScope().(Function).getLocation().getStartLine())
 }
 
 predicate selectedObservationExpr(Expr expr, int line) {
@@ -36,20 +48,130 @@ predicate selectedObservationExpr(Expr expr, int line) {
   )
 }
 
-predicate visibleLoaderCall(Call call, Function function) {
+predicate visibleLoaderCall(Call call, Function function, int functionEnd, int resultMode,
+                            string runnerName) {
   inSelectedTest(call) and
   visibleLoaderBindingFact(call.getLocation().getStartLine(), call.getFunc().(Name).getId(),
                           function.getLocation().getFile().getRelativePath(),
                           function.getLocation().getStartLine(), function.getName(),
-                          functionEndLine(function))
+                          functionEnd, resultMode, runnerName)
 }
 
-predicate resolvedProductCall(Call call, Function function) {
+predicate visibleImportCall(Call call, Function function, int functionEnd, int resultMode,
+                            string runnerName) {
+  inSelectedTest(call) and
+  visibleImportBindingFact(call.getLocation().getStartLine(), call.getFunc().(Name).getId(),
+                          function.getLocation().getFile().getRelativePath(),
+                          function.getLocation().getStartLine(), function.getName(),
+                          functionEnd, resultMode, runnerName)
+}
+
+predicate visibleFrontendCall(Call call, Function function, int functionEnd, int resultMode,
+                              string runnerName, string origin) {
+  visibleLoaderCall(call, function, functionEnd, resultMode, runnerName) and origin = "loader"
+  or
+  visibleImportCall(call, function, functionEnd, resultMode, runnerName) and origin = "import"
+}
+
+predicate visibleCallResultExpr(Call call, int resultMode, string runnerName, Expr resultExpr) {
+  resultMode = 0 and runnerName = "" and resultExpr = call
+  or
+  resultMode = 1 and runnerName = "" and
+    exists(Await await | await.getValue() = call and resultExpr = await)
+  or
+  resultMode = 2 and exists(Call runner |
+    runner.getArg(0) = call and resultExpr = runner and
+    runner.getFunc().(Attribute).getName() = "run" and
+    runner.getFunc().(Attribute).getObject().(Name).getId() = runnerName
+  )
+}
+
+predicate asyncioRun(Call runner) {
+  exists(DataFlow::CallCfgNode apiCall |
+    apiCall = API::moduleImport("asyncio").getMember("run").getACall() and
+    apiCall.asExpr() = runner
+  ) and
+  runner.getPositionalArgumentCount() = 1 and
+  not exists(runner.getANamedArg()) and not exists(runner.getStarArg()) and
+  not exists(runner.getKwargs())
+}
+
+predicate resolvedProductTarget(Call call, Function function) {
   inSelectedTest(call) and
   exists(FunctionObject callee, ControlFlowNode callNode |
     callee.getACall() = callNode and callNode.getNode() = call and
     function = callee.getFunction() and
+    not selectedSupportPath(function.getLocation().getFile().getRelativePath()) and
     not selectedTestPath(function.getLocation().getFile().getRelativePath())
+  )
+}
+
+predicate nativeCallResultExpr(Call call, Function function, int resultMode,
+                               string runnerName, Expr resultExpr) {
+  not function.isAsync() and resultMode = 0 and runnerName = "" and resultExpr = call
+  or
+  function.isAsync() and resultMode = 1 and runnerName = "" and
+    exists(Await await | await.getValue() = call and resultExpr = await)
+  or
+  function.isAsync() and resultMode = 2 and runnerName = "api:asyncio.run" and
+    exists(Call runner | runner.getArg(0) = call and asyncioRun(runner) and resultExpr = runner)
+}
+
+predicate authenticatedProductCall(Call call, Function function, int visibleEnd,
+                                   int resultMode, string runnerName, string origin) {
+  resolvedProductTarget(call, function) and visibleEnd = functionEndLine(function) and
+  origin = "native" and
+  (
+    nativeCallResultExpr(call, function, resultMode, runnerName, _)
+    or
+    function.isAsync() and resultMode = -1 and runnerName = "" and
+      not exists(Expr resultExpr, int mode, string runner |
+        nativeCallResultExpr(call, function, mode, runner, resultExpr)
+      )
+  )
+  or
+  visibleFrontendCall(call, function, visibleEnd, resultMode, runnerName, origin)
+}
+
+predicate executedProductCall(Call call, Function function, int visibleEnd,
+                              int resultMode, string runnerName, string origin) {
+  authenticatedProductCall(call, function, visibleEnd, resultMode, runnerName, origin) and
+  resultMode in [0, 1, 2]
+}
+
+predicate linkedProductResult(Call call, Function function, Expr resultExpr,
+                              Expr observation, int observationLine, string origin) {
+  exists(int visibleEnd, int resultMode, string runnerName, Expr observedUse |
+    executedProductCall(call, function, visibleEnd, resultMode, runnerName, origin) and
+    (origin = "native" and nativeCallResultExpr(call, function, resultMode, runnerName, resultExpr)
+     or origin != "native" and
+        visibleCallResultExpr(call, resultMode, runnerName, resultExpr)) and
+    selectedObservationExpr(observation, observationLine) and observation.contains(observedUse) and
+    DataFlow::localFlow(DataFlow::exprNode(resultExpr), DataFlow::exprNode(observedUse))
+  )
+}
+
+predicate selectedPytestRaisesObservation(Call productCall, Expr observation, int observationLine) {
+  selectedObservationExpr(observation, observationLine) and
+  exists(With context, Call raisesCall, DataFlow::CallCfgNode apiCall |
+    observation = raisesCall and context.getContextExpr() = raisesCall and
+    context.getBody().contains(productCall) and
+    apiCall = API::moduleImport("pytest").getMember("raises").getACall() and
+    apiCall.asExpr() = raisesCall and raisesCall.getPositionalArgumentCount() = 1 and
+    not exists(raisesCall.getANamedArg()) and not exists(raisesCall.getStarArg()) and
+    not exists(raisesCall.getKwargs())
+  )
+}
+
+predicate linkedProductObservation(Call productCall, Function function, Expr observation,
+                                   int observationLine, string origin) {
+  exists(Expr resultExpr |
+    linkedProductResult(productCall, function, resultExpr, observation, observationLine, origin)
+  )
+  or
+  exists(int visibleEnd, int resultMode, string runnerName |
+    executedProductCall(productCall, function, visibleEnd, resultMode, runnerName, origin) and
+    selectedPytestRaisesObservation(productCall, observation, observationLine)
   )
 }
 
@@ -64,14 +186,16 @@ int functionEndLine(Function function) {
 private module ActualFormalConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
     exists(Call call, Function function, int index |
-      resolvedProductCall(call, function) and
+      resolvedProductTarget(call, function) and
+      not function.isAsync() and
       source = DataFlow::exprNode(call.getArg(index))
     )
   }
 
   predicate isSink(DataFlow::Node sink) {
     exists(Call call, Function function, int index |
-      resolvedProductCall(call, function) and
+      resolvedProductTarget(call, function) and
+      not function.isAsync() and
       sink = DataFlow::parameterNode(function.getArg(index))
     )
   }
@@ -94,19 +218,28 @@ where
       argumentIndex = -1 and detail = "selected_observation_expression"
     )
     or
-    exists(Call call, Function function |
-      (resolvedProductCall(call, function) and relation = "resolved_test_product_call"
-       or visibleLoaderCall(call, function) and relation = "visible_loader_product_call") and
+    exists(Call call, Function function, int visibleEnd, int resultMode,
+      string runnerName, string origin |
+      authenticatedProductCall(call, function, visibleEnd, resultMode, runnerName, origin) and
+      (origin = "native" and resultMode = 0 and relation = "resolved_test_product_call"
+       or origin = "native" and resultMode in [1, 2] and relation = "resolved_async_test_product_call"
+       or origin = "native" and resultMode = -1 and relation = "resolved_raw_async_test_product_call"
+       or origin != "native" and resultMode = 0 and
+          relation = "visible_" + origin + "_product_call"
+       or origin != "native" and resultMode in [1, 2] and
+          relation = "visible_async_" + origin + "_product_call"
+       or origin != "native" and resultMode = -1 and
+          relation = "visible_raw_async_" + origin + "_product_call") and
       sourcePath = call.getLocation().getFile().getRelativePath() and
       sourceLine = call.getLocation().getStartLine() and
       sourceEndLine = call.getLocation().getEndLine() and
       targetPath = function.getLocation().getFile().getRelativePath() and
-      targetLine = function.getLocation().getStartLine() and targetEndLine = functionEndLine(function) and
+      targetLine = function.getLocation().getStartLine() and targetEndLine = visibleEnd and
       observationLine = 0 and argumentIndex = -1 and detail = function.getName()
     )
     or
     exists(Call call, Function function, int index |
-      resolvedProductCall(call, function) and
+      resolvedProductTarget(call, function) and not function.isAsync() and
       ActualFormalFlow::flow(DataFlow::exprNode(call.getArg(index)),
                              DataFlow::parameterNode(function.getArg(index))) and
       relation = "actual_to_formal" and
@@ -132,18 +265,102 @@ where
       argumentIndex = -1 and detail = "localFlow"
     )
     or
-    exists(Call call, Function function, Expr observation, Expr observedUse |
-      (resolvedProductCall(call, function) and relation = "resolved_product_result_to_observation"
-       or visibleLoaderCall(call, function) and relation = "loader_product_result_to_observation") and
-      selectedObservationExpr(observation, observationLine) and observation.contains(observedUse) and
-      DataFlow::localFlow(DataFlow::exprNode(call), DataFlow::exprNode(observedUse)) and
+    exists(Call call, Function function, int visibleEnd, int resultMode,
+      string runnerName, string origin, Expr resultExpr, Expr observation |
+      linkedProductResult(call, function, resultExpr, observation, observationLine, origin) and
+      executedProductCall(call, function, visibleEnd, resultMode, runnerName, origin) and
+      (origin = "native" and resultMode = 0 and
+       relation = "resolved_product_result_to_observation"
+       or origin = "native" and resultMode != 0 and
+          relation = "async_resolved_product_result_to_observation"
+       or origin != "native" and resultMode = 0 and
+          relation = origin + "_product_result_to_observation"
+       or origin != "native" and resultMode != 0 and
+          relation = "async_" + origin + "_product_result_to_observation") and
       sourcePath = function.getLocation().getFile().getRelativePath() and
-      sourceLine = function.getLocation().getStartLine() and
-      sourceEndLine = functionEndLine(function) and
+      sourceLine = function.getLocation().getStartLine() and sourceEndLine = visibleEnd and
       targetPath = observation.getLocation().getFile().getRelativePath() and
       targetLine = observation.getLocation().getStartLine() and
       targetEndLine = observation.getLocation().getEndLine() and
       argumentIndex = -1 and detail = function.getName()
+    )
+    or
+    exists(Call call, Function function, Expr resultExpr, Expr observation,
+      Return returned, ControlFlowNode returnNode, string origin |
+      linkedProductResult(call, function, resultExpr, observation, observationLine, origin) and
+      returned.getScope() = function and exists(Expr value | value = returned.getValue()) and
+      returnNode.getNode() = returned and function.getEntryNode().strictlyReaches(returnNode) and
+      relation = "product_return_to_observation" and
+      sourcePath = returned.getLocation().getFile().getRelativePath() and
+      sourceLine = returned.getLocation().getStartLine() and
+      sourceEndLine = returned.getLocation().getEndLine() and
+      targetPath = observation.getLocation().getFile().getRelativePath() and
+      targetLine = observation.getLocation().getStartLine() and
+      targetEndLine = observation.getLocation().getEndLine() and
+      argumentIndex = -1 and detail = origin + ":return_value"
+    )
+    or
+    exists(Call call, Function function, Expr resultExpr, Expr observation,
+      Return returned, If guard, ControlFlowNode guardNode, ControlFlowNode returnNode,
+      boolean truth, string origin |
+      linkedProductResult(call, function, resultExpr, observation, observationLine, origin) and
+      returned.getScope() = function and guard.getScope() = function and
+      guardNode.getNode() = guard.getTest() and returnNode.getNode() = returned and
+      function.getEntryNode().strictlyReaches(returnNode) and
+      guardNode.getBasicBlock().(ConditionBlock).controls(returnNode.getBasicBlock(), truth) and
+      relation = "product_guard_controls_return_to_observation" and
+      sourcePath = guard.getLocation().getFile().getRelativePath() and
+      sourceLine = guard.getLocation().getStartLine() and
+      sourceEndLine = guard.getLocation().getEndLine() and
+      targetPath = observation.getLocation().getFile().getRelativePath() and
+      targetLine = observation.getLocation().getStartLine() and
+      targetEndLine = observation.getLocation().getEndLine() and
+      argumentIndex = -1 and
+      detail = origin + ":return:" + returned.getLocation().getStartLine().toString() +
+               ":branch:" + truth.toString()
+    )
+    or
+    exists(Call call, Function function, Expr observation, string origin,
+      int visibleEnd, int resultMode, string runnerName, RaisingNode exceptionSource |
+      executedProductCall(call, function, visibleEnd, resultMode, runnerName, origin) and
+      selectedPytestRaisesObservation(call, observation, observationLine) and
+      exceptionSource.getNode().getScope() = function and
+      exceptionSource.isExceptionalExit(function) and
+      relation = "product_exception_exit_unknown" and
+      sourcePath = exceptionSource.getLocation().getFile().getRelativePath() and
+      sourceLine = exceptionSource.getLocation().getStartLine() and
+      sourceEndLine = exceptionSource.getLocation().getEndLine() and
+      targetPath = observation.getLocation().getFile().getRelativePath() and
+      targetLine = observation.getLocation().getStartLine() and
+      targetEndLine = observation.getLocation().getEndLine() and
+      argumentIndex = -1 and detail = origin + ":exceptional_exit_type_compatibility_unknown"
+    )
+    or
+    exists(Call call, Function function, Expr observation, Call effectCall, string origin |
+      linkedProductObservation(call, function, observation, observationLine, origin) and
+      effectCall.getScope() = function and
+      relation = "product_call_unknown_effect" and
+      sourcePath = effectCall.getLocation().getFile().getRelativePath() and
+      sourceLine = effectCall.getLocation().getStartLine() and
+      sourceEndLine = effectCall.getLocation().getEndLine() and
+      targetPath = observation.getLocation().getFile().getRelativePath() and
+      targetLine = observation.getLocation().getStartLine() and
+      targetEndLine = observation.getLocation().getEndLine() and
+      argumentIndex = -1 and detail = origin + ":return_exception_state_unknown"
+    )
+    or
+    exists(Call call, Function function, Expr observation,
+      DataFlow::AttrWrite write, string origin |
+      linkedProductObservation(call, function, observation, observationLine, origin) and
+      write.getScope() = function and
+      relation = "product_attribute_write_unknown_effect" and
+      sourcePath = write.getLocation().getFile().getRelativePath() and
+      sourceLine = write.getLocation().getStartLine() and
+      sourceEndLine = write.getLocation().getEndLine() and
+      targetPath = observation.getLocation().getFile().getRelativePath() and
+      targetLine = observation.getLocation().getStartLine() and
+      targetEndLine = observation.getLocation().getEndLine() and
+      argumentIndex = -1 and detail = origin + ":alias_and_overwrite_not_proven"
     )
     or
     exists(If guard, Expr observation, ControlFlowNode guardNode,

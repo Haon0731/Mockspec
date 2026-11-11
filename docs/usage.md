@@ -240,7 +240,9 @@ PYTHONPATH=src .venv/bin/python experiments/backward-slicing/batch_slice.py \
 ```
 
 正式模式拒绝筛选案例，冻结代码／配置／门禁证据，并保留165个逐例终态。
-候选解析最多3路、成熟后端最多2路；每个支持案例使用新缓存。
+候选解析最多3路、成熟后端最多2路，其中 WALA 最多1路；允许1路WALA＋1路CodeQL
+或2路CodeQL。等待Java名额的案例不占用共享后端名额。每个支持案例使用新缓存。
+调度交错两种语言以减少空闲，结果仍按冻结清单的原顺序保存。
 默认 `registered` 模式只适配Jib、`flask_308`和`langflow_189`；其它案例仍加载并分析候选图，
 语义后端资格拒绝单列。`candidate_diagnostics`与成熟契约分别保留，候选成功不计语义成功。
 Jib复用已核验的结构应用包，历史准备成本不算本次冷分析；Python机制探针不计为数据集案例。
@@ -251,13 +253,22 @@ Python研究桥仅为工具显式设置固定locale及`PATH=/bin:/usr/bin`，不
 
 #32 通用接入复用上述命令，增加 `--backend-mode generic` 并选择新输出目录。
 它按语言调用 `generic_backend.py`，不使用三例白名单、不自动回退到 `registered`；
-保留相同165例、masking、原观察与输入门禁。成熟后端仍最多2路并发，`--workers 3`
+保留相同165例、masking、原观察与输入门禁。成熟后端最多2路并发且WALA最多1路，`--workers 3`
 只控制外层任务上限。Python 使用新数据库及可复用的固定查询编译缓存；Java 禁用注解
 处理器，不生成依赖行为。临时审核源码和数据库在驱动正常退出时移除，保留关系、选择事实、
 源码摘要和失败日志。具体支持边界及定向／全量运行状态见
 [通用接入研究](../experiments/backward-slicing/README.md)。
 `complete` 不等于正确切片：输入、图／库、观察、绑定及观察关联跨源影响分别统计，
 所有新关系保持 `not_evaluated`。
+
+#33 的选源预算在运行清单和逐例选源回执中分别记录：普通上限仍为8文件／200000字节；
+Python 对原观察的赋值依赖链及相关 helper 中唯一、精确的 focal 路径另设512000字节单文件上限，
+使用该额度后停止扩展。超过上限仍整文件省略；这属于显式变更的预算配置，不能与
+#32 的200000字节结果作同预算效果比较。显式相对导入的 loader 辅助源码最多32000字节，
+计入普通文件数／字节预算，标为 `loader_support`，不作为产品方法。
+Java 的多观察运行共享图构建，每根保留独立准则、失败和截断。完整 checkpoint 只在临时目录流式处理；
+发布每根关系用到的精确语句／边、原索引、原 checkpoint 摘要及省略计数，避免保留全部图；
+新证据目录为 `out/mockbench-study/entry-repair-20261111/`，不能覆盖前轮结果。
 
 逐例对照使用`experiments/backward-slicing/compare_runs.py`，不启动分析：
 

@@ -281,6 +281,20 @@ def validate_result_contract(contract: dict) -> None:
     boundaries = _require_dict(contract["analysis_boundaries"], "analysis_boundaries")
     for key in ("assumptions", "unknown_effects", "unanalysed_regions"):
         _require_list(boundaries.get(key), f"analysis_boundaries.{key}")
+    for effect in boundaries["unknown_effects"]:
+        effect = _require_dict(effect, "unknown_effect")
+        if "observation_ids" in effect:
+            references = _require_list(effect["observation_ids"], "unknown_effect.observation_ids")
+            if not references:
+                raise ResultContractError("unknown_effect observation references must not be empty")
+            seen = set()
+            for reference in references:
+                _require_string(reference, "unknown_effect observation reference")
+                if reference not in observation_ids:
+                    raise ResultContractError("unknown_effect references an unknown observation")
+                if reference in seen:
+                    raise ResultContractError("unknown_effect repeats an observation reference")
+                seen.add(reference)
     completion = _require_dict(contract["completion"], "completion")
     _require_string(completion.get("status"), "completion.status")
     _require_string(completion.get("stage"), "completion.stage")

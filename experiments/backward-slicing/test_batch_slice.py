@@ -270,3 +270,53 @@ def test_semantic_rejection_isolated_and_later_case_still_recorded(monkeypatch, 
     assert all(row["result_contract"]["identity"]["snapshot_id"] == "s" for row in rows)
     assert summary["semantic_backend_status"] == {"failed": 1, "unsupported": 1}
     assert (output / "semantic" / "1-rejected-result.json").exists()
+
+
+def test_semantic_resource_slots_allow_one_java_or_two_python(monkeypatch, tmp_path):
+    languages = {"j1": "java", "j2": "java", "p1": "python", "p2": "python"}
+    inventory = {"input_policy": "frozen-agent", "registry_root": str(tmp_path), "cases": [
+        {"case_id": name, "dataset": language, "inventory_revision": "r1",
+         "snapshot_id": "s", "language": language} for name, language in languages.items()]}
+
+    class Dataset:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        @contextmanager
+        def load_case(self, case_id):
+            yield SimpleNamespace(case_id=case_id, snapshot_id="s", language=languages[case_id])
+
+    async def analyse(case, **kwargs):
+        return {"status": "partial", "failure_categories": ["semantic_analysis_gap"]}
+
+    active = []
+    overlaps = []
+
+    async def semantic(entry, result, **kwargs):
+        language = entry["language"]
+        active.append(language)
+        overlaps.append(tuple(active))
+        assert active.count("java") <= 1
+        assert len(active) <= 2
+        await asyncio.sleep(0.01)
+        active.remove(language)
+        return {"status": "unsupported", "reason": "resource scheduling fixture"}
+
+    ledger = [{**entry, "masked_test_sha256": None, "target_selector": None} for entry in inventory["cases"]]
+    monkeypatch.setattr(batch_slice, "verify_formal_inputs", lambda *args: {"baseline_input_identity": ledger})
+    monkeypatch.setattr(batch_slice, "FrozenDataset", Dataset)
+    monkeypatch.setattr(batch_slice, "run_case", analyse)
+    monkeypatch.setattr(batch_slice, "run_semantic_backend", semantic)
+    monkeypatch.setattr(batch_slice, "_backend_paths", lambda: None)
+    codeql = tmp_path / "codeql"
+    codeql.write_text("fixture")
+    codeql.chmod(0o700)
+    output = tmp_path / "formal"
+    asyncio.run(batch_slice.run(inventory, output, workers=4,
+                               semantic_gate=tmp_path / "gate", baseline=tmp_path / "baseline",
+                               codeql=codeql, backend_mode="generic"))
+    assert any(set(overlap) == {"java", "python"} for overlap in overlaps)
+    rows = json.loads((output / "results.json").read_text())["cases"]
+    assert [row["identity"]["case_id"] for row in rows] == list(languages)
+    manifest = json.loads((output / "run-manifest.json").read_text())
+    assert manifest["configuration"]["java_semantic_workers"] == 1

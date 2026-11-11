@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-from collections import Counter
+from collections import Counter, deque
 import copy
 import hashlib
 import json
@@ -17,7 +17,8 @@ import time
 from criteria import extract_criteria
 from result_contract import (RESULT_SCHEMA_VERSION, attach_result_contract, contract_digest,
                              validate_result_contract)
-from source_selection import select_sources
+from source_selection import (PYTHON_FOCAL_FILE_BYTES, PYTHON_LOADER_SUPPORT_FILE_BYTES,
+                              select_sources)
 from mock_spec.adapters.frozen_dataset import FrozenDataset
 from mock_spec.analysis_process import communicate
 from mock_spec.java_analysis import _backend_paths
@@ -398,6 +399,9 @@ async def run(inventory: dict, output: Path, *, seconds: float = 30,
         "profile": REPAIRED_PROFILE if formal else PROFILE, "result_schema_version": RESULT_SCHEMA_VERSION,
         "configuration": {"backend_timeout_seconds": seconds,
             "max_files": max_files, "max_bytes": max_bytes, "case_ids": case_ids,
+            "python_focal_file_bytes": PYTHON_FOCAL_FILE_BYTES,
+            "python_loader_support_file_bytes": PYTHON_LOADER_SUPPORT_FILE_BYTES,
+            "dispatch_order": "language_round_robin_results_in_inventory_order",
             "python_dependency_only": True, "java_heap_mb": 768, "workers": workers},
         "implementation_sha256": {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
                                    for path in implementation},
@@ -413,7 +417,8 @@ async def run(inventory: dict, output: Path, *, seconds: float = 30,
         manifest["formal_registration"] = formal
         manifest["configuration"].update(semantic_timeout_seconds=semantic_seconds,
                                           codeql=str(codeql), semantic_cache="new per supported case",
-                                          semantic_workers=2, backend_mode=backend_mode)
+                                          semantic_workers=2, java_semantic_workers=1,
+                                          backend_mode=backend_mode)
         manifest["semantic_support_scope"] = {
             "java": "authenticated Jib JarFiles observation adapter and prepared application only",
             "python": "authenticated flask_308 and langflow_189 adapters only",
@@ -437,7 +442,7 @@ async def run(inventory: dict, output: Path, *, seconds: float = 30,
             jar, java, javac = paths
             try:
                 code, _, stderr = await communicate(
-                    [str(javac), "-cp", str(jar), "-d", work, str(HERE / "SliceProbe.java")],
+                    [str(javac), "-proc:none", "-cp", str(jar), "-d", work, str(HERE / "SliceProbe.java")],
                     input_bytes=None, timeout_seconds=60, cwd=work,
                 )
                 manifest["java_backend"] = {"compiled": code == 0,
@@ -452,6 +457,7 @@ async def run(inventory: dict, output: Path, *, seconds: float = 30,
         write(output / "run-manifest.json", manifest)
         semaphore = asyncio.Semaphore(workers)
         semantic_semaphore = asyncio.Semaphore(2)
+        language_semaphores = {"java": asyncio.Semaphore(1), "python": asyncio.Semaphore(2)}
 
         async def analyse_entry(index: int, entry: dict) -> dict:
             async with semaphore:
@@ -489,7 +495,9 @@ async def run(inventory: dict, output: Path, *, seconds: float = 30,
                     semantic = {"status": "failed", "reason": "frozen input identity/admission rejected",
                                 "identity_mismatches": mismatch}
                 else:
-                    async with semantic_semaphore:
+                    # Acquire the language slot first so queued Java cases do not
+                    # occupy both shared slots and prevent Python from progressing.
+                    async with language_semaphores[entry["language"]], semantic_semaphore:
                         semantic = await run_semantic_backend(
                             entry, result, registry_root=inventory["registry_root"],
                             output=output / "semantic", codeql=codeql, seconds=semantic_seconds,
@@ -515,9 +523,19 @@ async def run(inventory: dict, output: Path, *, seconds: float = 30,
                 print(f"{index}/{len(entries)} {entry['case_id']} {result['status']}", flush=True)
             return result
 
-        # gather preserves the frozen inventory order even when cases finish out of order.
-        rows = await asyncio.gather(*(analyse_entry(index, entry)
-                                      for index, entry in enumerate(entries, 1)))
+        # Interleave languages so waiting Java cases cannot occupy every outer
+        # worker while Python is runnable. Restore frozen order after dispatch.
+        queues: dict[str, deque] = {}
+        for index, entry in enumerate(entries, 1):
+            queues.setdefault(entry["language"], deque()).append((index, entry))
+        scheduled = []
+        while any(queues.values()):
+            for queue in queues.values():
+                if queue:
+                    scheduled.append(queue.popleft())
+        completed = await asyncio.gather(*(analyse_entry(index, entry)
+                                           for index, entry in scheduled))
+        rows = [row for _, row in sorted(zip((index for index, _ in scheduled), completed))]
     summary = summarize(rows)
     if formal is not None:
         summary.update(profile=REPAIRED_PROFILE, semantic_validation="per_case",

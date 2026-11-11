@@ -39,6 +39,8 @@ import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.ISSABasicBlock;
 import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
+import com.ibm.wala.ssa.SSAConditionalBranchInstruction;
+import com.ibm.wala.ssa.SSAPutInstruction;
 import com.ibm.wala.ssa.SSAReturnInstruction;
 import com.ibm.wala.ssa.SSAThrowInstruction;
 import com.ibm.wala.ssa.ConstantValue;
@@ -53,7 +55,10 @@ import com.ibm.wala.util.CancelException;
 import com.ibm.wala.util.graph.dominators.Dominators;
 import com.ibm.wala.core.util.config.AnalysisScopeReader;
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -72,21 +77,39 @@ public final class WalaSliceProbe {
   private WalaSliceProbe() {}
 
   public static void main(String[] args) throws Exception {
-    if (args.length < 5 || args.length > 7) {
+    if (args.length < 5 || args.length > 8) {
       throw new IllegalArgumentException(
-          "usage: <application-jar> <library-classpath-or-dash> <entry-class> <entry-selector> <criterion> [OPAQUE_SUMMARIES] [GENERIC_NO_HEAP]");
+          "usage: <application-jar> <library-classpath-or-dash> <entry-class> <entry-selector> <criterion> [OPAQUE_SUMMARIES] [GENERIC_NO_HEAP] [ROOT_OUTPUT_DIR:<path>]");
     }
     Path application = Path.of(args[0]).toAbsolutePath().normalize();
     String libraryClasspath = args[1];
     String entryClass = args[2];
     String entrySelector = args[3];
     String criterion = args[4];
+    boolean criteriaFileMode = criterion.startsWith("CRITERIA_FILE:");
+    List<String> criterionQueries = criteriaFileMode
+        ? List.of(JSON.readValue(Path.of(criterion.substring("CRITERIA_FILE:".length())).toFile(), String[].class))
+        : List.of(criterion);
+    if (criterionQueries.isEmpty() || criterionQueries.stream().anyMatch(String::isBlank)
+        || new LinkedHashSet<>(criterionQueries).size() != criterionQueries.size()) {
+      throw new IllegalArgumentException("criteria must be non-empty and unique");
+    }
     boolean opaqueSummaries = false;
     boolean genericNoHeap = false;
+    Path rootOutputDirectory = null;
     for (int index = 5; index < args.length; index++) {
       if ("OPAQUE_SUMMARIES".equals(args[index])) opaqueSummaries = true;
       else if ("GENERIC_NO_HEAP".equals(args[index])) genericNoHeap = true;
+      else if (args[index].startsWith("ROOT_OUTPUT_DIR:")) {
+        if (rootOutputDirectory != null) throw new IllegalArgumentException("duplicate root output directory");
+        rootOutputDirectory = Path.of(args[index].substring("ROOT_OUTPUT_DIR:".length()))
+            .toAbsolutePath().normalize();
+        Files.createDirectories(rootOutputDirectory);
+      }
       else throw new IllegalArgumentException("unknown analysis option: " + args[index]);
+    }
+    if (rootOutputDirectory != null && !criteriaFileMode) {
+      throw new IllegalArgumentException("root checkpoints require criteria-file mode");
     }
     Map<String, Long> timings = new LinkedHashMap<>();
     long totalStart = System.nanoTime();
@@ -165,14 +188,15 @@ public final class WalaSliceProbe {
     List<Map<String, Object>> entryControlFlow = describeEntryControlFlow(entryNode);
     List<Map<String, Object>> summaryTargets =
         describeSummaryTargets(callGraph, summaries, pointerAnalysis);
-    NormalStatement seed = findSeed(entryNode, criterion);
     started = System.nanoTime();
     Slicer.DataDependenceOptions dataDependence = genericNoHeap
         ? Slicer.DataDependenceOptions.NO_HEAP
         : Slicer.DataDependenceOptions.FULL;
-    Slicer.ControlDependenceOptions controlDependence = genericNoHeap
-        ? Slicer.ControlDependenceOptions.NONE
-        : Slicer.ControlDependenceOptions.FULL;
+    // Generic mode bounds heap expansion, but an observation-directed result still needs the
+    // product guards and exceptional exits that decide whether the observed value is produced.
+    // FULL control dependence is independent of heap modelling and remains bounded by the same
+    // hash-backed traversal/frontier below.
+    Slicer.ControlDependenceOptions controlDependence = Slicer.ControlDependenceOptions.FULL;
     SDG<InstanceKey> sdg =
         new SDG<>(
             callGraph,
@@ -184,80 +208,25 @@ public final class WalaSliceProbe {
         "WALA_STAGE sdg_initialized lazy_pdg=true elapsed_ms=%d%n",
         timings.get("sdg_initialization"));
 
-    started = System.nanoTime();
-    System.err.println("WALA_STAGE backward_slice_started pdg_population=on_demand");
-    BackwardSliceResult genericSlice = genericNoHeap
-        ? hashBackedBackwardSlice(sdg, seed, 50_000)
-        : null;
-    Collection<Statement> slice = genericNoHeap
-        ? genericSlice.statements
-        : Slicer.computeBackwardSlice(sdg, seed);
-    timings.put("backward_slice", elapsed(started));
-    int lazySdgNodes = 0;
-    var lazyNodes = sdg.iterateLazyNodes();
-    while (lazyNodes.hasNext()) {
-      lazyNodes.next();
-      lazySdgNodes++;
-    }
-    System.err.printf(
-        "WALA_STAGE backward_slice_complete slice_statements=%d lazy_sdg_nodes=%d elapsed_ms=%d%n",
-        slice.size(), lazySdgNodes, timings.get("backward_slice"));
-    List<Map<String, Object>> effectForwardSlices = genericNoHeap
-        ? List.of()
-        : describeEffectForwardSlices(callGraph, summaries, sdg, entryMethod.getSignature());
-
-    started = System.nanoTime();
-    List<Map<String, Object>> statements = new ArrayList<>();
-    List<Statement> ordered = new ArrayList<>(slice);
-    ordered.sort(
-        Comparator.comparing((Statement s) -> s.getNode().getMethod().getSignature())
-            .thenComparing(Statement::getKind)
-            .thenComparing(Object::toString));
-    for (Statement statement : ordered) statements.add(describe(statement));
-    Set<Statement> sliceSet = new LinkedHashSet<>(slice);
-    Map<String, Integer> edgeKinds = new LinkedHashMap<>();
-    List<Map<String, Object>> edges = new ArrayList<>();
-    List<Map<String, Object>> callBindings = new ArrayList<>();
-    int edgeCount = 0;
-    for (Statement source : ordered) {
-      if (source instanceof StatementWithInstructionIndex) {
-        SSAInstruction instruction = ((StatementWithInstructionIndex) source).getInstruction();
-        if (instruction instanceof SSAAbstractInvokeInstruction
-            && source.getKind() == Statement.Kind.NORMAL) {
-          SSAAbstractInvokeInstruction invocation = (SSAAbstractInvokeInstruction) instruction;
-          Set<CGNode> targets = callGraph.getPossibleTargets(source.getNode(), invocation.getCallSite());
-          List<String> targetMethods = new ArrayList<>();
-          for (CGNode target : targets) targetMethods.add(target.getMethod().getSignature());
-          targetMethods.sort(String::compareTo);
-          Map<String, Object> binding = new LinkedHashMap<>();
-          binding.put("caller", source.getNode().getMethod().getSignature());
-          binding.put("caller_context", source.getNode().getContext().toString());
-          binding.put(
-              "instruction_index",
-              ((StatementWithInstructionIndex) source).getInstructionIndex());
-          binding.put("call_site", invocation.getCallSite().toString());
-          binding.put("declared_target", invocation.getDeclaredTarget().getSignature());
-          binding.put("possible_targets", targetMethods);
-          binding.put("status", targetMethods.isEmpty() ? "unresolved" : "resolved_candidates");
-          callBindings.add(binding);
-        }
+    List<Map<String, Object>> rootAnalyses = new ArrayList<>();
+    for (int rootIndex = 0; rootIndex < criterionQueries.size(); rootIndex++) {
+      String query = criterionQueries.get(rootIndex);
+      Map<String, Object> root;
+      try {
+        root = analyzeRoot(
+            query, entryNode, entryMethod.getSignature(), callGraph, summaries, sdg, genericNoHeap);
+      } catch (Exception failure) {
+        if (!criteriaFileMode) throw failure;
+        root = Map.of(
+            "criterion_query", query,
+            "error", failure.getClass().getSimpleName() + ": " + failure.getMessage());
       }
-      var successors = sdg.getSuccNodes(source);
-      while (successors.hasNext()) {
-        Statement target = successors.next();
-        if (!sliceSet.contains(target)) continue;
-        edgeCount++;
-        List<String> labels = new ArrayList<>();
-        for (Dependency label : sdg.getEdgeLabels(source, target)) {
-          edgeKinds.merge(label.name(), 1, Integer::sum);
-          labels.add(label.name());
-        }
-        labels.sort(String::compareTo);
-        edges.add(Map.of(
-            "from", ordered.indexOf(source), "to", ordered.indexOf(target), "labels", labels));
+      if (rootOutputDirectory == null) {
+        rootAnalyses.add(root);
+      } else {
+        rootAnalyses.add(writeRootCheckpoint(rootOutputDirectory, rootIndex, query, root));
       }
     }
-    timings.put("source_mapping", elapsed(started));
     timings.put("total", elapsed(totalStart));
 
     Map<String, Object> result = new LinkedHashMap<>();
@@ -305,7 +274,6 @@ public final class WalaSliceProbe {
     result.put("application", application.toString());
     result.put("library_count", libraryCount);
     result.put("entry", entryMethod.getSignature());
-    result.put("criterion", Map.of("query", criterion, "seed", describe(seed)));
     result.put("class_hierarchy_classes", hierarchy.getNumberOfClasses());
     List<String> unresolvedClasses = new ArrayList<>();
     for (Object unresolved : hierarchy.getUnresolvedClasses()) {
@@ -322,17 +290,6 @@ public final class WalaSliceProbe {
     result.put("entry_control_flow", entryControlFlow);
     result.put("summary_targets", summaryTargets);
     result.put("configured_summaries", describeConfiguredSummaries(summaries));
-    result.put("effect_forward_slices", effectForwardSlices);
-    result.put("lazy_sdg_nodes_after_slice", lazySdgNodes);
-    result.put("slice_statements", statements);
-    result.put("seed_index", ordered.indexOf(seed));
-    result.put("traversal_truncated", genericSlice != null && genericSlice.truncated);
-    result.put("traversal_frontier_count", genericSlice == null ? 0 : genericSlice.frontierCount);
-    result.put("slice_statement_count", statements.size());
-    result.put("slice_edge_count", edgeCount);
-    result.put("slice_edge_labels", edgeKinds);
-    result.put("slice_edges", edges);
-    result.put("call_bindings", callBindings);
     result.put("timings_millis", timings);
     result.put("limitations", List.of(
         "A slice member is a possible dependence under this call graph, not proof of path feasibility.",
@@ -342,9 +299,155 @@ public final class WalaSliceProbe {
         "The RuntimeException branch is a fixture mechanism probe, not a complete nondeterministic exception model.",
         "Bytecode line tables may not map synthetic or library statements to reviewed source."));
     result.put("generic_mode_boundary", genericNoHeap
-        ? "Heap and control dependence are omitted, and legacy summary forward-slice diagnostics are skipped. Hash-backed predecessor traversal does not enforce matched call/return contexts, so retained paths are context-insensitive may evidence."
+        ? "Heap dependence is omitted and legacy summary forward-slice diagnostics are skipped. FULL control/exception dependence is retained, but hash-backed predecessor traversal does not enforce matched call/return contexts, so retained paths are context-insensitive may evidence. Visible state writes are witnesses only when their exact SSA instruction is retained; other reachable state effects remain unknown."
         : null);
-    JSON.writerWithDefaultPrettyPrinter().writeValue(System.out, result);
+    if (!criteriaFileMode) {
+      result.putAll(rootAnalyses.get(0));
+      JSON.writerWithDefaultPrettyPrinter().writeValue(System.out, result);
+    } else {
+      Map<String, Object> multi = new LinkedHashMap<>();
+      multi.put("schema_version", rootOutputDirectory == null
+          ? "mockspec.wala-multi-root/v1" : "mockspec.wala-multi-root/v2");
+      multi.put("shared", result);
+      multi.put(rootOutputDirectory == null ? "analyses" : "root_manifest", rootAnalyses);
+      JSON.writerWithDefaultPrettyPrinter().writeValue(System.out, multi);
+    }
+  }
+
+  private static Map<String, Object> writeRootCheckpoint(
+      Path directory, int rootIndex, String query, Map<String, Object> root) throws Exception {
+    Map<String, Object> checkpoint = new LinkedHashMap<>();
+    checkpoint.put("schema_version", "mockspec.wala-root-checkpoint/v1");
+    checkpoint.put("root_index", rootIndex);
+    checkpoint.put("criterion_query", query);
+    checkpoint.put("root", root);
+    Path target = directory.resolve(String.format("root-%05d.json", rootIndex));
+    Path temporary = directory.resolve(String.format(".root-%05d.tmp", rootIndex));
+    byte[] content = JSON.writerWithDefaultPrettyPrinter().writeValueAsBytes(checkpoint);
+    Files.write(temporary, content);
+    try {
+      Files.move(temporary, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+    } catch (java.nio.file.AtomicMoveNotSupportedException unsupported) {
+      Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING);
+    }
+    return Map.of(
+        "root_index", rootIndex,
+        "criterion_query", query,
+        "checkpoint_file", target.getFileName().toString(),
+        "checkpoint_sha256", sha256(content),
+        "status", root.containsKey("error") ? "error" : "complete");
+  }
+
+  private static String sha256(byte[] content) throws Exception {
+    byte[] digest = MessageDigest.getInstance("SHA-256").digest(content);
+    StringBuilder result = new StringBuilder(digest.length * 2);
+    for (byte value : digest) result.append(String.format("%02x", value & 0xff));
+    return result.toString();
+  }
+
+  private static Map<String, Object> analyzeRoot(
+      String query,
+      CGNode entryNode,
+      String entrySignature,
+      CallGraph callGraph,
+      Map<MethodReference, MethodSummary> summaries,
+      SDG<InstanceKey> sdg,
+      boolean genericNoHeap) throws CancelException {
+    NormalStatement seed = findSeed(entryNode, query);
+    Map<String, Long> timings = new LinkedHashMap<>();
+    long started = System.nanoTime();
+    System.err.printf("WALA_STAGE backward_slice_started criterion=%s pdg_population=on_demand%n", query);
+    BackwardSliceResult genericSlice = genericNoHeap
+        ? hashBackedBackwardSlice(sdg, seed, 50_000)
+        : null;
+    Collection<Statement> slice = genericNoHeap
+        ? genericSlice.statements
+        : Slicer.computeBackwardSlice(sdg, seed);
+    timings.put("backward_slice", elapsed(started));
+    int lazySdgNodes = 0;
+    var lazyNodes = sdg.iterateLazyNodes();
+    while (lazyNodes.hasNext()) {
+      lazyNodes.next();
+      lazySdgNodes++;
+    }
+    System.err.printf(
+        "WALA_STAGE backward_slice_complete criterion=%s slice_statements=%d lazy_sdg_nodes=%d elapsed_ms=%d%n",
+        query, slice.size(), lazySdgNodes, timings.get("backward_slice"));
+    List<Map<String, Object>> effectForwardSlices = genericNoHeap
+        ? List.of()
+        : describeEffectForwardSlices(callGraph, summaries, sdg, entrySignature);
+    List<Map<String, Object>> productBodyEvidence =
+        describeProductBodyEvidence(slice, sdg, entrySignature);
+
+    started = System.nanoTime();
+    List<Map<String, Object>> statements = new ArrayList<>();
+    List<Statement> ordered = new ArrayList<>(slice);
+    ordered.sort(
+        Comparator.comparing((Statement s) -> s.getNode().getMethod().getSignature())
+            .thenComparing(Statement::getKind)
+            .thenComparing(Object::toString));
+    Map<Statement, Integer> indexes = new LinkedHashMap<>();
+    for (int index = 0; index < ordered.size(); index++) {
+      indexes.put(ordered.get(index), index);
+      statements.add(describe(ordered.get(index)));
+    }
+    Set<Statement> sliceSet = new LinkedHashSet<>(slice);
+    Map<String, Integer> edgeKinds = new LinkedHashMap<>();
+    List<Map<String, Object>> edges = new ArrayList<>();
+    List<Map<String, Object>> callBindings = new ArrayList<>();
+    int edgeCount = 0;
+    for (Statement source : ordered) {
+      if (source instanceof StatementWithInstructionIndex) {
+        SSAInstruction instruction = ((StatementWithInstructionIndex) source).getInstruction();
+        if (instruction instanceof SSAAbstractInvokeInstruction
+            && source.getKind() == Statement.Kind.NORMAL) {
+          SSAAbstractInvokeInstruction invocation = (SSAAbstractInvokeInstruction) instruction;
+          Set<CGNode> targets = callGraph.getPossibleTargets(source.getNode(), invocation.getCallSite());
+          List<String> targetMethods = new ArrayList<>();
+          for (CGNode target : targets) targetMethods.add(target.getMethod().getSignature());
+          targetMethods.sort(String::compareTo);
+          Map<String, Object> binding = new LinkedHashMap<>();
+          binding.put("caller", source.getNode().getMethod().getSignature());
+          binding.put("caller_context", source.getNode().getContext().toString());
+          binding.put("instruction_index", ((StatementWithInstructionIndex) source).getInstructionIndex());
+          binding.put("call_site", invocation.getCallSite().toString());
+          binding.put("declared_target", invocation.getDeclaredTarget().getSignature());
+          binding.put("possible_targets", targetMethods);
+          binding.put("status", targetMethods.isEmpty() ? "unresolved" : "resolved_candidates");
+          callBindings.add(binding);
+        }
+      }
+      var successors = sdg.getSuccNodes(source);
+      while (successors.hasNext()) {
+        Statement target = successors.next();
+        if (!sliceSet.contains(target)) continue;
+        edgeCount++;
+        List<String> labels = new ArrayList<>();
+        for (Dependency label : sdg.getEdgeLabels(source, target)) {
+          edgeKinds.merge(label.name(), 1, Integer::sum);
+          labels.add(label.name());
+        }
+        labels.sort(String::compareTo);
+        edges.add(Map.of("from", indexes.get(source), "to", indexes.get(target), "labels", labels));
+      }
+    }
+    timings.put("source_mapping", elapsed(started));
+    Map<String, Object> result = new LinkedHashMap<>();
+    result.put("criterion", Map.of("query", query, "seed", describe(seed)));
+    result.put("effect_forward_slices", effectForwardSlices);
+    result.put("product_body_evidence", productBodyEvidence);
+    result.put("lazy_sdg_nodes_after_slice", lazySdgNodes);
+    result.put("slice_statements", statements);
+    result.put("seed_index", indexes.get(seed));
+    result.put("traversal_truncated", genericSlice != null && genericSlice.truncated);
+    result.put("traversal_frontier_count", genericSlice == null ? 0 : genericSlice.frontierCount);
+    result.put("slice_statement_count", statements.size());
+    result.put("slice_edge_count", edgeCount);
+    result.put("slice_edge_labels", edgeKinds);
+    result.put("slice_edges", edges);
+    result.put("call_bindings", callBindings);
+    result.put("root_timings_millis", timings);
+    return result;
   }
 
   private static String effectKind(String entrySelector) {
@@ -643,6 +746,133 @@ public final class WalaSliceProbe {
     return result;
   }
 
+  /**
+   * Export product-body endpoints that are specific to this observation's retained slice.
+   *
+   * <p>This is deliberately narrower than scanning every reachable product method. Return, throw,
+   * and field-write rows require the exact SSA instruction to be in the backward slice. Guard rows
+   * require a homogeneous CONTROL_DEP path to such a retained instruction in the same method. This
+   * prevents unrelated same-method writes and branches from becoming observation evidence. Missing
+   * heap witnesses remain unknown to the host instead of being inferred from method reachability.
+   */
+  private static List<Map<String, Object>> describeProductBodyEvidence(
+      Collection<Statement> slice, SDG<InstanceKey> sdg, String entrySignature) {
+    Map<CGNode, Map<Integer, Statement>> retainedByNode = new LinkedHashMap<>();
+    for (Statement statement : slice) {
+      if (!(statement instanceof StatementWithInstructionIndex)) continue;
+      CGNode node = statement.getNode();
+      if (!node.getMethod().getDeclaringClass().getClassLoader().getReference()
+          .equals(ClassLoaderReference.Application)) continue;
+      if (node.getMethod().getSignature().equals(entrySignature)) continue;
+      retainedByNode
+          .computeIfAbsent(node, ignored -> new LinkedHashMap<>())
+          .put(((StatementWithInstructionIndex) statement).getInstructionIndex(), statement);
+    }
+
+    List<Map<String, Object>> result = new ArrayList<>();
+    Set<String> emitted = new LinkedHashSet<>();
+    for (Map.Entry<CGNode, Map<Integer, Statement>> entry : retainedByNode.entrySet()) {
+      CGNode node = entry.getKey();
+      IR ir = node.getIR();
+      if (ir == null) continue;
+      SSAInstruction[] instructions = ir.getInstructions();
+
+      for (Map.Entry<Integer, Statement> retainedEntry : entry.getValue().entrySet()) {
+        int retainedIndex = retainedEntry.getKey();
+        if (retainedIndex < 0 || retainedIndex >= instructions.length) continue;
+        SSAInstruction retained = instructions[retainedIndex];
+        if (retained == null) continue;
+        String kind = null;
+        if (retained instanceof SSAReturnInstruction) kind = "value_return";
+        else if (retained instanceof SSAThrowInstruction) kind = "exceptional_exit";
+        else if (retained instanceof SSAPutInstruction) kind = "retained_state_write_witness";
+        if (kind != null) {
+          addProductEvidence(result, emitted, node, kind, retainedIndex, retainedIndex, retained);
+        }
+
+      }
+
+      Set<Statement> sameMethodStatements = new LinkedHashSet<>(entry.getValue().values());
+      for (Map.Entry<Integer, Statement> guardEntry : entry.getValue().entrySet()) {
+        int guardIndex = guardEntry.getKey();
+        SSAInstruction guard = instructions[guardIndex];
+        if (!(guard instanceof SSAConditionalBranchInstruction)) continue;
+        Set<Statement> controlled = dependencyReachable(
+            sdg, guardEntry.getValue(), sameMethodStatements, Dependency.CONTROL_DEP);
+        for (Map.Entry<Integer, Statement> retainedEntry : entry.getValue().entrySet()) {
+          if (retainedEntry.getValue().equals(guardEntry.getValue())) continue;
+          if (!controlled.contains(retainedEntry.getValue())) continue;
+          addProductEvidence(
+              result, emitted, node, "control_guard", guardIndex, retainedEntry.getKey(), guard);
+        }
+      }
+    }
+    result.sort(
+        Comparator.comparing((Map<String, Object> row) -> (String) row.get("method"))
+            .thenComparingInt(row -> (Integer) row.get("instruction_index"))
+            .thenComparing(row -> (String) row.get("kind"))
+            .thenComparingInt(row -> (Integer) row.get("retained_instruction_index")));
+    return result;
+  }
+
+  private static Set<Statement> dependencyReachable(
+      SDG<InstanceKey> sdg,
+      Statement start,
+      Set<Statement> allowed,
+      Dependency required) {
+    Set<Statement> visited = new LinkedHashSet<>();
+    ArrayDeque<Statement> pending = new ArrayDeque<>();
+    pending.add(start);
+    // `allowed` is already restricted to the current method's statements in the outer
+    // 50,000-statement observation slice. Exhaust it so absence of a guard path is never caused by
+    // a second, silent frontier.
+    while (!pending.isEmpty()) {
+      Statement current = pending.removeFirst();
+      if (!visited.add(current)) continue;
+      var successors = sdg.getSuccNodes(current);
+      while (successors.hasNext()) {
+        Statement successor = successors.next();
+        if (!allowed.contains(successor)) continue;
+        boolean matches = false;
+        for (Dependency label : sdg.getEdgeLabels(current, successor)) {
+          if (label == required) {
+            matches = true;
+            break;
+          }
+        }
+        if (matches) pending.addLast(successor);
+      }
+    }
+    return visited;
+  }
+
+  private static void addProductEvidence(
+      List<Map<String, Object>> result,
+      Set<String> emitted,
+      CGNode node,
+      String kind,
+      int instructionIndex,
+      int retainedInstructionIndex,
+      SSAInstruction instruction) {
+    String key = node.getMethod().getSignature() + "\u0000" + kind + "\u0000"
+        + instructionIndex + "\u0000" + retainedInstructionIndex;
+    if (!emitted.add(key)) return;
+    Map<String, Object> row = new LinkedHashMap<>();
+    row.put("kind", kind);
+    row.put("method", node.getMethod().getSignature());
+    row.put("context", node.getContext().toString());
+    row.put("instruction_index", instructionIndex);
+    row.put("retained_instruction_index", retainedInstructionIndex);
+    row.put("line", sourceLine(node.getMethod(), instructionIndex));
+    row.put("instruction", instruction.toString());
+    row.put("precision", kind.equals("control_guard")
+        ? "same-method homogeneous CONTROL_DEP path to retained observation-slice instruction"
+        : kind.equals("retained_state_write_witness")
+            ? "exact write retained in observation slice; state_flow additionally requires a heap dependence path"
+            : "exact instruction retained in observation-directed backward slice");
+    result.add(row);
+  }
+
   private static List<String> pointerKeys(Iterable<PointerKey> keys) {
     List<String> result = new ArrayList<>();
     if (keys == null) return result;
@@ -752,7 +982,10 @@ public final class WalaSliceProbe {
           TypeReference type = method.getParameterType(parameter);
           if (!type.isReferenceType()) continue;
           IClass argumentClass = hierarchy.lookupClass(type);
-          if (argumentClass == null) continue;
+          // ArrayClass deliberately does not implement getAllInstanceFields().
+          // Array elements remain in opaque_effect_model_scope.unknown; skipping
+          // them here prevents a crash without treating their effects as empty.
+          if (argumentClass == null || argumentClass.isArrayClass()) continue;
           int argumentValue = parameter + 1;
           for (IField field : argumentClass.getAllInstanceFields()) {
             if (field.getFieldTypeReference().equals(TypeReference.Int)) {
