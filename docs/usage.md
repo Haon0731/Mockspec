@@ -241,13 +241,23 @@ PYTHONPATH=src .venv/bin/python experiments/backward-slicing/batch_slice.py \
 
 正式模式拒绝筛选案例，冻结代码／配置／门禁证据，并保留165个逐例终态。
 候选解析最多3路、成熟后端最多2路；每个支持案例使用新缓存。
-当前语义输入适配只支持Jib、`flask_308`和`langflow_189`；其它案例仍加载并分析候选图，
+默认 `registered` 模式只适配Jib、`flask_308`和`langflow_189`；其它案例仍加载并分析候选图，
 语义后端资格拒绝单列。`candidate_diagnostics`与成熟契约分别保留，候选成功不计语义成功。
 Jib复用已核验的结构应用包，历史准备成本不算本次冷分析；Python机制探针不计为数据集案例。
 工具、数据库与缓存按各后端已有配置定位，不执行目标测试或loader。
 `--codeql`必须指向可执行文件；安装目录会在创建运行目录前被拒绝。
 Python研究桥仅为工具显式设置固定locale及`PATH=/bin:/usr/bin`，不继承其它宿主环境。
 复验入口应覆盖生产`analysis_process.communicate`的受限环境，普通shell smoke不能替代该检查。
+
+#32 通用接入复用上述命令，增加 `--backend-mode generic` 并选择新输出目录。
+它按语言调用 `generic_backend.py`，不使用三例白名单、不自动回退到 `registered`；
+保留相同165例、masking、原观察与输入门禁。成熟后端仍最多2路并发，`--workers 3`
+只控制外层任务上限。Python 使用新数据库及可复用的固定查询编译缓存；Java 禁用注解
+处理器，不生成依赖行为。临时审核源码和数据库在驱动正常退出时移除，保留关系、选择事实、
+源码摘要和失败日志。具体支持边界及定向／全量运行状态见
+[通用接入研究](../experiments/backward-slicing/README.md)。
+`complete` 不等于正确切片：输入、图／库、观察、绑定及观察关联跨源影响分别统计，
+所有新关系保持 `not_evaluated`。
 
 逐例对照使用`experiments/backward-slicing/compare_runs.py`，不启动分析：
 

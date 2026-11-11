@@ -55,6 +55,7 @@ import com.ibm.wala.core.util.config.AnalysisScopeReader;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -71,16 +72,22 @@ public final class WalaSliceProbe {
   private WalaSliceProbe() {}
 
   public static void main(String[] args) throws Exception {
-    if (args.length != 5 && args.length != 6) {
+    if (args.length < 5 || args.length > 7) {
       throw new IllegalArgumentException(
-          "usage: <application-jar> <library-classpath-or-dash> <entry-class> <entry-selector> <criterion> [OPAQUE_SUMMARIES]");
+          "usage: <application-jar> <library-classpath-or-dash> <entry-class> <entry-selector> <criterion> [OPAQUE_SUMMARIES] [GENERIC_NO_HEAP]");
     }
     Path application = Path.of(args[0]).toAbsolutePath().normalize();
     String libraryClasspath = args[1];
     String entryClass = args[2];
     String entrySelector = args[3];
     String criterion = args[4];
-    boolean opaqueSummaries = args.length == 6 && "OPAQUE_SUMMARIES".equals(args[5]);
+    boolean opaqueSummaries = false;
+    boolean genericNoHeap = false;
+    for (int index = 5; index < args.length; index++) {
+      if ("OPAQUE_SUMMARIES".equals(args[index])) opaqueSummaries = true;
+      else if ("GENERIC_NO_HEAP".equals(args[index])) genericNoHeap = true;
+      else throw new IllegalArgumentException("unknown analysis option: " + args[index]);
+    }
     Map<String, Long> timings = new LinkedHashMap<>();
     long totalStart = System.nanoTime();
 
@@ -160,12 +167,18 @@ public final class WalaSliceProbe {
         describeSummaryTargets(callGraph, summaries, pointerAnalysis);
     NormalStatement seed = findSeed(entryNode, criterion);
     started = System.nanoTime();
+    Slicer.DataDependenceOptions dataDependence = genericNoHeap
+        ? Slicer.DataDependenceOptions.NO_HEAP
+        : Slicer.DataDependenceOptions.FULL;
+    Slicer.ControlDependenceOptions controlDependence = genericNoHeap
+        ? Slicer.ControlDependenceOptions.NONE
+        : Slicer.ControlDependenceOptions.FULL;
     SDG<InstanceKey> sdg =
         new SDG<>(
             callGraph,
             pointerAnalysis,
-            Slicer.DataDependenceOptions.FULL,
-            Slicer.ControlDependenceOptions.FULL);
+            dataDependence,
+            controlDependence);
     timings.put("sdg_initialization", elapsed(started));
     System.err.printf(
         "WALA_STAGE sdg_initialized lazy_pdg=true elapsed_ms=%d%n",
@@ -173,7 +186,12 @@ public final class WalaSliceProbe {
 
     started = System.nanoTime();
     System.err.println("WALA_STAGE backward_slice_started pdg_population=on_demand");
-    Collection<Statement> slice = Slicer.computeBackwardSlice(sdg, seed);
+    BackwardSliceResult genericSlice = genericNoHeap
+        ? hashBackedBackwardSlice(sdg, seed, 50_000)
+        : null;
+    Collection<Statement> slice = genericNoHeap
+        ? genericSlice.statements
+        : Slicer.computeBackwardSlice(sdg, seed);
     timings.put("backward_slice", elapsed(started));
     int lazySdgNodes = 0;
     var lazyNodes = sdg.iterateLazyNodes();
@@ -184,8 +202,9 @@ public final class WalaSliceProbe {
     System.err.printf(
         "WALA_STAGE backward_slice_complete slice_statements=%d lazy_sdg_nodes=%d elapsed_ms=%d%n",
         slice.size(), lazySdgNodes, timings.get("backward_slice"));
-    List<Map<String, Object>> effectForwardSlices =
-        describeEffectForwardSlices(callGraph, summaries, sdg, entryMethod.getSignature());
+    List<Map<String, Object>> effectForwardSlices = genericNoHeap
+        ? List.of()
+        : describeEffectForwardSlices(callGraph, summaries, sdg, entryMethod.getSignature());
 
     started = System.nanoTime();
     List<Map<String, Object>> statements = new ArrayList<>();
@@ -246,8 +265,9 @@ public final class WalaSliceProbe {
     result.put("wala_version", "1.7.2");
     result.put("configuration", Map.of(
         "call_graph", "0-1-CFA",
-        "data_dependence", "FULL",
-        "control_dependence", "FULL",
+        "data_dependence", dataDependence.name(),
+        "control_dependence", controlDependence.name(),
+        "traversal", genericNoHeap ? "hash_backed_unmatched_context_predecessors" : "wala_matched_call",
         "reflection", "NONE",
         "opaque_effect_model", "bounded-effect-token-v1",
         "entry_origin", "explicit_diagnostic",
@@ -305,6 +325,9 @@ public final class WalaSliceProbe {
     result.put("effect_forward_slices", effectForwardSlices);
     result.put("lazy_sdg_nodes_after_slice", lazySdgNodes);
     result.put("slice_statements", statements);
+    result.put("seed_index", ordered.indexOf(seed));
+    result.put("traversal_truncated", genericSlice != null && genericSlice.truncated);
+    result.put("traversal_frontier_count", genericSlice == null ? 0 : genericSlice.frontierCount);
     result.put("slice_statement_count", statements.size());
     result.put("slice_edge_count", edgeCount);
     result.put("slice_edge_labels", edgeKinds);
@@ -318,6 +341,9 @@ public final class WalaSliceProbe {
         "Reference-field replacement, deeper heap paths, arrays/collections, library/runtime globals, unbounded escaped regions, null, and arbitrary exception types remain unknown.",
         "The RuntimeException branch is a fixture mechanism probe, not a complete nondeterministic exception model.",
         "Bytecode line tables may not map synthetic or library statements to reviewed source."));
+    result.put("generic_mode_boundary", genericNoHeap
+        ? "Heap and control dependence are omitted, and legacy summary forward-slice diagnostics are skipped. Hash-backed predecessor traversal does not enforce matched call/return contexts, so retained paths are context-insensitive may evidence."
+        : null);
     JSON.writerWithDefaultPrettyPrinter().writeValue(System.out, result);
   }
 
@@ -863,6 +889,35 @@ public final class WalaSliceProbe {
     return Math.round((System.nanoTime() - started) / 1_000_000.0);
   }
 
+  /**
+   * Traverse the lazy SDG without WALA's numbered DFS. Numbered DFS calls getMaxNumber(), which
+   * eagerly constructs every method PDG before visiting the demanded observation frontier.
+   */
+  private static BackwardSliceResult hashBackedBackwardSlice(
+      SDG<InstanceKey> sdg, Statement seed, int maxStatements) {
+    Set<Statement> reached = new LinkedHashSet<>();
+    ArrayDeque<Statement> pending = new ArrayDeque<>();
+    pending.add(seed);
+    while (!pending.isEmpty() && reached.size() < maxStatements) {
+      Statement current = pending.removeFirst();
+      if (!reached.add(current)) continue;
+      sdg.getPredNodes(current).forEachRemaining(pending::addLast);
+    }
+    return new BackwardSliceResult(reached, !pending.isEmpty(), pending.size());
+  }
+
+  private static final class BackwardSliceResult {
+    final Collection<Statement> statements;
+    final boolean truncated;
+    final int frontierCount;
+
+    BackwardSliceResult(Collection<Statement> statements, boolean truncated, int frontierCount) {
+      this.statements = statements;
+      this.truncated = truncated;
+      this.frontierCount = frontierCount;
+    }
+  }
+
   private static CGNode findNode(CallGraph graph, MethodReference reference) {
     for (CGNode node : graph) {
       if (node.getMethod().getReference().equals(reference)) return node;
@@ -873,6 +928,38 @@ public final class WalaSliceProbe {
   private static NormalStatement findSeed(CGNode node, String criterion) {
     IR ir = node.getIR();
     if (ir == null) throw new IllegalArgumentException("entry has no IR");
+    if (criterion.startsWith("SOURCE_LINE:")) {
+      String[] parts = criterion.split(":", 4);
+      if (parts.length != 4) {
+        throw new IllegalArgumentException(
+            "source-line criterion must be SOURCE_LINE:<line>:<ordinal>:<target-fragment>");
+      }
+      int requestedLine = Integer.parseInt(parts[1]);
+      int requestedOrdinal = Integer.parseInt(parts[2]);
+      if (requestedLine < 1 || requestedOrdinal < -1 || parts[3].isBlank()) {
+        throw new IllegalArgumentException("invalid source-line criterion: " + criterion);
+      }
+      List<NormalStatement> matches = new ArrayList<>();
+      SSAInstruction[] instructions = ir.getInstructions();
+      for (int index = 0; index < instructions.length; index++) {
+        SSAInstruction instruction = instructions[index];
+        if (!(instruction instanceof SSAAbstractInvokeInstruction)) continue;
+        SSAAbstractInvokeInstruction invoke = (SSAAbstractInvokeInstruction) instruction;
+        if (!invoke.getDeclaredTarget().getSignature().contains(parts[3])) continue;
+        if (sourceLine(node.getMethod(), index) == requestedLine) {
+          matches.add(new NormalStatement(node, index));
+        }
+      }
+      if (requestedOrdinal == -1 && matches.size() != 1) {
+        throw new IllegalArgumentException(
+            "source-line criterion is ambiguous with " + matches.size() + " calls: " + criterion + "\n" + ir);
+      }
+      if (requestedOrdinal >= matches.size()) {
+        throw new IllegalArgumentException(
+            "source-line criterion matched " + matches.size() + " calls: " + criterion + "\n" + ir);
+      }
+      return matches.get(requestedOrdinal == -1 ? 0 : requestedOrdinal);
+    }
     NormalStatement returnSeed = null;
     SSAInstruction[] instructions = ir.getInstructions();
     for (int index = 0; index < instructions.length; index++) {
@@ -888,6 +975,18 @@ public final class WalaSliceProbe {
     }
     if ("RETURN".equals(criterion) && returnSeed != null) return returnSeed;
     throw new IllegalArgumentException("criterion absent from entry IR: " + criterion + "\n" + ir);
+  }
+
+  private static int sourceLine(IMethod method, int instructionIndex) {
+    try {
+      if (method instanceof IBytecodeMethod<?>) {
+        int bytecodeIndex = ((IBytecodeMethod<?>) method).getBytecodeIndex(instructionIndex);
+        return method.getLineNumber(bytecodeIndex);
+      }
+    } catch (Exception ignored) {
+      // Absence of debug line metadata is represented by -1 and cannot match a source criterion.
+    }
+    return -1;
   }
 
   private static Map<String, Object> describe(Statement statement) {

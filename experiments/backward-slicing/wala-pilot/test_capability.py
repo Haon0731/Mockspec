@@ -362,14 +362,19 @@ def test_propagation_report_consumes_real_witnesses_and_keeps_missing_gates_bloc
     assert len(report["attempt_ledger"]) == len(summarize_repair.PROPAGATION_ATTEMPTS)
 
 
-def test_issue23_closure_uses_current_sources_and_preserves_unknown_boundaries():
+def test_historical_issue23_gate_rejects_changed_backend_and_preserves_unknown_boundaries():
     study_root = HERE.parents[2] / "out/mockbench-study"
     report = summarize_capability.summarize_issue23_expanded_effects(
         study_root / "issue23-capability-closure-20261111-r4",
         study_root / "issue23-jib-ci-original-20261111-r7/summary.json",
     )
-    assert report["gate_passed"] is True
-    assert report["source_identity_matches"] is True
+    # Issue 32 adds a generic mode to the probe. The immutable issue-23 receipt
+    # remains accepted for its recorded implementation, never for new source.
+    historical = json.loads((study_root / "issue23-capability-closure-20261111-r4/report.json").read_text())
+    assert historical["gate_passed"] is True
+    assert historical["source_identity_matches"] is True
+    assert report["gate_passed"] is False
+    assert report["source_identity_matches"] is False
     assert report["preregistration_matches"] is True
     assert all(
         row["passed"] and row["region_origin_proved"]

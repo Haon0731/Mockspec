@@ -13,7 +13,11 @@
 
 ## 独立研究验证
 
-本轮已完成[后向分析修复与165例正式对照](../out/mockbench-study/backward-slice-formal165-20261111-r3/report.md)：
+[#32 通用成熟后端接入](../experiments/backward-slicing/README.md)正在扩展原完整分母：
+按语言分派而非三个 Case ID 白名单，分别核验输入、真实后端、原观察及跨源影响。
+新关系保持未核验；定向门禁与最终全量结果按研究入口记录，不计入生产能力。
+
+前轮已完成[后向分析修复与165例正式对照](../out/mockbench-study/backward-slice-formal165-20261111-r3/report.md)：
 Jib、Flask、langflow三例实际后端重跑并保留已核验的部分关系；162例仍超出成熟后端输入适配范围。
 完整语义恢复成功数为0，不能把候选触及产品源码的110例当作成功数。
 原r3、两轮正式失败、开发重跑与全部逐例结果均保留；253项研究回归通过。

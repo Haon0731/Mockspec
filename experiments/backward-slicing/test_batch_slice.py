@@ -156,6 +156,57 @@ def test_semantic_contract_survives_integration_without_candidate_reconstruction
     assert result["candidate_diagnostics"]["failure_categories"] == ["semantic_analysis_gap"]
 
 
+@pytest.mark.parametrize("language", ["python", "java"])
+def test_generic_dispatch_does_not_route_new_cases_through_registered_case_allowlist(monkeypatch, tmp_path, language):
+    from pathlib import Path
+
+    commands = []
+
+    async def invoke(command, **kwargs):
+        commands.append(command)
+        output = Path(command[command.index("--output") + 1])
+        output.mkdir()
+        (output / "batch-result.json").write_text(json.dumps({
+            "status": "failed", "reason": "real backend mechanism failure, not case admission"}))
+        return 1, b"", b""
+
+    monkeypatch.setattr(batch_slice, "communicate", invoke)
+    entry = {"case_id": "previously-unseen-case", "dataset": "frozen", "language": language}
+    result = asyncio.run(batch_slice.run_semantic_backend(
+        entry, {}, registry_root="/frozen", output=tmp_path, codeql=tmp_path / "codeql",
+        seconds=30, backend_mode="generic"))
+    assert commands[0][1].endswith("/generic_backend.py")
+    assert "batch_semantic_backend.py" not in " ".join(commands[0])
+    assert result["reason"] == "real backend mechanism failure, not case admission"
+
+
+def test_generic_backend_cannot_silently_run_candidate_only(tmp_path):
+    with pytest.raises(ValueError, match="explicit semantic"):
+        asyncio.run(batch_slice.run({"input_policy": "frozen-agent"}, tmp_path / "run",
+                                   backend_mode="generic"))
+    assert not (tmp_path / "run").exists()
+
+
+def test_generic_summary_does_not_count_database_or_unlinked_call_as_observation_influence():
+    row = {"identity": {"language": "python"}, "semantic_backend": {
+        "status": "complete", "entry_evidence": {
+            "input_prepared": True, "database_created": True,
+            "observations_total": 2, "observations_mapped": 2,
+            "product_call_bindings": 1}}, "result_contract": {"relations": [{
+                "kind": "call_binding", "observation_ids": [],
+                "from": {"logical_path": "test.py"}, "to": {"logical_path": "product.py"}}]}}
+    summary = batch_slice.summarize_generic_entry([row])["counts"]
+    assert summary["backend_completed"] == 1
+    assert summary["all_observations_mapped"] == 1
+    assert summary["observation_linked_cross_source_relation"] == 0
+    row["result_contract"]["relations"].append({
+        "kind": "value_flow", "observation_ids": ["criterion:0"],
+        "from": {"logical_path": "product.py"}, "to": {"logical_path": "test.py"}})
+    assert batch_slice.summarize_generic_entry([row])["counts"]["observation_linked_cross_source_relation"] == 1
+    row["semantic_backend"]["entry_evidence"]["ambiguous_observation_lines"] = [10]
+    assert batch_slice.summarize_generic_entry([row])["counts"]["all_observations_mapped"] == 0
+
+
 def test_formal_run_rejects_case_filter_before_creating_output(tmp_path):
     inventory = {"input_policy": "frozen-agent", "cases": [{"dataset": "d", "case_id": "a"}]}
     with pytest.raises(ValueError, match="no case filter"):

@@ -104,16 +104,20 @@ def merge_semantic_result(result: dict, semantic: dict, identity: dict) -> None:
 
 
 async def run_semantic_backend(entry: dict, result: dict, *, registry_root: str,
-                               output: Path, codeql: Path | None, seconds: float) -> dict:
+                               output: Path, codeql: Path | None, seconds: float,
+                               backend_mode: str = "registered") -> dict:
+    if backend_mode not in {"registered", "generic"}:
+        raise ValueError("unknown semantic backend mode")
     token = hashlib.sha256((entry["dataset"] + "\0" + entry["case_id"]).encode()).hexdigest()[:20]
     request = output / (token + "-request.json")
     write(request, {**entry, **result.get("input_context", {}),
                     "input_context": result.get("input_context", {}), "sources": result.get("sources", [])})
     pilot = "wala-pilot" if entry["language"] == "java" else "python-backend-pilot"
     destination = output / token
-    command = [sys.executable, str(HERE / pilot / "batch_semantic_backend.py"),
+    driver = "generic_backend.py" if backend_mode == "generic" else "batch_semantic_backend.py"
+    command = [sys.executable, str(HERE / pilot / driver),
                "--entry", str(request), "--registry-root", registry_root, "--output", str(destination)]
-    if entry["language"] == "python" and codeql is not None:
+    if (entry["language"] == "python" or backend_mode == "generic") and codeql is not None:
         command += ["--codeql", str(codeql)]
     started = time.monotonic()
     try:
@@ -305,11 +309,49 @@ def summarize(rows: list[dict]) -> dict:
             "semantic_validation": "not_evaluated"}
 
 
+def summarize_generic_entry(rows: list[dict]) -> dict:
+    """Separate execution, root mapping and cross-source influence evidence."""
+    def counts(subset: list[dict]) -> dict:
+        stages: Counter = Counter()
+        for row in subset:
+            backend = row.get("semantic_backend", {})
+            evidence = backend.get("entry_evidence", {})
+            contract = row.get("result_contract", {})
+            stages["attempted"] += 1
+            stages["input_prepared"] += evidence.get("input_prepared") is True
+            stages["database_or_graph_created"] += (
+                evidence.get("database_created") is True or evidence.get("graph_created") is True)
+            stages["backend_completed"] += backend.get("status") == "complete"
+            total = evidence.get("observations_total", 0)
+            stages["all_observations_mapped"] += (
+                total > 0 and evidence.get("observations_mapped") == total
+                and not evidence.get("ambiguous_observation_lines"))
+            stages["product_call_binding_present"] += evidence.get("product_call_bindings", 0) > 0
+            # A resolved call elsewhere in the test does not establish influence
+            # on any observation. Require an observation-linked cross-source edge.
+            stages["observation_linked_cross_source_relation"] += any(
+                relation.get("observation_ids")
+                and relation.get("kind") in {"value_flow", "control_dependence", "state_flow",
+                                              "normal_return_dependence", "exception_dependence"}
+                and relation.get("from", {}).get("logical_path")
+                and relation.get("to", {}).get("logical_path")
+                and relation["from"]["logical_path"] != relation["to"]["logical_path"]
+                for relation in contract.get("relations", []))
+        return dict(stages)
+
+    return {"counts": counts(rows),
+            "by_language": {language: counts([row for row in rows
+                                               if row["identity"]["language"] == language])
+                            for language in ("java", "python")},
+            "interpretation": "Stage evidence only. Observation-linked relations remain unverified; these are not semantic success counts."}
+
+
 async def run(inventory: dict, output: Path, *, seconds: float = 30,
               max_files: int = 8, max_bytes: int = 200000,
               case_ids: list[str] | None = None, workers: int = 1,
               semantic_gate: Path | None = None, baseline: Path | None = None,
-              codeql: Path | None = None, semantic_seconds: float = 1200) -> dict:
+              codeql: Path | None = None, semantic_seconds: float = 1200,
+              backend_mode: str = "registered") -> dict:
     batch_started = time.monotonic()
     if inventory.get("input_policy") != "frozen-agent":
         raise ValueError("requires frozen-agent inventory")
@@ -317,6 +359,10 @@ async def run(inventory: dict, output: Path, *, seconds: float = 30,
         raise ValueError("budgets must be positive and finite")
     if type(workers) is not int or workers < 1:
         raise ValueError("workers must be a positive integer")
+    if backend_mode not in {"registered", "generic"}:
+        raise ValueError("unknown semantic backend mode")
+    if backend_mode == "generic" and semantic_gate is None:
+        raise ValueError("generic backend execution requires explicit semantic study registration")
     entries = inventory["cases"]
     identities = [(row["dataset"], row["case_id"]) for row in entries]
     if len(identities) != len(set(identities)):
@@ -367,12 +413,18 @@ async def run(inventory: dict, output: Path, *, seconds: float = 30,
         manifest["formal_registration"] = formal
         manifest["configuration"].update(semantic_timeout_seconds=semantic_seconds,
                                           codeql=str(codeql), semantic_cache="new per supported case",
-                                          semantic_workers=2)
+                                          semantic_workers=2, backend_mode=backend_mode)
         manifest["semantic_support_scope"] = {
             "java": "authenticated Jib JarFiles observation adapter and prepared application only",
             "python": "authenticated flask_308 and langflow_189 adapters only",
             "other_cases": "candidate diagnostics plus explicit mature-backend support rejection; no semantic success claim",
         }
+        if backend_mode == "generic":
+            manifest["semantic_support_scope"] = {
+                "selection": "language-specific generic adapters; no case-ID allowlist or silent registered-case fallback",
+                "entry_evidence": "input, database/graph, observation mapping and cross-source relations reported separately",
+                "validation": "new relations remain unverified unless independently reviewed",
+            }
         manifest["runtime"] = {"python": sys.version, "executable": sys.executable,
                                "codeql_executable_sha256": hashlib.sha256(codeql.read_bytes()).hexdigest()
                                if codeql is not None and codeql.is_file() else None}
@@ -440,7 +492,8 @@ async def run(inventory: dict, output: Path, *, seconds: float = 30,
                     async with semantic_semaphore:
                         semantic = await run_semantic_backend(
                             entry, result, registry_root=inventory["registry_root"],
-                            output=output / "semantic", codeql=codeql, seconds=semantic_seconds)
+                            output=output / "semantic", codeql=codeql, seconds=semantic_seconds,
+                            backend_mode=backend_mode)
                 try:
                     merge_semantic_result(result, semantic, identity)
                 except Exception as exc:
@@ -469,6 +522,9 @@ async def run(inventory: dict, output: Path, *, seconds: float = 30,
     if formal is not None:
         summary.update(profile=REPAIRED_PROFILE, semantic_validation="per_case",
                        interpretation="All165 inputs attempted. Candidate diagnostics are retained separately; mature backend support is bounded to three registered cases.")
+        if backend_mode == "generic":
+            summary["interpretation"] = "All165 inputs attempted through generic adapters. Backend execution, observation mapping and cross-source influence remain separate from semantic correctness."
+            summary["generic_entry"] = summarize_generic_entry(rows)
         summary["semantic_backend_status"] = dict(Counter(row["semantic_backend"]["status"] for row in rows))
         summary["semantic_validation_counts"] = dict(Counter(row["result_contract"]["semantic_validation"]["status"] for row in rows))
         summary["candidate_status"] = dict(Counter(row["candidate_diagnostics"]["status"] for row in rows))
@@ -496,6 +552,7 @@ if __name__ == "__main__":
     parser.add_argument("--baseline", type=Path, help="immutable r3 results required for the formal165 run")
     parser.add_argument("--codeql", type=Path)
     parser.add_argument("--semantic-seconds", type=float, default=1200)
+    parser.add_argument("--backend-mode", choices=("registered", "generic"), default="registered")
     args = parser.parse_args()
     inventory = decode_json(args.inventory.read_text())
     if not isinstance(inventory, dict):
@@ -504,5 +561,6 @@ if __name__ == "__main__":
                               seconds=args.seconds, max_files=args.max_files,
                               max_bytes=args.max_bytes, case_ids=args.case_id, workers=args.workers,
                               semantic_gate=args.semantic_gate, baseline=args.baseline,
-                              codeql=args.codeql, semantic_seconds=args.semantic_seconds))
+                              codeql=args.codeql, semantic_seconds=args.semantic_seconds,
+                              backend_mode=args.backend_mode))
     print(json.dumps(summary, ensure_ascii=False, indent=2))
