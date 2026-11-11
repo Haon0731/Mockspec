@@ -1,8 +1,9 @@
 # Issue #32: generic intake targeted gate
 
 Status: **passed_bounded_entry**. This directory records the development attempts,
-negative results, final five-case gate and independent reviews before the separate
-full165 run. It is not a full-cohort or semantic-correctness result.
+negative results, final five-case gate and independent reviews, plus subsequent
+full-cohort audits under `verification/`. The [full165 report and raw evidence archive](../generic-entry-full165-20261111-r1/report.md)
+are published separately. Neither intake gate nor audit establishes semantic correctness.
 
 Implementation: commit `0e689e2` (runtime file digests are authoritative in the
 individual runs and `targeted-acceptance.json`). No target or loader was executed,
@@ -45,8 +46,9 @@ were invocation-path errors; the corrected command and successful output are
 retained separately. Ruff and scoped mypy passed. The legacy WALA synthetic
 state/alias checks were included in the Java run.
 
-The broader run is separately registered at
-`../backward-slice-generic165-20261111-r1/`; it uses original Java59/Python106,
+The broader run completed at `../backward-slice-generic165-20261111-r1/`; its
+[lossless archive](../generic-entry-full165-20261111-r1/README.md) and [canonical independent audit](verification/full-cohort-r3/audit.md)
+preserve all165 outcomes. It uses original Java59/Python106,
 `--backend-mode generic --workers 3 --semantic-seconds 1200`, with at most two
 mature backends. Backend completion, original-root mapping, call binding and
 observation-linked cross-source influence remain separate from semantic success.

@@ -183,7 +183,8 @@ Python 的固定 CodeQL 查询接收原观察位置和审核来源事实；可�
 处理器，缺失声明以受可见类型约束的未知入口参数表达。通用 WALA 模式明确关闭
 heap／控制依赖，保留有类型路径的 may 数据证据与未完成前沿；占位方法影响保持未知。输入准备、数据库／调用图、
 观察映射、产品绑定及观察关联的跨源影响分开统计；新关系保持未核验。
-当前进展与最终运行状态见[通用接入研究](../experiments/backward-slicing/README.md)。
+完整165例的接入验收与逐阶段证据见[通用接入结果](../out/mockbench-study/generic-entry-full165-20261111-r1/report.md)。
+通用路径未复现原三例专用关系；历史 `registered` 仍用于原研究复现，两者不能混算语义能力。
 
 单案例结果另附 `result_contract.py` 定义的 `mock-spec.backward-analysis-case/v1`：
 冻结身份、逐观察位置、入口来源、类型化关系覆盖、未知／未分析边界、核验状态和成本。

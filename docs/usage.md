@@ -254,8 +254,9 @@ Python研究桥仅为工具显式设置固定locale及`PATH=/bin:/usr/bin`，不
 保留相同165例、masking、原观察与输入门禁。成熟后端仍最多2路并发，`--workers 3`
 只控制外层任务上限。Python 使用新数据库及可复用的固定查询编译缓存；Java 禁用注解
 处理器，不生成依赖行为。临时审核源码和数据库在驱动正常退出时移除，保留关系、选择事实、
-源码摘要和失败日志。具体支持边界及定向／全量运行状态见
-[通用接入研究](../experiments/backward-slicing/README.md)。
+源码摘要和失败日志。完整165例结果与支持边界见
+[研究报告](../out/mockbench-study/generic-entry-full165-20261111-r1/report.md)，
+压缩证据恢复及独立复核命令见[证据清单](../out/mockbench-study/generic-entry-full165-20261111-r1/README.md)。
 `complete` 不等于正确切片：输入、图／库、观察、绑定及观察关联跨源影响分别统计，
 所有新关系保持 `not_evaluated`。
 
