@@ -1,0 +1,382 @@
+{
+  "schema": "mock-spec.python-demand-analysis/v1",
+  "plan_sha256": "3a03f74d2b309dcb5211955ceaaf2fa8f318a2be0886a45249d8a85edcff4c36",
+  "plan": {
+    "observations": {
+      "flask": {
+        "schema": "mock-spec.python-observation-expectations/v1",
+        "case_id": "flask_308",
+        "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+        "observations": [
+          {
+            "observation_id": "raises-context:102",
+            "kind": "exception_context",
+            "logical_path": "tests/test_308abort.py",
+            "line": 102,
+            "expected_mapping": "bounded_exception_influence",
+            "reason": "the reviewed pytest summary and CodeQL exceptional CFG connect the selected call to this context; the concrete exception remains unknown"
+          },
+          {
+            "observation_id": "assert-exception:120",
+            "kind": "assertion",
+            "logical_path": "tests/test_308abort.py",
+            "line": 120,
+            "expected_mapping": "bounded_exception_influence",
+            "guard_line": 111,
+            "guard_branch": "true",
+            "reason": "the branch and product exception to the same capture's value membership observation are backend-verifiable within the registered summary boundary"
+          },
+          {
+            "observation_id": "assert-exception:126",
+            "kind": "assertion",
+            "logical_path": "tests/test_308abort.py",
+            "line": 126,
+            "expected_mapping": "bounded_exception_influence",
+            "guard_line": 111,
+            "guard_branch": "false",
+            "reason": "the branch and product exception to the same capture's value membership observation are backend-verifiable within the registered summary boundary"
+          }
+        ],
+        "preserve": [
+          "resolved test call to visible product function",
+          "actual to formal argument flow with backend context",
+          "test guard control of each visible assertion",
+          "product ctx branch, normal continuation to fallback, and exceptional exits",
+          "reviewed pytest suppression summary, post-with CFG continuation, and same-capture value flow"
+        ],
+        "exclude": [
+          "lexical nesting or source order as dependency evidence",
+          "automatic attachment of product-internal events to every test observation",
+          "equating test has_app_context with product ctx by variable name"
+        ],
+        "unknown": [
+          "receiver, global, escaped, dynamic-field, and transitive-heap effects",
+          "return-alias effects beyond the one-hop mechanism support domain",
+          "exact exception type, text, and code-to-message construction",
+          "frozen-case pytest version compatibility with the host-verified reference",
+          "path satisfiability and hidden Mock behavior"
+        ]
+      },
+      "state": {
+        "schema": "mock-spec.python-state-observation-expectations/v1",
+        "source": "mechanism_probe.py",
+        "observations": [
+          {
+            "observation_id": "state:visible-write",
+            "function": "visible_write",
+            "line": 60,
+            "field": "ready",
+            "relation": "visible_write_to_read",
+            "scope": "direct_visible_write"
+          },
+          {
+            "observation_id": "state:direct-argument",
+            "function": "unknown_may_write",
+            "line": 81,
+            "field": "ready",
+            "relation": "unknown_may_write_to_read",
+            "scope": "direct_argument"
+          },
+          {
+            "observation_id": "state:return-alias",
+            "function": "returned_alias_write",
+            "line": 87,
+            "field": "ready",
+            "relation": "return_alias_write_to_argument_read",
+            "scope": "return_alias"
+          },
+          {
+            "observation_id": "state:receiver",
+            "function": "receiver_may_write",
+            "line": 132,
+            "field": "configured",
+            "relation": "unknown_receiver_write_to_read",
+            "scope": "receiver"
+          },
+          {
+            "observation_id": "state:receiver-loop",
+            "function": "receiver_loop_prewrite_is_not_a_kill",
+            "line": 154,
+            "field": "configured",
+            "relation": "unknown_receiver_write_to_read",
+            "scope": "receiver"
+          },
+          {
+            "observation_id": "state:module-global",
+            "function": "global_may_write",
+            "line": 159,
+            "field": "active",
+            "relation": "unknown_global_write_to_read",
+            "scope": "module_global"
+          },
+          {
+            "observation_id": "state:escaped-argument",
+            "function": "escaped_argument_may_write",
+            "line": 177,
+            "field": "sealed",
+            "relation": "unknown_escaped_argument_write_to_read",
+            "scope": "escaped_argument"
+          },
+          {
+            "observation_id": "state:exception-handler",
+            "function": "caught_and_finally",
+            "line": 51,
+            "field": "ready",
+            "relation": "write_effect_exception_path_to_read",
+            "scope": "exception_handler"
+          },
+          {
+            "observation_id": "state:finally",
+            "function": "caught_and_finally",
+            "line": 53,
+            "field": "ready",
+            "relation": "write_effect_exception_path_to_read",
+            "scope": "finally"
+          }
+        ],
+        "exclude": [
+          {
+            "function": "proven_fresh_write",
+            "reason": "trusted fresh allocation is disjoint"
+          },
+          {
+            "function": "receiver_fresh_other",
+            "reason": "fresh object is allocated after the receiver call and is not escaped"
+          },
+          {
+            "function": "receiver_effect_overwritten",
+            "reason": "unconditional same-field write kills the earlier unknown effect"
+          },
+          {
+            "function": "local_object_is_not_global",
+            "reason": "local allocation is not the named module-global region"
+          },
+          {
+            "function": "global_effect_overwritten",
+            "reason": "unconditional same-field write kills the earlier unknown global effect"
+          },
+          {
+            "function": "escaped_fresh_other",
+            "reason": "fresh object is allocated after both dependency calls and is not escaped"
+          },
+          {
+            "function": "escaped_effect_overwritten",
+            "reason": "unconditional same-field write kills the earlier escaped-region effect"
+          },
+          {
+            "function": "visible_pure_then_observe",
+            "reason": "visible pure call is not an opaque-effect boundary"
+          }
+        ],
+        "unknown_cases": [
+          {
+            "function": "global_rebind_boundary",
+            "scope": "module_global_rebind",
+            "relation": "global_rebind_boundary_unknown",
+            "reason": "the re-bound global object may or may not alias the object affected before the rebind"
+          },
+          {
+            "function": "receiver_other_object",
+            "scope": "parameter_alias",
+            "relation": "parameter_alias_boundary_unknown",
+            "reason": "distinct receiver and observed parameters may alias at runtime"
+          },
+          {
+            "function": "escaped_other_object",
+            "scope": "parameter_alias",
+            "relation": "parameter_alias_boundary_unknown",
+            "reason": "the retained and observed parameters may alias at runtime"
+          }
+        ],
+        "unknown": [
+          "dynamic attribute names",
+          "arbitrary transitive heap reachability",
+          "implicit escapes without a visible opaque argument-passing call",
+          "alias relation between distinct parameters in visible writes",
+          "concrete values written by opaque dependencies",
+          "path satisfiability"
+        ]
+      },
+      "recursive": {
+        "schema": "mock-spec.python-recursive-observation-expectations/v1",
+        "source": "demand_recursive_probe.py",
+        "observation": {
+          "observation_id": "recursive-state:box.ready",
+          "function": "recursive_left",
+          "line": 5,
+          "field": "ready"
+        }
+      }
+    },
+    "relations": {
+      "flask call/value/control observations": [
+        "flask-observation-flow"
+      ],
+      "flask normal/exception execution": [
+        "flask-abort",
+        "exceptions"
+      ],
+      "pytest captured exception observation": [
+        "pytest-exception-flow"
+      ],
+      "visible state write": [
+        "visible-state-flow"
+      ],
+      "argument and return-alias unknown state": [
+        "unknown-effect-flow"
+      ],
+      "receiver/global/escaped state": [
+        "state-boundary-flow"
+      ],
+      "handler/finally state": [
+        "unknown-exception-state"
+      ]
+    },
+    "plan": {
+      "schema": "mock-spec.python-demand-analysis/v1",
+      "roots": [
+        "flask-observations",
+        "state-observations",
+        "recursive-observation"
+      ],
+      "selected_units": [
+        "flask-observation-flow",
+        "flask-abort",
+        "exceptions",
+        "pytest-exception-flow",
+        "visible-state-flow",
+        "unknown-effect-flow",
+        "state-boundary-flow",
+        "unknown-exception-state",
+        "recursive-boundary"
+      ],
+      "unexpanded_boundaries": [],
+      "complete": true
+    },
+    "selector": {
+      "kind": "generated_authenticated_root_facts",
+      "initial": {
+        "test_path": "tests/test_308abort.py",
+        "observation_locations": [
+          [
+            "raises-context:102",
+            102
+          ],
+          [
+            "assert-exception:120",
+            120
+          ],
+          [
+            "assert-exception:126",
+            126
+          ]
+        ],
+        "test_call_line": 103,
+        "guard_lines": [
+          111
+        ],
+        "state_observations": [
+          [
+            "caught_and_finally",
+            51
+          ],
+          [
+            "caught_and_finally",
+            53
+          ],
+          [
+            "escaped_argument_may_write",
+            177
+          ],
+          [
+            "escaped_other_object",
+            183
+          ],
+          [
+            "global_may_write",
+            159
+          ],
+          [
+            "global_rebind_boundary",
+            206
+          ],
+          [
+            "receiver_loop_prewrite_is_not_a_kill",
+            154
+          ],
+          [
+            "receiver_may_write",
+            132
+          ],
+          [
+            "receiver_other_object",
+            137
+          ],
+          [
+            "returned_alias_write",
+            87
+          ],
+          [
+            "unknown_may_write",
+            81
+          ],
+          [
+            "visible_write",
+            60
+          ]
+        ],
+        "recursive_functions": [
+          "recursive_left",
+          "recursive_right"
+        ],
+        "recursive_observation": {
+          "observation_id": "recursive-state:box.ready",
+          "function": "recursive_left",
+          "line": 5,
+          "field": "ready"
+        },
+        "reached_product": null,
+        "module_sha256": "c3a7fc1f67711a16698e91f6a5fc98fcf1492008057a73872bdd8403cbe96f3b"
+      },
+      "expectations_sha256": {
+        "flask": "8d422a38252637f00e311a2fd184dd3b9ddc734cbd8695b4b6e8ed8bc07078cc",
+        "state": "ea96d623a0a2dded80abc115874751e196ac9dbba650a6e5c1dfa1e3b526d919",
+        "recursive": "5d8f85b8a782db8bc183b7863ffb7d2680409efb6a1c6ad99d8087af7471b164"
+      }
+    }
+  },
+  "config": {
+    "threads": 2,
+    "ram_mb": 4096,
+    "timeout_seconds": 180,
+    "language": "python",
+    "query_units": [
+      "flask-observation-flow",
+      "flask-abort",
+      "exceptions",
+      "pytest-exception-flow",
+      "visible-state-flow",
+      "unknown-effect-flow",
+      "state-boundary-flow",
+      "unknown-exception-state",
+      "recursive-boundary"
+    ],
+    "qlpack_sha256": "12e34cb7769846e61e7d85a048372bc4434c9e6b4a45a4a8abfabe5f7abe2fbd"
+  },
+  "config_sha256": "8170e594712457223f08c231237776e3d8cc38d78f18b961a95cfff16fade079",
+  "budget": {
+    "max_units": 9,
+    "max_depth": 3
+  },
+  "budget_sha256": "541e693d77637e18613d97cbb52cabf08964ee9e53a966450c070e780d38ebb5",
+  "baseline": "out/mockbench-study/python-issue26-27-20261111-r12",
+  "baseline_studies": {
+    "observation-study.json": "15d846afd2544d1f9e6f5dd7864af2acea15f95cac7d53410a03986ce10925ed",
+    "state-observation-study.json": "f11d91377e4d866990538c93b4749bfe8a1ffbc9b57edbbb89cad90308b0675c"
+  },
+  "baseline_role": "semantic comparison only; the stable pytest host-reference receipt is imported and revalidated against the current assumptions hash, but no baseline relation or mechanism verdict is imported",
+  "source_identities": {
+    "flask": "1d1d5aac39d3499595242db629e25139117f15e6bd47bb22c18f73be5954fd88",
+    "probe": "96ff1efae596f70e7659ec8ce330b4f7ec06b49280bd72b0ebf36562a368b73a"
+  }
+}

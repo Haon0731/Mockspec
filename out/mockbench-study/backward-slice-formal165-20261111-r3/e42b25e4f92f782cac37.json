@@ -1,0 +1,1671 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "observation_exact_value_unknown"
+  ],
+  "stage": "observation_mapping",
+  "input_context": {
+    "target_selector": "tests/test_308abort.py::test_abort_scenarios",
+    "masked_test_logical_path": "tests/test_308abort.py",
+    "masked_test_sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+    "masking_contract": "python-slot-v1"
+  },
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_308abort.py::test_abort_scenarios",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_abort_scenarios",
+          "start_line": 48,
+          "end_line": 126
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 102,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 120,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 126,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:2"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "flask.helpers",
+        "candidates": [
+          "src/src/flask/helpers.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/flask/helpers.py",
+        "hint_kind": "python_import",
+        "hint": "typing",
+        "candidates": [
+          "src/src/flask/typing.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "dynamic_loader_bindings": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 29222,
+    "read_bytes": 29222,
+    "attempted_files": 2,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_308abort.py",
+      "sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+      "bytes": 3044
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/src/flask/helpers.py",
+      "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+      "bytes": 23064
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/src/flask/typing.py",
+      "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+      "bytes": 3114
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "dynamic_loader_bindings": [],
+    "edges": [
+      {
+        "field": "body",
+        "from": "test:103:8:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:102:4:With"
+      },
+      {
+        "branch": "true",
+        "from": "test:111:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:120:8:Assert"
+      },
+      {
+        "branch": "false",
+        "from": "test:111:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:126:8:Assert"
+      },
+      {
+        "from": "test:102:4:With",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:102:37:Name"
+      },
+      {
+        "from": "test:48:60:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:103:8:Expr",
+        "variable": "code"
+      },
+      {
+        "from": "test:48:66:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:103:8:Expr",
+        "variable": "args"
+      },
+      {
+        "from": "test:48:72:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:103:8:Expr",
+        "variable": "kwargs"
+      },
+      {
+        "from": "test:48:60:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:120:8:Assert",
+        "variable": "code"
+      },
+      {
+        "from": "test:102:37:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:120:8:Assert",
+        "variable": "exc_info"
+      },
+      {
+        "from": "test:48:60:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:126:8:Assert",
+        "variable": "code"
+      },
+      {
+        "from": "test:102:37:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:126:8:Assert",
+        "variable": "exc_info"
+      },
+      {
+        "callee": "abort",
+        "from": "source:1:283:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:103:8:Expr"
+      },
+      {
+        "callee": "abort",
+        "from": "source:1:285:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:103:8:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:282:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:283:8:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:283:8:Expr",
+        "kind": "normal_branch_exit",
+        "precision": "possible_only_if_branch_completes_normally",
+        "to": "source:1:282:4:If"
+      },
+      {
+        "from": "source:1:282:4:If",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:282:8:Name"
+      },
+      {
+        "from": "source:1:282:8:NamedExpr",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:283:8:Expr",
+        "variable": "ctx"
+      },
+      {
+        "from": "source:1:282:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:283:8:Expr",
+        "variable": "ctx"
+      },
+      {
+        "from": "source:1:265:10:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:283:8:Expr",
+        "variable": "code"
+      },
+      {
+        "from": "source:1:265:10:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:285:4:Expr",
+        "variable": "code"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected",
+      "dynamic loader origins require a visible static path, namespace key, selected definition, and unrebound test callable"
+    ],
+    "nodes": [
+      {
+        "code": "code: int | BaseResponse",
+        "end_line": 265,
+        "id": "source:1:265:10:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 265
+      },
+      {
+        "code": "if (ctx := _cv_app.get(None)) is not None:\n    ctx.app.aborter(code, *args, **kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 283,
+        "exception_possible": true,
+        "id": "source:1:282:4:If",
+        "kind": "If",
+        "source_id": "source:1",
+        "start_line": 282,
+        "unresolved_calls": [
+          "_cv_app.get(None)"
+        ]
+      },
+      {
+        "code": "(ctx := _cv_app.get(None)) is not None",
+        "end_line": 282,
+        "id": "source:1:282:7:Compare",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 282
+      },
+      {
+        "code": "ctx",
+        "end_line": 282,
+        "id": "source:1:282:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 282
+      },
+      {
+        "code": "(ctx := _cv_app.get(None))",
+        "end_line": 282,
+        "id": "source:1:282:8:NamedExpr",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 282
+      },
+      {
+        "code": "ctx.app.aborter(code, *args, **kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 283,
+        "exception_possible": true,
+        "id": "source:1:283:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 283,
+        "unresolved_calls": [
+          "ctx.app.aborter(code, *args, **kwargs)"
+        ]
+      },
+      {
+        "code": "_wz_abort(code, *args, **kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 285,
+        "exception_possible": true,
+        "id": "source:1:285:4:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 285,
+        "unresolved_calls": [
+          "_wz_abort(code, *args, **kwargs)"
+        ]
+      },
+      {
+        "code": "exc_info",
+        "end_line": 102,
+        "id": "test:102:37:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 102
+      },
+      {
+        "code": "with pytest.raises(Exception) as exc_info:\n    abort(code, *args, **kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 103,
+        "exception_possible": true,
+        "id": "test:102:4:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 102,
+        "unresolved_calls": [
+          "pytest.raises(Exception)"
+        ]
+      },
+      {
+        "code": "abort(code, *args, **kwargs)",
+        "end_line": 103,
+        "exception_possible": true,
+        "id": "test:103:8:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 103
+      },
+      {
+        "code": "has_app_context",
+        "end_line": 111,
+        "id": "test:111:7:Name",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 111
+      },
+      {
+        "code": "assert f'Aborted with {code}' in str(exc_info.value)",
+        "contains_unresolved_call": true,
+        "end_line": 120,
+        "exception_possible": true,
+        "id": "test:120:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 120,
+        "unresolved_calls": [
+          "str(exc_info.value)"
+        ]
+      },
+      {
+        "code": "assert f'Werkzeug abort {code}' in str(exc_info.value)",
+        "contains_unresolved_call": true,
+        "end_line": 126,
+        "exception_possible": true,
+        "id": "test:126:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 126,
+        "unresolved_calls": [
+          "str(exc_info.value)"
+        ]
+      },
+      {
+        "code": "code",
+        "end_line": 48,
+        "id": "test:48:60:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 48
+      },
+      {
+        "code": "args",
+        "end_line": 48,
+        "id": "test:48:66:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 48
+      },
+      {
+        "code": "kwargs",
+        "end_line": 48,
+        "id": "test:48:72:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 48
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:102:4:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:120:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:126:8:Assert"
+      }
+    ],
+    "seeds": [
+      "test:102:4:With",
+      "test:120:8:Assert",
+      "test:126:8:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 16,
+    "edges": 20,
+    "edge_kinds": {
+      "normal_body_exit": 1,
+      "lexical_control": 3,
+      "definition_value_candidate": 2,
+      "data_candidate": 11,
+      "call_event_candidate": 2,
+      "normal_branch_exit": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:102:4:With",
+        "node_ids": [
+          "source:1:265:10:arg",
+          "source:1:282:4:If",
+          "source:1:282:7:Compare",
+          "source:1:282:8:Name",
+          "source:1:282:8:NamedExpr",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:4:With",
+          "test:103:8:Expr",
+          "test:48:60:arg",
+          "test:48:66:arg",
+          "test:48:72:arg"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:282:4:If",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:4:With"
+        ]
+      },
+      {
+        "seed": "test:120:8:Assert",
+        "node_ids": [
+          "source:1:265:10:arg",
+          "source:1:282:4:If",
+          "source:1:282:7:Compare",
+          "source:1:282:8:Name",
+          "source:1:282:8:NamedExpr",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:37:Name",
+          "test:102:4:With",
+          "test:103:8:Expr",
+          "test:111:7:Name",
+          "test:120:8:Assert",
+          "test:48:60:arg",
+          "test:48:66:arg",
+          "test:48:72:arg"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:282:4:If",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:4:With",
+          "test:120:8:Assert"
+        ]
+      },
+      {
+        "seed": "test:126:8:Assert",
+        "node_ids": [
+          "source:1:265:10:arg",
+          "source:1:282:4:If",
+          "source:1:282:7:Compare",
+          "source:1:282:8:Name",
+          "source:1:282:8:NamedExpr",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:37:Name",
+          "test:102:4:With",
+          "test:103:8:Expr",
+          "test:111:7:Name",
+          "test:126:8:Assert",
+          "test:48:60:arg",
+          "test:48:66:arg",
+          "test:48:72:arg"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:282:4:If",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:4:With",
+          "test:126:8:Assert"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:102:4:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:120:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:126:8:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.1175,
+  "timings_seconds": {
+    "criterion_extraction": 0.000512,
+    "source_selection": 0.011764,
+    "backend_total": 0.105085,
+    "evidence_summary": 8.3e-05
+  },
+  "identity": {
+    "case_id": "flask_308",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "flask_308",
+      "dataset": "python-benchmark-new",
+      "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+      "language": "python",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+      "target_selector": "tests/test_308abort.py::test_abort_scenarios"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_308abort.py",
+        "sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+        "bytes": 3044,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:efe0a2dabe591bda",
+        "logical_path": "src/src/flask/__init__.py",
+        "sha256": "2daebda4dc29fed5cb36c912a6115a234e9a4b5f9c33fd795e4bfeffd0cc9386",
+        "bytes": 2072,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:0d48fae8b67acb9c",
+        "logical_path": "src/src/flask/globals.py",
+        "sha256": "1abe9a4e0a96c8bb28c232e2b08993fffdfb9bb694be2230755e54a46a40ca4d",
+        "bytes": 2414,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:f249c086e235096e",
+        "logical_path": "src/src/flask/helpers.py",
+        "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+        "bytes": 23064,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 102,
+          "end_line": 102
+        },
+        "kind": "exception_observation",
+        "origin": "explicit",
+        "reason": "raises in the selected test function"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 120,
+          "end_line": 120
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:2",
+        "location": {
+          "source_id": "test",
+          "start_line": 126,
+          "end_line": 126
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "parameter rows are visible but not enumerated as path-feasible executions"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_308abort.py::test_abort_scenarios",
+        "evidence": [
+          {
+            "symbol": "test_abort_scenarios",
+            "start_line": 48,
+            "end_line": 126
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "unique",
+        "candidates": [],
+        "evidence": [
+          {
+            "logical_path": "src/src/flask/helpers.py",
+            "start_line": 265,
+            "end_line": 265
+          }
+        ],
+        "assumptions": []
+      }
+    },
+    "relations": [
+      {
+        "kind": "call_binding",
+        "modality": "certain",
+        "from": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 103,
+          "end_line": 103
+        },
+        "to": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 265,
+          "end_line": 265
+        },
+        "provenance": "CodeQL FunctionObject.getACall",
+        "precision": "unique selected-scope test-to-visible-product endpoint",
+        "assumptions": [],
+        "observation_ids": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 103,
+          "end_line": 103
+        },
+        "to": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 265,
+          "end_line": 265,
+          "parameter_index": 0
+        },
+        "provenance": "CodeQL Global data flow actual-to-formal",
+        "precision": "matched resolved call context",
+        "assumptions": [],
+        "observation_ids": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 111,
+          "end_line": 111
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 120,
+          "end_line": 120
+        },
+        "provenance": "CodeQL ConditionBlock.controls",
+        "precision": "backend control region: true branch",
+        "assumptions": [],
+        "observation_ids": [
+          "criterion:1"
+        ]
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 111,
+          "end_line": 111
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 126,
+          "end_line": 126
+        },
+        "provenance": "CodeQL ConditionBlock.controls",
+        "precision": "backend control region: false branch",
+        "assumptions": [],
+        "observation_ids": [
+          "criterion:2"
+        ]
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 283,
+          "end_line": 283
+        },
+        "to": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 285,
+          "end_line": 285
+        },
+        "provenance": "CodeQL normal CFG reachability",
+        "precision": "product-internal normal continuation",
+        "assumptions": [],
+        "observation_ids": []
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 285,
+          "end_line": 285
+        },
+        "to": {
+          "scope": "product_function_exceptional_exit"
+        },
+        "provenance": "CodeQL RaisingNode exceptional exit",
+        "precision": "product-internal; not linked to pytest observation",
+        "assumptions": [],
+        "observation_ids": []
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 283,
+          "end_line": 283
+        },
+        "to": {
+          "scope": "product_function_exceptional_exit"
+        },
+        "provenance": "CodeQL RaisingNode exceptional exit",
+        "precision": "product-internal; not linked to pytest observation",
+        "assumptions": [],
+        "observation_ids": []
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 282,
+          "end_line": 282
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 120,
+          "end_line": 120
+        },
+        "provenance": "CodeQL pytest.raises exception capture model",
+        "precision": "same with/capture SSA; type=unknown_may_match; .value to str membership",
+        "assumptions": [
+          "host pytest model version and source digests verified before analysis",
+          "frozen case pytest dependency version is unknown"
+        ],
+        "observation_ids": [
+          "criterion:0",
+          "criterion:1"
+        ]
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 282,
+          "end_line": 282
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 126,
+          "end_line": 126
+        },
+        "provenance": "CodeQL pytest.raises exception capture model",
+        "precision": "same with/capture SSA; type=unknown_may_match; .value to str membership",
+        "assumptions": [
+          "host pytest model version and source digests verified before analysis",
+          "frozen case pytest dependency version is unknown"
+        ],
+        "observation_ids": [
+          "criterion:0",
+          "criterion:2"
+        ]
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 283,
+          "end_line": 283
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 120,
+          "end_line": 120
+        },
+        "provenance": "CodeQL pytest.raises exception capture model",
+        "precision": "same with/capture SSA; type=unknown_may_match; .value to str membership",
+        "assumptions": [
+          "host pytest model version and source digests verified before analysis",
+          "frozen case pytest dependency version is unknown"
+        ],
+        "observation_ids": [
+          "criterion:0",
+          "criterion:1"
+        ]
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 283,
+          "end_line": 283
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 126,
+          "end_line": 126
+        },
+        "provenance": "CodeQL pytest.raises exception capture model",
+        "precision": "same with/capture SSA; type=unknown_may_match; .value to str membership",
+        "assumptions": [
+          "host pytest model version and source digests verified before analysis",
+          "frozen case pytest dependency version is unknown"
+        ],
+        "observation_ids": [
+          "criterion:0",
+          "criterion:2"
+        ]
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 285,
+          "end_line": 285
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 120,
+          "end_line": 120
+        },
+        "provenance": "CodeQL pytest.raises exception capture model",
+        "precision": "same with/capture SSA; type=unknown_may_match; .value to str membership",
+        "assumptions": [
+          "host pytest model version and source digests verified before analysis",
+          "frozen case pytest dependency version is unknown"
+        ],
+        "observation_ids": [
+          "criterion:0",
+          "criterion:1"
+        ]
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 285,
+          "end_line": 285
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 126,
+          "end_line": 126
+        },
+        "provenance": "CodeQL pytest.raises exception capture model",
+        "precision": "same with/capture SSA; type=unknown_may_match; .value to str membership",
+        "assumptions": [
+          "host pytest model version and source digests verified before analysis",
+          "frozen case pytest dependency version is unknown"
+        ],
+        "observation_ids": [
+          "criterion:0",
+          "criterion:2"
+        ]
+      }
+    ],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "verified_correct"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "verified_correct"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "verified_incomplete"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [
+        "selected visible Flask source scope only"
+      ],
+      "unknown_effects": [
+        {
+          "boundary_id": "product-call:282",
+          "effect": "may_write_or_raise",
+          "scope": "receiver",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:282",
+          "effect": "may_write_or_raise",
+          "scope": "direct_arguments",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:282",
+          "effect": "may_write_or_raise",
+          "scope": "return_alias",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:282",
+          "effect": "may_write_or_raise",
+          "scope": "global_or_escaped_state",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:282",
+          "effect": "may_write_or_raise",
+          "scope": "transitive_heap",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:283",
+          "effect": "may_write_or_raise",
+          "scope": "receiver",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:283",
+          "effect": "may_write_or_raise",
+          "scope": "direct_arguments",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:283",
+          "effect": "may_write_or_raise",
+          "scope": "return_alias",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:283",
+          "effect": "may_write_or_raise",
+          "scope": "global_or_escaped_state",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:283",
+          "effect": "may_write_or_raise",
+          "scope": "transitive_heap",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:285",
+          "effect": "may_write_or_raise",
+          "scope": "receiver",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:285",
+          "effect": "may_write_or_raise",
+          "scope": "direct_arguments",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:285",
+          "effect": "may_write_or_raise",
+          "scope": "return_alias",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:285",
+          "effect": "may_write_or_raise",
+          "scope": "global_or_escaped_state",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:285",
+          "effect": "may_write_or_raise",
+          "scope": "transitive_heap",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "receiver, global, escaped, dynamic-field, and transitive-heap effects",
+          "reason": "outside bounded model"
+        },
+        {
+          "scope": "return-alias effects beyond the one-hop mechanism support domain",
+          "reason": "outside bounded model"
+        },
+        {
+          "scope": "exact exception type, text, and code-to-message construction",
+          "reason": "outside bounded model"
+        },
+        {
+          "scope": "frozen-case pytest version compatibility with the host-verified reference",
+          "reason": "outside bounded model"
+        },
+        {
+          "scope": "path satisfiability and hidden Mock behavior",
+          "reason": "outside bounded model"
+        },
+        {
+          "scope": "observation_exact_value",
+          "observation_id": "criterion:0",
+          "reason": "influence recovered, but exact exception type/text and code-to-message construction are not modeled"
+        },
+        {
+          "scope": "observation_exact_value",
+          "observation_id": "criterion:1",
+          "reason": "influence recovered, but exact exception type/text and code-to-message construction are not modeled"
+        },
+        {
+          "scope": "observation_exact_value",
+          "observation_id": "criterion:2",
+          "reason": "influence recovered, but exact exception type/text and code-to-message construction are not modeled"
+        }
+      ]
+    },
+    "completion": {
+      "status": "partial",
+      "stage": "observation_mapping",
+      "failure_categories": [
+        "observation_exact_value_unknown"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "verified_incomplete",
+      "reviewer": "pre_registered_source_oracle",
+      "evidence": [
+        {
+          "observation_id": "criterion:0",
+          "expectation_id": "raises-context:102",
+          "location": {
+            "logical_path": "tests/test_308abort.py",
+            "start_line": 102,
+            "end_line": 102
+          }
+        },
+        {
+          "observation_id": "criterion:1",
+          "expectation_id": "assert-exception:120",
+          "location": {
+            "logical_path": "tests/test_308abort.py",
+            "start_line": 120,
+            "end_line": 120
+          }
+        },
+        {
+          "observation_id": "criterion:2",
+          "expectation_id": "assert-exception:126",
+          "location": {
+            "logical_path": "tests/test_308abort.py",
+            "start_line": 126,
+            "end_line": 126
+          }
+        }
+      ],
+      "notes": "bounded exception influence recovered; exact observed values remain unknown"
+    },
+    "cost": {
+      "timings_seconds": {
+        "flask-db": 7.21,
+        "flask-exceptions-decode": 0.67,
+        "flask-exceptions": 7.51,
+        "flask-flask-abort-decode": 0.63,
+        "flask-flask-abort": 10.03,
+        "flask-flask-observation-flow-decode": 0.72,
+        "flask-flask-observation-flow": 14.04,
+        "flask-pytest-exception-flow-decode": 0.51,
+        "flask-pytest-exception-flow": 7.91
+      },
+      "total_seconds": 49.23,
+      "total_scope": "Flask database creation and Flask-prefixed queries only; mechanism cost is separate",
+      "timing_coverage": "partial",
+      "peak_memory": {
+        "status": "measured_per_process_max",
+        "bytes": 591179776,
+        "reason": "maximum of per-process max RSS; not a simultaneous whole-run peak"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "OS and CodeQL compilation caches not isolated"
+      },
+      "input_size": {
+        "files": 4,
+        "bytes": 30594
+      },
+      "graph_size": {
+        "nodes": null,
+        "edges": null,
+        "relation_count": 13,
+        "reason": "backend graph size is not exported by these queries"
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter preparation is not separately timed"
+        },
+        {
+          "phase": "criterion_extraction",
+          "reason": "included in adapter process, not separately timed"
+        },
+        {
+          "phase": "observation_mapping",
+          "reason": "mapper and serialization are not separately timed"
+        },
+        {
+          "phase": "path_feasibility",
+          "reason": "not evaluated"
+        },
+        {
+          "phase": "star_args_and_kwargs",
+          "reason": "only positional argument 0 has matched actual/formal evidence"
+        },
+        {
+          "phase": "flask-control-flow",
+          "reason": "expected /usr/bin/time evidence is missing"
+        },
+        {
+          "phase": "flask-state-flow",
+          "reason": "expected /usr/bin/time evidence is missing"
+        }
+      ]
+    }
+  },
+  "candidate_diagnostics": {
+    "status": "partial",
+    "failure_categories": [
+      "unresolved_calls",
+      "semantic_analysis_gap"
+    ],
+    "result_contract": {
+      "schema_version": "mock-spec.backward-analysis-case/v1",
+      "identity": {
+        "case_id": "flask_308",
+        "dataset": "python-benchmark-new",
+        "language": "python",
+        "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+        "masking_contract": "python-slot-v1",
+        "masked_test_sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+        "target_selector": "tests/test_308abort.py::test_abort_scenarios"
+      },
+      "source_scope": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_308abort.py",
+          "sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+          "bytes": 3044,
+          "selection_role": "masked_test"
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/src/flask/helpers.py",
+          "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+          "bytes": 23064,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/src/flask/typing.py",
+          "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+          "bytes": 3114,
+          "selection_role": "candidate_product"
+        }
+      ],
+      "observations": [
+        {
+          "observation_id": "criterion:0",
+          "location": {
+            "source_id": "test",
+            "start_line": 102,
+            "end_line": 102
+          },
+          "kind": "exception_observation",
+          "origin": "explicit",
+          "reason": "raises in the selected test function"
+        },
+        {
+          "observation_id": "criterion:1",
+          "location": {
+            "source_id": "test",
+            "start_line": 120,
+            "end_line": 120
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        },
+        {
+          "observation_id": "criterion:2",
+          "location": {
+            "source_id": "test",
+            "start_line": 126,
+            "end_line": 126
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        }
+      ],
+      "parameterization": {
+        "status": "not_expanded",
+        "coverage": "selected_test_definition",
+        "reason": "the runner does not enumerate parameter rows"
+      },
+      "entry_point": {
+        "test_selection": {
+          "origin": "task_provided",
+          "status": "unique",
+          "selector": "tests/test_308abort.py::test_abort_scenarios",
+          "evidence": [
+            {
+              "symbol": "test_abort_scenarios",
+              "start_line": 48,
+              "end_line": 126
+            }
+          ]
+        },
+        "mut_binding": {
+          "origin": "automatic",
+          "status": "not_evaluated",
+          "candidates": [],
+          "evidence": [],
+          "assumptions": []
+        }
+      },
+      "relations": [],
+      "relation_coverage": [
+        {
+          "kind": "call_binding",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "control_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "exception_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "function_origin",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "normal_return_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "state_flow",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "value_flow",
+          "status": "not_evaluated"
+        }
+      ],
+      "analysis_boundaries": {
+        "assumptions": [],
+        "unknown_effects": [
+          {
+            "boundary_id": "source:1:282:4:If",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:283:8:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:285:4:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:102:4:With",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:120:8:Assert",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:126:8:Assert",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          }
+        ],
+        "unanalysed_regions": [
+          {
+            "scope": "semantic_relations",
+            "reason": "candidate_graph_has_no_validated_dependency_semantics"
+          }
+        ]
+      },
+      "completion": {
+        "status": "partial",
+        "stage": "complete",
+        "failure_categories": [
+          "unresolved_calls",
+          "semantic_analysis_gap"
+        ],
+        "error": null
+      },
+      "semantic_validation": {
+        "status": "not_evaluated",
+        "reviewer": null,
+        "evidence": [],
+        "notes": "candidate reachability is not semantic dependency validation"
+      },
+      "cost": {
+        "timings_seconds": {
+          "criterion_extraction": 0.000512,
+          "source_selection": 0.011764,
+          "backend_total": 0.105085,
+          "evidence_summary": 8.3e-05
+        },
+        "total_seconds": 0.1175,
+        "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+        "peak_memory": {
+          "status": "unavailable",
+          "bytes": null,
+          "reason": "case-level peak memory is not measured by this runner"
+        },
+        "cache_state": {
+          "status": "unknown",
+          "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+        },
+        "input_size": {
+          "files": 3,
+          "bytes": 29222
+        },
+        "graph_size": {
+          "nodes": 16,
+          "edges": 20
+        },
+        "unavailable_phases": [
+          {
+            "phase": "input_admission",
+            "reason": "adapter admission occurs outside the per-case analysis timer"
+          },
+          {
+            "phase": "front_end",
+            "reason": "the candidate backend does not report parsing time separately"
+          },
+          {
+            "phase": "call_graph",
+            "reason": "the candidate backend does not report call-graph time separately"
+          },
+          {
+            "phase": "pointer_analysis",
+            "reason": "the candidate backend does not provide pointer analysis"
+          },
+          {
+            "phase": "dependency_analysis",
+            "reason": "backend_total combines parsing, graph construction, and slicing"
+          },
+          {
+            "phase": "slice",
+            "reason": "the candidate backend does not report semantic slicing time separately"
+          },
+          {
+            "phase": "source_mapping",
+            "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+          }
+        ]
+      }
+    },
+    "stage": "complete",
+    "error": null,
+    "elapsed_seconds": 0.1175,
+    "timings_seconds": {
+      "criterion_extraction": 0.000512,
+      "source_selection": 0.011764,
+      "backend_total": 0.105085,
+      "evidence_summary": 8.3e-05
+    },
+    "graph_and_evidence": "top-level graph/evidence/sources remain candidate diagnostics only"
+  },
+  "semantic_backend": {
+    "schema": "mock-spec.batch-semantic-backend/v1",
+    "status": "complete",
+    "backend": "flask_demand",
+    "identity": {
+      "case_id": "flask_308",
+      "dataset": "python-benchmark-new",
+      "language": "python",
+      "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+      "target_selector": "tests/test_308abort.py::test_abort_scenarios"
+    },
+    "source": {
+      "scope": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_308abort.py",
+          "sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+          "bytes": 3044,
+          "selection_role": "masked_test"
+        },
+        {
+          "source_id": "source:efe0a2dabe591bda",
+          "logical_path": "src/src/flask/__init__.py",
+          "sha256": "2daebda4dc29fed5cb36c912a6115a234e9a4b5f9c33fd795e4bfeffd0cc9386",
+          "bytes": 2072,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:0d48fae8b67acb9c",
+          "logical_path": "src/src/flask/globals.py",
+          "sha256": "1abe9a4e0a96c8bb28c232e2b08993fffdfb9bb694be2230755e54a46a40ca4d",
+          "bytes": 2414,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:f249c086e235096e",
+          "logical_path": "src/src/flask/helpers.py",
+          "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+          "bytes": 23064,
+          "selection_role": "candidate_product"
+        }
+      ],
+      "adapter_validation": "exact_paths_and_sha256"
+    },
+    "provenance": {
+      "driver": "experiments/backward-slicing/python-backend-pilot/run_demand_analysis.py",
+      "driver_sha256": "f1a02120129cb1972fecfbc326748fa6dd6e1e87f0c312f76063ab5c14e95183",
+      "driver_output": "/home/haon/projects/Mockspec/out/mockbench-study/backward-slice-formal165-20261111-r3/semantic/e42b25e4f92f782cac37/driver",
+      "artifacts": {
+        "terminal": {
+          "path": "/home/haon/projects/Mockspec/out/mockbench-study/backward-slice-formal165-20261111-r3/semantic/e42b25e4f92f782cac37/driver/result.json",
+          "sha256": "9dd6b118e5ae572d3c008cc8d7432280142a0c6ac3cafa0bac7c11d6c2db948f"
+        },
+        "case_study": {
+          "path": "/home/haon/projects/Mockspec/out/mockbench-study/backward-slice-formal165-20261111-r3/semantic/e42b25e4f92f782cac37/driver/observation-study.json",
+          "sha256": "890a2de1c48c8db96bf943e9ff5b28a64a15a5fe330a42eb960968bf4606c6d0"
+        },
+        "mechanism_summary": {
+          "path": "/home/haon/projects/Mockspec/out/mockbench-study/backward-slice-formal165-20261111-r3/semantic/e42b25e4f92f782cac37/driver/demand-mechanism-summary.json",
+          "sha256": "67e6d829f2ac27abc5c5ef5d97962fb3c3de12e84c6acf8d73b835e2daa9ee3d"
+        }
+      },
+      "target_executed": false,
+      "loader_executed": false,
+      "mechanism_probes_counted_as_dataset_cases": false,
+      "driver_environment": {
+        "values": {
+          "LANG": "C.UTF-8",
+          "LC_ALL": "C.UTF-8",
+          "PATH": "/bin:/usr/bin"
+        },
+        "python_executable": "/home/haon/projects/Mockspec/.venv/bin/python",
+        "home": "omitted; neither accepted driver requires user configuration",
+        "policy": "fixed locale plus os.defpath; no inherited environment or credentials"
+      },
+      "precision": "Exact frozen adapter identity and source hashes; only the selected case_result is returned. Backend qualification probes, when used by the Flask driver, are not dataset cases."
+    },
+    "cost": {
+      "prepare_seconds": 0.08765879500060691,
+      "database": {
+        "flask": {
+          "exit_code": 0,
+          "seconds": 7.214626855999086,
+          "peak_rss_bytes": 229068800
+        },
+        "probe": {
+          "exit_code": 0,
+          "seconds": 4.709891184997105,
+          "peak_rss_bytes": 225140736
+        }
+      },
+      "query_seconds": 70.06969477200255,
+      "decode_seconds": 5.2221983399940655,
+      "mapping": {
+        "observation": {
+          "exit_code": 0,
+          "seconds": 0.0421737229989958,
+          "peak_rss_bytes": 20279296
+        },
+        "state": {
+          "exit_code": 0,
+          "seconds": 0.04371588900175993,
+          "peak_rss_bytes": 20471808
+        }
+      },
+      "mapping_seconds": 0.08588961200075573,
+      "peak_rss": {
+        "bytes": 591179776,
+        "phase": "query",
+        "scope": "maximum per-process RSS; not simultaneous run RSS"
+      },
+      "comparison_limitations": [
+        "shared host had parallel Java work and OS caches were not cleared",
+        "r12 ran at a different time, so absolute speed differences are not causal evidence",
+        "cold/warm cache status and same-run phase measurements remain directly observed"
+      ],
+      "total_seconds": 88.2948412730002,
+      "warm_cache_excludes_prior_build": false
+    },
+    "terminal": {
+      "execution": "complete",
+      "semantic_validation": "verified_incomplete",
+      "completion": "partial"
+    },
+    "driver_exit_code": 0,
+    "batch_dispatch_seconds": 88.527659,
+    "batch_dispatch_scope": "bridge process including support check, adapter and backend; excludes candidate diagnostics"
+  },
+  "error": null,
+  "batch_case_cost": {
+    "total_seconds": 88.675747,
+    "scope": "admission, candidate diagnostic, semantic-slot wait, dispatch and mapping; excludes case queue, shared compile and serialization"
+  },
+  "result_contract_sha256": "11ee5cf8c3fff4b730f84b6fd7729f27599b2d4366219792027a62b23c1fd496"
+}

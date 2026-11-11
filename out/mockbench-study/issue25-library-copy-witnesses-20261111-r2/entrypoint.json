@@ -1,0 +1,173 @@
+{
+  "schema": "mockspec.jib-library-copy-evidence.v1",
+  "source": {
+    "analysis": "out/mockbench-study/issue25-jib-method-facts-20261111-r1/analysis.json",
+    "analysis_sha256": "826b60440561942fb43ac2a4549e28ce646ccb61579068a37564a229f5e1f1bc",
+    "analysis_schema": "mockspec.jib-original-observation-probe/v1",
+    "wala_version": "1.7.2",
+    "target_executed": false
+  },
+  "getter_method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan.getEntrypoint()Ljava/util/List;",
+  "field": "entrypoint",
+  "reports": [
+    {
+      "evidence_channel": "complete_method_ssa_fact",
+      "witness": {
+        "status": "complete",
+        "checks": {
+          "exact_getter_method": true,
+          "exact_instance_field_read": true,
+          "field_receiver_is_getter_receiver": true,
+          "fresh_copy_receiver": true,
+          "resolved_exact_constructor_ir": true,
+          "field_actual_maps_to_constructor_formal": true,
+          "constructor_receiver_is_returned_object": true,
+          "single_normal_object_return": true,
+          "unique_witness": true,
+          "exact_method_fact_parameters": true,
+          "normal_cfg_paths": true
+        },
+        "path": [
+          {
+            "kind": "exact_field_read",
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan.getEntrypoint()Ljava/util/List;",
+            "context": "Everywhere",
+            "instruction_index": 9,
+            "instruction": "6 = getfield < Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, entrypoint, <Extension,Ljava/util/List> > 1",
+            "uses": [
+              1
+            ],
+            "definitions": [
+              6
+            ],
+            "basic_block": 5,
+            "normal_successor_blocks": [
+              6
+            ],
+            "exceptional_successor_blocks": [
+              8
+            ]
+          },
+          {
+            "kind": "fresh_allocation",
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan.getEntrypoint()Ljava/util/List;",
+            "context": "Everywhere",
+            "instruction_index": 6,
+            "instruction": "5 = new <Extension,Ljava/util/ArrayList>@11",
+            "uses": [],
+            "definitions": [
+              5
+            ],
+            "basic_block": 4,
+            "normal_successor_blocks": [
+              5
+            ],
+            "exceptional_successor_blocks": [
+              8
+            ],
+            "allocated_type": "java.util.ArrayList"
+          },
+          {
+            "kind": "resolved_constructor_call",
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan.getEntrypoint()Ljava/util/List;",
+            "context": "Everywhere",
+            "instruction_index": 10,
+            "instruction": "invokespecial < Extension, Ljava/util/ArrayList, <init>(Ljava/util/Collection;)V > 5,6 @19 exception:7",
+            "uses": [
+              5,
+              6
+            ],
+            "definitions": [
+              7
+            ],
+            "basic_block": 6,
+            "normal_successor_blocks": [
+              7
+            ],
+            "exceptional_successor_blocks": [
+              8
+            ],
+            "declared_target": "java.util.ArrayList.<init>(Ljava/util/Collection;)V",
+            "receiver_actual": 5,
+            "receiver_formal": 1,
+            "source_actual": 6,
+            "source_formal": 2,
+            "source_argument_index": 1
+          },
+          {
+            "kind": "identity_transfer",
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan.getEntrypoint()Ljava/util/List;",
+            "context": "Everywhere",
+            "instruction_index": null,
+            "instruction": "8 = phi  4,5",
+            "uses": [
+              4,
+              5
+            ],
+            "definitions": [
+              8
+            ],
+            "basic_block": 7,
+            "normal_successor_blocks": [],
+            "exceptional_successor_blocks": []
+          },
+          {
+            "kind": "normal_return",
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan.getEntrypoint()Ljava/util/List;",
+            "context": "Everywhere",
+            "instruction_index": 11,
+            "instruction": "return 8",
+            "uses": [
+              8
+            ],
+            "definitions": [],
+            "basic_block": 7,
+            "normal_successor_blocks": [
+              8
+            ],
+            "exceptional_successor_blocks": []
+          }
+        ],
+        "mechanism": "exact WALA SSA field def -> resolved constructor source actual/formal; fresh allocation -> constructor receiver actual/formal -> sole normal return",
+        "missing": [],
+        "provenance": {
+          "library_class": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan",
+          "library_method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan.getEntrypoint()Ljava/util/List;",
+          "field": {
+            "owner": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan",
+            "name": "entrypoint"
+          },
+          "normal_return_condition": "successful completion of the exact constructor invocation, followed by selection of the fresh allocation arm at the sole object return",
+          "precision": "structural SSA relation only; collection elements, order, indexes, equality, aliasing, and constructor transformation details are not inferred",
+          "constructor": {
+            "method": "java.util.ArrayList.<init>(Ljava/util/Collection;)V",
+            "context": "Everywhere",
+            "has_ir": true
+          },
+          "method_fact": {
+            "context": "Everywhere",
+            "parameter_value_numbers": [
+              1
+            ],
+            "normal_cfg_paths": {
+              "allocation_to_constructor": [
+                4,
+                5,
+                6
+              ],
+              "field_read_to_constructor": [
+                5,
+                6
+              ],
+              "constructor_to_return": [
+                6,
+                7
+              ]
+            },
+            "exception_boundary": "exceptional successors are excluded; the witness applies only along listed normal CFG paths"
+          }
+        }
+      }
+    }
+  ]
+}

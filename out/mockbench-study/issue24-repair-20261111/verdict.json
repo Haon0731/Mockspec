@@ -1,0 +1,53 @@
+{
+  "schema": "mock-spec.issue24-verdict/v2",
+  "status": "blocked",
+  "gate_passed": false,
+  "checks": {
+    "overwrite_removes_old_value_flow": true,
+    "matched_actual_formal_return_flow": true,
+    "unknown_call_normal_and_exception_edges": true,
+    "early_return_and_raise_do_not_reach_later_observe": true,
+    "catch_and_finally_structure": true,
+    "visible_alias_write_reaches_read": true,
+    "fresh_unrelated_write_excluded": true,
+    "candidate_unknown_return_alias_and_downstream_use_rows": true,
+    "candidate_unknown_may_write_observed_state_row": true,
+    "unknown_may_raise": true,
+    "candidate_unknown_write_before_raise_row": true,
+    "flask_test_call_resolves_to_mut": true,
+    "flask_aborter_normal_path_reaches_fallback": true,
+    "flask_aborter_exception_blocks_normal_continuation": true,
+    "unknown_effect_model_propagation_verified": true,
+    "exception_path_state_propagation_verified": false
+  },
+  "model_evidence_status": "blocked",
+  "model_evidence": {
+    "schema": "mock-spec.issue24-model-evidence/v2",
+    "status": "blocked",
+    "checks": {
+      "unknown_effect_model_propagation_verified": true,
+      "exception_path_state_propagation_verified": false
+    },
+    "supported_scope": [
+      "direct positional argument regions",
+      "one returned alias followed by a same-field write",
+      "same-field dominating kills",
+      "exceptional CFG paths to a handler or finally read in the same try statement",
+      "fresh regions created by a visible class constructor in the same source file"
+    ],
+    "unsupported_scope": [
+      "arbitrary transitive heap regions",
+      "factory calls not proven to allocate a fresh object",
+      "unknown or dynamic attribute names",
+      "global or escaped aliases not rooted at the selected argument region",
+      "freshness for classes with bases, metaclasses, __new__, or __init__",
+      "properties, __setattr__, container elements, and regions with multiple local sources"
+    ]
+  },
+  "limitations": [
+    "CodeQL supplies CFG, value flow, attribute nodes, and unknown-exception evidence.",
+    "The original effects query remains candidate evidence and is not accepted by the propagation gate.",
+    "The bounded model covers direct argument regions, one returned-alias field write, definite same-field kills, and exceptional handler/finally paths.",
+    "Arbitrary transitive heap reachability remains outside this pilot and must stay unknown."
+  ]
+}

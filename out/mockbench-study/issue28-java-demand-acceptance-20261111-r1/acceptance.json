@@ -1,0 +1,93 @@
+{
+  "schema": "mock-spec.java-demand-acceptance/v1",
+  "issue": 28,
+  "accepted": true,
+  "target_executed": false,
+  "implementation": {
+    "planner_sha256": "254f9a6832eb6069019bfce36ba798ce910bbc781cadaf4f47fcf6eeb9d27b24",
+    "runner_sha256": "1c2db09bccffe8ee14f059cb9c2c77c7e424e4baf7663ef2a7d2e6d2455ccd68",
+    "demand_slicer_sha256": "dfe347ceafc45ca67a4fac84b668ad88825626ee5dbc42dd70e8e6a020ff40b4",
+    "jib_probe_sha256": "bea40d03c64657c2b06b26b7a9f246c12094502ce11a99efb924d17e53203d15",
+    "tests_sha256": "dfeb6a915edcab9937273c001fffb6720e366faa3bc6b64c4a52ae22256e62a4"
+  },
+  "mechanism": {
+    "artifact": "out/mockbench-study/issue28-java-method-demand-mechanism-20261111-r3",
+    "analysis_sha256": "af4dd44827d7b7ed86aac58cab43f71271f953d92fe153802c0d2658f290e8d4",
+    "pre_registration_sha256": "2313cc503eba4b9589f4ade3d7ac9cfb004e4a9a798d4889ae7995ac382256cf",
+    "receipt_sha256": "f0cd08cde95667d2316e78d83210f1ed790a0c61071b905d0ca2e62c1f49a6c6",
+    "analysis_time_sha256": "98ebc493ddc464610e5428c8ee5c902bf77ac7c317604b8c99d098a25e53470a",
+    "all_10_checks": true,
+    "call_graph_method_contexts": 5,
+    "lazy_pdg_method_contexts": 4,
+    "eager_pdg_method_contexts": 5,
+    "peak_rss_bytes": 1229398016,
+    "facts": [
+      "zero PDGs existed before or immediately after demand-slicer construction",
+      "lazy and eager traversals produced the exact same slice",
+      "one reachable unrelated method remained unloaded lazily",
+      "mutual recursion terminated and loaded both recursive method contexts",
+      "method budget preserved a completed direct slice and an explicit frontier"
+    ]
+  },
+  "real_jib_cold": {
+    "artifact": "out/mockbench-study/issue28-java-demand-cold-20261111-r7",
+    "result_sha256": "c4aa571a3c699c308e9e5aa1408d0edd265c7d45b8f7122459ffedc50056b373",
+    "equivalence_sha256": "e20e6aa78394e5c19d4ea9ce2a96d9afa3fba9662e6d3a1b8de9c0da6f24ec3b",
+    "summary_sha256": "3531b79ba2b1b309f97b4faaa5e3a762e82656a054984e458f6cfc78ae91b99c",
+    "analysis_gzip_sha256": "f4d84292091d7d6d40cc62b477b7bf6efd9009d33e6b9efb1d9892adc0b01f83",
+    "observations_executed": 19,
+    "observations_equivalent": 19,
+    "full_semantic_summary_equivalent": true,
+    "relations": 173,
+    "control_relations": 126,
+    "optional_relations": 3,
+    "exact_observations": 14,
+    "opaque_may_observations": 5,
+    "pdgs_before_global_heap_index": 0,
+    "pdgs_after_global_heap_index": 0,
+    "pdgs_after_all_demands": 11184,
+    "entry_reachable_method_contexts": 11256,
+    "java_seconds": 39.652994681000564,
+    "compile_seconds": 1.1610753439999826,
+    "mapping_seconds": 7.803748727001221,
+    "total_seconds": 48.61781875200177,
+    "java_peak_rss_bytes": 1620631552,
+    "reused_input_preparation_excluded": true
+  },
+  "real_jib_warm": {
+    "artifact": "out/mockbench-study/issue28-java-demand-warm-20261111-r7",
+    "result_sha256": "0e1535f76c2c5bac6f4307419f51cfdbdf3c2a3fc67b7b985848a961b96c0b1a",
+    "analysis_gzip_sha256": "e4052e4bf06d48daecba420e2e992378fe43be2d0ef7b0ae28d8a0dbe1526d3d",
+    "cache_hits": 19,
+    "executed": 0,
+    "java_status": "not_run",
+    "full_semantic_summary_equivalent": true,
+    "total_seconds": 9.73362649900082,
+    "host_peak_rss_bytes": 685641728
+  },
+  "budget": {
+    "artifact": "out/mockbench-study/issue28-java-demand-budget-20261111-r3",
+    "result_sha256": "ad8f4bf29eef6e464176b8f3ad1b2ecd6e07a2fefc9c6c32930c213fc2a07659",
+    "analysis_gzip_sha256": "751144b261ca9c5507da6b53048735b2381f021fe48cd9e77660596cb0932c71",
+    "completed_observations": 1,
+    "completed_observation_equivalent": true,
+    "method_pdg_limit": 25,
+    "method_pdg_frontiers": 1,
+    "unit_frontiers": 17,
+    "frontier_method_context": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan.getPlatforms()Ljava/util/Set; @ Everywhere"
+  },
+  "semantic_equivalence_contract": {
+    "included": "all observation identities/status/missing/witnesses, value/control/state/normal/exception relation objects, unknown boundaries, entry binding, modality, relation coverage, outcome and optional evidence",
+    "excluded": "run cost and demand telemetry, collection order, absolute javap paths with hashes retained, and truncated excluded-state example samples with counts retained",
+    "positive_order_and_metadata_test": true,
+    "negative_removed_relation_test": true,
+    "negative_exact_to_opaque_test": true
+  },
+  "boundaries": [
+    "Call graph, pointer analysis and global Mod/Ref indexing remain eager and are costed.",
+    "Demand applies to method-context PDG construction under NONE control and NO_HEAP base SDG semantics.",
+    "Real Jib conservatively loads 11184 of 11256 reachable method contexts, so this result proves correctness and explicit cost, not a speedup.",
+    "Cold totals reuse the accepted prepared application JAR and exclude its earlier adaptation and compilation cost.",
+    "No target test or full-165 experiment was run."
+  ]
+}

@@ -1,0 +1,1100 @@
+{
+  "schema": "mock-spec.batch-semantic-backend/v1",
+  "status": "complete",
+  "backend": "langflow_origin_flow",
+  "identity": {
+    "case_id": "langflow_189",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+    "masking_contract": "python-slot-v1",
+    "masked_test_sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+    "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "langflow_189",
+      "dataset": "python-benchmark-new",
+      "language": "python",
+      "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+      "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_189is_encrypted.py",
+        "sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+        "bytes": 3541,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:1",
+        "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "sha256": "bfe36ac83538a629ee670c81b20ab9e3682688be7a031b7e61522b1779ea4c8b",
+        "bytes": 4547,
+        "selection_role": "visible_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "kind": "return_value_assertion",
+        "origin": "explicit",
+        "reason": "frozen explicit observation selected by extract_criteria"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "kind": "dynamic_global_identity_assertion",
+        "origin": "explicit",
+        "reason": "frozen explicit observation selected by extract_criteria"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected test definition",
+      "reason": "parameter rows and complete path feasibility were not evaluated"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+        "evidence": [
+          {
+            "symbol": "test_is_encrypted",
+            "start_line": 50,
+            "end_line": 115
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "unique",
+        "candidates": [],
+        "evidence": [
+          {
+            "status": "resolved",
+            "loader": "load_is_encrypted",
+            "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+            "path_line": 13,
+            "namespace": "namespace",
+            "exec_line": 36,
+            "return_line": 37,
+            "read_line": 27,
+            "function_key": "is_encrypted",
+            "return_index": 0,
+            "function_definition": {
+              "source_id": "source:1",
+              "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+              "name": "is_encrypted",
+              "start_line": 94,
+              "end_line": 118
+            },
+            "test_bindings": [
+              {
+                "name": "is_encrypted",
+                "line": 74
+              }
+            ],
+            "call_sites": [
+              {
+                "name": "is_encrypted",
+                "line": 104
+              }
+            ]
+          }
+        ],
+        "assumptions": []
+      }
+    },
+    "relations": [
+      {
+        "kind": "function_origin",
+        "modality": "certain",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 118,
+          "end_line": 118
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_function",
+          "raw_modality": "certain"
+        },
+        "precision": "bounded langflow backend relation; is_encrypted",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 104,
+          "end_line": 104
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; is_encrypted",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 112,
+          "end_line": 112
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; is_encrypted",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; is_encrypted",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 118,
+          "end_line": 118
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; is_encrypted",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "function_origin",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 116,
+          "end_line": 116
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_global_reference",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; InvalidToken",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "call_binding",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 104,
+          "end_line": 104
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "authenticated_loader_bridge_plus_exact_codeql_endpoint",
+          "raw_relation_kind": "test_dynamic_call_syntax",
+          "raw_modality": "authenticated_external_bridge"
+        },
+        "precision": "bounded langflow backend relation; frontend_bridge_required; authenticated_external_bridge projected as analysis_may",
+        "observation_ids": [],
+        "assumptions": [
+          "CodeQL did not resolve the exec-created callable"
+        ]
+      },
+      {
+        "kind": "call_binding",
+        "modality": "unknown_effect",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_dependency_call",
+          "raw_modality": "unknown_effect"
+        },
+        "precision": "bounded langflow backend relation; get_settings_service",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "call_binding",
+        "modality": "unknown_effect",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_dependency_call",
+          "raw_modality": "unknown_effect"
+        },
+        "precision": "bounded langflow backend relation; decrypt_api_key",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 103,
+          "end_line": 103
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 104,
+          "end_line": 104
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "guard_controls_product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; true",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 103,
+          "end_line": 103
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 112,
+          "end_line": 112
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "guard_controls_product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; false",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 103,
+          "end_line": 103
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "guard_controls_product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; false",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 103,
+          "end_line": 103
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 118,
+          "end_line": 118
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "guard_controls_product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; false",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 111,
+          "end_line": 111
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 112,
+          "end_line": 112
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "guard_controls_product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; true",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 111,
+          "end_line": 111
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "guard_controls_product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; false",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "parameter_to_return_value_use",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; return_comparison",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "settings_result_to_decrypt_argument",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; argument:1",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 111,
+          "end_line": 111
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "decrypt_result_to_downstream_use",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; guard",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "decrypt_result_to_downstream_use",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; return_comparison",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "parameter_to_decrypt_argument",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; argument:0",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 104,
+          "end_line": 104
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "test_call_result_to_observation",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 118,
+          "end_line": 118
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "decrypt_exception_to_handler_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; caught_path_candidate",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "function_origin",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "authenticated_loader_bridge_plus_exact_codeql_endpoint",
+          "raw_relation_kind": "dynamic_global_identity_observation",
+          "raw_modality": "authenticated_external_bridge"
+        },
+        "precision": "bounded langflow backend relation; frontend_namespace_bridge_required; authenticated_external_bridge projected as analysis_may",
+        "observation_ids": [],
+        "assumptions": [
+          "CodeQL did not resolve the exec-created callable"
+        ]
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 104,
+          "end_line": 104
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL return + authenticated loader callable + CodeQL test result local flow",
+          "raw_relation_kind": "normal_return_dependence",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": [
+          "the authenticated exec-created callable is invoked at test line 104"
+        ]
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 112,
+          "end_line": 112
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL return + authenticated loader callable + CodeQL test result local flow",
+          "raw_relation_kind": "normal_return_dependence",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": [
+          "the authenticated exec-created callable is invoked at test line 104"
+        ]
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL return + authenticated loader callable + CodeQL test result local flow",
+          "raw_relation_kind": "normal_return_dependence",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": [
+          "the authenticated exec-created callable is invoked at test line 104"
+        ]
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 118,
+          "end_line": 118
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL return + authenticated loader callable + CodeQL test result local flow",
+          "raw_relation_kind": "normal_return_dependence",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": [
+          "the authenticated exec-created callable is invoked at test line 104"
+        ]
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL flow 106->109 plus downstream decrypt flows and product return composition",
+          "raw_relation_kind": "value_flow",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; get_settings_service normal result may influence criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": [
+          "the relevant normal or caught-exception path reaches a product return",
+          "external values, exceptions, and state effects remain unknown"
+        ]
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL flows 109->111/115 plus product return composition",
+          "raw_relation_kind": "value_flow",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; decrypt_api_key normal result may influence criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": [
+          "the relevant normal or caught-exception path reaches a product return",
+          "external values, exceptions, and state effects remain unknown"
+        ]
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL exceptional successor candidate 109->118 plus product return composition",
+          "raw_relation_kind": "exception_dependence",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; decrypt_api_key caught exception may influence criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": [
+          "the relevant normal or caught-exception path reaches a product return",
+          "external values, exceptions, and state effects remain unknown"
+        ]
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 116,
+          "end_line": 116
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "provenance": {
+          "source": "CodeQL global reference + exact loader namespace/tuple/destructuring proof + exact CodeQL identity-expression endpoint",
+          "raw_relation_kind": "value_flow",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; criterion:1",
+        "observation_ids": [
+          "criterion:1"
+        ],
+        "assumptions": [
+          "no unsupported runtime mutation occurs outside authenticated visible intervals",
+          "this is a may-influence chain, not proof of the runtime identity outcome"
+        ]
+      }
+    ],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "function_origin",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "verified_incomplete"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [
+        "authenticated frontend bridges are explicit inputs, not backend-native dynamic resolution"
+      ],
+      "unknown_effects": [
+        {
+          "boundary_id": "src/src/backend/base/langflow/services/auth/mcp_encryption.py:106:get_settings_service",
+          "effect": {
+            "normal_return": "may supply decrypt_api_key argument 1 and thereby influence criterion:0",
+            "exception": "may prevent the product call from returning and criterion:0 from being reached",
+            "state_alias_scope": "returned service object and externally reachable state are unknown"
+          },
+          "scope": {
+            "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+            "start_line": 106,
+            "call": "get_settings_service"
+          },
+          "provenance": "structured unknown supplied by langflow backend study",
+          "precision": "unresolved; copied without inferring concrete effects",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "src/src/backend/base/langflow/services/auth/mcp_encryption.py:109:auth_utils.decrypt_api_key",
+          "effect": {
+            "normal_return": "may influence guard line 111 and comparison return line 115",
+            "exception": "caught listed exceptions may select handler return line 118; other exceptions may prevent the product call from returning",
+            "state_alias_scope": "reachable argument, settings-service, and auth-utils state effects are unknown"
+          },
+          "scope": {
+            "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+            "start_line": 109,
+            "call": "auth_utils.decrypt_api_key"
+          },
+          "provenance": "structured unknown supplied by langflow backend study",
+          "precision": "unresolved; copied without inferring concrete effects",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "tests/test_189is_encrypted.py:104:is_encrypted",
+          "effect": {
+            "normal_return": "may flow to criterion:0 at line 106",
+            "exception": "may prevent criteria at lines 106 and 115 from being reached",
+            "state_alias_scope": "dynamic callable effects beyond visible product facts are unknown"
+          },
+          "scope": {
+            "logical_path": "tests/test_189is_encrypted.py",
+            "start_line": 104,
+            "call": "is_encrypted"
+          },
+          "provenance": "structured unknown supplied by langflow backend study",
+          "precision": "unresolved; copied without inferring concrete effects",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "pre_registered_unknown",
+          "reason": "CodeQL does not resolve the exec-created function object to the test call without the authenticated frontend bridge"
+        },
+        {
+          "scope": "pre_registered_unknown",
+          "reason": "masked Mock values, decrypt outcomes, concrete exceptions, and path feasibility"
+        },
+        {
+          "scope": "pre_registered_unknown",
+          "reason": "unsupported dynamic namespace or callable rebinding"
+        },
+        {
+          "scope": "study_unknown",
+          "reason": "CodeQL does not resolve the exec-created function object to the test call without the authenticated frontend bridge"
+        },
+        {
+          "scope": "study_unknown",
+          "reason": "masked Mock values, decrypt outcomes, concrete exceptions, and path feasibility"
+        },
+        {
+          "scope": "study_unknown",
+          "reason": "unsupported dynamic namespace or callable rebinding"
+        },
+        {
+          "scope": "study_unknown",
+          "reason": "The bridge establishes conditional may-influence chains, not concrete runtime values."
+        },
+        {
+          "scope": "study_unknown",
+          "reason": "CodeQL return/control facts do not establish complete path feasibility."
+        }
+      ]
+    },
+    "completion": {
+      "status": "partial",
+      "stage": "langflow_contract_projection",
+      "failure_categories": [
+        "bounded_unknown_effects",
+        "path_feasibility_not_evaluated"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "verified_incomplete",
+      "reviewer": "contract_projection",
+      "evidence": [
+        {
+          "backend_evidence_rows_exact": 23,
+          "criterion0_result_flow": true,
+          "criterion0_dependency_paths": [
+            "106->109",
+            "109->111/115",
+            "109~exception->118"
+          ],
+          "criterion1_exact_frontend_and_backend_expression_composed": true
+        }
+      ],
+      "notes": "typed bounded evidence projected; independent review remains separate"
+    },
+    "cost": {
+      "timings_seconds": {
+        "database": 4.7080329240016,
+        "query": 7.312574212999607,
+        "decode": 0.5160364379989915
+      },
+      "total_seconds": 13.30811821199677,
+      "total_scope": "bounded langflow backend bridge",
+      "peak_memory": {
+        "status": "measured_per_process_max",
+        "bytes": 662220800,
+        "reason": "maximum of phase process RSS values; not a simultaneous run peak"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "cache isolation was not supplied"
+      },
+      "input_size": {
+        "files": 2,
+        "bytes": 8088
+      },
+      "graph_size": {
+        "nodes": null,
+        "edges": null,
+        "relation_count": 31,
+        "reason": "backend graph size is not exported"
+      },
+      "unavailable_phases": []
+    }
+  },
+  "source": {
+    "scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_189is_encrypted.py",
+        "sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+        "bytes": 3541,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:1",
+        "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "sha256": "bfe36ac83538a629ee670c81b20ab9e3682688be7a031b7e61522b1779ea4c8b",
+        "bytes": 4547,
+        "selection_role": "visible_product"
+      }
+    ],
+    "adapter_validation": "exact_paths_and_sha256"
+  },
+  "provenance": {
+    "driver": "experiments/backward-slicing/python-backend-pilot/run_langflow_backend.py",
+    "driver_sha256": "777bdf09687add53007254054d28dbad1241833e6f123c0e40b66d3619563935",
+    "driver_output": "/home/haon/projects/Mockspec/out/mockbench-study/issue31-python-batch-langflow-scrubbed-smoke-20261111-r1/driver",
+    "artifacts": {
+      "terminal": {
+        "path": "/home/haon/projects/Mockspec/out/mockbench-study/issue31-python-batch-langflow-scrubbed-smoke-20261111-r1/driver/receipt.json",
+        "sha256": "4e4ae7459e481b0c86bc908ba1b865b2c9a626e534fccb239810de0130808f92"
+      },
+      "case_study": {
+        "path": "/home/haon/projects/Mockspec/out/mockbench-study/issue31-python-batch-langflow-scrubbed-smoke-20261111-r1/driver/study.json",
+        "sha256": "bf5702d77234bcc7a0a921d71e475eac79bb29902b3af51e2c3eb84935b78983"
+      },
+      "input_manifest": {
+        "path": "/home/haon/projects/Mockspec/out/mockbench-study/issue31-python-batch-langflow-scrubbed-smoke-20261111-r1/driver/input-manifest.json",
+        "sha256": "95123f2de08595bfcdbd5d31e70e48328ca45f38caf59d75834676cf782567d2"
+      }
+    },
+    "target_executed": false,
+    "loader_executed": false,
+    "mechanism_probes_counted_as_dataset_cases": false,
+    "driver_environment": {
+      "values": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "PATH": "/bin:/usr/bin"
+      },
+      "python_executable": "/home/haon/projects/Mockspec/.venv/bin/python",
+      "home": "omitted; neither accepted driver requires user configuration",
+      "policy": "fixed locale plus os.defpath; no inherited environment or credentials"
+    },
+    "precision": "Exact frozen adapter identity and source hashes; only the selected case_result is returned. Backend qualification probes, when used by the Flask driver, are not dataset cases."
+  },
+  "cost": {
+    "database": {
+      "exit_code": 0,
+      "seconds": 4.7080329240016,
+      "peak_rss_bytes": 225353728
+    },
+    "query": {
+      "exit_code": 0,
+      "seconds": 7.312574212999607,
+      "peak_rss_bytes": 662220800
+    },
+    "decode": {
+      "exit_code": 0,
+      "seconds": 0.5160364379989915,
+      "peak_rss_bytes": 91103232
+    },
+    "total_seconds": 13.30811821199677,
+    "cache_state": "cold; OS and CodeQL distribution caches not isolated"
+  },
+  "terminal": {
+    "execution": "complete",
+    "semantic_validation": "verified_incomplete",
+    "completion": "partial"
+  }
+}

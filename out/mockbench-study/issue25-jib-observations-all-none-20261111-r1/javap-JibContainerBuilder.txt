@@ -1,0 +1,859 @@
+Compiled from "JibContainerBuilder.java"
+public class com.google.cloud.tools.jib.api.JibContainerBuilder {
+  private final com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder containerBuildPlanBuilder;
+
+  private final com.google.cloud.tools.jib.configuration.ContainerConfiguration$Builder containerConfigurationBuilder;
+
+  private final com.google.cloud.tools.jib.configuration.BuildContext$Builder buildContextBuilder;
+
+  private com.google.cloud.tools.jib.configuration.ImageConfiguration baseImageConfiguration;
+
+  private java.util.List<com.google.cloud.tools.jib.api.buildplan.FileEntriesLayer> layerConfigurations;
+
+  private static java.lang.String capitalizeFirstLetter(java.lang.String);
+    Code:
+       0: aload_0
+       1: invokevirtual #1                  // Method java/lang/String.isEmpty:()Z
+       4: ifeq          9
+       7: aload_0
+       8: areturn
+       9: new           #2                  // class java/lang/StringBuilder
+      12: dup
+      13: invokespecial #3                  // Method java/lang/StringBuilder."<init>":()V
+      16: aload_0
+      17: iconst_0
+      18: invokevirtual #4                  // Method java/lang/String.charAt:(I)C
+      21: invokestatic  #5                  // Method java/lang/Character.toUpperCase:(C)C
+      24: invokevirtual #6                  // Method java/lang/StringBuilder.append:(C)Ljava/lang/StringBuilder;
+      27: aload_0
+      28: iconst_1
+      29: invokevirtual #7                  // Method java/lang/String.substring:(I)Ljava/lang/String;
+      32: invokevirtual #8                  // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      35: invokevirtual #9                  // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      38: areturn
+
+  com.google.cloud.tools.jib.api.JibContainerBuilder(com.google.cloud.tools.jib.api.RegistryImage);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokevirtual #10                 // Method com/google/cloud/tools/jib/api/RegistryImage.getImageReference:()Lcom/google/cloud/tools/jib/api/ImageReference;
+       5: invokestatic  #11                 // Method com/google/cloud/tools/jib/configuration/ImageConfiguration.builder:(Lcom/google/cloud/tools/jib/api/ImageReference;)Lcom/google/cloud/tools/jib/configuration/ImageConfiguration$Builder;
+       8: aload_1
+       9: invokevirtual #12                 // Method com/google/cloud/tools/jib/api/RegistryImage.getCredentialRetrievers:()Ljava/util/List;
+      12: invokevirtual #13                 // Method com/google/cloud/tools/jib/configuration/ImageConfiguration$Builder.setCredentialRetrievers:(Ljava/util/List;)Lcom/google/cloud/tools/jib/configuration/ImageConfiguration$Builder;
+      15: invokevirtual #14                 // Method com/google/cloud/tools/jib/configuration/ImageConfiguration$Builder.build:()Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;
+      18: invokestatic  #15                 // Method com/google/cloud/tools/jib/configuration/BuildContext.builder:()Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      21: invokespecial #16                 // Method "<init>":(Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;)V
+      24: return
+
+  com.google.cloud.tools.jib.api.JibContainerBuilder(com.google.cloud.tools.jib.api.DockerDaemonImage);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokevirtual #17                 // Method com/google/cloud/tools/jib/api/DockerDaemonImage.getImageReference:()Lcom/google/cloud/tools/jib/api/ImageReference;
+       5: invokestatic  #11                 // Method com/google/cloud/tools/jib/configuration/ImageConfiguration.builder:(Lcom/google/cloud/tools/jib/api/ImageReference;)Lcom/google/cloud/tools/jib/configuration/ImageConfiguration$Builder;
+       8: new           #18                 // class com/google/cloud/tools/jib/docker/DockerClient
+      11: dup
+      12: aload_1
+      13: invokevirtual #19                 // Method com/google/cloud/tools/jib/api/DockerDaemonImage.getDockerExecutable:()Ljava/nio/file/Path;
+      16: aload_1
+      17: invokevirtual #20                 // Method com/google/cloud/tools/jib/api/DockerDaemonImage.getDockerEnvironment:()Ljava/util/Map;
+      20: invokespecial #21                 // Method com/google/cloud/tools/jib/docker/DockerClient."<init>":(Ljava/nio/file/Path;Ljava/util/Map;)V
+      23: invokevirtual #22                 // Method com/google/cloud/tools/jib/configuration/ImageConfiguration$Builder.setDockerClient:(Lcom/google/cloud/tools/jib/docker/DockerClient;)Lcom/google/cloud/tools/jib/configuration/ImageConfiguration$Builder;
+      26: invokevirtual #14                 // Method com/google/cloud/tools/jib/configuration/ImageConfiguration$Builder.build:()Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;
+      29: invokestatic  #15                 // Method com/google/cloud/tools/jib/configuration/BuildContext.builder:()Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      32: invokespecial #16                 // Method "<init>":(Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;)V
+      35: return
+
+  com.google.cloud.tools.jib.api.JibContainerBuilder(com.google.cloud.tools.jib.api.TarImage);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokevirtual #23                 // Method com/google/cloud/tools/jib/api/TarImage.getImageReference:()Ljava/util/Optional;
+       5: invokestatic  #24                 // Method com/google/cloud/tools/jib/api/ImageReference.scratch:()Lcom/google/cloud/tools/jib/api/ImageReference;
+       8: invokevirtual #25                 // Method java/util/Optional.orElse:(Ljava/lang/Object;)Ljava/lang/Object;
+      11: checkcast     #26                 // class com/google/cloud/tools/jib/api/ImageReference
+      14: invokestatic  #11                 // Method com/google/cloud/tools/jib/configuration/ImageConfiguration.builder:(Lcom/google/cloud/tools/jib/api/ImageReference;)Lcom/google/cloud/tools/jib/configuration/ImageConfiguration$Builder;
+      17: aload_1
+      18: invokevirtual #27                 // Method com/google/cloud/tools/jib/api/TarImage.getPath:()Ljava/nio/file/Path;
+      21: invokevirtual #28                 // Method com/google/cloud/tools/jib/configuration/ImageConfiguration$Builder.setTarPath:(Ljava/nio/file/Path;)Lcom/google/cloud/tools/jib/configuration/ImageConfiguration$Builder;
+      24: invokevirtual #14                 // Method com/google/cloud/tools/jib/configuration/ImageConfiguration$Builder.build:()Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;
+      27: invokestatic  #15                 // Method com/google/cloud/tools/jib/configuration/BuildContext.builder:()Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      30: invokespecial #16                 // Method "<init>":(Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;)V
+      33: return
+
+  com.google.cloud.tools.jib.api.JibContainerBuilder(com.google.cloud.tools.jib.configuration.ImageConfiguration, com.google.cloud.tools.jib.configuration.BuildContext$Builder);
+    Code:
+       0: aload_0
+       1: invokespecial #29                 // Method java/lang/Object."<init>":()V
+       4: aload_0
+       5: invokestatic  #30                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.builder:()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: putfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      11: aload_0
+      12: invokestatic  #32                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration.builder:()Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      15: putfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      18: aload_0
+      19: new           #34                 // class java/util/ArrayList
+      22: dup
+      23: invokespecial #35                 // Method java/util/ArrayList."<init>":()V
+      26: putfield      #36                 // Field layerConfigurations:Ljava/util/List;
+      29: aload_0
+      30: aload_2
+      31: aload_1
+      32: invokevirtual #37                 // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setBaseImageConfiguration:(Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      35: putfield      #38                 // Field buildContextBuilder:Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      38: aload_0
+      39: aload_1
+      40: putfield      #39                 // Field baseImageConfiguration:Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;
+      43: aload_0
+      44: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      47: aload_1
+      48: invokevirtual #40                 // Method com/google/cloud/tools/jib/configuration/ImageConfiguration.getImage:()Lcom/google/cloud/tools/jib/api/ImageReference;
+      51: invokevirtual #41                 // Method com/google/cloud/tools/jib/api/ImageReference.toString:()Ljava/lang/String;
+      54: invokevirtual #42                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setBaseImage:(Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      57: pop
+      58: return
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder addLayer(java.util.List<java.nio.file.Path>, com.google.cloud.tools.jib.api.buildplan.AbsoluteUnixPath) throws java.io.IOException;
+    Code:
+       0: invokestatic  #43                 // Method com/google/cloud/tools/jib/api/buildplan/FileEntriesLayer.builder:()Lcom/google/cloud/tools/jib/api/buildplan/FileEntriesLayer$Builder;
+       3: astore_3
+       4: aload_1
+       5: invokeinterface #44,  1           // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+      10: astore        4
+      12: aload         4
+      14: invokeinterface #45,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+      19: ifeq          55
+      22: aload         4
+      24: invokeinterface #46,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+      29: checkcast     #47                 // class java/nio/file/Path
+      32: astore        5
+      34: aload_3
+      35: aload         5
+      37: aload_2
+      38: aload         5
+      40: invokeinterface #48,  1           // InterfaceMethod java/nio/file/Path.getFileName:()Ljava/nio/file/Path;
+      45: invokevirtual #49                 // Method com/google/cloud/tools/jib/api/buildplan/AbsoluteUnixPath.resolve:(Ljava/nio/file/Path;)Lcom/google/cloud/tools/jib/api/buildplan/AbsoluteUnixPath;
+      48: invokevirtual #50                 // Method com/google/cloud/tools/jib/api/buildplan/FileEntriesLayer$Builder.addEntryRecursive:(Ljava/nio/file/Path;Lcom/google/cloud/tools/jib/api/buildplan/AbsoluteUnixPath;)Lcom/google/cloud/tools/jib/api/buildplan/FileEntriesLayer$Builder;
+      51: pop
+      52: goto          12
+      55: aload_0
+      56: aload_3
+      57: invokevirtual #51                 // Method com/google/cloud/tools/jib/api/buildplan/FileEntriesLayer$Builder.build:()Lcom/google/cloud/tools/jib/api/buildplan/FileEntriesLayer;
+      60: invokevirtual #52                 // Method addFileEntriesLayer:(Lcom/google/cloud/tools/jib/api/buildplan/FileEntriesLayer;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder;
+      63: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder addLayer(java.util.List<java.nio.file.Path>, java.lang.String) throws java.io.IOException;
+    Code:
+       0: aload_0
+       1: aload_1
+       2: aload_2
+       3: invokestatic  #53                 // Method com/google/cloud/tools/jib/api/buildplan/AbsoluteUnixPath.get:(Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/buildplan/AbsoluteUnixPath;
+       6: invokevirtual #54                 // Method addLayer:(Ljava/util/List;Lcom/google/cloud/tools/jib/api/buildplan/AbsoluteUnixPath;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder;
+       9: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder addLayer(com.google.cloud.tools.jib.api.LayerConfiguration);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokevirtual #55                 // Method com/google/cloud/tools/jib/api/LayerConfiguration.toFileEntriesLayer:()Lcom/google/cloud/tools/jib/api/buildplan/FileEntriesLayer;
+       5: invokevirtual #52                 // Method addFileEntriesLayer:(Lcom/google/cloud/tools/jib/api/buildplan/FileEntriesLayer;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder;
+       8: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder addFileEntriesLayer(com.google.cloud.tools.jib.api.buildplan.FileEntriesLayer);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #56                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.addLayer:(Lcom/google/cloud/tools/jib/api/buildplan/LayerObject;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: pop
+       9: aload_0
+      10: getfield      #36                 // Field layerConfigurations:Ljava/util/List;
+      13: aload_1
+      14: invokeinterface #57,  2           // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+      19: pop
+      20: aload_0
+      21: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setLayers(java.util.List<com.google.cloud.tools.jib.api.LayerConfiguration>);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokeinterface #58,  1           // InterfaceMethod java/util/List.stream:()Ljava/util/stream/Stream;
+       7: invokedynamic #59,  0             // InvokeDynamic #0:apply:()Ljava/util/function/Function;
+      12: invokeinterface #60,  2           // InterfaceMethod java/util/stream/Stream.map:(Ljava/util/function/Function;)Ljava/util/stream/Stream;
+      17: invokestatic  #61                 // Method java/util/stream/Collectors.toList:()Ljava/util/stream/Collector;
+      20: invokeinterface #62,  2           // InterfaceMethod java/util/stream/Stream.collect:(Ljava/util/stream/Collector;)Ljava/lang/Object;
+      25: checkcast     #63                 // class java/util/List
+      28: invokevirtual #64                 // Method setFileEntriesLayers:(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder;
+      31: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setFileEntriesLayers(java.util.List<com.google.cloud.tools.jib.api.buildplan.FileEntriesLayer>);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #65                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setLayers:(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: pop
+       9: aload_0
+      10: new           #34                 // class java/util/ArrayList
+      13: dup
+      14: aload_1
+      15: invokespecial #66                 // Method java/util/ArrayList."<init>":(Ljava/util/Collection;)V
+      18: putfield      #36                 // Field layerConfigurations:Ljava/util/List;
+      21: aload_0
+      22: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setLayers(com.google.cloud.tools.jib.api.LayerConfiguration...);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokestatic  #67                 // Method java/util/Arrays.asList:([Ljava/lang/Object;)Ljava/util/List;
+       5: invokevirtual #68                 // Method setLayers:(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder;
+       8: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setFileEntriesLayers(com.google.cloud.tools.jib.api.buildplan.FileEntriesLayer...);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokestatic  #67                 // Method java/util/Arrays.asList:([Ljava/lang/Object;)Ljava/util/List;
+       5: invokevirtual #64                 // Method setFileEntriesLayers:(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder;
+       8: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setEntrypoint(java.util.List<java.lang.String>);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #69                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setEntrypoint:(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: pop
+       9: aload_0
+      10: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      13: aload_1
+      14: invokevirtual #70                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setEntrypoint:(Ljava/util/List;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      17: pop
+      18: aload_0
+      19: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setEntrypoint(java.lang.String...);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokestatic  #67                 // Method java/util/Arrays.asList:([Ljava/lang/Object;)Ljava/util/List;
+       5: invokevirtual #71                 // Method setEntrypoint:(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder;
+       8: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setProgramArguments(java.util.List<java.lang.String>);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #72                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setCmd:(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: pop
+       9: aload_0
+      10: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      13: aload_1
+      14: invokevirtual #73                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setProgramArguments:(Ljava/util/List;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      17: pop
+      18: aload_0
+      19: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setProgramArguments(java.lang.String...);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokestatic  #67                 // Method java/util/Arrays.asList:([Ljava/lang/Object;)Ljava/util/List;
+       5: invokevirtual #74                 // Method setProgramArguments:(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder;
+       8: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setEnvironment(java.util.Map<java.lang.String, java.lang.String>);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #75                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setEnvironment:(Ljava/util/Map;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: pop
+       9: aload_0
+      10: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      13: aload_1
+      14: invokevirtual #76                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setEnvironment:(Ljava/util/Map;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      17: pop
+      18: aload_0
+      19: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder addEnvironmentVariable(java.lang.String, java.lang.String);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: aload_2
+       6: invokevirtual #77                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.addEnvironmentVariable:(Ljava/lang/String;Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       9: pop
+      10: aload_0
+      11: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      14: aload_1
+      15: aload_2
+      16: invokevirtual #78                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.addEnvironment:(Ljava/lang/String;Ljava/lang/String;)V
+      19: aload_0
+      20: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setVolumes(java.util.Set<com.google.cloud.tools.jib.api.buildplan.AbsoluteUnixPath>);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #79                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setVolumes:(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: pop
+       9: aload_0
+      10: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      13: aload_1
+      14: invokevirtual #80                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setVolumes:(Ljava/util/Set;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      17: pop
+      18: aload_0
+      19: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setVolumes(com.google.cloud.tools.jib.api.buildplan.AbsoluteUnixPath...);
+    Code:
+       0: aload_0
+       1: new           #81                 // class java/util/HashSet
+       4: dup
+       5: aload_1
+       6: invokestatic  #67                 // Method java/util/Arrays.asList:([Ljava/lang/Object;)Ljava/util/List;
+       9: invokespecial #82                 // Method java/util/HashSet."<init>":(Ljava/util/Collection;)V
+      12: invokevirtual #83                 // Method setVolumes:(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder;
+      15: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder addVolume(com.google.cloud.tools.jib.api.buildplan.AbsoluteUnixPath);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #84                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.addVolume:(Lcom/google/cloud/tools/jib/api/buildplan/AbsoluteUnixPath;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: pop
+       9: aload_0
+      10: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      13: aload_1
+      14: invokevirtual #85                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.addVolume:(Lcom/google/cloud/tools/jib/api/buildplan/AbsoluteUnixPath;)V
+      17: aload_0
+      18: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setExposedPorts(java.util.Set<com.google.cloud.tools.jib.api.buildplan.Port>);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #86                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setExposedPorts:(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: pop
+       9: aload_0
+      10: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      13: aload_1
+      14: invokevirtual #87                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setExposedPorts:(Ljava/util/Set;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      17: pop
+      18: aload_0
+      19: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setExposedPorts(com.google.cloud.tools.jib.api.buildplan.Port...);
+    Code:
+       0: aload_0
+       1: new           #81                 // class java/util/HashSet
+       4: dup
+       5: aload_1
+       6: invokestatic  #67                 // Method java/util/Arrays.asList:([Ljava/lang/Object;)Ljava/util/List;
+       9: invokespecial #82                 // Method java/util/HashSet."<init>":(Ljava/util/Collection;)V
+      12: invokevirtual #88                 // Method setExposedPorts:(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder;
+      15: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder addExposedPort(com.google.cloud.tools.jib.api.buildplan.Port);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #89                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.addExposedPort:(Lcom/google/cloud/tools/jib/api/buildplan/Port;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: pop
+       9: aload_0
+      10: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      13: aload_1
+      14: invokevirtual #90                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.addExposedPort:(Lcom/google/cloud/tools/jib/api/buildplan/Port;)V
+      17: aload_0
+      18: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setLabels(java.util.Map<java.lang.String, java.lang.String>);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #91                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setLabels:(Ljava/util/Map;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: pop
+       9: aload_0
+      10: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      13: aload_1
+      14: invokevirtual #92                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setLabels:(Ljava/util/Map;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      17: pop
+      18: aload_0
+      19: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder addLabel(java.lang.String, java.lang.String);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: aload_2
+       6: invokevirtual #93                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.addLabel:(Ljava/lang/String;Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       9: pop
+      10: aload_0
+      11: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      14: aload_1
+      15: aload_2
+      16: invokevirtual #94                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.addLabel:(Ljava/lang/String;Ljava/lang/String;)V
+      19: aload_0
+      20: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setFormat(com.google.cloud.tools.jib.api.buildplan.ImageFormat);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #95                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setFormat:(Lcom/google/cloud/tools/jib/api/buildplan/ImageFormat;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: pop
+       9: aload_0
+      10: getfield      #38                 // Field buildContextBuilder:Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      13: aload_1
+      14: invokevirtual #96                 // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setTargetFormat:(Lcom/google/cloud/tools/jib/api/buildplan/ImageFormat;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      17: pop
+      18: aload_0
+      19: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setCreationTime(java.time.Instant);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #97                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setCreationTime:(Ljava/time/Instant;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: pop
+       9: aload_0
+      10: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      13: aload_1
+      14: invokevirtual #98                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setCreationTime:(Ljava/time/Instant;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      17: pop
+      18: aload_0
+      19: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setPlatforms(java.util.Set<com.google.cloud.tools.jib.api.buildplan.Platform>);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #99                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setPlatforms:(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: pop
+       9: aload_0
+      10: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      13: aload_1
+      14: invokevirtual #100                // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setPlatforms:(Ljava/util/Set;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      17: pop
+      18: aload_0
+      19: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder addPlatform(java.lang.String, java.lang.String);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: aload_2
+       6: invokevirtual #101                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.addPlatform:(Ljava/lang/String;Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       9: pop
+      10: aload_0
+      11: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      14: aload_1
+      15: aload_2
+      16: invokevirtual #102                // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.addPlatform:(Ljava/lang/String;Ljava/lang/String;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      19: pop
+      20: aload_0
+      21: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setUser(java.lang.String);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #103                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setUser:(Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: pop
+       9: aload_0
+      10: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      13: aload_1
+      14: invokevirtual #104                // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setUser:(Ljava/lang/String;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      17: pop
+      18: aload_0
+      19: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder setWorkingDirectory(com.google.cloud.tools.jib.api.buildplan.AbsoluteUnixPath);
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #105                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setWorkingDirectory:(Lcom/google/cloud/tools/jib/api/buildplan/AbsoluteUnixPath;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       8: pop
+       9: aload_0
+      10: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      13: aload_1
+      14: invokevirtual #106                // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setWorkingDirectory:(Lcom/google/cloud/tools/jib/api/buildplan/AbsoluteUnixPath;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      17: pop
+      18: aload_0
+      19: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainer containerize(com.google.cloud.tools.jib.api.Containerizer) throws java.lang.InterruptedException, com.google.cloud.tools.jib.api.RegistryException, java.io.IOException, com.google.cloud.tools.jib.api.CacheDirectoryCreationException, java.util.concurrent.ExecutionException;
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokevirtual #107                // Method toBuildContext:(Lcom/google/cloud/tools/jib/api/Containerizer;)Lcom/google/cloud/tools/jib/configuration/BuildContext;
+       5: astore_2
+       6: new           #108                // class com/google/cloud/tools/jib/builder/TimerEventDispatcher
+       9: dup
+      10: aload_2
+      11: invokevirtual #109                // Method com/google/cloud/tools/jib/configuration/BuildContext.getEventHandlers:()Lcom/google/cloud/tools/jib/event/EventHandlers;
+      14: aload_1
+      15: invokevirtual #110                // Method com/google/cloud/tools/jib/api/Containerizer.getDescription:()Ljava/lang/String;
+      18: invokespecial #111                // Method com/google/cloud/tools/jib/builder/TimerEventDispatcher."<init>":(Lcom/google/cloud/tools/jib/event/EventHandlers;Ljava/lang/String;)V
+      21: astore_3
+      22: aload_0
+      23: aload_2
+      24: invokevirtual #109                // Method com/google/cloud/tools/jib/configuration/BuildContext.getEventHandlers:()Lcom/google/cloud/tools/jib/event/EventHandlers;
+      27: invokespecial #112                // Method logSources:(Lcom/google/cloud/tools/jib/event/EventHandlers;)V
+      30: aload_1
+      31: aload_2
+      32: invokevirtual #113                // Method com/google/cloud/tools/jib/api/Containerizer.run:(Lcom/google/cloud/tools/jib/configuration/BuildContext;)Lcom/google/cloud/tools/jib/builder/steps/BuildResult;
+      35: astore        4
+      37: aload_2
+      38: aload         4
+      40: invokestatic  #114                // Method com/google/cloud/tools/jib/api/JibContainer.from:(Lcom/google/cloud/tools/jib/configuration/BuildContext;Lcom/google/cloud/tools/jib/builder/steps/BuildResult;)Lcom/google/cloud/tools/jib/api/JibContainer;
+      43: astore        5
+      45: aload_3
+      46: invokevirtual #115                // Method com/google/cloud/tools/jib/builder/TimerEventDispatcher.close:()V
+      49: aload_2
+      50: ifnull        57
+      53: aload_2
+      54: invokevirtual #116                // Method com/google/cloud/tools/jib/configuration/BuildContext.close:()V
+      57: aload         5
+      59: areturn
+      60: astore        4
+      62: aload_3
+      63: invokevirtual #115                // Method com/google/cloud/tools/jib/builder/TimerEventDispatcher.close:()V
+      66: goto          78
+      69: astore        5
+      71: aload         4
+      73: aload         5
+      75: invokevirtual #118                // Method java/lang/Throwable.addSuppressed:(Ljava/lang/Throwable;)V
+      78: aload         4
+      80: athrow
+      81: astore_3
+      82: aload_2
+      83: ifnull        101
+      86: aload_2
+      87: invokevirtual #116                // Method com/google/cloud/tools/jib/configuration/BuildContext.close:()V
+      90: goto          101
+      93: astore        4
+      95: aload_3
+      96: aload         4
+      98: invokevirtual #118                // Method java/lang/Throwable.addSuppressed:(Ljava/lang/Throwable;)V
+     101: aload_3
+     102: athrow
+     103: astore_2
+     104: aload_2
+     105: invokevirtual #120                // Method java/util/concurrent/ExecutionException.getCause:()Ljava/lang/Throwable;
+     108: instanceof    #121                // class com/google/cloud/tools/jib/api/RegistryException
+     111: ifeq          122
+     114: aload_2
+     115: invokevirtual #120                // Method java/util/concurrent/ExecutionException.getCause:()Ljava/lang/Throwable;
+     118: checkcast     #121                // class com/google/cloud/tools/jib/api/RegistryException
+     121: athrow
+     122: aload_2
+     123: athrow
+    Exception table:
+       from    to  target type
+          22    45    60   Class java/lang/Throwable
+          62    66    69   Class java/lang/Throwable
+           6    49    81   Class java/lang/Throwable
+          60    81    81   Class java/lang/Throwable
+          86    90    93   Class java/lang/Throwable
+           0    57   103   Class java/util/concurrent/ExecutionException
+          60   103   103   Class java/util/concurrent/ExecutionException
+
+  public com.google.cloud.tools.jib.api.JibContainerDescription describeContainer();
+    Code:
+       0: new           #122                // class com/google/cloud/tools/jib/api/JibContainerDescription
+       3: dup
+       4: aload_0
+       5: getfield      #36                 // Field layerConfigurations:Ljava/util/List;
+       8: invokespecial #123                // Method com/google/cloud/tools/jib/api/JibContainerDescription."<init>":(Ljava/util/List;)V
+      11: areturn
+
+  public com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan toContainerBuildPlan();
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: invokevirtual #124                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.build:()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan;
+       7: areturn
+
+  public com.google.cloud.tools.jib.api.JibContainerBuilder applyContainerBuildPlan(com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan) throws com.google.cloud.tools.jib.api.InvalidImageReferenceException;
+    Code:
+       0: aload_0
+       1: getfield      #31                 // Field containerBuildPlanBuilder:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+       4: aload_1
+       5: invokevirtual #125                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getBaseImage:()Ljava/lang/String;
+       8: invokevirtual #42                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setBaseImage:(Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      11: aload_1
+      12: invokevirtual #126                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getPlatforms:()Ljava/util/Set;
+      15: invokevirtual #99                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setPlatforms:(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      18: aload_1
+      19: invokevirtual #127                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getCreationTime:()Ljava/time/Instant;
+      22: invokevirtual #97                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setCreationTime:(Ljava/time/Instant;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      25: aload_1
+      26: invokevirtual #128                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getFormat:()Lcom/google/cloud/tools/jib/api/buildplan/ImageFormat;
+      29: invokevirtual #95                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setFormat:(Lcom/google/cloud/tools/jib/api/buildplan/ImageFormat;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      32: aload_1
+      33: invokevirtual #129                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getEnvironment:()Ljava/util/Map;
+      36: invokevirtual #75                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setEnvironment:(Ljava/util/Map;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      39: aload_1
+      40: invokevirtual #130                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getLabels:()Ljava/util/Map;
+      43: invokevirtual #91                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setLabels:(Ljava/util/Map;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      46: aload_1
+      47: invokevirtual #131                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getVolumes:()Ljava/util/Set;
+      50: invokevirtual #79                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setVolumes:(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      53: aload_1
+      54: invokevirtual #132                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getExposedPorts:()Ljava/util/Set;
+      57: invokevirtual #86                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setExposedPorts:(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      60: aload_1
+      61: invokevirtual #133                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getUser:()Ljava/lang/String;
+      64: invokevirtual #103                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setUser:(Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      67: aload_1
+      68: invokevirtual #134                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getWorkingDirectory:()Lcom/google/cloud/tools/jib/api/buildplan/AbsoluteUnixPath;
+      71: invokevirtual #105                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setWorkingDirectory:(Lcom/google/cloud/tools/jib/api/buildplan/AbsoluteUnixPath;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      74: aload_1
+      75: invokevirtual #135                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getEntrypoint:()Ljava/util/List;
+      78: invokevirtual #69                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setEntrypoint:(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      81: aload_1
+      82: invokevirtual #136                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getCmd:()Ljava/util/List;
+      85: invokevirtual #72                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setCmd:(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      88: aload_1
+      89: invokevirtual #137                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getLayers:()Ljava/util/List;
+      92: invokevirtual #65                 // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder.setLayers:(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;
+      95: pop
+      96: aload_0
+      97: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+     100: aload_1
+     101: invokevirtual #126                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getPlatforms:()Ljava/util/Set;
+     104: invokevirtual #100                // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setPlatforms:(Ljava/util/Set;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+     107: aload_1
+     108: invokevirtual #127                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getCreationTime:()Ljava/time/Instant;
+     111: invokevirtual #98                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setCreationTime:(Ljava/time/Instant;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+     114: aload_1
+     115: invokevirtual #129                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getEnvironment:()Ljava/util/Map;
+     118: invokevirtual #76                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setEnvironment:(Ljava/util/Map;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+     121: aload_1
+     122: invokevirtual #130                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getLabels:()Ljava/util/Map;
+     125: invokevirtual #92                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setLabels:(Ljava/util/Map;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+     128: aload_1
+     129: invokevirtual #131                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getVolumes:()Ljava/util/Set;
+     132: invokevirtual #80                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setVolumes:(Ljava/util/Set;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+     135: aload_1
+     136: invokevirtual #132                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getExposedPorts:()Ljava/util/Set;
+     139: invokevirtual #87                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setExposedPorts:(Ljava/util/Set;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+     142: aload_1
+     143: invokevirtual #133                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getUser:()Ljava/lang/String;
+     146: invokevirtual #104                // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setUser:(Ljava/lang/String;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+     149: aload_1
+     150: invokevirtual #134                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getWorkingDirectory:()Lcom/google/cloud/tools/jib/api/buildplan/AbsoluteUnixPath;
+     153: invokevirtual #106                // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setWorkingDirectory:(Lcom/google/cloud/tools/jib/api/buildplan/AbsoluteUnixPath;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+     156: aload_1
+     157: invokevirtual #135                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getEntrypoint:()Ljava/util/List;
+     160: invokevirtual #70                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setEntrypoint:(Ljava/util/List;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+     163: aload_1
+     164: invokevirtual #136                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getCmd:()Ljava/util/List;
+     167: invokevirtual #73                 // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.setProgramArguments:(Ljava/util/List;)Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+     170: pop
+     171: aload_1
+     172: invokevirtual #125                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getBaseImage:()Ljava/lang/String;
+     175: invokestatic  #138                // Method com/google/cloud/tools/jib/api/ImageReference.parse:(Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/ImageReference;
+     178: invokestatic  #11                 // Method com/google/cloud/tools/jib/configuration/ImageConfiguration.builder:(Lcom/google/cloud/tools/jib/api/ImageReference;)Lcom/google/cloud/tools/jib/configuration/ImageConfiguration$Builder;
+     181: aload_0
+     182: getfield      #39                 // Field baseImageConfiguration:Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;
+     185: invokevirtual #139                // Method com/google/cloud/tools/jib/configuration/ImageConfiguration.getCredentialRetrievers:()Lcom/google/common/collect/ImmutableList;
+     188: invokevirtual #13                 // Method com/google/cloud/tools/jib/configuration/ImageConfiguration$Builder.setCredentialRetrievers:(Ljava/util/List;)Lcom/google/cloud/tools/jib/configuration/ImageConfiguration$Builder;
+     191: astore_2
+     192: aload_0
+     193: getfield      #39                 // Field baseImageConfiguration:Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;
+     196: invokevirtual #140                // Method com/google/cloud/tools/jib/configuration/ImageConfiguration.getDockerClient:()Ljava/util/Optional;
+     199: aload_2
+     200: dup
+     201: invokestatic  #141                // Method java/util/Objects.requireNonNull:(Ljava/lang/Object;)Ljava/lang/Object;
+     204: pop
+     205: invokedynamic #142,  0            // InvokeDynamic #1:accept:(Lcom/google/cloud/tools/jib/configuration/ImageConfiguration$Builder;)Ljava/util/function/Consumer;
+     210: invokevirtual #143                // Method java/util/Optional.ifPresent:(Ljava/util/function/Consumer;)V
+     213: aload_0
+     214: getfield      #39                 // Field baseImageConfiguration:Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;
+     217: invokevirtual #144                // Method com/google/cloud/tools/jib/configuration/ImageConfiguration.getTarPath:()Ljava/util/Optional;
+     220: aload_2
+     221: dup
+     222: invokestatic  #141                // Method java/util/Objects.requireNonNull:(Ljava/lang/Object;)Ljava/lang/Object;
+     225: pop
+     226: invokedynamic #145,  0            // InvokeDynamic #2:accept:(Lcom/google/cloud/tools/jib/configuration/ImageConfiguration$Builder;)Ljava/util/function/Consumer;
+     231: invokevirtual #143                // Method java/util/Optional.ifPresent:(Ljava/util/function/Consumer;)V
+     234: aload_0
+     235: aload_2
+     236: invokevirtual #14                 // Method com/google/cloud/tools/jib/configuration/ImageConfiguration$Builder.build:()Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;
+     239: putfield      #39                 // Field baseImageConfiguration:Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;
+     242: invokedynamic #146,  0            // InvokeDynamic #3:apply:()Ljava/util/function/Function;
+     247: astore_3
+     248: aload_0
+     249: aload_1
+     250: invokevirtual #137                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getLayers:()Ljava/util/List;
+     253: invokeinterface #58,  1           // InterfaceMethod java/util/List.stream:()Ljava/util/stream/Stream;
+     258: aload_3
+     259: invokeinterface #60,  2           // InterfaceMethod java/util/stream/Stream.map:(Ljava/util/function/Function;)Ljava/util/stream/Stream;
+     264: invokestatic  #61                 // Method java/util/stream/Collectors.toList:()Ljava/util/stream/Collector;
+     267: invokeinterface #62,  2           // InterfaceMethod java/util/stream/Stream.collect:(Ljava/util/stream/Collector;)Ljava/lang/Object;
+     272: checkcast     #63                 // class java/util/List
+     275: putfield      #36                 // Field layerConfigurations:Ljava/util/List;
+     278: aload_0
+     279: getfield      #38                 // Field buildContextBuilder:Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+     282: aload_1
+     283: invokevirtual #128                // Method com/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan.getFormat:()Lcom/google/cloud/tools/jib/api/buildplan/ImageFormat;
+     286: invokevirtual #96                 // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setTargetFormat:(Lcom/google/cloud/tools/jib/api/buildplan/ImageFormat;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+     289: aload_0
+     290: getfield      #39                 // Field baseImageConfiguration:Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;
+     293: invokevirtual #37                 // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setBaseImageConfiguration:(Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+     296: aload_0
+     297: getfield      #36                 // Field layerConfigurations:Ljava/util/List;
+     300: invokevirtual #147                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setLayerConfigurations:(Ljava/util/List;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+     303: pop
+     304: aload_0
+     305: areturn
+
+  com.google.cloud.tools.jib.configuration.BuildContext toBuildContext(com.google.cloud.tools.jib.api.Containerizer) throws com.google.cloud.tools.jib.api.CacheDirectoryCreationException;
+    Code:
+       0: aload_0
+       1: getfield      #38                 // Field buildContextBuilder:Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+       4: aload_1
+       5: invokevirtual #148                // Method com/google/cloud/tools/jib/api/Containerizer.getImageConfiguration:()Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;
+       8: invokevirtual #149                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setTargetImageConfiguration:(Lcom/google/cloud/tools/jib/configuration/ImageConfiguration;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      11: aload_1
+      12: invokevirtual #150                // Method com/google/cloud/tools/jib/api/Containerizer.getAdditionalTags:()Ljava/util/Set;
+      15: invokevirtual #151                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setAdditionalTargetImageTags:(Ljava/util/Set;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      18: aload_1
+      19: invokevirtual #152                // Method com/google/cloud/tools/jib/api/Containerizer.getBaseImageLayersCacheDirectory:()Ljava/nio/file/Path;
+      22: invokevirtual #153                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setBaseImageLayersCacheDirectory:(Ljava/nio/file/Path;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      25: aload_1
+      26: invokevirtual #154                // Method com/google/cloud/tools/jib/api/Containerizer.getApplicationLayersCacheDirectory:()Ljava/nio/file/Path;
+      29: invokevirtual #155                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setApplicationLayersCacheDirectory:(Ljava/nio/file/Path;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      32: aload_0
+      33: getfield      #33                 // Field containerConfigurationBuilder:Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder;
+      36: invokevirtual #156                // Method com/google/cloud/tools/jib/configuration/ContainerConfiguration$Builder.build:()Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration;
+      39: invokevirtual #157                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setContainerConfiguration:(Lcom/google/cloud/tools/jib/configuration/ContainerConfiguration;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      42: aload_0
+      43: getfield      #36                 // Field layerConfigurations:Ljava/util/List;
+      46: invokevirtual #147                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setLayerConfigurations:(Ljava/util/List;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      49: aload_1
+      50: invokevirtual #158                // Method com/google/cloud/tools/jib/api/Containerizer.getAllowInsecureRegistries:()Z
+      53: invokevirtual #159                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setAllowInsecureRegistries:(Z)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      56: aload_1
+      57: invokevirtual #160                // Method com/google/cloud/tools/jib/api/Containerizer.isOfflineMode:()Z
+      60: invokevirtual #161                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setOffline:(Z)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      63: aload_1
+      64: invokevirtual #162                // Method com/google/cloud/tools/jib/api/Containerizer.getToolName:()Ljava/lang/String;
+      67: invokevirtual #163                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setToolName:(Ljava/lang/String;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      70: aload_1
+      71: invokevirtual #164                // Method com/google/cloud/tools/jib/api/Containerizer.getToolVersion:()Ljava/lang/String;
+      74: invokevirtual #165                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setToolVersion:(Ljava/lang/String;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      77: aload_1
+      78: invokevirtual #166                // Method com/google/cloud/tools/jib/api/Containerizer.getExecutorService:()Ljava/util/Optional;
+      81: aconst_null
+      82: invokevirtual #25                 // Method java/util/Optional.orElse:(Ljava/lang/Object;)Ljava/lang/Object;
+      85: checkcast     #167                // class java/util/concurrent/ExecutorService
+      88: invokevirtual #168                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setExecutorService:(Ljava/util/concurrent/ExecutorService;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      91: aload_1
+      92: invokevirtual #169                // Method com/google/cloud/tools/jib/api/Containerizer.buildEventHandlers:()Lcom/google/cloud/tools/jib/event/EventHandlers;
+      95: invokevirtual #170                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setEventHandlers:(Lcom/google/cloud/tools/jib/event/EventHandlers;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+      98: aload_1
+      99: invokevirtual #171                // Method com/google/cloud/tools/jib/api/Containerizer.getAlwaysCacheBaseImage:()Z
+     102: invokevirtual #172                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setAlwaysCacheBaseImage:(Z)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+     105: aload_1
+     106: invokevirtual #173                // Method com/google/cloud/tools/jib/api/Containerizer.getRegistryMirrors:()Lcom/google/common/collect/ListMultimap;
+     109: invokevirtual #174                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.setRegistryMirrors:(Lcom/google/common/collect/ListMultimap;)Lcom/google/cloud/tools/jib/configuration/BuildContext$Builder;
+     112: invokevirtual #175                // Method com/google/cloud/tools/jib/configuration/BuildContext$Builder.build:()Lcom/google/cloud/tools/jib/configuration/BuildContext;
+     115: areturn
+
+  private void logSources(com.google.cloud.tools.jib.event.EventHandlers);
+    Code:
+       0: aload_1
+       1: ldc           #176                // String Containerizing application with the following files:
+       3: invokestatic  #177                // Method com/google/cloud/tools/jib/api/LogEvent.info:(Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/LogEvent;
+       6: invokevirtual #178                // Method com/google/cloud/tools/jib/event/EventHandlers.dispatch:(Lcom/google/cloud/tools/jib/api/JibEvent;)V
+       9: aload_0
+      10: getfield      #36                 // Field layerConfigurations:Ljava/util/List;
+      13: invokeinterface #44,  1           // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+      18: astore_2
+      19: aload_2
+      20: invokeinterface #45,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+      25: ifeq          159
+      28: aload_2
+      29: invokeinterface #46,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+      34: checkcast     #179                // class com/google/cloud/tools/jib/api/buildplan/FileEntriesLayer
+      37: astore_3
+      38: aload_3
+      39: invokevirtual #180                // Method com/google/cloud/tools/jib/api/buildplan/FileEntriesLayer.getEntries:()Ljava/util/List;
+      42: invokeinterface #181,  1          // InterfaceMethod java/util/List.isEmpty:()Z
+      47: ifeq          53
+      50: goto          19
+      53: aload_1
+      54: new           #2                  // class java/lang/StringBuilder
+      57: dup
+      58: invokespecial #3                  // Method java/lang/StringBuilder."<init>":()V
+      61: ldc           #182                // String \t
+      63: invokevirtual #8                  // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      66: aload_3
+      67: invokevirtual #183                // Method com/google/cloud/tools/jib/api/buildplan/FileEntriesLayer.getName:()Ljava/lang/String;
+      70: invokestatic  #184                // Method capitalizeFirstLetter:(Ljava/lang/String;)Ljava/lang/String;
+      73: invokevirtual #8                  // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      76: ldc           #185                // String :
+      78: invokevirtual #8                  // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      81: invokevirtual #9                  // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      84: invokestatic  #177                // Method com/google/cloud/tools/jib/api/LogEvent.info:(Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/LogEvent;
+      87: invokevirtual #178                // Method com/google/cloud/tools/jib/event/EventHandlers.dispatch:(Lcom/google/cloud/tools/jib/api/JibEvent;)V
+      90: aload_3
+      91: invokevirtual #180                // Method com/google/cloud/tools/jib/api/buildplan/FileEntriesLayer.getEntries:()Ljava/util/List;
+      94: invokeinterface #44,  1           // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+      99: astore        4
+     101: aload         4
+     103: invokeinterface #45,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+     108: ifeq          156
+     111: aload         4
+     113: invokeinterface #46,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+     118: checkcast     #186                // class com/google/cloud/tools/jib/api/buildplan/FileEntry
+     121: astore        5
+     123: aload_1
+     124: new           #2                  // class java/lang/StringBuilder
+     127: dup
+     128: invokespecial #3                  // Method java/lang/StringBuilder."<init>":()V
+     131: ldc           #187                // String \t\t
+     133: invokevirtual #8                  // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     136: aload         5
+     138: invokevirtual #188                // Method com/google/cloud/tools/jib/api/buildplan/FileEntry.getSourceFile:()Ljava/nio/file/Path;
+     141: invokevirtual #189                // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+     144: invokevirtual #9                  // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     147: invokestatic  #177                // Method com/google/cloud/tools/jib/api/LogEvent.info:(Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/LogEvent;
+     150: invokevirtual #178                // Method com/google/cloud/tools/jib/event/EventHandlers.dispatch:(Lcom/google/cloud/tools/jib/api/JibEvent;)V
+     153: goto          101
+     156: goto          19
+     159: return
+
+  private static com.google.cloud.tools.jib.api.buildplan.FileEntriesLayer lambda$applyContainerBuildPlan$0(com.google.cloud.tools.jib.api.buildplan.LayerObject);
+    Code:
+       0: aload_0
+       1: instanceof    #179                // class com/google/cloud/tools/jib/api/buildplan/FileEntriesLayer
+       4: ldc           #190                // String layer types other than FileEntriesLayer not yet supported in build plan layers
+       6: iconst_0
+       7: anewarray     #191                // class java/lang/Object
+      10: invokestatic  #192                // Method com/google/common/base/Verify.verify:(ZLjava/lang/String;[Ljava/lang/Object;)V
+      13: aload_0
+      14: checkcast     #179                // class com/google/cloud/tools/jib/api/buildplan/FileEntriesLayer
+      17: areturn
+}

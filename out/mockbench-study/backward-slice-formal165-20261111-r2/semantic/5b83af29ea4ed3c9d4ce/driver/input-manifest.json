@@ -1,0 +1,109 @@
+{
+  "schema": "mock-spec.langflow-codeql-input/v1",
+  "case_id": "langflow_189",
+  "dataset": "python-benchmark-new",
+  "inventory_revision": "0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc",
+  "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+  "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+  "masking_contract": "python-slot-v1",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_is_encrypted",
+          "start_line": 50,
+          "end_line": 115
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 106,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "line": 115,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "dynamic_loader_binding": {
+    "status": "resolved",
+    "loader": "load_is_encrypted",
+    "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+    "path_line": 13,
+    "namespace": "namespace",
+    "exec_line": 36,
+    "return_line": 37,
+    "read_line": 27,
+    "function_key": "is_encrypted",
+    "return_index": 0,
+    "function_definition": {
+      "source_id": "source:1",
+      "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+      "name": "is_encrypted",
+      "start_line": 94,
+      "end_line": 118
+    },
+    "test_bindings": [
+      {
+        "name": "is_encrypted",
+        "line": 74
+      }
+    ],
+    "call_sites": [
+      {
+        "name": "is_encrypted",
+        "line": 104
+      }
+    ]
+  },
+  "invalid_token_identity_binding": {
+    "status": "resolved",
+    "loader_class": "LocalInvalidToken",
+    "namespace": "namespace",
+    "namespace_key": "InvalidToken",
+    "namespace_assignment_line": 35,
+    "loader_return_line": 37,
+    "return_slots": [
+      {
+        "index": 0,
+        "test_name": "is_encrypted"
+      },
+      {
+        "index": 1,
+        "test_name": "invalid_token_cls"
+      }
+    ],
+    "test_binding_line": 74,
+    "observation_line": 115,
+    "comparison": "invalid_token_cls is is_encrypted.__globals__['InvalidToken']",
+    "precision": "strict_supported_python_ast"
+  },
+  "files": [
+    {
+      "logical_path": "tests/test_189is_encrypted.py",
+      "source_id": "test",
+      "sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+      "bytes": 3541,
+      "role": "masked_test"
+    },
+    {
+      "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+      "source_id": "source:1",
+      "sha256": "bfe36ac83538a629ee670c81b20ab9e3682688be7a031b7e61522b1779ea4c8b",
+      "bytes": 4547,
+      "role": "visible_product"
+    }
+  ],
+  "adaptation": "Exact visible sources materialized through FrozenDataset; loader code was not executed. The authenticated frontend binding is an explicit bridge input, not a CodeQL call-resolution result."
+}

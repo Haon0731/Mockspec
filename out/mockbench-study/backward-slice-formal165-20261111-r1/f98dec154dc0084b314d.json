@@ -1,0 +1,2033 @@
+{
+  "status": "unsupported",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap",
+    "semantic_backend_unsupported"
+  ],
+  "stage": "semantic_backend",
+  "input_context": {
+    "target_selector": "tests/test_445get_url.py::test_get_url_loads_configuration_and_waits_for_the_zq_process",
+    "masked_test_logical_path": "tests/test_445get_url.py",
+    "masked_test_sha256": "0d3e0eaaba5338faed935a52ae8c421c55c595112ae2001363f73a2d80d45c38",
+    "masking_contract": "python-slot-v1"
+  },
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_445get_url.py::test_get_url_loads_configuration_and_waits_for_the_zq_process",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_get_url_loads_configuration_and_waits_for_the_zq_process",
+          "start_line": 38,
+          "end_line": 104
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 82,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 89,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 92,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:2"
+      }
+    ],
+    "dynamic_loading": [
+      {
+        "line": 67,
+        "name": "load_function_from_source_ast",
+        "precision": "python_ast_call_name"
+      }
+    ],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_dynamic_path",
+        "hint": "src/tqsdk/zq.py",
+        "candidates": [
+          "src/tqsdk/zq.py"
+        ],
+        "precision": "exact_visible_path"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/tqsdk/zq.py",
+        "hint_kind": "python_import",
+        "hint": "tqsdk.exceptions",
+        "candidates": [
+          "src/tqsdk/exceptions.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "dynamic_loader_bindings": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 8521,
+    "read_bytes": 8521,
+    "attempted_files": 2,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_445get_url.py",
+      "sha256": "0d3e0eaaba5338faed935a52ae8c421c55c595112ae2001363f73a2d80d45c38",
+      "bytes": 3022
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/tqsdk/zq.py",
+      "sha256": "d18b2a5f055a1dd5cec88613465558e20162c08f488e18bb900099d14b4ce36c",
+      "bytes": 1837
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/tqsdk/exceptions.py",
+      "sha256": "d90559cdbd08986933a31c225fc8bbe3257943f0841c9092cbe0180ea903da8a",
+      "bytes": 3662
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "dynamic_loader_bindings": [],
+    "edges": [
+      {
+        "branch": "true",
+        "from": "test:81:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:82:8:With"
+      },
+      {
+        "field": "body",
+        "from": "test:83:12:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:82:8:With"
+      },
+      {
+        "branch": "true",
+        "from": "test:88:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:89:8:With"
+      },
+      {
+        "field": "body",
+        "from": "test:90:12:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:89:8:With"
+      },
+      {
+        "branch": "false",
+        "from": "test:88:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:92:8:Assert"
+      },
+      {
+        "from": "test:57:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:57:4:Name"
+      },
+      {
+        "from": "test:58:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:58:4:Name"
+      },
+      {
+        "from": "test:57:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:58:4:Assign",
+        "variable": "api"
+      },
+      {
+        "from": "test:62:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:62:4:Name"
+      },
+      {
+        "from": "test:66:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:66:4:Name"
+      },
+      {
+        "from": "test:67:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:67:4:Name"
+      },
+      {
+        "from": "test:39:22:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:67:4:Assign",
+        "variable": "platform"
+      },
+      {
+        "from": "test:62:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:67:4:Assign",
+        "variable": "subprocess_api"
+      },
+      {
+        "from": "test:66:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:67:4:Assign",
+        "variable": "asyncio_api"
+      },
+      {
+        "from": "test:67:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:83:12:Expr",
+        "variable": "get_url"
+      },
+      {
+        "from": "test:58:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:83:12:Expr",
+        "variable": "owner"
+      },
+      {
+        "from": "test:67:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:90:12:Expr",
+        "variable": "get_url"
+      },
+      {
+        "from": "test:58:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:90:12:Expr",
+        "variable": "owner"
+      },
+      {
+        "from": "test:67:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:92:8:Assert",
+        "variable": "get_url"
+      },
+      {
+        "from": "test:58:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:92:8:Assert",
+        "variable": "owner"
+      },
+      {
+        "callee": "get_url",
+        "from": "source:1:37:16:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:83:12:Expr"
+      },
+      {
+        "callee": "get_url",
+        "from": "source:1:36:20:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:83:12:Expr"
+      },
+      {
+        "callee": "get_url",
+        "from": "source:1:39:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:83:12:Expr"
+      },
+      {
+        "callee": "get_url",
+        "from": "source:1:41:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:83:12:Expr"
+      },
+      {
+        "callee": "get_url",
+        "from": "source:1:37:16:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:90:12:Expr"
+      },
+      {
+        "callee": "get_url",
+        "from": "source:1:36:20:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:90:12:Expr"
+      },
+      {
+        "callee": "get_url",
+        "from": "source:1:39:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:90:12:Expr"
+      },
+      {
+        "callee": "get_url",
+        "from": "source:1:41:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:90:12:Expr"
+      },
+      {
+        "callee": "get_url",
+        "from": "source:1:37:16:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:92:8:Assert"
+      },
+      {
+        "callee": "get_url",
+        "from": "source:1:36:20:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:92:8:Assert"
+      },
+      {
+        "callee": "get_url",
+        "from": "source:1:39:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:92:8:Assert"
+      },
+      {
+        "callee": "get_url",
+        "from": "source:1:41:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:92:8:Assert"
+      },
+      {
+        "field": "body",
+        "from": "source:1:37:16:Return",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "source:1:25:12:With"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:29:19:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:30:20:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:29:19:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:31:20:Assign"
+      },
+      {
+        "branch": "false",
+        "from": "source:1:29:19:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:33:20:Assign"
+      },
+      {
+        "branch": "false",
+        "from": "source:1:29:19:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:34:20:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:35:19:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:36:20:Raise"
+      },
+      {
+        "from": "source:1:22:22:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:25:12:With",
+        "variable": "self"
+      },
+      {
+        "from": "source:1:25:12:With",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:25:52:Name"
+      },
+      {
+        "from": "source:1:26:16:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:26:16:Name"
+      },
+      {
+        "from": "source:1:25:52:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:26:16:Assign",
+        "variable": "file"
+      },
+      {
+        "from": "source:1:27:16:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:27:16:Name"
+      },
+      {
+        "from": "source:1:26:16:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:27:16:Assign",
+        "variable": "config"
+      },
+      {
+        "from": "source:1:28:16:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:28:16:Name"
+      },
+      {
+        "from": "source:1:26:16:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:28:16:Assign",
+        "variable": "config"
+      },
+      {
+        "from": "source:1:30:20:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:30:20:Name"
+      },
+      {
+        "from": "source:1:28:16:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:30:20:Assign",
+        "variable": "interpreter"
+      },
+      {
+        "from": "source:1:31:20:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:31:20:Name"
+      },
+      {
+        "from": "source:1:22:22:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:31:20:Assign",
+        "variable": "self"
+      },
+      {
+        "from": "source:1:33:20:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:33:20:Name"
+      },
+      {
+        "from": "source:1:28:16:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:33:20:Assign",
+        "variable": "interpreter"
+      },
+      {
+        "from": "source:1:34:20:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:34:20:Name"
+      },
+      {
+        "from": "source:1:30:20:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:34:20:Assign",
+        "variable": "zq_proc"
+      },
+      {
+        "from": "source:1:33:20:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:34:20:Assign",
+        "variable": "zq_proc"
+      },
+      {
+        "from": "source:1:31:20:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:36:20:Raise",
+        "variable": "returncode"
+      },
+      {
+        "from": "source:1:34:20:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:36:20:Raise",
+        "variable": "returncode"
+      },
+      {
+        "from": "source:1:27:16:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:37:16:Return",
+        "variable": "td_url"
+      },
+      {
+        "from": "source:1:22:22:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:39:12:Raise",
+        "variable": "self"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected",
+      "dynamic loader origins require a visible static path, namespace key, selected definition, and unrebound test callable"
+    ],
+    "nodes": [
+      {
+        "code": "self",
+        "end_line": 22,
+        "id": "source:1:22:22:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 22
+      },
+      {
+        "code": "with open(self._zq_config_path, 'r') as file:\n    config = json.load(file)\n    td_url = config['td_url']\n    interpreter = config['interpreter']\n    if sys.platform.startswith('win'):\n        zq_proc = subprocess.Popen([interpreter, '-m', 'tqsdk_zq.cli', 'start'], stdin=subprocess.DEVNULL, stdout=su",
+        "contains_unresolved_call": true,
+        "end_line": 37,
+        "exception_possible": true,
+        "id": "source:1:25:12:With",
+        "kind": "With",
+        "source_id": "source:1",
+        "start_line": 25,
+        "unresolved_calls": [
+          "open(self._zq_config_path, 'r')"
+        ]
+      },
+      {
+        "code": "file",
+        "end_line": 25,
+        "id": "source:1:25:52:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 25
+      },
+      {
+        "code": "config = json.load(file)",
+        "contains_unresolved_call": true,
+        "end_line": 26,
+        "exception_possible": true,
+        "id": "source:1:26:16:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 26,
+        "unresolved_calls": [
+          "json.load(file)"
+        ]
+      },
+      {
+        "code": "config",
+        "end_line": 26,
+        "id": "source:1:26:16:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 26
+      },
+      {
+        "code": "td_url = config['td_url']",
+        "end_line": 27,
+        "id": "source:1:27:16:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 27
+      },
+      {
+        "code": "td_url",
+        "end_line": 27,
+        "id": "source:1:27:16:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 27
+      },
+      {
+        "code": "interpreter = config['interpreter']",
+        "end_line": 28,
+        "id": "source:1:28:16:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 28
+      },
+      {
+        "code": "interpreter",
+        "end_line": 28,
+        "id": "source:1:28:16:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 28
+      },
+      {
+        "code": "sys.platform.startswith('win')",
+        "end_line": 29,
+        "id": "source:1:29:19:Call",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 29
+      },
+      {
+        "code": "zq_proc = subprocess.Popen([interpreter, '-m', 'tqsdk_zq.cli', 'start'], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)",
+        "contains_unresolved_call": true,
+        "end_line": 30,
+        "exception_possible": true,
+        "id": "source:1:30:20:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 30,
+        "unresolved_calls": [
+          "subprocess.Popen([interpreter, '-m', 'tqsdk_zq.cli', 'start'], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)"
+        ]
+      },
+      {
+        "code": "zq_proc",
+        "end_line": 30,
+        "id": "source:1:30:20:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 30
+      },
+      {
+        "code": "returncode = await self._api._loop.run_in_executor(None, lambda: zq_proc.wait())",
+        "contains_unresolved_call": true,
+        "end_line": 31,
+        "exception_possible": true,
+        "id": "source:1:31:20:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 31,
+        "unresolved_calls": [
+          "self._api._loop.run_in_executor(None, lambda: zq_proc.wait())",
+          "zq_proc.wait()"
+        ]
+      },
+      {
+        "code": "returncode",
+        "end_line": 31,
+        "id": "source:1:31:20:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 31
+      },
+      {
+        "code": "zq_proc = await asyncio.create_subprocess_exec(interpreter, '-m', 'tqsdk_zq.cli', 'start', stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)",
+        "contains_unresolved_call": true,
+        "end_line": 33,
+        "exception_possible": true,
+        "id": "source:1:33:20:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 33,
+        "unresolved_calls": [
+          "asyncio.create_subprocess_exec(interpreter, '-m', 'tqsdk_zq.cli', 'start', stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)"
+        ]
+      },
+      {
+        "code": "zq_proc",
+        "end_line": 33,
+        "id": "source:1:33:20:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 33
+      },
+      {
+        "code": "returncode = await zq_proc.wait()",
+        "contains_unresolved_call": true,
+        "end_line": 34,
+        "exception_possible": true,
+        "id": "source:1:34:20:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 34,
+        "unresolved_calls": [
+          "zq_proc.wait()"
+        ]
+      },
+      {
+        "code": "returncode",
+        "end_line": 34,
+        "id": "source:1:34:20:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 34
+      },
+      {
+        "code": "returncode != 0",
+        "end_line": 35,
+        "id": "source:1:35:19:Compare",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 35
+      },
+      {
+        "code": "raise TqContextManagerError(f'无法拉起 zq 进程, 返回码: {returncode}')",
+        "contains_unresolved_call": true,
+        "end_line": 36,
+        "exception_possible": true,
+        "id": "source:1:36:20:Raise",
+        "kind": "Raise",
+        "source_id": "source:1",
+        "start_line": 36,
+        "unresolved_calls": [
+          "TqContextManagerError(f'无法拉起 zq 进程, 返回码: {returncode}')"
+        ]
+      },
+      {
+        "code": "return td_url",
+        "end_line": 37,
+        "id": "source:1:37:16:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 37
+      },
+      {
+        "code": "raise Exception(f'加载配置文件失败: {self._zq_config_path}, 请尝试重新初始化: tqsdk-zq init') from None",
+        "contains_unresolved_call": true,
+        "end_line": 39,
+        "exception_possible": true,
+        "id": "source:1:39:12:Raise",
+        "kind": "Raise",
+        "source_id": "source:1",
+        "start_line": 39,
+        "unresolved_calls": [
+          "Exception(f'加载配置文件失败: {self._zq_config_path}, 请尝试重新初始化: tqsdk-zq init')"
+        ]
+      },
+      {
+        "code": "raise TqContextManagerError('获取交易服务地址失败')",
+        "contains_unresolved_call": true,
+        "end_line": 41,
+        "exception_possible": true,
+        "id": "source:1:41:12:Raise",
+        "kind": "Raise",
+        "source_id": "source:1",
+        "start_line": 41,
+        "unresolved_calls": [
+          "TqContextManagerError('获取交易服务地址失败')"
+        ]
+      },
+      {
+        "code": "platform",
+        "end_line": 39,
+        "id": "test:39:22:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 39
+      },
+      {
+        "code": "api = SimpleNamespace(_loop=SimpleNamespace(run_in_executor=run_in_executor))",
+        "contains_unresolved_call": true,
+        "end_line": 57,
+        "exception_possible": true,
+        "id": "test:57:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 57,
+        "unresolved_calls": [
+          "SimpleNamespace(_loop=SimpleNamespace(run_in_executor=run_in_executor))",
+          "SimpleNamespace(run_in_executor=run_in_executor)"
+        ]
+      },
+      {
+        "code": "api",
+        "end_line": 57,
+        "id": "test:57:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 57
+      },
+      {
+        "code": "owner = SimpleNamespace(_api=api, _zq_config_path=Path('/home/user/.tqsdk/zq/config/zq.json'))",
+        "contains_unresolved_call": true,
+        "end_line": 61,
+        "exception_possible": true,
+        "id": "test:58:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 58,
+        "unresolved_calls": [
+          "SimpleNamespace(_api=api, _zq_config_path=Path('/home/user/.tqsdk/zq/config/zq.json'))",
+          "Path('/home/user/.tqsdk/zq/config/zq.json')"
+        ]
+      },
+      {
+        "code": "owner",
+        "end_line": 58,
+        "id": "test:58:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 58
+      },
+      {
+        "code": "subprocess_api = SimpleNamespace(Popen=popen, DEVNULL=object())",
+        "contains_unresolved_call": true,
+        "end_line": 65,
+        "exception_possible": true,
+        "id": "test:62:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 62,
+        "unresolved_calls": [
+          "SimpleNamespace(Popen=popen, DEVNULL=object())",
+          "object()"
+        ]
+      },
+      {
+        "code": "subprocess_api",
+        "end_line": 62,
+        "id": "test:62:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 62
+      },
+      {
+        "code": "asyncio_api = SimpleNamespace(create_subprocess_exec=create_process)",
+        "contains_unresolved_call": true,
+        "end_line": 66,
+        "exception_possible": true,
+        "id": "test:66:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 66,
+        "unresolved_calls": [
+          "SimpleNamespace(create_subprocess_exec=create_process)"
+        ]
+      },
+      {
+        "code": "asyncio_api",
+        "end_line": 66,
+        "id": "test:66:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 66
+      },
+      {
+        "code": "get_url = load_function_from_source_ast(SRC_PATH, 'get_url', namespace={'open': open_file, 'json': json, 'sys': SimpleNamespace(platform=platform), 'subprocess': subprocess_api, 'asyncio': asyncio_api, 'TqContextManagerError': TqContextManagerError}, start_line=22)",
+        "contains_unresolved_call": true,
+        "end_line": 79,
+        "exception_possible": true,
+        "id": "test:67:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 67,
+        "unresolved_calls": [
+          "load_function_from_source_ast(SRC_PATH, 'get_url', namespace={'open': open_file, 'json': json, 'sys': SimpleNamespace(platform=platform), 'subprocess': subprocess_api, 'asyncio': asyncio_api, 'TqContextManagerError': TqContextManagerError}, start_line=22)",
+          "SimpleNamespace(platform=platform)"
+        ]
+      },
+      {
+        "code": "get_url",
+        "end_line": 67,
+        "id": "test:67:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 67
+      },
+      {
+        "code": "scenario == 'missing_configuration'",
+        "end_line": 81,
+        "id": "test:81:7:Compare",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 81
+      },
+      {
+        "code": "with pytest.raises(Exception, match='加载配置文件失败'):\n    asyncio.run(get_url(owner, {}))",
+        "contains_unresolved_call": true,
+        "end_line": 83,
+        "exception_possible": true,
+        "id": "test:82:8:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 82,
+        "unresolved_calls": [
+          "pytest.raises(Exception, match='加载配置文件失败')"
+        ]
+      },
+      {
+        "code": "asyncio.run(get_url(owner, {}))",
+        "contains_unresolved_call": true,
+        "end_line": 83,
+        "exception_possible": true,
+        "id": "test:83:12:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 83,
+        "unresolved_calls": [
+          "asyncio.run(get_url(owner, {}))"
+        ]
+      },
+      {
+        "code": "scenario == 'process_failure'",
+        "end_line": 88,
+        "id": "test:88:7:Compare",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 88
+      },
+      {
+        "code": "with pytest.raises(TqContextManagerError, match='获取交易服务地址失败'):\n    asyncio.run(get_url(owner, {}))",
+        "contains_unresolved_call": true,
+        "end_line": 90,
+        "exception_possible": true,
+        "id": "test:89:8:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 89,
+        "unresolved_calls": [
+          "pytest.raises(TqContextManagerError, match='获取交易服务地址失败')"
+        ]
+      },
+      {
+        "code": "asyncio.run(get_url(owner, {}))",
+        "contains_unresolved_call": true,
+        "end_line": 90,
+        "exception_possible": true,
+        "id": "test:90:12:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 90,
+        "unresolved_calls": [
+          "asyncio.run(get_url(owner, {}))"
+        ]
+      },
+      {
+        "code": "assert asyncio.run(get_url(owner, {})) == 'ws://127.0.0.1:7788'",
+        "contains_unresolved_call": true,
+        "end_line": 92,
+        "exception_possible": true,
+        "id": "test:92:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 92,
+        "unresolved_calls": [
+          "asyncio.run(get_url(owner, {}))"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:82:8:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:89:8:With"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:92:8:Assert"
+      }
+    ],
+    "seeds": [
+      "test:82:8:With",
+      "test:89:8:With",
+      "test:92:8:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 41,
+    "edges": 59,
+    "edge_kinds": {
+      "lexical_control": 8,
+      "normal_body_exit": 3,
+      "definition_value_candidate": 13,
+      "data_candidate": 23,
+      "call_target_candidate": 3,
+      "call_event_candidate": 9
+    },
+    "criteria": [
+      {
+        "seed": "test:82:8:With",
+        "node_ids": [
+          "source:1:22:22:arg",
+          "source:1:25:12:With",
+          "source:1:25:52:Name",
+          "source:1:26:16:Assign",
+          "source:1:26:16:Name",
+          "source:1:27:16:Assign",
+          "source:1:27:16:Name",
+          "source:1:28:16:Assign",
+          "source:1:28:16:Name",
+          "source:1:29:19:Call",
+          "source:1:30:20:Assign",
+          "source:1:30:20:Name",
+          "source:1:31:20:Assign",
+          "source:1:31:20:Name",
+          "source:1:33:20:Assign",
+          "source:1:33:20:Name",
+          "source:1:34:20:Assign",
+          "source:1:34:20:Name",
+          "source:1:35:19:Compare",
+          "source:1:36:20:Raise",
+          "source:1:37:16:Return",
+          "source:1:39:12:Raise",
+          "source:1:41:12:Raise",
+          "test:39:22:arg",
+          "test:57:4:Assign",
+          "test:57:4:Name",
+          "test:58:4:Assign",
+          "test:58:4:Name",
+          "test:62:4:Assign",
+          "test:62:4:Name",
+          "test:66:4:Assign",
+          "test:66:4:Name",
+          "test:67:4:Assign",
+          "test:67:4:Name",
+          "test:81:7:Compare",
+          "test:82:8:With",
+          "test:83:12:Expr"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:25:12:With",
+          "source:1:26:16:Assign",
+          "source:1:30:20:Assign",
+          "source:1:31:20:Assign",
+          "source:1:33:20:Assign",
+          "source:1:34:20:Assign",
+          "source:1:36:20:Raise",
+          "source:1:39:12:Raise",
+          "source:1:41:12:Raise",
+          "test:57:4:Assign",
+          "test:58:4:Assign",
+          "test:62:4:Assign",
+          "test:66:4:Assign",
+          "test:67:4:Assign",
+          "test:82:8:With",
+          "test:83:12:Expr"
+        ]
+      },
+      {
+        "seed": "test:89:8:With",
+        "node_ids": [
+          "source:1:22:22:arg",
+          "source:1:25:12:With",
+          "source:1:25:52:Name",
+          "source:1:26:16:Assign",
+          "source:1:26:16:Name",
+          "source:1:27:16:Assign",
+          "source:1:27:16:Name",
+          "source:1:28:16:Assign",
+          "source:1:28:16:Name",
+          "source:1:29:19:Call",
+          "source:1:30:20:Assign",
+          "source:1:30:20:Name",
+          "source:1:31:20:Assign",
+          "source:1:31:20:Name",
+          "source:1:33:20:Assign",
+          "source:1:33:20:Name",
+          "source:1:34:20:Assign",
+          "source:1:34:20:Name",
+          "source:1:35:19:Compare",
+          "source:1:36:20:Raise",
+          "source:1:37:16:Return",
+          "source:1:39:12:Raise",
+          "source:1:41:12:Raise",
+          "test:39:22:arg",
+          "test:57:4:Assign",
+          "test:57:4:Name",
+          "test:58:4:Assign",
+          "test:58:4:Name",
+          "test:62:4:Assign",
+          "test:62:4:Name",
+          "test:66:4:Assign",
+          "test:66:4:Name",
+          "test:67:4:Assign",
+          "test:67:4:Name",
+          "test:88:7:Compare",
+          "test:89:8:With",
+          "test:90:12:Expr"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:25:12:With",
+          "source:1:26:16:Assign",
+          "source:1:30:20:Assign",
+          "source:1:31:20:Assign",
+          "source:1:33:20:Assign",
+          "source:1:34:20:Assign",
+          "source:1:36:20:Raise",
+          "source:1:39:12:Raise",
+          "source:1:41:12:Raise",
+          "test:57:4:Assign",
+          "test:58:4:Assign",
+          "test:62:4:Assign",
+          "test:66:4:Assign",
+          "test:67:4:Assign",
+          "test:89:8:With",
+          "test:90:12:Expr"
+        ]
+      },
+      {
+        "seed": "test:92:8:Assert",
+        "node_ids": [
+          "source:1:22:22:arg",
+          "source:1:25:12:With",
+          "source:1:25:52:Name",
+          "source:1:26:16:Assign",
+          "source:1:26:16:Name",
+          "source:1:27:16:Assign",
+          "source:1:27:16:Name",
+          "source:1:28:16:Assign",
+          "source:1:28:16:Name",
+          "source:1:29:19:Call",
+          "source:1:30:20:Assign",
+          "source:1:30:20:Name",
+          "source:1:31:20:Assign",
+          "source:1:31:20:Name",
+          "source:1:33:20:Assign",
+          "source:1:33:20:Name",
+          "source:1:34:20:Assign",
+          "source:1:34:20:Name",
+          "source:1:35:19:Compare",
+          "source:1:36:20:Raise",
+          "source:1:37:16:Return",
+          "source:1:39:12:Raise",
+          "source:1:41:12:Raise",
+          "test:39:22:arg",
+          "test:57:4:Assign",
+          "test:57:4:Name",
+          "test:58:4:Assign",
+          "test:58:4:Name",
+          "test:62:4:Assign",
+          "test:62:4:Name",
+          "test:66:4:Assign",
+          "test:66:4:Name",
+          "test:67:4:Assign",
+          "test:67:4:Name",
+          "test:88:7:Compare",
+          "test:92:8:Assert"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:25:12:With",
+          "source:1:26:16:Assign",
+          "source:1:30:20:Assign",
+          "source:1:31:20:Assign",
+          "source:1:33:20:Assign",
+          "source:1:34:20:Assign",
+          "source:1:36:20:Raise",
+          "source:1:39:12:Raise",
+          "source:1:41:12:Raise",
+          "test:57:4:Assign",
+          "test:58:4:Assign",
+          "test:62:4:Assign",
+          "test:66:4:Assign",
+          "test:67:4:Assign",
+          "test:92:8:Assert"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:82:8:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:89:8:With"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:92:8:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.3119,
+  "timings_seconds": {
+    "criterion_extraction": 0.000949,
+    "source_selection": 0.019661,
+    "backend_total": 0.291118,
+    "evidence_summary": 0.000143
+  },
+  "identity": {
+    "case_id": "tqsdk-python_445",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "8d3e9c69f4cf357ea4bab5f50ea29e8b5ad636b39b14444f0ba3f7c1890f7afb"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "tqsdk-python_445",
+      "dataset": "python-benchmark-new",
+      "language": "python",
+      "snapshot_id": "8d3e9c69f4cf357ea4bab5f50ea29e8b5ad636b39b14444f0ba3f7c1890f7afb",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "0d3e0eaaba5338faed935a52ae8c421c55c595112ae2001363f73a2d80d45c38",
+      "target_selector": "tests/test_445get_url.py::test_get_url_loads_configuration_and_waits_for_the_zq_process"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_445get_url.py",
+        "sha256": "0d3e0eaaba5338faed935a52ae8c421c55c595112ae2001363f73a2d80d45c38",
+        "bytes": 3022,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:1",
+        "logical_path": "src/tqsdk/zq.py",
+        "sha256": "d18b2a5f055a1dd5cec88613465558e20162c08f488e18bb900099d14b4ce36c",
+        "bytes": 1837,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:2",
+        "logical_path": "src/tqsdk/exceptions.py",
+        "sha256": "d90559cdbd08986933a31c225fc8bbe3257943f0841c9092cbe0180ea903da8a",
+        "bytes": 3662,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 82,
+          "end_line": 82
+        },
+        "kind": "exception_observation",
+        "origin": "explicit",
+        "reason": "raises in the selected test function"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 89,
+          "end_line": 89
+        },
+        "kind": "exception_observation",
+        "origin": "explicit",
+        "reason": "raises in the selected test function"
+      },
+      {
+        "observation_id": "criterion:2",
+        "location": {
+          "source_id": "test",
+          "start_line": 92,
+          "end_line": 92
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "the runner does not enumerate parameter rows"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_445get_url.py::test_get_url_loads_configuration_and_waits_for_the_zq_process",
+        "evidence": [
+          {
+            "symbol": "test_get_url_loads_configuration_and_waits_for_the_zq_process",
+            "start_line": 38,
+            "end_line": 104
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "not_evaluated",
+        "candidates": [],
+        "evidence": [],
+        "assumptions": []
+      }
+    },
+    "relations": [],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [],
+      "unknown_effects": [
+        {
+          "boundary_id": "source:1:25:12:With",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:26:16:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:30:20:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:31:20:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:33:20:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:34:20:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:36:20:Raise",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:39:12:Raise",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:41:12:Raise",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:57:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:58:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:62:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:66:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:67:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:82:8:With",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:83:12:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:89:8:With",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:90:12:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:92:8:Assert",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "mature_backend_support_domain",
+          "reason": "semantic_backend_unsupported",
+          "details": [
+            "No authenticated Python semantic driver is registered for this case.",
+            "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+            "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+          ]
+        }
+      ]
+    },
+    "completion": {
+      "status": "unsupported",
+      "stage": "semantic_backend",
+      "failure_categories": [
+        "unresolved_calls",
+        "semantic_analysis_gap",
+        "semantic_backend_unsupported"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "not_evaluated",
+      "reviewer": null,
+      "evidence": [],
+      "notes": "candidate reachability is not semantic dependency validation"
+    },
+    "cost": {
+      "timings_seconds": {
+        "criterion_extraction": 0.000949,
+        "source_selection": 0.019661,
+        "backend_total": 0.291118,
+        "evidence_summary": 0.000143
+      },
+      "total_seconds": 0.3119,
+      "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+      "peak_memory": {
+        "status": "unavailable",
+        "bytes": null,
+        "reason": "case-level peak memory is not measured by this runner"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+      },
+      "input_size": {
+        "files": 3,
+        "bytes": 8521
+      },
+      "graph_size": {
+        "nodes": 41,
+        "edges": 59
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter admission occurs outside the per-case analysis timer"
+        },
+        {
+          "phase": "front_end",
+          "reason": "the candidate backend does not report parsing time separately"
+        },
+        {
+          "phase": "call_graph",
+          "reason": "the candidate backend does not report call-graph time separately"
+        },
+        {
+          "phase": "pointer_analysis",
+          "reason": "the candidate backend does not provide pointer analysis"
+        },
+        {
+          "phase": "dependency_analysis",
+          "reason": "backend_total combines parsing, graph construction, and slicing"
+        },
+        {
+          "phase": "slice",
+          "reason": "the candidate backend does not report semantic slicing time separately"
+        },
+        {
+          "phase": "source_mapping",
+          "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+        }
+      ]
+    }
+  },
+  "candidate_diagnostics": {
+    "status": "partial",
+    "failure_categories": [
+      "unresolved_calls",
+      "semantic_analysis_gap"
+    ],
+    "result_contract": {
+      "schema_version": "mock-spec.backward-analysis-case/v1",
+      "identity": {
+        "case_id": "tqsdk-python_445",
+        "dataset": "python-benchmark-new",
+        "language": "python",
+        "snapshot_id": "8d3e9c69f4cf357ea4bab5f50ea29e8b5ad636b39b14444f0ba3f7c1890f7afb",
+        "masking_contract": "python-slot-v1",
+        "masked_test_sha256": "0d3e0eaaba5338faed935a52ae8c421c55c595112ae2001363f73a2d80d45c38",
+        "target_selector": "tests/test_445get_url.py::test_get_url_loads_configuration_and_waits_for_the_zq_process"
+      },
+      "source_scope": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_445get_url.py",
+          "sha256": "0d3e0eaaba5338faed935a52ae8c421c55c595112ae2001363f73a2d80d45c38",
+          "bytes": 3022,
+          "selection_role": "masked_test"
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/tqsdk/zq.py",
+          "sha256": "d18b2a5f055a1dd5cec88613465558e20162c08f488e18bb900099d14b4ce36c",
+          "bytes": 1837,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/tqsdk/exceptions.py",
+          "sha256": "d90559cdbd08986933a31c225fc8bbe3257943f0841c9092cbe0180ea903da8a",
+          "bytes": 3662,
+          "selection_role": "candidate_product"
+        }
+      ],
+      "observations": [
+        {
+          "observation_id": "criterion:0",
+          "location": {
+            "source_id": "test",
+            "start_line": 82,
+            "end_line": 82
+          },
+          "kind": "exception_observation",
+          "origin": "explicit",
+          "reason": "raises in the selected test function"
+        },
+        {
+          "observation_id": "criterion:1",
+          "location": {
+            "source_id": "test",
+            "start_line": 89,
+            "end_line": 89
+          },
+          "kind": "exception_observation",
+          "origin": "explicit",
+          "reason": "raises in the selected test function"
+        },
+        {
+          "observation_id": "criterion:2",
+          "location": {
+            "source_id": "test",
+            "start_line": 92,
+            "end_line": 92
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        }
+      ],
+      "parameterization": {
+        "status": "not_expanded",
+        "coverage": "selected_test_definition",
+        "reason": "the runner does not enumerate parameter rows"
+      },
+      "entry_point": {
+        "test_selection": {
+          "origin": "task_provided",
+          "status": "unique",
+          "selector": "tests/test_445get_url.py::test_get_url_loads_configuration_and_waits_for_the_zq_process",
+          "evidence": [
+            {
+              "symbol": "test_get_url_loads_configuration_and_waits_for_the_zq_process",
+              "start_line": 38,
+              "end_line": 104
+            }
+          ]
+        },
+        "mut_binding": {
+          "origin": "automatic",
+          "status": "not_evaluated",
+          "candidates": [],
+          "evidence": [],
+          "assumptions": []
+        }
+      },
+      "relations": [],
+      "relation_coverage": [
+        {
+          "kind": "call_binding",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "control_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "exception_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "function_origin",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "normal_return_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "state_flow",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "value_flow",
+          "status": "not_evaluated"
+        }
+      ],
+      "analysis_boundaries": {
+        "assumptions": [],
+        "unknown_effects": [
+          {
+            "boundary_id": "source:1:25:12:With",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:26:16:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:30:20:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:31:20:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:33:20:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:34:20:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:36:20:Raise",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:39:12:Raise",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:41:12:Raise",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:57:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:58:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:62:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:66:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:67:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:82:8:With",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:83:12:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:89:8:With",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:90:12:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:92:8:Assert",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          }
+        ],
+        "unanalysed_regions": [
+          {
+            "scope": "semantic_relations",
+            "reason": "candidate_graph_has_no_validated_dependency_semantics"
+          }
+        ]
+      },
+      "completion": {
+        "status": "partial",
+        "stage": "complete",
+        "failure_categories": [
+          "unresolved_calls",
+          "semantic_analysis_gap"
+        ],
+        "error": null
+      },
+      "semantic_validation": {
+        "status": "not_evaluated",
+        "reviewer": null,
+        "evidence": [],
+        "notes": "candidate reachability is not semantic dependency validation"
+      },
+      "cost": {
+        "timings_seconds": {
+          "criterion_extraction": 0.000949,
+          "source_selection": 0.019661,
+          "backend_total": 0.291118,
+          "evidence_summary": 0.000143
+        },
+        "total_seconds": 0.3119,
+        "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+        "peak_memory": {
+          "status": "unavailable",
+          "bytes": null,
+          "reason": "case-level peak memory is not measured by this runner"
+        },
+        "cache_state": {
+          "status": "unknown",
+          "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+        },
+        "input_size": {
+          "files": 3,
+          "bytes": 8521
+        },
+        "graph_size": {
+          "nodes": 41,
+          "edges": 59
+        },
+        "unavailable_phases": [
+          {
+            "phase": "input_admission",
+            "reason": "adapter admission occurs outside the per-case analysis timer"
+          },
+          {
+            "phase": "front_end",
+            "reason": "the candidate backend does not report parsing time separately"
+          },
+          {
+            "phase": "call_graph",
+            "reason": "the candidate backend does not report call-graph time separately"
+          },
+          {
+            "phase": "pointer_analysis",
+            "reason": "the candidate backend does not provide pointer analysis"
+          },
+          {
+            "phase": "dependency_analysis",
+            "reason": "backend_total combines parsing, graph construction, and slicing"
+          },
+          {
+            "phase": "slice",
+            "reason": "the candidate backend does not report semantic slicing time separately"
+          },
+          {
+            "phase": "source_mapping",
+            "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+          }
+        ]
+      }
+    },
+    "stage": "complete",
+    "error": null,
+    "elapsed_seconds": 0.3119,
+    "timings_seconds": {
+      "criterion_extraction": 0.000949,
+      "source_selection": 0.019661,
+      "backend_total": 0.291118,
+      "evidence_summary": 0.000143
+    },
+    "graph_and_evidence": "top-level graph/evidence/sources remain candidate diagnostics only"
+  },
+  "semantic_backend": {
+    "schema": "mock-spec.batch-semantic-backend/v1",
+    "status": "unsupported",
+    "backend": null,
+    "identity": {
+      "language": "python",
+      "dataset": "python-benchmark-new",
+      "case_id": "tqsdk-python_445",
+      "inventory_revision": "0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc",
+      "snapshot_id": "8d3e9c69f4cf357ea4bab5f50ea29e8b5ad636b39b14444f0ba3f7c1890f7afb",
+      "snapshot_root": "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/python-benchmark-new/8d3e9c69f4cf357ea4bab5f50ea29e8b5ad636b39b14444f0ba3f7c1890f7afb",
+      "admission_status": "frozen_candidate",
+      "admission_verified": false,
+      "reviewed_snapshot_id": null,
+      "target_selector": "tests/test_445get_url.py::test_get_url_loads_configuration_and_waits_for_the_zq_process",
+      "masked_test_logical_path": "tests/test_445get_url.py",
+      "masked_test_sha256": "0d3e0eaaba5338faed935a52ae8c421c55c595112ae2001363f73a2d80d45c38",
+      "masking_contract": "python-slot-v1",
+      "input_context": {
+        "target_selector": "tests/test_445get_url.py::test_get_url_loads_configuration_and_waits_for_the_zq_process",
+        "masked_test_logical_path": "tests/test_445get_url.py",
+        "masked_test_sha256": "0d3e0eaaba5338faed935a52ae8c421c55c595112ae2001363f73a2d80d45c38",
+        "masking_contract": "python-slot-v1"
+      },
+      "sources": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_445get_url.py",
+          "sha256": "0d3e0eaaba5338faed935a52ae8c421c55c595112ae2001363f73a2d80d45c38",
+          "bytes": 3022
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/tqsdk/zq.py",
+          "sha256": "d18b2a5f055a1dd5cec88613465558e20162c08f488e18bb900099d14b4ce36c",
+          "bytes": 1837
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/tqsdk/exceptions.py",
+          "sha256": "d90559cdbd08986933a31c225fc8bbe3257943f0841c9092cbe0180ea903da8a",
+          "bytes": 3662
+        }
+      ]
+    },
+    "limitations": [
+      "No authenticated Python semantic driver is registered for this case.",
+      "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+      "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+    ],
+    "source": null,
+    "provenance": {
+      "target_executed": false
+    },
+    "cost": null,
+    "terminal": {
+      "execution": "not_started",
+      "semantic_validation": "not_evaluated"
+    },
+    "driver_exit_code": 0,
+    "batch_dispatch_seconds": 0.079308,
+    "batch_dispatch_scope": "bridge process including support check, adapter and backend; excludes candidate diagnostics"
+  },
+  "batch_case_cost": {
+    "total_seconds": 0.433611,
+    "scope": "admission, candidate diagnostic, semantic-slot wait, dispatch and mapping; excludes case queue, shared compile and serialization"
+  },
+  "result_contract_sha256": "0d793fc2fbc33705b6221db3065219a38596185ac708ee03329bfac1927a1620"
+}

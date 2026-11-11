@@ -1,0 +1,25 @@
+{
+  "schema": "mockspec.jib-channel-comparison/v1",
+  "target_executed": false,
+  "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.baseImage(Ljava/lang/Object;)V",
+  "input_identity_equal": true,
+  "execution_channel": {
+    "control_dependence": "FULL",
+    "slice_statement_count": 326252,
+    "retained_statement_count": 1843,
+    "total_millis": 60925,
+    "meaning": "possible execution/control/exception influence; includes unrelated state writes"
+  },
+  "value_state_channel": {
+    "control_dependence": "NONE",
+    "slice_statement_count": 107,
+    "retained_statement_count": 94,
+    "total_millis": 21271,
+    "meaning": "value/state diagnostic only; absence cannot exclude control or exception influence"
+  },
+  "reduction": {
+    "slice_statement_ratio": 0.0003279673381312605,
+    "retained_statement_ratio": 0.051003798155181766
+  },
+  "interpretation": "FULL control dependence is the dominant cause of the indistinguishable 325k-statement closure. NONE preserves the exact builder/plan/getter state witness but intentionally drops source branch and exception evidence; the two channels must be reported together."
+}

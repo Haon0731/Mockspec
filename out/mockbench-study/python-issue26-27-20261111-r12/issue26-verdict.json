@@ -1,0 +1,64 @@
+{
+  "schema": "mock-spec.issue26-verdict/v1",
+  "status": "passed",
+  "checks": {
+    "identity_and_three_observations": true,
+    "exact_call_and_actual_formal": true,
+    "guarded_assertions": true,
+    "normal_product_continuation": true,
+    "exception_to_each_observation": true,
+    "no_unmapped_observation": true,
+    "exact_values_remain_unknown": true,
+    "overwrite_and_cross_process_values": true,
+    "early_return_catch_finally_and_exception": true,
+    "visible_pure_not_opaque": true,
+    "conditional_support_domain_preserved": true,
+    "timing_and_memory_recorded": true
+  },
+  "expectations": {
+    "schema": "mock-spec.issue26-expectations/v1",
+    "case_id": "flask_308",
+    "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+    "observations": [
+      {
+        "line": 102,
+        "kind": "exception_observation"
+      },
+      {
+        "line": 120,
+        "kind": "value_assertion",
+        "guard_line": 111,
+        "guard_branch": "true"
+      },
+      {
+        "line": 126,
+        "kind": "value_assertion",
+        "guard_line": 111,
+        "guard_branch": "false"
+      }
+    ],
+    "preserve": [
+      "exact test call to visible product function",
+      "actual argument zero to formal parameter zero",
+      "test guard to each guarded assertion",
+      "product normal continuation from aborter call to fallback",
+      "product exceptional exits to the pytest capture and both membership assertions",
+      "overwrite, early-return, catch, finally, and cross-process value mechanisms"
+    ],
+    "exclude": [
+      "lexical nesting or source order as dependency evidence",
+      "same variable name as cross-scope binding evidence",
+      "visible pure call as an opaque side-effect or exception boundary",
+      "exceptions handled inside the callee or with body"
+    ],
+    "unknown": [
+      "exact exception type and text",
+      "code-to-message construction",
+      "path satisfiability",
+      "dynamic calls outside the registered support domain"
+    ]
+  },
+  "case_result_sha256": "15d846afd2544d1f9e6f5dd7864af2acea15f95cac7d53410a03986ce10925ed",
+  "backend_verdict_sha256": "818563c8f7955a722c342062ab1a9c94ebaebc82776204e3d30c86b6cc9e13b2",
+  "semantic_scope": "bounded may-influence for the registered Flask observations; exact values and path satisfiability remain unknown"
+}

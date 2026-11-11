@@ -1,0 +1,2121 @@
+{
+  "status": "unsupported",
+  "failure_categories": [
+    "inferred_criterion_only",
+    "unresolved_calls",
+    "semantic_analysis_gap",
+    "semantic_backend_unsupported"
+  ],
+  "stage": "semantic_backend",
+  "input_context": {
+    "target_selector": "tests/test_177display_pool_info.py::test_display_pool_info",
+    "masked_test_logical_path": "tests/test_177display_pool_info.py",
+    "masked_test_sha256": "1b4963c8d0b16fab961c4c4f4738d9f88f8652529bb9f882086ca38e51675a05",
+    "masking_contract": "python-slot-v1"
+  },
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_177display_pool_info.py::test_display_pool_info",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_display_pool_info",
+          "start_line": 116,
+          "end_line": 175
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 140,
+        "kind": "candidate_event",
+        "confidence": "candidate",
+        "reason": "visible call in a selected test with no explicit observation; it is not an oracle",
+        "call": "load_display_pool_info",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 157,
+        "kind": "candidate_event",
+        "confidence": "candidate",
+        "reason": "visible call in a selected test with no explicit observation; it is not an oracle",
+        "call": "hasattr",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 162,
+        "kind": "candidate_event",
+        "confidence": "candidate",
+        "reason": "visible call in a selected test with no explicit observation; it is not an oracle",
+        "call": "hasattr",
+        "criterion_id": "criterion:2"
+      },
+      {
+        "line": 166,
+        "kind": "candidate_event",
+        "confidence": "candidate",
+        "reason": "visible call in a selected test with no explicit observation; it is not an oracle",
+        "call": "display_pool_info",
+        "criterion_id": "criterion:3"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": [
+      {
+        "code": "no_explicit_observation",
+        "message": "candidate events do not establish expected values, arguments, counts, or reachability"
+      }
+    ]
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_visible_source_path",
+        "hint": "src/hummingbot/client/command/lp_command_utils.py",
+        "candidates": [
+          "src/hummingbot/client/command/lp_command_utils.py"
+        ],
+        "precision": "exact_visible_path"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/hummingbot/client/command/lp_command_utils.py",
+        "hint_kind": "python_import",
+        "hint": "hummingbot.client.command.command_utils",
+        "candidates": [
+          "src/hummingbot/client/command/command_utils.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/hummingbot/client/command/lp_command_utils.py",
+        "hint_kind": "python_import",
+        "hint": "hummingbot.connector.gateway.gateway_lp",
+        "candidates": [
+          "src/hummingbot/connector/gateway/gateway_lp.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "dynamic_loader_bindings": [
+      {
+        "status": "unknown",
+        "loader": "load_display_pool_info",
+        "path": "src/hummingbot/client/command/lp_command_utils.py",
+        "path_line": 16,
+        "namespace": "namespace",
+        "exec_line": 33,
+        "return_line": 34,
+        "function_key": "LPCommandUtils",
+        "reason": "exec_source_provenance_not_supported"
+      }
+    ],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 73960,
+    "read_bytes": 73960,
+    "attempted_files": 3,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_177display_pool_info.py",
+      "sha256": "1b4963c8d0b16fab961c4c4f4738d9f88f8652529bb9f882086ca38e51675a05",
+      "bytes": 4915
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/hummingbot/client/command/lp_command_utils.py",
+      "sha256": "6b6f01a5536393acdf03615eb367f426e3eb99f99d96e69daff01523e439a13b",
+      "bytes": 17893
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/hummingbot/client/command/command_utils.py",
+      "sha256": "32313b517e52f25ec5b641b2126b0873fb2db045e100ad65caba45809ad51ae4",
+      "bytes": 16252
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/hummingbot/connector/gateway/gateway_lp.py",
+      "sha256": "4459f3261c1c71a84a0d95920c4b6624a21ffd9e97721d2858eaf5ea0be09e8d",
+      "bytes": 34900
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "dynamic_loader_bindings": [
+      {
+        "exec_line": 33,
+        "function_key": "LPCommandUtils",
+        "loader": "load_display_pool_info",
+        "namespace": "namespace",
+        "path": "src/hummingbot/client/command/lp_command_utils.py",
+        "path_line": 16,
+        "reason": "exec_source_provenance_not_supported",
+        "return_line": 34,
+        "status": "unknown"
+      }
+    ],
+    "edges": [
+      {
+        "from": "test:20:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:20:4:Name"
+      },
+      {
+        "from": "test:21:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:21:4:Name"
+      },
+      {
+        "from": "test:22:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:22:4:Name"
+      },
+      {
+        "from": "test:23:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:23:4:Name"
+      },
+      {
+        "from": "test:20:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:23:4:Assign",
+        "variable": "source_lines"
+      },
+      {
+        "from": "test:21:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:23:4:Assign",
+        "variable": "start_line"
+      },
+      {
+        "from": "test:22:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:23:4:Assign",
+        "variable": "end_line"
+      },
+      {
+        "from": "test:29:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:29:4:Name"
+      },
+      {
+        "from": "test:23:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:29:4:Assign",
+        "variable": "function_source"
+      },
+      {
+        "from": "test:32:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:32:4:Name"
+      },
+      {
+        "from": "test:21:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:33:4:Expr",
+        "variable": "start_line"
+      },
+      {
+        "from": "test:29:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:33:4:Expr",
+        "variable": "class_source"
+      },
+      {
+        "from": "test:32:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:33:4:Expr",
+        "variable": "namespace"
+      },
+      {
+        "from": "test:32:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:34:4:Return",
+        "variable": "namespace"
+      },
+      {
+        "branch": "false",
+        "from": "test:154:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:157:8:If"
+      },
+      {
+        "branch": "true",
+        "from": "test:157:11:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:158:12:Delete"
+      },
+      {
+        "branch": "true",
+        "from": "test:158:12:Delete",
+        "kind": "normal_branch_exit",
+        "precision": "possible_only_if_branch_completes_normally",
+        "to": "test:157:8:If"
+      },
+      {
+        "branch": "false",
+        "from": "test:159:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:162:8:If"
+      },
+      {
+        "branch": "true",
+        "from": "test:162:11:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:163:12:Delete"
+      },
+      {
+        "branch": "true",
+        "from": "test:163:12:Delete",
+        "kind": "normal_branch_exit",
+        "precision": "possible_only_if_branch_completes_normally",
+        "to": "test:162:8:If"
+      },
+      {
+        "from": "test:140:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:140:4:Name"
+      },
+      {
+        "from": "test:140:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:166:4:Expr",
+        "variable": "lp_utils"
+      },
+      {
+        "from": "test:119:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:166:4:Expr",
+        "variable": "is_clmm"
+      },
+      {
+        "from": "test:122:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:166:4:Expr",
+        "variable": "base_token"
+      },
+      {
+        "from": "test:123:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:166:4:Expr",
+        "variable": "quote_token"
+      },
+      {
+        "callee": "load_display_pool_info",
+        "from": "test:34:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:140:4:Assign"
+      },
+      {
+        "callee": "load_display_pool_info",
+        "from": "test:33:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:140:4:Assign"
+      },
+      {
+        "callee": "display_pool_info",
+        "from": "source:1:277:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:166:4:Expr"
+      },
+      {
+        "callee": "display_pool_info",
+        "from": "source:1:278:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:166:4:Expr"
+      },
+      {
+        "callee": "display_pool_info",
+        "from": "source:1:279:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:166:4:Expr"
+      },
+      {
+        "callee": "display_pool_info",
+        "from": "source:1:280:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:166:4:Expr"
+      },
+      {
+        "callee": "display_pool_info",
+        "from": "source:1:283:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:166:4:Expr"
+      },
+      {
+        "callee": "display_pool_info",
+        "from": "source:1:284:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:166:4:Expr"
+      },
+      {
+        "callee": "display_pool_info",
+        "from": "source:1:286:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:166:4:Expr"
+      },
+      {
+        "callee": "display_pool_info",
+        "from": "source:1:290:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:166:4:Expr"
+      },
+      {
+        "callee": "display_pool_info",
+        "from": "source:1:291:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:166:4:Expr"
+      },
+      {
+        "callee": "display_pool_info",
+        "from": "source:1:296:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:166:4:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:282:11:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:283:12:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:282:11:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:284:12:Expr"
+      },
+      {
+        "from": "source:1:270:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:277:8:Expr",
+        "variable": "app"
+      },
+      {
+        "from": "source:1:270:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:278:8:Expr",
+        "variable": "app"
+      },
+      {
+        "from": "source:1:271:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:278:8:Expr",
+        "variable": "pool_info"
+      },
+      {
+        "from": "source:1:270:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:279:8:Expr",
+        "variable": "app"
+      },
+      {
+        "from": "source:1:271:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:279:8:Expr",
+        "variable": "pool_info"
+      },
+      {
+        "from": "source:1:270:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:280:8:Expr",
+        "variable": "app"
+      },
+      {
+        "from": "source:1:271:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:280:8:Expr",
+        "variable": "pool_info"
+      },
+      {
+        "from": "source:1:270:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:283:12:Expr",
+        "variable": "app"
+      },
+      {
+        "from": "source:1:271:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:283:12:Expr",
+        "variable": "pool_info"
+      },
+      {
+        "from": "source:1:270:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:284:12:Expr",
+        "variable": "app"
+      },
+      {
+        "from": "source:1:271:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:284:12:Expr",
+        "variable": "pool_info"
+      },
+      {
+        "from": "source:1:270:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:286:8:Expr",
+        "variable": "app"
+      },
+      {
+        "from": "source:1:288:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:288:8:Name"
+      },
+      {
+        "from": "source:1:273:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:288:8:Assign",
+        "variable": "base_token"
+      },
+      {
+        "from": "source:1:289:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:289:8:Name"
+      },
+      {
+        "from": "source:1:274:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:289:8:Assign",
+        "variable": "quote_token"
+      },
+      {
+        "from": "source:1:270:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:290:8:Expr",
+        "variable": "app"
+      },
+      {
+        "from": "source:1:288:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:290:8:Expr",
+        "variable": "base_label"
+      },
+      {
+        "from": "source:1:271:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:290:8:Expr",
+        "variable": "pool_info"
+      },
+      {
+        "from": "source:1:270:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:291:8:Expr",
+        "variable": "app"
+      },
+      {
+        "from": "source:1:289:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:291:8:Expr",
+        "variable": "quote_label"
+      },
+      {
+        "from": "source:1:271:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:291:8:Expr",
+        "variable": "pool_info"
+      },
+      {
+        "from": "source:1:294:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:294:8:Name"
+      },
+      {
+        "from": "source:1:271:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:294:8:Assign",
+        "variable": "pool_info"
+      },
+      {
+        "from": "source:1:270:8:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:296:8:Expr",
+        "variable": "app"
+      },
+      {
+        "from": "source:1:289:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:296:8:Expr",
+        "variable": "quote_label"
+      },
+      {
+        "from": "source:1:294:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:296:8:Expr",
+        "variable": "tvl_estimate"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected",
+      "dynamic loader origins require a visible static path, namespace key, selected definition, and unrebound test callable"
+    ],
+    "nodes": [
+      {
+        "code": "app: Any",
+        "end_line": 270,
+        "id": "source:1:270:8:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 270
+      },
+      {
+        "code": "pool_info: Union['AMMPoolInfo', 'CLMMPoolInfo']",
+        "end_line": 271,
+        "id": "source:1:271:8:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 271
+      },
+      {
+        "code": "base_token: str",
+        "end_line": 273,
+        "id": "source:1:273:8:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 273
+      },
+      {
+        "code": "quote_token: str",
+        "end_line": 274,
+        "id": "source:1:274:8:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 274
+      },
+      {
+        "code": "app.notify('\\n=== Pool Information ===')",
+        "contains_unresolved_call": true,
+        "end_line": 277,
+        "exception_possible": true,
+        "id": "source:1:277:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 277,
+        "unresolved_calls": [
+          "app.notify('\\n=== Pool Information ===')"
+        ]
+      },
+      {
+        "code": "app.notify(f'Pool Address: {pool_info.address}')",
+        "contains_unresolved_call": true,
+        "end_line": 278,
+        "exception_possible": true,
+        "id": "source:1:278:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 278,
+        "unresolved_calls": [
+          "app.notify(f'Pool Address: {pool_info.address}')"
+        ]
+      },
+      {
+        "code": "app.notify(f'Current Price: {pool_info.price:.6f}')",
+        "contains_unresolved_call": true,
+        "end_line": 279,
+        "exception_possible": true,
+        "id": "source:1:279:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 279,
+        "unresolved_calls": [
+          "app.notify(f'Current Price: {pool_info.price:.6f}')"
+        ]
+      },
+      {
+        "code": "app.notify(f'Fee: {pool_info.fee_pct}%')",
+        "contains_unresolved_call": true,
+        "end_line": 280,
+        "exception_possible": true,
+        "id": "source:1:280:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 280,
+        "unresolved_calls": [
+          "app.notify(f'Fee: {pool_info.fee_pct}%')"
+        ]
+      },
+      {
+        "code": "is_clmm and hasattr(pool_info, 'active_bin_id')",
+        "end_line": 282,
+        "id": "source:1:282:11:BoolOp",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 282
+      },
+      {
+        "code": "app.notify(f'Active Bin ID: {pool_info.active_bin_id}')",
+        "contains_unresolved_call": true,
+        "end_line": 283,
+        "exception_possible": true,
+        "id": "source:1:283:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 283,
+        "unresolved_calls": [
+          "app.notify(f'Active Bin ID: {pool_info.active_bin_id}')"
+        ]
+      },
+      {
+        "code": "app.notify(f'Bin Step: {pool_info.bin_step}')",
+        "contains_unresolved_call": true,
+        "end_line": 284,
+        "exception_possible": true,
+        "id": "source:1:284:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 284,
+        "unresolved_calls": [
+          "app.notify(f'Bin Step: {pool_info.bin_step}')"
+        ]
+      },
+      {
+        "code": "app.notify('\\nPool Reserves:')",
+        "contains_unresolved_call": true,
+        "end_line": 286,
+        "exception_possible": true,
+        "id": "source:1:286:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 286,
+        "unresolved_calls": [
+          "app.notify('\\nPool Reserves:')"
+        ]
+      },
+      {
+        "code": "base_label = base_token if base_token else 'Base'",
+        "end_line": 288,
+        "id": "source:1:288:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 288
+      },
+      {
+        "code": "base_label",
+        "end_line": 288,
+        "id": "source:1:288:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 288
+      },
+      {
+        "code": "quote_label = quote_token if quote_token else 'Quote'",
+        "end_line": 289,
+        "id": "source:1:289:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 289
+      },
+      {
+        "code": "quote_label",
+        "end_line": 289,
+        "id": "source:1:289:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 289
+      },
+      {
+        "code": "app.notify(f'  {base_label}: {pool_info.base_token_amount:.6f}')",
+        "contains_unresolved_call": true,
+        "end_line": 290,
+        "exception_possible": true,
+        "id": "source:1:290:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 290,
+        "unresolved_calls": [
+          "app.notify(f'  {base_label}: {pool_info.base_token_amount:.6f}')"
+        ]
+      },
+      {
+        "code": "app.notify(f'  {quote_label}: {pool_info.quote_token_amount:.6f}')",
+        "contains_unresolved_call": true,
+        "end_line": 291,
+        "exception_possible": true,
+        "id": "source:1:291:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 291,
+        "unresolved_calls": [
+          "app.notify(f'  {quote_label}: {pool_info.quote_token_amount:.6f}')"
+        ]
+      },
+      {
+        "code": "tvl_estimate = pool_info.base_token_amount * pool_info.price + pool_info.quote_token_amount",
+        "end_line": 295,
+        "id": "source:1:294:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 294
+      },
+      {
+        "code": "tvl_estimate",
+        "end_line": 294,
+        "id": "source:1:294:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 294
+      },
+      {
+        "code": "app.notify(f'  TVL (in {quote_label}): ~{tvl_estimate:.2f}')",
+        "contains_unresolved_call": true,
+        "end_line": 296,
+        "exception_possible": true,
+        "id": "source:1:296:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 296,
+        "unresolved_calls": [
+          "app.notify(f'  TVL (in {quote_label}): ~{tvl_estimate:.2f}')"
+        ]
+      },
+      {
+        "code": "is_clmm",
+        "end_line": 119,
+        "id": "test:119:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 119
+      },
+      {
+        "code": "base_token",
+        "end_line": 122,
+        "id": "test:122:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 122
+      },
+      {
+        "code": "quote_token",
+        "end_line": 123,
+        "id": "test:123:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 123
+      },
+      {
+        "code": "lp_utils = load_display_pool_info()",
+        "end_line": 140,
+        "exception_possible": true,
+        "id": "test:140:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 140
+      },
+      {
+        "code": "lp_utils",
+        "end_line": 140,
+        "id": "test:140:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 140
+      },
+      {
+        "code": "active_bin_id != 'missing'",
+        "end_line": 154,
+        "id": "test:154:7:Compare",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 154
+      },
+      {
+        "code": "hasattr(pool_info, 'active_bin_id')",
+        "end_line": 157,
+        "id": "test:157:11:Call",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 157
+      },
+      {
+        "code": "if hasattr(pool_info, 'active_bin_id'):\n    del pool_info.active_bin_id",
+        "contains_unresolved_call": true,
+        "end_line": 158,
+        "exception_possible": true,
+        "id": "test:157:8:If",
+        "kind": "If",
+        "source_id": "test",
+        "start_line": 157,
+        "unresolved_calls": [
+          "hasattr(pool_info, 'active_bin_id')"
+        ]
+      },
+      {
+        "code": "del pool_info.active_bin_id",
+        "end_line": 158,
+        "id": "test:158:12:Delete",
+        "kind": "Delete",
+        "source_id": "test",
+        "start_line": 158
+      },
+      {
+        "code": "bin_step != 'missing'",
+        "end_line": 159,
+        "id": "test:159:7:Compare",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 159
+      },
+      {
+        "code": "hasattr(pool_info, 'bin_step')",
+        "end_line": 162,
+        "id": "test:162:11:Call",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 162
+      },
+      {
+        "code": "if hasattr(pool_info, 'bin_step'):\n    del pool_info.bin_step",
+        "contains_unresolved_call": true,
+        "end_line": 163,
+        "exception_possible": true,
+        "id": "test:162:8:If",
+        "kind": "If",
+        "source_id": "test",
+        "start_line": 162,
+        "unresolved_calls": [
+          "hasattr(pool_info, 'bin_step')"
+        ]
+      },
+      {
+        "code": "del pool_info.bin_step",
+        "end_line": 163,
+        "id": "test:163:12:Delete",
+        "kind": "Delete",
+        "source_id": "test",
+        "start_line": 163
+      },
+      {
+        "code": "lp_utils.display_pool_info(mock_app, pool_info, is_clmm, base_token=base_token, quote_token=quote_token)",
+        "end_line": 172,
+        "exception_possible": true,
+        "id": "test:166:4:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 166
+      },
+      {
+        "code": "source_lines = MODULE_PATH.read_text(encoding='utf-8').splitlines()",
+        "contains_unresolved_call": true,
+        "end_line": 20,
+        "exception_possible": true,
+        "id": "test:20:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 20,
+        "unresolved_calls": [
+          "MODULE_PATH.read_text(encoding='utf-8').splitlines()",
+          "MODULE_PATH.read_text(encoding='utf-8')"
+        ]
+      },
+      {
+        "code": "source_lines",
+        "end_line": 20,
+        "id": "test:20:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 20
+      },
+      {
+        "code": "start_line = 269",
+        "end_line": 21,
+        "id": "test:21:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 21
+      },
+      {
+        "code": "start_line",
+        "end_line": 21,
+        "id": "test:21:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 21
+      },
+      {
+        "code": "end_line = 296",
+        "end_line": 22,
+        "id": "test:22:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 22
+      },
+      {
+        "code": "end_line",
+        "end_line": 22,
+        "id": "test:22:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 22
+      },
+      {
+        "code": "function_source = textwrap.dedent('\\n'.join(source_lines[start_line - 1:end_line]))",
+        "contains_unresolved_call": true,
+        "end_line": 23,
+        "exception_possible": true,
+        "id": "test:23:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 23,
+        "unresolved_calls": [
+          "textwrap.dedent('\\n'.join(source_lines[start_line - 1:end_line]))",
+          "'\\n'.join(source_lines[start_line - 1:end_line])"
+        ]
+      },
+      {
+        "code": "function_source",
+        "end_line": 23,
+        "id": "test:23:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 23
+      },
+      {
+        "code": "class_source = 'class LPCommandUtils:\\n    @staticmethod\\n' + textwrap.indent(function_source, '    ')",
+        "contains_unresolved_call": true,
+        "end_line": 31,
+        "exception_possible": true,
+        "id": "test:29:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 29,
+        "unresolved_calls": [
+          "textwrap.indent(function_source, '    ')"
+        ]
+      },
+      {
+        "code": "class_source",
+        "end_line": 29,
+        "id": "test:29:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 29
+      },
+      {
+        "code": "namespace = {'Any': Any, 'Union': Union, 'GatewayCommandUtils': FakeGatewayCommandUtils}",
+        "end_line": 32,
+        "id": "test:32:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 32
+      },
+      {
+        "code": "namespace",
+        "end_line": 32,
+        "id": "test:32:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 32
+      },
+      {
+        "code": "exec(compile('\\n' * (start_line - 3) + class_source, str(MODULE_PATH), 'exec'), namespace)",
+        "contains_unresolved_call": true,
+        "end_line": 33,
+        "exception_possible": true,
+        "id": "test:33:4:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 33,
+        "unresolved_calls": [
+          "exec(compile('\\n' * (start_line - 3) + class_source, str(MODULE_PATH), 'exec'), namespace)",
+          "compile('\\n' * (start_line - 3) + class_source, str(MODULE_PATH), 'exec')",
+          "str(MODULE_PATH)"
+        ]
+      },
+      {
+        "code": "return namespace['LPCommandUtils']",
+        "end_line": 34,
+        "id": "test:34:4:Return",
+        "kind": "Return",
+        "source_id": "test",
+        "start_line": 34
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:140:4:Assign"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:157:8:If"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:162:8:If"
+      },
+      {
+        "criterion_id": "criterion:3",
+        "seed": "test:166:4:Expr"
+      }
+    ],
+    "seeds": [
+      "test:140:4:Assign",
+      "test:157:8:If",
+      "test:162:8:If",
+      "test:166:4:Expr"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 49,
+    "edges": 66,
+    "edge_kinds": {
+      "definition_value_candidate": 10,
+      "data_candidate": 36,
+      "lexical_control": 6,
+      "normal_branch_exit": 2,
+      "call_target_candidate": 1,
+      "call_event_candidate": 11
+    },
+    "criteria": [
+      {
+        "seed": "test:140:4:Assign",
+        "node_ids": [
+          "test:140:4:Assign",
+          "test:20:4:Assign",
+          "test:20:4:Name",
+          "test:21:4:Assign",
+          "test:21:4:Name",
+          "test:22:4:Assign",
+          "test:22:4:Name",
+          "test:23:4:Assign",
+          "test:23:4:Name",
+          "test:29:4:Assign",
+          "test:29:4:Name",
+          "test:32:4:Assign",
+          "test:32:4:Name",
+          "test:33:4:Expr",
+          "test:34:4:Return"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:20:4:Assign",
+          "test:23:4:Assign",
+          "test:29:4:Assign",
+          "test:33:4:Expr"
+        ]
+      },
+      {
+        "seed": "test:157:8:If",
+        "node_ids": [
+          "test:154:7:Compare",
+          "test:157:11:Call",
+          "test:157:8:If",
+          "test:158:12:Delete"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:157:8:If"
+        ]
+      },
+      {
+        "seed": "test:162:8:If",
+        "node_ids": [
+          "test:159:7:Compare",
+          "test:162:11:Call",
+          "test:162:8:If",
+          "test:163:12:Delete"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:162:8:If"
+        ]
+      },
+      {
+        "seed": "test:166:4:Expr",
+        "node_ids": [
+          "source:1:270:8:arg",
+          "source:1:271:8:arg",
+          "source:1:273:8:arg",
+          "source:1:274:8:arg",
+          "source:1:277:8:Expr",
+          "source:1:278:8:Expr",
+          "source:1:279:8:Expr",
+          "source:1:280:8:Expr",
+          "source:1:282:11:BoolOp",
+          "source:1:283:12:Expr",
+          "source:1:284:12:Expr",
+          "source:1:286:8:Expr",
+          "source:1:288:8:Assign",
+          "source:1:288:8:Name",
+          "source:1:289:8:Assign",
+          "source:1:289:8:Name",
+          "source:1:290:8:Expr",
+          "source:1:291:8:Expr",
+          "source:1:294:8:Assign",
+          "source:1:294:8:Name",
+          "source:1:296:8:Expr",
+          "test:119:4:arg",
+          "test:122:4:arg",
+          "test:123:4:arg",
+          "test:140:4:Assign",
+          "test:140:4:Name",
+          "test:166:4:Expr",
+          "test:20:4:Assign",
+          "test:20:4:Name",
+          "test:21:4:Assign",
+          "test:21:4:Name",
+          "test:22:4:Assign",
+          "test:22:4:Name",
+          "test:23:4:Assign",
+          "test:23:4:Name",
+          "test:29:4:Assign",
+          "test:29:4:Name",
+          "test:32:4:Assign",
+          "test:32:4:Name",
+          "test:33:4:Expr",
+          "test:34:4:Return"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:277:8:Expr",
+          "source:1:278:8:Expr",
+          "source:1:279:8:Expr",
+          "source:1:280:8:Expr",
+          "source:1:283:12:Expr",
+          "source:1:284:12:Expr",
+          "source:1:286:8:Expr",
+          "source:1:290:8:Expr",
+          "source:1:291:8:Expr",
+          "source:1:296:8:Expr",
+          "test:20:4:Assign",
+          "test:23:4:Assign",
+          "test:29:4:Assign",
+          "test:33:4:Expr"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:140:4:Assign"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:157:8:If"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:162:8:If"
+      },
+      {
+        "criterion_id": "criterion:3",
+        "seed": "test:166:4:Expr"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.3446,
+  "timings_seconds": {
+    "criterion_extraction": 0.001126,
+    "source_selection": 0.043053,
+    "backend_total": 0.299998,
+    "evidence_summary": 0.000124
+  },
+  "identity": {
+    "case_id": "hummingbot_177",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "8be9675d5463b43baf8217e4b9cc9852b6ca022cf7dd1bb648353aff56690da6"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "hummingbot_177",
+      "dataset": "python-benchmark-new",
+      "language": "python",
+      "snapshot_id": "8be9675d5463b43baf8217e4b9cc9852b6ca022cf7dd1bb648353aff56690da6",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "1b4963c8d0b16fab961c4c4f4738d9f88f8652529bb9f882086ca38e51675a05",
+      "target_selector": "tests/test_177display_pool_info.py::test_display_pool_info"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_177display_pool_info.py",
+        "sha256": "1b4963c8d0b16fab961c4c4f4738d9f88f8652529bb9f882086ca38e51675a05",
+        "bytes": 4915,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:1",
+        "logical_path": "src/hummingbot/client/command/lp_command_utils.py",
+        "sha256": "6b6f01a5536393acdf03615eb367f426e3eb99f99d96e69daff01523e439a13b",
+        "bytes": 17893,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:2",
+        "logical_path": "src/hummingbot/client/command/command_utils.py",
+        "sha256": "32313b517e52f25ec5b641b2126b0873fb2db045e100ad65caba45809ad51ae4",
+        "bytes": 16252,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:3",
+        "logical_path": "src/hummingbot/connector/gateway/gateway_lp.py",
+        "sha256": "4459f3261c1c71a84a0d95920c4b6624a21ffd9e97721d2858eaf5ea0be09e8d",
+        "bytes": 34900,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 140,
+          "end_line": 140
+        },
+        "kind": "candidate_event",
+        "origin": "candidate",
+        "reason": "visible call in a selected test with no explicit observation; it is not an oracle"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 157,
+          "end_line": 157
+        },
+        "kind": "candidate_event",
+        "origin": "candidate",
+        "reason": "visible call in a selected test with no explicit observation; it is not an oracle"
+      },
+      {
+        "observation_id": "criterion:2",
+        "location": {
+          "source_id": "test",
+          "start_line": 162,
+          "end_line": 162
+        },
+        "kind": "candidate_event",
+        "origin": "candidate",
+        "reason": "visible call in a selected test with no explicit observation; it is not an oracle"
+      },
+      {
+        "observation_id": "criterion:3",
+        "location": {
+          "source_id": "test",
+          "start_line": 166,
+          "end_line": 166
+        },
+        "kind": "candidate_event",
+        "origin": "candidate",
+        "reason": "visible call in a selected test with no explicit observation; it is not an oracle"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "the runner does not enumerate parameter rows"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_177display_pool_info.py::test_display_pool_info",
+        "evidence": [
+          {
+            "symbol": "test_display_pool_info",
+            "start_line": 116,
+            "end_line": 175
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "not_evaluated",
+        "candidates": [],
+        "evidence": [],
+        "assumptions": []
+      }
+    },
+    "relations": [],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [],
+      "unknown_effects": [
+        {
+          "boundary_id": "source:1:277:8:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:278:8:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:279:8:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:280:8:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:283:12:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:284:12:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:286:8:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:290:8:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:291:8:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:296:8:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:157:8:If",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:162:8:If",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:20:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:23:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:29:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:33:4:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "mature_backend_support_domain",
+          "reason": "semantic_backend_unsupported",
+          "details": [
+            "No authenticated Python semantic driver is registered for this case.",
+            "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+            "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+          ]
+        }
+      ]
+    },
+    "completion": {
+      "status": "unsupported",
+      "stage": "semantic_backend",
+      "failure_categories": [
+        "inferred_criterion_only",
+        "unresolved_calls",
+        "semantic_analysis_gap",
+        "semantic_backend_unsupported"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "not_evaluated",
+      "reviewer": null,
+      "evidence": [],
+      "notes": "candidate reachability is not semantic dependency validation"
+    },
+    "cost": {
+      "timings_seconds": {
+        "criterion_extraction": 0.001126,
+        "source_selection": 0.043053,
+        "backend_total": 0.299998,
+        "evidence_summary": 0.000124
+      },
+      "total_seconds": 0.3446,
+      "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+      "peak_memory": {
+        "status": "unavailable",
+        "bytes": null,
+        "reason": "case-level peak memory is not measured by this runner"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+      },
+      "input_size": {
+        "files": 4,
+        "bytes": 73960
+      },
+      "graph_size": {
+        "nodes": 49,
+        "edges": 66
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter admission occurs outside the per-case analysis timer"
+        },
+        {
+          "phase": "front_end",
+          "reason": "the candidate backend does not report parsing time separately"
+        },
+        {
+          "phase": "call_graph",
+          "reason": "the candidate backend does not report call-graph time separately"
+        },
+        {
+          "phase": "pointer_analysis",
+          "reason": "the candidate backend does not provide pointer analysis"
+        },
+        {
+          "phase": "dependency_analysis",
+          "reason": "backend_total combines parsing, graph construction, and slicing"
+        },
+        {
+          "phase": "slice",
+          "reason": "the candidate backend does not report semantic slicing time separately"
+        },
+        {
+          "phase": "source_mapping",
+          "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+        }
+      ]
+    }
+  },
+  "candidate_diagnostics": {
+    "status": "partial",
+    "failure_categories": [
+      "inferred_criterion_only",
+      "unresolved_calls",
+      "semantic_analysis_gap"
+    ],
+    "result_contract": {
+      "schema_version": "mock-spec.backward-analysis-case/v1",
+      "identity": {
+        "case_id": "hummingbot_177",
+        "dataset": "python-benchmark-new",
+        "language": "python",
+        "snapshot_id": "8be9675d5463b43baf8217e4b9cc9852b6ca022cf7dd1bb648353aff56690da6",
+        "masking_contract": "python-slot-v1",
+        "masked_test_sha256": "1b4963c8d0b16fab961c4c4f4738d9f88f8652529bb9f882086ca38e51675a05",
+        "target_selector": "tests/test_177display_pool_info.py::test_display_pool_info"
+      },
+      "source_scope": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_177display_pool_info.py",
+          "sha256": "1b4963c8d0b16fab961c4c4f4738d9f88f8652529bb9f882086ca38e51675a05",
+          "bytes": 4915,
+          "selection_role": "masked_test"
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/hummingbot/client/command/lp_command_utils.py",
+          "sha256": "6b6f01a5536393acdf03615eb367f426e3eb99f99d96e69daff01523e439a13b",
+          "bytes": 17893,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/hummingbot/client/command/command_utils.py",
+          "sha256": "32313b517e52f25ec5b641b2126b0873fb2db045e100ad65caba45809ad51ae4",
+          "bytes": 16252,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:3",
+          "logical_path": "src/hummingbot/connector/gateway/gateway_lp.py",
+          "sha256": "4459f3261c1c71a84a0d95920c4b6624a21ffd9e97721d2858eaf5ea0be09e8d",
+          "bytes": 34900,
+          "selection_role": "candidate_product"
+        }
+      ],
+      "observations": [
+        {
+          "observation_id": "criterion:0",
+          "location": {
+            "source_id": "test",
+            "start_line": 140,
+            "end_line": 140
+          },
+          "kind": "candidate_event",
+          "origin": "candidate",
+          "reason": "visible call in a selected test with no explicit observation; it is not an oracle"
+        },
+        {
+          "observation_id": "criterion:1",
+          "location": {
+            "source_id": "test",
+            "start_line": 157,
+            "end_line": 157
+          },
+          "kind": "candidate_event",
+          "origin": "candidate",
+          "reason": "visible call in a selected test with no explicit observation; it is not an oracle"
+        },
+        {
+          "observation_id": "criterion:2",
+          "location": {
+            "source_id": "test",
+            "start_line": 162,
+            "end_line": 162
+          },
+          "kind": "candidate_event",
+          "origin": "candidate",
+          "reason": "visible call in a selected test with no explicit observation; it is not an oracle"
+        },
+        {
+          "observation_id": "criterion:3",
+          "location": {
+            "source_id": "test",
+            "start_line": 166,
+            "end_line": 166
+          },
+          "kind": "candidate_event",
+          "origin": "candidate",
+          "reason": "visible call in a selected test with no explicit observation; it is not an oracle"
+        }
+      ],
+      "parameterization": {
+        "status": "not_expanded",
+        "coverage": "selected_test_definition",
+        "reason": "the runner does not enumerate parameter rows"
+      },
+      "entry_point": {
+        "test_selection": {
+          "origin": "task_provided",
+          "status": "unique",
+          "selector": "tests/test_177display_pool_info.py::test_display_pool_info",
+          "evidence": [
+            {
+              "symbol": "test_display_pool_info",
+              "start_line": 116,
+              "end_line": 175
+            }
+          ]
+        },
+        "mut_binding": {
+          "origin": "automatic",
+          "status": "not_evaluated",
+          "candidates": [],
+          "evidence": [],
+          "assumptions": []
+        }
+      },
+      "relations": [],
+      "relation_coverage": [
+        {
+          "kind": "call_binding",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "control_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "exception_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "function_origin",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "normal_return_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "state_flow",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "value_flow",
+          "status": "not_evaluated"
+        }
+      ],
+      "analysis_boundaries": {
+        "assumptions": [],
+        "unknown_effects": [
+          {
+            "boundary_id": "source:1:277:8:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:278:8:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:279:8:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:280:8:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:283:12:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:284:12:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:286:8:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:290:8:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:291:8:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:296:8:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:157:8:If",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:162:8:If",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:20:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:23:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:29:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:33:4:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          }
+        ],
+        "unanalysed_regions": [
+          {
+            "scope": "semantic_relations",
+            "reason": "candidate_graph_has_no_validated_dependency_semantics"
+          }
+        ]
+      },
+      "completion": {
+        "status": "partial",
+        "stage": "complete",
+        "failure_categories": [
+          "inferred_criterion_only",
+          "unresolved_calls",
+          "semantic_analysis_gap"
+        ],
+        "error": null
+      },
+      "semantic_validation": {
+        "status": "not_evaluated",
+        "reviewer": null,
+        "evidence": [],
+        "notes": "candidate reachability is not semantic dependency validation"
+      },
+      "cost": {
+        "timings_seconds": {
+          "criterion_extraction": 0.001126,
+          "source_selection": 0.043053,
+          "backend_total": 0.299998,
+          "evidence_summary": 0.000124
+        },
+        "total_seconds": 0.3446,
+        "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+        "peak_memory": {
+          "status": "unavailable",
+          "bytes": null,
+          "reason": "case-level peak memory is not measured by this runner"
+        },
+        "cache_state": {
+          "status": "unknown",
+          "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+        },
+        "input_size": {
+          "files": 4,
+          "bytes": 73960
+        },
+        "graph_size": {
+          "nodes": 49,
+          "edges": 66
+        },
+        "unavailable_phases": [
+          {
+            "phase": "input_admission",
+            "reason": "adapter admission occurs outside the per-case analysis timer"
+          },
+          {
+            "phase": "front_end",
+            "reason": "the candidate backend does not report parsing time separately"
+          },
+          {
+            "phase": "call_graph",
+            "reason": "the candidate backend does not report call-graph time separately"
+          },
+          {
+            "phase": "pointer_analysis",
+            "reason": "the candidate backend does not provide pointer analysis"
+          },
+          {
+            "phase": "dependency_analysis",
+            "reason": "backend_total combines parsing, graph construction, and slicing"
+          },
+          {
+            "phase": "slice",
+            "reason": "the candidate backend does not report semantic slicing time separately"
+          },
+          {
+            "phase": "source_mapping",
+            "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+          }
+        ]
+      }
+    },
+    "stage": "complete",
+    "error": null,
+    "elapsed_seconds": 0.3446,
+    "timings_seconds": {
+      "criterion_extraction": 0.001126,
+      "source_selection": 0.043053,
+      "backend_total": 0.299998,
+      "evidence_summary": 0.000124
+    },
+    "graph_and_evidence": "top-level graph/evidence/sources remain candidate diagnostics only"
+  },
+  "semantic_backend": {
+    "schema": "mock-spec.batch-semantic-backend/v1",
+    "status": "unsupported",
+    "backend": null,
+    "identity": {
+      "language": "python",
+      "dataset": "python-benchmark-new",
+      "case_id": "hummingbot_177",
+      "inventory_revision": "0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc",
+      "snapshot_id": "8be9675d5463b43baf8217e4b9cc9852b6ca022cf7dd1bb648353aff56690da6",
+      "snapshot_root": "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/python-benchmark-new/8be9675d5463b43baf8217e4b9cc9852b6ca022cf7dd1bb648353aff56690da6",
+      "admission_status": "frozen_candidate",
+      "admission_verified": false,
+      "reviewed_snapshot_id": null,
+      "target_selector": "tests/test_177display_pool_info.py::test_display_pool_info",
+      "masked_test_logical_path": "tests/test_177display_pool_info.py",
+      "masked_test_sha256": "1b4963c8d0b16fab961c4c4f4738d9f88f8652529bb9f882086ca38e51675a05",
+      "masking_contract": "python-slot-v1",
+      "input_context": {
+        "target_selector": "tests/test_177display_pool_info.py::test_display_pool_info",
+        "masked_test_logical_path": "tests/test_177display_pool_info.py",
+        "masked_test_sha256": "1b4963c8d0b16fab961c4c4f4738d9f88f8652529bb9f882086ca38e51675a05",
+        "masking_contract": "python-slot-v1"
+      },
+      "sources": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_177display_pool_info.py",
+          "sha256": "1b4963c8d0b16fab961c4c4f4738d9f88f8652529bb9f882086ca38e51675a05",
+          "bytes": 4915
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/hummingbot/client/command/lp_command_utils.py",
+          "sha256": "6b6f01a5536393acdf03615eb367f426e3eb99f99d96e69daff01523e439a13b",
+          "bytes": 17893
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/hummingbot/client/command/command_utils.py",
+          "sha256": "32313b517e52f25ec5b641b2126b0873fb2db045e100ad65caba45809ad51ae4",
+          "bytes": 16252
+        },
+        {
+          "source_id": "source:3",
+          "logical_path": "src/hummingbot/connector/gateway/gateway_lp.py",
+          "sha256": "4459f3261c1c71a84a0d95920c4b6624a21ffd9e97721d2858eaf5ea0be09e8d",
+          "bytes": 34900
+        }
+      ]
+    },
+    "limitations": [
+      "No authenticated Python semantic driver is registered for this case.",
+      "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+      "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+    ],
+    "source": null,
+    "provenance": {
+      "target_executed": false
+    },
+    "cost": null,
+    "terminal": {
+      "execution": "not_started",
+      "semantic_validation": "not_evaluated"
+    },
+    "driver_exit_code": 0,
+    "batch_dispatch_seconds": 0.171707,
+    "batch_dispatch_scope": "bridge process including support check, adapter and backend; excludes candidate diagnostics"
+  },
+  "batch_case_cost": {
+    "total_seconds": 0.577436,
+    "scope": "admission, candidate diagnostic, semantic-slot wait, dispatch and mapping; excludes case queue, shared compile and serialization"
+  },
+  "result_contract_sha256": "2f1e7d97d9c39e920757b620db9c12271f7b96200bedfae11a94e8f7fda95fb9"
+}

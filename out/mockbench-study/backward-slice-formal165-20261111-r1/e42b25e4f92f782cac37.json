@@ -1,0 +1,1186 @@
+{
+  "status": "failed",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap",
+    "semantic_backend_failed"
+  ],
+  "stage": "semantic_backend",
+  "input_context": {
+    "target_selector": "tests/test_308abort.py::test_abort_scenarios",
+    "masked_test_logical_path": "tests/test_308abort.py",
+    "masked_test_sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+    "masking_contract": "python-slot-v1"
+  },
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_308abort.py::test_abort_scenarios",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_abort_scenarios",
+          "start_line": 48,
+          "end_line": 126
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 102,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 120,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 126,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:2"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "flask.helpers",
+        "candidates": [
+          "src/src/flask/helpers.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/flask/helpers.py",
+        "hint_kind": "python_import",
+        "hint": "typing",
+        "candidates": [
+          "src/src/flask/typing.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "dynamic_loader_bindings": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 29222,
+    "read_bytes": 29222,
+    "attempted_files": 2,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_308abort.py",
+      "sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+      "bytes": 3044
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/src/flask/helpers.py",
+      "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+      "bytes": 23064
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/src/flask/typing.py",
+      "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+      "bytes": 3114
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "dynamic_loader_bindings": [],
+    "edges": [
+      {
+        "field": "body",
+        "from": "test:103:8:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:102:4:With"
+      },
+      {
+        "branch": "true",
+        "from": "test:111:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:120:8:Assert"
+      },
+      {
+        "branch": "false",
+        "from": "test:111:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:126:8:Assert"
+      },
+      {
+        "from": "test:102:4:With",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:102:37:Name"
+      },
+      {
+        "from": "test:48:60:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:103:8:Expr",
+        "variable": "code"
+      },
+      {
+        "from": "test:48:66:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:103:8:Expr",
+        "variable": "args"
+      },
+      {
+        "from": "test:48:72:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:103:8:Expr",
+        "variable": "kwargs"
+      },
+      {
+        "from": "test:48:60:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:120:8:Assert",
+        "variable": "code"
+      },
+      {
+        "from": "test:102:37:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:120:8:Assert",
+        "variable": "exc_info"
+      },
+      {
+        "from": "test:48:60:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:126:8:Assert",
+        "variable": "code"
+      },
+      {
+        "from": "test:102:37:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:126:8:Assert",
+        "variable": "exc_info"
+      },
+      {
+        "callee": "abort",
+        "from": "source:1:283:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:103:8:Expr"
+      },
+      {
+        "callee": "abort",
+        "from": "source:1:285:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:103:8:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:282:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:283:8:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:283:8:Expr",
+        "kind": "normal_branch_exit",
+        "precision": "possible_only_if_branch_completes_normally",
+        "to": "source:1:282:4:If"
+      },
+      {
+        "from": "source:1:282:4:If",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:282:8:Name"
+      },
+      {
+        "from": "source:1:282:8:NamedExpr",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:283:8:Expr",
+        "variable": "ctx"
+      },
+      {
+        "from": "source:1:282:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:283:8:Expr",
+        "variable": "ctx"
+      },
+      {
+        "from": "source:1:265:10:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:283:8:Expr",
+        "variable": "code"
+      },
+      {
+        "from": "source:1:265:10:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:285:4:Expr",
+        "variable": "code"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected",
+      "dynamic loader origins require a visible static path, namespace key, selected definition, and unrebound test callable"
+    ],
+    "nodes": [
+      {
+        "code": "code: int | BaseResponse",
+        "end_line": 265,
+        "id": "source:1:265:10:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 265
+      },
+      {
+        "code": "if (ctx := _cv_app.get(None)) is not None:\n    ctx.app.aborter(code, *args, **kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 283,
+        "exception_possible": true,
+        "id": "source:1:282:4:If",
+        "kind": "If",
+        "source_id": "source:1",
+        "start_line": 282,
+        "unresolved_calls": [
+          "_cv_app.get(None)"
+        ]
+      },
+      {
+        "code": "(ctx := _cv_app.get(None)) is not None",
+        "end_line": 282,
+        "id": "source:1:282:7:Compare",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 282
+      },
+      {
+        "code": "ctx",
+        "end_line": 282,
+        "id": "source:1:282:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 282
+      },
+      {
+        "code": "(ctx := _cv_app.get(None))",
+        "end_line": 282,
+        "id": "source:1:282:8:NamedExpr",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 282
+      },
+      {
+        "code": "ctx.app.aborter(code, *args, **kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 283,
+        "exception_possible": true,
+        "id": "source:1:283:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 283,
+        "unresolved_calls": [
+          "ctx.app.aborter(code, *args, **kwargs)"
+        ]
+      },
+      {
+        "code": "_wz_abort(code, *args, **kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 285,
+        "exception_possible": true,
+        "id": "source:1:285:4:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 285,
+        "unresolved_calls": [
+          "_wz_abort(code, *args, **kwargs)"
+        ]
+      },
+      {
+        "code": "exc_info",
+        "end_line": 102,
+        "id": "test:102:37:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 102
+      },
+      {
+        "code": "with pytest.raises(Exception) as exc_info:\n    abort(code, *args, **kwargs)",
+        "contains_unresolved_call": true,
+        "end_line": 103,
+        "exception_possible": true,
+        "id": "test:102:4:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 102,
+        "unresolved_calls": [
+          "pytest.raises(Exception)"
+        ]
+      },
+      {
+        "code": "abort(code, *args, **kwargs)",
+        "end_line": 103,
+        "exception_possible": true,
+        "id": "test:103:8:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 103
+      },
+      {
+        "code": "has_app_context",
+        "end_line": 111,
+        "id": "test:111:7:Name",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 111
+      },
+      {
+        "code": "assert f'Aborted with {code}' in str(exc_info.value)",
+        "contains_unresolved_call": true,
+        "end_line": 120,
+        "exception_possible": true,
+        "id": "test:120:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 120,
+        "unresolved_calls": [
+          "str(exc_info.value)"
+        ]
+      },
+      {
+        "code": "assert f'Werkzeug abort {code}' in str(exc_info.value)",
+        "contains_unresolved_call": true,
+        "end_line": 126,
+        "exception_possible": true,
+        "id": "test:126:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 126,
+        "unresolved_calls": [
+          "str(exc_info.value)"
+        ]
+      },
+      {
+        "code": "code",
+        "end_line": 48,
+        "id": "test:48:60:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 48
+      },
+      {
+        "code": "args",
+        "end_line": 48,
+        "id": "test:48:66:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 48
+      },
+      {
+        "code": "kwargs",
+        "end_line": 48,
+        "id": "test:48:72:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 48
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:102:4:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:120:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:126:8:Assert"
+      }
+    ],
+    "seeds": [
+      "test:102:4:With",
+      "test:120:8:Assert",
+      "test:126:8:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 16,
+    "edges": 20,
+    "edge_kinds": {
+      "normal_body_exit": 1,
+      "lexical_control": 3,
+      "definition_value_candidate": 2,
+      "data_candidate": 11,
+      "call_event_candidate": 2,
+      "normal_branch_exit": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:102:4:With",
+        "node_ids": [
+          "source:1:265:10:arg",
+          "source:1:282:4:If",
+          "source:1:282:7:Compare",
+          "source:1:282:8:Name",
+          "source:1:282:8:NamedExpr",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:4:With",
+          "test:103:8:Expr",
+          "test:48:60:arg",
+          "test:48:66:arg",
+          "test:48:72:arg"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:282:4:If",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:4:With"
+        ]
+      },
+      {
+        "seed": "test:120:8:Assert",
+        "node_ids": [
+          "source:1:265:10:arg",
+          "source:1:282:4:If",
+          "source:1:282:7:Compare",
+          "source:1:282:8:Name",
+          "source:1:282:8:NamedExpr",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:37:Name",
+          "test:102:4:With",
+          "test:103:8:Expr",
+          "test:111:7:Name",
+          "test:120:8:Assert",
+          "test:48:60:arg",
+          "test:48:66:arg",
+          "test:48:72:arg"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:282:4:If",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:4:With",
+          "test:120:8:Assert"
+        ]
+      },
+      {
+        "seed": "test:126:8:Assert",
+        "node_ids": [
+          "source:1:265:10:arg",
+          "source:1:282:4:If",
+          "source:1:282:7:Compare",
+          "source:1:282:8:Name",
+          "source:1:282:8:NamedExpr",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:37:Name",
+          "test:102:4:With",
+          "test:103:8:Expr",
+          "test:111:7:Name",
+          "test:126:8:Assert",
+          "test:48:60:arg",
+          "test:48:66:arg",
+          "test:48:72:arg"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:282:4:If",
+          "source:1:283:8:Expr",
+          "source:1:285:4:Expr",
+          "test:102:4:With",
+          "test:126:8:Assert"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:102:4:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:120:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:126:8:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.1388,
+  "timings_seconds": {
+    "criterion_extraction": 0.000793,
+    "source_selection": 0.030372,
+    "backend_total": 0.107384,
+    "evidence_summary": 0.00013
+  },
+  "identity": {
+    "case_id": "flask_308",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "flask_308",
+      "dataset": "python-benchmark-new",
+      "language": "python",
+      "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+      "target_selector": "tests/test_308abort.py::test_abort_scenarios"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_308abort.py",
+        "sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+        "bytes": 3044,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:1",
+        "logical_path": "src/src/flask/helpers.py",
+        "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+        "bytes": 23064,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:2",
+        "logical_path": "src/src/flask/typing.py",
+        "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+        "bytes": 3114,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 102,
+          "end_line": 102
+        },
+        "kind": "exception_observation",
+        "origin": "explicit",
+        "reason": "raises in the selected test function"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 120,
+          "end_line": 120
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:2",
+        "location": {
+          "source_id": "test",
+          "start_line": 126,
+          "end_line": 126
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "the runner does not enumerate parameter rows"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_308abort.py::test_abort_scenarios",
+        "evidence": [
+          {
+            "symbol": "test_abort_scenarios",
+            "start_line": 48,
+            "end_line": 126
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "not_evaluated",
+        "candidates": [],
+        "evidence": [],
+        "assumptions": []
+      }
+    },
+    "relations": [],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [],
+      "unknown_effects": [
+        {
+          "boundary_id": "source:1:282:4:If",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:283:8:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:285:4:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:102:4:With",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:120:8:Assert",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:126:8:Assert",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "semantic_backend",
+          "reason": "unresolved_calls,semantic_analysis_gap,semantic_backend_failed"
+        },
+        {
+          "scope": "mature_backend_support_domain",
+          "reason": "CodeQL executable does not exist: /tmp/mockspec-issue24-tools/codeql-v2.27.4/codeql",
+          "details": []
+        }
+      ]
+    },
+    "completion": {
+      "status": "failed",
+      "stage": "semantic_backend",
+      "failure_categories": [
+        "unresolved_calls",
+        "semantic_analysis_gap",
+        "semantic_backend_failed"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "not_evaluated",
+      "reviewer": null,
+      "evidence": [],
+      "notes": "candidate reachability is not semantic dependency validation"
+    },
+    "cost": {
+      "timings_seconds": {
+        "criterion_extraction": 0.000793,
+        "source_selection": 0.030372,
+        "backend_total": 0.107384,
+        "evidence_summary": 0.00013
+      },
+      "total_seconds": 0.1388,
+      "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+      "peak_memory": {
+        "status": "unavailable",
+        "bytes": null,
+        "reason": "case-level peak memory is not measured by this runner"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+      },
+      "input_size": {
+        "files": 3,
+        "bytes": 29222
+      },
+      "graph_size": {
+        "nodes": 16,
+        "edges": 20
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter admission occurs outside the per-case analysis timer"
+        },
+        {
+          "phase": "front_end",
+          "reason": "the candidate backend does not report parsing time separately"
+        },
+        {
+          "phase": "call_graph",
+          "reason": "the candidate backend does not report call-graph time separately"
+        },
+        {
+          "phase": "pointer_analysis",
+          "reason": "the candidate backend does not provide pointer analysis"
+        },
+        {
+          "phase": "dependency_analysis",
+          "reason": "backend_total combines parsing, graph construction, and slicing"
+        },
+        {
+          "phase": "slice",
+          "reason": "the candidate backend does not report semantic slicing time separately"
+        },
+        {
+          "phase": "source_mapping",
+          "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+        }
+      ]
+    }
+  },
+  "candidate_diagnostics": {
+    "status": "partial",
+    "failure_categories": [
+      "unresolved_calls",
+      "semantic_analysis_gap"
+    ],
+    "result_contract": {
+      "schema_version": "mock-spec.backward-analysis-case/v1",
+      "identity": {
+        "case_id": "flask_308",
+        "dataset": "python-benchmark-new",
+        "language": "python",
+        "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+        "masking_contract": "python-slot-v1",
+        "masked_test_sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+        "target_selector": "tests/test_308abort.py::test_abort_scenarios"
+      },
+      "source_scope": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_308abort.py",
+          "sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+          "bytes": 3044,
+          "selection_role": "masked_test"
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/src/flask/helpers.py",
+          "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+          "bytes": 23064,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/src/flask/typing.py",
+          "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+          "bytes": 3114,
+          "selection_role": "candidate_product"
+        }
+      ],
+      "observations": [
+        {
+          "observation_id": "criterion:0",
+          "location": {
+            "source_id": "test",
+            "start_line": 102,
+            "end_line": 102
+          },
+          "kind": "exception_observation",
+          "origin": "explicit",
+          "reason": "raises in the selected test function"
+        },
+        {
+          "observation_id": "criterion:1",
+          "location": {
+            "source_id": "test",
+            "start_line": 120,
+            "end_line": 120
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        },
+        {
+          "observation_id": "criterion:2",
+          "location": {
+            "source_id": "test",
+            "start_line": 126,
+            "end_line": 126
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        }
+      ],
+      "parameterization": {
+        "status": "not_expanded",
+        "coverage": "selected_test_definition",
+        "reason": "the runner does not enumerate parameter rows"
+      },
+      "entry_point": {
+        "test_selection": {
+          "origin": "task_provided",
+          "status": "unique",
+          "selector": "tests/test_308abort.py::test_abort_scenarios",
+          "evidence": [
+            {
+              "symbol": "test_abort_scenarios",
+              "start_line": 48,
+              "end_line": 126
+            }
+          ]
+        },
+        "mut_binding": {
+          "origin": "automatic",
+          "status": "not_evaluated",
+          "candidates": [],
+          "evidence": [],
+          "assumptions": []
+        }
+      },
+      "relations": [],
+      "relation_coverage": [
+        {
+          "kind": "call_binding",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "control_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "exception_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "function_origin",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "normal_return_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "state_flow",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "value_flow",
+          "status": "not_evaluated"
+        }
+      ],
+      "analysis_boundaries": {
+        "assumptions": [],
+        "unknown_effects": [
+          {
+            "boundary_id": "source:1:282:4:If",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:283:8:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:285:4:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:102:4:With",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:120:8:Assert",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:126:8:Assert",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          }
+        ],
+        "unanalysed_regions": [
+          {
+            "scope": "semantic_relations",
+            "reason": "candidate_graph_has_no_validated_dependency_semantics"
+          }
+        ]
+      },
+      "completion": {
+        "status": "partial",
+        "stage": "complete",
+        "failure_categories": [
+          "unresolved_calls",
+          "semantic_analysis_gap"
+        ],
+        "error": null
+      },
+      "semantic_validation": {
+        "status": "not_evaluated",
+        "reviewer": null,
+        "evidence": [],
+        "notes": "candidate reachability is not semantic dependency validation"
+      },
+      "cost": {
+        "timings_seconds": {
+          "criterion_extraction": 0.000793,
+          "source_selection": 0.030372,
+          "backend_total": 0.107384,
+          "evidence_summary": 0.00013
+        },
+        "total_seconds": 0.1388,
+        "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+        "peak_memory": {
+          "status": "unavailable",
+          "bytes": null,
+          "reason": "case-level peak memory is not measured by this runner"
+        },
+        "cache_state": {
+          "status": "unknown",
+          "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+        },
+        "input_size": {
+          "files": 3,
+          "bytes": 29222
+        },
+        "graph_size": {
+          "nodes": 16,
+          "edges": 20
+        },
+        "unavailable_phases": [
+          {
+            "phase": "input_admission",
+            "reason": "adapter admission occurs outside the per-case analysis timer"
+          },
+          {
+            "phase": "front_end",
+            "reason": "the candidate backend does not report parsing time separately"
+          },
+          {
+            "phase": "call_graph",
+            "reason": "the candidate backend does not report call-graph time separately"
+          },
+          {
+            "phase": "pointer_analysis",
+            "reason": "the candidate backend does not provide pointer analysis"
+          },
+          {
+            "phase": "dependency_analysis",
+            "reason": "backend_total combines parsing, graph construction, and slicing"
+          },
+          {
+            "phase": "slice",
+            "reason": "the candidate backend does not report semantic slicing time separately"
+          },
+          {
+            "phase": "source_mapping",
+            "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+          }
+        ]
+      }
+    },
+    "stage": "complete",
+    "error": null,
+    "elapsed_seconds": 0.1388,
+    "timings_seconds": {
+      "criterion_extraction": 0.000793,
+      "source_selection": 0.030372,
+      "backend_total": 0.107384,
+      "evidence_summary": 0.00013
+    },
+    "graph_and_evidence": "top-level graph/evidence/sources remain candidate diagnostics only"
+  },
+  "semantic_backend": {
+    "schema": "mock-spec.batch-semantic-backend/v1",
+    "status": "failed",
+    "backend": "flask_demand",
+    "identity": {
+      "language": "python",
+      "dataset": "python-benchmark-new",
+      "case_id": "flask_308",
+      "inventory_revision": "0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc",
+      "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+      "snapshot_root": "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/python-benchmark-new/723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+      "admission_status": "frozen_candidate",
+      "admission_verified": false,
+      "reviewed_snapshot_id": null,
+      "target_selector": "tests/test_308abort.py::test_abort_scenarios",
+      "masked_test_logical_path": "tests/test_308abort.py",
+      "masked_test_sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+      "masking_contract": "python-slot-v1",
+      "input_context": {
+        "target_selector": "tests/test_308abort.py::test_abort_scenarios",
+        "masked_test_logical_path": "tests/test_308abort.py",
+        "masked_test_sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+        "masking_contract": "python-slot-v1"
+      },
+      "sources": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_308abort.py",
+          "sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+          "bytes": 3044
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/src/flask/helpers.py",
+          "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+          "bytes": 23064
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/src/flask/typing.py",
+          "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+          "bytes": 3114
+        }
+      ]
+    },
+    "error": {
+      "type": "ValueError",
+      "message": "CodeQL executable does not exist: /tmp/mockspec-issue24-tools/codeql-v2.27.4/codeql"
+    },
+    "source": null,
+    "provenance": {
+      "target_executed": false,
+      "driver_output": "/home/haon/projects/Mockspec/out/mockbench-study/backward-slice-formal165-20261111-r1/semantic/e42b25e4f92f782cac37/driver"
+    },
+    "cost": null,
+    "terminal": {
+      "execution": "failed",
+      "semantic_validation": "not_evaluated"
+    },
+    "driver_exit_code": 1,
+    "batch_dispatch_seconds": 0.184795,
+    "batch_dispatch_scope": "bridge process including support check, adapter and backend; excludes candidate diagnostics"
+  },
+  "batch_case_cost": {
+    "total_seconds": 0.377075,
+    "scope": "admission, candidate diagnostic, semantic-slot wait, dispatch and mapping; excludes case queue, shared compile and serialization"
+  },
+  "result_contract_sha256": "d4b081af8dc32e9b5e7148a26717a87d190adedfa8dda3f8072c7a2f0f8d71df"
+}

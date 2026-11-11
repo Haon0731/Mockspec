@@ -1,0 +1,373 @@
+{
+  "schema_version": "mockspec.wala-unknown-effects-study/v1",
+  "status": "blocked",
+  "mechanism_gate_passed": true,
+  "overall_gate_passed": false,
+  "configuration": {
+    "wala": "1.7.2",
+    "call_graph": "0-1-CFA",
+    "data_dependence": "FULL",
+    "control_dependence": "FULL",
+    "heap_limit_bytes": 2147483648,
+    "analysis_timeout_seconds_per_probe": 180,
+    "effect_model": "bounded-effect-token-v1",
+    "configuration_families": 1
+  },
+  "relations": {
+    "unknown_value_state_write": {
+      "passed": true,
+      "witness": {
+        "summary_write_to_heap_return": [
+          12,
+          17
+        ],
+        "same_call_heap_return": [
+          17,
+          26
+        ],
+        "heap_return_to_observation": [
+          26,
+          19
+        ],
+        "heap_location": "[[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, ready, <Primordial,I> >]"
+      },
+      "summary_target_is_real_ir": true,
+      "semantic_scope": "bounded_effect_token_to_same_call_same_region_write",
+      "unknown_value_havoc_proved": true,
+      "unknown_value_source_path": [
+        15,
+        13
+      ]
+    },
+    "return_alias_with_fresh_alternative": {
+      "passed": true,
+      "witness": [
+        16,
+        21,
+        31,
+        26,
+        25
+      ],
+      "summary_target_is_real_ir": true,
+      "argument_regions": [
+        "[<Application,Lsample/MechanismProbe$Box>]"
+      ],
+      "return_regions": [
+        "[<Application,Lsample/MechanismProbe$Box>]"
+      ],
+      "shared_regions": [
+        "[<Application,Lsample/MechanismProbe$Box>]"
+      ],
+      "semantic_scope": "bounded_unique_call_returned_parameter_alias",
+      "alternatives_in_summary_ir": true,
+      "pa_distinguishes_alternatives": false
+    },
+    "normal_completion": {
+      "passed": true,
+      "summary_normal_exit_indexes": [
+        5
+      ],
+      "summary_exception_exit_indexes": [
+        7
+      ],
+      "exact_call_cfg": {
+        "caller": "sample.MechanismProbe.unknownCompletionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+        "caller_context": "Everywhere",
+        "instruction_index": 2,
+        "call_site": "invokeinterface < Application, Lsample/MechanismProbe$UnknownDependency, mutate(Lsample/MechanismProbe$Box;)V >@2",
+        "declared_target": "sample.MechanismProbe$UnknownDependency.mutate(Lsample/MechanismProbe$Box;)V",
+        "call_block": 1,
+        "normal_successor_blocks": [
+          2
+        ],
+        "exceptional_successor_blocks": [
+          3
+        ],
+        "normal_reachable": [
+          {
+            "instruction": "return 5",
+            "instruction_index": 4,
+            "basic_block": 2
+          }
+        ],
+        "exceptional_reachable": []
+      },
+      "normal_continuation_reaches_return": true,
+      "exceptional_first_edge_present": true,
+      "sdg_normal_exit_reaches_entry": false,
+      "evidence_semantics": {
+        "callee": "summary CFG contains a structurally possible normal return",
+        "caller": "entry SSA CFG has an exact-call normal first edge that may reach the selected observation",
+        "note": "This is structured CFG evidence; it is not represented as one SDG edge."
+      },
+      "semantic_scope": "bounded_summary_exit_plus_exact_callsite_cfg_continuation"
+    },
+    "write_before_throw_to_handler_state_read": {
+      "passed": true,
+      "state_effect": {
+        "passed": true,
+        "witness": {
+          "summary_write_to_heap_return": [
+            11,
+            14
+          ],
+          "same_call_heap_return": [
+            14,
+            25
+          ],
+          "heap_return_to_observation": [
+            25,
+            16
+          ],
+          "heap_location": "[[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]"
+        },
+        "summary_target_is_real_ir": true,
+        "semantic_scope": "bounded_effect_token_to_same_call_same_region_write",
+        "unknown_value_havoc_proved": true,
+        "unknown_value_source_path": [
+          13,
+          11
+        ]
+      },
+      "put_dominates_throw": true,
+      "exception_path": {
+        "summary_method": "sample.MechanismProbe$OpaqueCarrier.mutate(Lsample/MechanismProbe$Box;)V",
+        "summary_context": "Everywhere",
+        "exit_kind": "exception",
+        "source_instruction_index": 7,
+        "source_instruction": "throw 8",
+        "entry_reachable_statements": [
+          {
+            "kind": "EXC_RET_CALLER",
+            "method": "sample.MechanismProbe.unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+            "context": "Everywhere",
+            "instruction": "invokeinterface < Application, Lsample/MechanismProbe$UnknownDependency, mutate(Lsample/MechanismProbe$Box;)V > 1,2 @2 exception:4",
+            "instruction_index": 2,
+            "line": 71,
+            "basic_block": 1,
+            "statement_text": "EXC_RET_CALLER:Node: < Application, Lsample/MechanismProbe, unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere[2]invokeinterface < Application, Lsample/MechanismProbe$UnknownDependency, mutate(Lsample/MechanismProbe$Box;)V > 1,2 @2 exception:4",
+            "heap_location": null,
+            "call_instruction_index": 2,
+            "call_site": "invokeinterface < Application, Lsample/MechanismProbe$UnknownDependency, mutate(Lsample/MechanismProbe$Box;)V >@2",
+            "declared_target": "sample.MechanismProbe$UnknownDependency.mutate(Lsample/MechanismProbe$Box;)V"
+          },
+          {
+            "kind": "NORMAL",
+            "method": "sample.MechanismProbe.unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+            "context": "Everywhere",
+            "instruction": "throw 7",
+            "instruction_index": 27,
+            "line": 77,
+            "basic_block": 11,
+            "statement_text": "NORMAL unknownExceptionObservation:throw 7 Node: < Application, Lsample/MechanismProbe, unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere",
+            "heap_location": null,
+            "call_instruction_index": null,
+            "call_site": null,
+            "declared_target": null
+          },
+          {
+            "kind": "CATCH",
+            "method": "sample.MechanismProbe.unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+            "context": "Everywhere",
+            "instruction": "5 = getCaughtException ",
+            "instruction_index": null,
+            "line": null,
+            "basic_block": 5,
+            "statement_text": "Node: < Application, Lsample/MechanismProbe, unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere:5 = getCaughtException ",
+            "heap_location": null,
+            "call_instruction_index": null,
+            "call_site": null,
+            "declared_target": null
+          },
+          {
+            "kind": "CATCH",
+            "method": "sample.MechanismProbe.unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+            "context": "Everywhere",
+            "instruction": "7 = getCaughtException ",
+            "instruction_index": null,
+            "line": null,
+            "basic_block": 9,
+            "statement_text": "Node: < Application, Lsample/MechanismProbe, unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere:7 = getCaughtException ",
+            "heap_location": null,
+            "call_instruction_index": null,
+            "call_site": null,
+            "declared_target": null
+          },
+          {
+            "kind": "EXC_RET_CALLEE",
+            "method": "sample.MechanismProbe.unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+            "context": "Everywhere",
+            "instruction": null,
+            "instruction_index": null,
+            "line": null,
+            "basic_block": null,
+            "statement_text": "EXC_RET_CALLEE:Node: < Application, Lsample/MechanismProbe, unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere",
+            "heap_location": null,
+            "call_instruction_index": null,
+            "call_site": null,
+            "declared_target": null
+          }
+        ]
+      },
+      "catch_blocks": [
+        5,
+        9
+      ],
+      "heap_return_to_handler_read": [
+        25,
+        16
+      ],
+      "handler_reads_state": true,
+      "semantic_scope": "bounded_effect_token_write_before_exact_call_exception"
+    }
+  },
+  "negative_validator_checks": {
+    "unrelated_return_rejected": true,
+    "wrong_callsite_rejected": true
+  },
+  "model_interpretation": {
+    "proved": [
+      "native unknown scalar token reaches a same-call/same-region field write",
+      "argument alias and fresh return alternatives occur in summary IR",
+      "a structural summary normal exit aligns with the exact call site's normal CFG continuation to the selected observation",
+      "write dominates throw and the exact exceptional path reaches a handler read of the same heap region"
+    ],
+    "still_unknown": [
+      "pointer analysis merges the fresh and argument return alternatives",
+      "receiver fields, reference fields, arrays, globals/statics, escaped regions, null, other arguments, and arbitrary exception types",
+      "visible-signature library boundaries outside the configured Application carrier set"
+    ],
+    "not_claimed": "This is not a general sound unknown-call havoc model and does not encode concrete Mock behavior."
+  },
+  "root_cause_correction": {
+    "old_model": "self-write preserved the old field value and receiver-null was an infeasible exception branch",
+    "new_model": "native EffectSource tokens supply unknown scalar values; explicit CFG alternatives model normal return, throw, write-before-throw, argument return, and fresh return",
+    "normal_completion_note": "WALA emits no void NORMAL_RET SDG bridge, so this relation uses separate callee-summary CFG and exact caller CFG evidence."
+  },
+  "attempt_ledger": [
+    {
+      "artifact": "out/mockbench-study/issue23-unknown-effects-20261111-config-a",
+      "status": "analysed",
+      "backend_sha256": "52366d0a47c655fe2974a03dc17a602d2e8acc3b7b85676e748dd091fdcee0af",
+      "probes": [
+        {
+          "label": "unknown_ready",
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 53.42240452899932
+        },
+        {
+          "label": "unknown_alias",
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 3.4939378109993413
+        },
+        {
+          "label": "unknown_completion",
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 45.34680178799954
+        },
+        {
+          "label": "unknown_exception",
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 38.47091652400013
+        },
+        {
+          "label": "unknown_fresh",
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 49.88211216799937
+        }
+      ]
+    },
+    {
+      "artifact": "out/mockbench-study/issue23-unknown-effects-20261111-config-a-forward",
+      "status": "analysed",
+      "backend_sha256": "8f717e4a45a0f00b7e54e09410c7ec02d07dba1c40127ab799b71c0c962b8bb6",
+      "probes": [
+        {
+          "label": "unknown_completion",
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 106.39955470899986
+        },
+        {
+          "label": "unknown_exception",
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 70.08066169599988
+        }
+      ]
+    },
+    {
+      "artifact": "out/mockbench-study/issue23-unknown-effects-20261111-config-b",
+      "status": "analysed",
+      "backend_sha256": "862ce2a8450c87f1709d490cde58525f9422a37199872986bb5b16534056bb9a",
+      "probes": [
+        {
+          "label": "unknown_ready",
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 44.113157970999964
+        },
+        {
+          "label": "unknown_exception",
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 45.43465289300002
+        }
+      ]
+    },
+    {
+      "artifact": "out/mockbench-study/issue23-unknown-effects-20261111-final",
+      "status": "analysis_failed",
+      "backend_sha256": "ea347be175cfc431c42c6ea454c752306a959fa62e35aed6a7f974f7f508b8ed",
+      "probes": [
+        {
+          "label": "unknown_ready",
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 43.78222777799965
+        },
+        {
+          "label": "unknown_alias",
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 2.630846699000358
+        },
+        {
+          "label": "unknown_completion",
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 44.664439205000235
+        },
+        {
+          "label": "unknown_exception",
+          "exit_code": 1,
+          "timed_out": false,
+          "seconds": 49.09833843099932
+        }
+      ]
+    },
+    {
+      "artifact": "out/mockbench-study/issue23-unknown-effects-20261111-final-r2",
+      "status": "analysed",
+      "backend_sha256": "b27462bf7bbb4eab379900221e8524c4e9ae3b410be4d1e99a871314a4e005be",
+      "probes": [
+        {
+          "label": "unknown_exception",
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 36.550379158000396
+        }
+      ]
+    }
+  ],
+  "real_jib": {
+    "status": "not_rerun",
+    "reason": "This bounded mechanism change does not address transitive-MOD HeapReturnCaller materialization pressure."
+  },
+  "decision": "Retain the bounded mechanism, but keep the issue gate blocked pending an explicit unknown-region abstraction and a completed real reviewed-input run."
+}

@@ -1,0 +1,111 @@
+{
+  "schema": "mock-spec.python-demand-mechanism-summary/v1",
+  "status": "authenticated",
+  "root_selector_sha256": "aee51c747769bcbd6505917d470fcb115efa6e562a5ebc296c55d127b8001887",
+  "query_receipts": {
+    "flask-exceptions": {
+      "receipt": "flask-exceptions.receipt.json",
+      "receipt_sha256": "c86daae535ef65cdfe152d2cc6185129c3fee98830a4b9be561f3f6cf19460a9",
+      "result_sha256": "0fb52e66b21b794285b0d3c0ed3e790dc0cd6abdf15ad35651c2cb0c4e98a19e"
+    },
+    "flask-flask-abort": {
+      "receipt": "flask-flask-abort.receipt.json",
+      "receipt_sha256": "02f10a91ce9585a76d9f012e47937ee587f2ac5138f69aea369c5822d77bc911",
+      "result_sha256": "f9df8a0d1ea403c1f54e4da6308d75bc92b520a71d2c1cedbb968abbc14fa972"
+    },
+    "flask-flask-observation-flow": {
+      "receipt": "flask-flask-observation-flow.receipt.json",
+      "receipt_sha256": "f51959c87226a0cd9694f06ecdbeadea459264df17cca9911ead16053911933c",
+      "result_sha256": "0660ffdbbb22a722acb7115c3bab3f58de512fc17a776f4c978a8b81e8a777e3"
+    },
+    "flask-pytest-exception-flow": {
+      "receipt": "flask-pytest-exception-flow.receipt.json",
+      "receipt_sha256": "e0ab5a5ef46fc91c81cfe5c3a17382cc827cf8fe380289c857895fa1cb14687f",
+      "result_sha256": "7b013dfab5fff54604d231c87ecb83f3f8cc2c46fd2539ffb763d385ea033db9"
+    },
+    "probe-recursive-boundary": {
+      "receipt": "probe-recursive-boundary.receipt.json",
+      "receipt_sha256": "5285576ea57aae1ffbefed1248ee5535c40ebcf20206a5138262f75e745fe1e6",
+      "result_sha256": "37f908b258c631a27d03cc5ff4401ca44c78086fbad8c4efe9c5a88dd13d35a4"
+    },
+    "probe-state-boundary-flow": {
+      "receipt": "probe-state-boundary-flow.receipt.json",
+      "receipt_sha256": "da35b627e767f45b2a00b67ce3ce92d6122a125d78f3ad14e47621d48cbff654",
+      "result_sha256": "df69927eff9910c0cafe473e6fd3f1ddc284a5c752d9738bd2e5d1180243fada"
+    },
+    "probe-unknown-effect-flow": {
+      "receipt": "probe-unknown-effect-flow.receipt.json",
+      "receipt_sha256": "0943707f17b6e45a6d6d80e8684e75e3b2b943fff6395c68e5ac412549ed14df",
+      "result_sha256": "b718afb90571882c3f3e0391c7eb0439ed00cb233bad539b685bc7ae39ba4f74"
+    },
+    "probe-unknown-exception-state": {
+      "receipt": "probe-unknown-exception-state.receipt.json",
+      "receipt_sha256": "205208178037e6e51ee41c61e145728c9e2a83d018b0b36211a1f85b20a5b63f",
+      "result_sha256": "4f3cb71560e97e6a30b84cb01e432aeaf81d712f8a7a8ee88d0e7828819abe02"
+    },
+    "probe-visible-state-flow": {
+      "receipt": "probe-visible-state-flow.receipt.json",
+      "receipt_sha256": "93c914515879e058831cc1edcefb242715baa82174399f9a43facf773aee9741",
+      "result_sha256": "0d02e1eb91644946b16f59a2cb2226cff2cb4ce9ed59b8a003987c95c9cd94ea"
+    }
+  },
+  "pytest_capture_model": {
+    "status": "passed",
+    "required_observation_lines": [
+      120,
+      126
+    ],
+    "observed_lines": [
+      120,
+      126
+    ]
+  },
+  "model_evidence": {
+    "status": "passed",
+    "checks": {
+      "state:visible-write": true,
+      "state:direct-argument": true,
+      "state:return-alias": true,
+      "state:receiver": true,
+      "state:receiver-loop": true,
+      "state:module-global": true,
+      "state:escaped-argument": true,
+      "state:exception-handler": true,
+      "state:finally": true,
+      "unknown:global_rebind_boundary": true,
+      "unknown:receiver_other_object": true,
+      "unknown:escaped_other_object": true
+    }
+  },
+  "state_boundary_evidence": {
+    "status": "passed",
+    "checks": {
+      "state:visible-write": true,
+      "state:direct-argument": true,
+      "state:return-alias": true,
+      "state:receiver": true,
+      "state:receiver-loop": true,
+      "state:module-global": true,
+      "state:escaped-argument": true,
+      "state:exception-handler": true,
+      "state:finally": true,
+      "unknown:global_rebind_boundary": true,
+      "unknown:receiver_other_object": true,
+      "unknown:escaped_other_object": true
+    },
+    "semantic_scope": "registered state observation roots only"
+  },
+  "relation_families": {
+    "positive": [
+      "return_alias_write_to_argument_read",
+      "unknown_escaped_argument_write_to_read",
+      "unknown_global_write_to_read",
+      "unknown_may_write_to_read",
+      "unknown_receiver_write_to_read"
+    ],
+    "negative": [],
+    "exception": [
+      "write_effect_exception_path_to_read"
+    ]
+  }
+}

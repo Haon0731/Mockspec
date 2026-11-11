@@ -1,0 +1,35 @@
+{
+  "state_boundary": {
+    "schema": "mock-spec.issue27-state-boundary-evidence/v1",
+    "status": "passed",
+    "checks": {
+      "receiver_effect_reaches_receiver_read": true,
+      "receiver_loop_prewrite_not_false_kill": true,
+      "global_effect_reaches_global_read": true,
+      "escaped_argument_effect_reaches_same_argument_read": true,
+      "receiver_fresh_object_excluded": true,
+      "receiver_parameter_alias_recorded_unknown": true,
+      "receiver_overwrite_kills_unknown_effect": true,
+      "local_object_not_promoted_to_global": true,
+      "global_overwrite_kills_unknown_effect": true,
+      "global_rebind_recorded_as_unknown": true,
+      "global_rebind_not_falsely_linked": true,
+      "escaped_fresh_object_excluded": true,
+      "escaped_parameter_alias_recorded_unknown": true,
+      "escaped_overwrite_kills_unknown_effect": true,
+      "visible_pure_call_has_no_unknown_effect": true,
+      "negative_fixtures_present": true,
+      "unknown_fixtures_present": true
+    },
+    "semantic_scope": "bounded exact receiver, resolved module-global binding, and explicit retain-then-use escape paths",
+    "limitations": [
+      "The module-global relation is a conservative unknown-call boundary, not a concrete write.",
+      "A module-global object rebind is emitted as an unresolved region boundary, not an exclusion.",
+      "Distinct parameter local sources are emitted as unresolved possible aliases.",
+      "The escaped relation requires an explicit earlier opaque argument-passing call on the same dependency receiver.",
+      "Dynamic attributes and arbitrary transitive heap reachability remain unknown."
+    ]
+  },
+  "visible_write": true,
+  "direct_loop_effect_survives": true
+}

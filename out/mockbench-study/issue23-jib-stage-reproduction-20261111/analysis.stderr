@@ -1,0 +1,25 @@
+WALA_STAGE call_graph_complete nodes=13086 application_nodes=17 contexts=61 pointer_instance_keys=4852 elapsed_ms=14113
+WALA_STAGE sdg_initialized lazy_pdg=true elapsed_ms=21553
+WALA_STAGE backward_slice_started pdg_population=on_demand
+Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+	at java.base/java.util.Arrays.copyOf(Arrays.java:3689)
+	at com.ibm.wala.util.intset.MutableMapping.add(MutableMapping.java:111)
+	at com.ibm.wala.util.graph.impl.SlowNumberedNodeManager.addNode(SlowNumberedNodeManager.java:67)
+	at com.ibm.wala.util.graph.AbstractGraph.addNode(AbstractGraph.java:101)
+	at com.ibm.wala.ipa.slicer.PDG.addParamPassingStatements(PDG.java:1036)
+	at com.ibm.wala.ipa.slicer.PDG.createNormalStatements(PDG.java:993)
+	at com.ibm.wala.ipa.slicer.PDG.createNodes(PDG.java:897)
+	at com.ibm.wala.ipa.slicer.PDG.populate(PDG.java:191)
+	at com.ibm.wala.ipa.slicer.PDG.getNumber(PDG.java:1264)
+	at com.ibm.wala.ipa.slicer.SDGSupergraph.getLocalBlockNumber(SDGSupergraph.java:126)
+	at com.ibm.wala.ipa.slicer.SDGSupergraph.getLocalBlockNumber(SDGSupergraph.java:26)
+	at com.ibm.wala.dataflow.IFDS.BackwardsSupergraph.getLocalBlockNumber(BackwardsSupergraph.java:300)
+	at com.ibm.wala.dataflow.IFDS.TabulationSolver.processParticularCallee(TabulationSolver.java:613)
+	at com.ibm.wala.dataflow.IFDS.TabulationSolver.processCall(TabulationSolver.java:517)
+	at com.ibm.wala.dataflow.IFDS.TabulationSolver.forwardTabulateSLRPs(TabulationSolver.java:250)
+	at com.ibm.wala.dataflow.IFDS.TabulationSolver.solve(TabulationSolver.java:190)
+	at com.ibm.wala.ipa.slicer.Slicer.slice(Slicer.java:265)
+	at com.ibm.wala.ipa.slicer.Slicer.slice(Slicer.java:242)
+	at com.ibm.wala.ipa.slicer.Slicer.computeSlice(Slicer.java:229)
+	at com.ibm.wala.ipa.slicer.Slicer.computeBackwardSlice(Slicer.java:206)
+	at org.mockspec.research.WalaSliceProbe.main(WalaSliceProbe.java:169)

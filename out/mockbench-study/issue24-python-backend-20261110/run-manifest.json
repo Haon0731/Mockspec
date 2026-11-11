@@ -1,0 +1,40 @@
+{
+  "schema": "mock-spec.issue24-run/v1",
+  "status": "blocked",
+  "gate_passed": false,
+  "budgets": {
+    "download_bytes": 157286400,
+    "database_seconds_each": 180,
+    "query_seconds_each": 180,
+    "query_ram_mib": 4096,
+    "maximum_databases": 2
+  },
+  "actual": {
+    "download_bytes": 111263054,
+    "databases": 2,
+    "final_run_wall_seconds_sum": 188.13,
+    "final_run_peak_rss_kib": 1950700,
+    "cold_probe_query_peak_rss_kib": 2133984,
+    "timeouts": 0,
+    "target_tests_executed": 0,
+    "loaders_executed": 0
+  },
+  "temporary_only": [
+    "CodeQL bundle and extracted CLI",
+    "CodeQL databases",
+    "materialized analysis source trees",
+    "BQRS files"
+  ],
+  "persistent": [
+    "tool and input identity",
+    "query and adapter hashes",
+    "CSV relations",
+    "phase timings and logs",
+    "machine-checked verdict"
+  ],
+  "blockers": [
+    "unknown return alias and may-write are emitted as candidate rows but are not injected into a propagating backend model",
+    "write-before-raise does not yet prove the modified state reaches an observation through the exceptional-handler path"
+  ],
+  "reproduction": "experiments/backward-slicing/python-backend-pilot/run_pilot.sh CODEQL_CLI FROZEN_REGISTRY_ROOT NEW_OUTPUT_DIRECTORY"
+}

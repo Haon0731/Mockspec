@@ -1,0 +1,1431 @@
+{
+  "status": "unsupported",
+  "failure_categories": [
+    "unresolved_calls",
+    "semantic_analysis_gap",
+    "semantic_backend_unsupported"
+  ],
+  "stage": "semantic_backend",
+  "input_context": {
+    "target_selector": "tests/test_406confirmation_option.py::test_confirmation_option",
+    "masked_test_logical_path": "tests/test_406confirmation_option.py",
+    "masked_test_sha256": "ce52452e247f6aa9fbe623d87deba4dcafee399b5b68dbc8cba0884f1c469fee",
+    "masking_contract": "python-slot-v1"
+  },
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_406confirmation_option.py::test_confirmation_option",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_confirmation_option",
+          "start_line": 23,
+          "end_line": 57
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 38,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 40,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 42,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:2"
+      },
+      {
+        "line": 43,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:3"
+      },
+      {
+        "line": 44,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:4"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "click.decorators",
+        "candidates": [
+          "src/click/decorators.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "dynamic_loader_bindings": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 20979,
+    "read_bytes": 20979,
+    "attempted_files": 1,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_406confirmation_option.py",
+      "sha256": "ce52452e247f6aa9fbe623d87deba4dcafee399b5b68dbc8cba0884f1c469fee",
+      "bytes": 2518
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/click/decorators.py",
+      "sha256": "e4feda6e126d010629fca1e08d4be132fe3ae044703b3aefd9e9cd9279701f24",
+      "bytes": 18461
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "dynamic_loader_bindings": [],
+    "edges": [
+      {
+        "field": "body",
+        "from": "test:42:8:Assert",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:41:4:For"
+      },
+      {
+        "from": "test:27:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:27:4:Name"
+      },
+      {
+        "from": "test:35:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:35:4:Name"
+      },
+      {
+        "from": "test:23:60:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:35:4:Assign",
+        "variable": "param_decls"
+      },
+      {
+        "from": "test:23:73:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:35:4:Assign",
+        "variable": "kwargs"
+      },
+      {
+        "from": "test:37:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:37:4:Name"
+      },
+      {
+        "from": "test:23:60:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:37:4:Assign",
+        "variable": "param_decls"
+      },
+      {
+        "from": "test:27:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:38:4:Assert",
+        "variable": "option_calls"
+      },
+      {
+        "from": "test:39:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:39:4:Name"
+      },
+      {
+        "from": "test:39:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:39:18:Name"
+      },
+      {
+        "from": "test:27:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:39:4:Assign",
+        "variable": "option_calls"
+      },
+      {
+        "from": "test:39:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:40:4:Assert",
+        "variable": "declarations"
+      },
+      {
+        "from": "test:37:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:40:4:Assert",
+        "variable": "expected_decls"
+      },
+      {
+        "from": "test:41:4:For",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:41:8:Name"
+      },
+      {
+        "from": "test:41:4:For",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:41:13:Name"
+      },
+      {
+        "from": "test:23:81:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:41:4:For",
+        "variable": "expected_option_kwargs"
+      },
+      {
+        "from": "test:39:18:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:42:8:Assert",
+        "variable": "option_kwargs"
+      },
+      {
+        "from": "test:41:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:42:8:Assert",
+        "variable": "key"
+      },
+      {
+        "from": "test:41:13:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:42:8:Assert",
+        "variable": "value"
+      },
+      {
+        "from": "test:39:18:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:43:4:Assert",
+        "variable": "option_kwargs"
+      },
+      {
+        "from": "test:35:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:44:4:Assert",
+        "variable": "result_decorator"
+      },
+      {
+        "callee": "confirmation_option",
+        "from": "source:1:401:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:35:4:Assign"
+      },
+      {
+        "callee": "confirmation_option",
+        "from": "source:1:396:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:35:4:Assign"
+      },
+      {
+        "callee": "confirmation_option",
+        "from": "source:1:397:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:35:4:Assign"
+      },
+      {
+        "callee": "confirmation_option",
+        "from": "source:1:398:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:35:4:Assign"
+      },
+      {
+        "callee": "confirmation_option",
+        "from": "source:1:399:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:35:4:Assign"
+      },
+      {
+        "callee": "confirmation_option",
+        "from": "source:1:400:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:35:4:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:393:7:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:394:8:Assign"
+      },
+      {
+        "from": "source:1:394:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:394:8:Name"
+      },
+      {
+        "from": "source:1:394:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:401:4:Return",
+        "variable": "param_decls"
+      },
+      {
+        "callee": "option",
+        "from": "source:1:377:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:1:401:4:Return"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected",
+      "dynamic loader origins require a visible static path, namespace key, selected definition, and unrebound test callable"
+    ],
+    "nodes": [
+      {
+        "code": "return decorator",
+        "end_line": 377,
+        "id": "source:1:377:4:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 377
+      },
+      {
+        "code": "not param_decls",
+        "end_line": 393,
+        "id": "source:1:393:7:UnaryOp",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 393
+      },
+      {
+        "code": "param_decls = ('--yes',)",
+        "end_line": 394,
+        "id": "source:1:394:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 394
+      },
+      {
+        "code": "param_decls",
+        "end_line": 394,
+        "id": "source:1:394:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 394
+      },
+      {
+        "code": "kwargs.setdefault('is_flag', True)",
+        "contains_unresolved_call": true,
+        "end_line": 396,
+        "exception_possible": true,
+        "id": "source:1:396:4:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 396,
+        "unresolved_calls": [
+          "kwargs.setdefault('is_flag', True)"
+        ]
+      },
+      {
+        "code": "kwargs.setdefault('callback', callback)",
+        "contains_unresolved_call": true,
+        "end_line": 397,
+        "exception_possible": true,
+        "id": "source:1:397:4:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 397,
+        "unresolved_calls": [
+          "kwargs.setdefault('callback', callback)"
+        ]
+      },
+      {
+        "code": "kwargs.setdefault('expose_value', False)",
+        "contains_unresolved_call": true,
+        "end_line": 398,
+        "exception_possible": true,
+        "id": "source:1:398:4:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 398,
+        "unresolved_calls": [
+          "kwargs.setdefault('expose_value', False)"
+        ]
+      },
+      {
+        "code": "kwargs.setdefault('prompt', 'Do you want to continue?')",
+        "contains_unresolved_call": true,
+        "end_line": 399,
+        "exception_possible": true,
+        "id": "source:1:399:4:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 399,
+        "unresolved_calls": [
+          "kwargs.setdefault('prompt', 'Do you want to continue?')"
+        ]
+      },
+      {
+        "code": "kwargs.setdefault('help', 'Confirm the action without prompting.')",
+        "contains_unresolved_call": true,
+        "end_line": 400,
+        "exception_possible": true,
+        "id": "source:1:400:4:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 400,
+        "unresolved_calls": [
+          "kwargs.setdefault('help', 'Confirm the action without prompting.')"
+        ]
+      },
+      {
+        "code": "return option(*param_decls, **kwargs)",
+        "end_line": 401,
+        "exception_possible": true,
+        "id": "source:1:401:4:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 401
+      },
+      {
+        "code": "param_decls",
+        "end_line": 23,
+        "id": "test:23:60:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 23
+      },
+      {
+        "code": "kwargs",
+        "end_line": 23,
+        "id": "test:23:73:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 23
+      },
+      {
+        "code": "expected_option_kwargs",
+        "end_line": 23,
+        "id": "test:23:81:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 23
+      },
+      {
+        "code": "option_calls = []",
+        "end_line": 27,
+        "id": "test:27:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 27
+      },
+      {
+        "code": "option_calls",
+        "end_line": 27,
+        "id": "test:27:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 27
+      },
+      {
+        "code": "result_decorator = confirmation_option(*param_decls, **kwargs)",
+        "end_line": 35,
+        "exception_possible": true,
+        "id": "test:35:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 35
+      },
+      {
+        "code": "result_decorator",
+        "end_line": 35,
+        "id": "test:35:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 35
+      },
+      {
+        "code": "expected_decls = param_decls or ('--yes',)",
+        "end_line": 37,
+        "id": "test:37:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 37
+      },
+      {
+        "code": "expected_decls",
+        "end_line": 37,
+        "id": "test:37:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 37
+      },
+      {
+        "code": "assert len(option_calls) == 1",
+        "contains_unresolved_call": true,
+        "end_line": 38,
+        "exception_possible": true,
+        "id": "test:38:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 38,
+        "unresolved_calls": [
+          "len(option_calls)"
+        ]
+      },
+      {
+        "code": "option_kwargs",
+        "end_line": 39,
+        "id": "test:39:18:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 39
+      },
+      {
+        "code": "declarations, option_kwargs = option_calls[0]",
+        "end_line": 39,
+        "id": "test:39:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 39
+      },
+      {
+        "code": "declarations",
+        "end_line": 39,
+        "id": "test:39:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 39
+      },
+      {
+        "code": "assert declarations == expected_decls",
+        "end_line": 40,
+        "id": "test:40:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 40
+      },
+      {
+        "code": "value",
+        "end_line": 41,
+        "id": "test:41:13:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 41
+      },
+      {
+        "code": "for key, value in expected_option_kwargs.items():\n    assert option_kwargs[key] == value",
+        "contains_unresolved_call": true,
+        "end_line": 42,
+        "exception_possible": true,
+        "id": "test:41:4:For",
+        "kind": "For",
+        "source_id": "test",
+        "start_line": 41,
+        "unresolved_calls": [
+          "expected_option_kwargs.items()"
+        ]
+      },
+      {
+        "code": "key",
+        "end_line": 41,
+        "id": "test:41:8:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 41
+      },
+      {
+        "code": "assert option_kwargs[key] == value",
+        "end_line": 42,
+        "id": "test:42:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 42
+      },
+      {
+        "code": "assert option_kwargs['callback'] is not None",
+        "end_line": 43,
+        "id": "test:43:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 43
+      },
+      {
+        "code": "assert result_decorator is option_decorator",
+        "end_line": 44,
+        "id": "test:44:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 44
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:38:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:40:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:42:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:3",
+        "seed": "test:43:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:4",
+        "seed": "test:44:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:38:4:Assert",
+      "test:40:4:Assert",
+      "test:42:8:Assert",
+      "test:43:4:Assert",
+      "test:44:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 30,
+    "edges": 31,
+    "edge_kinds": {
+      "normal_body_exit": 1,
+      "definition_value_candidate": 8,
+      "data_candidate": 14,
+      "call_target_candidate": 2,
+      "call_event_candidate": 5,
+      "lexical_control": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:38:4:Assert",
+        "node_ids": [
+          "test:27:4:Assign",
+          "test:27:4:Name",
+          "test:38:4:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:38:4:Assert"
+        ]
+      },
+      {
+        "seed": "test:40:4:Assert",
+        "node_ids": [
+          "test:23:60:arg",
+          "test:27:4:Assign",
+          "test:27:4:Name",
+          "test:37:4:Assign",
+          "test:37:4:Name",
+          "test:39:4:Assign",
+          "test:39:4:Name",
+          "test:40:4:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": []
+      },
+      {
+        "seed": "test:42:8:Assert",
+        "node_ids": [
+          "test:23:81:arg",
+          "test:27:4:Assign",
+          "test:27:4:Name",
+          "test:39:18:Name",
+          "test:39:4:Assign",
+          "test:41:13:Name",
+          "test:41:4:For",
+          "test:41:8:Name",
+          "test:42:8:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:41:4:For"
+        ]
+      },
+      {
+        "seed": "test:43:4:Assert",
+        "node_ids": [
+          "test:27:4:Assign",
+          "test:27:4:Name",
+          "test:39:18:Name",
+          "test:39:4:Assign",
+          "test:43:4:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": []
+      },
+      {
+        "seed": "test:44:4:Assert",
+        "node_ids": [
+          "source:1:377:4:Return",
+          "source:1:393:7:UnaryOp",
+          "source:1:394:8:Assign",
+          "source:1:394:8:Name",
+          "source:1:396:4:Expr",
+          "source:1:397:4:Expr",
+          "source:1:398:4:Expr",
+          "source:1:399:4:Expr",
+          "source:1:400:4:Expr",
+          "source:1:401:4:Return",
+          "test:23:60:arg",
+          "test:23:73:arg",
+          "test:35:4:Assign",
+          "test:35:4:Name",
+          "test:44:4:Assert"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:396:4:Expr",
+          "source:1:397:4:Expr",
+          "source:1:398:4:Expr",
+          "source:1:399:4:Expr",
+          "source:1:400:4:Expr"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:38:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:40:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:42:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:3",
+        "seed": "test:43:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:4",
+        "seed": "test:44:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.1351,
+  "timings_seconds": {
+    "criterion_extraction": 0.000925,
+    "source_selection": 0.016163,
+    "backend_total": 0.11787,
+    "evidence_summary": 9.4e-05
+  },
+  "identity": {
+    "case_id": "click_406",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "3a3bbf1adf5030a1e9f193c6582b8b9236474f6d921bb3f9ba202dfd704079d0"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "click_406",
+      "dataset": "python-benchmark-new",
+      "language": "python",
+      "snapshot_id": "3a3bbf1adf5030a1e9f193c6582b8b9236474f6d921bb3f9ba202dfd704079d0",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "ce52452e247f6aa9fbe623d87deba4dcafee399b5b68dbc8cba0884f1c469fee",
+      "target_selector": "tests/test_406confirmation_option.py::test_confirmation_option"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_406confirmation_option.py",
+        "sha256": "ce52452e247f6aa9fbe623d87deba4dcafee399b5b68dbc8cba0884f1c469fee",
+        "bytes": 2518,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:1",
+        "logical_path": "src/click/decorators.py",
+        "sha256": "e4feda6e126d010629fca1e08d4be132fe3ae044703b3aefd9e9cd9279701f24",
+        "bytes": 18461,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 38,
+          "end_line": 38
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 40,
+          "end_line": 40
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:2",
+        "location": {
+          "source_id": "test",
+          "start_line": 42,
+          "end_line": 42
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:3",
+        "location": {
+          "source_id": "test",
+          "start_line": 43,
+          "end_line": 43
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:4",
+        "location": {
+          "source_id": "test",
+          "start_line": 44,
+          "end_line": 44
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "the runner does not enumerate parameter rows"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_406confirmation_option.py::test_confirmation_option",
+        "evidence": [
+          {
+            "symbol": "test_confirmation_option",
+            "start_line": 23,
+            "end_line": 57
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "not_evaluated",
+        "candidates": [],
+        "evidence": [],
+        "assumptions": []
+      }
+    },
+    "relations": [],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [],
+      "unknown_effects": [
+        {
+          "boundary_id": "source:1:396:4:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:397:4:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:398:4:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:399:4:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:400:4:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:38:4:Assert",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:41:4:For",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "mature_backend_support_domain",
+          "reason": "semantic_backend_unsupported",
+          "details": [
+            "No authenticated Python semantic driver is registered for this case.",
+            "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+            "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+          ]
+        }
+      ]
+    },
+    "completion": {
+      "status": "unsupported",
+      "stage": "semantic_backend",
+      "failure_categories": [
+        "unresolved_calls",
+        "semantic_analysis_gap",
+        "semantic_backend_unsupported"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "not_evaluated",
+      "reviewer": null,
+      "evidence": [],
+      "notes": "candidate reachability is not semantic dependency validation"
+    },
+    "cost": {
+      "timings_seconds": {
+        "criterion_extraction": 0.000925,
+        "source_selection": 0.016163,
+        "backend_total": 0.11787,
+        "evidence_summary": 9.4e-05
+      },
+      "total_seconds": 0.1351,
+      "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+      "peak_memory": {
+        "status": "unavailable",
+        "bytes": null,
+        "reason": "case-level peak memory is not measured by this runner"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+      },
+      "input_size": {
+        "files": 2,
+        "bytes": 20979
+      },
+      "graph_size": {
+        "nodes": 30,
+        "edges": 31
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter admission occurs outside the per-case analysis timer"
+        },
+        {
+          "phase": "front_end",
+          "reason": "the candidate backend does not report parsing time separately"
+        },
+        {
+          "phase": "call_graph",
+          "reason": "the candidate backend does not report call-graph time separately"
+        },
+        {
+          "phase": "pointer_analysis",
+          "reason": "the candidate backend does not provide pointer analysis"
+        },
+        {
+          "phase": "dependency_analysis",
+          "reason": "backend_total combines parsing, graph construction, and slicing"
+        },
+        {
+          "phase": "slice",
+          "reason": "the candidate backend does not report semantic slicing time separately"
+        },
+        {
+          "phase": "source_mapping",
+          "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+        }
+      ]
+    }
+  },
+  "candidate_diagnostics": {
+    "status": "partial",
+    "failure_categories": [
+      "unresolved_calls",
+      "semantic_analysis_gap"
+    ],
+    "result_contract": {
+      "schema_version": "mock-spec.backward-analysis-case/v1",
+      "identity": {
+        "case_id": "click_406",
+        "dataset": "python-benchmark-new",
+        "language": "python",
+        "snapshot_id": "3a3bbf1adf5030a1e9f193c6582b8b9236474f6d921bb3f9ba202dfd704079d0",
+        "masking_contract": "python-slot-v1",
+        "masked_test_sha256": "ce52452e247f6aa9fbe623d87deba4dcafee399b5b68dbc8cba0884f1c469fee",
+        "target_selector": "tests/test_406confirmation_option.py::test_confirmation_option"
+      },
+      "source_scope": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_406confirmation_option.py",
+          "sha256": "ce52452e247f6aa9fbe623d87deba4dcafee399b5b68dbc8cba0884f1c469fee",
+          "bytes": 2518,
+          "selection_role": "masked_test"
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/click/decorators.py",
+          "sha256": "e4feda6e126d010629fca1e08d4be132fe3ae044703b3aefd9e9cd9279701f24",
+          "bytes": 18461,
+          "selection_role": "candidate_product"
+        }
+      ],
+      "observations": [
+        {
+          "observation_id": "criterion:0",
+          "location": {
+            "source_id": "test",
+            "start_line": 38,
+            "end_line": 38
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        },
+        {
+          "observation_id": "criterion:1",
+          "location": {
+            "source_id": "test",
+            "start_line": 40,
+            "end_line": 40
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        },
+        {
+          "observation_id": "criterion:2",
+          "location": {
+            "source_id": "test",
+            "start_line": 42,
+            "end_line": 42
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        },
+        {
+          "observation_id": "criterion:3",
+          "location": {
+            "source_id": "test",
+            "start_line": 43,
+            "end_line": 43
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        },
+        {
+          "observation_id": "criterion:4",
+          "location": {
+            "source_id": "test",
+            "start_line": 44,
+            "end_line": 44
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        }
+      ],
+      "parameterization": {
+        "status": "not_expanded",
+        "coverage": "selected_test_definition",
+        "reason": "the runner does not enumerate parameter rows"
+      },
+      "entry_point": {
+        "test_selection": {
+          "origin": "task_provided",
+          "status": "unique",
+          "selector": "tests/test_406confirmation_option.py::test_confirmation_option",
+          "evidence": [
+            {
+              "symbol": "test_confirmation_option",
+              "start_line": 23,
+              "end_line": 57
+            }
+          ]
+        },
+        "mut_binding": {
+          "origin": "automatic",
+          "status": "not_evaluated",
+          "candidates": [],
+          "evidence": [],
+          "assumptions": []
+        }
+      },
+      "relations": [],
+      "relation_coverage": [
+        {
+          "kind": "call_binding",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "control_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "exception_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "function_origin",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "normal_return_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "state_flow",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "value_flow",
+          "status": "not_evaluated"
+        }
+      ],
+      "analysis_boundaries": {
+        "assumptions": [],
+        "unknown_effects": [
+          {
+            "boundary_id": "source:1:396:4:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:397:4:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:398:4:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:399:4:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:400:4:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:38:4:Assert",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:41:4:For",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          }
+        ],
+        "unanalysed_regions": [
+          {
+            "scope": "semantic_relations",
+            "reason": "candidate_graph_has_no_validated_dependency_semantics"
+          }
+        ]
+      },
+      "completion": {
+        "status": "partial",
+        "stage": "complete",
+        "failure_categories": [
+          "unresolved_calls",
+          "semantic_analysis_gap"
+        ],
+        "error": null
+      },
+      "semantic_validation": {
+        "status": "not_evaluated",
+        "reviewer": null,
+        "evidence": [],
+        "notes": "candidate reachability is not semantic dependency validation"
+      },
+      "cost": {
+        "timings_seconds": {
+          "criterion_extraction": 0.000925,
+          "source_selection": 0.016163,
+          "backend_total": 0.11787,
+          "evidence_summary": 9.4e-05
+        },
+        "total_seconds": 0.1351,
+        "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+        "peak_memory": {
+          "status": "unavailable",
+          "bytes": null,
+          "reason": "case-level peak memory is not measured by this runner"
+        },
+        "cache_state": {
+          "status": "unknown",
+          "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+        },
+        "input_size": {
+          "files": 2,
+          "bytes": 20979
+        },
+        "graph_size": {
+          "nodes": 30,
+          "edges": 31
+        },
+        "unavailable_phases": [
+          {
+            "phase": "input_admission",
+            "reason": "adapter admission occurs outside the per-case analysis timer"
+          },
+          {
+            "phase": "front_end",
+            "reason": "the candidate backend does not report parsing time separately"
+          },
+          {
+            "phase": "call_graph",
+            "reason": "the candidate backend does not report call-graph time separately"
+          },
+          {
+            "phase": "pointer_analysis",
+            "reason": "the candidate backend does not provide pointer analysis"
+          },
+          {
+            "phase": "dependency_analysis",
+            "reason": "backend_total combines parsing, graph construction, and slicing"
+          },
+          {
+            "phase": "slice",
+            "reason": "the candidate backend does not report semantic slicing time separately"
+          },
+          {
+            "phase": "source_mapping",
+            "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+          }
+        ]
+      }
+    },
+    "stage": "complete",
+    "error": null,
+    "elapsed_seconds": 0.1351,
+    "timings_seconds": {
+      "criterion_extraction": 0.000925,
+      "source_selection": 0.016163,
+      "backend_total": 0.11787,
+      "evidence_summary": 9.4e-05
+    },
+    "graph_and_evidence": "top-level graph/evidence/sources remain candidate diagnostics only"
+  },
+  "semantic_backend": {
+    "schema": "mock-spec.batch-semantic-backend/v1",
+    "status": "unsupported",
+    "backend": null,
+    "identity": {
+      "language": "python",
+      "dataset": "python-benchmark-new",
+      "case_id": "click_406",
+      "inventory_revision": "0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc",
+      "snapshot_id": "3a3bbf1adf5030a1e9f193c6582b8b9236474f6d921bb3f9ba202dfd704079d0",
+      "snapshot_root": "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/python-benchmark-new/3a3bbf1adf5030a1e9f193c6582b8b9236474f6d921bb3f9ba202dfd704079d0",
+      "admission_status": "frozen_candidate",
+      "admission_verified": false,
+      "reviewed_snapshot_id": null,
+      "target_selector": "tests/test_406confirmation_option.py::test_confirmation_option",
+      "masked_test_logical_path": "tests/test_406confirmation_option.py",
+      "masked_test_sha256": "ce52452e247f6aa9fbe623d87deba4dcafee399b5b68dbc8cba0884f1c469fee",
+      "masking_contract": "python-slot-v1",
+      "input_context": {
+        "target_selector": "tests/test_406confirmation_option.py::test_confirmation_option",
+        "masked_test_logical_path": "tests/test_406confirmation_option.py",
+        "masked_test_sha256": "ce52452e247f6aa9fbe623d87deba4dcafee399b5b68dbc8cba0884f1c469fee",
+        "masking_contract": "python-slot-v1"
+      },
+      "sources": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_406confirmation_option.py",
+          "sha256": "ce52452e247f6aa9fbe623d87deba4dcafee399b5b68dbc8cba0884f1c469fee",
+          "bytes": 2518
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/click/decorators.py",
+          "sha256": "e4feda6e126d010629fca1e08d4be132fe3ae044703b3aefd9e9cd9279701f24",
+          "bytes": 18461
+        }
+      ]
+    },
+    "limitations": [
+      "No authenticated Python semantic driver is registered for this case.",
+      "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+      "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+    ],
+    "source": null,
+    "provenance": {
+      "target_executed": false
+    },
+    "cost": null,
+    "terminal": {
+      "execution": "not_started",
+      "semantic_validation": "not_evaluated"
+    },
+    "driver_exit_code": 0,
+    "batch_dispatch_seconds": 0.087629,
+    "batch_dispatch_scope": "bridge process including support check, adapter and backend; excludes candidate diagnostics"
+  },
+  "batch_case_cost": {
+    "total_seconds": 0.228136,
+    "scope": "admission, candidate diagnostic, semantic-slot wait, dispatch and mapping; excludes case queue, shared compile and serialization"
+  },
+  "result_contract_sha256": "4e2bc2c997719c228060ce628a77b11ee535fefe29b7f5cda1d2bd34b15a2515"
+}

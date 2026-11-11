@@ -1,0 +1,1077 @@
+{
+  "status": "unsupported",
+  "failure_categories": [
+    "test_to_product_not_reached",
+    "unresolved_calls",
+    "semantic_analysis_gap",
+    "semantic_backend_unsupported"
+  ],
+  "stage": "semantic_backend",
+  "input_context": {
+    "target_selector": "com.ctrip.framework.apollo.configservice.filter.ClientAuthenticationFilterTest#testAuthorizedSuccessfully",
+    "masked_test_logical_path": "src/test/java/com/ctrip/framework/apollo/configservice/filter/ClientAuthenticationFilterTest.java",
+    "masked_test_sha256": "eccd35ca51a88774162f6c0a30b48adb8d5f09426e8c6529d741b4ed0ae6bfb5",
+    "masking_contract": "java-dual-region-v1"
+  },
+  "target_extraction": {
+    "target_scope": {
+      "selector": "com.ctrip.framework.apollo.configservice.filter.ClientAuthenticationFilterTest#testAuthorizedSuccessfully",
+      "status": "located",
+      "precision": "java_lexical_method_scope",
+      "locations": [
+        {
+          "symbol": "testAuthorizedSuccessfully",
+          "start_line": 28,
+          "end_line": 47
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 45,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 46,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:1"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_import",
+        "hint": "com.ctrip.framework.apollo.configservice.util.AccessKeyUtil",
+        "candidates": [
+          "src/main/java/com/ctrip/framework/apollo/configservice/util/AccessKeyUtil.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_same_package_type",
+        "hint": "com.ctrip.framework.apollo.configservice.filter.ClientAuthenticationFilter",
+        "candidates": [
+          "src/main/java/com/ctrip/framework/apollo/configservice/filter/ClientAuthenticationFilter.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/main/java/com/ctrip/framework/apollo/configservice/util/AccessKeyUtil.java",
+        "hint_kind": "java_import",
+        "hint": "com.ctrip.framework.apollo.configservice.service.AccessKeyServiceWithCache",
+        "candidates": [
+          "src/main/java/com/ctrip/framework/apollo/configservice/service/AccessKeyServiceWithCache.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "dynamic_loader_bindings": [],
+    "truncated": false,
+    "opaque_methods": [
+      {
+        "source_id": "source:1",
+        "name": "findAvailableSecret",
+        "start_line": 27,
+        "end_line": 29
+      },
+      {
+        "source_id": "source:1",
+        "name": "extractAppIdFromRequest",
+        "start_line": 29,
+        "end_line": 31
+      },
+      {
+        "source_id": "source:1",
+        "name": "buildSignature",
+        "start_line": 31,
+        "end_line": 33
+      }
+    ],
+    "selected_bytes": 14607,
+    "read_bytes": 14607,
+    "attempted_files": 3,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "src/test/java/com/ctrip/framework/apollo/configservice/filter/ClientAuthenticationFilterTest.java",
+      "sha256": "eccd35ca51a88774162f6c0a30b48adb8d5f09426e8c6529d741b4ed0ae6bfb5",
+      "bytes": 1887
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/util/AccessKeyUtil.java",
+      "sha256": "d953a86cbaf732f09ba8cfd71f57737bfa7f2fdd623a0db27221592f3aec65f0",
+      "bytes": 1401
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/filter/ClientAuthenticationFilter.java",
+      "sha256": "94490191144af27936778d7a23fb3bab46600b7f657783ac4da9c3af72e7fa22",
+      "bytes": 3777
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/service/AccessKeyServiceWithCache.java",
+      "sha256": "625beffefc3522825b10686c7afd5b88f0636c6d7c1724bd5756d2d5e098dc21",
+      "bytes": 7542
+    }
+  ],
+  "graph": {
+    "status": "ok",
+    "limitations": [
+      "data_candidate edges are conservative name/declaration candidates, not a sound reaching-def analysis",
+      "lexical_control edges describe AST ancestry, not post-dominator control dependence",
+      "call_return edges use no-classpath resolution plus name/arity virtual candidates and do not prove dispatch",
+      "expression_value_candidate edges preserve syntax containment, not runtime evaluation or value equality",
+      "heap aliasing, reflection, exceptions, concurrency, and path feasibility are not modeled",
+      "boundary calls are retained as nodes and are not traversed into dependency implementations"
+    ],
+    "seeds": [
+      "test:45:5:CtInvocationImpl",
+      "test:46:5:CtInvocationImpl"
+    ],
+    "nodes": [
+      {
+        "id": "test:41:36:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 41,
+        "end_line": 41,
+        "kind": "CtLocalVariableImpl",
+        "code": "org.mockito.ArgumentCaptor<javax.servlet.ServletRequest> reqCaptor = org.mockito.ArgumentCaptor.forClass(javax.servlet.ServletRequest.class)",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "org.mockito.ArgumentCaptor.forClass(javax.servlet.ServletRequest.class)"
+        ],
+        "unknown_call_details": [
+          {
+            "source_name_arity_candidates": [],
+            "name": "forClass",
+            "arity": 1,
+            "call": "org.mockito.ArgumentCaptor.forClass(javax.servlet.ServletRequest.class)",
+            "receiver": "org.mockito.ArgumentCaptor"
+          }
+        ]
+      },
+      {
+        "id": "test:41:48:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 41,
+        "end_line": 41,
+        "kind": "CtInvocationImpl",
+        "code": "org.mockito.ArgumentCaptor.forClass(javax.servlet.ServletRequest.class)"
+      },
+      {
+        "id": "test:41:48:CtTypeAccessImpl",
+        "source_id": "test",
+        "start_line": 41,
+        "end_line": 41,
+        "kind": "expression",
+        "code": "org.mockito.ArgumentCaptor"
+      },
+      {
+        "id": "test:41:72:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 41,
+        "end_line": 41,
+        "kind": "expression",
+        "code": "javax.servlet.ServletRequest.class"
+      },
+      {
+        "id": "test:42:37:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 42,
+        "end_line": 42,
+        "kind": "CtLocalVariableImpl",
+        "code": "org.mockito.ArgumentCaptor<javax.servlet.ServletResponse> respCaptor = org.mockito.ArgumentCaptor.forClass(javax.servlet.ServletResponse.class)",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "org.mockito.ArgumentCaptor.forClass(javax.servlet.ServletResponse.class)"
+        ],
+        "unknown_call_details": [
+          {
+            "source_name_arity_candidates": [],
+            "name": "forClass",
+            "arity": 1,
+            "call": "org.mockito.ArgumentCaptor.forClass(javax.servlet.ServletResponse.class)",
+            "receiver": "org.mockito.ArgumentCaptor"
+          }
+        ]
+      },
+      {
+        "id": "test:42:50:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 42,
+        "end_line": 42,
+        "kind": "CtInvocationImpl",
+        "code": "org.mockito.ArgumentCaptor.forClass(javax.servlet.ServletResponse.class)"
+      },
+      {
+        "id": "test:42:50:CtTypeAccessImpl",
+        "source_id": "test",
+        "start_line": 42,
+        "end_line": 42,
+        "kind": "expression",
+        "code": "org.mockito.ArgumentCaptor"
+      },
+      {
+        "id": "test:42:74:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 42,
+        "end_line": 42,
+        "kind": "expression",
+        "code": "javax.servlet.ServletResponse.class"
+      },
+      {
+        "id": "test:45:16:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 45,
+        "end_line": 45,
+        "kind": "expression",
+        "code": "request"
+      },
+      {
+        "id": "test:45:25:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 45,
+        "end_line": 45,
+        "kind": "CtInvocationImpl",
+        "code": "reqCaptor.getValue()"
+      },
+      {
+        "id": "test:45:25:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 45,
+        "end_line": 45,
+        "kind": "expression",
+        "code": "reqCaptor"
+      },
+      {
+        "id": "test:45:5:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 45,
+        "end_line": 45,
+        "kind": "CtInvocationImpl",
+        "code": "// === VERIFY-START === // === VERIFY-END === org.junit.Assert.assertSame(request, reqCaptor.getValue())",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "reqCaptor.getValue()"
+        ],
+        "unknown_call_details": [
+          {
+            "source_name_arity_candidates": [],
+            "name": "getValue",
+            "arity": 0,
+            "call": "reqCaptor.getValue()",
+            "receiver": "org.mockito.ArgumentCaptor"
+          }
+        ]
+      },
+      {
+        "id": "test:46:16:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 46,
+        "end_line": 46,
+        "kind": "expression",
+        "code": "response"
+      },
+      {
+        "id": "test:46:26:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 46,
+        "end_line": 46,
+        "kind": "CtInvocationImpl",
+        "code": "respCaptor.getValue()"
+      },
+      {
+        "id": "test:46:26:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 46,
+        "end_line": 46,
+        "kind": "expression",
+        "code": "respCaptor"
+      },
+      {
+        "id": "test:46:5:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 46,
+        "end_line": 46,
+        "kind": "CtInvocationImpl",
+        "code": "org.junit.Assert.assertSame(response, respCaptor.getValue())",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "respCaptor.getValue()"
+        ],
+        "unknown_call_details": [
+          {
+            "source_name_arity_candidates": [],
+            "name": "getValue",
+            "arity": 0,
+            "call": "respCaptor.getValue()",
+            "receiver": "org.mockito.ArgumentCaptor"
+          }
+        ]
+      }
+    ],
+    "backend": "spoon-source-evidence-prototype",
+    "edges": [
+      {
+        "from": "test:41:48:CtInvocationImpl",
+        "to": "test:41:36:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:41:48:CtTypeAccessImpl",
+        "to": "test:41:48:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:41:72:CtFieldReadImpl",
+        "to": "test:41:48:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:42:50:CtInvocationImpl",
+        "to": "test:42:37:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:42:50:CtTypeAccessImpl",
+        "to": "test:42:50:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:42:74:CtFieldReadImpl",
+        "to": "test:42:50:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:45:16:CtFieldReadImpl",
+        "to": "test:45:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:45:25:CtInvocationImpl",
+        "to": "test:45:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:45:25:CtVariableReadImpl",
+        "to": "test:45:25:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:46:16:CtFieldReadImpl",
+        "to": "test:46:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:46:26:CtInvocationImpl",
+        "to": "test:46:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:46:26:CtVariableReadImpl",
+        "to": "test:46:26:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:41:36:CtLocalVariableImpl",
+        "to": "test:45:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "resolved_declaration",
+        "variable": "reqCaptor"
+      },
+      {
+        "from": "test:41:36:CtLocalVariableImpl",
+        "to": "test:45:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "prior_write_same_method",
+        "variable": "reqCaptor"
+      },
+      {
+        "from": "test:41:36:CtLocalVariableImpl",
+        "to": "test:45:25:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "resolved_declaration",
+        "variable": "reqCaptor"
+      },
+      {
+        "from": "test:41:36:CtLocalVariableImpl",
+        "to": "test:45:25:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "prior_write_same_method",
+        "variable": "reqCaptor"
+      },
+      {
+        "from": "test:42:37:CtLocalVariableImpl",
+        "to": "test:46:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "resolved_declaration",
+        "variable": "respCaptor"
+      },
+      {
+        "from": "test:42:37:CtLocalVariableImpl",
+        "to": "test:46:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "prior_write_same_method",
+        "variable": "respCaptor"
+      },
+      {
+        "from": "test:42:37:CtLocalVariableImpl",
+        "to": "test:46:26:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "resolved_declaration",
+        "variable": "respCaptor"
+      },
+      {
+        "from": "test:42:37:CtLocalVariableImpl",
+        "to": "test:46:26:CtInvocationImpl",
+        "kind": "data_candidate",
+        "precision": "prior_write_same_method",
+        "variable": "respCaptor"
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:45:5:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:46:5:CtInvocationImpl"
+      }
+    ]
+  },
+  "evidence": {
+    "nodes": 16,
+    "edges": 20,
+    "edge_kinds": {
+      "expression_value_candidate": 12,
+      "data_candidate": 8
+    },
+    "criteria": [
+      {
+        "seed": "test:45:5:CtInvocationImpl",
+        "node_ids": [
+          "test:41:36:CtLocalVariableImpl",
+          "test:41:48:CtInvocationImpl",
+          "test:41:48:CtTypeAccessImpl",
+          "test:41:72:CtFieldReadImpl",
+          "test:45:16:CtFieldReadImpl",
+          "test:45:25:CtInvocationImpl",
+          "test:45:25:CtVariableReadImpl",
+          "test:45:5:CtInvocationImpl"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:41:36:CtLocalVariableImpl",
+          "test:45:5:CtInvocationImpl"
+        ]
+      },
+      {
+        "seed": "test:46:5:CtInvocationImpl",
+        "node_ids": [
+          "test:42:37:CtLocalVariableImpl",
+          "test:42:50:CtInvocationImpl",
+          "test:42:50:CtTypeAccessImpl",
+          "test:42:74:CtFieldReadImpl",
+          "test:46:16:CtFieldReadImpl",
+          "test:46:26:CtInvocationImpl",
+          "test:46:26:CtVariableReadImpl",
+          "test:46:5:CtInvocationImpl"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:42:37:CtLocalVariableImpl",
+          "test:46:5:CtInvocationImpl"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:45:5:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:46:5:CtInvocationImpl"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 4.5503,
+  "timings_seconds": {
+    "criterion_extraction": 0.000699,
+    "source_selection": 0.010601,
+    "backend_total": 4.538822,
+    "evidence_summary": 9.8e-05
+  },
+  "identity": {
+    "case_id": "com.ctrip.framework.apollo.configservice.filter.ClientAuthenticationFilterTest#testAuthorizedSuccessfully@6ff6ddd4",
+    "dataset": "java-bechmark-strong",
+    "language": "java",
+    "snapshot_id": "ffbdd7c333458f23a1d8966be4c5a282114eb2ccce416787c57598d50e1c3fee"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "com.ctrip.framework.apollo.configservice.filter.ClientAuthenticationFilterTest#testAuthorizedSuccessfully@6ff6ddd4",
+      "dataset": "java-bechmark-strong",
+      "language": "java",
+      "snapshot_id": "ffbdd7c333458f23a1d8966be4c5a282114eb2ccce416787c57598d50e1c3fee",
+      "masking_contract": "java-dual-region-v1",
+      "masked_test_sha256": "eccd35ca51a88774162f6c0a30b48adb8d5f09426e8c6529d741b4ed0ae6bfb5",
+      "target_selector": "com.ctrip.framework.apollo.configservice.filter.ClientAuthenticationFilterTest#testAuthorizedSuccessfully"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "src/test/java/com/ctrip/framework/apollo/configservice/filter/ClientAuthenticationFilterTest.java",
+        "sha256": "eccd35ca51a88774162f6c0a30b48adb8d5f09426e8c6529d741b4ed0ae6bfb5",
+        "bytes": 1887,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:1",
+        "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/util/AccessKeyUtil.java",
+        "sha256": "d953a86cbaf732f09ba8cfd71f57737bfa7f2fdd623a0db27221592f3aec65f0",
+        "bytes": 1401,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:2",
+        "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/filter/ClientAuthenticationFilter.java",
+        "sha256": "94490191144af27936778d7a23fb3bab46600b7f657783ac4da9c3af72e7fa22",
+        "bytes": 3777,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:3",
+        "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/service/AccessKeyServiceWithCache.java",
+        "sha256": "625beffefc3522825b10686c7afd5b88f0636c6d7c1724bd5756d2d5e098dc21",
+        "bytes": 7542,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 45,
+          "end_line": 45
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 46,
+          "end_line": 46
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "the runner does not enumerate parameter rows"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "com.ctrip.framework.apollo.configservice.filter.ClientAuthenticationFilterTest#testAuthorizedSuccessfully",
+        "evidence": [
+          {
+            "symbol": "testAuthorizedSuccessfully",
+            "start_line": 28,
+            "end_line": 47
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "not_evaluated",
+        "candidates": [],
+        "evidence": [],
+        "assumptions": []
+      }
+    },
+    "relations": [],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [],
+      "unknown_effects": [
+        {
+          "boundary_id": "test:41:36:CtLocalVariableImpl",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:42:37:CtLocalVariableImpl",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:45:5:CtInvocationImpl",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:46:5:CtInvocationImpl",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "mature_backend_support_domain",
+          "reason": "The accepted Java backend currently prepares bytecode, library summaries, and source-derived observations only for the exact JarFiles Jib case.",
+          "details": []
+        }
+      ]
+    },
+    "completion": {
+      "status": "unsupported",
+      "stage": "semantic_backend",
+      "failure_categories": [
+        "test_to_product_not_reached",
+        "unresolved_calls",
+        "semantic_analysis_gap",
+        "semantic_backend_unsupported"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "not_evaluated",
+      "reviewer": null,
+      "evidence": [],
+      "notes": "candidate reachability is not semantic dependency validation"
+    },
+    "cost": {
+      "timings_seconds": {
+        "criterion_extraction": 0.000699,
+        "source_selection": 0.010601,
+        "backend_total": 4.538822,
+        "evidence_summary": 9.8e-05
+      },
+      "total_seconds": 4.5503,
+      "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+      "peak_memory": {
+        "status": "unavailable",
+        "bytes": null,
+        "reason": "case-level peak memory is not measured by this runner"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+      },
+      "input_size": {
+        "files": 4,
+        "bytes": 14607
+      },
+      "graph_size": {
+        "nodes": 16,
+        "edges": 20
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter admission occurs outside the per-case analysis timer"
+        },
+        {
+          "phase": "front_end",
+          "reason": "the candidate backend does not report parsing time separately"
+        },
+        {
+          "phase": "call_graph",
+          "reason": "the candidate backend does not report call-graph time separately"
+        },
+        {
+          "phase": "pointer_analysis",
+          "reason": "the candidate backend does not provide pointer analysis"
+        },
+        {
+          "phase": "dependency_analysis",
+          "reason": "backend_total combines parsing, graph construction, and slicing"
+        },
+        {
+          "phase": "slice",
+          "reason": "the candidate backend does not report semantic slicing time separately"
+        },
+        {
+          "phase": "source_mapping",
+          "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+        }
+      ]
+    }
+  },
+  "candidate_diagnostics": {
+    "status": "partial",
+    "failure_categories": [
+      "test_to_product_not_reached",
+      "unresolved_calls",
+      "semantic_analysis_gap"
+    ],
+    "result_contract": {
+      "schema_version": "mock-spec.backward-analysis-case/v1",
+      "identity": {
+        "case_id": "com.ctrip.framework.apollo.configservice.filter.ClientAuthenticationFilterTest#testAuthorizedSuccessfully@6ff6ddd4",
+        "dataset": "java-bechmark-strong",
+        "language": "java",
+        "snapshot_id": "ffbdd7c333458f23a1d8966be4c5a282114eb2ccce416787c57598d50e1c3fee",
+        "masking_contract": "java-dual-region-v1",
+        "masked_test_sha256": "eccd35ca51a88774162f6c0a30b48adb8d5f09426e8c6529d741b4ed0ae6bfb5",
+        "target_selector": "com.ctrip.framework.apollo.configservice.filter.ClientAuthenticationFilterTest#testAuthorizedSuccessfully"
+      },
+      "source_scope": [
+        {
+          "source_id": "test",
+          "logical_path": "src/test/java/com/ctrip/framework/apollo/configservice/filter/ClientAuthenticationFilterTest.java",
+          "sha256": "eccd35ca51a88774162f6c0a30b48adb8d5f09426e8c6529d741b4ed0ae6bfb5",
+          "bytes": 1887,
+          "selection_role": "masked_test"
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/util/AccessKeyUtil.java",
+          "sha256": "d953a86cbaf732f09ba8cfd71f57737bfa7f2fdd623a0db27221592f3aec65f0",
+          "bytes": 1401,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/filter/ClientAuthenticationFilter.java",
+          "sha256": "94490191144af27936778d7a23fb3bab46600b7f657783ac4da9c3af72e7fa22",
+          "bytes": 3777,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:3",
+          "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/service/AccessKeyServiceWithCache.java",
+          "sha256": "625beffefc3522825b10686c7afd5b88f0636c6d7c1724bd5756d2d5e098dc21",
+          "bytes": 7542,
+          "selection_role": "candidate_product"
+        }
+      ],
+      "observations": [
+        {
+          "observation_id": "criterion:0",
+          "location": {
+            "source_id": "test",
+            "start_line": 45,
+            "end_line": 45
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "lexical observation syntax inside the selected Java method"
+        },
+        {
+          "observation_id": "criterion:1",
+          "location": {
+            "source_id": "test",
+            "start_line": 46,
+            "end_line": 46
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "lexical observation syntax inside the selected Java method"
+        }
+      ],
+      "parameterization": {
+        "status": "not_expanded",
+        "coverage": "selected_test_definition",
+        "reason": "the runner does not enumerate parameter rows"
+      },
+      "entry_point": {
+        "test_selection": {
+          "origin": "task_provided",
+          "status": "unique",
+          "selector": "com.ctrip.framework.apollo.configservice.filter.ClientAuthenticationFilterTest#testAuthorizedSuccessfully",
+          "evidence": [
+            {
+              "symbol": "testAuthorizedSuccessfully",
+              "start_line": 28,
+              "end_line": 47
+            }
+          ]
+        },
+        "mut_binding": {
+          "origin": "automatic",
+          "status": "not_evaluated",
+          "candidates": [],
+          "evidence": [],
+          "assumptions": []
+        }
+      },
+      "relations": [],
+      "relation_coverage": [
+        {
+          "kind": "call_binding",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "control_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "exception_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "function_origin",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "normal_return_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "state_flow",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "value_flow",
+          "status": "not_evaluated"
+        }
+      ],
+      "analysis_boundaries": {
+        "assumptions": [],
+        "unknown_effects": [
+          {
+            "boundary_id": "test:41:36:CtLocalVariableImpl",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:42:37:CtLocalVariableImpl",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:45:5:CtInvocationImpl",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:46:5:CtInvocationImpl",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          }
+        ],
+        "unanalysed_regions": [
+          {
+            "scope": "semantic_relations",
+            "reason": "candidate_graph_has_no_validated_dependency_semantics"
+          }
+        ]
+      },
+      "completion": {
+        "status": "partial",
+        "stage": "complete",
+        "failure_categories": [
+          "test_to_product_not_reached",
+          "unresolved_calls",
+          "semantic_analysis_gap"
+        ],
+        "error": null
+      },
+      "semantic_validation": {
+        "status": "not_evaluated",
+        "reviewer": null,
+        "evidence": [],
+        "notes": "candidate reachability is not semantic dependency validation"
+      },
+      "cost": {
+        "timings_seconds": {
+          "criterion_extraction": 0.000699,
+          "source_selection": 0.010601,
+          "backend_total": 4.538822,
+          "evidence_summary": 9.8e-05
+        },
+        "total_seconds": 4.5503,
+        "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+        "peak_memory": {
+          "status": "unavailable",
+          "bytes": null,
+          "reason": "case-level peak memory is not measured by this runner"
+        },
+        "cache_state": {
+          "status": "unknown",
+          "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+        },
+        "input_size": {
+          "files": 4,
+          "bytes": 14607
+        },
+        "graph_size": {
+          "nodes": 16,
+          "edges": 20
+        },
+        "unavailable_phases": [
+          {
+            "phase": "input_admission",
+            "reason": "adapter admission occurs outside the per-case analysis timer"
+          },
+          {
+            "phase": "front_end",
+            "reason": "the candidate backend does not report parsing time separately"
+          },
+          {
+            "phase": "call_graph",
+            "reason": "the candidate backend does not report call-graph time separately"
+          },
+          {
+            "phase": "pointer_analysis",
+            "reason": "the candidate backend does not provide pointer analysis"
+          },
+          {
+            "phase": "dependency_analysis",
+            "reason": "backend_total combines parsing, graph construction, and slicing"
+          },
+          {
+            "phase": "slice",
+            "reason": "the candidate backend does not report semantic slicing time separately"
+          },
+          {
+            "phase": "source_mapping",
+            "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+          }
+        ]
+      }
+    },
+    "stage": "complete",
+    "error": null,
+    "elapsed_seconds": 4.5503,
+    "timings_seconds": {
+      "criterion_extraction": 0.000699,
+      "source_selection": 0.010601,
+      "backend_total": 4.538822,
+      "evidence_summary": 9.8e-05
+    },
+    "graph_and_evidence": "top-level graph/evidence/sources remain candidate diagnostics only"
+  },
+  "semantic_backend": {
+    "schema": "mockspec.java-batch-semantic-backend/v1",
+    "status": "unsupported",
+    "support_status": "unsupported_input_domain",
+    "identity": {
+      "language": "java",
+      "dataset": "java-bechmark-strong",
+      "case_id": "com.ctrip.framework.apollo.configservice.filter.ClientAuthenticationFilterTest#testAuthorizedSuccessfully@6ff6ddd4",
+      "inventory_revision": "e8ed1a717304ae6437602a4da6389aae46d96f4a805bc140883d0a626742811f",
+      "snapshot_id": "ffbdd7c333458f23a1d8966be4c5a282114eb2ccce416787c57598d50e1c3fee"
+    },
+    "failure_categories": [
+      "java_semantic_backend_input_unsupported"
+    ],
+    "reason": "The accepted Java backend currently prepares bytecode, library summaries, and source-derived observations only for the exact JarFiles Jib case.",
+    "backend_attempted": false,
+    "candidate_diagnostic_required": true,
+    "driver_exit_code": 0,
+    "batch_dispatch_seconds": 0.143114,
+    "batch_dispatch_scope": "bridge process including support check, adapter and backend; excludes candidate diagnostics"
+  },
+  "batch_case_cost": {
+    "total_seconds": 4.708669,
+    "scope": "admission, candidate diagnostic, semantic-slot wait, dispatch and mapping; excludes case queue, shared compile and serialization"
+  },
+  "result_contract_sha256": "edd7f5ee3fd6bb3330b5870cc0fdf19fd3dbfb025a9964f7164526b650ec52ee"
+}

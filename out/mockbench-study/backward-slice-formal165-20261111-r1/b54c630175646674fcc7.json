@@ -1,0 +1,2618 @@
+{
+  "status": "unsupported",
+  "failure_categories": [
+    "empty_support_source_omitted",
+    "unresolved_calls",
+    "semantic_analysis_gap",
+    "semantic_backend_unsupported"
+  ],
+  "stage": "semantic_backend",
+  "input_context": {
+    "target_selector": "tests/test_434get_compatibility.py::test_get_compatibility_fetches_and_selects_the_active_spacy_version",
+    "masked_test_logical_path": "tests/test_434get_compatibility.py",
+    "masked_test_sha256": "6d641c5ffd2419bc068769c420df17f88b6e325e8c09da57d11d8a8f50cac79e",
+    "masking_contract": "python-slot-v1"
+  },
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_434get_compatibility.py::test_get_compatibility_fetches_and_selects_the_active_spacy_version",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_get_compatibility_fetches_and_selects_the_active_spacy_version",
+          "start_line": 23,
+          "end_line": 87
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 69,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 72,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      }
+    ],
+    "dynamic_loading": [
+      {
+        "line": 42,
+        "name": "load_function_from_source_ast",
+        "precision": "python_ast_call_name"
+      },
+      {
+        "line": 47,
+        "name": "load_function_from_source_ast",
+        "precision": "python_ast_call_name"
+      },
+      {
+        "line": 56,
+        "name": "load_function_from_source_ast",
+        "precision": "python_ast_call_name"
+      }
+    ],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_dynamic_path",
+        "hint": "src/spacy/util.py",
+        "candidates": [
+          "src/spacy/util.py"
+        ],
+        "precision": "exact_visible_path"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_dynamic_path",
+        "hint": "src/spacy/cli/download.py",
+        "candidates": [
+          "src/spacy/cli/download.py"
+        ],
+        "precision": "exact_visible_path"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/spacy/util.py",
+        "hint_kind": "python_import",
+        "hint": "spacy.lang",
+        "candidates": [
+          "src/spacy/lang/__init__.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [
+      "unresolved_dynamic_path:1459",
+      "unresolved_visible_source_path:1838",
+      "empty_source_rejected:src/spacy/lang/__init__.py"
+    ],
+    "source_rejections": [
+      {
+        "logical_path": "src/spacy/lang/__init__.py",
+        "reason": "frozen source is empty"
+      }
+    ],
+    "dynamic_loader_bindings": [],
+    "truncated": false,
+    "opaque_methods": [
+      {
+        "source_id": "source:1",
+        "name": "__setitem__",
+        "start_line": 319,
+        "end_line": 320
+      },
+      {
+        "source_id": "source:1",
+        "name": "pop",
+        "start_line": 322,
+        "end_line": 323
+      },
+      {
+        "source_id": "source:1",
+        "name": "update",
+        "start_line": 325,
+        "end_line": 326
+      },
+      {
+        "source_id": "source:1",
+        "name": "append",
+        "start_line": 345,
+        "end_line": 346
+      },
+      {
+        "source_id": "source:1",
+        "name": "clear",
+        "start_line": 348,
+        "end_line": 349
+      },
+      {
+        "source_id": "source:1",
+        "name": "extend",
+        "start_line": 351,
+        "end_line": 352
+      },
+      {
+        "source_id": "source:1",
+        "name": "insert",
+        "start_line": 354,
+        "end_line": 355
+      },
+      {
+        "source_id": "source:1",
+        "name": "pop",
+        "start_line": 357,
+        "end_line": 358
+      },
+      {
+        "source_id": "source:1",
+        "name": "remove",
+        "start_line": 360,
+        "end_line": 361
+      },
+      {
+        "source_id": "source:1",
+        "name": "reverse",
+        "start_line": 363,
+        "end_line": 364
+      },
+      {
+        "source_id": "source:1",
+        "name": "sort",
+        "start_line": 366,
+        "end_line": 367
+      },
+      {
+        "source_id": "source:1",
+        "name": "__call__",
+        "start_line": 1671,
+        "end_line": 1672
+      }
+    ],
+    "selected_bytes": 77936,
+    "read_bytes": 77936,
+    "attempted_files": 3,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_434get_compatibility.py",
+      "sha256": "6d641c5ffd2419bc068769c420df17f88b6e325e8c09da57d11d8a8f50cac79e",
+      "bytes": 2852
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/spacy/util.py",
+      "sha256": "da1338a9da8e21646b3844c42e3c383425911de4146f6314e39de93860d359cc",
+      "bytes": 68461
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/spacy/cli/download.py",
+      "sha256": "ef46c05160227693e507bce1c2f7718a289fe77799a709cbd6d3c7dc7b6a3891",
+      "bytes": 6623
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "dynamic_loader_bindings": [],
+    "edges": [
+      {
+        "branch": "true",
+        "from": "test:68:7:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:69:8:With"
+      },
+      {
+        "field": "body",
+        "from": "test:70:12:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:69:8:With"
+      },
+      {
+        "branch": "false",
+        "from": "test:68:7:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:72:8:Assert"
+      },
+      {
+        "from": "test:42:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:42:4:Name"
+      },
+      {
+        "from": "test:47:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:47:4:Name"
+      },
+      {
+        "from": "test:52:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:52:4:Name"
+      },
+      {
+        "from": "test:24:22:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:52:4:Assign",
+        "variable": "spacy_version"
+      },
+      {
+        "from": "test:56:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:56:4:Name"
+      },
+      {
+        "from": "test:52:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:56:4:Assign",
+        "variable": "about"
+      },
+      {
+        "from": "test:42:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:56:4:Assign",
+        "variable": "is_prerelease_version"
+      },
+      {
+        "from": "test:47:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:56:4:Assign",
+        "variable": "get_minor_version"
+      },
+      {
+        "from": "test:24:65:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:69:8:With",
+        "variable": "expected"
+      },
+      {
+        "from": "test:56:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:70:12:Expr",
+        "variable": "get_compatibility"
+      },
+      {
+        "from": "test:56:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:72:8:Assert",
+        "variable": "get_compatibility"
+      },
+      {
+        "from": "test:24:65:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:72:8:Assert",
+        "variable": "expected"
+      },
+      {
+        "callee": "get_compatibility",
+        "from": "source:2:146:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:70:12:Expr"
+      },
+      {
+        "callee": "get_compatibility",
+        "from": "source:2:134:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:70:12:Expr"
+      },
+      {
+        "callee": "get_compatibility",
+        "from": "source:2:145:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:70:12:Expr"
+      },
+      {
+        "callee": "get_compatibility",
+        "from": "source:2:146:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:72:8:Assert"
+      },
+      {
+        "callee": "get_compatibility",
+        "from": "source:2:134:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:72:8:Assert"
+      },
+      {
+        "callee": "get_compatibility",
+        "from": "source:2:145:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:72:8:Assert"
+      },
+      {
+        "from": "source:1:918:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:918:8:Name"
+      },
+      {
+        "from": "source:1:911:22:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:918:8:Assign",
+        "variable": "version"
+      },
+      {
+        "from": "source:1:918:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:921:4:Return",
+        "variable": "v"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:215:11:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:216:12:Expr"
+      },
+      {
+        "field": "body",
+        "from": "source:1:224:12:If",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "source:1:223:8:For"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:224:15:BoolOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:225:16:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:225:16:Expr",
+        "kind": "normal_branch_exit",
+        "precision": "possible_only_if_branch_completes_normally",
+        "to": "source:1:224:12:If"
+      },
+      {
+        "from": "source:1:219:27:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:221:8:Expr",
+        "variable": "cls"
+      },
+      {
+        "from": "source:1:222:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:222:8:Name"
+      },
+      {
+        "from": "source:1:223:8:For",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:223:12:Name"
+      },
+      {
+        "from": "source:1:223:8:For",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:223:18:Name"
+      },
+      {
+        "from": "source:1:219:27:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:223:8:For",
+        "variable": "cls"
+      },
+      {
+        "from": "source:1:223:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:224:12:If",
+        "variable": "name"
+      },
+      {
+        "from": "source:1:223:18:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:224:12:If",
+        "variable": "value"
+      },
+      {
+        "from": "source:1:222:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:225:16:Expr",
+        "variable": "names"
+      },
+      {
+        "from": "source:1:223:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:225:16:Expr",
+        "variable": "name"
+      },
+      {
+        "from": "source:1:222:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:226:8:Return",
+        "variable": "names"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:234:11:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:235:12:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:234:11:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:236:12:Raise"
+      },
+      {
+        "from": "source:1:229:12:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:231:8:Expr",
+        "variable": "cls"
+      },
+      {
+        "from": "source:1:235:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:235:12:Name"
+      },
+      {
+        "from": "source:1:229:12:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:235:12:Assign",
+        "variable": "cls"
+      },
+      {
+        "from": "source:1:229:17:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:236:12:Raise",
+        "variable": "registry_name"
+      },
+      {
+        "from": "source:1:235:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:236:12:Raise",
+        "variable": "names"
+      },
+      {
+        "from": "source:1:237:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:237:8:Name"
+      },
+      {
+        "from": "source:1:229:12:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:237:8:Assign",
+        "variable": "cls"
+      },
+      {
+        "from": "source:1:229:17:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:237:8:Assign",
+        "variable": "registry_name"
+      },
+      {
+        "from": "source:1:239:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:239:12:Name"
+      },
+      {
+        "from": "source:1:237:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:239:12:Assign",
+        "variable": "reg"
+      },
+      {
+        "from": "source:1:229:37:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:239:12:Assign",
+        "variable": "func_name"
+      },
+      {
+        "from": "source:1:242:16:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:242:16:Name"
+      },
+      {
+        "from": "source:1:229:37:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:242:16:Assign",
+        "variable": "func_name"
+      },
+      {
+        "from": "source:1:237:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:244:20:Return",
+        "variable": "reg"
+      },
+      {
+        "from": "source:1:242:16:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:244:20:Return",
+        "variable": "legacy_name"
+      },
+      {
+        "from": "source:1:247:12:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:247:12:Name"
+      },
+      {
+        "from": "source:1:237:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:247:12:Assign",
+        "variable": "reg"
+      },
+      {
+        "from": "source:1:229:37:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:248:12:Raise",
+        "variable": "func_name"
+      },
+      {
+        "from": "source:1:229:17:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:248:12:Raise",
+        "variable": "registry_name"
+      },
+      {
+        "from": "source:1:247:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:248:12:Raise",
+        "variable": "available"
+      },
+      {
+        "from": "source:1:239:12:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:253:8:Return",
+        "variable": "func"
+      },
+      {
+        "callee": "ensure_populated",
+        "from": "source:1:216:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:221:8:Expr"
+      },
+      {
+        "callee": "ensure_populated",
+        "from": "source:1:216:12:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:231:8:Expr"
+      },
+      {
+        "callee": "get",
+        "from": "source:1:244:20:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:1:239:12:Assign"
+      },
+      {
+        "callee": "get",
+        "from": "source:1:253:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:1:239:12:Assign"
+      },
+      {
+        "callee": "get",
+        "from": "source:1:231:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:239:12:Assign"
+      },
+      {
+        "callee": "get",
+        "from": "source:1:236:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:239:12:Assign"
+      },
+      {
+        "callee": "get",
+        "from": "source:1:248:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:239:12:Assign"
+      },
+      {
+        "callee": "get_registry_names",
+        "from": "source:1:226:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:1:235:12:Assign"
+      },
+      {
+        "callee": "get_registry_names",
+        "from": "source:1:221:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:235:12:Assign"
+      },
+      {
+        "callee": "get_registry_names",
+        "from": "source:1:225:16:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:235:12:Assign"
+      },
+      {
+        "callee": "get",
+        "from": "source:1:253:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:1:244:20:Return"
+      },
+      {
+        "callee": "get",
+        "from": "source:1:231:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:244:20:Return"
+      },
+      {
+        "callee": "get",
+        "from": "source:1:236:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:244:20:Return"
+      },
+      {
+        "callee": "get",
+        "from": "source:1:248:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:1:244:20:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:128:7:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:129:8:AnnAssign"
+      },
+      {
+        "branch": "false",
+        "from": "source:2:128:7:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:131:8:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:133:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:134:8:Expr"
+      },
+      {
+        "branch": "true",
+        "from": "source:2:144:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:2:145:8:Expr"
+      },
+      {
+        "from": "source:2:129:8:AnnAssign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:129:8:Name"
+      },
+      {
+        "from": "source:2:131:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:131:8:Name"
+      },
+      {
+        "from": "source:2:132:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:132:4:Name"
+      },
+      {
+        "from": "source:2:132:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:134:8:Expr",
+        "variable": "r"
+      },
+      {
+        "from": "source:2:142:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:142:4:Name"
+      },
+      {
+        "from": "source:2:132:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:142:4:Assign",
+        "variable": "r"
+      },
+      {
+        "from": "source:2:143:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:2:143:4:Name"
+      },
+      {
+        "from": "source:2:142:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:143:4:Assign",
+        "variable": "comp_table"
+      },
+      {
+        "from": "source:2:129:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:145:8:Expr",
+        "variable": "version"
+      },
+      {
+        "from": "source:2:131:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:145:8:Expr",
+        "variable": "version"
+      },
+      {
+        "from": "source:2:143:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:146:4:Return",
+        "variable": "comp"
+      },
+      {
+        "from": "source:2:129:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:146:4:Return",
+        "variable": "version"
+      },
+      {
+        "from": "source:2:131:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:2:146:4:Return",
+        "variable": "version"
+      },
+      {
+        "callee": "get",
+        "from": "source:1:244:20:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:132:4:Assign"
+      },
+      {
+        "callee": "get",
+        "from": "source:1:253:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:132:4:Assign"
+      },
+      {
+        "callee": "get",
+        "from": "source:1:231:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:132:4:Assign"
+      },
+      {
+        "callee": "get",
+        "from": "source:1:236:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:132:4:Assign"
+      },
+      {
+        "callee": "get",
+        "from": "source:1:248:12:Raise",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:2:132:4:Assign"
+      },
+      {
+        "callee": "get_minor_version",
+        "from": "source:1:920:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:131:8:Assign"
+      },
+      {
+        "callee": "get_minor_version",
+        "from": "source:1:921:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:2:131:8:Assign"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected",
+      "dynamic loader origins require a visible static path, namespace key, selected definition, and unrebound test callable"
+    ],
+    "nodes": [
+      {
+        "code": "not REGISTRY_POPULATED",
+        "end_line": 215,
+        "id": "source:1:215:11:UnaryOp",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 215
+      },
+      {
+        "code": "populate_registry()",
+        "contains_unresolved_call": true,
+        "end_line": 216,
+        "exception_possible": true,
+        "id": "source:1:216:12:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 216,
+        "unresolved_calls": [
+          "populate_registry()"
+        ]
+      },
+      {
+        "code": "cls",
+        "end_line": 219,
+        "id": "source:1:219:27:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 219
+      },
+      {
+        "code": "cls.ensure_populated()",
+        "end_line": 221,
+        "exception_possible": true,
+        "id": "source:1:221:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 221
+      },
+      {
+        "code": "names = []",
+        "end_line": 222,
+        "id": "source:1:222:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 222
+      },
+      {
+        "code": "names",
+        "end_line": 222,
+        "id": "source:1:222:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 222
+      },
+      {
+        "code": "name",
+        "end_line": 223,
+        "id": "source:1:223:12:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 223
+      },
+      {
+        "code": "value",
+        "end_line": 223,
+        "id": "source:1:223:18:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 223
+      },
+      {
+        "code": "for name, value in inspect.getmembers(cls):\n    if not name.startswith('_') and isinstance(value, Registry):\n        names.append(name)",
+        "contains_unresolved_call": true,
+        "end_line": 225,
+        "exception_possible": true,
+        "id": "source:1:223:8:For",
+        "kind": "For",
+        "source_id": "source:1",
+        "start_line": 223,
+        "unresolved_calls": [
+          "inspect.getmembers(cls)"
+        ]
+      },
+      {
+        "code": "if not name.startswith('_') and isinstance(value, Registry):\n    names.append(name)",
+        "contains_unresolved_call": true,
+        "end_line": 225,
+        "exception_possible": true,
+        "id": "source:1:224:12:If",
+        "kind": "If",
+        "source_id": "source:1",
+        "start_line": 224,
+        "unresolved_calls": [
+          "isinstance(value, Registry)",
+          "name.startswith('_')"
+        ]
+      },
+      {
+        "code": "not name.startswith('_') and isinstance(value, Registry)",
+        "end_line": 224,
+        "id": "source:1:224:15:BoolOp",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 224
+      },
+      {
+        "boundary_calls": [
+          "names.append(name)"
+        ],
+        "code": "names.append(name)",
+        "contains_boundary_call": true,
+        "end_line": 225,
+        "exception_possible": true,
+        "id": "source:1:225:16:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 225
+      },
+      {
+        "code": "return sorted(names)",
+        "contains_unresolved_call": true,
+        "end_line": 226,
+        "exception_possible": true,
+        "id": "source:1:226:8:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 226,
+        "unresolved_calls": [
+          "sorted(names)"
+        ]
+      },
+      {
+        "code": "cls",
+        "end_line": 229,
+        "id": "source:1:229:12:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 229
+      },
+      {
+        "code": "registry_name: str",
+        "end_line": 229,
+        "id": "source:1:229:17:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 229
+      },
+      {
+        "code": "func_name: str",
+        "end_line": 229,
+        "id": "source:1:229:37:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 229
+      },
+      {
+        "code": "cls.ensure_populated()",
+        "end_line": 231,
+        "exception_possible": true,
+        "id": "source:1:231:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:1",
+        "start_line": 231
+      },
+      {
+        "code": "not hasattr(cls, registry_name)",
+        "end_line": 234,
+        "id": "source:1:234:11:UnaryOp",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 234
+      },
+      {
+        "code": "names = ', '.join(cls.get_registry_names()) or 'none'",
+        "contains_unresolved_call": true,
+        "end_line": 235,
+        "exception_possible": true,
+        "id": "source:1:235:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 235,
+        "unresolved_calls": [
+          "', '.join(cls.get_registry_names())"
+        ]
+      },
+      {
+        "code": "names",
+        "end_line": 235,
+        "id": "source:1:235:12:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 235
+      },
+      {
+        "code": "raise RegistryError(Errors.E892.format(name=registry_name, available=names))",
+        "contains_unresolved_call": true,
+        "end_line": 236,
+        "exception_possible": true,
+        "id": "source:1:236:12:Raise",
+        "kind": "Raise",
+        "source_id": "source:1",
+        "start_line": 236,
+        "unresolved_calls": [
+          "RegistryError(Errors.E892.format(name=registry_name, available=names))",
+          "Errors.E892.format(name=registry_name, available=names)"
+        ]
+      },
+      {
+        "code": "reg = getattr(cls, registry_name)",
+        "contains_unresolved_call": true,
+        "end_line": 237,
+        "exception_possible": true,
+        "id": "source:1:237:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 237,
+        "unresolved_calls": [
+          "getattr(cls, registry_name)"
+        ]
+      },
+      {
+        "code": "reg",
+        "end_line": 237,
+        "id": "source:1:237:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 237
+      },
+      {
+        "code": "func = reg.get(func_name)",
+        "end_line": 239,
+        "exception_possible": true,
+        "id": "source:1:239:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 239
+      },
+      {
+        "code": "func",
+        "end_line": 239,
+        "id": "source:1:239:12:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 239
+      },
+      {
+        "code": "legacy_name = func_name.replace('spacy.', 'spacy-legacy.')",
+        "contains_unresolved_call": true,
+        "end_line": 242,
+        "exception_possible": true,
+        "id": "source:1:242:16:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 242,
+        "unresolved_calls": [
+          "func_name.replace('spacy.', 'spacy-legacy.')"
+        ]
+      },
+      {
+        "code": "legacy_name",
+        "end_line": 242,
+        "id": "source:1:242:16:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 242
+      },
+      {
+        "code": "return reg.get(legacy_name)",
+        "end_line": 244,
+        "exception_possible": true,
+        "id": "source:1:244:20:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 244
+      },
+      {
+        "code": "available = ', '.join(sorted(reg.get_all().keys())) or 'none'",
+        "contains_unresolved_call": true,
+        "end_line": 247,
+        "exception_possible": true,
+        "id": "source:1:247:12:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 247,
+        "unresolved_calls": [
+          "', '.join(sorted(reg.get_all().keys()))",
+          "sorted(reg.get_all().keys())",
+          "reg.get_all().keys()",
+          "reg.get_all()"
+        ]
+      },
+      {
+        "code": "available",
+        "end_line": 247,
+        "id": "source:1:247:12:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 247
+      },
+      {
+        "code": "raise RegistryError(Errors.E893.format(name=func_name, reg_name=registry_name, available=available)) from None",
+        "contains_unresolved_call": true,
+        "end_line": 252,
+        "exception_possible": true,
+        "id": "source:1:248:12:Raise",
+        "kind": "Raise",
+        "source_id": "source:1",
+        "start_line": 248,
+        "unresolved_calls": [
+          "RegistryError(Errors.E893.format(name=func_name, reg_name=registry_name, available=available))",
+          "Errors.E893.format(name=func_name, reg_name=registry_name, available=available)"
+        ]
+      },
+      {
+        "code": "return func",
+        "end_line": 253,
+        "id": "source:1:253:8:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 253
+      },
+      {
+        "code": "version: str",
+        "end_line": 911,
+        "id": "source:1:911:22:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 911
+      },
+      {
+        "code": "v = Version(version)",
+        "contains_unresolved_call": true,
+        "end_line": 918,
+        "exception_possible": true,
+        "id": "source:1:918:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 918,
+        "unresolved_calls": [
+          "Version(version)"
+        ]
+      },
+      {
+        "code": "v",
+        "end_line": 918,
+        "id": "source:1:918:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 918
+      },
+      {
+        "code": "return None",
+        "end_line": 920,
+        "id": "source:1:920:8:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 920
+      },
+      {
+        "code": "return f'{v.major}.{v.minor}'",
+        "end_line": 921,
+        "id": "source:1:921:4:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 921
+      },
+      {
+        "code": "is_prerelease_version(about.__version__)",
+        "end_line": 128,
+        "id": "source:2:128:7:Call",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 128
+      },
+      {
+        "code": "version: Optional[str] = about.__version__",
+        "end_line": 129,
+        "id": "source:2:129:8:AnnAssign",
+        "kind": "AnnAssign",
+        "source_id": "source:2",
+        "start_line": 129
+      },
+      {
+        "code": "version",
+        "end_line": 129,
+        "id": "source:2:129:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 129
+      },
+      {
+        "code": "version = get_minor_version(about.__version__)",
+        "end_line": 131,
+        "exception_possible": true,
+        "id": "source:2:131:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 131
+      },
+      {
+        "code": "version",
+        "end_line": 131,
+        "id": "source:2:131:8:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 131
+      },
+      {
+        "code": "r = requests.get(about.__compatibility__)",
+        "end_line": 132,
+        "exception_possible": true,
+        "id": "source:2:132:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 132
+      },
+      {
+        "code": "r",
+        "end_line": 132,
+        "id": "source:2:132:4:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 132
+      },
+      {
+        "code": "r.status_code != 200",
+        "end_line": 133,
+        "id": "source:2:133:7:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 133
+      },
+      {
+        "code": "msg.fail(f'Server error ({r.status_code})', f\"Couldn't fetch compatibility table. Please find a package for your spaCy installation (v{about.__version__}), and download it manually. For more details, see the documentation: https://spacy.io/usage/models\", exits=1)",
+        "contains_unresolved_call": true,
+        "end_line": 141,
+        "exception_possible": true,
+        "id": "source:2:134:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 134,
+        "unresolved_calls": [
+          "msg.fail(f'Server error ({r.status_code})', f\"Couldn't fetch compatibility table. Please find a package for your spaCy installation (v{about.__version__}), and download it manually. For more details, see the documentation: https://spacy.io/usage/models\", exits=1)"
+        ]
+      },
+      {
+        "code": "comp_table = r.json()",
+        "contains_unresolved_call": true,
+        "end_line": 142,
+        "exception_possible": true,
+        "id": "source:2:142:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 142,
+        "unresolved_calls": [
+          "r.json()"
+        ]
+      },
+      {
+        "code": "comp_table",
+        "end_line": 142,
+        "id": "source:2:142:4:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 142
+      },
+      {
+        "code": "comp = comp_table['spacy']",
+        "end_line": 143,
+        "id": "source:2:143:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:2",
+        "start_line": 143
+      },
+      {
+        "code": "comp",
+        "end_line": 143,
+        "id": "source:2:143:4:Name",
+        "kind": "Name",
+        "source_id": "source:2",
+        "start_line": 143
+      },
+      {
+        "code": "version not in comp",
+        "end_line": 144,
+        "id": "source:2:144:7:Compare",
+        "kind": "if_condition",
+        "source_id": "source:2",
+        "start_line": 144
+      },
+      {
+        "code": "msg.fail(f'No compatible packages found for v{version} of spaCy', exits=1)",
+        "contains_unresolved_call": true,
+        "end_line": 145,
+        "exception_possible": true,
+        "id": "source:2:145:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:2",
+        "start_line": 145,
+        "unresolved_calls": [
+          "msg.fail(f'No compatible packages found for v{version} of spaCy', exits=1)"
+        ]
+      },
+      {
+        "code": "return comp[version]",
+        "end_line": 146,
+        "id": "source:2:146:4:Return",
+        "kind": "Return",
+        "source_id": "source:2",
+        "start_line": 146
+      },
+      {
+        "code": "spacy_version",
+        "end_line": 24,
+        "id": "test:24:22:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 24
+      },
+      {
+        "code": "expected",
+        "end_line": 24,
+        "id": "test:24:65:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 24
+      },
+      {
+        "code": "is_prerelease_version = load_function_from_source_ast(UTIL_PATH, 'is_prerelease_version', namespace={'Version': Version})",
+        "contains_unresolved_call": true,
+        "end_line": 46,
+        "exception_possible": true,
+        "id": "test:42:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 42,
+        "unresolved_calls": [
+          "load_function_from_source_ast(UTIL_PATH, 'is_prerelease_version', namespace={'Version': Version})"
+        ]
+      },
+      {
+        "code": "is_prerelease_version",
+        "end_line": 42,
+        "id": "test:42:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 42
+      },
+      {
+        "code": "get_minor_version = load_function_from_source_ast(UTIL_PATH, 'get_minor_version', namespace={'Version': Version, 'InvalidVersion': InvalidVersion})",
+        "contains_unresolved_call": true,
+        "end_line": 51,
+        "exception_possible": true,
+        "id": "test:47:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 47,
+        "unresolved_calls": [
+          "load_function_from_source_ast(UTIL_PATH, 'get_minor_version', namespace={'Version': Version, 'InvalidVersion': InvalidVersion})"
+        ]
+      },
+      {
+        "code": "get_minor_version",
+        "end_line": 47,
+        "id": "test:47:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 47
+      },
+      {
+        "code": "about = SimpleNamespace(__version__=spacy_version, __compatibility__='https://models.example/compatibility.json')",
+        "contains_unresolved_call": true,
+        "end_line": 55,
+        "exception_possible": true,
+        "id": "test:52:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 52,
+        "unresolved_calls": [
+          "SimpleNamespace(__version__=spacy_version, __compatibility__='https://models.example/compatibility.json')"
+        ]
+      },
+      {
+        "code": "about",
+        "end_line": 52,
+        "id": "test:52:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 52
+      },
+      {
+        "code": "get_compatibility = load_function_from_source_ast(DOWNLOAD_PATH, 'get_compatibility', namespace={'about': about, 'requests': requests, 'msg': message, 'is_prerelease_version': is_prerelease_version, 'get_minor_version': get_minor_version})",
+        "contains_unresolved_call": true,
+        "end_line": 66,
+        "exception_possible": true,
+        "id": "test:56:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 56,
+        "unresolved_calls": [
+          "load_function_from_source_ast(DOWNLOAD_PATH, 'get_compatibility', namespace={'about': about, 'requests': requests, 'msg': message, 'is_prerelease_version': is_prerelease_version, 'get_minor_version': get_minor_version})"
+        ]
+      },
+      {
+        "code": "get_compatibility",
+        "end_line": 56,
+        "id": "test:56:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 56
+      },
+      {
+        "code": "isinstance(expected, type)",
+        "end_line": 68,
+        "id": "test:68:7:Call",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 68
+      },
+      {
+        "code": "with pytest.raises(expected, match='compatibility unavailable'):\n    get_compatibility()",
+        "contains_unresolved_call": true,
+        "end_line": 70,
+        "exception_possible": true,
+        "id": "test:69:8:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 69,
+        "unresolved_calls": [
+          "pytest.raises(expected, match='compatibility unavailable')"
+        ]
+      },
+      {
+        "code": "get_compatibility()",
+        "end_line": 70,
+        "exception_possible": true,
+        "id": "test:70:12:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 70
+      },
+      {
+        "code": "assert get_compatibility() == expected",
+        "end_line": 72,
+        "exception_possible": true,
+        "id": "test:72:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 72
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:69:8:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:72:8:Assert"
+      }
+    ],
+    "seeds": [
+      "test:69:8:With",
+      "test:72:8:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 67,
+    "edges": 99,
+    "edge_kinds": {
+      "lexical_control": 10,
+      "normal_body_exit": 2,
+      "definition_value_candidate": 18,
+      "data_candidate": 41,
+      "call_target_candidate": 10,
+      "call_event_candidate": 17,
+      "normal_branch_exit": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:69:8:With",
+        "node_ids": [
+          "source:1:215:11:UnaryOp",
+          "source:1:216:12:Expr",
+          "source:1:219:27:arg",
+          "source:1:221:8:Expr",
+          "source:1:222:8:Assign",
+          "source:1:222:8:Name",
+          "source:1:223:12:Name",
+          "source:1:223:18:Name",
+          "source:1:223:8:For",
+          "source:1:224:12:If",
+          "source:1:224:15:BoolOp",
+          "source:1:225:16:Expr",
+          "source:1:226:8:Return",
+          "source:1:229:12:arg",
+          "source:1:229:17:arg",
+          "source:1:229:37:arg",
+          "source:1:231:8:Expr",
+          "source:1:234:11:UnaryOp",
+          "source:1:235:12:Assign",
+          "source:1:235:12:Name",
+          "source:1:236:12:Raise",
+          "source:1:237:8:Assign",
+          "source:1:237:8:Name",
+          "source:1:239:12:Assign",
+          "source:1:239:12:Name",
+          "source:1:242:16:Assign",
+          "source:1:242:16:Name",
+          "source:1:244:20:Return",
+          "source:1:247:12:Assign",
+          "source:1:247:12:Name",
+          "source:1:248:12:Raise",
+          "source:1:253:8:Return",
+          "source:1:911:22:arg",
+          "source:1:918:8:Assign",
+          "source:1:918:8:Name",
+          "source:1:920:8:Return",
+          "source:1:921:4:Return",
+          "source:2:128:7:Call",
+          "source:2:129:8:AnnAssign",
+          "source:2:129:8:Name",
+          "source:2:131:8:Assign",
+          "source:2:131:8:Name",
+          "source:2:132:4:Assign",
+          "source:2:132:4:Name",
+          "source:2:133:7:Compare",
+          "source:2:134:8:Expr",
+          "source:2:142:4:Assign",
+          "source:2:142:4:Name",
+          "source:2:143:4:Assign",
+          "source:2:143:4:Name",
+          "source:2:144:7:Compare",
+          "source:2:145:8:Expr",
+          "source:2:146:4:Return",
+          "test:24:22:arg",
+          "test:24:65:arg",
+          "test:42:4:Assign",
+          "test:42:4:Name",
+          "test:47:4:Assign",
+          "test:47:4:Name",
+          "test:52:4:Assign",
+          "test:52:4:Name",
+          "test:56:4:Assign",
+          "test:56:4:Name",
+          "test:68:7:Call",
+          "test:69:8:With",
+          "test:70:12:Expr"
+        ],
+        "product_source_candidates": [
+          "source:1",
+          "source:2"
+        ],
+        "unknown_call_nodes": [
+          "source:1:216:12:Expr",
+          "source:1:223:8:For",
+          "source:1:224:12:If",
+          "source:1:225:16:Expr",
+          "source:1:226:8:Return",
+          "source:1:235:12:Assign",
+          "source:1:236:12:Raise",
+          "source:1:237:8:Assign",
+          "source:1:242:16:Assign",
+          "source:1:247:12:Assign",
+          "source:1:248:12:Raise",
+          "source:1:918:8:Assign",
+          "source:2:134:8:Expr",
+          "source:2:142:4:Assign",
+          "source:2:145:8:Expr",
+          "test:42:4:Assign",
+          "test:47:4:Assign",
+          "test:52:4:Assign",
+          "test:56:4:Assign",
+          "test:69:8:With"
+        ]
+      },
+      {
+        "seed": "test:72:8:Assert",
+        "node_ids": [
+          "source:1:215:11:UnaryOp",
+          "source:1:216:12:Expr",
+          "source:1:219:27:arg",
+          "source:1:221:8:Expr",
+          "source:1:222:8:Assign",
+          "source:1:222:8:Name",
+          "source:1:223:12:Name",
+          "source:1:223:18:Name",
+          "source:1:223:8:For",
+          "source:1:224:12:If",
+          "source:1:224:15:BoolOp",
+          "source:1:225:16:Expr",
+          "source:1:226:8:Return",
+          "source:1:229:12:arg",
+          "source:1:229:17:arg",
+          "source:1:229:37:arg",
+          "source:1:231:8:Expr",
+          "source:1:234:11:UnaryOp",
+          "source:1:235:12:Assign",
+          "source:1:235:12:Name",
+          "source:1:236:12:Raise",
+          "source:1:237:8:Assign",
+          "source:1:237:8:Name",
+          "source:1:239:12:Assign",
+          "source:1:239:12:Name",
+          "source:1:242:16:Assign",
+          "source:1:242:16:Name",
+          "source:1:244:20:Return",
+          "source:1:247:12:Assign",
+          "source:1:247:12:Name",
+          "source:1:248:12:Raise",
+          "source:1:253:8:Return",
+          "source:1:911:22:arg",
+          "source:1:918:8:Assign",
+          "source:1:918:8:Name",
+          "source:1:920:8:Return",
+          "source:1:921:4:Return",
+          "source:2:128:7:Call",
+          "source:2:129:8:AnnAssign",
+          "source:2:129:8:Name",
+          "source:2:131:8:Assign",
+          "source:2:131:8:Name",
+          "source:2:132:4:Assign",
+          "source:2:132:4:Name",
+          "source:2:133:7:Compare",
+          "source:2:134:8:Expr",
+          "source:2:142:4:Assign",
+          "source:2:142:4:Name",
+          "source:2:143:4:Assign",
+          "source:2:143:4:Name",
+          "source:2:144:7:Compare",
+          "source:2:145:8:Expr",
+          "source:2:146:4:Return",
+          "test:24:22:arg",
+          "test:24:65:arg",
+          "test:42:4:Assign",
+          "test:42:4:Name",
+          "test:47:4:Assign",
+          "test:47:4:Name",
+          "test:52:4:Assign",
+          "test:52:4:Name",
+          "test:56:4:Assign",
+          "test:56:4:Name",
+          "test:68:7:Call",
+          "test:72:8:Assert"
+        ],
+        "product_source_candidates": [
+          "source:1",
+          "source:2"
+        ],
+        "unknown_call_nodes": [
+          "source:1:216:12:Expr",
+          "source:1:223:8:For",
+          "source:1:224:12:If",
+          "source:1:225:16:Expr",
+          "source:1:226:8:Return",
+          "source:1:235:12:Assign",
+          "source:1:236:12:Raise",
+          "source:1:237:8:Assign",
+          "source:1:242:16:Assign",
+          "source:1:247:12:Assign",
+          "source:1:248:12:Raise",
+          "source:1:918:8:Assign",
+          "source:2:134:8:Expr",
+          "source:2:142:4:Assign",
+          "source:2:145:8:Expr",
+          "test:42:4:Assign",
+          "test:47:4:Assign",
+          "test:52:4:Assign",
+          "test:56:4:Assign"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:69:8:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:72:8:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.4183,
+  "timings_seconds": {
+    "criterion_extraction": 0.000696,
+    "source_selection": 0.075895,
+    "backend_total": 0.341272,
+    "evidence_summary": 0.000365
+  },
+  "identity": {
+    "case_id": "spaCy_434",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "017449aae1fd49631204dad9be790d36e394551378b795396c27323384dfa3c1"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "spaCy_434",
+      "dataset": "python-benchmark-new",
+      "language": "python",
+      "snapshot_id": "017449aae1fd49631204dad9be790d36e394551378b795396c27323384dfa3c1",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "6d641c5ffd2419bc068769c420df17f88b6e325e8c09da57d11d8a8f50cac79e",
+      "target_selector": "tests/test_434get_compatibility.py::test_get_compatibility_fetches_and_selects_the_active_spacy_version"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_434get_compatibility.py",
+        "sha256": "6d641c5ffd2419bc068769c420df17f88b6e325e8c09da57d11d8a8f50cac79e",
+        "bytes": 2852,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:1",
+        "logical_path": "src/spacy/util.py",
+        "sha256": "da1338a9da8e21646b3844c42e3c383425911de4146f6314e39de93860d359cc",
+        "bytes": 68461,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:2",
+        "logical_path": "src/spacy/cli/download.py",
+        "sha256": "ef46c05160227693e507bce1c2f7718a289fe77799a709cbd6d3c7dc7b6a3891",
+        "bytes": 6623,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 69,
+          "end_line": 69
+        },
+        "kind": "exception_observation",
+        "origin": "explicit",
+        "reason": "raises in the selected test function"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 72,
+          "end_line": 72
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "the runner does not enumerate parameter rows"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_434get_compatibility.py::test_get_compatibility_fetches_and_selects_the_active_spacy_version",
+        "evidence": [
+          {
+            "symbol": "test_get_compatibility_fetches_and_selects_the_active_spacy_version",
+            "start_line": 23,
+            "end_line": 87
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "not_evaluated",
+        "candidates": [],
+        "evidence": [],
+        "assumptions": []
+      }
+    },
+    "relations": [],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [],
+      "unknown_effects": [
+        {
+          "boundary_id": "source:1:216:12:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:223:8:For",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:224:12:If",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:225:16:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:226:8:Return",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:235:12:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:236:12:Raise",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:237:8:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:242:16:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:247:12:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:248:12:Raise",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:918:8:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:2:134:8:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:2:142:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:2:145:8:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:42:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:47:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:52:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:56:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:69:8:With",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "mature_backend_support_domain",
+          "reason": "semantic_backend_unsupported",
+          "details": [
+            "No authenticated Python semantic driver is registered for this case.",
+            "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+            "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+          ]
+        }
+      ]
+    },
+    "completion": {
+      "status": "unsupported",
+      "stage": "semantic_backend",
+      "failure_categories": [
+        "empty_support_source_omitted",
+        "unresolved_calls",
+        "semantic_analysis_gap",
+        "semantic_backend_unsupported"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "not_evaluated",
+      "reviewer": null,
+      "evidence": [],
+      "notes": "candidate reachability is not semantic dependency validation"
+    },
+    "cost": {
+      "timings_seconds": {
+        "criterion_extraction": 0.000696,
+        "source_selection": 0.075895,
+        "backend_total": 0.341272,
+        "evidence_summary": 0.000365
+      },
+      "total_seconds": 0.4183,
+      "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+      "peak_memory": {
+        "status": "unavailable",
+        "bytes": null,
+        "reason": "case-level peak memory is not measured by this runner"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+      },
+      "input_size": {
+        "files": 3,
+        "bytes": 77936
+      },
+      "graph_size": {
+        "nodes": 67,
+        "edges": 99
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter admission occurs outside the per-case analysis timer"
+        },
+        {
+          "phase": "front_end",
+          "reason": "the candidate backend does not report parsing time separately"
+        },
+        {
+          "phase": "call_graph",
+          "reason": "the candidate backend does not report call-graph time separately"
+        },
+        {
+          "phase": "pointer_analysis",
+          "reason": "the candidate backend does not provide pointer analysis"
+        },
+        {
+          "phase": "dependency_analysis",
+          "reason": "backend_total combines parsing, graph construction, and slicing"
+        },
+        {
+          "phase": "slice",
+          "reason": "the candidate backend does not report semantic slicing time separately"
+        },
+        {
+          "phase": "source_mapping",
+          "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+        }
+      ]
+    }
+  },
+  "candidate_diagnostics": {
+    "status": "partial",
+    "failure_categories": [
+      "empty_support_source_omitted",
+      "unresolved_calls",
+      "semantic_analysis_gap"
+    ],
+    "result_contract": {
+      "schema_version": "mock-spec.backward-analysis-case/v1",
+      "identity": {
+        "case_id": "spaCy_434",
+        "dataset": "python-benchmark-new",
+        "language": "python",
+        "snapshot_id": "017449aae1fd49631204dad9be790d36e394551378b795396c27323384dfa3c1",
+        "masking_contract": "python-slot-v1",
+        "masked_test_sha256": "6d641c5ffd2419bc068769c420df17f88b6e325e8c09da57d11d8a8f50cac79e",
+        "target_selector": "tests/test_434get_compatibility.py::test_get_compatibility_fetches_and_selects_the_active_spacy_version"
+      },
+      "source_scope": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_434get_compatibility.py",
+          "sha256": "6d641c5ffd2419bc068769c420df17f88b6e325e8c09da57d11d8a8f50cac79e",
+          "bytes": 2852,
+          "selection_role": "masked_test"
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/spacy/util.py",
+          "sha256": "da1338a9da8e21646b3844c42e3c383425911de4146f6314e39de93860d359cc",
+          "bytes": 68461,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/spacy/cli/download.py",
+          "sha256": "ef46c05160227693e507bce1c2f7718a289fe77799a709cbd6d3c7dc7b6a3891",
+          "bytes": 6623,
+          "selection_role": "candidate_product"
+        }
+      ],
+      "observations": [
+        {
+          "observation_id": "criterion:0",
+          "location": {
+            "source_id": "test",
+            "start_line": 69,
+            "end_line": 69
+          },
+          "kind": "exception_observation",
+          "origin": "explicit",
+          "reason": "raises in the selected test function"
+        },
+        {
+          "observation_id": "criterion:1",
+          "location": {
+            "source_id": "test",
+            "start_line": 72,
+            "end_line": 72
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        }
+      ],
+      "parameterization": {
+        "status": "not_expanded",
+        "coverage": "selected_test_definition",
+        "reason": "the runner does not enumerate parameter rows"
+      },
+      "entry_point": {
+        "test_selection": {
+          "origin": "task_provided",
+          "status": "unique",
+          "selector": "tests/test_434get_compatibility.py::test_get_compatibility_fetches_and_selects_the_active_spacy_version",
+          "evidence": [
+            {
+              "symbol": "test_get_compatibility_fetches_and_selects_the_active_spacy_version",
+              "start_line": 23,
+              "end_line": 87
+            }
+          ]
+        },
+        "mut_binding": {
+          "origin": "automatic",
+          "status": "not_evaluated",
+          "candidates": [],
+          "evidence": [],
+          "assumptions": []
+        }
+      },
+      "relations": [],
+      "relation_coverage": [
+        {
+          "kind": "call_binding",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "control_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "exception_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "function_origin",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "normal_return_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "state_flow",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "value_flow",
+          "status": "not_evaluated"
+        }
+      ],
+      "analysis_boundaries": {
+        "assumptions": [],
+        "unknown_effects": [
+          {
+            "boundary_id": "source:1:216:12:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:223:8:For",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:224:12:If",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:225:16:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:226:8:Return",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:235:12:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:236:12:Raise",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:237:8:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:242:16:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:247:12:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:248:12:Raise",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:918:8:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:2:134:8:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:2:142:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:2:145:8:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:42:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:47:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:52:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:56:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:69:8:With",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          }
+        ],
+        "unanalysed_regions": [
+          {
+            "scope": "semantic_relations",
+            "reason": "candidate_graph_has_no_validated_dependency_semantics"
+          }
+        ]
+      },
+      "completion": {
+        "status": "partial",
+        "stage": "complete",
+        "failure_categories": [
+          "empty_support_source_omitted",
+          "unresolved_calls",
+          "semantic_analysis_gap"
+        ],
+        "error": null
+      },
+      "semantic_validation": {
+        "status": "not_evaluated",
+        "reviewer": null,
+        "evidence": [],
+        "notes": "candidate reachability is not semantic dependency validation"
+      },
+      "cost": {
+        "timings_seconds": {
+          "criterion_extraction": 0.000696,
+          "source_selection": 0.075895,
+          "backend_total": 0.341272,
+          "evidence_summary": 0.000365
+        },
+        "total_seconds": 0.4183,
+        "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+        "peak_memory": {
+          "status": "unavailable",
+          "bytes": null,
+          "reason": "case-level peak memory is not measured by this runner"
+        },
+        "cache_state": {
+          "status": "unknown",
+          "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+        },
+        "input_size": {
+          "files": 3,
+          "bytes": 77936
+        },
+        "graph_size": {
+          "nodes": 67,
+          "edges": 99
+        },
+        "unavailable_phases": [
+          {
+            "phase": "input_admission",
+            "reason": "adapter admission occurs outside the per-case analysis timer"
+          },
+          {
+            "phase": "front_end",
+            "reason": "the candidate backend does not report parsing time separately"
+          },
+          {
+            "phase": "call_graph",
+            "reason": "the candidate backend does not report call-graph time separately"
+          },
+          {
+            "phase": "pointer_analysis",
+            "reason": "the candidate backend does not provide pointer analysis"
+          },
+          {
+            "phase": "dependency_analysis",
+            "reason": "backend_total combines parsing, graph construction, and slicing"
+          },
+          {
+            "phase": "slice",
+            "reason": "the candidate backend does not report semantic slicing time separately"
+          },
+          {
+            "phase": "source_mapping",
+            "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+          }
+        ]
+      }
+    },
+    "stage": "complete",
+    "error": null,
+    "elapsed_seconds": 0.4183,
+    "timings_seconds": {
+      "criterion_extraction": 0.000696,
+      "source_selection": 0.075895,
+      "backend_total": 0.341272,
+      "evidence_summary": 0.000365
+    },
+    "graph_and_evidence": "top-level graph/evidence/sources remain candidate diagnostics only"
+  },
+  "semantic_backend": {
+    "schema": "mock-spec.batch-semantic-backend/v1",
+    "status": "unsupported",
+    "backend": null,
+    "identity": {
+      "language": "python",
+      "dataset": "python-benchmark-new",
+      "case_id": "spaCy_434",
+      "inventory_revision": "0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc",
+      "snapshot_id": "017449aae1fd49631204dad9be790d36e394551378b795396c27323384dfa3c1",
+      "snapshot_root": "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/python-benchmark-new/017449aae1fd49631204dad9be790d36e394551378b795396c27323384dfa3c1",
+      "admission_status": "frozen_candidate",
+      "admission_verified": false,
+      "reviewed_snapshot_id": null,
+      "target_selector": "tests/test_434get_compatibility.py::test_get_compatibility_fetches_and_selects_the_active_spacy_version",
+      "masked_test_logical_path": "tests/test_434get_compatibility.py",
+      "masked_test_sha256": "6d641c5ffd2419bc068769c420df17f88b6e325e8c09da57d11d8a8f50cac79e",
+      "masking_contract": "python-slot-v1",
+      "input_context": {
+        "target_selector": "tests/test_434get_compatibility.py::test_get_compatibility_fetches_and_selects_the_active_spacy_version",
+        "masked_test_logical_path": "tests/test_434get_compatibility.py",
+        "masked_test_sha256": "6d641c5ffd2419bc068769c420df17f88b6e325e8c09da57d11d8a8f50cac79e",
+        "masking_contract": "python-slot-v1"
+      },
+      "sources": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_434get_compatibility.py",
+          "sha256": "6d641c5ffd2419bc068769c420df17f88b6e325e8c09da57d11d8a8f50cac79e",
+          "bytes": 2852
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/spacy/util.py",
+          "sha256": "da1338a9da8e21646b3844c42e3c383425911de4146f6314e39de93860d359cc",
+          "bytes": 68461
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/spacy/cli/download.py",
+          "sha256": "ef46c05160227693e507bce1c2f7718a289fe77799a709cbd6d3c7dc7b6a3891",
+          "bytes": 6623
+        }
+      ]
+    },
+    "limitations": [
+      "No authenticated Python semantic driver is registered for this case.",
+      "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+      "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+    ],
+    "source": null,
+    "provenance": {
+      "target_executed": false
+    },
+    "cost": null,
+    "terminal": {
+      "execution": "not_started",
+      "semantic_validation": "not_evaluated"
+    },
+    "driver_exit_code": 0,
+    "batch_dispatch_seconds": 0.13273,
+    "batch_dispatch_scope": "bridge process including support check, adapter and backend; excludes candidate diagnostics"
+  },
+  "batch_case_cost": {
+    "total_seconds": 0.595646,
+    "scope": "admission, candidate diagnostic, semantic-slot wait, dispatch and mapping; excludes case queue, shared compile and serialization"
+  },
+  "result_contract_sha256": "0778759af8cd894ddddc7430a7e78224e8e817d2ac437e53dead047531e39252"
+}

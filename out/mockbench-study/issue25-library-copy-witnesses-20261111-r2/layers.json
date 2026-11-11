@@ -1,0 +1,156 @@
+{
+  "schema": "mockspec.jib-library-copy-evidence.v1",
+  "source": {
+    "analysis": "out/mockbench-study/issue25-jib-method-facts-20261111-r1/analysis.json",
+    "analysis_sha256": "826b60440561942fb43ac2a4549e28ce646ccb61579068a37564a229f5e1f1bc",
+    "analysis_schema": "mockspec.jib-original-observation-probe/v1",
+    "wala_version": "1.7.2",
+    "target_executed": false
+  },
+  "getter_method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan.getLayers()Ljava/util/List;",
+  "field": "layers",
+  "reports": [
+    {
+      "evidence_channel": "complete_method_ssa_fact",
+      "witness": {
+        "status": "complete",
+        "checks": {
+          "exact_getter_method": true,
+          "exact_instance_field_read": true,
+          "field_receiver_is_getter_receiver": true,
+          "fresh_copy_receiver": true,
+          "resolved_exact_constructor_ir": true,
+          "field_actual_maps_to_constructor_formal": true,
+          "constructor_receiver_is_returned_object": true,
+          "single_normal_object_return": true,
+          "unique_witness": true,
+          "exact_method_fact_parameters": true,
+          "normal_cfg_paths": true
+        },
+        "path": [
+          {
+            "kind": "exact_field_read",
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan.getLayers()Ljava/util/List;",
+            "context": "Everywhere",
+            "instruction_index": 3,
+            "instruction": "4 = getfield < Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, layers, <Extension,Ljava/util/List> > 1",
+            "uses": [
+              1
+            ],
+            "definitions": [
+              4
+            ],
+            "basic_block": 2,
+            "normal_successor_blocks": [
+              3
+            ],
+            "exceptional_successor_blocks": [
+              5
+            ]
+          },
+          {
+            "kind": "fresh_allocation",
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan.getLayers()Ljava/util/List;",
+            "context": "Everywhere",
+            "instruction_index": 0,
+            "instruction": "3 = new <Extension,Ljava/util/ArrayList>@0",
+            "uses": [],
+            "definitions": [
+              3
+            ],
+            "basic_block": 1,
+            "normal_successor_blocks": [
+              2
+            ],
+            "exceptional_successor_blocks": [
+              5
+            ],
+            "allocated_type": "java.util.ArrayList"
+          },
+          {
+            "kind": "resolved_constructor_call",
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan.getLayers()Ljava/util/List;",
+            "context": "Everywhere",
+            "instruction_index": 4,
+            "instruction": "invokespecial < Extension, Ljava/util/ArrayList, <init>(Ljava/util/Collection;)V > 3,4 @8 exception:5",
+            "uses": [
+              3,
+              4
+            ],
+            "definitions": [
+              5
+            ],
+            "basic_block": 3,
+            "normal_successor_blocks": [
+              4
+            ],
+            "exceptional_successor_blocks": [
+              5
+            ],
+            "declared_target": "java.util.ArrayList.<init>(Ljava/util/Collection;)V",
+            "receiver_actual": 3,
+            "receiver_formal": 1,
+            "source_actual": 4,
+            "source_formal": 2,
+            "source_argument_index": 1
+          },
+          {
+            "kind": "normal_return",
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan.getLayers()Ljava/util/List;",
+            "context": "Everywhere",
+            "instruction_index": 5,
+            "instruction": "return 3",
+            "uses": [
+              3
+            ],
+            "definitions": [],
+            "basic_block": 4,
+            "normal_successor_blocks": [
+              5
+            ],
+            "exceptional_successor_blocks": []
+          }
+        ],
+        "mechanism": "exact WALA SSA field def -> resolved constructor source actual/formal; fresh allocation -> constructor receiver actual/formal -> sole normal return",
+        "missing": [],
+        "provenance": {
+          "library_class": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan",
+          "library_method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan.getLayers()Ljava/util/List;",
+          "field": {
+            "owner": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan",
+            "name": "layers"
+          },
+          "normal_return_condition": "successful completion of the exact constructor invocation before the sole object return",
+          "precision": "structural SSA relation only; collection elements, order, indexes, equality, aliasing, and constructor transformation details are not inferred",
+          "constructor": {
+            "method": "java.util.ArrayList.<init>(Ljava/util/Collection;)V",
+            "context": "Everywhere",
+            "has_ir": true
+          },
+          "method_fact": {
+            "context": "Everywhere",
+            "parameter_value_numbers": [
+              1
+            ],
+            "normal_cfg_paths": {
+              "allocation_to_constructor": [
+                1,
+                2,
+                3
+              ],
+              "field_read_to_constructor": [
+                2,
+                3
+              ],
+              "constructor_to_return": [
+                3,
+                4
+              ]
+            },
+            "exception_boundary": "exceptional successors are excluded; the witness applies only along listed normal CFG paths"
+          }
+        }
+      }
+    }
+  ]
+}

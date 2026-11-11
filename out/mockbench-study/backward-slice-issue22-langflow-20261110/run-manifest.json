@@ -1,0 +1,41 @@
+{
+  "profile": "test-goal-backward-candidates/v1",
+  "result_schema_version": "mock-spec.backward-analysis-case/v1",
+  "configuration": {
+    "backend_timeout_seconds": 30.0,
+    "max_files": 8,
+    "max_bytes": 200000,
+    "case_ids": [
+      "langflow_189"
+    ],
+    "python_dependency_only": true,
+    "java_heap_mb": 768
+  },
+  "implementation_sha256": {
+    "experiments/backward-slicing/batch_slice.py": "e6149e04e106de13845a59bc33e603fd5efeae5052c15ee46fcba8f9ed02acc5",
+    "experiments/backward-slicing/criteria.py": "7c5372e54192b755850b9a8bd22804d09e9353b62dcbe9135882eb449f976469",
+    "experiments/backward-slicing/source_selection.py": "70b1150bd83b87397d092a2de94b7357c57501837eea89621e0f32d8dd0a9138",
+    "experiments/backward-slicing/survey_targets.py": "fd4b94294040df260a73ef657a4f81b25fbeadd7c29e3b484a925a80cdd0c1cc",
+    "experiments/backward-slicing/python_probe.py": "25904bc0112d3fdf330f72adbdd1b41961f70fc788fef191872d2de41cd3cb67",
+    "experiments/backward-slicing/SliceProbe.java": "04748b07cbcecab32da7c188a8d80ff4511b879d43165632e42e415e13ad5662",
+    "experiments/backward-slicing/result_contract.py": "d4e15b2123eef6ec059702908ea1225281bd9889cbe80c4a5f1fcdfb989da856",
+    "src/mock_spec/adapters/frozen_dataset.py": "d34cf2d4f68e5cf03875305c64a43713df458af8f58c6558f030bd60ad549983",
+    "src/mock_spec/validation.py": "b5f7da1432467a7565cde15a390e0e5248e762685f46550a05bea1c06ff6ede6",
+    "src/mock_spec/analysis_process.py": "ed8186c9a6c2869c2a49309aa6a0eb8a9fff5bc9408c685775088f072fee14ac",
+    "src/mock_spec/java_analysis.py": "eaa2abd69230aaa902b0e3a9fb4e19c964fd4e7defe150abba0d01f84563b067"
+  },
+  "inventory_sha256": "d010fd04b774220f83917f75114699e01731f2f8b9e0d38fefcb22ffc57d8156",
+  "scope": "Read frozen sources through Adapter; run trusted parsers only; no target execution, model calls or dataset copy.",
+  "limitations": [
+    "Candidate source graph, not SDG or feasible path analysis.",
+    "No pointer/heap/exception-flow solver or reliable dynamic dispatch.",
+    "No confirmed test-to-MUT binding or confirmed Mock boundary classification.",
+    "Backend deadline excludes bounded adapter reads and source selection; peak memory not measured.",
+    "Input summaries and graph snippets are evidence; full source files are not persisted."
+  ],
+  "java_backend": {
+    "compiled": true,
+    "jar_sha256": "52ec4e8b874cb3f2b5a87a65ee7bf9da992a5175dcc66f539387dbb2c2053c7c",
+    "diagnostic": ""
+  }
+}

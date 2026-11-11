@@ -1,0 +1,24 @@
+{
+  "schema": "mock-spec.issue27-state-boundary-evidence/v1",
+  "status": "passed",
+  "checks": {
+    "receiver_effect_reaches_receiver_read": true,
+    "receiver_loop_prewrite_not_false_kill": true,
+    "global_effect_reaches_global_read": true,
+    "escaped_argument_effect_reaches_same_argument_read": true,
+    "receiver_other_object_excluded": true,
+    "receiver_overwrite_kills_unknown_effect": true,
+    "local_object_not_promoted_to_global": true,
+    "global_overwrite_kills_unknown_effect": true,
+    "global_rebind_excludes_old_unknown_effect": true,
+    "escaped_other_object_excluded": true,
+    "escaped_overwrite_kills_unknown_effect": true,
+    "visible_pure_call_has_no_unknown_effect": true
+  },
+  "semantic_scope": "bounded exact receiver, named module-global, and explicit retain-then-use escape paths",
+  "limitations": [
+    "The module-global relation is a conservative unknown-call boundary, not a concrete write.",
+    "The escaped relation requires an explicit earlier opaque argument-passing call on the same dependency receiver.",
+    "Dynamic attributes and arbitrary transitive heap reachability remain unknown."
+  ]
+}

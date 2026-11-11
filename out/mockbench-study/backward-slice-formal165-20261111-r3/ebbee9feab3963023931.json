@@ -1,0 +1,587 @@
+{
+  "status": "unsupported",
+  "failure_categories": [
+    "product_source_not_located",
+    "test_to_product_not_reached",
+    "semantic_analysis_gap",
+    "semantic_backend_unsupported"
+  ],
+  "stage": "semantic_backend",
+  "input_context": {
+    "target_selector": "tests/test_265apply_token_merging.py::test_apply_token_merging",
+    "masked_test_logical_path": "tests/test_265apply_token_merging.py",
+    "masked_test_sha256": "658ae793d4ec8b6677f048d85789dfb56120b22c8ebe0b9c71d4dc02ec15ea9e",
+    "masking_contract": "python-slot-v1"
+  },
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_265apply_token_merging.py::test_apply_token_merging",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_apply_token_merging",
+          "start_line": 95,
+          "end_line": 179
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 179,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [],
+    "diagnostics": [],
+    "source_rejections": [],
+    "dynamic_loader_bindings": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 5199,
+    "read_bytes": 5199,
+    "attempted_files": 0,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_265apply_token_merging.py",
+      "sha256": "658ae793d4ec8b6677f048d85789dfb56120b22c8ebe0b9c71d4dc02ec15ea9e",
+      "bytes": 5199
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "dynamic_loader_bindings": [],
+    "edges": [
+      {
+        "from": "test:95:54:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:179:4:Assert",
+        "variable": "target_ratio"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected",
+      "dynamic loader origins require a visible static path, namespace key, selected definition, and unrebound test callable"
+    ],
+    "nodes": [
+      {
+        "code": "assert sd_model.applied_token_merged_ratio == target_ratio",
+        "end_line": 179,
+        "id": "test:179:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 179
+      },
+      {
+        "code": "target_ratio",
+        "end_line": 95,
+        "id": "test:95:54:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 95
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:179:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:179:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 2,
+    "edges": 1,
+    "edge_kinds": {
+      "data_candidate": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:179:4:Assert",
+        "node_ids": [
+          "test:179:4:Assert",
+          "test:95:54:arg"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": []
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:179:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": false,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.1246,
+  "timings_seconds": {
+    "criterion_extraction": 0.001302,
+    "source_selection": 0.003392,
+    "backend_total": 0.119835,
+    "evidence_summary": 5.1e-05
+  },
+  "identity": {
+    "case_id": "stable-diffusion-webui_265",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "eaa56821765699f7745007df14f8c8f062373dd41c27e76a1cea037d395720a7"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "stable-diffusion-webui_265",
+      "dataset": "python-benchmark-new",
+      "language": "python",
+      "snapshot_id": "eaa56821765699f7745007df14f8c8f062373dd41c27e76a1cea037d395720a7",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "658ae793d4ec8b6677f048d85789dfb56120b22c8ebe0b9c71d4dc02ec15ea9e",
+      "target_selector": "tests/test_265apply_token_merging.py::test_apply_token_merging"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_265apply_token_merging.py",
+        "sha256": "658ae793d4ec8b6677f048d85789dfb56120b22c8ebe0b9c71d4dc02ec15ea9e",
+        "bytes": 5199,
+        "selection_role": "masked_test"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 179,
+          "end_line": 179
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "the runner does not enumerate parameter rows"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_265apply_token_merging.py::test_apply_token_merging",
+        "evidence": [
+          {
+            "symbol": "test_apply_token_merging",
+            "start_line": 95,
+            "end_line": 179
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "not_evaluated",
+        "candidates": [],
+        "evidence": [],
+        "assumptions": []
+      }
+    },
+    "relations": [],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [],
+      "unknown_effects": [],
+      "unanalysed_regions": [
+        {
+          "scope": "mature_backend_support_domain",
+          "reason": "semantic_backend_unsupported",
+          "details": [
+            "No authenticated Python semantic driver is registered for this case.",
+            "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+            "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+          ]
+        }
+      ]
+    },
+    "completion": {
+      "status": "unsupported",
+      "stage": "semantic_backend",
+      "failure_categories": [
+        "product_source_not_located",
+        "test_to_product_not_reached",
+        "semantic_analysis_gap",
+        "semantic_backend_unsupported"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "not_evaluated",
+      "reviewer": null,
+      "evidence": [],
+      "notes": "candidate reachability is not semantic dependency validation"
+    },
+    "cost": {
+      "timings_seconds": {
+        "criterion_extraction": 0.001302,
+        "source_selection": 0.003392,
+        "backend_total": 0.119835,
+        "evidence_summary": 5.1e-05
+      },
+      "total_seconds": 0.1246,
+      "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+      "peak_memory": {
+        "status": "unavailable",
+        "bytes": null,
+        "reason": "case-level peak memory is not measured by this runner"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+      },
+      "input_size": {
+        "files": 1,
+        "bytes": 5199
+      },
+      "graph_size": {
+        "nodes": 2,
+        "edges": 1
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter admission occurs outside the per-case analysis timer"
+        },
+        {
+          "phase": "front_end",
+          "reason": "the candidate backend does not report parsing time separately"
+        },
+        {
+          "phase": "call_graph",
+          "reason": "the candidate backend does not report call-graph time separately"
+        },
+        {
+          "phase": "pointer_analysis",
+          "reason": "the candidate backend does not provide pointer analysis"
+        },
+        {
+          "phase": "dependency_analysis",
+          "reason": "backend_total combines parsing, graph construction, and slicing"
+        },
+        {
+          "phase": "slice",
+          "reason": "the candidate backend does not report semantic slicing time separately"
+        },
+        {
+          "phase": "source_mapping",
+          "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+        }
+      ]
+    }
+  },
+  "candidate_diagnostics": {
+    "status": "partial",
+    "failure_categories": [
+      "product_source_not_located",
+      "test_to_product_not_reached",
+      "semantic_analysis_gap"
+    ],
+    "result_contract": {
+      "schema_version": "mock-spec.backward-analysis-case/v1",
+      "identity": {
+        "case_id": "stable-diffusion-webui_265",
+        "dataset": "python-benchmark-new",
+        "language": "python",
+        "snapshot_id": "eaa56821765699f7745007df14f8c8f062373dd41c27e76a1cea037d395720a7",
+        "masking_contract": "python-slot-v1",
+        "masked_test_sha256": "658ae793d4ec8b6677f048d85789dfb56120b22c8ebe0b9c71d4dc02ec15ea9e",
+        "target_selector": "tests/test_265apply_token_merging.py::test_apply_token_merging"
+      },
+      "source_scope": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_265apply_token_merging.py",
+          "sha256": "658ae793d4ec8b6677f048d85789dfb56120b22c8ebe0b9c71d4dc02ec15ea9e",
+          "bytes": 5199,
+          "selection_role": "masked_test"
+        }
+      ],
+      "observations": [
+        {
+          "observation_id": "criterion:0",
+          "location": {
+            "source_id": "test",
+            "start_line": 179,
+            "end_line": 179
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        }
+      ],
+      "parameterization": {
+        "status": "not_expanded",
+        "coverage": "selected_test_definition",
+        "reason": "the runner does not enumerate parameter rows"
+      },
+      "entry_point": {
+        "test_selection": {
+          "origin": "task_provided",
+          "status": "unique",
+          "selector": "tests/test_265apply_token_merging.py::test_apply_token_merging",
+          "evidence": [
+            {
+              "symbol": "test_apply_token_merging",
+              "start_line": 95,
+              "end_line": 179
+            }
+          ]
+        },
+        "mut_binding": {
+          "origin": "automatic",
+          "status": "not_evaluated",
+          "candidates": [],
+          "evidence": [],
+          "assumptions": []
+        }
+      },
+      "relations": [],
+      "relation_coverage": [
+        {
+          "kind": "call_binding",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "control_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "exception_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "function_origin",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "normal_return_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "state_flow",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "value_flow",
+          "status": "not_evaluated"
+        }
+      ],
+      "analysis_boundaries": {
+        "assumptions": [],
+        "unknown_effects": [],
+        "unanalysed_regions": [
+          {
+            "scope": "semantic_relations",
+            "reason": "candidate_graph_has_no_validated_dependency_semantics"
+          }
+        ]
+      },
+      "completion": {
+        "status": "partial",
+        "stage": "complete",
+        "failure_categories": [
+          "product_source_not_located",
+          "test_to_product_not_reached",
+          "semantic_analysis_gap"
+        ],
+        "error": null
+      },
+      "semantic_validation": {
+        "status": "not_evaluated",
+        "reviewer": null,
+        "evidence": [],
+        "notes": "candidate reachability is not semantic dependency validation"
+      },
+      "cost": {
+        "timings_seconds": {
+          "criterion_extraction": 0.001302,
+          "source_selection": 0.003392,
+          "backend_total": 0.119835,
+          "evidence_summary": 5.1e-05
+        },
+        "total_seconds": 0.1246,
+        "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+        "peak_memory": {
+          "status": "unavailable",
+          "bytes": null,
+          "reason": "case-level peak memory is not measured by this runner"
+        },
+        "cache_state": {
+          "status": "unknown",
+          "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+        },
+        "input_size": {
+          "files": 1,
+          "bytes": 5199
+        },
+        "graph_size": {
+          "nodes": 2,
+          "edges": 1
+        },
+        "unavailable_phases": [
+          {
+            "phase": "input_admission",
+            "reason": "adapter admission occurs outside the per-case analysis timer"
+          },
+          {
+            "phase": "front_end",
+            "reason": "the candidate backend does not report parsing time separately"
+          },
+          {
+            "phase": "call_graph",
+            "reason": "the candidate backend does not report call-graph time separately"
+          },
+          {
+            "phase": "pointer_analysis",
+            "reason": "the candidate backend does not provide pointer analysis"
+          },
+          {
+            "phase": "dependency_analysis",
+            "reason": "backend_total combines parsing, graph construction, and slicing"
+          },
+          {
+            "phase": "slice",
+            "reason": "the candidate backend does not report semantic slicing time separately"
+          },
+          {
+            "phase": "source_mapping",
+            "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+          }
+        ]
+      }
+    },
+    "stage": "complete",
+    "error": null,
+    "elapsed_seconds": 0.1246,
+    "timings_seconds": {
+      "criterion_extraction": 0.001302,
+      "source_selection": 0.003392,
+      "backend_total": 0.119835,
+      "evidence_summary": 5.1e-05
+    },
+    "graph_and_evidence": "top-level graph/evidence/sources remain candidate diagnostics only"
+  },
+  "semantic_backend": {
+    "schema": "mock-spec.batch-semantic-backend/v1",
+    "status": "unsupported",
+    "backend": null,
+    "identity": {
+      "language": "python",
+      "dataset": "python-benchmark-new",
+      "case_id": "stable-diffusion-webui_265",
+      "inventory_revision": "0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc",
+      "snapshot_id": "eaa56821765699f7745007df14f8c8f062373dd41c27e76a1cea037d395720a7",
+      "snapshot_root": "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/python-benchmark-new/eaa56821765699f7745007df14f8c8f062373dd41c27e76a1cea037d395720a7",
+      "admission_status": "frozen_candidate",
+      "admission_verified": false,
+      "reviewed_snapshot_id": null,
+      "target_selector": "tests/test_265apply_token_merging.py::test_apply_token_merging",
+      "masked_test_logical_path": "tests/test_265apply_token_merging.py",
+      "masked_test_sha256": "658ae793d4ec8b6677f048d85789dfb56120b22c8ebe0b9c71d4dc02ec15ea9e",
+      "masking_contract": "python-slot-v1",
+      "input_context": {
+        "target_selector": "tests/test_265apply_token_merging.py::test_apply_token_merging",
+        "masked_test_logical_path": "tests/test_265apply_token_merging.py",
+        "masked_test_sha256": "658ae793d4ec8b6677f048d85789dfb56120b22c8ebe0b9c71d4dc02ec15ea9e",
+        "masking_contract": "python-slot-v1"
+      },
+      "sources": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_265apply_token_merging.py",
+          "sha256": "658ae793d4ec8b6677f048d85789dfb56120b22c8ebe0b9c71d4dc02ec15ea9e",
+          "bytes": 5199
+        }
+      ]
+    },
+    "limitations": [
+      "No authenticated Python semantic driver is registered for this case.",
+      "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+      "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+    ],
+    "source": null,
+    "provenance": {
+      "target_executed": false
+    },
+    "cost": null,
+    "terminal": {
+      "execution": "not_started",
+      "semantic_validation": "not_evaluated"
+    },
+    "driver_exit_code": 0,
+    "batch_dispatch_seconds": 0.148763,
+    "batch_dispatch_scope": "bridge process including support check, adapter and backend; excludes candidate diagnostics"
+  },
+  "batch_case_cost": {
+    "total_seconds": 0.42112,
+    "scope": "admission, candidate diagnostic, semantic-slot wait, dispatch and mapping; excludes case queue, shared compile and serialization"
+  },
+  "result_contract_sha256": "20c12a48f28789c547b3d7585e688120286cde9deae2bcaf81ea5641e049869d"
+}

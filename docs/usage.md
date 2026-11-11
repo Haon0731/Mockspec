@@ -131,6 +131,135 @@ Java复用下文的固定 Spoon/JDK；Python使用标准库AST。默认每例最
 随案例留证。`partial` 是候选图完成，不是关系正确或Mock恢复成功；命令正常退出仅
 表示批次报告写完，需检查 `summary.json` 的失败/超时分布。
 准则、边界与精度说明见[候选切片研究入口](../experiments/backward-slicing/README.md#全量候选切片入口2026-11-09)。
+候选批处理可用`--workers 3`并行案例，默认仍为1；各案例失败独立保存，汇总保持清单顺序。
+每个并行Java进程各有768 MiB堆预算，并发数写入运行manifest，跨并发配置的耗时不能直接比较。
+这个选项不会把候选后端升级为已核验语义后端，也不跳过正式165例的准入门禁。
+
+新结果包含 `result_contract` 和 `result_contract_sha256`，契约版本为
+`mock-spec.backward-analysis-case/v1`。契约的 `semantic_validation`、关系覆盖及入口精度
+应分别读取，不能用 `partial` 或产品源码命中推断关系正确。
+有后端关系时，检查其 `observation_ids` 以及逐观察的未知原因；未关联的产品内部关系
+不能计为测试断言恢复。引用合法只证明结构一致，不证明关系语义正确。
+`backend_total` 是解析／构图／切片合计，`evidence_summary` 是宿主闭包汇总；
+逐案例总耗时不含输入准入、共享 Java 编译和文件写入，缺少的成本项单列原因。
+静态加载来源可查看 `source_selection.dynamic_loader_bindings` 与图中的同名字段；
+Java 调用连接可查看图的 `call_binding` 及其 `precision`。
+入口修复的局部复验可重复指定 `--case-id`；只有门禁通过后才运行正式全量对照。
+后端试验使用各自入口和新输出目录，不通过上述批处理命令替换后端。
+WALA 修复复现命令见[传播修复报告](../out/mockbench-study/issue23-propagation-20261111/report.md)，
+Python 使用 `experiments/backward-slicing/python-backend-pilot/run_pilot.sh`，新增
+`observation-study.json` 包含单案例契约、逐观察未知映射及独立机制证据。
+具体工具版本、预算、已核验范围见[单案例报告](../out/mockbench-study/python-observation-integration-20261111-r3/report.md)
+与[最新根因和修复验证](../out/mockbench-study/root-cause-repair-20261111/report.md)。
+
+Jib 分阶段规模诊断入口为
+`experiments/backward-slicing/wala-pilot/run_scale_diagnostic.py --help`。
+只使用已准备的结构骨架、已选依赖和显式诊断入口，输出目录必须新建；
+`--entry-scope` 与 `--runtime-region` 是分别记录的研究配置。
+已完成的Jib规模诊断使用 `--entry-scope --ci-heap`，保留原始堆位置，不加
+`--runtime-region`。`--ci-heap` 的底层SDG不构造堆参数，但CISlicer仍以Mod/Ref加入
+堆may-dependence；其上下文和覆盖写精度低于FULL SDG，结果明确保留边界。
+该轮依赖选择遗漏冻结的`jib-build-plan-0.4.0.jar`；#25需补齐转换实现后重新验证，
+旧耗时不能代表补齐依赖后的成本。这些结果不能代替原测试观察验收，
+也不启动165例正式复跑。
+
+WALA #23最低能力门的当前收尾证据为
+`out/mockbench-study/issue23-capability-closure-20261111-r4/`。
+重新核验已有证据时，使用新的输出文件（入口拒绝覆盖已有报告）：
+
+```bash
+.venv/bin/python experiments/backward-slicing/wala-pilot/summarize_capability.py \
+  --issue23-expanded-run out/mockbench-study/issue23-capability-closure-20261111-r4 \
+  --jib-summary out/mockbench-study/issue23-jib-ci-original-20261111-r7/summary.json \
+  --output /tmp/mockspec-issue23-recheck/report.json
+```
+
+该检查核对预登记身份、当前模型的机制正反例与真实输入接入证据；
+通过不代表#25原始Jib逐断言验收完成。
+
+Python当前联合验收证据为
+`out/mockbench-study/python-issue26-27-20261111-r12/`，复现沿用
+`experiments/backward-slicing/python-backend-pilot/run_pilot.sh`并指定新的输出目录。
+`issue26-verdict.json`／`observation-study.json`对应真实Flask；
+`verdict.json`内的状态门禁及`state-observation-study.json`对应独立机制案例。
+两者均使用单案例结果契约，支持范围与成本分别报告；`partial/verified_incomplete`
+不会因对应工程票通过而改成完整语义成功。
+
+Python按需研究入口为`experiments/backward-slicing/python-backend-pilot/run_demand_analysis.py`：
+
+```bash
+.venv/bin/python experiments/backward-slicing/python-backend-pilot/run_demand_analysis.py \
+  --codeql /path/to/codeql --registry-root /path/to/frozen-registry \
+  --baseline out/mockbench-study/python-issue26-27-20261111-r12 \
+  --cache /tmp/mockspec-demand-cache --output /tmp/mockspec-demand-cold
+```
+
+空关系缓存用于冷运行；保留缓存、换新输出目录用于暖运行。
+冷运行包含数据库提取；全部关系命中缓存时可跳过提取和查询，暖运行明确不含此前构建成本。
+`--max-units`／`--max-depth`限制查询计划，预算不足保留已完成证据和未展开边界。
+基线仅用于对照；当前关系必须来自当前查询或通过完整身份校验的缓存。
+r12的27份已记录源码保存在
+[带逐文件哈希的归档](../out/mockbench-study/issue29-baseline-source-preservation-20261111/README.md)，
+不要为重放历史结果覆盖当前实现。
+
+Jib逐观察研究入口为`experiments/backward-slicing/wala-pilot/run_jib_observations.py --help`。
+它要求已审核源码、选源manifest、自动绑定报告及显式依赖classpath；
+`--criteria baseImage`用于单观察诊断，省略则选择全部预登记观察。
+输出目录必须不存在；诊断执行成功仍需检查逐观察关系、未知边界与独立验收结果。
+当前限定验收为[issue25 r6](../out/mockbench-study/issue25-acceptance-20261111-r1/acceptance.json)，
+使用实际冻结build-plan库；`summary.json`保留逐观察证据，`analysis.json.gz`是原始分析的
+无损副本，压缩收据保存原始与压缩SHA。复现旧运行使用其`analysis-source-snapshot/`，
+不能用已变更的工作树源码宣称同一实现。r6观察adapter的自动来源已通过
+[追加式核验](../out/mockbench-study/issue25-jib-observation-adapter-revalidation-20261111-r3/independent-review.json)，
+当前runner从原测试生成入口；只支持明确的直线测试语法。未知效果仍保留，结果保持partial。
+
+Java按需与缓存入口：
+
+```bash
+.venv/bin/python experiments/backward-slicing/wala-pilot/run_java_demand_analysis.py \
+  --baseline out/mockbench-study/issue25-jib-observations-all-none-20261111-r6 \
+  --cache /tmp/mockspec-java-demand-cache --output /tmp/mockspec-java-demand-cold
+```
+
+基线提供已审核的prepared application、classpath和正确性对照；当前切片来自实际分析或身份核验缓存。
+使用相同缓存和新输出目录复验暖运行。`--max-units`限制观察数量，`--max-method-pdgs`限制实际
+方法上下文展开；预算耗尽保留已得证据及方法／观察前沿。CG／PA和全局堆效果索引仍提前构建。
+当前[独立验收](../out/mockbench-study/issue28-java-demand-acceptance-20261111-r1/independent-review.json)
+证明关系等价、缓存及预算行为；真实Jib仍展开大多数方法，不宣称加速。
+冷运行明确复用此前输入准备；暖运行另不含之前的分析成本。工具拒绝覆盖已有输出目录。
+
+正式165例使用同一批处理入口，并显式引用已通过的#30门禁及原r3：
+
+```bash
+PYTHONPATH=src .venv/bin/python experiments/backward-slicing/batch_slice.py \
+  --inventory out/mockbench-study/backward-slice-full-20261109-r3/inventory.json \
+  --baseline out/mockbench-study/backward-slice-full-20261109-r3/results.json \
+  --semantic-gate out/mockbench-study/issue30-final-gate-20261111-r1/acceptance.json \
+  --codeql /path/to/pinned-codeql-2.27.4/codeql \
+  --workers 3 --semantic-seconds 1200 --output /tmp/mockspec-formal165
+```
+
+正式模式拒绝筛选案例，冻结代码／配置／门禁证据，并保留165个逐例终态。
+候选解析最多3路、成熟后端最多2路；每个支持案例使用新缓存。
+当前语义输入适配只支持Jib、`flask_308`和`langflow_189`；其它案例仍加载并分析候选图，
+语义后端资格拒绝单列。`candidate_diagnostics`与成熟契约分别保留，候选成功不计语义成功。
+Jib复用已核验的结构应用包，历史准备成本不算本次冷分析；Python机制探针不计为数据集案例。
+工具、数据库与缓存按各后端已有配置定位，不执行目标测试或loader。
+`--codeql`必须指向可执行文件；安装目录会在创建运行目录前被拒绝。
+Python研究桥仅为工具显式设置固定locale及`PATH=/bin:/usr/bin`，不继承其它宿主环境。
+复验入口应覆盖生产`analysis_process.communicate`的受限环境，普通shell smoke不能替代该检查。
+
+逐例对照使用`experiments/backward-slicing/compare_runs.py`，不启动分析：
+
+```bash
+.venv/bin/python experiments/backward-slicing/compare_runs.py \
+  --baseline out/mockbench-study/backward-slice-full-20261109-r3/results.json \
+  --current /path/to/new-run/results.json --output /tmp/mockspec-r3-comparison
+```
+
+该命令要求原165例全部有终态，拒绝缺例、重复、替换或snapshot变化；输出目录不得已存在。
+旧r3没有的关系指标标记未记录，不从候选图推算语义正确率。两次运行的成本值保留，
+未完成同配置与计时边界核对时不计算耗时差。本工具不替代#30正式运行准入。
 
 Python 宿主按需读取源码，明确选择 MUT 后再构造现有 `UnifiedTask`：
 

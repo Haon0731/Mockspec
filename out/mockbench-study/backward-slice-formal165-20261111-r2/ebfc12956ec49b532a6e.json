@@ -1,0 +1,578 @@
+{
+  "status": "failed",
+  "failure_categories": [
+    "duplicate_type_input",
+    "semantic_backend_unsupported"
+  ],
+  "stage": "semantic_backend",
+  "input_context": {
+    "target_selector": "com.ctrip.framework.apollo.configservice.service.config.DefaultConfigServiceTest#testLoadConfigWithGrayRelease",
+    "masked_test_logical_path": "src/test/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigServiceTest.java",
+    "masked_test_sha256": "6f951bf35e7b43ddb332d2f1758d259da69804ec9a09dfbe2b9a099a02e0737a",
+    "masking_contract": "java-dual-region-v1"
+  },
+  "target_extraction": {
+    "target_scope": {
+      "selector": "com.ctrip.framework.apollo.configservice.service.config.DefaultConfigServiceTest#testLoadConfigWithGrayRelease",
+      "status": "located",
+      "precision": "java_lexical_method_scope",
+      "locations": [
+        {
+          "symbol": "testLoadConfigWithGrayRelease",
+          "start_line": 39,
+          "end_line": 73
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 72,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_same_package_type",
+        "hint": "com.ctrip.framework.apollo.configservice.service.config.DefaultConfigService",
+        "candidates": [
+          "DefaultConfigServiceTest_setUp_67a78efb0f109cc0c8086a8fa2218bf6f03b00ae/src/main/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigService.java",
+          "src/main/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigService.java"
+        ],
+        "precision": "candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "DefaultConfigServiceTest_setUp_67a78efb0f109cc0c8086a8fa2218bf6f03b00ae/src/main/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigService.java",
+        "hint_kind": "java_same_package_type",
+        "hint": "com.ctrip.framework.apollo.configservice.service.config.AbstractConfigService",
+        "candidates": [
+          "DefaultConfigServiceTest_setUp_67a78efb0f109cc0c8086a8fa2218bf6f03b00ae/src/main/java/com/ctrip/framework/apollo/configservice/service/config/AbstractConfigService.java",
+          "src/main/java/com/ctrip/framework/apollo/configservice/service/config/AbstractConfigService.java"
+        ],
+        "precision": "candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "dynamic_loader_bindings": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 14075,
+    "read_bytes": 14075,
+    "attempted_files": 4,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "src/test/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigServiceTest.java",
+      "sha256": "6f951bf35e7b43ddb332d2f1758d259da69804ec9a09dfbe2b9a099a02e0737a",
+      "bytes": 2643
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "DefaultConfigServiceTest_setUp_67a78efb0f109cc0c8086a8fa2218bf6f03b00ae/src/main/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigService.java",
+      "sha256": "ccf872725054ceccff986794d3f757f988c9957e5fac8ee0deb143548434f658",
+      "bytes": 1793
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigService.java",
+      "sha256": "ccf872725054ceccff986794d3f757f988c9957e5fac8ee0deb143548434f658",
+      "bytes": 1793
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "DefaultConfigServiceTest_setUp_67a78efb0f109cc0c8086a8fa2218bf6f03b00ae/src/main/java/com/ctrip/framework/apollo/configservice/service/config/AbstractConfigService.java",
+      "sha256": "8b06fb1864593073248c9ce2eebd3fdc90c64b5a03356bb506562eb20a6bf304",
+      "bytes": 3923
+    },
+    {
+      "source_id": "source:4",
+      "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/service/config/AbstractConfigService.java",
+      "sha256": "8b06fb1864593073248c9ce2eebd3fdc90c64b5a03356bb506562eb20a6bf304",
+      "bytes": 3923
+    }
+  ],
+  "error": {
+    "type": "RuntimeError",
+    "message": "backend_exit_1: SLF4J(W): No SLF4J providers were found.\nSLF4J(W): Defaulting to no-operation (NOP) logger implementation\nSLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.\nException in thread \"main\" spoon.compiler.ModelBuildingException: The type DefaultConfigService is already defined\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.reportProblem(JDTBasedSpoonCompiler.java:615)\n\tat spoon.support.compiler.jdt.TreeBuilderRequestor.acceptResult(TreeBuilderRequestor.java:29)\n\tat spoon.support.compiler.jdt.TreeBuilderCompiler.buildUnits(TreeBuilderCompiler.java:110)\n\tat spoon.support.compiler.jdt.JDTBatchCompiler.getUnits(JDTBatchCompiler.java:282)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.buildUnits(JDTBasedSpoonCompiler.java:442)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.buildUnitsAndModel(JDTBasedSpoonCompiler.java:386)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.buildSources(JDTBasedSpoonCompiler.java:347)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.build(JDTBasedSpoonCompiler.java:118)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.build(JDTBasedSpoonCompiler.java:101)\n\tat spoon.Launcher.buildModel(Launcher.java:781)\n\tat SliceProbe.run(SliceProbe.java:79)\n\tat SliceProbe.main(SliceProbe.java:55)\n"
+  },
+  "elapsed_seconds": 2.3739,
+  "timings_seconds": {
+    "criterion_extraction": 0.000934,
+    "source_selection": 0.281364
+  },
+  "identity": {
+    "case_id": "com.ctrip.framework.apollo.configservice.service.config.DefaultConfigServiceTest#testLoadConfigWithGrayRelease@67a78efb",
+    "dataset": "java-bechmark-strong",
+    "language": "java",
+    "snapshot_id": "7d314185ed28eb0436048df23ac0ddc202fdc3ed4993cb1af730c38efddc3622"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "com.ctrip.framework.apollo.configservice.service.config.DefaultConfigServiceTest#testLoadConfigWithGrayRelease@67a78efb",
+      "dataset": "java-bechmark-strong",
+      "language": "java",
+      "snapshot_id": "7d314185ed28eb0436048df23ac0ddc202fdc3ed4993cb1af730c38efddc3622",
+      "masking_contract": "java-dual-region-v1",
+      "masked_test_sha256": "6f951bf35e7b43ddb332d2f1758d259da69804ec9a09dfbe2b9a099a02e0737a",
+      "target_selector": "com.ctrip.framework.apollo.configservice.service.config.DefaultConfigServiceTest#testLoadConfigWithGrayRelease"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "src/test/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigServiceTest.java",
+        "sha256": "6f951bf35e7b43ddb332d2f1758d259da69804ec9a09dfbe2b9a099a02e0737a",
+        "bytes": 2643,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:1",
+        "logical_path": "DefaultConfigServiceTest_setUp_67a78efb0f109cc0c8086a8fa2218bf6f03b00ae/src/main/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigService.java",
+        "sha256": "ccf872725054ceccff986794d3f757f988c9957e5fac8ee0deb143548434f658",
+        "bytes": 1793,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:2",
+        "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigService.java",
+        "sha256": "ccf872725054ceccff986794d3f757f988c9957e5fac8ee0deb143548434f658",
+        "bytes": 1793,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:3",
+        "logical_path": "DefaultConfigServiceTest_setUp_67a78efb0f109cc0c8086a8fa2218bf6f03b00ae/src/main/java/com/ctrip/framework/apollo/configservice/service/config/AbstractConfigService.java",
+        "sha256": "8b06fb1864593073248c9ce2eebd3fdc90c64b5a03356bb506562eb20a6bf304",
+        "bytes": 3923,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:4",
+        "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/service/config/AbstractConfigService.java",
+        "sha256": "8b06fb1864593073248c9ce2eebd3fdc90c64b5a03356bb506562eb20a6bf304",
+        "bytes": 3923,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 72,
+          "end_line": 72
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "the runner does not enumerate parameter rows"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "com.ctrip.framework.apollo.configservice.service.config.DefaultConfigServiceTest#testLoadConfigWithGrayRelease",
+        "evidence": [
+          {
+            "symbol": "testLoadConfigWithGrayRelease",
+            "start_line": 39,
+            "end_line": 73
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "not_evaluated",
+        "candidates": [],
+        "evidence": [],
+        "assumptions": []
+      }
+    },
+    "relations": [],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [],
+      "unknown_effects": [],
+      "unanalysed_regions": [
+        {
+          "scope": "semantic_backend",
+          "reason": "duplicate_type_input,semantic_backend_unsupported"
+        },
+        {
+          "scope": "mature_backend_support_domain",
+          "reason": "The accepted Java backend currently prepares bytecode, library summaries, and source-derived observations only for the exact JarFiles Jib case.",
+          "details": []
+        }
+      ]
+    },
+    "completion": {
+      "status": "failed",
+      "stage": "semantic_backend",
+      "failure_categories": [
+        "duplicate_type_input",
+        "semantic_backend_unsupported"
+      ],
+      "error": {
+        "type": "RuntimeError",
+        "message": "backend_exit_1: SLF4J(W): No SLF4J providers were found.\nSLF4J(W): Defaulting to no-operation (NOP) logger implementation\nSLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.\nException in thread \"main\" spoon.compiler.ModelBuildingException: The type DefaultConfigService is already defined\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.reportProblem(JDTBasedSpoonCompiler.java:615)\n\tat spoon.support.compiler.jdt.TreeBuilderRequestor.acceptResult(TreeBuilderRequestor.java:29)\n\tat spoon.support.compiler.jdt.TreeBuilderCompiler.buildUnits(TreeBuilderCompiler.java:110)\n\tat spoon.support.compiler.jdt.JDTBatchCompiler.getUnits(JDTBatchCompiler.java:282)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.buildUnits(JDTBasedSpoonCompiler.java:442)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.buildUnitsAndModel(JDTBasedSpoonCompiler.java:386)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.buildSources(JDTBasedSpoonCompiler.java:347)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.build(JDTBasedSpoonCompiler.java:118)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.build(JDTBasedSpoonCompiler.java:101)\n\tat spoon.Launcher.buildModel(Launcher.java:781)\n\tat SliceProbe.run(SliceProbe.java:79)\n\tat SliceProbe.main(SliceProbe.java:55)\n"
+      }
+    },
+    "semantic_validation": {
+      "status": "not_evaluated",
+      "reviewer": null,
+      "evidence": [],
+      "notes": "candidate reachability is not semantic dependency validation"
+    },
+    "cost": {
+      "timings_seconds": {
+        "criterion_extraction": 0.000934,
+        "source_selection": 0.281364
+      },
+      "total_seconds": 2.3739,
+      "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+      "peak_memory": {
+        "status": "unavailable",
+        "bytes": null,
+        "reason": "case-level peak memory is not measured by this runner"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+      },
+      "input_size": {
+        "files": 5,
+        "bytes": 14075
+      },
+      "graph_size": {
+        "nodes": null,
+        "edges": null
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter admission occurs outside the per-case analysis timer"
+        },
+        {
+          "phase": "front_end",
+          "reason": "the candidate backend does not report parsing time separately"
+        },
+        {
+          "phase": "call_graph",
+          "reason": "the candidate backend does not report call-graph time separately"
+        },
+        {
+          "phase": "pointer_analysis",
+          "reason": "the candidate backend does not provide pointer analysis"
+        },
+        {
+          "phase": "dependency_analysis",
+          "reason": "backend_total combines parsing, graph construction, and slicing"
+        },
+        {
+          "phase": "slice",
+          "reason": "the candidate backend does not report semantic slicing time separately"
+        },
+        {
+          "phase": "source_mapping",
+          "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+        }
+      ]
+    }
+  },
+  "candidate_diagnostics": {
+    "status": "failed",
+    "failure_categories": [
+      "duplicate_type_input"
+    ],
+    "result_contract": {
+      "schema_version": "mock-spec.backward-analysis-case/v1",
+      "identity": {
+        "case_id": "com.ctrip.framework.apollo.configservice.service.config.DefaultConfigServiceTest#testLoadConfigWithGrayRelease@67a78efb",
+        "dataset": "java-bechmark-strong",
+        "language": "java",
+        "snapshot_id": "7d314185ed28eb0436048df23ac0ddc202fdc3ed4993cb1af730c38efddc3622",
+        "masking_contract": "java-dual-region-v1",
+        "masked_test_sha256": "6f951bf35e7b43ddb332d2f1758d259da69804ec9a09dfbe2b9a099a02e0737a",
+        "target_selector": "com.ctrip.framework.apollo.configservice.service.config.DefaultConfigServiceTest#testLoadConfigWithGrayRelease"
+      },
+      "source_scope": [
+        {
+          "source_id": "test",
+          "logical_path": "src/test/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigServiceTest.java",
+          "sha256": "6f951bf35e7b43ddb332d2f1758d259da69804ec9a09dfbe2b9a099a02e0737a",
+          "bytes": 2643,
+          "selection_role": "masked_test"
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "DefaultConfigServiceTest_setUp_67a78efb0f109cc0c8086a8fa2218bf6f03b00ae/src/main/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigService.java",
+          "sha256": "ccf872725054ceccff986794d3f757f988c9957e5fac8ee0deb143548434f658",
+          "bytes": 1793,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/service/config/DefaultConfigService.java",
+          "sha256": "ccf872725054ceccff986794d3f757f988c9957e5fac8ee0deb143548434f658",
+          "bytes": 1793,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:3",
+          "logical_path": "DefaultConfigServiceTest_setUp_67a78efb0f109cc0c8086a8fa2218bf6f03b00ae/src/main/java/com/ctrip/framework/apollo/configservice/service/config/AbstractConfigService.java",
+          "sha256": "8b06fb1864593073248c9ce2eebd3fdc90c64b5a03356bb506562eb20a6bf304",
+          "bytes": 3923,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:4",
+          "logical_path": "src/main/java/com/ctrip/framework/apollo/configservice/service/config/AbstractConfigService.java",
+          "sha256": "8b06fb1864593073248c9ce2eebd3fdc90c64b5a03356bb506562eb20a6bf304",
+          "bytes": 3923,
+          "selection_role": "candidate_product"
+        }
+      ],
+      "observations": [
+        {
+          "observation_id": "criterion:0",
+          "location": {
+            "source_id": "test",
+            "start_line": 72,
+            "end_line": 72
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "lexical observation syntax inside the selected Java method"
+        }
+      ],
+      "parameterization": {
+        "status": "not_expanded",
+        "coverage": "selected_test_definition",
+        "reason": "the runner does not enumerate parameter rows"
+      },
+      "entry_point": {
+        "test_selection": {
+          "origin": "task_provided",
+          "status": "unique",
+          "selector": "com.ctrip.framework.apollo.configservice.service.config.DefaultConfigServiceTest#testLoadConfigWithGrayRelease",
+          "evidence": [
+            {
+              "symbol": "testLoadConfigWithGrayRelease",
+              "start_line": 39,
+              "end_line": 73
+            }
+          ]
+        },
+        "mut_binding": {
+          "origin": "automatic",
+          "status": "not_evaluated",
+          "candidates": [],
+          "evidence": [],
+          "assumptions": []
+        }
+      },
+      "relations": [],
+      "relation_coverage": [
+        {
+          "kind": "call_binding",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "control_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "exception_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "function_origin",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "normal_return_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "state_flow",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "value_flow",
+          "status": "not_evaluated"
+        }
+      ],
+      "analysis_boundaries": {
+        "assumptions": [],
+        "unknown_effects": [],
+        "unanalysed_regions": [
+          {
+            "scope": "backward_graph",
+            "reason": "duplicate_type_input"
+          }
+        ]
+      },
+      "completion": {
+        "status": "failed",
+        "stage": "backward_graph",
+        "failure_categories": [
+          "duplicate_type_input"
+        ],
+        "error": {
+          "type": "RuntimeError",
+          "message": "backend_exit_1: SLF4J(W): No SLF4J providers were found.\nSLF4J(W): Defaulting to no-operation (NOP) logger implementation\nSLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.\nException in thread \"main\" spoon.compiler.ModelBuildingException: The type DefaultConfigService is already defined\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.reportProblem(JDTBasedSpoonCompiler.java:615)\n\tat spoon.support.compiler.jdt.TreeBuilderRequestor.acceptResult(TreeBuilderRequestor.java:29)\n\tat spoon.support.compiler.jdt.TreeBuilderCompiler.buildUnits(TreeBuilderCompiler.java:110)\n\tat spoon.support.compiler.jdt.JDTBatchCompiler.getUnits(JDTBatchCompiler.java:282)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.buildUnits(JDTBasedSpoonCompiler.java:442)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.buildUnitsAndModel(JDTBasedSpoonCompiler.java:386)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.buildSources(JDTBasedSpoonCompiler.java:347)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.build(JDTBasedSpoonCompiler.java:118)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.build(JDTBasedSpoonCompiler.java:101)\n\tat spoon.Launcher.buildModel(Launcher.java:781)\n\tat SliceProbe.run(SliceProbe.java:79)\n\tat SliceProbe.main(SliceProbe.java:55)\n"
+        }
+      },
+      "semantic_validation": {
+        "status": "not_evaluated",
+        "reviewer": null,
+        "evidence": [],
+        "notes": "candidate reachability is not semantic dependency validation"
+      },
+      "cost": {
+        "timings_seconds": {
+          "criterion_extraction": 0.000934,
+          "source_selection": 0.281364
+        },
+        "total_seconds": 2.3739,
+        "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+        "peak_memory": {
+          "status": "unavailable",
+          "bytes": null,
+          "reason": "case-level peak memory is not measured by this runner"
+        },
+        "cache_state": {
+          "status": "unknown",
+          "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+        },
+        "input_size": {
+          "files": 5,
+          "bytes": 14075
+        },
+        "graph_size": {
+          "nodes": null,
+          "edges": null
+        },
+        "unavailable_phases": [
+          {
+            "phase": "input_admission",
+            "reason": "adapter admission occurs outside the per-case analysis timer"
+          },
+          {
+            "phase": "front_end",
+            "reason": "the candidate backend does not report parsing time separately"
+          },
+          {
+            "phase": "call_graph",
+            "reason": "the candidate backend does not report call-graph time separately"
+          },
+          {
+            "phase": "pointer_analysis",
+            "reason": "the candidate backend does not provide pointer analysis"
+          },
+          {
+            "phase": "dependency_analysis",
+            "reason": "backend_total combines parsing, graph construction, and slicing"
+          },
+          {
+            "phase": "slice",
+            "reason": "the candidate backend does not report semantic slicing time separately"
+          },
+          {
+            "phase": "source_mapping",
+            "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+          }
+        ]
+      }
+    },
+    "stage": "backward_graph",
+    "error": {
+      "type": "RuntimeError",
+      "message": "backend_exit_1: SLF4J(W): No SLF4J providers were found.\nSLF4J(W): Defaulting to no-operation (NOP) logger implementation\nSLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.\nException in thread \"main\" spoon.compiler.ModelBuildingException: The type DefaultConfigService is already defined\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.reportProblem(JDTBasedSpoonCompiler.java:615)\n\tat spoon.support.compiler.jdt.TreeBuilderRequestor.acceptResult(TreeBuilderRequestor.java:29)\n\tat spoon.support.compiler.jdt.TreeBuilderCompiler.buildUnits(TreeBuilderCompiler.java:110)\n\tat spoon.support.compiler.jdt.JDTBatchCompiler.getUnits(JDTBatchCompiler.java:282)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.buildUnits(JDTBasedSpoonCompiler.java:442)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.buildUnitsAndModel(JDTBasedSpoonCompiler.java:386)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.buildSources(JDTBasedSpoonCompiler.java:347)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.build(JDTBasedSpoonCompiler.java:118)\n\tat spoon.support.compiler.jdt.JDTBasedSpoonCompiler.build(JDTBasedSpoonCompiler.java:101)\n\tat spoon.Launcher.buildModel(Launcher.java:781)\n\tat SliceProbe.run(SliceProbe.java:79)\n\tat SliceProbe.main(SliceProbe.java:55)\n"
+    },
+    "elapsed_seconds": 2.3739,
+    "timings_seconds": {
+      "criterion_extraction": 0.000934,
+      "source_selection": 0.281364
+    },
+    "graph_and_evidence": "top-level graph/evidence/sources remain candidate diagnostics only"
+  },
+  "semantic_backend": {
+    "schema": "mockspec.java-batch-semantic-backend/v1",
+    "status": "unsupported",
+    "support_status": "unsupported_input_domain",
+    "identity": {
+      "language": "java",
+      "dataset": "java-bechmark-strong",
+      "case_id": "com.ctrip.framework.apollo.configservice.service.config.DefaultConfigServiceTest#testLoadConfigWithGrayRelease@67a78efb",
+      "inventory_revision": "e8ed1a717304ae6437602a4da6389aae46d96f4a805bc140883d0a626742811f",
+      "snapshot_id": "7d314185ed28eb0436048df23ac0ddc202fdc3ed4993cb1af730c38efddc3622"
+    },
+    "failure_categories": [
+      "java_semantic_backend_input_unsupported"
+    ],
+    "reason": "The accepted Java backend currently prepares bytecode, library summaries, and source-derived observations only for the exact JarFiles Jib case.",
+    "backend_attempted": false,
+    "candidate_diagnostic_required": true,
+    "driver_exit_code": 0,
+    "batch_dispatch_seconds": 0.138639,
+    "batch_dispatch_scope": "bridge process including support check, adapter and backend; excludes candidate diagnostics"
+  },
+  "batch_case_cost": {
+    "total_seconds": 3.123527,
+    "scope": "admission, candidate diagnostic, semantic-slot wait, dispatch and mapping; excludes case queue, shared compile and serialization"
+  },
+  "result_contract_sha256": "474a625e31e5168f2be777b245a9ff97ee9929b5288c508aaa97e24572eb6a53"
+}

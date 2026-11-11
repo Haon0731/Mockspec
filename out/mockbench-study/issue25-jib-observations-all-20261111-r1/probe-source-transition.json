@@ -1,0 +1,9 @@
+{
+  "schema": "mockspec.probe-source-transition/v1",
+  "analysis_probe_sha256": "1dea277750a452ff08aa11c15b53b5e78a4239e12a5c45f0616eb763c58e8e40",
+  "current_probe_sha256": "8fcd47b75381ed91d7fcf2e21f54303df6ef52e138c9972293bd859344043fa8",
+  "reconstruction": "Starting from the current UTF-8 source, reverse exactly the three hunks below. The reconstructed source SHA-256 was checked and equals analysis_probe_sha256.",
+  "compatibility": "The run used the five-argument form and fixed FULL control dependence. The current optional sixth argument preserves identical FULL behavior for that invocation; it only adds an explicit NONE diagnostic mode.",
+  "semantic_effect_on_recorded_run": "none",
+  "exact_unified_diff_from_analysis_source_to_current_source": "@@ -152,9 +152,9 @@\n-    if (args.length != 5) {\n+    if (args.length != 5 && args.length != 6) {\n-          \"application.jar library-classpath entry-class entry-selector criterion1,criterion2,...\");\n+          \"application.jar library-classpath entry-class entry-selector criterion1,criterion2,... [FULL|NONE]\");\n@@ -198,8 +198,9 @@\n-    var slicer = new CISlicer(graph, pointers, modRef, Slicer.DataDependenceOptions.NO_HEAP,\n-        Slicer.ControlDependenceOptions.FULL);\n+    Slicer.ControlDependenceOptions control = args.length == 6 && args[5].equals(\"NONE\")\n+        ? Slicer.ControlDependenceOptions.NONE : Slicer.ControlDependenceOptions.FULL;\n+    var slicer = new CISlicer(graph, pointers, modRef, Slicer.DataDependenceOptions.NO_HEAP, control);\n@@ -265,7 +266,7 @@\n-        \"control_dependence\", \"FULL\"));\n+        \"control_dependence\", control.toString()));"
+}

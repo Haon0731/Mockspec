@@ -1,0 +1,85 @@
+{
+  "issue": 21,
+  "status": "engineering_acceptance_passed",
+  "case_identity": {
+    "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+    "dataset": "java-bechmark-strong",
+    "snapshot_id": "5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4",
+    "masked_test_sha256": "19e800bf8967238ef3b7772278e476186e509051e5021067b1f7234de0f68ed0"
+  },
+  "predeclared_expectations": {
+    "preserve": [
+      "test invocation line 63 to the five-parameter static JarFiles.toJibContainerBuilder declaration",
+      "five call arguments to formal parameters in declaration order",
+      "callee return line 93 to the receiving local variable beginning on test line 62"
+    ],
+    "exclude": [
+      "methods with an unrelated declaring receiver",
+      "proven-incompatible overloads",
+      "argument edges from a different call site"
+    ],
+    "unknown": [
+      "argument type compatibility when masked mock declarations are not visible",
+      "effects of containerBuilder.toContainerBuildPlan and its observed fields",
+      "other unresolved calls and source-budget omissions"
+    ]
+  },
+  "baseline": {
+    "artifact": "out/mockbench-study/backward-slice-full-20261109-r3/2a37d7a1edfad4e10a7d.json",
+    "target_call_marked_unknown": true,
+    "target_binding_edges": 0,
+    "slice_source_ids": ["source:1", "test"]
+  },
+  "root_causes": [
+    {
+      "cause": "static_receiver_misread",
+      "evidence": "Spoon represents the class qualifier as CtTypeAccess; reading target.getType() yields the class-object type rather than the accessed JarFiles type, so fallback receiver matching rejected the visible declaration when noClasspath getDeclaration was absent"
+    },
+    {
+      "cause": "masked_argument_types_are_not_evidence",
+      "evidence": "undeclared masked mock variables receive the enclosing test type from Spoon; treating that inferred type as authoritative incorrectly rejects compatible formal parameters"
+    },
+    {
+      "cause": "parameter_position_can_be_invalid",
+      "evidence": "one visible formal parameter lacked a usable Spoon position; the previous node builder silently omitted its argument binding"
+    }
+  ],
+  "current_result": {
+    "input_mode": "automatic frozen-case selection; no diagnostic entry override",
+    "target_call_site": "test:63:9:CtInvocationImpl",
+    "target_callee": "com.google.cloud.tools.jib.cli.jar.JarFiles.toJibContainerBuilder(com.google.cloud.tools.jib.cli.ArtifactProcessor,com.google.cloud.tools.jib.cli.Jar,com.google.cloud.tools.jib.cli.CommonCliOptions,com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions,com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger)",
+    "binding_count": 1,
+    "binding_precision": "receiver_and_arity_signature_unknown",
+    "argument_parameter_indexes": [0, 1, 2, 3, 4],
+    "argument_parameter_names": [
+      "processor",
+      "jarOptions",
+      "commonCliOptions",
+      "commonContainerConfigCliOptions",
+      "logger"
+    ],
+    "return_binding_count": 1,
+    "target_call_marked_unknown": false,
+    "slice_source_ids": ["source:1", "source:3", "source:4", "test"],
+    "remaining_failure_categories": [
+      "source_budget",
+      "unresolved_calls",
+      "semantic_analysis_gap"
+    ]
+  },
+  "implementation": {
+    "baseline_commit": "aeff1d36cb451ded3c1891f64eeec63957f2676e",
+    "slice_probe_sha256": "a6bce128caf392ee3f8f7486441ea813d25c48ecc98727388d4624aebe86f52a"
+  },
+  "verification": [
+    {
+      "command": "PYTHONPATH=src .venv/bin/python -m pytest -q experiments/backward-slicing/test_java_probe.py",
+      "result": "10 passed"
+    },
+    {
+      "command": "PYTHONPATH=src .venv/bin/python experiments/backward-slicing/batch_slice.py --inventory out/mockbench-study/backward-slice-full-20261109-r3/inventory.json --output <new-temp-dir>/run --case-id <Jib-case-id>",
+      "result": "partial result retained; target binding 1, five argument mappings, return binding 1, target unknown marker 0"
+    }
+  ],
+  "interpretation": "This result establishes automatic source-level call binding for issue 21. It does not establish reliable heap/state propagation through toContainerBuildPlan, semantic correctness of the remaining candidate graph, or completion of parent issue 19."
+}

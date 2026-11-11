@@ -13,12 +13,46 @@
 
 ## 独立研究验证
 
+本轮已完成[后向分析修复与165例正式对照](../out/mockbench-study/backward-slice-formal165-20261111-r3/report.md)：
+Jib、Flask、langflow三例实际后端重跑并保留已核验的部分关系；162例仍超出成熟后端输入适配范围。
+完整语义恢复成功数为0，不能把候选触及产品源码的110例当作成功数。
+原r3、两轮正式失败、开发重跑与全部逐例结果均保留；253项研究回归通过。
+代码和压缩证据的发布范围及恢复方法见[发布清单](../out/mockbench-study/backward-analysis-publication-20261111-r1/README.md)。
+
 当前后向切片方案调研：[完整 MockBench 上的研究结论](../experiments/backward-slicing/full-benchmark-research.md)。
 包含主源文献、后端能力边界、165例目标测试结构盘点与验证设计；尚未报告全量切片成功率。
 实现入口：[目标导向候选切片批处理](../experiments/backward-slicing/README.md#全量候选切片入口2026-11-09)，
 从目标测试准则到有界选源、后向候选图和逐例失败；不把构图完成当作语义恢复成功。
 [首次全量执行结果](../out/mockbench-study/backward-slice-full-20261109-r3/report.md)：
 165例全部尝试，155例候选图、10例构图失败，包含逐准则证据与具体失败归因。
+
+后续修复按[父规格 #19](https://github.com/Haon0731/Mockspec/issues/19)及其子任务推进：
+结果契约、Jib 静态调用绑定与 langflow 加载来源分别验证；WALA／Python 后端能力门与
+独立验收通过前，不把这些入口改进计为完整依赖恢复，也不启动新的正式165例对照。
+最新[根因与修复记录](../out/mockbench-study/root-cause-repair-20261111/report.md)
+区分异常捕获库模型、未知效果传播和 Jib 传递堆规模；保留失败尝试与支持范围。
+后续[WALA能力门收尾](../out/mockbench-study/issue23-capability-closure-20261111-r4/report.md)
+补齐受限接收者、可达对象和静态逃逸区域传播；#23已独立核验关闭。
+[Jib逐观察独立验收](../out/mockbench-study/issue25-acceptance-20261111-r1/acceptance.json)
+已完成#25的限定验收：19个观察均有字段状态影响证据，当时保留诊断观察adapter和未知Mock效果；
+[追加的自动观察核验](../out/mockbench-study/issue25-jib-observation-adapter-revalidation-20261111-r3/independent-review.json)
+进一步从原测试自动提取观察，生成源码与已分析输入一致；未知Mock效果仍保留。
+[Java按需独立验收](../out/mockbench-study/issue28-java-demand-acceptance-20261111-r1/independent-review.json)
+已完成#28，保留原关系并验证缓存及预算；真实Jib只减少72个方法上下文，不宣称加速。
+[最终独立门禁 #30](../out/mockbench-study/issue30-final-gate-20261111-r1/acceptance.json)
+已通过并关闭；限定真实案例、状态机制及按需分析验收通过，不代表165例均具备语义分析能力。
+[langflow最终后端契约](../out/mockbench-study/langflow-backend-bridge-20261111-r6-contract-revalidation/verification.json)
+保留两个原观察、31条类型化关系及未知效果；动态加载仅静态核验，不执行loader。
+[Flask逐观察接入](../out/mockbench-study/python-issue26-27-20261111-r11/issue26-report.md)
+已完成#26的独立验收，结果保留精确异常值、路径可满足性及支持域外效果未知。
+[Python状态接入](../out/mockbench-study/python-issue26-27-20261111-r12/issue27-report.md)
+已完成#27验收，9个机制观察与真实Flask分开；潜在参数别名和全局重绑定保持未知。
+[Python按需查询验收](../out/issue29-python-demand-cold-20261111-r3/acceptance-revalidation.json)
+已完成#29：观察根驱动的关系查询、冷／暖缓存等价及预算边界通过；
+数据库仍完整解析。正式165例阶段由#31单独留证，候选诊断与成熟后端支持范围分别报告。
+前轮[逐观察接入与摘要传播](../experiments/backward-slicing/README.md#逐观察接入与摘要传播2026-11-11)：
+Flask 输出三个原始观察的关系与未知映射；WALA 修复摘要选择器时序，并更正先前对
+空 IR 调用目标的过强判断。两者仍不代表完整案例或全量语义恢复成功。
 
 全量研究入口：[完整 MockBench 研究框架](../experiments/mockbench-study/README.md)。
 覆盖冻结 Java/Python 案例清单、实际加载检查、源码读取接口、历史语法基线和失败记录；

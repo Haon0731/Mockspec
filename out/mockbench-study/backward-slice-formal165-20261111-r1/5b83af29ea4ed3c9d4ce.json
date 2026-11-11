@@ -1,0 +1,1731 @@
+{
+  "status": "failed",
+  "failure_categories": [
+    "empty_support_source_omitted",
+    "unresolved_calls",
+    "semantic_analysis_gap",
+    "semantic_backend_failed"
+  ],
+  "stage": "semantic_backend",
+  "input_context": {
+    "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+    "masked_test_logical_path": "tests/test_189is_encrypted.py",
+    "masked_test_sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+    "masking_contract": "python-slot-v1"
+  },
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_is_encrypted",
+          "start_line": 50,
+          "end_line": 115
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 106,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 115,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_visible_source_path",
+        "hint": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "candidates": [
+          "src/src/backend/base/langflow/services/auth/mcp_encryption.py"
+        ],
+        "precision": "exact_visible_path"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "hint_kind": "python_import",
+        "hint": "lfx.log.logger",
+        "candidates": [
+          "src/src/lfx/src/lfx/log/logger.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "hint_kind": "python_import",
+        "hint": "langflow.services.auth",
+        "candidates": [
+          "src/src/backend/base/langflow/services/auth/__init__.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "hint_kind": "python_import",
+        "hint": "langflow.services.deps",
+        "candidates": [
+          "src/src/backend/base/langflow/services/deps.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [
+      "empty_source_rejected:src/src/backend/base/langflow/services/auth/__init__.py"
+    ],
+    "source_rejections": [
+      {
+        "logical_path": "src/src/backend/base/langflow/services/auth/__init__.py",
+        "reason": "frozen source is empty"
+      }
+    ],
+    "dynamic_loader_bindings": [
+      {
+        "status": "resolved",
+        "loader": "load_is_encrypted",
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "path_line": 13,
+        "namespace": "namespace",
+        "exec_line": 36,
+        "return_line": 37,
+        "read_line": 27,
+        "function_key": "is_encrypted",
+        "return_index": 0,
+        "function_definition": {
+          "source_id": "source:1",
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "name": "is_encrypted",
+          "start_line": 94,
+          "end_line": 118
+        },
+        "test_bindings": [
+          {
+            "name": "is_encrypted",
+            "line": 74
+          }
+        ],
+        "call_sites": [
+          {
+            "name": "is_encrypted",
+            "line": 104
+          }
+        ]
+      }
+    ],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 30532,
+    "read_bytes": 30532,
+    "attempted_files": 4,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_189is_encrypted.py",
+      "sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+      "bytes": 3541
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+      "sha256": "bfe36ac83538a629ee670c81b20ab9e3682688be7a031b7e61522b1779ea4c8b",
+      "bytes": 4547
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/src/lfx/src/lfx/log/logger.py",
+      "sha256": "af1183762ac97ea959a555ad5f866baade1219431b9befa0d7c9ba27781eb80b",
+      "bytes": 14421
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/src/backend/base/langflow/services/deps.py",
+      "sha256": "26c2b1b0e158d1f342923a242af795a91a6da119c6bb82e69c3e889eabb9fd59",
+      "bytes": 8023
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "dynamic_loader_bindings": [
+      {
+        "call_sites": [
+          {
+            "line": 104,
+            "name": "is_encrypted"
+          }
+        ],
+        "exec_line": 36,
+        "function_definition": {
+          "end_line": 118,
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "name": "is_encrypted",
+          "source_id": "source:1",
+          "start_line": 94
+        },
+        "function_key": "is_encrypted",
+        "loader": "load_is_encrypted",
+        "namespace": "namespace",
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "path_line": 13,
+        "read_line": 27,
+        "return_index": 0,
+        "return_line": 37,
+        "status": "resolved",
+        "test_bindings": [
+          {
+            "line": 74,
+            "name": "is_encrypted"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "test:27:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:27:4:Name"
+      },
+      {
+        "from": "test:28:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:28:4:Name"
+      },
+      {
+        "from": "test:29:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:29:4:Name"
+      },
+      {
+        "from": "test:30:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:30:4:Name"
+      },
+      {
+        "from": "test:27:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:30:4:Assign",
+        "variable": "source_lines"
+      },
+      {
+        "from": "test:28:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:30:4:Assign",
+        "variable": "start_line"
+      },
+      {
+        "from": "test:29:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:30:4:Assign",
+        "variable": "end_line"
+      },
+      {
+        "from": "test:35:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:35:4:Name"
+      },
+      {
+        "from": "test:28:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:36:4:Expr",
+        "variable": "start_line"
+      },
+      {
+        "from": "test:30:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:36:4:Expr",
+        "variable": "function_source"
+      },
+      {
+        "from": "test:35:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:36:4:Expr",
+        "variable": "namespace"
+      },
+      {
+        "from": "test:35:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:37:4:Return",
+        "variable": "namespace"
+      },
+      {
+        "from": "test:74:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:74:4:Name"
+      },
+      {
+        "from": "test:74:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:74:18:Name"
+      },
+      {
+        "from": "test:104:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:104:4:Name"
+      },
+      {
+        "from": "test:74:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:104:4:Assign",
+        "variable": "is_encrypted"
+      },
+      {
+        "from": "test:53:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:104:4:Assign",
+        "variable": "value"
+      },
+      {
+        "from": "test:104:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:106:4:Assert",
+        "variable": "result"
+      },
+      {
+        "from": "test:56:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:106:4:Assert",
+        "variable": "expected_result"
+      },
+      {
+        "from": "test:74:18:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:115:4:Assert",
+        "variable": "invalid_token_cls"
+      },
+      {
+        "from": "test:74:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:115:4:Assert",
+        "variable": "is_encrypted"
+      },
+      {
+        "callee": "load_is_encrypted",
+        "from": "test:37:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:74:4:Assign"
+      },
+      {
+        "callee": "load_is_encrypted",
+        "from": "test:36:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:74:4:Assign"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:104:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:104:4:Assign"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:112:12:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:104:4:Assign"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:115:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:104:4:Assign"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:118:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:104:4:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:103:7:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:104:8:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:111:11:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:112:12:Return"
+      },
+      {
+        "from": "source:1:106:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:106:4:Name"
+      },
+      {
+        "from": "source:1:109:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:109:8:Name"
+      },
+      {
+        "from": "source:1:94:17:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:109:8:Assign",
+        "variable": "value"
+      },
+      {
+        "from": "source:1:106:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:109:8:Assign",
+        "variable": "settings_service"
+      },
+      {
+        "from": "source:1:109:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:115:8:Return",
+        "variable": "decrypted"
+      },
+      {
+        "from": "source:1:94:17:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:115:8:Return",
+        "variable": "value"
+      },
+      {
+        "callee": "get_settings_service",
+        "from": "source:3:138:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:1:106:4:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:3:49:7:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:3:54:8:Expr"
+      },
+      {
+        "from": "source:3:47:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:3:47:4:Name"
+      },
+      {
+        "from": "source:3:47:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:54:8:Expr",
+        "variable": "service_manager"
+      },
+      {
+        "from": "source:3:47:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:55:4:Return",
+        "variable": "service_manager"
+      },
+      {
+        "from": "source:3:33:16:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:55:4:Return",
+        "variable": "service_type"
+      },
+      {
+        "from": "source:3:33:43:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:55:4:Return",
+        "variable": "default"
+      },
+      {
+        "callee": "get_service",
+        "from": "source:3:55:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:3:138:4:Return"
+      },
+      {
+        "callee": "get_service",
+        "from": "source:3:54:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:3:138:4:Return"
+      },
+      {
+        "from": "source:1:94:0:FunctionDef",
+        "function": "is_encrypted",
+        "kind": "dynamic_function_origin",
+        "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "precision": "visible_path_namespace_key_and_definition",
+        "to": "test:37:4:Return"
+      },
+      {
+        "from": "test:27:4:Assign",
+        "kind": "dynamic_source_text",
+        "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "precision": "visible_read_to_exec_compile",
+        "to": "test:36:4:Expr"
+      },
+      {
+        "from": "test:36:4:Expr",
+        "function": "is_encrypted",
+        "kind": "dynamic_namespace_definition",
+        "namespace": "namespace",
+        "precision": "visible_exec_namespace_to_literal_key",
+        "to": "test:37:4:Return"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:104:8:Return",
+        "kind": "dynamic_call_target",
+        "precision": "visible_loader_binding",
+        "to": "test:104:4:Assign"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:112:12:Return",
+        "kind": "dynamic_call_target",
+        "precision": "visible_loader_binding",
+        "to": "test:104:4:Assign"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:115:8:Return",
+        "kind": "dynamic_call_target",
+        "precision": "visible_loader_binding",
+        "to": "test:104:4:Assign"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:118:8:Return",
+        "kind": "dynamic_call_target",
+        "precision": "visible_loader_binding",
+        "to": "test:104:4:Assign"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected",
+      "dynamic loader origins require a visible static path, namespace key, selected definition, and unrebound test callable"
+    ],
+    "nodes": [
+      {
+        "code": "not value",
+        "end_line": 103,
+        "id": "source:1:103:7:UnaryOp",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 103
+      },
+      {
+        "code": "return False",
+        "end_line": 104,
+        "id": "source:1:104:8:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 104
+      },
+      {
+        "code": "settings_service = get_settings_service()",
+        "end_line": 106,
+        "exception_possible": true,
+        "id": "source:1:106:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 106
+      },
+      {
+        "code": "settings_service",
+        "end_line": 106,
+        "id": "source:1:106:4:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 106
+      },
+      {
+        "code": "decrypted = auth_utils.decrypt_api_key(value, settings_service)",
+        "contains_unresolved_call": true,
+        "end_line": 109,
+        "exception_possible": true,
+        "id": "source:1:109:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 109,
+        "unresolved_calls": [
+          "auth_utils.decrypt_api_key(value, settings_service)"
+        ]
+      },
+      {
+        "code": "decrypted",
+        "end_line": 109,
+        "id": "source:1:109:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 109
+      },
+      {
+        "code": "not decrypted",
+        "end_line": 111,
+        "id": "source:1:111:11:UnaryOp",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 111
+      },
+      {
+        "code": "return True",
+        "end_line": 112,
+        "id": "source:1:112:12:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 112
+      },
+      {
+        "code": "return decrypted != value",
+        "end_line": 115,
+        "id": "source:1:115:8:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 115
+      },
+      {
+        "code": "return True",
+        "end_line": 118,
+        "id": "source:1:118:8:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 118
+      },
+      {
+        "code": "def is_encrypted(value: str) -> bool:\n    \"\"\"Check if a value appears to be encrypted.\n\n    Args:\n        value: String value to check\n\n    Returns:\n        True if the value appears to be encrypted (base64 Fernet token)\n    \"\"\"\n    if not value:\n        return False\n    settings_service = get_setti",
+        "end_line": 118,
+        "id": "source:1:94:0:FunctionDef",
+        "kind": "dynamic_function_definition",
+        "source_id": "source:1",
+        "start_line": 94
+      },
+      {
+        "code": "value: str",
+        "end_line": 94,
+        "id": "source:1:94:17:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 94
+      },
+      {
+        "code": "return get_service(ServiceType.SETTINGS_SERVICE, SettingsServiceFactory())",
+        "contains_unresolved_call": true,
+        "end_line": 138,
+        "exception_possible": true,
+        "id": "source:3:138:4:Return",
+        "kind": "Return",
+        "source_id": "source:3",
+        "start_line": 138,
+        "unresolved_calls": [
+          "SettingsServiceFactory()"
+        ]
+      },
+      {
+        "code": "service_type: ServiceType",
+        "end_line": 33,
+        "id": "source:3:33:16:arg",
+        "kind": "name_definition",
+        "source_id": "source:3",
+        "start_line": 33
+      },
+      {
+        "code": "default",
+        "end_line": 33,
+        "id": "source:3:33:43:arg",
+        "kind": "name_definition",
+        "source_id": "source:3",
+        "start_line": 33
+      },
+      {
+        "code": "service_manager = get_service_manager()",
+        "contains_unresolved_call": true,
+        "end_line": 47,
+        "exception_possible": true,
+        "id": "source:3:47:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:3",
+        "start_line": 47,
+        "unresolved_calls": [
+          "get_service_manager()"
+        ]
+      },
+      {
+        "code": "service_manager",
+        "end_line": 47,
+        "id": "source:3:47:4:Name",
+        "kind": "Name",
+        "source_id": "source:3",
+        "start_line": 47
+      },
+      {
+        "code": "not service_manager.are_factories_registered()",
+        "end_line": 49,
+        "id": "source:3:49:7:UnaryOp",
+        "kind": "if_condition",
+        "source_id": "source:3",
+        "start_line": 49
+      },
+      {
+        "code": "service_manager.register_factories(ServiceManager.get_factories())",
+        "contains_unresolved_call": true,
+        "end_line": 54,
+        "exception_possible": true,
+        "id": "source:3:54:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:3",
+        "start_line": 54,
+        "unresolved_calls": [
+          "service_manager.register_factories(ServiceManager.get_factories())",
+          "ServiceManager.get_factories()"
+        ]
+      },
+      {
+        "code": "return service_manager.get(service_type, default)",
+        "contains_unresolved_call": true,
+        "end_line": 55,
+        "exception_possible": true,
+        "id": "source:3:55:4:Return",
+        "kind": "Return",
+        "source_id": "source:3",
+        "start_line": 55,
+        "unresolved_calls": [
+          "service_manager.get(service_type, default)"
+        ]
+      },
+      {
+        "code": "result = is_encrypted(value)",
+        "end_line": 104,
+        "exception_possible": true,
+        "id": "test:104:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 104
+      },
+      {
+        "code": "result",
+        "end_line": 104,
+        "id": "test:104:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 104
+      },
+      {
+        "code": "assert result is expected_result",
+        "end_line": 106,
+        "id": "test:106:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 106
+      },
+      {
+        "code": "assert invalid_token_cls is is_encrypted.__globals__['InvalidToken']",
+        "end_line": 115,
+        "id": "test:115:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 115
+      },
+      {
+        "code": "source_lines = MODULE_PATH.read_text(encoding='utf-8').splitlines()",
+        "contains_unresolved_call": true,
+        "end_line": 27,
+        "exception_possible": true,
+        "id": "test:27:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 27,
+        "unresolved_calls": [
+          "MODULE_PATH.read_text(encoding='utf-8').splitlines()",
+          "MODULE_PATH.read_text(encoding='utf-8')"
+        ]
+      },
+      {
+        "code": "source_lines",
+        "end_line": 27,
+        "id": "test:27:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 27
+      },
+      {
+        "code": "start_line = 94",
+        "end_line": 28,
+        "id": "test:28:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 28
+      },
+      {
+        "code": "start_line",
+        "end_line": 28,
+        "id": "test:28:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 28
+      },
+      {
+        "code": "end_line = 118",
+        "end_line": 29,
+        "id": "test:29:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 29
+      },
+      {
+        "code": "end_line",
+        "end_line": 29,
+        "id": "test:29:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 29
+      },
+      {
+        "code": "function_source = '\\n'.join(source_lines[start_line - 1:end_line])",
+        "contains_unresolved_call": true,
+        "end_line": 30,
+        "exception_possible": true,
+        "id": "test:30:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 30,
+        "unresolved_calls": [
+          "'\\n'.join(source_lines[start_line - 1:end_line])"
+        ]
+      },
+      {
+        "code": "function_source",
+        "end_line": 30,
+        "id": "test:30:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 30
+      },
+      {
+        "code": "namespace = {'InvalidToken': LocalInvalidToken}",
+        "end_line": 35,
+        "id": "test:35:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 35
+      },
+      {
+        "code": "namespace",
+        "end_line": 35,
+        "id": "test:35:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 35
+      },
+      {
+        "code": "exec(compile('\\n' * (start_line - 1) + function_source, str(MODULE_PATH), 'exec'), namespace)",
+        "contains_unresolved_call": true,
+        "end_line": 36,
+        "exception_possible": true,
+        "id": "test:36:4:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 36,
+        "unresolved_calls": [
+          "exec(compile('\\n' * (start_line - 1) + function_source, str(MODULE_PATH), 'exec'), namespace)",
+          "compile('\\n' * (start_line - 1) + function_source, str(MODULE_PATH), 'exec')",
+          "str(MODULE_PATH)"
+        ]
+      },
+      {
+        "code": "return (namespace['is_encrypted'], LocalInvalidToken)",
+        "end_line": 37,
+        "id": "test:37:4:Return",
+        "kind": "Return",
+        "source_id": "test",
+        "start_line": 37
+      },
+      {
+        "code": "value",
+        "end_line": 53,
+        "id": "test:53:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 53
+      },
+      {
+        "code": "expected_result",
+        "end_line": 56,
+        "id": "test:56:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 56
+      },
+      {
+        "code": "invalid_token_cls",
+        "end_line": 74,
+        "id": "test:74:18:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 74
+      },
+      {
+        "code": "is_encrypted, invalid_token_cls = load_is_encrypted()",
+        "end_line": 74,
+        "exception_possible": true,
+        "id": "test:74:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 74
+      },
+      {
+        "code": "is_encrypted",
+        "end_line": 74,
+        "id": "test:74:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 74
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:106:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:115:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:106:4:Assert",
+      "test:115:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 41,
+    "edges": 51,
+    "edge_kinds": {
+      "definition_value_candidate": 11,
+      "data_candidate": 21,
+      "call_target_candidate": 7,
+      "call_event_candidate": 2,
+      "lexical_control": 3,
+      "dynamic_function_origin": 1,
+      "dynamic_source_text": 1,
+      "dynamic_namespace_definition": 1,
+      "dynamic_call_target": 4
+    },
+    "criteria": [
+      {
+        "seed": "test:106:4:Assert",
+        "node_ids": [
+          "source:1:103:7:UnaryOp",
+          "source:1:104:8:Return",
+          "source:1:106:4:Assign",
+          "source:1:106:4:Name",
+          "source:1:109:8:Assign",
+          "source:1:109:8:Name",
+          "source:1:111:11:UnaryOp",
+          "source:1:112:12:Return",
+          "source:1:115:8:Return",
+          "source:1:118:8:Return",
+          "source:1:94:0:FunctionDef",
+          "source:1:94:17:arg",
+          "source:3:138:4:Return",
+          "source:3:33:16:arg",
+          "source:3:33:43:arg",
+          "source:3:47:4:Assign",
+          "source:3:47:4:Name",
+          "source:3:49:7:UnaryOp",
+          "source:3:54:8:Expr",
+          "source:3:55:4:Return",
+          "test:104:4:Assign",
+          "test:104:4:Name",
+          "test:106:4:Assert",
+          "test:27:4:Assign",
+          "test:27:4:Name",
+          "test:28:4:Assign",
+          "test:28:4:Name",
+          "test:29:4:Assign",
+          "test:29:4:Name",
+          "test:30:4:Assign",
+          "test:30:4:Name",
+          "test:35:4:Assign",
+          "test:35:4:Name",
+          "test:36:4:Expr",
+          "test:37:4:Return",
+          "test:53:4:arg",
+          "test:56:4:arg",
+          "test:74:4:Assign",
+          "test:74:4:Name"
+        ],
+        "product_source_candidates": [
+          "source:1",
+          "source:3"
+        ],
+        "unknown_call_nodes": [
+          "source:1:109:8:Assign",
+          "source:3:138:4:Return",
+          "source:3:47:4:Assign",
+          "source:3:54:8:Expr",
+          "source:3:55:4:Return",
+          "test:27:4:Assign",
+          "test:30:4:Assign",
+          "test:36:4:Expr"
+        ]
+      },
+      {
+        "seed": "test:115:4:Assert",
+        "node_ids": [
+          "source:1:94:0:FunctionDef",
+          "test:115:4:Assert",
+          "test:27:4:Assign",
+          "test:27:4:Name",
+          "test:28:4:Assign",
+          "test:28:4:Name",
+          "test:29:4:Assign",
+          "test:29:4:Name",
+          "test:30:4:Assign",
+          "test:30:4:Name",
+          "test:35:4:Assign",
+          "test:35:4:Name",
+          "test:36:4:Expr",
+          "test:37:4:Return",
+          "test:74:18:Name",
+          "test:74:4:Assign",
+          "test:74:4:Name"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "test:27:4:Assign",
+          "test:30:4:Assign",
+          "test:36:4:Expr"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:106:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:115:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.1992,
+  "timings_seconds": {
+    "criterion_extraction": 0.000804,
+    "source_selection": 0.01966,
+    "backend_total": 0.178539,
+    "evidence_summary": 0.000102
+  },
+  "identity": {
+    "case_id": "langflow_189",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "langflow_189",
+      "dataset": "python-benchmark-new",
+      "language": "python",
+      "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+      "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_189is_encrypted.py",
+        "sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+        "bytes": 3541,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:1",
+        "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "sha256": "bfe36ac83538a629ee670c81b20ab9e3682688be7a031b7e61522b1779ea4c8b",
+        "bytes": 4547,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:2",
+        "logical_path": "src/src/lfx/src/lfx/log/logger.py",
+        "sha256": "af1183762ac97ea959a555ad5f866baade1219431b9befa0d7c9ba27781eb80b",
+        "bytes": 14421,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:3",
+        "logical_path": "src/src/backend/base/langflow/services/deps.py",
+        "sha256": "26c2b1b0e158d1f342923a242af795a91a6da119c6bb82e69c3e889eabb9fd59",
+        "bytes": 8023,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "the runner does not enumerate parameter rows"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+        "evidence": [
+          {
+            "symbol": "test_is_encrypted",
+            "start_line": 50,
+            "end_line": 115
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "not_evaluated",
+        "candidates": [],
+        "evidence": [],
+        "assumptions": []
+      }
+    },
+    "relations": [],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [],
+      "unknown_effects": [
+        {
+          "boundary_id": "source:1:109:8:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:3:138:4:Return",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:3:47:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:3:54:8:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:3:55:4:Return",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:27:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:30:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:36:4:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "semantic_backend",
+          "reason": "empty_support_source_omitted,unresolved_calls,semantic_analysis_gap,semantic_backend_failed"
+        },
+        {
+          "scope": "mature_backend_support_domain",
+          "reason": "CodeQL executable does not exist: /tmp/mockspec-issue24-tools/codeql-v2.27.4/codeql",
+          "details": []
+        }
+      ]
+    },
+    "completion": {
+      "status": "failed",
+      "stage": "semantic_backend",
+      "failure_categories": [
+        "empty_support_source_omitted",
+        "unresolved_calls",
+        "semantic_analysis_gap",
+        "semantic_backend_failed"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "not_evaluated",
+      "reviewer": null,
+      "evidence": [],
+      "notes": "candidate reachability is not semantic dependency validation"
+    },
+    "cost": {
+      "timings_seconds": {
+        "criterion_extraction": 0.000804,
+        "source_selection": 0.01966,
+        "backend_total": 0.178539,
+        "evidence_summary": 0.000102
+      },
+      "total_seconds": 0.1992,
+      "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+      "peak_memory": {
+        "status": "unavailable",
+        "bytes": null,
+        "reason": "case-level peak memory is not measured by this runner"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+      },
+      "input_size": {
+        "files": 4,
+        "bytes": 30532
+      },
+      "graph_size": {
+        "nodes": 41,
+        "edges": 51
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter admission occurs outside the per-case analysis timer"
+        },
+        {
+          "phase": "front_end",
+          "reason": "the candidate backend does not report parsing time separately"
+        },
+        {
+          "phase": "call_graph",
+          "reason": "the candidate backend does not report call-graph time separately"
+        },
+        {
+          "phase": "pointer_analysis",
+          "reason": "the candidate backend does not provide pointer analysis"
+        },
+        {
+          "phase": "dependency_analysis",
+          "reason": "backend_total combines parsing, graph construction, and slicing"
+        },
+        {
+          "phase": "slice",
+          "reason": "the candidate backend does not report semantic slicing time separately"
+        },
+        {
+          "phase": "source_mapping",
+          "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+        }
+      ]
+    }
+  },
+  "candidate_diagnostics": {
+    "status": "partial",
+    "failure_categories": [
+      "empty_support_source_omitted",
+      "unresolved_calls",
+      "semantic_analysis_gap"
+    ],
+    "result_contract": {
+      "schema_version": "mock-spec.backward-analysis-case/v1",
+      "identity": {
+        "case_id": "langflow_189",
+        "dataset": "python-benchmark-new",
+        "language": "python",
+        "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+        "masking_contract": "python-slot-v1",
+        "masked_test_sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+        "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted"
+      },
+      "source_scope": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_189is_encrypted.py",
+          "sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+          "bytes": 3541,
+          "selection_role": "masked_test"
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "sha256": "bfe36ac83538a629ee670c81b20ab9e3682688be7a031b7e61522b1779ea4c8b",
+          "bytes": 4547,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/src/lfx/src/lfx/log/logger.py",
+          "sha256": "af1183762ac97ea959a555ad5f866baade1219431b9befa0d7c9ba27781eb80b",
+          "bytes": 14421,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:3",
+          "logical_path": "src/src/backend/base/langflow/services/deps.py",
+          "sha256": "26c2b1b0e158d1f342923a242af795a91a6da119c6bb82e69c3e889eabb9fd59",
+          "bytes": 8023,
+          "selection_role": "candidate_product"
+        }
+      ],
+      "observations": [
+        {
+          "observation_id": "criterion:0",
+          "location": {
+            "source_id": "test",
+            "start_line": 106,
+            "end_line": 106
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        },
+        {
+          "observation_id": "criterion:1",
+          "location": {
+            "source_id": "test",
+            "start_line": 115,
+            "end_line": 115
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        }
+      ],
+      "parameterization": {
+        "status": "not_expanded",
+        "coverage": "selected_test_definition",
+        "reason": "the runner does not enumerate parameter rows"
+      },
+      "entry_point": {
+        "test_selection": {
+          "origin": "task_provided",
+          "status": "unique",
+          "selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+          "evidence": [
+            {
+              "symbol": "test_is_encrypted",
+              "start_line": 50,
+              "end_line": 115
+            }
+          ]
+        },
+        "mut_binding": {
+          "origin": "automatic",
+          "status": "not_evaluated",
+          "candidates": [],
+          "evidence": [],
+          "assumptions": []
+        }
+      },
+      "relations": [],
+      "relation_coverage": [
+        {
+          "kind": "call_binding",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "control_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "exception_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "function_origin",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "normal_return_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "state_flow",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "value_flow",
+          "status": "not_evaluated"
+        }
+      ],
+      "analysis_boundaries": {
+        "assumptions": [],
+        "unknown_effects": [
+          {
+            "boundary_id": "source:1:109:8:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:3:138:4:Return",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:3:47:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:3:54:8:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:3:55:4:Return",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:27:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:30:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:36:4:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          }
+        ],
+        "unanalysed_regions": [
+          {
+            "scope": "semantic_relations",
+            "reason": "candidate_graph_has_no_validated_dependency_semantics"
+          }
+        ]
+      },
+      "completion": {
+        "status": "partial",
+        "stage": "complete",
+        "failure_categories": [
+          "empty_support_source_omitted",
+          "unresolved_calls",
+          "semantic_analysis_gap"
+        ],
+        "error": null
+      },
+      "semantic_validation": {
+        "status": "not_evaluated",
+        "reviewer": null,
+        "evidence": [],
+        "notes": "candidate reachability is not semantic dependency validation"
+      },
+      "cost": {
+        "timings_seconds": {
+          "criterion_extraction": 0.000804,
+          "source_selection": 0.01966,
+          "backend_total": 0.178539,
+          "evidence_summary": 0.000102
+        },
+        "total_seconds": 0.1992,
+        "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+        "peak_memory": {
+          "status": "unavailable",
+          "bytes": null,
+          "reason": "case-level peak memory is not measured by this runner"
+        },
+        "cache_state": {
+          "status": "unknown",
+          "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+        },
+        "input_size": {
+          "files": 4,
+          "bytes": 30532
+        },
+        "graph_size": {
+          "nodes": 41,
+          "edges": 51
+        },
+        "unavailable_phases": [
+          {
+            "phase": "input_admission",
+            "reason": "adapter admission occurs outside the per-case analysis timer"
+          },
+          {
+            "phase": "front_end",
+            "reason": "the candidate backend does not report parsing time separately"
+          },
+          {
+            "phase": "call_graph",
+            "reason": "the candidate backend does not report call-graph time separately"
+          },
+          {
+            "phase": "pointer_analysis",
+            "reason": "the candidate backend does not provide pointer analysis"
+          },
+          {
+            "phase": "dependency_analysis",
+            "reason": "backend_total combines parsing, graph construction, and slicing"
+          },
+          {
+            "phase": "slice",
+            "reason": "the candidate backend does not report semantic slicing time separately"
+          },
+          {
+            "phase": "source_mapping",
+            "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+          }
+        ]
+      }
+    },
+    "stage": "complete",
+    "error": null,
+    "elapsed_seconds": 0.1992,
+    "timings_seconds": {
+      "criterion_extraction": 0.000804,
+      "source_selection": 0.01966,
+      "backend_total": 0.178539,
+      "evidence_summary": 0.000102
+    },
+    "graph_and_evidence": "top-level graph/evidence/sources remain candidate diagnostics only"
+  },
+  "semantic_backend": {
+    "schema": "mock-spec.batch-semantic-backend/v1",
+    "status": "failed",
+    "backend": "langflow_origin_flow",
+    "identity": {
+      "language": "python",
+      "dataset": "python-benchmark-new",
+      "case_id": "langflow_189",
+      "inventory_revision": "0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc",
+      "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+      "snapshot_root": "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/python-benchmark-new/ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+      "admission_status": "frozen_candidate",
+      "admission_verified": false,
+      "reviewed_snapshot_id": null,
+      "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+      "masked_test_logical_path": "tests/test_189is_encrypted.py",
+      "masked_test_sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+      "masking_contract": "python-slot-v1",
+      "input_context": {
+        "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+        "masked_test_logical_path": "tests/test_189is_encrypted.py",
+        "masked_test_sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+        "masking_contract": "python-slot-v1"
+      },
+      "sources": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_189is_encrypted.py",
+          "sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+          "bytes": 3541
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "sha256": "bfe36ac83538a629ee670c81b20ab9e3682688be7a031b7e61522b1779ea4c8b",
+          "bytes": 4547
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/src/lfx/src/lfx/log/logger.py",
+          "sha256": "af1183762ac97ea959a555ad5f866baade1219431b9befa0d7c9ba27781eb80b",
+          "bytes": 14421
+        },
+        {
+          "source_id": "source:3",
+          "logical_path": "src/src/backend/base/langflow/services/deps.py",
+          "sha256": "26c2b1b0e158d1f342923a242af795a91a6da119c6bb82e69c3e889eabb9fd59",
+          "bytes": 8023
+        }
+      ]
+    },
+    "error": {
+      "type": "ValueError",
+      "message": "CodeQL executable does not exist: /tmp/mockspec-issue24-tools/codeql-v2.27.4/codeql"
+    },
+    "source": null,
+    "provenance": {
+      "target_executed": false,
+      "driver_output": "/home/haon/projects/Mockspec/out/mockbench-study/backward-slice-formal165-20261111-r1/semantic/5b83af29ea4ed3c9d4ce/driver"
+    },
+    "cost": null,
+    "terminal": {
+      "execution": "failed",
+      "semantic_validation": "not_evaluated"
+    },
+    "driver_exit_code": 1,
+    "batch_dispatch_seconds": 0.338861,
+    "batch_dispatch_scope": "bridge process including support check, adapter and backend; excludes candidate diagnostics"
+  },
+  "batch_case_cost": {
+    "total_seconds": 0.64259,
+    "scope": "admission, candidate diagnostic, semantic-slot wait, dispatch and mapping; excludes case queue, shared compile and serialization"
+  },
+  "result_contract_sha256": "edd7fea7f6cb7ce5d31454af7f782e8d40e56c8fe5ff382d923dff37f45efe5b"
+}

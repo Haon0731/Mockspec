@@ -1,0 +1,493 @@
+{
+  "schema": "mock-spec.langflow-backend-study/v1",
+  "status": "verified_incomplete",
+  "identity": {
+    "case_id": "langflow_189",
+    "dataset": "python-benchmark-new",
+    "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+    "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+    "masking_contract": "python-slot-v1"
+  },
+  "entry_point": {
+    "function_origin": {
+      "origin": "automatic_visible_loader",
+      "status": "unique",
+      "evidence": [
+        {
+          "status": "resolved",
+          "loader": "load_is_encrypted",
+          "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "path_line": 13,
+          "namespace": "namespace",
+          "exec_line": 36,
+          "return_line": 37,
+          "read_line": 27,
+          "function_key": "is_encrypted",
+          "return_index": 0,
+          "function_definition": {
+            "source_id": "source:1",
+            "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+            "name": "is_encrypted",
+            "start_line": 94,
+            "end_line": 118
+          },
+          "test_bindings": [
+            {
+              "name": "is_encrypted",
+              "line": 74
+            }
+          ],
+          "call_sites": [
+            {
+              "name": "is_encrypted",
+              "line": 104
+            }
+          ]
+        }
+      ]
+    },
+    "backend_resolution": "composed: authenticated frontend origin plus exact CodeQL function/call endpoints"
+  },
+  "observations": [
+    {
+      "id": "criterion:0",
+      "line": 106,
+      "kind": "return_value_assertion"
+    },
+    {
+      "id": "criterion:1",
+      "line": 115,
+      "kind": "dynamic_global_identity_assertion"
+    }
+  ],
+  "relations": [
+    {
+      "kind": "product_function",
+      "modality": "certain",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 94
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 118
+      },
+      "detail": "is_encrypted",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "product_return",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 104
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 94
+      },
+      "detail": "is_encrypted",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "product_return",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 112
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 94
+      },
+      "detail": "is_encrypted",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "product_return",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 115
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 94
+      },
+      "detail": "is_encrypted",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "product_return",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 118
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 94
+      },
+      "detail": "is_encrypted",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "product_global_reference",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 116
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 94
+      },
+      "detail": "InvalidToken",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "test_dynamic_call_syntax",
+      "modality": "authenticated_external_bridge",
+      "from": {
+        "path": "tests/test_189is_encrypted.py",
+        "line": 104
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 94
+      },
+      "detail": "frontend_bridge_required",
+      "observation_ids": [],
+      "provenance": "authenticated issue22 visible-loader evidence plus CodeQL endpoint"
+    },
+    {
+      "kind": "product_dependency_call",
+      "modality": "unknown_effect",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 106
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 94
+      },
+      "detail": "get_settings_service",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "product_dependency_call",
+      "modality": "unknown_effect",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 109
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 94
+      },
+      "detail": "decrypt_api_key",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "guard_controls_product_return",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 103
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 104
+      },
+      "detail": "true",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "guard_controls_product_return",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 103
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 112
+      },
+      "detail": "false",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "guard_controls_product_return",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 103
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 115
+      },
+      "detail": "false",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "guard_controls_product_return",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 103
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 118
+      },
+      "detail": "false",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "guard_controls_product_return",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 111
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 112
+      },
+      "detail": "true",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "guard_controls_product_return",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 111
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 115
+      },
+      "detail": "false",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "parameter_to_return_value_use",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 94
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 115
+      },
+      "detail": "return_comparison",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "dynamic_global_identity_observation",
+      "modality": "authenticated_external_bridge",
+      "from": {
+        "path": "tests/test_189is_encrypted.py",
+        "line": 115
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 94
+      },
+      "detail": "frontend_namespace_bridge_required",
+      "observation_ids": [],
+      "provenance": "authenticated issue22 visible-loader evidence plus CodeQL endpoint"
+    },
+    {
+      "kind": "parameter_to_decrypt_argument",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 94
+      },
+      "to": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 109
+      },
+      "detail": "argument:0",
+      "observation_ids": [],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "test_call_result_to_observation",
+      "modality": "analysis_may",
+      "from": {
+        "path": "tests/test_189is_encrypted.py",
+        "line": 104
+      },
+      "to": {
+        "path": "tests/test_189is_encrypted.py",
+        "line": 106
+      },
+      "detail": "criterion:0",
+      "observation_ids": [
+        "criterion:0"
+      ],
+      "provenance": "CodeQL 2.27.4"
+    },
+    {
+      "kind": "composed_product_return_to_observation",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 104
+      },
+      "to": {
+        "path": "tests/test_189is_encrypted.py",
+        "line": 106
+      },
+      "detail": "criterion:0",
+      "observation_ids": [
+        "criterion:0"
+      ],
+      "provenance": "composition of CodeQL product return, authenticated issue22 function-object bridge, and CodeQL test call-result local flow",
+      "assumptions": [
+        "the authenticated exec-created callable is the function invoked at line 104"
+      ]
+    },
+    {
+      "kind": "composed_product_return_to_observation",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 112
+      },
+      "to": {
+        "path": "tests/test_189is_encrypted.py",
+        "line": 106
+      },
+      "detail": "criterion:0",
+      "observation_ids": [
+        "criterion:0"
+      ],
+      "provenance": "composition of CodeQL product return, authenticated issue22 function-object bridge, and CodeQL test call-result local flow",
+      "assumptions": [
+        "the authenticated exec-created callable is the function invoked at line 104"
+      ]
+    },
+    {
+      "kind": "composed_product_return_to_observation",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 115
+      },
+      "to": {
+        "path": "tests/test_189is_encrypted.py",
+        "line": 106
+      },
+      "detail": "criterion:0",
+      "observation_ids": [
+        "criterion:0"
+      ],
+      "provenance": "composition of CodeQL product return, authenticated issue22 function-object bridge, and CodeQL test call-result local flow",
+      "assumptions": [
+        "the authenticated exec-created callable is the function invoked at line 104"
+      ]
+    },
+    {
+      "kind": "composed_product_return_to_observation",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 118
+      },
+      "to": {
+        "path": "tests/test_189is_encrypted.py",
+        "line": 106
+      },
+      "detail": "criterion:0",
+      "observation_ids": [
+        "criterion:0"
+      ],
+      "provenance": "composition of CodeQL product return, authenticated issue22 function-object bridge, and CodeQL test call-result local flow",
+      "assumptions": [
+        "the authenticated exec-created callable is the function invoked at line 104"
+      ]
+    },
+    {
+      "kind": "composed_invalid_token_global_to_observation",
+      "modality": "analysis_may",
+      "from": {
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "line": 116
+      },
+      "to": {
+        "path": "tests/test_189is_encrypted.py",
+        "line": 115
+      },
+      "detail": "criterion:1",
+      "observation_ids": [
+        "criterion:1"
+      ],
+      "provenance": "composition of CodeQL product global reference, authenticated issue22 exec namespace, and the exact dynamic-global identity observation",
+      "assumptions": [
+        "the visible loader namespace remains unrebound as authenticated"
+      ]
+    }
+  ],
+  "unknowns": [
+    "CodeQL does not resolve the exec-created function object to the test call without the authenticated frontend bridge",
+    "masked Mock values, decrypt outcomes, concrete exceptions, and path feasibility",
+    "unsupported dynamic namespace or callable rebinding",
+    "The bridge establishes function identity, not concrete values or guaranteed runtime execution.",
+    "CodeQL return/guard facts do not prove complete path feasibility or external dependency behavior."
+  ],
+  "checks": {
+    "product_returns": [
+      104,
+      112,
+      115,
+      118
+    ],
+    "invalid_token_reference_line": 116,
+    "criterion0_result_flow": true,
+    "criterion1_endpoints_composed_under_authenticated_bridge": true
+  },
+  "provenance": {
+    "pre_registration_sha256": "0ddf5cfae9a51c6f037aa51a2b36f0c1fa3bcecbab15ece73819c167edd42bb0",
+    "query_csv_sha256": "da6fb5b7a59ec564736e7f0d6e75332981fc8f5915670eee5af4f8898f42f6e1"
+  },
+  "cost": {
+    "database": {
+      "exit_code": 0,
+      "seconds": 7.529272117000801,
+      "peak_rss_bytes": 226942976
+    },
+    "query": {
+      "exit_code": 0,
+      "seconds": 44.91783862000011,
+      "peak_rss_bytes": 1696350208
+    },
+    "decode": {
+      "exit_code": 0,
+      "seconds": 0.6012381090004055,
+      "peak_rss_bytes": 91443200
+    },
+    "total_seconds": 54.07145480899999,
+    "cache_state": "cold; OS and CodeQL distribution caches not isolated"
+  }
+}

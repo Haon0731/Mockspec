@@ -1,0 +1,626 @@
+{
+  "schema": "mockspec.jib-observation-summary/v1",
+  "target_executed": false,
+  "entry_origin": "diagnostic_override_mapped_from_original_observations",
+  "observations": [
+    {
+      "observation_id": "criterion:0",
+      "line": 71,
+      "end_line": 71,
+      "observed_line": 71,
+      "expression": "buildPlan.getBaseImage()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.baseImage(Ljava/lang/Object;)V",
+      "field": "baseImage",
+      "status": "verified_incomplete",
+      "state_evidence": {
+        "modality": "analysis_may",
+        "builder_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, builder()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, baseImage, <Extension,Ljava/lang/String> >]"
+        ],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, baseImage, <Extension,Ljava/lang/String> >]"
+        ],
+        "candidate_write_methods": [
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setBaseImage(Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;"
+        ],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "complete",
+        "checks": {
+          "entry_mut_to_plan": true,
+          "entry_plan_to_getter": true,
+          "entry_getter_to_sink": true,
+          "getter_read_to_return": true,
+          "builder_receiver_to_build": true,
+          "build_result_to_plan_return": true,
+          "build_read_actual_to_ctor_formal": true,
+          "setbase_actual_to_formal_write": true
+        },
+        "mechanism": "explicit IR def-use plus resolved actual/formal/return witnesses"
+      },
+      "source_boundaries": [
+        {
+          "call": "CommonContainerConfigCliOptions.getFrom",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokevirtual < Application, Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions, getFrom()Ljava/util/Optional; >@11",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getFrom()Ljava/util/Optional;",
+          "result_points_to": {
+            "value_number": 25,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v25]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        },
+        {
+          "call": "ArtifactProcessor.getJavaVersion",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokeinterface < Application, Lcom/google/cloud/tools/jib/cli/ArtifactProcessor, getJavaVersion()Ljava/lang/Integer; >@35",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.ArtifactProcessor.getJavaVersion()Ljava/lang/Integer;",
+          "result_points_to": {
+            "value_number": 13,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v13]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [
+        {
+          "alternative": "getFrom present",
+          "status": "unknown_effect",
+          "evidence": {
+            "getFrom": true,
+            "isPresent": true,
+            "optional_get": true,
+            "real_container_builders": true
+          },
+          "blocker": "getFrom normal reference return has an empty points-to set; payload, null, and exception remain unknown"
+        },
+        {
+          "alternative": "getFrom absent and Java version <=8 or >8",
+          "status": "unknown_effect",
+          "evidence": {
+            "getFrom": true,
+            "isPresent": true,
+            "getJavaVersion": true,
+            "unbox": true,
+            "conditional_branch": true,
+            "jib_from": false
+          },
+          "blocker": "boxed Java-version return has an empty points-to set and branch/path feasibility is unknown"
+        }
+      ],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 18,
+        "examples": [
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setPlatforms(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEnvironment(Ljava/util/Map;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, environment, <Extension,Ljava/util/Map> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setLabels(Ljava/util/Map;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, labels, <Extension,Ljava/util/Map> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 19"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setVolumes(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 21"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setExposedPorts(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> > = 4"
+          }
+        ]
+      },
+      "missing": [],
+      "slice_statement_count": 326252,
+      "retained_statement_count": 1843
+    }
+  ],
+  "raw_ci_warning": "CI slice membership is over-approximate and is never state support by itself.",
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+      "dataset": "Stub-Tester Java frozen snapshot",
+      "language": "java",
+      "snapshot_id": "5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4",
+      "masking_contract": "masked MOCK-STUB region retained",
+      "masked_test_sha256": "19e800bf8967238ef3b7772278e476186e509051e5021067b1f7234de0f68ed0",
+      "target_selector": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "src/test/java/com/google/cloud/tools/jib/cli/jar/JarFilesTest.java",
+        "sha256": "0346159882e9a5e2731a3916096b5b52f2f8cd7ce8d0222eebbce257129a4885",
+        "bytes": 4503,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "mut",
+        "logical_path": "src/main/java/com/google/cloud/tools/jib/cli/jar/JarFiles.java",
+        "sha256": "ff8ee22a4aa1bce7d61024a2d06fcb7983abc3e92751683cee598a92a0020140",
+        "bytes": 3996,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 71,
+          "end_line": 71
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getBaseImage()"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 72,
+          "end_line": 72
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getPlatforms()"
+      },
+      {
+        "observation_id": "criterion:2",
+        "location": {
+          "source_id": "test",
+          "start_line": 73,
+          "end_line": 73
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getCreationTime()"
+      },
+      {
+        "observation_id": "criterion:3",
+        "location": {
+          "source_id": "test",
+          "start_line": 74,
+          "end_line": 74
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getFormat()"
+      },
+      {
+        "observation_id": "criterion:4",
+        "location": {
+          "source_id": "test",
+          "start_line": 75,
+          "end_line": 75
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEnvironment().size()"
+      },
+      {
+        "observation_id": "criterion:5",
+        "location": {
+          "source_id": "test",
+          "start_line": 76,
+          "end_line": 76
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getLabels().size()"
+      },
+      {
+        "observation_id": "criterion:6",
+        "location": {
+          "source_id": "test",
+          "start_line": 77,
+          "end_line": 77
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getVolumes().size()"
+      },
+      {
+        "observation_id": "criterion:7",
+        "location": {
+          "source_id": "test",
+          "start_line": 78,
+          "end_line": 78
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getExposedPorts().size()"
+      },
+      {
+        "observation_id": "criterion:8",
+        "location": {
+          "source_id": "test",
+          "start_line": 79,
+          "end_line": 79
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getUser()"
+      },
+      {
+        "observation_id": "criterion:9",
+        "location": {
+          "source_id": "test",
+          "start_line": 80,
+          "end_line": 80
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getWorkingDirectory()"
+      },
+      {
+        "observation_id": "criterion:10",
+        "location": {
+          "source_id": "test",
+          "start_line": 81,
+          "end_line": 81
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEntrypoint().size()"
+      },
+      {
+        "observation_id": "criterion:11",
+        "location": {
+          "source_id": "test",
+          "start_line": 82,
+          "end_line": 82
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEntrypoint().get(0)"
+      },
+      {
+        "observation_id": "criterion:12",
+        "location": {
+          "source_id": "test",
+          "start_line": 83,
+          "end_line": 83
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEntrypoint().get(1)"
+      },
+      {
+        "observation_id": "criterion:13",
+        "location": {
+          "source_id": "test",
+          "start_line": 84,
+          "end_line": 84
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEntrypoint().get(2)"
+      },
+      {
+        "observation_id": "criterion:14",
+        "location": {
+          "source_id": "test",
+          "start_line": 85,
+          "end_line": 85
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEntrypoint().get(3)"
+      },
+      {
+        "observation_id": "criterion:15",
+        "location": {
+          "source_id": "test",
+          "start_line": 86,
+          "end_line": 86
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getLayers().size()"
+      },
+      {
+        "observation_id": "criterion:16",
+        "location": {
+          "source_id": "test",
+          "start_line": 87,
+          "end_line": 87
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getLayers().get(0).getName()"
+      },
+      {
+        "observation_id": "criterion:17",
+        "location": {
+          "source_id": "test",
+          "start_line": 88,
+          "end_line": 96
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().toArray(new Object[0])"
+      },
+      {
+        "observation_id": "criterion:18",
+        "location": {
+          "source_id": "test",
+          "start_line": 97,
+          "end_line": 99
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().get(0).getExtractionPath()"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected frozen test method",
+      "reason": "the test is not parameterized"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+        "evidence": [
+          "0346159882e9a5e2731a3916096b5b52f2f8cd7ce8d0222eebbce257129a4885"
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "unique",
+        "candidates": [
+          "com.google.cloud.tools.jib.cli.jar.JarFiles.toJibContainerBuilder(com.google.cloud.tools.jib.cli.ArtifactProcessor,com.google.cloud.tools.jib.cli.Jar,com.google.cloud.tools.jib.cli.CommonCliOptions,com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions,com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger)"
+        ],
+        "evidence": [
+          {
+            "report_sha256": "f9e9f63797e5fd3a1a567a0cac3ce4de1b3bcc0a3f15ca3f0da92af275571d21",
+            "case_identity": {
+              "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+              "dataset": "java-bechmark-strong",
+              "snapshot_id": "5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4",
+              "masked_test_sha256": "19e800bf8967238ef3b7772278e476186e509051e5021067b1f7234de0f68ed0"
+            },
+            "target_call_site": "test:63:9:CtInvocationImpl",
+            "target_callee": "com.google.cloud.tools.jib.cli.jar.JarFiles.toJibContainerBuilder(com.google.cloud.tools.jib.cli.ArtifactProcessor,com.google.cloud.tools.jib.cli.Jar,com.google.cloud.tools.jib.cli.CommonCliOptions,com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions,com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger)",
+            "binding_count": 1,
+            "argument_parameter_indexes": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "return_binding_count": 1
+          }
+        ],
+        "assumptions": []
+      }
+    },
+    "relations": [
+      {
+        "kind": "state_flow",
+        "modality": "analysis_may",
+        "from": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V | com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setBaseImage(Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+        "to": "buildPlan.getBaseImage()",
+        "provenance": "wala_modref_plus_frozen_library_bytecode",
+        "precision": "exact_field_and_intersecting_receiver_region",
+        "assumptions": [
+          "path feasibility and concrete value are not established"
+        ],
+        "observation_ids": [
+          "criterion:0"
+        ]
+      }
+    ],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [
+        "diagnostic observation mapping is manual; issue21 supplies automatic MUT binding"
+      ],
+      "unknown_effects": [
+        {
+          "boundary_id": "CommonContainerConfigCliOptions.getFrom",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "ArtifactProcessor.getJavaVersion",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "criterion:1",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:2",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:3",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:4",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:5",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:6",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:7",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:8",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:9",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:10",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:11",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:12",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:13",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:14",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:15",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:16",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:17",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:18",
+          "reason": "criterion not run in this bounded batch"
+        }
+      ]
+    },
+    "completion": {
+      "status": "partial",
+      "stage": "jib_observation_state_mapping",
+      "failure_categories": [
+        "unknown_native_values_and_exceptions"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "verified_incomplete",
+      "reviewer": "mechanical_exact_field_gate",
+      "evidence": [
+        "field Mod/Ref intersections and mutation negatives"
+      ],
+      "notes": "Concrete values and native effects are deliberately unknown."
+    },
+    "cost": {
+      "timings_seconds": {
+        "scope_hierarchy_entry": 5.417,
+        "call_graph_pointer": 37.82,
+        "ci_graph": 2.133,
+        "total": 60.925
+      },
+      "total_seconds": 60.925,
+      "peak_memory": {
+        "status": "measured_by_usr_bin_time",
+        "bytes": 1514123264
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "OS and Maven caches were not isolated"
+      },
+      "input_size": {
+        "files": 2,
+        "bytes": 8499
+      },
+      "graph_size": {
+        "nodes": 11256,
+        "edges": null
+      },
+      "unavailable_phases": []
+    }
+  }
+}

@@ -1,0 +1,574 @@
+{
+  "schema": "mockspec.jib-observation-summary/v1",
+  "target_executed": false,
+  "entry_origin": "diagnostic_override_mapped_from_original_observations",
+  "observations": [
+    {
+      "observation_id": "criterion:16",
+      "line": 87,
+      "end_line": 87,
+      "observed_line": 87,
+      "expression": "buildPlan.getLayers().get(0).getName()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.layer0Name(Ljava/lang/Object;)V",
+      "field": "layers",
+      "status": "unknown",
+      "state_evidence": {
+        "modality": "unknown_effect",
+        "builder_region_intersection": [],
+        "plan_region_intersection": [],
+        "candidate_write_methods": [],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "incomplete",
+        "checks": {
+          "entry_mut_to_plan": false,
+          "entry_plan_to_getter": false,
+          "getter_read_to_return": false,
+          "builder_receiver_to_build": false,
+          "build_result_to_plan_return": false,
+          "build_read_actual_to_ctor_formal": false
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "missing",
+        "path": [],
+        "unknown_calls": []
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.ArtifactProcessor.createLayers",
+          "in_ci_slice_only": false,
+          "dependency_status": "unknown",
+          "callsite": null,
+          "context": null,
+          "declared_target": null,
+          "result_points_to": null,
+          "empty_return_region": false,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 0,
+        "examples": []
+      },
+      "missing": [
+        "exact getter field read",
+        "plan constructor field write",
+        "Builder.build field read",
+        "candidate builder field write",
+        "builder write/read region intersection",
+        "plan write/getter region intersection"
+      ],
+      "slice_statement_count": 2,
+      "retained_statement_count": 2
+    }
+  ],
+  "raw_ci_warning": "CI slice membership is over-approximate and is never state support by itself.",
+  "raw_evidence": {
+    "path": "out/mockbench-study/issue25-jib-opaque-negative-20261111-r1/analysis.json",
+    "bytes": 15278,
+    "sha256": "ab2c5e8284e85c58c3e3800655766d84167a29c062883da396d60be9af5b28cc",
+    "probe_sha256": "35bd145e07d0c1286ccf085ce60e7eba29fab73875dc726aa334253888c73c46",
+    "probe_source_transition": null
+  },
+  "outcome": {
+    "status": "partial",
+    "original_observation_count": 19,
+    "observed_expression_complete": 0,
+    "observed_expression_complete_with_opaque_may": 0,
+    "observed_expression_unknown_boundary": 0,
+    "observed_expression_missing": 1,
+    "state_flow_verified_incomplete": 0,
+    "state_region_candidates_only": 0,
+    "state_unknown": 1,
+    "closure_gate": "blocked",
+    "failure_categories": [
+      "visible_collection_getter_copy_return_not_recovered",
+      "unknown_source_to_setter_effect_propagation_not_established",
+      "overwrite_and_path_feasibility_not_established",
+      "control_and_exception_relations_not_evaluated",
+      "original_observation_mapping_remains_diagnostic_override",
+      "nested_layer_path_missing_in_value_state_channel",
+      "nested_layer_state_source_closure_incomplete",
+      "missing_candidate_builder_write"
+    ],
+    "blockers": [
+      "visible ContainerBuildPlan collection getters still lack field-to-copyOf-to-return witnesses",
+      "unknown source returns are not yet connected through MUT setter actual/formal values to builder writes, alias/state effects, or exception-before-write conditions",
+      "FULL execution slices retain unrelated same-receiver setters; neither channel establishes overwrite or path feasibility alone",
+      "control and exception relation coverage remains not_evaluated, and original observation mapping still uses a diagnostic override",
+      "masked dependency contents, aliasing, nullness, and concrete values deliberately remain unknown and are not treated as recovered facts",
+      "one or more nested layer observations still lack a complete plan/getter-to-sink may witness",
+      "one or more observations have no retained candidate builder write in the NONE channel"
+    ]
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+      "dataset": "Stub-Tester Java frozen snapshot",
+      "language": "java",
+      "snapshot_id": "5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4",
+      "masking_contract": "masked MOCK-STUB region retained",
+      "masked_test_sha256": "19e800bf8967238ef3b7772278e476186e509051e5021067b1f7234de0f68ed0",
+      "target_selector": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "src/test/java/com/google/cloud/tools/jib/cli/jar/JarFilesTest.java",
+        "sha256": "0346159882e9a5e2731a3916096b5b52f2f8cd7ce8d0222eebbce257129a4885",
+        "bytes": 4503,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "mut",
+        "logical_path": "src/main/java/com/google/cloud/tools/jib/cli/jar/JarFiles.java",
+        "sha256": "ff8ee22a4aa1bce7d61024a2d06fcb7983abc3e92751683cee598a92a0020140",
+        "bytes": 3996,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 71,
+          "end_line": 71
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getBaseImage()"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 72,
+          "end_line": 72
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getPlatforms()"
+      },
+      {
+        "observation_id": "criterion:2",
+        "location": {
+          "source_id": "test",
+          "start_line": 73,
+          "end_line": 73
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getCreationTime()"
+      },
+      {
+        "observation_id": "criterion:3",
+        "location": {
+          "source_id": "test",
+          "start_line": 74,
+          "end_line": 74
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getFormat()"
+      },
+      {
+        "observation_id": "criterion:4",
+        "location": {
+          "source_id": "test",
+          "start_line": 75,
+          "end_line": 75
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEnvironment().size()"
+      },
+      {
+        "observation_id": "criterion:5",
+        "location": {
+          "source_id": "test",
+          "start_line": 76,
+          "end_line": 76
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getLabels().size()"
+      },
+      {
+        "observation_id": "criterion:6",
+        "location": {
+          "source_id": "test",
+          "start_line": 77,
+          "end_line": 77
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getVolumes().size()"
+      },
+      {
+        "observation_id": "criterion:7",
+        "location": {
+          "source_id": "test",
+          "start_line": 78,
+          "end_line": 78
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getExposedPorts().size()"
+      },
+      {
+        "observation_id": "criterion:8",
+        "location": {
+          "source_id": "test",
+          "start_line": 79,
+          "end_line": 79
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getUser()"
+      },
+      {
+        "observation_id": "criterion:9",
+        "location": {
+          "source_id": "test",
+          "start_line": 80,
+          "end_line": 80
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getWorkingDirectory()"
+      },
+      {
+        "observation_id": "criterion:10",
+        "location": {
+          "source_id": "test",
+          "start_line": 81,
+          "end_line": 81
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEntrypoint().size()"
+      },
+      {
+        "observation_id": "criterion:11",
+        "location": {
+          "source_id": "test",
+          "start_line": 82,
+          "end_line": 82
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEntrypoint().get(0)"
+      },
+      {
+        "observation_id": "criterion:12",
+        "location": {
+          "source_id": "test",
+          "start_line": 83,
+          "end_line": 83
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEntrypoint().get(1)"
+      },
+      {
+        "observation_id": "criterion:13",
+        "location": {
+          "source_id": "test",
+          "start_line": 84,
+          "end_line": 84
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEntrypoint().get(2)"
+      },
+      {
+        "observation_id": "criterion:14",
+        "location": {
+          "source_id": "test",
+          "start_line": 85,
+          "end_line": 85
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEntrypoint().get(3)"
+      },
+      {
+        "observation_id": "criterion:15",
+        "location": {
+          "source_id": "test",
+          "start_line": 86,
+          "end_line": 86
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getLayers().size()"
+      },
+      {
+        "observation_id": "criterion:16",
+        "location": {
+          "source_id": "test",
+          "start_line": 87,
+          "end_line": 87
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getLayers().get(0).getName()"
+      },
+      {
+        "observation_id": "criterion:17",
+        "location": {
+          "source_id": "test",
+          "start_line": 88,
+          "end_line": 96
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().toArray(new Object[0])"
+      },
+      {
+        "observation_id": "criterion:18",
+        "location": {
+          "source_id": "test",
+          "start_line": 97,
+          "end_line": 99
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().get(0).getExtractionPath()"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected frozen test method",
+      "reason": "the test is not parameterized"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+        "evidence": [
+          "0346159882e9a5e2731a3916096b5b52f2f8cd7ce8d0222eebbce257129a4885"
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "unique",
+        "candidates": [
+          "com.google.cloud.tools.jib.cli.jar.JarFiles.toJibContainerBuilder(com.google.cloud.tools.jib.cli.ArtifactProcessor,com.google.cloud.tools.jib.cli.Jar,com.google.cloud.tools.jib.cli.CommonCliOptions,com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions,com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger)"
+        ],
+        "evidence": [
+          {
+            "report_sha256": "f9e9f63797e5fd3a1a567a0cac3ce4de1b3bcc0a3f15ca3f0da92af275571d21",
+            "case_identity": {
+              "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+              "dataset": "java-bechmark-strong",
+              "snapshot_id": "5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4",
+              "masked_test_sha256": "19e800bf8967238ef3b7772278e476186e509051e5021067b1f7234de0f68ed0"
+            },
+            "target_call_site": "test:63:9:CtInvocationImpl",
+            "target_callee": "com.google.cloud.tools.jib.cli.jar.JarFiles.toJibContainerBuilder(com.google.cloud.tools.jib.cli.ArtifactProcessor,com.google.cloud.tools.jib.cli.Jar,com.google.cloud.tools.jib.cli.CommonCliOptions,com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions,com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger)",
+            "binding_count": 1,
+            "argument_parameter_indexes": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "return_binding_count": 1
+          }
+        ],
+        "assumptions": []
+      }
+    },
+    "relations": [],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [
+        "diagnostic observation mapping is manual; issue21 supplies automatic MUT binding"
+      ],
+      "unknown_effects": [
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.ArtifactProcessor.createLayers",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "criterion:0",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:1",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:2",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:3",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:4",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:5",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:6",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:7",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:8",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:9",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:10",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:11",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:12",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:13",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:14",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:15",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:17",
+          "reason": "criterion not run in this bounded batch"
+        },
+        {
+          "scope": "criterion:18",
+          "reason": "criterion not run in this bounded batch"
+        }
+      ]
+    },
+    "completion": {
+      "status": "partial",
+      "stage": "jib_observation_state_mapping",
+      "failure_categories": [
+        "visible_collection_getter_copy_return_not_recovered",
+        "unknown_source_to_setter_effect_propagation_not_established",
+        "overwrite_and_path_feasibility_not_established",
+        "control_and_exception_relations_not_evaluated",
+        "original_observation_mapping_remains_diagnostic_override",
+        "nested_layer_path_missing_in_value_state_channel",
+        "nested_layer_state_source_closure_incomplete",
+        "missing_candidate_builder_write"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "verified_incomplete",
+      "reviewer": "mechanical_exact_field_gate",
+      "evidence": [
+        "field Mod/Ref intersections and mutation negatives"
+      ],
+      "notes": "Concrete values and native effects are deliberately unknown."
+    },
+    "cost": {
+      "timings_seconds": {
+        "scope_hierarchy_entry": 2.217,
+        "call_graph_pointer": 15.355,
+        "ci_graph": 1.229,
+        "total": 19.674
+      },
+      "total_seconds": 19.674,
+      "peak_memory": {
+        "status": "measured_by_usr_bin_time",
+        "bytes": 1414000640
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "OS and Maven caches were not isolated"
+      },
+      "input_size": {
+        "files": 2,
+        "bytes": 8499
+      },
+      "graph_size": {
+        "nodes": 11256,
+        "edges": null
+      },
+      "unavailable_phases": []
+    }
+  }
+}

@@ -166,6 +166,74 @@ SDG、heap/异常流或路径可行性，也未确认哪些未知调用必然属
 未解析、预算不足、构图失败和超时保留在全量分母；协议与运行解释见
 [候选切片研究入口](../experiments/backward-slicing/README.md#全量候选切片入口2026-11-09)。
 
+同一批入口以`--semantic-gate`启用正式修复研究：先核对#30验收及r3的165个冻结身份，
+每例保留候选诊断，再调用各语言`batch_semantic_backend.py`。
+Java桥验证当前Jib源码与自动观察适配，重新运行WALA按需分析；Python桥验证当前
+Flask／langflow输入，重新运行对应CodeQL分析。桥输出必须匹配当前案例的身份、mask和selector；
+Jib历史描述身份到FrozenCase身份的投影单列收据，不在汇总时静默改写。
+支持范围外的案例明确记录`unsupported`，同时保留候选构图失败与未知；
+三个特定输入适配器不构成通用Java/Python语义后端。进程隔离、并发预算及逐例落盘由既有批处理负责。
+生产进程的环境清理保持不变；研究Python桥仅向可信CodeQL驱动显式设置locale和系统PATH，
+以支持其解释器及多进程工具启动。该边界已经用相同受限入口的双案例并发运行验证。
+
+单案例结果另附 `result_contract.py` 定义的 `mock-spec.backward-analysis-case/v1`：
+冻结身份、逐观察位置、入口来源、类型化关系覆盖、未知／未分析边界、核验状态和成本。
+旧候选图仍按原 profile 解读，不会因增加结果契约而成为已核验的语义关系。
+关系可附 `observation_ids` 关联已登记观察；校验器拒绝未知或重复引用。
+空列表表示尚未关联到原始观察，不能据内部关系推定该观察的依赖已恢复。
+`compare_runs.py`仅比较已保存结果，按dataset、Case ID及snapshot固定全量分母，
+保留逐例证据与未知／失败；没有记录的旧指标不推算为零，也不把覆盖标签变化认作语义改善。
+当前 backend_total 包含解析、构图与切片；独立阶段未计量时明确记录原因。
+Java 绑定区分静态类型访问与普通接收者，保留签名未知和参数源码位置回退的精度。
+Python 在受支持的静态 Path 与直线加载代码中，连接读取文本、截取区间、compile／exec
+命名空间、函数定义和测试调用变量；动态键、重绑定或无法证明文本来源时保留未知。
+这些入口关系不构成完整 heap／异常依赖分析，后端能力验证仍在独立研究路径进行。
+`python-backend-pilot/` 在 CodeQL 原生 CFG／值流之上增加有界参数区域效果查询，
+由 `verify_results.py` 按调用、字段、区域及路径身份核验；支持域外保持未知，未接入批处理。
+`observation_mapping.py` 把预登记的真实案例证据映射到单案例契约；以
+`criteria.py` 的原始观察为准，独立保留未关联的内部关系和逐观察未知项。
+`verify_issue26.py` 核验真实Flask的逐观察关系及机制证据；
+`visible-state-flow.ql`／`state-boundary-flow.ql` 提供通用字段流和有界receiver、模块全局、
+显式逃逸路径，`state_observation_mapping.py` 将其映射为明确的机制案例。
+已证fresh及确定覆盖的排除与参数别名／全局重绑定未知分别表达；异常多路径仅在源码
+确认唯一调用位置时汇合。机制案例不冒充真实Flask的状态观察。
+`demand_roots.py`从预登记观察与可见源码产生隔离的CodeQL查询根；
+`run_demand_analysis.py`先获取调用绑定，再按已到达的产品方法限定后续关系查询。
+`demand_analysis.py`负责查询依赖、身份绑定缓存及失败／预算边界。
+完整数据库提取仍是前置成本；查询选择和缓存命中不能单独证明关系等价。
+`wala-pilot/` 在 builder 初始化后、CG／PA／SDG 构建前安装摘要选择器；
+`summarize_repair.py` 分开报告机制关系与真实输入门禁。
+摘要目标可达不等于摘要 IR 实际参与分析，需结合实现类型、指针区域及依赖路径核验。
+Python 的 `pytest-exception-flow.ql` 以有来源的库摘要连接异常捕获边界，
+并由 CodeQL 核验精确调用的异常出口、捕获值流与断言可达性；冻结依赖版本未知时保留假设。
+Java 未知效果以有界 token 摘要及同调用点 CFG／堆证据核验。
+其能力基线覆盖接收者直接整数属性、参数一跳可达对象、Application静态整数属性及静态逃逸对象，
+以所选写入、调用上下文和ModRef区域绑定证据；更深堆、引用字段替换及库全局仍保留未知。
+`run_scale_diagnostic.py`／`WalaScaleProbe.java` 单独定位 Jib 的调用图和堆参数成本；
+`RuntimeRegionModRef.java` 试验依赖层的运行时堆区域合并，不改指针分析。
+Jib已完成的规模诊断保留原始Mod/Ref堆位置，使用入口可达图与WALA CISlicer重建
+上下文不敏感堆may-dependence，FULL控制保持；区域合并仅保留为已验证的独立成本试验。
+该诊断未加载冻结的`jib-build-plan-0.4.0.jar`，不能证明builder到buildPlan的状态传递；
+原始观察集成必须核验所需库实现及实际字段路径。
+`run_jib_observations.py`／`JibObservationProbe.java`提供原始观察表达式的独立研究入口，
+加载有审核来源的`ContainerBuilders`与build-plan库，导出SSA、调用及指针区域证据。
+自动测试调用绑定与结构诊断入口分别留证；切片成员、字段候选和已核验值传播不得混称。
+`jib_observation_adapter.py`从可见测试导出MUT接收变量、plan绑定及顶层JUnit断言的实际表达式；
+它只支持明确的直线语法，拒绝重绑定及其他可执行语句，预登记预期仅用于导出后的核验。
+自动生成源码与旧分析输入逐字节相同时，可追加来源核验收据，旧运行身份保持不变。
+`jib_library_evidence.py`核验字段到集合复制构造器和返回的SSA路径，并单列有来源的JDK内容影响摘要；
+`jib_optional_evidence.py`结合字节码方法引用及字段写入，保留Optional回调的条件式影响。
+`jib_control_evidence.py`将正常／异常CFG路径及分支条件映射到原观察，路径存在不提升为必经关系。
+`summarize_jib_observations.py`核验实际调用上下文、参数／返回及字段区域后生成统一单案例结果；
+其#25限定验收与最终自动输入门禁分开，`verified_incomplete`不表示具体Mock值已知。
+`DemandCISlicer.java`沿用WALA CISDG依赖关系，使用不查询最大节点编号的遍历器，
+避免numbered DFS触发全部PDG；CG／PA及全局Mod/Ref索引仍提前计算。
+`run_java_demand_analysis.py`／`java_demand_analysis.py`负责观察计划、身份绑定缓存、方法预算前沿
+和严格语义对照。真实Jib因保守堆关系仍展开大多数方法，不能从按需机制推断加速。
+这些是限定支持域的研究实现，不能据配置名称推断关系已经恢复。
+两者的[最新证据与边界](../out/mockbench-study/root-cause-repair-20261111/report.md)
+独立于生产推断与正式165例结果。
+
 `experiments/staged-inference/` 承接 [M1-1 / #7](https://github.com/Haon0731/Mockspec/issues/7)
 、[M1-2 / #8](https://github.com/Haon0731/Mockspec/issues/8)
 、[M1-3 / #9](https://github.com/Haon0731/Mockspec/issues/9)

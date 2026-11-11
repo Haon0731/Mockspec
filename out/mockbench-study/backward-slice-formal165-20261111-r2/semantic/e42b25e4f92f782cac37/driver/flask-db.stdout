@@ -1,0 +1,58 @@
+[2026-11-11 09:57:33] [build-stderr] /bin/sh: 1: python2: not found
+[2026-11-11 09:57:33] [build-stdout] No directories containing root identifiers were found. Returning working directory as root.
+[2026-11-11 09:57:33] [build-stdout] Will try to guess Python version, as it was not specified in `lgtm.yml`
+[2026-11-11 09:57:33] [build-stdout] Trying to guess Python version based on Trove classifiers in setup.py
+[2026-11-11 09:57:33] [build-stdout] Did not find setup.py (expected it to be at /tmp/mockspec-issue29-7o20qakj/flask-input/setup.py)
+[2026-11-11 09:57:33] [build-stdout] Trying to guess Python version based on travis file
+[2026-11-11 09:57:33] [build-stdout] Did not find any travis files (expected them at either ['/tmp/mockspec-issue29-7o20qakj/flask-input/.travis.yml', '/tmp/mockspec-issue29-7o20qakj/flask-input/travis.yml'])
+[2026-11-11 09:57:33] [build-stdout] Trying to guess Python version based on installed versions
+[2026-11-11 09:57:33] [build-stdout] Wanted to run Python 2, but it is not available. Using Python 3 instead
+[2026-11-11 09:57:33] [build-stdout] This script is running Python 3, but Python 2 is also available (as 'python3')
+[2026-11-11 09:57:33] [build-stdout] Could not guess Python version, will use default: Python 3
+[2026-11-11 09:57:33] [build-stdout] Calling python3 -S /tmp/mockspec-issue24-tools/codeql-v2.27.4/codeql/python/tools/python_tracer.py --verbosity 3 -z all -c /tmp/mockspec-issue29-7o20qakj/flask-db/working/trap_cache -R /tmp/mockspec-issue29-7o20qakj/flask-input
+[2026-11-11 09:57:33] [build-stdout] INFO: The Python extractor has recently stopped extracting the standard library by default. If you encounter problems, please let us know by submitting an issue to https://github.com/github/codeql. It is possible to re-enable extraction of the standard library by setting the environment variable CODEQL_EXTRACTOR_PYTHON_EXTRACT_STDLIB.
+[2026-11-11 09:57:33] [build-stderr] Traceback (most recent call last):
+[2026-11-11 09:57:33] [build-stderr]   File "/tmp/mockspec-issue24-tools/codeql-v2.27.4/codeql/python/tools/python_tracer.py", line 53, in <module>
+[2026-11-11 09:57:33] [build-stderr]     semmle.populator.main(original_path)
+[2026-11-11 09:57:33] [build-stderr]     ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+[2026-11-11 09:57:33] [build-stderr]   File "/tmp/mockspec-issue24-tools/codeql-v2.27.4/codeql/python/tools/python3src.zip/semmle/populator.py", line 60, in main
+[2026-11-11 09:57:33] [build-stderr]     logger = logging.Logger(options.verbosity, options.colorize)
+[2026-11-11 09:57:33] [build-stderr]   File "/tmp/mockspec-issue24-tools/codeql-v2.27.4/codeql/python/tools/python3src.zip/semmle/logging.py", line 96, in __init__
+[2026-11-11 09:57:33] [build-stderr]     self.queue = ctx.Queue()
+[2026-11-11 09:57:33] [build-stderr]                  ~~~~~~~~~^^
+[2026-11-11 09:57:33] [build-stderr]   File "/usr/lib/python3.14/multiprocessing/context.py", line 103, in Queue
+[2026-11-11 09:57:33] [build-stderr]     return Queue(maxsize, ctx=self.get_context())
+[2026-11-11 09:57:33] [build-stderr]   File "/usr/lib/python3.14/multiprocessing/queues.py", line 41, in __init__
+[2026-11-11 09:57:33] [build-stderr]     self._rlock = ctx.Lock()
+[2026-11-11 09:57:33] [build-stderr]                   ~~~~~~~~^^
+[2026-11-11 09:57:33] [build-stderr]   File "/usr/lib/python3.14/multiprocessing/context.py", line 68, in Lock
+[2026-11-11 09:57:33] [build-stderr]     return Lock(ctx=self.get_context())
+[2026-11-11 09:57:33] [build-stderr]   File "/usr/lib/python3.14/multiprocessing/synchronize.py", line 176, in __init__
+[2026-11-11 09:57:33] [build-stderr]     SemLock.__init__(self, SEMAPHORE, 1, 1, ctx=ctx)
+[2026-11-11 09:57:33] [build-stderr]     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-11-11 09:57:33] [build-stderr]   File "/usr/lib/python3.14/multiprocessing/synchronize.py", line 79, in __init__
+[2026-11-11 09:57:33] [build-stderr]     register(self._semlock.name, "semaphore")
+[2026-11-11 09:57:33] [build-stderr]     ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-11-11 09:57:33] [build-stderr]   File "/usr/lib/python3.14/multiprocessing/resource_tracker.py", line 268, in register
+[2026-11-11 09:57:33] [build-stderr]     self._send('REGISTER', name, rtype)
+[2026-11-11 09:57:33] [build-stderr]     ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+[2026-11-11 09:57:33] [build-stderr]   File "/usr/lib/python3.14/multiprocessing/resource_tracker.py", line 285, in _send
+[2026-11-11 09:57:33] [build-stderr]     self._ensure_running_and_write(msg)
+[2026-11-11 09:57:33] [build-stderr]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+[2026-11-11 09:57:33] [build-stderr]   File "/usr/lib/python3.14/multiprocessing/resource_tracker.py", line 253, in _ensure_running_and_write
+[2026-11-11 09:57:33] [build-stderr]     self._write(msg)
+[2026-11-11 09:57:33] [build-stderr]     ~~~~~~~~~~~^^^^^
+[2026-11-11 09:57:33] [build-stderr]   File "/usr/lib/python3.14/multiprocessing/resource_tracker.py", line 275, in _write
+[2026-11-11 09:57:33] [build-stderr]     nbytes = os.write(self._fd, msg)
+[2026-11-11 09:57:33] [build-stderr] BrokenPipeError: [Errno 32] Broken pipe
+[2026-11-11 09:57:34] [build-stderr] Traceback (most recent call last):
+[2026-11-11 09:57:34] [build-stderr]   File "/tmp/mockspec-issue24-tools/codeql-v2.27.4/codeql/python/tools/index.py", line 28, in <module>
+[2026-11-11 09:57:34] [build-stderr]     buildtools.index.main()
+[2026-11-11 09:57:34] [build-stderr]     ~~~~~~~~~~~~~~~~~~~~~^^
+[2026-11-11 09:57:34] [build-stderr]   File "/tmp/mockspec-issue24-tools/codeql-v2.27.4/codeql/python/tools/python3src.zip/buildtools/index.py", line 409, in main
+[2026-11-11 09:57:34] [build-stderr]     subprocess.check_call(args, env=env)
+[2026-11-11 09:57:34] [build-stderr]     ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+[2026-11-11 09:57:34] [build-stderr]   File "/usr/lib/python3.14/subprocess.py", line 420, in check_call
+[2026-11-11 09:57:34] [build-stderr]     raise CalledProcessError(retcode, cmd)
+[2026-11-11 09:57:34] [build-stderr] subprocess.CalledProcessError: Command '['python3', '-S', '/tmp/mockspec-issue24-tools/codeql-v2.27.4/codeql/python/tools/python_tracer.py', '--verbosity', '3', '-z', 'all', '-c', '/tmp/mockspec-issue29-7o20qakj/flask-db/working/trap_cache', '-R', '/tmp/mockspec-issue29-7o20qakj/flask-input']' returned non-zero exit status 1.
+[2026-11-11 09:57:34] [ERROR] Spawned process exited abnormally (code 1; tried to run: [/tmp/mockspec-issue24-tools/codeql-v2.27.4/codeql/python/tools/autobuild.sh])

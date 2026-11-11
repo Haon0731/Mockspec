@@ -1,0 +1,1020 @@
+{
+  "status": "unsupported",
+  "failure_categories": [
+    "source_budget",
+    "product_source_not_located",
+    "test_to_product_not_reached",
+    "unresolved_calls",
+    "semantic_analysis_gap",
+    "semantic_backend_unsupported"
+  ],
+  "stage": "semantic_backend",
+  "input_context": {
+    "target_selector": "io.grpc.xds.internal.sds.SdsProtocolNegotiatorsTest#clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute",
+    "masked_test_logical_path": "src/test/java/io/grpc/xds/internal/sds/SdsProtocolNegotiatorsTest.java",
+    "masked_test_sha256": "30acf40eb0ef8f39b2ad1113c46a347539007227ead6d9d205b3dbd40bcb327d",
+    "masking_contract": "java-dual-region-v1"
+  },
+  "target_extraction": {
+    "target_scope": {
+      "selector": "io.grpc.xds.internal.sds.SdsProtocolNegotiatorsTest#clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute",
+      "status": "located",
+      "precision": "java_lexical_method_scope",
+      "locations": [
+        {
+          "symbol": "clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute",
+          "start_line": 38,
+          "end_line": 54
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 49,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 50,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 51,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method",
+        "precision": "java_lexical_method_scope",
+        "criterion_id": "criterion:2"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "java_import",
+        "hint": "io.envoyproxy.envoy.extensions.transport_sockets.tls.v3.CommonTlsContext",
+        "candidates": [
+          "src/main/java/io/envoyproxy/envoy/extensions/transport_sockets/tls/v3/CommonTlsContext.java"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [
+      "byte_budget_omitted:src/main/java/io/envoyproxy/envoy/extensions/transport_sockets/tls/v3/CommonTlsContext.java"
+    ],
+    "source_rejections": [],
+    "dynamic_loader_bindings": [],
+    "truncated": true,
+    "opaque_methods": [],
+    "selected_bytes": 2246,
+    "read_bytes": 351103,
+    "attempted_files": 1,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "src/test/java/io/grpc/xds/internal/sds/SdsProtocolNegotiatorsTest.java",
+      "sha256": "30acf40eb0ef8f39b2ad1113c46a347539007227ead6d9d205b3dbd40bcb327d",
+      "bytes": 2246
+    }
+  ],
+  "graph": {
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:49:5:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:50:5:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:51:5:CtInvocationImpl"
+      }
+    ],
+    "status": "ok",
+    "limitations": [
+      "data_candidate edges are conservative name/declaration candidates, not a sound reaching-def analysis",
+      "lexical_control edges describe AST ancestry, not post-dominator control dependence",
+      "call_return edges use no-classpath resolution plus name/arity virtual candidates and do not prove dispatch",
+      "expression_value_candidate edges preserve syntax containment, not runtime evaluation or value equality",
+      "heap aliasing, reflection, exceptions, concurrency, and path feasibility are not modeled",
+      "boundary calls are retained as nodes and are not traversed into dependency implementations"
+    ],
+    "seeds": [
+      "test:49:5:CtInvocationImpl",
+      "test:50:5:CtInvocationImpl",
+      "test:51:5:CtInvocationImpl"
+    ],
+    "nodes": [
+      {
+        "id": "test:47:33:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 47,
+        "end_line": 47,
+        "kind": "CtLocalVariableImpl",
+        "code": "// === MOCK-STUB-START === // === MOCK-STUB-END === io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsProtocolNegotiator pn = new io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsProtocolNegotiator()"
+      },
+      {
+        "id": "test:47:38:CtConstructorCallImpl",
+        "source_id": "test",
+        "start_line": 47,
+        "end_line": 47,
+        "kind": "CtConstructorCallImpl",
+        "code": "new io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsProtocolNegotiator()"
+      },
+      {
+        "id": "test:48:20:CtLocalVariableImpl",
+        "source_id": "test",
+        "start_line": 48,
+        "end_line": 48,
+        "kind": "CtLocalVariableImpl",
+        "code": "io.netty.channel.ChannelHandler newHandler = pn.newHandler(mockHandler)",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "pn.newHandler(mockHandler)"
+        ],
+        "unknown_call_details": [
+          {
+            "receiver": "io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsProtocolNegotiator",
+            "source_name_arity_candidates": [],
+            "name": "newHandler",
+            "arity": 1,
+            "call": "pn.newHandler(mockHandler)"
+          }
+        ]
+      },
+      {
+        "id": "test:48:33:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 48,
+        "end_line": 48,
+        "kind": "CtInvocationImpl",
+        "code": "pn.newHandler(mockHandler)"
+      },
+      {
+        "id": "test:48:33:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 48,
+        "end_line": 48,
+        "kind": "expression",
+        "code": "pn"
+      },
+      {
+        "id": "test:48:47:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 48,
+        "end_line": 48,
+        "kind": "expression",
+        "code": "mockHandler"
+      },
+      {
+        "id": "test:49:19:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 49,
+        "end_line": 49,
+        "kind": "expression",
+        "code": "newHandler"
+      },
+      {
+        "id": "test:49:5:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 49,
+        "end_line": 49,
+        "kind": "CtInvocationImpl",
+        "code": "assertNotNull(newHandler)"
+      },
+      {
+        "id": "test:50:16:CtBinaryOperatorImpl",
+        "source_id": "test",
+        "start_line": 50,
+        "end_line": 50,
+        "kind": "expression",
+        "code": "newHandler instanceof io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsHandler"
+      },
+      {
+        "id": "test:50:16:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 50,
+        "end_line": 50,
+        "kind": "expression",
+        "code": "newHandler"
+      },
+      {
+        "id": "test:50:38:CtTypeAccessImpl",
+        "source_id": "test",
+        "start_line": 50,
+        "end_line": 50,
+        "kind": "expression",
+        "code": "io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsHandler"
+      },
+      {
+        "id": "test:50:5:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 50,
+        "end_line": 50,
+        "kind": "CtInvocationImpl",
+        "code": "assertTrue(newHandler instanceof io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsHandler)"
+      },
+      {
+        "id": "test:51:16:CtFieldReadImpl",
+        "source_id": "test",
+        "start_line": 51,
+        "end_line": 51,
+        "kind": "expression",
+        "code": "io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsHandler.class"
+      },
+      {
+        "id": "test:51:40:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 51,
+        "end_line": 51,
+        "kind": "CtInvocationImpl",
+        "code": "newHandler.getClass()"
+      },
+      {
+        "id": "test:51:40:CtVariableReadImpl",
+        "source_id": "test",
+        "start_line": 51,
+        "end_line": 51,
+        "kind": "expression",
+        "code": "newHandler"
+      },
+      {
+        "id": "test:51:5:CtInvocationImpl",
+        "source_id": "test",
+        "start_line": 51,
+        "end_line": 51,
+        "kind": "CtInvocationImpl",
+        "code": "assertSame(io.grpc.xds.internal.sds.SdsProtocolNegotiators.ClientSdsHandler.class, newHandler.getClass())",
+        "contains_unknown_call": true,
+        "unknown_calls": [
+          "newHandler.getClass()"
+        ],
+        "unknown_call_details": [
+          {
+            "receiver": "io.netty.channel.ChannelHandler",
+            "source_name_arity_candidates": [],
+            "name": "getClass",
+            "arity": 0,
+            "call": "newHandler.getClass()"
+          }
+        ]
+      }
+    ],
+    "backend": "spoon-source-evidence-prototype",
+    "edges": [
+      {
+        "from": "test:47:38:CtConstructorCallImpl",
+        "to": "test:47:33:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:48:33:CtInvocationImpl",
+        "to": "test:48:20:CtLocalVariableImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:48:33:CtVariableReadImpl",
+        "to": "test:48:33:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:48:47:CtFieldReadImpl",
+        "to": "test:48:33:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:49:19:CtVariableReadImpl",
+        "to": "test:49:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:50:16:CtBinaryOperatorImpl",
+        "to": "test:50:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:50:16:CtVariableReadImpl",
+        "to": "test:50:16:CtBinaryOperatorImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:50:38:CtTypeAccessImpl",
+        "to": "test:50:16:CtBinaryOperatorImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:51:16:CtFieldReadImpl",
+        "to": "test:51:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:51:40:CtInvocationImpl",
+        "to": "test:51:5:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:51:40:CtVariableReadImpl",
+        "to": "test:51:40:CtInvocationImpl",
+        "kind": "expression_value_candidate",
+        "precision": "direct_ast_value_containment"
+      },
+      {
+        "from": "test:47:33:CtLocalVariableImpl",
+        "to": "test:48:20:CtLocalVariableImpl",
+        "kind": "data_candidate",
+        "variable": "pn",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:47:33:CtLocalVariableImpl",
+        "to": "test:48:20:CtLocalVariableImpl",
+        "kind": "data_candidate",
+        "variable": "pn",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:47:33:CtLocalVariableImpl",
+        "to": "test:48:33:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "pn",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:47:33:CtLocalVariableImpl",
+        "to": "test:48:33:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "pn",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:48:20:CtLocalVariableImpl",
+        "to": "test:49:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newHandler",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:48:20:CtLocalVariableImpl",
+        "to": "test:49:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newHandler",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:48:20:CtLocalVariableImpl",
+        "to": "test:50:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newHandler",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:48:20:CtLocalVariableImpl",
+        "to": "test:50:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newHandler",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:48:20:CtLocalVariableImpl",
+        "to": "test:51:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newHandler",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:48:20:CtLocalVariableImpl",
+        "to": "test:51:5:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newHandler",
+        "precision": "prior_write_same_method"
+      },
+      {
+        "from": "test:48:20:CtLocalVariableImpl",
+        "to": "test:51:40:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newHandler",
+        "precision": "resolved_declaration"
+      },
+      {
+        "from": "test:48:20:CtLocalVariableImpl",
+        "to": "test:51:40:CtInvocationImpl",
+        "kind": "data_candidate",
+        "variable": "newHandler",
+        "precision": "prior_write_same_method"
+      }
+    ]
+  },
+  "evidence": {
+    "nodes": 16,
+    "edges": 23,
+    "edge_kinds": {
+      "expression_value_candidate": 11,
+      "data_candidate": 12
+    },
+    "criteria": [
+      {
+        "seed": "test:49:5:CtInvocationImpl",
+        "node_ids": [
+          "test:47:33:CtLocalVariableImpl",
+          "test:47:38:CtConstructorCallImpl",
+          "test:48:20:CtLocalVariableImpl",
+          "test:48:33:CtInvocationImpl",
+          "test:48:33:CtVariableReadImpl",
+          "test:48:47:CtFieldReadImpl",
+          "test:49:19:CtVariableReadImpl",
+          "test:49:5:CtInvocationImpl"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:48:20:CtLocalVariableImpl"
+        ]
+      },
+      {
+        "seed": "test:50:5:CtInvocationImpl",
+        "node_ids": [
+          "test:47:33:CtLocalVariableImpl",
+          "test:47:38:CtConstructorCallImpl",
+          "test:48:20:CtLocalVariableImpl",
+          "test:48:33:CtInvocationImpl",
+          "test:48:33:CtVariableReadImpl",
+          "test:48:47:CtFieldReadImpl",
+          "test:50:16:CtBinaryOperatorImpl",
+          "test:50:16:CtVariableReadImpl",
+          "test:50:38:CtTypeAccessImpl",
+          "test:50:5:CtInvocationImpl"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:48:20:CtLocalVariableImpl"
+        ]
+      },
+      {
+        "seed": "test:51:5:CtInvocationImpl",
+        "node_ids": [
+          "test:47:33:CtLocalVariableImpl",
+          "test:47:38:CtConstructorCallImpl",
+          "test:48:20:CtLocalVariableImpl",
+          "test:48:33:CtInvocationImpl",
+          "test:48:33:CtVariableReadImpl",
+          "test:48:47:CtFieldReadImpl",
+          "test:51:16:CtFieldReadImpl",
+          "test:51:40:CtInvocationImpl",
+          "test:51:40:CtVariableReadImpl",
+          "test:51:5:CtInvocationImpl"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:48:20:CtLocalVariableImpl",
+          "test:51:5:CtInvocationImpl"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:49:5:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:50:5:CtInvocationImpl"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:51:5:CtInvocationImpl"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 3.3,
+  "timings_seconds": {
+    "criterion_extraction": 0.001186,
+    "source_selection": 0.007953,
+    "backend_total": 3.290565,
+    "evidence_summary": 0.000151
+  },
+  "identity": {
+    "case_id": "io.grpc.xds.internal.sds.SdsProtocolNegotiatorsTest#clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute@5f9d000a",
+    "dataset": "java-bechmark-strong",
+    "language": "java",
+    "snapshot_id": "e30097998df7cc9a5e1fdcc3ffcd2515a24f1d9e788685a896948aa91dce881a"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "io.grpc.xds.internal.sds.SdsProtocolNegotiatorsTest#clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute@5f9d000a",
+      "dataset": "java-bechmark-strong",
+      "language": "java",
+      "snapshot_id": "e30097998df7cc9a5e1fdcc3ffcd2515a24f1d9e788685a896948aa91dce881a",
+      "masking_contract": "java-dual-region-v1",
+      "masked_test_sha256": "30acf40eb0ef8f39b2ad1113c46a347539007227ead6d9d205b3dbd40bcb327d",
+      "target_selector": "io.grpc.xds.internal.sds.SdsProtocolNegotiatorsTest#clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "src/test/java/io/grpc/xds/internal/sds/SdsProtocolNegotiatorsTest.java",
+        "sha256": "30acf40eb0ef8f39b2ad1113c46a347539007227ead6d9d205b3dbd40bcb327d",
+        "bytes": 2246,
+        "selection_role": "masked_test"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 49,
+          "end_line": 49
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 50,
+          "end_line": 50
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method"
+      },
+      {
+        "observation_id": "criterion:2",
+        "location": {
+          "source_id": "test",
+          "start_line": 51,
+          "end_line": 51
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "lexical observation syntax inside the selected Java method"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "the runner does not enumerate parameter rows"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "io.grpc.xds.internal.sds.SdsProtocolNegotiatorsTest#clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute",
+        "evidence": [
+          {
+            "symbol": "clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute",
+            "start_line": 38,
+            "end_line": 54
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "not_evaluated",
+        "candidates": [],
+        "evidence": [],
+        "assumptions": []
+      }
+    },
+    "relations": [],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [],
+      "unknown_effects": [
+        {
+          "boundary_id": "test:48:20:CtLocalVariableImpl",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:51:5:CtInvocationImpl",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "source_selection",
+          "reason": "source_budget"
+        },
+        {
+          "scope": "mature_backend_support_domain",
+          "reason": "The accepted Java backend currently prepares bytecode, library summaries, and source-derived observations only for the exact JarFiles Jib case.",
+          "details": []
+        }
+      ]
+    },
+    "completion": {
+      "status": "unsupported",
+      "stage": "semantic_backend",
+      "failure_categories": [
+        "source_budget",
+        "product_source_not_located",
+        "test_to_product_not_reached",
+        "unresolved_calls",
+        "semantic_analysis_gap",
+        "semantic_backend_unsupported"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "not_evaluated",
+      "reviewer": null,
+      "evidence": [],
+      "notes": "candidate reachability is not semantic dependency validation"
+    },
+    "cost": {
+      "timings_seconds": {
+        "criterion_extraction": 0.001186,
+        "source_selection": 0.007953,
+        "backend_total": 3.290565,
+        "evidence_summary": 0.000151
+      },
+      "total_seconds": 3.3,
+      "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+      "peak_memory": {
+        "status": "unavailable",
+        "bytes": null,
+        "reason": "case-level peak memory is not measured by this runner"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+      },
+      "input_size": {
+        "files": 1,
+        "bytes": 2246
+      },
+      "graph_size": {
+        "nodes": 16,
+        "edges": 23
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter admission occurs outside the per-case analysis timer"
+        },
+        {
+          "phase": "front_end",
+          "reason": "the candidate backend does not report parsing time separately"
+        },
+        {
+          "phase": "call_graph",
+          "reason": "the candidate backend does not report call-graph time separately"
+        },
+        {
+          "phase": "pointer_analysis",
+          "reason": "the candidate backend does not provide pointer analysis"
+        },
+        {
+          "phase": "dependency_analysis",
+          "reason": "backend_total combines parsing, graph construction, and slicing"
+        },
+        {
+          "phase": "slice",
+          "reason": "the candidate backend does not report semantic slicing time separately"
+        },
+        {
+          "phase": "source_mapping",
+          "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+        }
+      ]
+    }
+  },
+  "candidate_diagnostics": {
+    "status": "partial",
+    "failure_categories": [
+      "source_budget",
+      "product_source_not_located",
+      "test_to_product_not_reached",
+      "unresolved_calls",
+      "semantic_analysis_gap"
+    ],
+    "result_contract": {
+      "schema_version": "mock-spec.backward-analysis-case/v1",
+      "identity": {
+        "case_id": "io.grpc.xds.internal.sds.SdsProtocolNegotiatorsTest#clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute@5f9d000a",
+        "dataset": "java-bechmark-strong",
+        "language": "java",
+        "snapshot_id": "e30097998df7cc9a5e1fdcc3ffcd2515a24f1d9e788685a896948aa91dce881a",
+        "masking_contract": "java-dual-region-v1",
+        "masked_test_sha256": "30acf40eb0ef8f39b2ad1113c46a347539007227ead6d9d205b3dbd40bcb327d",
+        "target_selector": "io.grpc.xds.internal.sds.SdsProtocolNegotiatorsTest#clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute"
+      },
+      "source_scope": [
+        {
+          "source_id": "test",
+          "logical_path": "src/test/java/io/grpc/xds/internal/sds/SdsProtocolNegotiatorsTest.java",
+          "sha256": "30acf40eb0ef8f39b2ad1113c46a347539007227ead6d9d205b3dbd40bcb327d",
+          "bytes": 2246,
+          "selection_role": "masked_test"
+        }
+      ],
+      "observations": [
+        {
+          "observation_id": "criterion:0",
+          "location": {
+            "source_id": "test",
+            "start_line": 49,
+            "end_line": 49
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "lexical observation syntax inside the selected Java method"
+        },
+        {
+          "observation_id": "criterion:1",
+          "location": {
+            "source_id": "test",
+            "start_line": 50,
+            "end_line": 50
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "lexical observation syntax inside the selected Java method"
+        },
+        {
+          "observation_id": "criterion:2",
+          "location": {
+            "source_id": "test",
+            "start_line": 51,
+            "end_line": 51
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "lexical observation syntax inside the selected Java method"
+        }
+      ],
+      "parameterization": {
+        "status": "not_expanded",
+        "coverage": "selected_test_definition",
+        "reason": "the runner does not enumerate parameter rows"
+      },
+      "entry_point": {
+        "test_selection": {
+          "origin": "task_provided",
+          "status": "unique",
+          "selector": "io.grpc.xds.internal.sds.SdsProtocolNegotiatorsTest#clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute",
+          "evidence": [
+            {
+              "symbol": "clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute",
+              "start_line": 38,
+              "end_line": 54
+            }
+          ]
+        },
+        "mut_binding": {
+          "origin": "automatic",
+          "status": "not_evaluated",
+          "candidates": [],
+          "evidence": [],
+          "assumptions": []
+        }
+      },
+      "relations": [],
+      "relation_coverage": [
+        {
+          "kind": "call_binding",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "control_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "exception_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "function_origin",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "normal_return_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "state_flow",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "value_flow",
+          "status": "not_evaluated"
+        }
+      ],
+      "analysis_boundaries": {
+        "assumptions": [],
+        "unknown_effects": [
+          {
+            "boundary_id": "test:48:20:CtLocalVariableImpl",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:51:5:CtInvocationImpl",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          }
+        ],
+        "unanalysed_regions": [
+          {
+            "scope": "source_selection",
+            "reason": "source_budget"
+          },
+          {
+            "scope": "semantic_relations",
+            "reason": "candidate_graph_has_no_validated_dependency_semantics"
+          }
+        ]
+      },
+      "completion": {
+        "status": "partial",
+        "stage": "complete",
+        "failure_categories": [
+          "source_budget",
+          "product_source_not_located",
+          "test_to_product_not_reached",
+          "unresolved_calls",
+          "semantic_analysis_gap"
+        ],
+        "error": null
+      },
+      "semantic_validation": {
+        "status": "not_evaluated",
+        "reviewer": null,
+        "evidence": [],
+        "notes": "candidate reachability is not semantic dependency validation"
+      },
+      "cost": {
+        "timings_seconds": {
+          "criterion_extraction": 0.001186,
+          "source_selection": 0.007953,
+          "backend_total": 3.290565,
+          "evidence_summary": 0.000151
+        },
+        "total_seconds": 3.3,
+        "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+        "peak_memory": {
+          "status": "unavailable",
+          "bytes": null,
+          "reason": "case-level peak memory is not measured by this runner"
+        },
+        "cache_state": {
+          "status": "unknown",
+          "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+        },
+        "input_size": {
+          "files": 1,
+          "bytes": 2246
+        },
+        "graph_size": {
+          "nodes": 16,
+          "edges": 23
+        },
+        "unavailable_phases": [
+          {
+            "phase": "input_admission",
+            "reason": "adapter admission occurs outside the per-case analysis timer"
+          },
+          {
+            "phase": "front_end",
+            "reason": "the candidate backend does not report parsing time separately"
+          },
+          {
+            "phase": "call_graph",
+            "reason": "the candidate backend does not report call-graph time separately"
+          },
+          {
+            "phase": "pointer_analysis",
+            "reason": "the candidate backend does not provide pointer analysis"
+          },
+          {
+            "phase": "dependency_analysis",
+            "reason": "backend_total combines parsing, graph construction, and slicing"
+          },
+          {
+            "phase": "slice",
+            "reason": "the candidate backend does not report semantic slicing time separately"
+          },
+          {
+            "phase": "source_mapping",
+            "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+          }
+        ]
+      }
+    },
+    "stage": "complete",
+    "error": null,
+    "elapsed_seconds": 3.3,
+    "timings_seconds": {
+      "criterion_extraction": 0.001186,
+      "source_selection": 0.007953,
+      "backend_total": 3.290565,
+      "evidence_summary": 0.000151
+    },
+    "graph_and_evidence": "top-level graph/evidence/sources remain candidate diagnostics only"
+  },
+  "semantic_backend": {
+    "schema": "mockspec.java-batch-semantic-backend/v1",
+    "status": "unsupported",
+    "support_status": "unsupported_input_domain",
+    "identity": {
+      "language": "java",
+      "dataset": "java-bechmark-strong",
+      "case_id": "io.grpc.xds.internal.sds.SdsProtocolNegotiatorsTest#clientSdsProtocolNegotiatorNewHandler_withTlsContextAttribute@5f9d000a",
+      "inventory_revision": "e8ed1a717304ae6437602a4da6389aae46d96f4a805bc140883d0a626742811f",
+      "snapshot_id": "e30097998df7cc9a5e1fdcc3ffcd2515a24f1d9e788685a896948aa91dce881a"
+    },
+    "failure_categories": [
+      "java_semantic_backend_input_unsupported"
+    ],
+    "reason": "The accepted Java backend currently prepares bytecode, library summaries, and source-derived observations only for the exact JarFiles Jib case.",
+    "backend_attempted": false,
+    "candidate_diagnostic_required": true,
+    "driver_exit_code": 0,
+    "batch_dispatch_seconds": 0.184518,
+    "batch_dispatch_scope": "bridge process including support check, adapter and backend; excludes candidate diagnostics"
+  },
+  "batch_case_cost": {
+    "total_seconds": 3.57008,
+    "scope": "admission, candidate diagnostic, semantic-slot wait, dispatch and mapping; excludes case queue, shared compile and serialization"
+  },
+  "result_contract_sha256": "937e891fe8c594216baca3c2931578a106acb42cc9cec23ba5687433f47a94e0"
+}

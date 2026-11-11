@@ -1,0 +1,220 @@
+{
+  "schema_version": "mockspec.wala-issue23-repair/v2",
+  "status": "blocked",
+  "gate_passed": false,
+  "mechanism_gate_passed": false,
+  "gate_components": {
+    "mechanism_relations": false,
+    "positive_real_input_analysis": false,
+    "accepted_unknown_effect_model": false
+  },
+  "model_scope": {
+    "status": "bounded_mechanism_only",
+    "implemented_in": "WALA MethodSummary + BypassMethodTargetSelector before CG/PA/SDG",
+    "not_mock_behavior": true,
+    "covered": [
+      "visible argument field mod/ref probe",
+      "one same-type argument return-alias probe",
+      "normal/unchecked-exception summary CFG probe"
+    ],
+    "not_covered": [
+      "fresh/null/receiver/other-argument/global return alternatives",
+      "unknown-region overflow when a field or implementation is absent",
+      "general nondeterministic exception sources and feasibility",
+      "proof that distinct allocation sites remain disjoint through heap summaries"
+    ]
+  },
+  "mechanism_run": {
+    "path": "out/mockbench-study/issue23-repair-20261111-mechanisms-r5",
+    "manifest_status": "analysed",
+    "all_opaque_calls_bound_to_summary_target": true,
+    "relations": {
+      "state_may_write": {
+        "passed": false,
+        "call_binding": "resolved_candidates",
+        "possible_target_count": 1,
+        "witness_path": null,
+        "field_heap_edge_required": true,
+        "shared_region_path": null,
+        "summary_effect_kinds": [
+          "state"
+        ],
+        "region_evidence": null
+      },
+      "return_alias": {
+        "passed": false,
+        "call_binding": "resolved_candidates",
+        "possible_target_count": 1,
+        "witness_path": null,
+        "field_heap_edge_required": false,
+        "shared_region_path": null,
+        "summary_effect_kinds": [
+          "alias"
+        ],
+        "region_evidence": null
+      },
+      "normal_completion": {
+        "passed": false,
+        "call_binding": "resolved_candidates",
+        "possible_target_count": 1,
+        "witness_path": null,
+        "field_heap_edge_required": false,
+        "shared_region_path": null,
+        "summary_effect_kinds": [
+          "normal_completion"
+        ],
+        "region_evidence": null
+      },
+      "write_before_throw": {
+        "passed": false,
+        "call_binding": "resolved_candidates",
+        "possible_target_count": 1,
+        "witness_path": null,
+        "field_heap_edge_required": true,
+        "shared_region_path": null,
+        "summary_effect_kinds": [
+          "write_before_throw"
+        ],
+        "region_evidence": null
+      },
+      "fresh_no_alias": {
+        "passed": false,
+        "call_binding": "resolved_candidates",
+        "possible_target_count": 1,
+        "witness_path": null,
+        "field_heap_edge_required": false,
+        "shared_region_path": false,
+        "summary_effect_kinds": [
+          "fresh_negative"
+        ],
+        "region_evidence": null
+      }
+    },
+    "metrics": {
+      "unknown_write": {
+        "call_graph_nodes": 9,
+        "application_call_graph_nodes": 4,
+        "call_graph_contexts": 1,
+        "pointer_instance_keys": 5,
+        "lazy_sdg_nodes_after_slice": 34,
+        "slice_statements": 17,
+        "slice_edges": 22,
+        "timings_millis": {
+          "scope": 85,
+          "class_hierarchy_and_entry": 4004,
+          "call_graph_and_pointer": 633,
+          "sdg_initialization": 23,
+          "backward_slice": 90,
+          "source_mapping": 108,
+          "total": 4959
+        }
+      },
+      "unknown_alias": {
+        "call_graph_nodes": 9,
+        "application_call_graph_nodes": 4,
+        "call_graph_contexts": 1,
+        "pointer_instance_keys": 5,
+        "lazy_sdg_nodes_after_slice": 42,
+        "slice_statements": 20,
+        "slice_edges": 25,
+        "timings_millis": {
+          "scope": 97,
+          "class_hierarchy_and_entry": 3991,
+          "call_graph_and_pointer": 410,
+          "sdg_initialization": 22,
+          "backward_slice": 82,
+          "source_mapping": 118,
+          "total": 4732
+        }
+      },
+      "unknown_completion": {
+        "call_graph_nodes": 9,
+        "application_call_graph_nodes": 4,
+        "call_graph_contexts": 1,
+        "pointer_instance_keys": 5,
+        "lazy_sdg_nodes_after_slice": 30,
+        "slice_statements": 13,
+        "slice_edges": 16,
+        "timings_millis": {
+          "scope": 78,
+          "class_hierarchy_and_entry": 2957,
+          "call_graph_and_pointer": 325,
+          "sdg_initialization": 16,
+          "backward_slice": 50,
+          "source_mapping": 67,
+          "total": 3506
+        }
+      },
+      "unknown_exception": {
+        "call_graph_nodes": 9,
+        "application_call_graph_nodes": 4,
+        "call_graph_contexts": 1,
+        "pointer_instance_keys": 5,
+        "lazy_sdg_nodes_after_slice": 46,
+        "slice_statements": 19,
+        "slice_edges": 28,
+        "timings_millis": {
+          "scope": 59,
+          "class_hierarchy_and_entry": 3420,
+          "call_graph_and_pointer": 624,
+          "sdg_initialization": 23,
+          "backward_slice": 119,
+          "source_mapping": 162,
+          "total": 4426
+        }
+      },
+      "unknown_fresh": {
+        "call_graph_nodes": 9,
+        "application_call_graph_nodes": 4,
+        "call_graph_contexts": 1,
+        "pointer_instance_keys": 5,
+        "lazy_sdg_nodes_after_slice": 40,
+        "slice_statements": 19,
+        "slice_edges": 25,
+        "timings_millis": {
+          "scope": 127,
+          "class_hierarchy_and_entry": 3854,
+          "call_graph_and_pointer": 563,
+          "sdg_initialization": 25,
+          "backward_slice": 98,
+          "source_mapping": 98,
+          "total": 4783
+        }
+      }
+    }
+  },
+  "historical_comparison": {
+    "path": "out/mockbench-study/issue23-wala-evidence-20261110",
+    "old_gate_passed": false,
+    "old_opaque_status": "blocked",
+    "change": "Opaque calls now have one WALA summary target in the call graph, but the strict relation gate remains blocked because the SDG evidence does not yet prove the required state, alias, completion, exception, and disjoint-region relations."
+  },
+  "jib_scale_diagnostic": {
+    "rerun": "not_rerun",
+    "reason": "The bounded mechanism model did not recover any strict relation, so another real-Jib FULL/FULL run would repeat the known 2 GiB PDG population failure without a scale fix.",
+    "known_failure": "OutOfMemoryError in PDG.populate/addParamPassingStatements",
+    "known_configuration": "WALA 1.7.2, 0-1-CFA, FULL/FULL, -Xmx2g, 180s",
+    "positive_completion_required": true,
+    "no_oom_is_not_completion": true,
+    "instrumentation_added": [
+      "call graph/application node/context/pointer counts before SDG",
+      "explicit lazy SDG initialization marker",
+      "backward-slice start/completion and lazy SDG node count"
+    ],
+    "pdg_note": "WALA SDG creates PDGs lazily; enumerating every PDG to count it would force the same population cost. Stage markers therefore report the last completed stage instead.",
+    "analysis_gate": {
+      "passed": false,
+      "analysis_completed": false,
+      "automatic_entry_recovery": false,
+      "entry_origin": "not_run"
+    }
+  },
+  "entry_and_input": {
+    "raw_or_reviewed_structure_skeleton_allowed": true,
+    "reviewed_structure_skeleton_counts_as_automatic_entry": false,
+    "automatic_entry_recovery": "not_evaluated_in_this_mechanism_run",
+    "issue21_binding_evidence_consumed": false,
+    "reason": "No new Jib run was justified after the strict mechanism gate remained blocked."
+  },
+  "decision": "Keep issue 23 blocked. The summary is genuinely integrated before CG/PA/SDG and fixes call-target reachability, but it is not yet a sound general opaque-effect model and the reported SDG lacks the relation-specific witnesses required by the repaired gate."
+}

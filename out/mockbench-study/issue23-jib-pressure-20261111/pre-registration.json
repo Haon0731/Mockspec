@@ -1,0 +1,23 @@
+{
+  "schema": "mockspec.jib-pressure-registration/v1",
+  "source_sha256": "0a9ab499e8495d6a04e047eb67614725a29830cec0ca782e7a33e7bf546dc464",
+  "entry_origin": "diagnostic_override",
+  "wala": "1.7.2",
+  "call_graph": "0-1-CFA",
+  "reflection": "NONE",
+  "timeout_seconds": 180,
+  "java_heap": "2g",
+  "purpose": "measure transitive MOD/REF union pressure without PDG construction; not semantic success",
+  "arguments": [
+    "/tmp/mockspec-issue23-work-20261110/jib-skeleton-r2/application.jar",
+    "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/java-bechmark-strong/5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4/tree/repo/libs/module-deps.jar:/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/java-bechmark-strong/5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4/tree/repo/libs/jib-plugins-common-0.1.0-SNAPSHOT.jar:/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/java-bechmark-strong/5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4/tree/repo/libs/guava-30.1.1-jre.jar",
+    "com.google.cloud.tools.jib.cli.jar.JibDiagnosticEntry",
+    "observe(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan;"
+  ],
+  "target_executed": false,
+  "hypotheses": [
+    "large per-call MOD union drives heap return nodes",
+    "JDK baseline dominates application expansion",
+    "few library call boundaries account for most pressure"
+  ]
+}

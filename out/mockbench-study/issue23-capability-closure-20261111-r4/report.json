@@ -1,0 +1,436 @@
+{
+  "schema_version": "mockspec.wala-issue23-closure/v1",
+  "status": "passed",
+  "gate_passed": true,
+  "configuration": {
+    "wala": "1.7.2",
+    "call_graph": "0-1-CFA",
+    "data_dependence": "FULL",
+    "control_dependence": "FULL",
+    "reflection": "NONE",
+    "opaque_effect_model": "bounded-effect-token-v1",
+    "heap_limit_bytes": 2147483648,
+    "analysis_timeout_seconds": 180,
+    "target_executed": false
+  },
+  "evaluator_sha256": "ad8941e0aeebc222d5d8b7edbaa527125c000b7d82146167a121165776814074",
+  "source_identity_matches": true,
+  "preregistration_matches": true,
+  "expanded_unknown_effects": {
+    "passed": true,
+    "relations": {
+      "receiver_direct_field": {
+        "passed": true,
+        "witness": {
+          "summary_write_to_heap_return": [
+            11,
+            14
+          ],
+          "same_call_heap_return": [
+            14,
+            23
+          ],
+          "heap_return_to_observation": [
+            23,
+            16
+          ],
+          "heap_location": "[[<Application,Lsample/MechanismProbe$OpaqueCarrier>],< Application, Lsample/MechanismProbe$OpaqueCarrier, receiverState, <Primordial,I> >]"
+        },
+        "summary_target_is_real_ir": true,
+        "semantic_scope": "bounded_effect_token_to_same_call_same_region_write",
+        "unknown_value_havoc_proved": true,
+        "unknown_value_source_path": [
+          13,
+          11
+        ],
+        "selected_write_instruction_index": 1,
+        "selected_write_modref_matches_heap_location": true,
+        "region_origin_proved": true,
+        "region_origin_path": [
+          11
+        ]
+      },
+      "argument_one_hop_reachable_field": {
+        "passed": true,
+        "witness": {
+          "summary_write_to_heap_return": [
+            21,
+            31
+          ],
+          "same_call_heap_return": [
+            31,
+            46
+          ],
+          "heap_return_to_observation": [
+            46,
+            34
+          ],
+          "heap_location": "[SITE_IN_NODE{< Application, Lsample/MechanismProbe, unknownReachableObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I >:Lsample/MechanismProbe$Box:NEW <Application,Lsample/MechanismProbe$Box>@0 in Everywhere},< Application, Lsample/MechanismProbe$Box, ready, <Primordial,I> >]"
+        },
+        "summary_target_is_real_ir": true,
+        "semantic_scope": "bounded_effect_token_to_same_call_same_region_write",
+        "unknown_value_havoc_proved": true,
+        "unknown_value_source_path": [
+          29,
+          21
+        ],
+        "selected_write_instruction_index": 10,
+        "selected_write_modref_matches_heap_location": true,
+        "region_origin_proved": true,
+        "region_origin_path": [
+          17,
+          21
+        ]
+      },
+      "application_static_escaped_object": {
+        "passed": true,
+        "witness": {
+          "summary_write_to_heap_return": [
+            25,
+            42
+          ],
+          "same_call_heap_return": [
+            42,
+            57
+          ],
+          "heap_return_to_observation": [
+            57,
+            44
+          ],
+          "heap_location": "[SITE_IN_NODE{synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V >:Lsample/MechanismProbe$Box:NEW <Application,Lsample/MechanismProbe$Box>@5 in Everywhere},< Application, Lsample/MechanismProbe$Box, ready, <Primordial,I> >]"
+        },
+        "summary_target_is_real_ir": true,
+        "semantic_scope": "bounded_effect_token_to_same_call_same_region_write",
+        "unknown_value_havoc_proved": true,
+        "unknown_value_source_path": [
+          35,
+          25
+        ],
+        "selected_write_instruction_index": 15,
+        "selected_write_modref_matches_heap_location": true,
+        "region_origin_proved": true,
+        "region_origin_path": [
+          18,
+          25
+        ]
+      },
+      "application_static_primitive": {
+        "passed": true,
+        "witness": {
+          "summary_write_to_heap_return": [
+            31,
+            44
+          ],
+          "same_call_heap_return": [
+            44,
+            58
+          ],
+          "heap_return_to_observation": [
+            58,
+            46
+          ],
+          "heap_location": "[< Application, Lsample/MechanismProbe, globalReady, <Primordial,I> >]"
+        },
+        "summary_target_is_real_ir": true,
+        "semantic_scope": "bounded_effect_token_to_same_call_same_region_write",
+        "unknown_value_havoc_proved": true,
+        "unknown_value_source_path": [
+          37,
+          31
+        ],
+        "selected_write_instruction_index": 17,
+        "selected_write_modref_matches_heap_location": true,
+        "region_origin_proved": true,
+        "region_origin_path": [
+          31
+        ]
+      }
+    },
+    "negative_checks": {
+      "receiver_direct_field_without_selected_token_rejected": true,
+      "argument_one_hop_reachable_field_without_selected_token_rejected": true,
+      "application_static_escaped_object_without_selected_token_rejected": true,
+      "application_static_primitive_without_selected_token_rejected": true
+    },
+    "scope": {
+      "unknown": [
+        "reference-field replacement",
+        "heap paths deeper than one reference field",
+        "arrays and collection contents",
+        "library and runtime globals",
+        "escaped objects not reachable through modeled parameters or Application statics",
+        "null and arbitrary exception types"
+      ],
+      "modeled": [
+        "receiver direct int fields",
+        "direct reference-argument int fields",
+        "one reference-field hop to int fields",
+        "Application static int fields",
+        "Application static reference fields one hop to int fields",
+        "compatible argument-or-fresh reference return",
+        "normal completion or RuntimeException after modeled writes"
+      ]
+    }
+  },
+  "prior_value_control_state_mechanisms": {
+    "passed": true,
+    "current_relations": {
+      "unknown_value_state_write": {
+        "passed": true,
+        "witness": {
+          "summary_write_to_heap_return": [
+            14,
+            21
+          ],
+          "same_call_heap_return": [
+            21,
+            31
+          ],
+          "heap_return_to_observation": [
+            31,
+            23
+          ],
+          "heap_location": "[SITE_IN_NODE{synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V >:Lsample/MechanismProbe$Box:NEW <Application,Lsample/MechanismProbe$Box>@3 in Everywhere},< Application, Lsample/MechanismProbe$Box, ready, <Primordial,I> >]"
+        },
+        "summary_target_is_real_ir": true,
+        "semantic_scope": "bounded_effect_token_to_same_call_same_region_write",
+        "unknown_value_havoc_proved": true,
+        "unknown_value_source_path": [
+          20,
+          14
+        ],
+        "selected_write_instruction_index": 5,
+        "selected_write_modref_matches_heap_location": true
+      },
+      "return_alias_with_fresh_alternative": {
+        "passed": true,
+        "witness": [
+          33,
+          44,
+          57,
+          51,
+          50
+        ],
+        "summary_target_is_real_ir": true,
+        "argument_regions": [
+          "SITE_IN_NODE{synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V >:Lsample/MechanismProbe$Box:NEW <Application,Lsample/MechanismProbe$Box>@3 in Everywhere}"
+        ],
+        "return_regions": [
+          "SITE_IN_NODE{synthetic < Application, Lsample/MechanismProbe$OpaqueCarrier, alias(Lsample/MechanismProbe$Box;)Lsample/MechanismProbe$Box; >:Lsample/MechanismProbe$Box:NEW <Application,Lsample/MechanismProbe$Box>@20 in Everywhere}",
+          "SITE_IN_NODE{synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V >:Lsample/MechanismProbe$Box:NEW <Application,Lsample/MechanismProbe$Box>@3 in Everywhere}"
+        ],
+        "shared_regions": [
+          "SITE_IN_NODE{synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V >:Lsample/MechanismProbe$Box:NEW <Application,Lsample/MechanismProbe$Box>@3 in Everywhere}"
+        ],
+        "semantic_scope": "bounded_unique_call_returned_parameter_alias",
+        "alternatives_in_summary_ir": true,
+        "pa_distinguishes_alternatives": true
+      },
+      "normal_completion": {
+        "passed": true,
+        "summary_normal_exit_indexes": [
+          19
+        ],
+        "summary_exception_exit_indexes": [
+          21
+        ],
+        "exact_call_cfg": {
+          "caller": "sample.MechanismProbe.unknownCompletionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+          "caller_context": "Everywhere",
+          "instruction_index": 2,
+          "call_site": "invokeinterface < Application, Lsample/MechanismProbe$UnknownDependency, mutate(Lsample/MechanismProbe$Box;)V >@2",
+          "declared_target": "sample.MechanismProbe$UnknownDependency.mutate(Lsample/MechanismProbe$Box;)V",
+          "call_block": 1,
+          "normal_successor_blocks": [
+            2
+          ],
+          "exceptional_successor_blocks": [
+            3
+          ],
+          "normal_reachable": [
+            {
+              "instruction_index": 4,
+              "basic_block": 2,
+              "instruction": "return 5"
+            }
+          ],
+          "exceptional_reachable": []
+        },
+        "normal_continuation_reaches_return": true,
+        "selected_seed_matches_caller": true,
+        "exceptional_first_edge_present": true,
+        "sdg_normal_exit_reaches_entry": false,
+        "evidence_semantics": {
+          "callee": "summary CFG contains a structurally possible normal return",
+          "caller": "entry SSA CFG has an exact-call normal first edge that may reach the selected observation",
+          "note": "This is structured CFG evidence; it is not represented as one SDG edge."
+        },
+        "semantic_scope": "bounded_summary_exit_plus_exact_callsite_cfg_continuation"
+      },
+      "write_before_throw_to_handler_state_read": {
+        "passed": true,
+        "state_effect": {
+          "passed": true,
+          "witness": {
+            "summary_write_to_heap_return": [
+              13,
+              18
+            ],
+            "same_call_heap_return": [
+              18,
+              30
+            ],
+            "heap_return_to_observation": [
+              30,
+              20
+            ],
+            "heap_location": "[SITE_IN_NODE{synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V >:Lsample/MechanismProbe$Box:NEW <Application,Lsample/MechanismProbe$Box>@3 in Everywhere},< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]"
+          },
+          "summary_target_is_real_ir": true,
+          "semantic_scope": "bounded_effect_token_to_same_call_same_region_write",
+          "unknown_value_havoc_proved": true,
+          "unknown_value_source_path": [
+            17,
+            13
+          ],
+          "selected_write_instruction_index": 3,
+          "selected_write_modref_matches_heap_location": true
+        },
+        "selected_put_dominates_matched_throw": true,
+        "exception_path": {
+          "summary_method": "sample.MechanismProbe$OpaqueCarrier.mutate(Lsample/MechanismProbe$Box;)V",
+          "summary_context": "Everywhere",
+          "exit_kind": "exception",
+          "source_instruction_index": 21,
+          "source_instruction": "throw 22",
+          "entry_reachable_statements": [
+            {
+              "kind": "EXC_RET_CALLER",
+              "method": "sample.MechanismProbe.unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+              "context": "Everywhere",
+              "instruction": "invokeinterface < Application, Lsample/MechanismProbe$UnknownDependency, mutate(Lsample/MechanismProbe$Box;)V > 1,2 @2 exception:4",
+              "instruction_index": 2,
+              "line": 76,
+              "basic_block": 1,
+              "statement_text": "EXC_RET_CALLER:Node: < Application, Lsample/MechanismProbe, unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere[2]invokeinterface < Application, Lsample/MechanismProbe$UnknownDependency, mutate(Lsample/MechanismProbe$Box;)V > 1,2 @2 exception:4",
+              "heap_location": null,
+              "call_instruction_index": 2,
+              "call_site": "invokeinterface < Application, Lsample/MechanismProbe$UnknownDependency, mutate(Lsample/MechanismProbe$Box;)V >@2",
+              "declared_target": "sample.MechanismProbe$UnknownDependency.mutate(Lsample/MechanismProbe$Box;)V"
+            },
+            {
+              "kind": "NORMAL",
+              "method": "sample.MechanismProbe.unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+              "context": "Everywhere",
+              "instruction": "throw 7",
+              "instruction_index": 27,
+              "line": 82,
+              "basic_block": 11,
+              "statement_text": "NORMAL unknownExceptionObservation:throw 7 Node: < Application, Lsample/MechanismProbe, unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere",
+              "heap_location": null,
+              "call_instruction_index": null,
+              "call_site": null,
+              "declared_target": null
+            },
+            {
+              "kind": "CATCH",
+              "method": "sample.MechanismProbe.unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+              "context": "Everywhere",
+              "instruction": "5 = getCaughtException ",
+              "instruction_index": null,
+              "line": null,
+              "basic_block": 5,
+              "statement_text": "Node: < Application, Lsample/MechanismProbe, unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere:5 = getCaughtException ",
+              "heap_location": null,
+              "call_instruction_index": null,
+              "call_site": null,
+              "declared_target": null
+            },
+            {
+              "kind": "CATCH",
+              "method": "sample.MechanismProbe.unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+              "context": "Everywhere",
+              "instruction": "7 = getCaughtException ",
+              "instruction_index": null,
+              "line": null,
+              "basic_block": 9,
+              "statement_text": "Node: < Application, Lsample/MechanismProbe, unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere:7 = getCaughtException ",
+              "heap_location": null,
+              "call_instruction_index": null,
+              "call_site": null,
+              "declared_target": null
+            },
+            {
+              "kind": "EXC_RET_CALLEE",
+              "method": "sample.MechanismProbe.unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+              "context": "Everywhere",
+              "instruction": null,
+              "instruction_index": null,
+              "line": null,
+              "basic_block": null,
+              "statement_text": "EXC_RET_CALLEE:Node: < Application, Lsample/MechanismProbe, unknownExceptionObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere",
+              "heap_location": null,
+              "call_instruction_index": null,
+              "call_site": null,
+              "declared_target": null
+            }
+          ]
+        },
+        "catch_blocks": [
+          5,
+          9
+        ],
+        "heap_return_to_handler_read": [
+          30,
+          20
+        ],
+        "handler_reads_state": true,
+        "semantic_scope": "bounded_effect_token_write_before_exact_call_exception"
+      }
+    },
+    "current_negative_checks": {
+      "missing_selected_field_token_rejected": true,
+      "other_method_same_return_rejected": true,
+      "wrong_callsite_rejected": true,
+      "other_field_dominance_rejected": true
+    },
+    "historical_evidence": "out/mockbench-study/issue23-unknown-effects-20261111-review-rev/report.json",
+    "historical_gate_passed": true
+  },
+  "first_real_input_attempt": {
+    "passed": true,
+    "evidence": "out/mockbench-study/issue23-wala-evidence-20261110/report.json",
+    "raw_masked_compile": "blocked",
+    "structure_only_skeleton": "compiled",
+    "visible_mechanisms": "passed"
+  },
+  "real_reviewed_input": {
+    "passed": true,
+    "evidence": "out/mockbench-study/issue23-jib-ci-original-20261111-r7/summary.json",
+    "entry_origin": "diagnostic_override",
+    "automatic_entry_recovery": "not_evaluated_here",
+    "semantic_status": "partial_diagnostic",
+    "target_executed": false,
+    "slice_statement_count": 324890,
+    "limitations": [
+      "pre-entry global/class initialization and callers are unknown, not absent effects; original WALA heap locations retained",
+      "upstream experimental context-insensitive may-dependencies; overwritten writes and cross-call paths may be retained; native/no-IR effects remain explicit unknown boundaries",
+      "This capability gate does not substitute for issue 25's original-assertion Jib acceptance."
+    ]
+  },
+  "acceptance_matrix": {
+    "version_config_budget_and_cost_recorded": true,
+    "raw_masked_and_structure_only_attempts_preserved": true,
+    "real_input_mappable_result_with_diagnostic_entry_separated": true,
+    "value_control_field_alias_and_unknown_effect_mechanisms": true,
+    "receiver_argument_reachable_global_escaped_and_write_before_throw": true,
+    "failures_and_resource_boundaries_preserved": true
+  },
+  "not_claimed": [
+    "general sound havoc for arbitrary Java heaps",
+    "automatic Jib entry recovery",
+    "original Jib assertion-to-code influence",
+    "path feasibility or concrete Mock behavior"
+  ],
+  "decision": "Issue 23's bounded backend capability gate passes. Continue to issue 25 for original-observation mapping; retain unsupported heap regions as explicit unknowns."
+}

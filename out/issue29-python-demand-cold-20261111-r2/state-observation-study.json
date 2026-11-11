@@ -1,0 +1,800 @@
+{
+  "schema": "mock-spec.python-state-observation-study/v1",
+  "case_result": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "python-state-mechanism-probe",
+      "dataset": "analysis-mechanism-probe",
+      "language": "python",
+      "snapshot_id": "3c1c0cb361a103ce11eefc8042923030a6cbbda06bc8bf83deb84f39e27d5e4a",
+      "masking_contract": null,
+      "masked_test_sha256": "3c1c0cb361a103ce11eefc8042923030a6cbbda06bc8bf83deb84f39e27d5e4a",
+      "target_selector": "mechanism_probe.py::bounded_state_mechanisms"
+    },
+    "source_scope": [
+      {
+        "source_id": "probe",
+        "logical_path": "mechanism_probe.py",
+        "sha256": "3c1c0cb361a103ce11eefc8042923030a6cbbda06bc8bf83deb84f39e27d5e4a",
+        "bytes": 4455,
+        "selection_role": "mechanism_probe"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "state:visible-write",
+        "location": {
+          "source_id": "probe",
+          "start_line": 60,
+          "end_line": 60
+        },
+        "kind": "field_read_observation",
+        "origin": "explicit",
+        "reason": "registered direct_visible_write ready-field observation"
+      },
+      {
+        "observation_id": "state:direct-argument",
+        "location": {
+          "source_id": "probe",
+          "start_line": 81,
+          "end_line": 81
+        },
+        "kind": "field_read_observation",
+        "origin": "explicit",
+        "reason": "registered direct_argument ready-field observation"
+      },
+      {
+        "observation_id": "state:return-alias",
+        "location": {
+          "source_id": "probe",
+          "start_line": 87,
+          "end_line": 87
+        },
+        "kind": "field_read_observation",
+        "origin": "explicit",
+        "reason": "registered return_alias ready-field observation"
+      },
+      {
+        "observation_id": "state:receiver",
+        "location": {
+          "source_id": "probe",
+          "start_line": 132,
+          "end_line": 132
+        },
+        "kind": "field_read_observation",
+        "origin": "explicit",
+        "reason": "registered receiver configured-field observation"
+      },
+      {
+        "observation_id": "state:receiver-loop",
+        "location": {
+          "source_id": "probe",
+          "start_line": 154,
+          "end_line": 154
+        },
+        "kind": "field_read_observation",
+        "origin": "explicit",
+        "reason": "registered receiver configured-field observation"
+      },
+      {
+        "observation_id": "state:module-global",
+        "location": {
+          "source_id": "probe",
+          "start_line": 159,
+          "end_line": 159
+        },
+        "kind": "field_read_observation",
+        "origin": "explicit",
+        "reason": "registered module_global active-field observation"
+      },
+      {
+        "observation_id": "state:escaped-argument",
+        "location": {
+          "source_id": "probe",
+          "start_line": 177,
+          "end_line": 177
+        },
+        "kind": "field_read_observation",
+        "origin": "explicit",
+        "reason": "registered escaped_argument sealed-field observation"
+      },
+      {
+        "observation_id": "state:exception-handler",
+        "location": {
+          "source_id": "probe",
+          "start_line": 51,
+          "end_line": 51
+        },
+        "kind": "field_read_observation",
+        "origin": "explicit",
+        "reason": "registered exception_handler ready-field observation"
+      },
+      {
+        "observation_id": "state:finally",
+        "location": {
+          "source_id": "probe",
+          "start_line": 53,
+          "end_line": 53
+        },
+        "kind": "field_read_observation",
+        "origin": "explicit",
+        "reason": "registered finally ready-field observation"
+      }
+    ],
+    "parameterization": {
+      "status": "not_applicable",
+      "coverage": "registered probe functions",
+      "reason": "static mechanism fixture has no parameter rows"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "diagnostic_override",
+        "status": "unique",
+        "selector": "mechanism_probe.py::bounded_state_mechanisms",
+        "evidence": [
+          {
+            "source_id": "probe",
+            "functions": [
+              "visible_write",
+              "unknown_may_write",
+              "returned_alias_write",
+              "receiver_may_write",
+              "receiver_loop_prewrite_is_not_a_kill",
+              "global_may_write",
+              "escaped_argument_may_write",
+              "caught_and_finally",
+              "caught_and_finally"
+            ]
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "diagnostic_override",
+        "status": "not_evaluated",
+        "candidates": [],
+        "evidence": [],
+        "assumptions": []
+      }
+    },
+    "relations": [
+      {
+        "kind": "state_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 59,
+          "end_line": 59
+        },
+        "to": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 60,
+          "end_line": 60,
+          "field": "ready"
+        },
+        "provenance": "CodeQL generic visible AttrWrite/AttrRead region flow",
+        "precision": "same local source and backend CFG reachability",
+        "assumptions": [],
+        "observation_ids": [
+          "state:visible-write"
+        ]
+      },
+      {
+        "kind": "state_flow",
+        "modality": "unknown_effect",
+        "from": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 80,
+          "end_line": 80
+        },
+        "to": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 81,
+          "end_line": 81,
+          "field": "ready"
+        },
+        "provenance": "CodeQL bounded opaque-call region model",
+        "precision": "direct_argument may-write; concrete value unknown",
+        "assumptions": [],
+        "observation_ids": [
+          "state:direct-argument"
+        ]
+      },
+      {
+        "kind": "state_flow",
+        "modality": "unknown_effect",
+        "from": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 85,
+          "end_line": 85
+        },
+        "to": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 87,
+          "end_line": 87,
+          "field": "ready"
+        },
+        "provenance": "CodeQL bounded opaque-call region model",
+        "precision": "return_alias may-write; concrete value unknown",
+        "assumptions": [],
+        "observation_ids": [
+          "state:return-alias"
+        ]
+      },
+      {
+        "kind": "state_flow",
+        "modality": "unknown_effect",
+        "from": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 131,
+          "end_line": 131
+        },
+        "to": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 132,
+          "end_line": 132,
+          "field": "configured"
+        },
+        "provenance": "CodeQL bounded opaque-call boundary path",
+        "precision": "receiver region path; concrete write unknown",
+        "assumptions": [],
+        "observation_ids": [
+          "state:receiver"
+        ]
+      },
+      {
+        "kind": "state_flow",
+        "modality": "unknown_effect",
+        "from": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 149,
+          "end_line": 149
+        },
+        "to": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 154,
+          "end_line": 154,
+          "field": "configured"
+        },
+        "provenance": "CodeQL bounded opaque-call boundary path",
+        "precision": "receiver region path; concrete write unknown",
+        "assumptions": [],
+        "observation_ids": [
+          "state:receiver-loop"
+        ]
+      },
+      {
+        "kind": "state_flow",
+        "modality": "unknown_effect",
+        "from": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 158,
+          "end_line": 158
+        },
+        "to": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 159,
+          "end_line": 159,
+          "field": "active"
+        },
+        "provenance": "CodeQL bounded opaque-call boundary path",
+        "precision": "module_global region path; concrete write unknown",
+        "assumptions": [],
+        "observation_ids": [
+          "state:module-global"
+        ]
+      },
+      {
+        "kind": "state_flow",
+        "modality": "unknown_effect",
+        "from": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 176,
+          "end_line": 176
+        },
+        "to": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 177,
+          "end_line": 177,
+          "field": "sealed"
+        },
+        "provenance": "CodeQL bounded opaque-call boundary path",
+        "precision": "escaped_argument region path; concrete write unknown",
+        "assumptions": [],
+        "observation_ids": [
+          "state:escaped-argument"
+        ]
+      },
+      {
+        "kind": "state_flow",
+        "modality": "unknown_effect",
+        "from": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 48,
+          "end_line": 48
+        },
+        "to": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 51,
+          "end_line": 51,
+          "field": "ready"
+        },
+        "provenance": "CodeQL exceptional CFG plus opaque state model",
+        "precision": "write-before-raise may reach exception_handler read",
+        "assumptions": [],
+        "observation_ids": [
+          "state:exception-handler"
+        ]
+      },
+      {
+        "kind": "state_flow",
+        "modality": "unknown_effect",
+        "from": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 48,
+          "end_line": 48
+        },
+        "to": {
+          "logical_path": "mechanism_probe.py",
+          "start_line": 53,
+          "end_line": 53,
+          "field": "ready"
+        },
+        "provenance": "CodeQL exceptional CFG plus opaque state model",
+        "precision": "write-before-raise may reach finally read",
+        "assumptions": [],
+        "observation_ids": [
+          "state:finally"
+        ]
+      }
+    ],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "verified_correct"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [
+        "opaque boundary calls are calls through the registered dependency parameter",
+        "module-global may-write is conservative and does not assert a concrete write"
+      ],
+      "unknown_effects": [
+        {
+          "boundary_id": "state-boundary:state:direct-argument",
+          "effect": "may_write_ready",
+          "scope": "direct_argument",
+          "provenance": "backend state relation",
+          "precision": "unresolved concrete value",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "state-boundary:state:return-alias",
+          "effect": "may_write_ready",
+          "scope": "return_alias",
+          "provenance": "backend state relation",
+          "precision": "unresolved concrete value",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "state-boundary:state:receiver",
+          "effect": "may_write_configured",
+          "scope": "receiver",
+          "provenance": "backend state relation",
+          "precision": "unresolved concrete value",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "state-boundary:state:receiver-loop",
+          "effect": "may_write_configured",
+          "scope": "receiver",
+          "provenance": "backend state relation",
+          "precision": "unresolved concrete value",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "state-boundary:state:module-global",
+          "effect": "may_write_active",
+          "scope": "module_global",
+          "provenance": "backend state relation",
+          "precision": "unresolved concrete value",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "state-boundary:state:escaped-argument",
+          "effect": "may_write_sealed",
+          "scope": "escaped_argument",
+          "provenance": "backend state relation",
+          "precision": "unresolved concrete value",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "state-boundary:state:exception-handler",
+          "effect": "may_write_ready",
+          "scope": "exception_handler",
+          "provenance": "backend state relation",
+          "precision": "unresolved concrete value",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "state-boundary:state:finally",
+          "effect": "may_write_ready",
+          "scope": "finally",
+          "provenance": "backend state relation",
+          "precision": "unresolved concrete value",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "state-boundary:global_rebind_boundary",
+          "effect": "unresolved_effect_after_global_rebind",
+          "scope": "module_global_rebind",
+          "provenance": "backend global-binding boundary",
+          "precision": "post-rebind identity unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "state-boundary:receiver_other_object",
+          "effect": "unresolved_alias_relation",
+          "scope": "parameter_alias",
+          "provenance": "backend parameter-alias boundary",
+          "precision": "runtime parameter alias unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "state-boundary:escaped_other_object",
+          "effect": "unresolved_alias_relation",
+          "scope": "parameter_alias",
+          "provenance": "backend parameter-alias boundary",
+          "precision": "runtime parameter alias unresolved",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "dynamic attribute names",
+          "reason": "outside bounded state model"
+        },
+        {
+          "scope": "arbitrary transitive heap reachability",
+          "reason": "outside bounded state model"
+        },
+        {
+          "scope": "implicit escapes without a visible opaque argument-passing call",
+          "reason": "outside bounded state model"
+        },
+        {
+          "scope": "alias relation between distinct parameters in visible writes",
+          "reason": "outside bounded state model"
+        },
+        {
+          "scope": "concrete values written by opaque dependencies",
+          "reason": "outside bounded state model"
+        },
+        {
+          "scope": "path satisfiability",
+          "reason": "outside bounded state model"
+        },
+        {
+          "scope": "module_global_rebind",
+          "reason": "the re-bound global object may or may not alias the object affected before the rebind"
+        },
+        {
+          "scope": "parameter_alias",
+          "reason": "distinct receiver and observed parameters may alias at runtime"
+        },
+        {
+          "scope": "parameter_alias",
+          "reason": "the retained and observed parameters may alias at runtime"
+        }
+      ]
+    },
+    "completion": {
+      "status": "partial",
+      "stage": "state_observation_mapping",
+      "failure_categories": [
+        "unsupported_state_regions"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "verified_incomplete",
+      "reviewer": "pre_registered_mechanism_oracle",
+      "evidence": [
+        {
+          "observation_id": "state:visible-write",
+          "expectation": "visible_write_to_read"
+        },
+        {
+          "observation_id": "state:direct-argument",
+          "expectation": "unknown_may_write_to_read"
+        },
+        {
+          "observation_id": "state:return-alias",
+          "expectation": "return_alias_write_to_argument_read"
+        },
+        {
+          "observation_id": "state:receiver",
+          "expectation": "unknown_receiver_write_to_read"
+        },
+        {
+          "observation_id": "state:receiver-loop",
+          "expectation": "unknown_receiver_write_to_read"
+        },
+        {
+          "observation_id": "state:module-global",
+          "expectation": "unknown_global_write_to_read"
+        },
+        {
+          "observation_id": "state:escaped-argument",
+          "expectation": "unknown_escaped_argument_write_to_read"
+        },
+        {
+          "observation_id": "state:exception-handler",
+          "expectation": "write_effect_exception_path_to_read"
+        },
+        {
+          "observation_id": "state:finally",
+          "expectation": "write_effect_exception_path_to_read"
+        }
+      ],
+      "notes": "registered state paths and negatives verified; unsupported regions remain unknown"
+    },
+    "cost": {
+      "timings_seconds": {
+        "probe-db": 5.7,
+        "probe-recursive-boundary-decode": 1.01,
+        "probe-recursive-boundary": 24.45,
+        "probe-state-boundary-flow-decode": 0.72,
+        "probe-state-boundary-flow": 6.01,
+        "probe-unknown-effect-flow-decode": 0.54,
+        "probe-unknown-effect-flow": 8.21,
+        "probe-unknown-exception-state-decode": 0.64,
+        "probe-unknown-exception-state": 5.71,
+        "probe-visible-state-flow-decode": 1.18,
+        "probe-visible-state-flow": 7.41
+      },
+      "total_seconds": 61.58,
+      "total_scope": "probe database and queries; mapper serialization excluded",
+      "peak_memory": {
+        "status": "measured_per_process_max",
+        "bytes": 1506598912,
+        "reason": "maximum of per-process max RSS; not a simultaneous whole-run peak"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "OS and CodeQL caches not isolated"
+      },
+      "input_size": {
+        "files": 1,
+        "bytes": 4455
+      },
+      "graph_size": {
+        "nodes": null,
+        "edges": null,
+        "relation_count": 9,
+        "reason": "CodeQL graph size is not exported"
+      },
+      "unavailable_phases": [
+        {
+          "phase": "source_mapping",
+          "reason": "mapper execution is not separately timed"
+        },
+        {
+          "phase": "path_satisfiability",
+          "reason": "not evaluated"
+        }
+      ]
+    }
+  },
+  "pre_registered_expectations": {
+    "schema": "mock-spec.python-state-observation-expectations/v1",
+    "source": "mechanism_probe.py",
+    "observations": [
+      {
+        "observation_id": "state:visible-write",
+        "function": "visible_write",
+        "line": 60,
+        "field": "ready",
+        "relation": "visible_write_to_read",
+        "scope": "direct_visible_write"
+      },
+      {
+        "observation_id": "state:direct-argument",
+        "function": "unknown_may_write",
+        "line": 81,
+        "field": "ready",
+        "relation": "unknown_may_write_to_read",
+        "scope": "direct_argument"
+      },
+      {
+        "observation_id": "state:return-alias",
+        "function": "returned_alias_write",
+        "line": 87,
+        "field": "ready",
+        "relation": "return_alias_write_to_argument_read",
+        "scope": "return_alias"
+      },
+      {
+        "observation_id": "state:receiver",
+        "function": "receiver_may_write",
+        "line": 132,
+        "field": "configured",
+        "relation": "unknown_receiver_write_to_read",
+        "scope": "receiver"
+      },
+      {
+        "observation_id": "state:receiver-loop",
+        "function": "receiver_loop_prewrite_is_not_a_kill",
+        "line": 154,
+        "field": "configured",
+        "relation": "unknown_receiver_write_to_read",
+        "scope": "receiver"
+      },
+      {
+        "observation_id": "state:module-global",
+        "function": "global_may_write",
+        "line": 159,
+        "field": "active",
+        "relation": "unknown_global_write_to_read",
+        "scope": "module_global"
+      },
+      {
+        "observation_id": "state:escaped-argument",
+        "function": "escaped_argument_may_write",
+        "line": 177,
+        "field": "sealed",
+        "relation": "unknown_escaped_argument_write_to_read",
+        "scope": "escaped_argument"
+      },
+      {
+        "observation_id": "state:exception-handler",
+        "function": "caught_and_finally",
+        "line": 51,
+        "field": "ready",
+        "relation": "write_effect_exception_path_to_read",
+        "scope": "exception_handler"
+      },
+      {
+        "observation_id": "state:finally",
+        "function": "caught_and_finally",
+        "line": 53,
+        "field": "ready",
+        "relation": "write_effect_exception_path_to_read",
+        "scope": "finally"
+      }
+    ],
+    "exclude": [
+      {
+        "function": "proven_fresh_write",
+        "reason": "trusted fresh allocation is disjoint"
+      },
+      {
+        "function": "receiver_fresh_other",
+        "reason": "fresh object is allocated after the receiver call and is not escaped"
+      },
+      {
+        "function": "receiver_effect_overwritten",
+        "reason": "unconditional same-field write kills the earlier unknown effect"
+      },
+      {
+        "function": "local_object_is_not_global",
+        "reason": "local allocation is not the named module-global region"
+      },
+      {
+        "function": "global_effect_overwritten",
+        "reason": "unconditional same-field write kills the earlier unknown global effect"
+      },
+      {
+        "function": "escaped_fresh_other",
+        "reason": "fresh object is allocated after both dependency calls and is not escaped"
+      },
+      {
+        "function": "escaped_effect_overwritten",
+        "reason": "unconditional same-field write kills the earlier escaped-region effect"
+      },
+      {
+        "function": "visible_pure_then_observe",
+        "reason": "visible pure call is not an opaque-effect boundary"
+      }
+    ],
+    "unknown_cases": [
+      {
+        "function": "global_rebind_boundary",
+        "scope": "module_global_rebind",
+        "relation": "global_rebind_boundary_unknown",
+        "reason": "the re-bound global object may or may not alias the object affected before the rebind"
+      },
+      {
+        "function": "receiver_other_object",
+        "scope": "parameter_alias",
+        "relation": "parameter_alias_boundary_unknown",
+        "reason": "distinct receiver and observed parameters may alias at runtime"
+      },
+      {
+        "function": "escaped_other_object",
+        "scope": "parameter_alias",
+        "relation": "parameter_alias_boundary_unknown",
+        "reason": "the retained and observed parameters may alias at runtime"
+      }
+    ],
+    "unknown": [
+      "dynamic attribute names",
+      "arbitrary transitive heap reachability",
+      "implicit escapes without a visible opaque argument-passing call",
+      "alias relation between distinct parameters in visible writes",
+      "concrete values written by opaque dependencies",
+      "path satisfiability"
+    ]
+  },
+  "state_boundary_evidence": {
+    "status": "passed",
+    "checks": {
+      "state:visible-write": true,
+      "state:direct-argument": true,
+      "state:return-alias": true,
+      "state:receiver": true,
+      "state:receiver-loop": true,
+      "state:module-global": true,
+      "state:escaped-argument": true,
+      "state:exception-handler": true,
+      "state:finally": true,
+      "unknown:global_rebind_boundary": true,
+      "unknown:receiver_other_object": true,
+      "unknown:escaped_other_object": true
+    },
+    "semantic_scope": "registered state observation roots only"
+  },
+  "negative_functions": [
+    "escaped_effect_overwritten",
+    "escaped_fresh_other",
+    "global_effect_overwritten",
+    "local_object_is_not_global",
+    "proven_fresh_write",
+    "receiver_effect_overwritten",
+    "receiver_fresh_other",
+    "visible_pure_then_observe"
+  ],
+  "unknown_cases": [
+    {
+      "function": "global_rebind_boundary",
+      "scope": "module_global_rebind",
+      "relation": "global_rebind_boundary_unknown",
+      "reason": "the re-bound global object may or may not alias the object affected before the rebind"
+    },
+    {
+      "function": "receiver_other_object",
+      "scope": "parameter_alias",
+      "relation": "parameter_alias_boundary_unknown",
+      "reason": "distinct receiver and observed parameters may alias at runtime"
+    },
+    {
+      "function": "escaped_other_object",
+      "scope": "parameter_alias",
+      "relation": "parameter_alias_boundary_unknown",
+      "reason": "the retained and observed parameters may alias at runtime"
+    }
+  ]
+}

@@ -1,0 +1,631 @@
+{
+  "schema": "mock-spec.python-observation-study/v1",
+  "case_result": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "flask_308",
+      "dataset": "python-benchmark-new",
+      "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+      "language": "python",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+      "target_selector": "tests/test_308abort.py::test_abort_scenarios"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_308abort.py",
+        "sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+        "bytes": 3044,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:efe0a2dabe591bda",
+        "logical_path": "src/src/flask/__init__.py",
+        "sha256": "2daebda4dc29fed5cb36c912a6115a234e9a4b5f9c33fd795e4bfeffd0cc9386",
+        "bytes": 2072,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:0d48fae8b67acb9c",
+        "logical_path": "src/src/flask/globals.py",
+        "sha256": "1abe9a4e0a96c8bb28c232e2b08993fffdfb9bb694be2230755e54a46a40ca4d",
+        "bytes": 2414,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:f249c086e235096e",
+        "logical_path": "src/src/flask/helpers.py",
+        "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+        "bytes": 23064,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 102,
+          "end_line": 102
+        },
+        "kind": "exception_observation",
+        "origin": "explicit",
+        "reason": "raises in the selected test function"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 120,
+          "end_line": 120
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:2",
+        "location": {
+          "source_id": "test",
+          "start_line": 126,
+          "end_line": 126
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "parameter rows are visible but not enumerated as path-feasible executions"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_308abort.py::test_abort_scenarios",
+        "evidence": [
+          {
+            "symbol": "test_abort_scenarios",
+            "start_line": 48,
+            "end_line": 126
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "unique",
+        "candidates": [],
+        "evidence": [
+          {
+            "logical_path": "src/src/flask/helpers.py",
+            "start_line": 265,
+            "end_line": 265
+          }
+        ],
+        "assumptions": []
+      }
+    },
+    "relations": [
+      {
+        "kind": "call_binding",
+        "modality": "certain",
+        "from": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 103,
+          "end_line": 103
+        },
+        "to": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 265,
+          "end_line": 265
+        },
+        "provenance": "CodeQL FunctionObject.getACall",
+        "precision": "unique selected-scope test-to-visible-product endpoint",
+        "assumptions": [],
+        "observation_ids": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 103,
+          "end_line": 103
+        },
+        "to": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 265,
+          "end_line": 265,
+          "parameter_index": 0
+        },
+        "provenance": "CodeQL Global data flow actual-to-formal",
+        "precision": "matched resolved call context",
+        "assumptions": [],
+        "observation_ids": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 111,
+          "end_line": 111
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 120,
+          "end_line": 120
+        },
+        "provenance": "CodeQL ConditionBlock.controls",
+        "precision": "backend control region: true branch",
+        "assumptions": [],
+        "observation_ids": [
+          "criterion:1"
+        ]
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 111,
+          "end_line": 111
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 126,
+          "end_line": 126
+        },
+        "provenance": "CodeQL ConditionBlock.controls",
+        "precision": "backend control region: false branch",
+        "assumptions": [],
+        "observation_ids": [
+          "criterion:2"
+        ]
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 283,
+          "end_line": 283
+        },
+        "to": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 285,
+          "end_line": 285
+        },
+        "provenance": "CodeQL normal CFG reachability",
+        "precision": "product-internal normal continuation",
+        "assumptions": [],
+        "observation_ids": []
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 285,
+          "end_line": 285
+        },
+        "to": {
+          "scope": "product_function_exceptional_exit"
+        },
+        "provenance": "CodeQL RaisingNode exceptional exit",
+        "precision": "product-internal; not linked to pytest observation",
+        "assumptions": [],
+        "observation_ids": []
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 283,
+          "end_line": 283
+        },
+        "to": {
+          "scope": "product_function_exceptional_exit"
+        },
+        "provenance": "CodeQL RaisingNode exceptional exit",
+        "precision": "product-internal; not linked to pytest observation",
+        "assumptions": [],
+        "observation_ids": []
+      }
+    ],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "verified_correct"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "verified_correct"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "verified_incomplete"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [
+        "selected visible Flask source scope only"
+      ],
+      "unknown_effects": [
+        {
+          "boundary_id": "product-call:283",
+          "effect": "may_write_or_raise",
+          "scope": "receiver",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:283",
+          "effect": "may_write_or_raise",
+          "scope": "direct_arguments",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:283",
+          "effect": "may_write_or_raise",
+          "scope": "return_alias",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:283",
+          "effect": "may_write_or_raise",
+          "scope": "global_or_escaped_state",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:283",
+          "effect": "may_write_or_raise",
+          "scope": "transitive_heap",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:285",
+          "effect": "may_write_or_raise",
+          "scope": "receiver",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:285",
+          "effect": "may_write_or_raise",
+          "scope": "direct_arguments",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:285",
+          "effect": "may_write_or_raise",
+          "scope": "return_alias",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:285",
+          "effect": "may_write_or_raise",
+          "scope": "global_or_escaped_state",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:285",
+          "effect": "may_write_or_raise",
+          "scope": "transitive_heap",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "pytest.raises suppression and exception-object construction across the library boundary",
+          "reason": "outside bounded model"
+        },
+        {
+          "scope": "receiver, global, escaped, dynamic-field, and transitive-heap effects",
+          "reason": "outside bounded model"
+        },
+        {
+          "scope": "return-alias effects beyond the one-hop mechanism support domain",
+          "reason": "outside bounded model"
+        },
+        {
+          "scope": "path satisfiability and hidden Mock behavior",
+          "reason": "outside bounded model"
+        },
+        {
+          "scope": "observation_value_mapping",
+          "observation_id": "criterion:0",
+          "reason": "pytest.raises capture semantics and the hidden Mock behavior are not expanded by the backend"
+        },
+        {
+          "scope": "observation_value_mapping",
+          "observation_id": "criterion:1",
+          "reason": "the branch is backend-verifiable, but product exception to exc_info.value string flow is not"
+        },
+        {
+          "scope": "observation_value_mapping",
+          "observation_id": "criterion:2",
+          "reason": "the branch is backend-verifiable, but product exception to exc_info.value string flow is not"
+        }
+      ]
+    },
+    "completion": {
+      "status": "partial",
+      "stage": "observation_mapping",
+      "failure_categories": [
+        "observation_value_mapping_unknown"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "verified_incomplete",
+      "reviewer": "pre_registered_source_oracle",
+      "evidence": [
+        {
+          "observation_id": "criterion:0",
+          "expectation_id": "raises-context:102",
+          "location": {
+            "logical_path": "tests/test_308abort.py",
+            "start_line": 102,
+            "end_line": 102
+          }
+        },
+        {
+          "observation_id": "criterion:1",
+          "expectation_id": "assert-exception:120",
+          "location": {
+            "logical_path": "tests/test_308abort.py",
+            "start_line": 120,
+            "end_line": 120
+          }
+        },
+        {
+          "observation_id": "criterion:2",
+          "expectation_id": "assert-exception:126",
+          "location": {
+            "logical_path": "tests/test_308abort.py",
+            "start_line": 126,
+            "end_line": 126
+          }
+        }
+      ],
+      "notes": "backend-supported internal relations verified; cross-library observation value flow remains unknown"
+    },
+    "cost": {
+      "timings_seconds": {
+        "flask-control-flow": 5.2,
+        "flask-db": 5.11,
+        "flask-exceptions": 9.51,
+        "flask-flask-abort": 9.92,
+        "flask-flask-observation-flow": 12.64,
+        "flask-state-flow": 9.12
+      },
+      "total_seconds": 51.5,
+      "total_scope": "Flask database creation and Flask-prefixed queries only; mechanism cost is separate",
+      "timing_coverage": "complete",
+      "peak_memory": {
+        "status": "measured",
+        "bytes": 738496512,
+        "reason": "maximum of per-process max RSS; not a simultaneous whole-run peak"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "OS and CodeQL compilation caches not isolated"
+      },
+      "input_size": {
+        "files": 4,
+        "bytes": 30594
+      },
+      "graph_size": {
+        "nodes": null,
+        "edges": null,
+        "relation_count": 7,
+        "reason": "backend graph size is not exported by these queries"
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter preparation is not separately timed"
+        },
+        {
+          "phase": "criterion_extraction",
+          "reason": "included in adapter process, not separately timed"
+        },
+        {
+          "phase": "observation_mapping",
+          "reason": "mapper and serialization are not separately timed"
+        },
+        {
+          "phase": "path_feasibility",
+          "reason": "not evaluated"
+        },
+        {
+          "phase": "star_args_and_kwargs",
+          "reason": "only positional argument 0 has matched actual/formal evidence"
+        }
+      ]
+    }
+  },
+  "observation_aliases": [
+    {
+      "observation_id": "criterion:0",
+      "expectation_id": "raises-context:102",
+      "location": {
+        "logical_path": "tests/test_308abort.py",
+        "start_line": 102,
+        "end_line": 102
+      }
+    },
+    {
+      "observation_id": "criterion:1",
+      "expectation_id": "assert-exception:120",
+      "location": {
+        "logical_path": "tests/test_308abort.py",
+        "start_line": 120,
+        "end_line": 120
+      }
+    },
+    {
+      "observation_id": "criterion:2",
+      "expectation_id": "assert-exception:126",
+      "location": {
+        "logical_path": "tests/test_308abort.py",
+        "start_line": 126,
+        "end_line": 126
+      }
+    }
+  ],
+  "unknown_observation_mappings": [
+    {
+      "observation_id": "criterion:0",
+      "status": "unknown",
+      "reason": "pytest.raises capture semantics and the hidden Mock behavior are not expanded by the backend",
+      "missing_relation": "product exception to pytest capture value"
+    },
+    {
+      "observation_id": "criterion:1",
+      "status": "unknown",
+      "reason": "the branch is backend-verifiable, but product exception to exc_info.value string flow is not",
+      "missing_relation": "product exception to pytest capture value"
+    },
+    {
+      "observation_id": "criterion:2",
+      "status": "unknown",
+      "reason": "the branch is backend-verifiable, but product exception to exc_info.value string flow is not",
+      "missing_relation": "product exception to pytest capture value"
+    }
+  ],
+  "mechanism_validation": {
+    "status": "verified_bounded",
+    "positive_relations": [
+      "execution_effect_after_state_kill",
+      "return_alias_write_to_argument_read",
+      "unknown_may_write_to_read",
+      "unknown_state_killed_by_definite_write"
+    ],
+    "negative_relations": [
+      "conditional_write_not_a_kill",
+      "return_alias_other_field_excluded",
+      "trusted_fresh_argument_region_disjoint",
+      "trusted_fresh_return_alias_channel_disjoint"
+    ],
+    "exception_relations": [
+      "write_effect_exception_path_to_read"
+    ],
+    "scope": "mechanism probe only; not automatically attached to Flask observations",
+    "verdict_schema": "mock-spec.issue24-verdict/v2",
+    "cost": {
+      "timings_seconds": {
+        "probe-control-flow": 6.42,
+        "probe-db": 5.01,
+        "probe-effects": 10.12,
+        "probe-exceptions": 6.21,
+        "probe-global-flow": 10.73,
+        "probe-local-flow": 10.52,
+        "probe-reachability": 6.11,
+        "probe-state-flow": 6.71,
+        "probe-unknown-effect-flow": 9.12,
+        "probe-unknown-exception-state": 5.41
+      },
+      "total_seconds": 76.36,
+      "peak_memory": {
+        "status": "measured",
+        "bytes": 689405952,
+        "reason": "maximum of per-process max RSS; not a simultaneous whole-run peak"
+      },
+      "scope": "mechanism database and mechanism queries only",
+      "timing_coverage": "complete",
+      "missing_timings": []
+    }
+  },
+  "pre_registered_expectations": {
+    "schema": "mock-spec.python-observation-expectations/v1",
+    "case_id": "flask_308",
+    "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+    "observations": [
+      {
+        "observation_id": "raises-context:102",
+        "kind": "exception_context",
+        "logical_path": "tests/test_308abort.py",
+        "line": 102,
+        "expected_mapping": "unknown",
+        "reason": "pytest.raises capture semantics and the hidden Mock behavior are not expanded by the backend"
+      },
+      {
+        "observation_id": "assert-exception:120",
+        "kind": "assertion",
+        "logical_path": "tests/test_308abort.py",
+        "line": 120,
+        "expected_mapping": "unknown",
+        "guard_line": 111,
+        "guard_branch": "true",
+        "reason": "the branch is backend-verifiable, but product exception to exc_info.value string flow is not"
+      },
+      {
+        "observation_id": "assert-exception:126",
+        "kind": "assertion",
+        "logical_path": "tests/test_308abort.py",
+        "line": 126,
+        "expected_mapping": "unknown",
+        "guard_line": 111,
+        "guard_branch": "false",
+        "reason": "the branch is backend-verifiable, but product exception to exc_info.value string flow is not"
+      }
+    ],
+    "preserve": [
+      "resolved test call to visible product function",
+      "actual to formal argument flow with backend context",
+      "test guard control of each visible assertion",
+      "product ctx branch, normal continuation to fallback, and exceptional exits"
+    ],
+    "exclude": [
+      "lexical nesting or source order as dependency evidence",
+      "automatic attachment of product-internal events to every test observation",
+      "equating test has_app_context with product ctx by variable name"
+    ],
+    "unknown": [
+      "pytest.raises suppression and exception-object construction across the library boundary",
+      "receiver, global, escaped, dynamic-field, and transitive-heap effects",
+      "return-alias effects beyond the one-hop mechanism support domain",
+      "path satisfiability and hidden Mock behavior"
+    ]
+  }
+}

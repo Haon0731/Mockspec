@@ -1,0 +1,1344 @@
+{
+  "status": "unsupported",
+  "failure_categories": [
+    "empty_support_source_omitted",
+    "product_source_not_located",
+    "test_to_product_not_reached",
+    "unresolved_calls",
+    "semantic_analysis_gap",
+    "semantic_backend_unsupported"
+  ],
+  "stage": "semantic_backend",
+  "input_context": {
+    "target_selector": "tests/test_424run.py::test_run",
+    "masked_test_logical_path": "tests/test_424run.py",
+    "masked_test_sha256": "3922e68120c5c28fdfc43dbe322f66999575304b7dfc4ebf45abe2b7d802fdb9",
+    "masking_contract": "python-slot-v1"
+  },
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_424run.py::test_run",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_run",
+          "start_line": 17,
+          "end_line": 74
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 40,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 42,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 43,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:2"
+      },
+      {
+        "line": 44,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:3"
+      },
+      {
+        "line": 46,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:4"
+      },
+      {
+        "line": 74,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:5"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "modules",
+        "candidates": [
+          "src/modules/__init__.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [
+      "empty_source_rejected:src/modules/__init__.py"
+    ],
+    "source_rejections": [
+      {
+        "logical_path": "src/modules/__init__.py",
+        "reason": "frozen source is empty"
+      }
+    ],
+    "dynamic_loader_bindings": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 2235,
+    "read_bytes": 2235,
+    "attempted_files": 1,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_424run.py",
+      "sha256": "3922e68120c5c28fdfc43dbe322f66999575304b7dfc4ebf45abe2b7d802fdb9",
+      "bytes": 2235
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "dynamic_loader_bindings": [],
+    "edges": [
+      {
+        "branch": "true",
+        "from": "test:39:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:40:8:With"
+      },
+      {
+        "branch": "true",
+        "from": "test:39:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:42:8:Assert"
+      },
+      {
+        "branch": "true",
+        "from": "test:39:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:43:8:Assert"
+      },
+      {
+        "branch": "true",
+        "from": "test:39:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:44:8:Assert"
+      },
+      {
+        "field": "body",
+        "from": "test:41:12:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:40:8:With"
+      },
+      {
+        "branch": "false",
+        "from": "test:39:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:46:8:Assert"
+      },
+      {
+        "branch": "true",
+        "from": "test:73:7:Name",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:74:8:Assert"
+      },
+      {
+        "from": "test:40:8:With",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:40:82:Name"
+      },
+      {
+        "from": "test:20:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:41:12:Expr",
+        "variable": "command"
+      },
+      {
+        "from": "test:21:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:41:12:Expr",
+        "variable": "desc"
+      },
+      {
+        "from": "test:22:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:41:12:Expr",
+        "variable": "errdesc"
+      },
+      {
+        "from": "test:23:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:41:12:Expr",
+        "variable": "custom_env"
+      },
+      {
+        "from": "test:24:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:41:12:Expr",
+        "variable": "live"
+      },
+      {
+        "from": "test:20:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:42:8:Assert",
+        "variable": "command"
+      },
+      {
+        "from": "test:40:82:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:42:8:Assert",
+        "variable": "exc_info"
+      },
+      {
+        "from": "test:40:82:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:43:8:Assert",
+        "variable": "exc_info"
+      },
+      {
+        "from": "test:40:82:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:44:8:Assert",
+        "variable": "exc_info"
+      },
+      {
+        "from": "test:20:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:46:8:Assert",
+        "variable": "command"
+      },
+      {
+        "from": "test:21:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:46:8:Assert",
+        "variable": "desc"
+      },
+      {
+        "from": "test:22:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:46:8:Assert",
+        "variable": "errdesc"
+      },
+      {
+        "from": "test:23:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:46:8:Assert",
+        "variable": "custom_env"
+      },
+      {
+        "from": "test:24:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:46:8:Assert",
+        "variable": "live"
+      },
+      {
+        "from": "test:28:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:46:8:Assert",
+        "variable": "expected"
+      },
+      {
+        "from": "test:29:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:74:8:Assert",
+        "variable": "capsys"
+      },
+      {
+        "from": "test:21:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:74:8:Assert",
+        "variable": "desc"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected",
+      "dynamic loader origins require a visible static path, namespace key, selected definition, and unrebound test callable"
+    ],
+    "nodes": [
+      {
+        "code": "command",
+        "end_line": 20,
+        "id": "test:20:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 20
+      },
+      {
+        "code": "desc",
+        "end_line": 21,
+        "id": "test:21:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 21
+      },
+      {
+        "code": "errdesc",
+        "end_line": 22,
+        "id": "test:22:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 22
+      },
+      {
+        "code": "custom_env",
+        "end_line": 23,
+        "id": "test:23:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 23
+      },
+      {
+        "code": "live",
+        "end_line": 24,
+        "id": "test:24:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 24
+      },
+      {
+        "code": "expected",
+        "end_line": 28,
+        "id": "test:28:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 28
+      },
+      {
+        "code": "capsys",
+        "end_line": 29,
+        "id": "test:29:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 29
+      },
+      {
+        "code": "returncode",
+        "end_line": 39,
+        "id": "test:39:7:Name",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 39
+      },
+      {
+        "code": "exc_info",
+        "end_line": 40,
+        "id": "test:40:82:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 40
+      },
+      {
+        "code": "with pytest.raises(RuntimeError, match='failed|Error running command') as exc_info:\n    launch_utils.run(command, desc=desc, errdesc=errdesc, custom_env=custom_env, live=live)",
+        "contains_unresolved_call": true,
+        "end_line": 41,
+        "exception_possible": true,
+        "id": "test:40:8:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 40,
+        "unresolved_calls": [
+          "pytest.raises(RuntimeError, match='failed|Error running command')"
+        ]
+      },
+      {
+        "code": "launch_utils.run(command, desc=desc, errdesc=errdesc, custom_env=custom_env, live=live)",
+        "contains_unresolved_call": true,
+        "end_line": 41,
+        "exception_possible": true,
+        "id": "test:41:12:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 41,
+        "unresolved_calls": [
+          "launch_utils.run(command, desc=desc, errdesc=errdesc, custom_env=custom_env, live=live)"
+        ]
+      },
+      {
+        "code": "assert f'Command: {command}' in str(exc_info.value)",
+        "contains_unresolved_call": true,
+        "end_line": 42,
+        "exception_possible": true,
+        "id": "test:42:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 42,
+        "unresolved_calls": [
+          "str(exc_info.value)"
+        ]
+      },
+      {
+        "code": "assert 'stdout: out' in str(exc_info.value)",
+        "contains_unresolved_call": true,
+        "end_line": 43,
+        "exception_possible": true,
+        "id": "test:43:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 43,
+        "unresolved_calls": [
+          "str(exc_info.value)"
+        ]
+      },
+      {
+        "code": "assert 'stderr: err' in str(exc_info.value)",
+        "contains_unresolved_call": true,
+        "end_line": 44,
+        "exception_possible": true,
+        "id": "test:44:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 44,
+        "unresolved_calls": [
+          "str(exc_info.value)"
+        ]
+      },
+      {
+        "code": "assert launch_utils.run(command, desc=desc, errdesc=errdesc, custom_env=custom_env, live=live) == expected",
+        "contains_unresolved_call": true,
+        "end_line": 46,
+        "exception_possible": true,
+        "id": "test:46:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 46,
+        "unresolved_calls": [
+          "launch_utils.run(command, desc=desc, errdesc=errdesc, custom_env=custom_env, live=live)"
+        ]
+      },
+      {
+        "code": "desc",
+        "end_line": 73,
+        "id": "test:73:7:Name",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 73
+      },
+      {
+        "code": "assert capsys.readouterr().out == f'{desc}\\n'",
+        "contains_unresolved_call": true,
+        "end_line": 74,
+        "exception_possible": true,
+        "id": "test:74:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 74,
+        "unresolved_calls": [
+          "capsys.readouterr()"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:40:8:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:42:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:43:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:3",
+        "seed": "test:44:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:4",
+        "seed": "test:46:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:5",
+        "seed": "test:74:8:Assert"
+      }
+    ],
+    "seeds": [
+      "test:40:8:With",
+      "test:42:8:Assert",
+      "test:43:8:Assert",
+      "test:44:8:Assert",
+      "test:46:8:Assert",
+      "test:74:8:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 17,
+    "edges": 25,
+    "edge_kinds": {
+      "lexical_control": 6,
+      "normal_body_exit": 1,
+      "definition_value_candidate": 1,
+      "data_candidate": 17
+    },
+    "criteria": [
+      {
+        "seed": "test:40:8:With",
+        "node_ids": [
+          "test:20:4:arg",
+          "test:21:4:arg",
+          "test:22:4:arg",
+          "test:23:4:arg",
+          "test:24:4:arg",
+          "test:39:7:Name",
+          "test:40:8:With",
+          "test:41:12:Expr"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:40:8:With",
+          "test:41:12:Expr"
+        ]
+      },
+      {
+        "seed": "test:42:8:Assert",
+        "node_ids": [
+          "test:20:4:arg",
+          "test:21:4:arg",
+          "test:22:4:arg",
+          "test:23:4:arg",
+          "test:24:4:arg",
+          "test:39:7:Name",
+          "test:40:82:Name",
+          "test:40:8:With",
+          "test:41:12:Expr",
+          "test:42:8:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:40:8:With",
+          "test:41:12:Expr",
+          "test:42:8:Assert"
+        ]
+      },
+      {
+        "seed": "test:43:8:Assert",
+        "node_ids": [
+          "test:20:4:arg",
+          "test:21:4:arg",
+          "test:22:4:arg",
+          "test:23:4:arg",
+          "test:24:4:arg",
+          "test:39:7:Name",
+          "test:40:82:Name",
+          "test:40:8:With",
+          "test:41:12:Expr",
+          "test:43:8:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:40:8:With",
+          "test:41:12:Expr",
+          "test:43:8:Assert"
+        ]
+      },
+      {
+        "seed": "test:44:8:Assert",
+        "node_ids": [
+          "test:20:4:arg",
+          "test:21:4:arg",
+          "test:22:4:arg",
+          "test:23:4:arg",
+          "test:24:4:arg",
+          "test:39:7:Name",
+          "test:40:82:Name",
+          "test:40:8:With",
+          "test:41:12:Expr",
+          "test:44:8:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:40:8:With",
+          "test:41:12:Expr",
+          "test:44:8:Assert"
+        ]
+      },
+      {
+        "seed": "test:46:8:Assert",
+        "node_ids": [
+          "test:20:4:arg",
+          "test:21:4:arg",
+          "test:22:4:arg",
+          "test:23:4:arg",
+          "test:24:4:arg",
+          "test:28:4:arg",
+          "test:39:7:Name",
+          "test:46:8:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:46:8:Assert"
+        ]
+      },
+      {
+        "seed": "test:74:8:Assert",
+        "node_ids": [
+          "test:21:4:arg",
+          "test:29:4:arg",
+          "test:73:7:Name",
+          "test:74:8:Assert"
+        ],
+        "product_source_candidates": [],
+        "unknown_call_nodes": [
+          "test:74:8:Assert"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:40:8:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:42:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:43:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:3",
+        "seed": "test:44:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:4",
+        "seed": "test:46:8:Assert"
+      },
+      {
+        "criterion_id": "criterion:5",
+        "seed": "test:74:8:Assert"
+      }
+    ],
+    "reaches_product_candidate": false,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.107,
+  "timings_seconds": {
+    "criterion_extraction": 0.001066,
+    "source_selection": 0.002714,
+    "backend_total": 0.103045,
+    "evidence_summary": 0.000135
+  },
+  "identity": {
+    "case_id": "stable-diffusion-webui_424",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "5c89c5e78feb54c97f6697781a0681aa0d563c6f0886177c02f2a29f36439674"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "stable-diffusion-webui_424",
+      "dataset": "python-benchmark-new",
+      "language": "python",
+      "snapshot_id": "5c89c5e78feb54c97f6697781a0681aa0d563c6f0886177c02f2a29f36439674",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "3922e68120c5c28fdfc43dbe322f66999575304b7dfc4ebf45abe2b7d802fdb9",
+      "target_selector": "tests/test_424run.py::test_run"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_424run.py",
+        "sha256": "3922e68120c5c28fdfc43dbe322f66999575304b7dfc4ebf45abe2b7d802fdb9",
+        "bytes": 2235,
+        "selection_role": "masked_test"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 40,
+          "end_line": 40
+        },
+        "kind": "exception_observation",
+        "origin": "explicit",
+        "reason": "raises in the selected test function"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 42,
+          "end_line": 42
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:2",
+        "location": {
+          "source_id": "test",
+          "start_line": 43,
+          "end_line": 43
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:3",
+        "location": {
+          "source_id": "test",
+          "start_line": 44,
+          "end_line": 44
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:4",
+        "location": {
+          "source_id": "test",
+          "start_line": 46,
+          "end_line": 46
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:5",
+        "location": {
+          "source_id": "test",
+          "start_line": 74,
+          "end_line": 74
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "the runner does not enumerate parameter rows"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_424run.py::test_run",
+        "evidence": [
+          {
+            "symbol": "test_run",
+            "start_line": 17,
+            "end_line": 74
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "not_evaluated",
+        "candidates": [],
+        "evidence": [],
+        "assumptions": []
+      }
+    },
+    "relations": [],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [],
+      "unknown_effects": [
+        {
+          "boundary_id": "test:40:8:With",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:41:12:Expr",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:42:8:Assert",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:43:8:Assert",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:44:8:Assert",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:46:8:Assert",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:74:8:Assert",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "mature_backend_support_domain",
+          "reason": "semantic_backend_unsupported",
+          "details": [
+            "No authenticated Python semantic driver is registered for this case.",
+            "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+            "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+          ]
+        }
+      ]
+    },
+    "completion": {
+      "status": "unsupported",
+      "stage": "semantic_backend",
+      "failure_categories": [
+        "empty_support_source_omitted",
+        "product_source_not_located",
+        "test_to_product_not_reached",
+        "unresolved_calls",
+        "semantic_analysis_gap",
+        "semantic_backend_unsupported"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "not_evaluated",
+      "reviewer": null,
+      "evidence": [],
+      "notes": "candidate reachability is not semantic dependency validation"
+    },
+    "cost": {
+      "timings_seconds": {
+        "criterion_extraction": 0.001066,
+        "source_selection": 0.002714,
+        "backend_total": 0.103045,
+        "evidence_summary": 0.000135
+      },
+      "total_seconds": 0.107,
+      "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+      "peak_memory": {
+        "status": "unavailable",
+        "bytes": null,
+        "reason": "case-level peak memory is not measured by this runner"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+      },
+      "input_size": {
+        "files": 1,
+        "bytes": 2235
+      },
+      "graph_size": {
+        "nodes": 17,
+        "edges": 25
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter admission occurs outside the per-case analysis timer"
+        },
+        {
+          "phase": "front_end",
+          "reason": "the candidate backend does not report parsing time separately"
+        },
+        {
+          "phase": "call_graph",
+          "reason": "the candidate backend does not report call-graph time separately"
+        },
+        {
+          "phase": "pointer_analysis",
+          "reason": "the candidate backend does not provide pointer analysis"
+        },
+        {
+          "phase": "dependency_analysis",
+          "reason": "backend_total combines parsing, graph construction, and slicing"
+        },
+        {
+          "phase": "slice",
+          "reason": "the candidate backend does not report semantic slicing time separately"
+        },
+        {
+          "phase": "source_mapping",
+          "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+        }
+      ]
+    }
+  },
+  "candidate_diagnostics": {
+    "status": "partial",
+    "failure_categories": [
+      "empty_support_source_omitted",
+      "product_source_not_located",
+      "test_to_product_not_reached",
+      "unresolved_calls",
+      "semantic_analysis_gap"
+    ],
+    "result_contract": {
+      "schema_version": "mock-spec.backward-analysis-case/v1",
+      "identity": {
+        "case_id": "stable-diffusion-webui_424",
+        "dataset": "python-benchmark-new",
+        "language": "python",
+        "snapshot_id": "5c89c5e78feb54c97f6697781a0681aa0d563c6f0886177c02f2a29f36439674",
+        "masking_contract": "python-slot-v1",
+        "masked_test_sha256": "3922e68120c5c28fdfc43dbe322f66999575304b7dfc4ebf45abe2b7d802fdb9",
+        "target_selector": "tests/test_424run.py::test_run"
+      },
+      "source_scope": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_424run.py",
+          "sha256": "3922e68120c5c28fdfc43dbe322f66999575304b7dfc4ebf45abe2b7d802fdb9",
+          "bytes": 2235,
+          "selection_role": "masked_test"
+        }
+      ],
+      "observations": [
+        {
+          "observation_id": "criterion:0",
+          "location": {
+            "source_id": "test",
+            "start_line": 40,
+            "end_line": 40
+          },
+          "kind": "exception_observation",
+          "origin": "explicit",
+          "reason": "raises in the selected test function"
+        },
+        {
+          "observation_id": "criterion:1",
+          "location": {
+            "source_id": "test",
+            "start_line": 42,
+            "end_line": 42
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        },
+        {
+          "observation_id": "criterion:2",
+          "location": {
+            "source_id": "test",
+            "start_line": 43,
+            "end_line": 43
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        },
+        {
+          "observation_id": "criterion:3",
+          "location": {
+            "source_id": "test",
+            "start_line": 44,
+            "end_line": 44
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        },
+        {
+          "observation_id": "criterion:4",
+          "location": {
+            "source_id": "test",
+            "start_line": 46,
+            "end_line": 46
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        },
+        {
+          "observation_id": "criterion:5",
+          "location": {
+            "source_id": "test",
+            "start_line": 74,
+            "end_line": 74
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        }
+      ],
+      "parameterization": {
+        "status": "not_expanded",
+        "coverage": "selected_test_definition",
+        "reason": "the runner does not enumerate parameter rows"
+      },
+      "entry_point": {
+        "test_selection": {
+          "origin": "task_provided",
+          "status": "unique",
+          "selector": "tests/test_424run.py::test_run",
+          "evidence": [
+            {
+              "symbol": "test_run",
+              "start_line": 17,
+              "end_line": 74
+            }
+          ]
+        },
+        "mut_binding": {
+          "origin": "automatic",
+          "status": "not_evaluated",
+          "candidates": [],
+          "evidence": [],
+          "assumptions": []
+        }
+      },
+      "relations": [],
+      "relation_coverage": [
+        {
+          "kind": "call_binding",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "control_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "exception_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "function_origin",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "normal_return_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "state_flow",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "value_flow",
+          "status": "not_evaluated"
+        }
+      ],
+      "analysis_boundaries": {
+        "assumptions": [],
+        "unknown_effects": [
+          {
+            "boundary_id": "test:40:8:With",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:41:12:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:42:8:Assert",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:43:8:Assert",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:44:8:Assert",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:46:8:Assert",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:74:8:Assert",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          }
+        ],
+        "unanalysed_regions": [
+          {
+            "scope": "semantic_relations",
+            "reason": "candidate_graph_has_no_validated_dependency_semantics"
+          }
+        ]
+      },
+      "completion": {
+        "status": "partial",
+        "stage": "complete",
+        "failure_categories": [
+          "empty_support_source_omitted",
+          "product_source_not_located",
+          "test_to_product_not_reached",
+          "unresolved_calls",
+          "semantic_analysis_gap"
+        ],
+        "error": null
+      },
+      "semantic_validation": {
+        "status": "not_evaluated",
+        "reviewer": null,
+        "evidence": [],
+        "notes": "candidate reachability is not semantic dependency validation"
+      },
+      "cost": {
+        "timings_seconds": {
+          "criterion_extraction": 0.001066,
+          "source_selection": 0.002714,
+          "backend_total": 0.103045,
+          "evidence_summary": 0.000135
+        },
+        "total_seconds": 0.107,
+        "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+        "peak_memory": {
+          "status": "unavailable",
+          "bytes": null,
+          "reason": "case-level peak memory is not measured by this runner"
+        },
+        "cache_state": {
+          "status": "unknown",
+          "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+        },
+        "input_size": {
+          "files": 1,
+          "bytes": 2235
+        },
+        "graph_size": {
+          "nodes": 17,
+          "edges": 25
+        },
+        "unavailable_phases": [
+          {
+            "phase": "input_admission",
+            "reason": "adapter admission occurs outside the per-case analysis timer"
+          },
+          {
+            "phase": "front_end",
+            "reason": "the candidate backend does not report parsing time separately"
+          },
+          {
+            "phase": "call_graph",
+            "reason": "the candidate backend does not report call-graph time separately"
+          },
+          {
+            "phase": "pointer_analysis",
+            "reason": "the candidate backend does not provide pointer analysis"
+          },
+          {
+            "phase": "dependency_analysis",
+            "reason": "backend_total combines parsing, graph construction, and slicing"
+          },
+          {
+            "phase": "slice",
+            "reason": "the candidate backend does not report semantic slicing time separately"
+          },
+          {
+            "phase": "source_mapping",
+            "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+          }
+        ]
+      }
+    },
+    "stage": "complete",
+    "error": null,
+    "elapsed_seconds": 0.107,
+    "timings_seconds": {
+      "criterion_extraction": 0.001066,
+      "source_selection": 0.002714,
+      "backend_total": 0.103045,
+      "evidence_summary": 0.000135
+    },
+    "graph_and_evidence": "top-level graph/evidence/sources remain candidate diagnostics only"
+  },
+  "semantic_backend": {
+    "schema": "mock-spec.batch-semantic-backend/v1",
+    "status": "unsupported",
+    "backend": null,
+    "identity": {
+      "language": "python",
+      "dataset": "python-benchmark-new",
+      "case_id": "stable-diffusion-webui_424",
+      "inventory_revision": "0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc",
+      "snapshot_id": "5c89c5e78feb54c97f6697781a0681aa0d563c6f0886177c02f2a29f36439674",
+      "snapshot_root": "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/python-benchmark-new/5c89c5e78feb54c97f6697781a0681aa0d563c6f0886177c02f2a29f36439674",
+      "admission_status": "frozen_candidate",
+      "admission_verified": false,
+      "reviewed_snapshot_id": null,
+      "target_selector": "tests/test_424run.py::test_run",
+      "masked_test_logical_path": "tests/test_424run.py",
+      "masked_test_sha256": "3922e68120c5c28fdfc43dbe322f66999575304b7dfc4ebf45abe2b7d802fdb9",
+      "masking_contract": "python-slot-v1",
+      "input_context": {
+        "target_selector": "tests/test_424run.py::test_run",
+        "masked_test_logical_path": "tests/test_424run.py",
+        "masked_test_sha256": "3922e68120c5c28fdfc43dbe322f66999575304b7dfc4ebf45abe2b7d802fdb9",
+        "masking_contract": "python-slot-v1"
+      },
+      "sources": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_424run.py",
+          "sha256": "3922e68120c5c28fdfc43dbe322f66999575304b7dfc4ebf45abe2b7d802fdb9",
+          "bytes": 2235
+        }
+      ]
+    },
+    "limitations": [
+      "No authenticated Python semantic driver is registered for this case.",
+      "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+      "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+    ],
+    "source": null,
+    "provenance": {
+      "target_executed": false
+    },
+    "cost": null,
+    "terminal": {
+      "execution": "not_started",
+      "semantic_validation": "not_evaluated"
+    },
+    "driver_exit_code": 0,
+    "batch_dispatch_seconds": 0.131449,
+    "batch_dispatch_scope": "bridge process including support check, adapter and backend; excludes candidate diagnostics"
+  },
+  "batch_case_cost": {
+    "total_seconds": 0.253433,
+    "scope": "admission, candidate diagnostic, semantic-slot wait, dispatch and mapping; excludes case queue, shared compile and serialization"
+  },
+  "result_contract_sha256": "9bde3399df5a991b50d22f2d58013a54eae98a3969e234afc71ba1166119bee0"
+}

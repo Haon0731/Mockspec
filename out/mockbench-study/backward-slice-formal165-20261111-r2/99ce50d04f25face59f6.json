@@ -1,0 +1,1346 @@
+{
+  "status": "unsupported",
+  "failure_categories": [
+    "source_budget",
+    "unresolved_calls",
+    "semantic_analysis_gap",
+    "semantic_backend_unsupported"
+  ],
+  "stage": "semantic_backend",
+  "input_context": {
+    "target_selector": "tests/test_438get_export.py::test_get_export_validates_format_and_returns_api_payload",
+    "masked_test_logical_path": "tests/test_438get_export.py",
+    "masked_test_sha256": "c81db7776a8449aeac2aabd81627cf4efa9a9c8324d9ea8e594cc3297b48a688",
+    "masking_contract": "python-slot-v1"
+  },
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_438get_export.py::test_get_export_validates_format_and_returns_api_payload",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_get_export_validates_format_and_returns_api_payload",
+          "start_line": 20,
+          "end_line": 66
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 47,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 54,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises",
+        "criterion_id": "criterion:1"
+      },
+      {
+        "line": 60,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:2"
+      }
+    ],
+    "dynamic_loading": [
+      {
+        "line": 35,
+        "name": "load_function_from_source_ast",
+        "precision": "python_ast_call_name"
+      }
+    ],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_dynamic_path",
+        "hint": "src/ultralytics/hub/__init__.py",
+        "candidates": [
+          "src/ultralytics/hub/__init__.py"
+        ],
+        "precision": "exact_visible_path"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/ultralytics/hub/__init__.py",
+        "hint_kind": "python_import",
+        "hint": "ultralytics.data.utils",
+        "candidates": [
+          "src/ultralytics/data/utils.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/ultralytics/hub/__init__.py",
+        "hint_kind": "python_import",
+        "hint": "ultralytics.hub.auth",
+        "candidates": [
+          "src/ultralytics/hub/auth.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/ultralytics/hub/__init__.py",
+        "hint_kind": "python_import",
+        "hint": "ultralytics.hub.session",
+        "candidates": [
+          "src/ultralytics/hub/session.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/ultralytics/hub/__init__.py",
+        "hint_kind": "python_import",
+        "hint": "ultralytics.hub.utils",
+        "candidates": [
+          "src/ultralytics/hub/utils.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/ultralytics/hub/__init__.py",
+        "hint_kind": "python_import",
+        "hint": "ultralytics.utils",
+        "candidates": [
+          "src/ultralytics/utils/__init__.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/ultralytics/hub/__init__.py",
+        "hint_kind": "python_import",
+        "hint": "ultralytics.engine.exporter",
+        "candidates": [
+          "src/ultralytics/engine/exporter.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [
+      "byte_budget_omitted:src/ultralytics/engine/exporter.py"
+    ],
+    "source_rejections": [],
+    "dynamic_loader_bindings": [],
+    "truncated": true,
+    "opaque_methods": [],
+    "selected_bytes": 131643,
+    "read_bytes": 205153,
+    "attempted_files": 7,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_438get_export.py",
+      "sha256": "c81db7776a8449aeac2aabd81627cf4efa9a9c8324d9ea8e594cc3297b48a688",
+      "bytes": 2000
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/ultralytics/hub/__init__.py",
+      "sha256": "6742bf134d23cd087dd1bd7cab72030a1c15993bf2218a7a0b4d2c095fa7d85f",
+      "bytes": 6709
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/ultralytics/data/utils.py",
+      "sha256": "41fca902dd1f1827dbe4f1b0f68f596bec671f9314553b044e4fbf64186d2e4a",
+      "bytes": 36818
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/ultralytics/hub/auth.py",
+      "sha256": "00dcc279903b954cd359cfec1476c3baec818758cb976b13a4792851b2241581",
+      "bytes": 6254
+    },
+    {
+      "source_id": "source:4",
+      "logical_path": "src/ultralytics/hub/session.py",
+      "sha256": "3b305700bf51d77e6044375f35852aca24abc4ec9a88c142558499b9af7db05d",
+      "bytes": 18364
+    },
+    {
+      "source_id": "source:5",
+      "logical_path": "src/ultralytics/hub/utils.py",
+      "sha256": "8e49e5974eb235a0312b23aa2a58882c9bf55ce537f562563861bf0f2154876d",
+      "bytes": 6353
+    },
+    {
+      "source_id": "source:6",
+      "logical_path": "src/ultralytics/utils/__init__.py",
+      "sha256": "5cb10afe9be9b7335684968ef31d0c5a0851108c840de8b42ce1a7527994d4a8",
+      "bytes": 55145
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "dynamic_loader_bindings": [],
+    "edges": [
+      {
+        "branch": "true",
+        "from": "test:46:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:47:8:With"
+      },
+      {
+        "field": "body",
+        "from": "test:48:12:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:47:8:With"
+      },
+      {
+        "branch": "true",
+        "from": "test:53:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:54:8:With"
+      },
+      {
+        "field": "body",
+        "from": "test:55:12:Expr",
+        "kind": "normal_body_exit",
+        "precision": "possible_only_if_body_completes_normally",
+        "to": "test:54:8:With"
+      },
+      {
+        "branch": "false",
+        "from": "test:53:7:Compare",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "test:60:8:Assert"
+      },
+      {
+        "from": "test:23:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:23:4:Name"
+      },
+      {
+        "from": "test:35:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:35:4:Name"
+      },
+      {
+        "from": "test:35:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:48:12:Expr",
+        "variable": "get_export"
+      },
+      {
+        "from": "test:21:22:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:48:12:Expr",
+        "variable": "format_name"
+      },
+      {
+        "from": "test:35:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:55:12:Expr",
+        "variable": "get_export"
+      },
+      {
+        "from": "test:21:22:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:55:12:Expr",
+        "variable": "format_name"
+      },
+      {
+        "from": "test:35:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:60:8:Assert",
+        "variable": "get_export"
+      },
+      {
+        "from": "test:21:22:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:60:8:Assert",
+        "variable": "format_name"
+      },
+      {
+        "from": "test:23:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:60:8:Assert",
+        "variable": "payload"
+      },
+      {
+        "callee": "get_export",
+        "from": "source:1:143:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:48:12:Expr"
+      },
+      {
+        "callee": "get_export",
+        "from": "source:1:143:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:55:12:Expr"
+      },
+      {
+        "callee": "get_export",
+        "from": "source:1:143:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:60:8:Assert"
+      },
+      {
+        "from": "source:1:137:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:137:4:Name"
+      },
+      {
+        "from": "source:1:117:15:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:137:4:Assign",
+        "variable": "model_id"
+      },
+      {
+        "from": "source:1:117:35:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:137:4:Assign",
+        "variable": "format"
+      },
+      {
+        "from": "source:1:137:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:143:4:Return",
+        "variable": "r"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected",
+      "dynamic loader origins require a visible static path, namespace key, selected definition, and unrebound test callable"
+    ],
+    "nodes": [
+      {
+        "code": "model_id: str",
+        "end_line": 117,
+        "id": "source:1:117:15:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 117
+      },
+      {
+        "code": "format: str",
+        "end_line": 117,
+        "id": "source:1:117:35:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 117
+      },
+      {
+        "code": "r = requests.post(f'{HUB_API_ROOT}/get-export', json={'apiKey': Auth().api_key, 'modelId': model_id, 'format': format}, headers={'x-api-key': Auth().api_key})",
+        "contains_unresolved_call": true,
+        "end_line": 141,
+        "exception_possible": true,
+        "id": "source:1:137:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 137,
+        "unresolved_calls": [
+          "requests.post(f'{HUB_API_ROOT}/get-export', json={'apiKey': Auth().api_key, 'modelId': model_id, 'format': format}, headers={'x-api-key': Auth().api_key})",
+          "Auth()",
+          "Auth()"
+        ]
+      },
+      {
+        "code": "r",
+        "end_line": 137,
+        "id": "source:1:137:4:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 137
+      },
+      {
+        "code": "return r.json()",
+        "contains_unresolved_call": true,
+        "end_line": 143,
+        "exception_possible": true,
+        "id": "source:1:143:4:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 143,
+        "unresolved_calls": [
+          "r.json()"
+        ]
+      },
+      {
+        "code": "format_name",
+        "end_line": 21,
+        "id": "test:21:22:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 21
+      },
+      {
+        "code": "payload = {'download': 'https://models.example/model.onnx'}",
+        "end_line": 23,
+        "id": "test:23:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 23
+      },
+      {
+        "code": "payload",
+        "end_line": 23,
+        "id": "test:23:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 23
+      },
+      {
+        "code": "get_export = load_function_from_source_ast(SRC_PATH, 'get_export', namespace={'HUB_API_ROOT': 'https://hub.example/api', 'Auth': auth, 'PREFIX': 'HUB: ', 'export_fmts_hub': export_formats})",
+        "contains_unresolved_call": true,
+        "end_line": 44,
+        "exception_possible": true,
+        "id": "test:35:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 35,
+        "unresolved_calls": [
+          "load_function_from_source_ast(SRC_PATH, 'get_export', namespace={'HUB_API_ROOT': 'https://hub.example/api', 'Auth': auth, 'PREFIX': 'HUB: ', 'export_fmts_hub': export_formats})"
+        ]
+      },
+      {
+        "code": "get_export",
+        "end_line": 35,
+        "id": "test:35:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 35
+      },
+      {
+        "code": "scenario == 'unsupported_format'",
+        "end_line": 46,
+        "id": "test:46:7:Compare",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 46
+      },
+      {
+        "code": "with pytest.raises(AssertionError, match='Unsupported export format'):\n    get_export('model-123', format_name)",
+        "contains_unresolved_call": true,
+        "end_line": 48,
+        "exception_possible": true,
+        "id": "test:47:8:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 47,
+        "unresolved_calls": [
+          "pytest.raises(AssertionError, match='Unsupported export format')"
+        ]
+      },
+      {
+        "code": "get_export('model-123', format_name)",
+        "end_line": 48,
+        "exception_possible": true,
+        "id": "test:48:12:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 48
+      },
+      {
+        "code": "scenario == 'api_failure'",
+        "end_line": 53,
+        "id": "test:53:7:Compare",
+        "kind": "if_condition",
+        "source_id": "test",
+        "start_line": 53
+      },
+      {
+        "code": "with pytest.raises(AssertionError, match='get_export failure 502 Bad Gateway'):\n    get_export('model-123', format_name)",
+        "contains_unresolved_call": true,
+        "end_line": 55,
+        "exception_possible": true,
+        "id": "test:54:8:With",
+        "kind": "With",
+        "source_id": "test",
+        "start_line": 54,
+        "unresolved_calls": [
+          "pytest.raises(AssertionError, match='get_export failure 502 Bad Gateway')"
+        ]
+      },
+      {
+        "code": "get_export('model-123', format_name)",
+        "end_line": 55,
+        "exception_possible": true,
+        "id": "test:55:12:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 55
+      },
+      {
+        "code": "assert get_export('model-123', format_name) == payload",
+        "end_line": 60,
+        "exception_possible": true,
+        "id": "test:60:8:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 60
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:47:8:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:54:8:With"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:60:8:Assert"
+      }
+    ],
+    "seeds": [
+      "test:47:8:With",
+      "test:54:8:With",
+      "test:60:8:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 17,
+    "edges": 21,
+    "edge_kinds": {
+      "lexical_control": 3,
+      "normal_body_exit": 2,
+      "definition_value_candidate": 3,
+      "data_candidate": 10,
+      "call_target_candidate": 3
+    },
+    "criteria": [
+      {
+        "seed": "test:47:8:With",
+        "node_ids": [
+          "source:1:117:15:arg",
+          "source:1:117:35:arg",
+          "source:1:137:4:Assign",
+          "source:1:137:4:Name",
+          "source:1:143:4:Return",
+          "test:21:22:arg",
+          "test:35:4:Assign",
+          "test:35:4:Name",
+          "test:46:7:Compare",
+          "test:47:8:With",
+          "test:48:12:Expr"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:137:4:Assign",
+          "source:1:143:4:Return",
+          "test:35:4:Assign",
+          "test:47:8:With"
+        ]
+      },
+      {
+        "seed": "test:54:8:With",
+        "node_ids": [
+          "source:1:117:15:arg",
+          "source:1:117:35:arg",
+          "source:1:137:4:Assign",
+          "source:1:137:4:Name",
+          "source:1:143:4:Return",
+          "test:21:22:arg",
+          "test:35:4:Assign",
+          "test:35:4:Name",
+          "test:53:7:Compare",
+          "test:54:8:With",
+          "test:55:12:Expr"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:137:4:Assign",
+          "source:1:143:4:Return",
+          "test:35:4:Assign",
+          "test:54:8:With"
+        ]
+      },
+      {
+        "seed": "test:60:8:Assert",
+        "node_ids": [
+          "source:1:117:15:arg",
+          "source:1:117:35:arg",
+          "source:1:137:4:Assign",
+          "source:1:137:4:Name",
+          "source:1:143:4:Return",
+          "test:21:22:arg",
+          "test:23:4:Assign",
+          "test:23:4:Name",
+          "test:35:4:Assign",
+          "test:35:4:Name",
+          "test:53:7:Compare",
+          "test:60:8:Assert"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "source:1:137:4:Assign",
+          "source:1:143:4:Return",
+          "test:35:4:Assign"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:47:8:With"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:54:8:With"
+      },
+      {
+        "criterion_id": "criterion:2",
+        "seed": "test:60:8:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.6445,
+  "timings_seconds": {
+    "criterion_extraction": 0.000526,
+    "source_selection": 0.049203,
+    "backend_total": 0.594363,
+    "evidence_summary": 0.000178
+  },
+  "identity": {
+    "case_id": "ultralytics_438",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "9fead7f64d96fc69fa76cc544384ea9d4c39a80b61ad3626f17fa2a09a198af1"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "ultralytics_438",
+      "dataset": "python-benchmark-new",
+      "language": "python",
+      "snapshot_id": "9fead7f64d96fc69fa76cc544384ea9d4c39a80b61ad3626f17fa2a09a198af1",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "c81db7776a8449aeac2aabd81627cf4efa9a9c8324d9ea8e594cc3297b48a688",
+      "target_selector": "tests/test_438get_export.py::test_get_export_validates_format_and_returns_api_payload"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_438get_export.py",
+        "sha256": "c81db7776a8449aeac2aabd81627cf4efa9a9c8324d9ea8e594cc3297b48a688",
+        "bytes": 2000,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:1",
+        "logical_path": "src/ultralytics/hub/__init__.py",
+        "sha256": "6742bf134d23cd087dd1bd7cab72030a1c15993bf2218a7a0b4d2c095fa7d85f",
+        "bytes": 6709,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:2",
+        "logical_path": "src/ultralytics/data/utils.py",
+        "sha256": "41fca902dd1f1827dbe4f1b0f68f596bec671f9314553b044e4fbf64186d2e4a",
+        "bytes": 36818,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:3",
+        "logical_path": "src/ultralytics/hub/auth.py",
+        "sha256": "00dcc279903b954cd359cfec1476c3baec818758cb976b13a4792851b2241581",
+        "bytes": 6254,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:4",
+        "logical_path": "src/ultralytics/hub/session.py",
+        "sha256": "3b305700bf51d77e6044375f35852aca24abc4ec9a88c142558499b9af7db05d",
+        "bytes": 18364,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:5",
+        "logical_path": "src/ultralytics/hub/utils.py",
+        "sha256": "8e49e5974eb235a0312b23aa2a58882c9bf55ce537f562563861bf0f2154876d",
+        "bytes": 6353,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:6",
+        "logical_path": "src/ultralytics/utils/__init__.py",
+        "sha256": "5cb10afe9be9b7335684968ef31d0c5a0851108c840de8b42ce1a7527994d4a8",
+        "bytes": 55145,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 47,
+          "end_line": 47
+        },
+        "kind": "exception_observation",
+        "origin": "explicit",
+        "reason": "raises in the selected test function"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 54,
+          "end_line": 54
+        },
+        "kind": "exception_observation",
+        "origin": "explicit",
+        "reason": "raises in the selected test function"
+      },
+      {
+        "observation_id": "criterion:2",
+        "location": {
+          "source_id": "test",
+          "start_line": 60,
+          "end_line": 60
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "the runner does not enumerate parameter rows"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_438get_export.py::test_get_export_validates_format_and_returns_api_payload",
+        "evidence": [
+          {
+            "symbol": "test_get_export_validates_format_and_returns_api_payload",
+            "start_line": 20,
+            "end_line": 66
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "not_evaluated",
+        "candidates": [],
+        "evidence": [],
+        "assumptions": []
+      }
+    },
+    "relations": [],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [],
+      "unknown_effects": [
+        {
+          "boundary_id": "source:1:137:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "source:1:143:4:Return",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:35:4:Assign",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:47:8:With",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "test:54:8:With",
+          "effect": "unclassified_call_effect",
+          "scope": "unknown",
+          "provenance": "candidate_graph_marker",
+          "precision": "unresolved",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "source_selection",
+          "reason": "source_budget"
+        },
+        {
+          "scope": "mature_backend_support_domain",
+          "reason": "semantic_backend_unsupported",
+          "details": [
+            "No authenticated Python semantic driver is registered for this case.",
+            "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+            "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+          ]
+        }
+      ]
+    },
+    "completion": {
+      "status": "unsupported",
+      "stage": "semantic_backend",
+      "failure_categories": [
+        "source_budget",
+        "unresolved_calls",
+        "semantic_analysis_gap",
+        "semantic_backend_unsupported"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "not_evaluated",
+      "reviewer": null,
+      "evidence": [],
+      "notes": "candidate reachability is not semantic dependency validation"
+    },
+    "cost": {
+      "timings_seconds": {
+        "criterion_extraction": 0.000526,
+        "source_selection": 0.049203,
+        "backend_total": 0.594363,
+        "evidence_summary": 0.000178
+      },
+      "total_seconds": 0.6445,
+      "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+      "peak_memory": {
+        "status": "unavailable",
+        "bytes": null,
+        "reason": "case-level peak memory is not measured by this runner"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+      },
+      "input_size": {
+        "files": 7,
+        "bytes": 131643
+      },
+      "graph_size": {
+        "nodes": 17,
+        "edges": 21
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter admission occurs outside the per-case analysis timer"
+        },
+        {
+          "phase": "front_end",
+          "reason": "the candidate backend does not report parsing time separately"
+        },
+        {
+          "phase": "call_graph",
+          "reason": "the candidate backend does not report call-graph time separately"
+        },
+        {
+          "phase": "pointer_analysis",
+          "reason": "the candidate backend does not provide pointer analysis"
+        },
+        {
+          "phase": "dependency_analysis",
+          "reason": "backend_total combines parsing, graph construction, and slicing"
+        },
+        {
+          "phase": "slice",
+          "reason": "the candidate backend does not report semantic slicing time separately"
+        },
+        {
+          "phase": "source_mapping",
+          "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+        }
+      ]
+    }
+  },
+  "candidate_diagnostics": {
+    "status": "partial",
+    "failure_categories": [
+      "source_budget",
+      "unresolved_calls",
+      "semantic_analysis_gap"
+    ],
+    "result_contract": {
+      "schema_version": "mock-spec.backward-analysis-case/v1",
+      "identity": {
+        "case_id": "ultralytics_438",
+        "dataset": "python-benchmark-new",
+        "language": "python",
+        "snapshot_id": "9fead7f64d96fc69fa76cc544384ea9d4c39a80b61ad3626f17fa2a09a198af1",
+        "masking_contract": "python-slot-v1",
+        "masked_test_sha256": "c81db7776a8449aeac2aabd81627cf4efa9a9c8324d9ea8e594cc3297b48a688",
+        "target_selector": "tests/test_438get_export.py::test_get_export_validates_format_and_returns_api_payload"
+      },
+      "source_scope": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_438get_export.py",
+          "sha256": "c81db7776a8449aeac2aabd81627cf4efa9a9c8324d9ea8e594cc3297b48a688",
+          "bytes": 2000,
+          "selection_role": "masked_test"
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/ultralytics/hub/__init__.py",
+          "sha256": "6742bf134d23cd087dd1bd7cab72030a1c15993bf2218a7a0b4d2c095fa7d85f",
+          "bytes": 6709,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/ultralytics/data/utils.py",
+          "sha256": "41fca902dd1f1827dbe4f1b0f68f596bec671f9314553b044e4fbf64186d2e4a",
+          "bytes": 36818,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:3",
+          "logical_path": "src/ultralytics/hub/auth.py",
+          "sha256": "00dcc279903b954cd359cfec1476c3baec818758cb976b13a4792851b2241581",
+          "bytes": 6254,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:4",
+          "logical_path": "src/ultralytics/hub/session.py",
+          "sha256": "3b305700bf51d77e6044375f35852aca24abc4ec9a88c142558499b9af7db05d",
+          "bytes": 18364,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:5",
+          "logical_path": "src/ultralytics/hub/utils.py",
+          "sha256": "8e49e5974eb235a0312b23aa2a58882c9bf55ce537f562563861bf0f2154876d",
+          "bytes": 6353,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:6",
+          "logical_path": "src/ultralytics/utils/__init__.py",
+          "sha256": "5cb10afe9be9b7335684968ef31d0c5a0851108c840de8b42ce1a7527994d4a8",
+          "bytes": 55145,
+          "selection_role": "candidate_product"
+        }
+      ],
+      "observations": [
+        {
+          "observation_id": "criterion:0",
+          "location": {
+            "source_id": "test",
+            "start_line": 47,
+            "end_line": 47
+          },
+          "kind": "exception_observation",
+          "origin": "explicit",
+          "reason": "raises in the selected test function"
+        },
+        {
+          "observation_id": "criterion:1",
+          "location": {
+            "source_id": "test",
+            "start_line": 54,
+            "end_line": 54
+          },
+          "kind": "exception_observation",
+          "origin": "explicit",
+          "reason": "raises in the selected test function"
+        },
+        {
+          "observation_id": "criterion:2",
+          "location": {
+            "source_id": "test",
+            "start_line": 60,
+            "end_line": 60
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        }
+      ],
+      "parameterization": {
+        "status": "not_expanded",
+        "coverage": "selected_test_definition",
+        "reason": "the runner does not enumerate parameter rows"
+      },
+      "entry_point": {
+        "test_selection": {
+          "origin": "task_provided",
+          "status": "unique",
+          "selector": "tests/test_438get_export.py::test_get_export_validates_format_and_returns_api_payload",
+          "evidence": [
+            {
+              "symbol": "test_get_export_validates_format_and_returns_api_payload",
+              "start_line": 20,
+              "end_line": 66
+            }
+          ]
+        },
+        "mut_binding": {
+          "origin": "automatic",
+          "status": "not_evaluated",
+          "candidates": [],
+          "evidence": [],
+          "assumptions": []
+        }
+      },
+      "relations": [],
+      "relation_coverage": [
+        {
+          "kind": "call_binding",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "control_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "exception_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "function_origin",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "normal_return_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "state_flow",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "value_flow",
+          "status": "not_evaluated"
+        }
+      ],
+      "analysis_boundaries": {
+        "assumptions": [],
+        "unknown_effects": [
+          {
+            "boundary_id": "source:1:137:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:1:143:4:Return",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:35:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:47:8:With",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:54:8:With",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          }
+        ],
+        "unanalysed_regions": [
+          {
+            "scope": "source_selection",
+            "reason": "source_budget"
+          },
+          {
+            "scope": "semantic_relations",
+            "reason": "candidate_graph_has_no_validated_dependency_semantics"
+          }
+        ]
+      },
+      "completion": {
+        "status": "partial",
+        "stage": "complete",
+        "failure_categories": [
+          "source_budget",
+          "unresolved_calls",
+          "semantic_analysis_gap"
+        ],
+        "error": null
+      },
+      "semantic_validation": {
+        "status": "not_evaluated",
+        "reviewer": null,
+        "evidence": [],
+        "notes": "candidate reachability is not semantic dependency validation"
+      },
+      "cost": {
+        "timings_seconds": {
+          "criterion_extraction": 0.000526,
+          "source_selection": 0.049203,
+          "backend_total": 0.594363,
+          "evidence_summary": 0.000178
+        },
+        "total_seconds": 0.6445,
+        "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+        "peak_memory": {
+          "status": "unavailable",
+          "bytes": null,
+          "reason": "case-level peak memory is not measured by this runner"
+        },
+        "cache_state": {
+          "status": "unknown",
+          "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+        },
+        "input_size": {
+          "files": 7,
+          "bytes": 131643
+        },
+        "graph_size": {
+          "nodes": 17,
+          "edges": 21
+        },
+        "unavailable_phases": [
+          {
+            "phase": "input_admission",
+            "reason": "adapter admission occurs outside the per-case analysis timer"
+          },
+          {
+            "phase": "front_end",
+            "reason": "the candidate backend does not report parsing time separately"
+          },
+          {
+            "phase": "call_graph",
+            "reason": "the candidate backend does not report call-graph time separately"
+          },
+          {
+            "phase": "pointer_analysis",
+            "reason": "the candidate backend does not provide pointer analysis"
+          },
+          {
+            "phase": "dependency_analysis",
+            "reason": "backend_total combines parsing, graph construction, and slicing"
+          },
+          {
+            "phase": "slice",
+            "reason": "the candidate backend does not report semantic slicing time separately"
+          },
+          {
+            "phase": "source_mapping",
+            "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+          }
+        ]
+      }
+    },
+    "stage": "complete",
+    "error": null,
+    "elapsed_seconds": 0.6445,
+    "timings_seconds": {
+      "criterion_extraction": 0.000526,
+      "source_selection": 0.049203,
+      "backend_total": 0.594363,
+      "evidence_summary": 0.000178
+    },
+    "graph_and_evidence": "top-level graph/evidence/sources remain candidate diagnostics only"
+  },
+  "semantic_backend": {
+    "schema": "mock-spec.batch-semantic-backend/v1",
+    "status": "unsupported",
+    "backend": null,
+    "identity": {
+      "language": "python",
+      "dataset": "python-benchmark-new",
+      "case_id": "ultralytics_438",
+      "inventory_revision": "0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc",
+      "snapshot_id": "9fead7f64d96fc69fa76cc544384ea9d4c39a80b61ad3626f17fa2a09a198af1",
+      "snapshot_root": "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/python-benchmark-new/9fead7f64d96fc69fa76cc544384ea9d4c39a80b61ad3626f17fa2a09a198af1",
+      "admission_status": "frozen_candidate",
+      "admission_verified": false,
+      "reviewed_snapshot_id": null,
+      "target_selector": "tests/test_438get_export.py::test_get_export_validates_format_and_returns_api_payload",
+      "masked_test_logical_path": "tests/test_438get_export.py",
+      "masked_test_sha256": "c81db7776a8449aeac2aabd81627cf4efa9a9c8324d9ea8e594cc3297b48a688",
+      "masking_contract": "python-slot-v1",
+      "input_context": {
+        "target_selector": "tests/test_438get_export.py::test_get_export_validates_format_and_returns_api_payload",
+        "masked_test_logical_path": "tests/test_438get_export.py",
+        "masked_test_sha256": "c81db7776a8449aeac2aabd81627cf4efa9a9c8324d9ea8e594cc3297b48a688",
+        "masking_contract": "python-slot-v1"
+      },
+      "sources": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_438get_export.py",
+          "sha256": "c81db7776a8449aeac2aabd81627cf4efa9a9c8324d9ea8e594cc3297b48a688",
+          "bytes": 2000
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/ultralytics/hub/__init__.py",
+          "sha256": "6742bf134d23cd087dd1bd7cab72030a1c15993bf2218a7a0b4d2c095fa7d85f",
+          "bytes": 6709
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/ultralytics/data/utils.py",
+          "sha256": "41fca902dd1f1827dbe4f1b0f68f596bec671f9314553b044e4fbf64186d2e4a",
+          "bytes": 36818
+        },
+        {
+          "source_id": "source:3",
+          "logical_path": "src/ultralytics/hub/auth.py",
+          "sha256": "00dcc279903b954cd359cfec1476c3baec818758cb976b13a4792851b2241581",
+          "bytes": 6254
+        },
+        {
+          "source_id": "source:4",
+          "logical_path": "src/ultralytics/hub/session.py",
+          "sha256": "3b305700bf51d77e6044375f35852aca24abc4ec9a88c142558499b9af7db05d",
+          "bytes": 18364
+        },
+        {
+          "source_id": "source:5",
+          "logical_path": "src/ultralytics/hub/utils.py",
+          "sha256": "8e49e5974eb235a0312b23aa2a58882c9bf55ce537f562563861bf0f2154876d",
+          "bytes": 6353
+        },
+        {
+          "source_id": "source:6",
+          "logical_path": "src/ultralytics/utils/__init__.py",
+          "sha256": "5cb10afe9be9b7335684968ef31d0c5a0851108c840de8b42ce1a7527994d4a8",
+          "bytes": 55145
+        }
+      ]
+    },
+    "limitations": [
+      "No authenticated Python semantic driver is registered for this case.",
+      "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+      "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+    ],
+    "source": null,
+    "provenance": {
+      "target_executed": false
+    },
+    "cost": null,
+    "terminal": {
+      "execution": "not_started",
+      "semantic_validation": "not_evaluated"
+    },
+    "driver_exit_code": 0,
+    "batch_dispatch_seconds": 0.117352,
+    "batch_dispatch_scope": "bridge process including support check, adapter and backend; excludes candidate diagnostics"
+  },
+  "batch_case_cost": {
+    "total_seconds": 0.783786,
+    "scope": "admission, candidate diagnostic, semantic-slot wait, dispatch and mapping; excludes case queue, shared compile and serialization"
+  },
+  "result_contract_sha256": "a5ee83b827363285b8d4ab7e26221c529fd4626deecfdbec66d054b5415e47d1"
+}

@@ -1,0 +1,374 @@
+{
+  "schema_version": "mockspec.wala-issue23-repair/v3-propagation",
+  "status": "blocked",
+  "gate_passed": false,
+  "canonical_evidence": "out/mockbench-study/issue23-propagation-20261111-final-regression-r3",
+  "correction_to_v2": "The r5 call target was a native ShrikeCTMethod with empty IR and empty ModRef. Target reachability did not mean MethodSummary SSA participated in CG/PA/SDG. Builder creation overwrote the selector installed too early.",
+  "verified_relations": {
+    "same_call_same_region_state_propagation": {
+      "passed": true,
+      "witness": {
+        "summary_write_to_heap_return": [
+          11,
+          14
+        ],
+        "same_call_heap_return": [
+          14,
+          24
+        ],
+        "heap_return_to_observation": [
+          24,
+          16
+        ],
+        "heap_location": "[[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]"
+      },
+      "summary_target_is_real_ir": true,
+      "semantic_scope": "same_call_same_region_effect_propagation_only",
+      "unknown_value_havoc_proved": false
+    },
+    "return_alias_with_caller_state_observation": {
+      "passed": true,
+      "witness": [
+        12,
+        14,
+        25,
+        20,
+        19
+      ],
+      "summary_target_is_real_ir": true,
+      "argument_regions": [
+        "[<Application,Lsample/MechanismProbe$Box>]"
+      ],
+      "return_regions": [
+        "[<Application,Lsample/MechanismProbe$Box>]"
+      ],
+      "shared_regions": [
+        "[<Application,Lsample/MechanismProbe$Box>]"
+      ],
+      "semantic_scope": "bounded_unique_call_returned_parameter_alias"
+    }
+  },
+  "hypotheses": {
+    "summary_ssa_missing": {
+      "verdict": "confirmed_for_r5_and_config_a",
+      "selected_implementation": "com.ibm.wala.classLoader.ShrikeCTMethod",
+      "selected_ir_instruction_count": 0,
+      "selected_mod_region_count": 0
+    },
+    "pointer_alias_missing": {
+      "verdict": "rejected_for_return_alias_after_selector_fix",
+      "argument_regions": [
+        "[<Application,Lsample/MechanismProbe$Box>]"
+      ],
+      "return_regions": [
+        "[<Application,Lsample/MechanismProbe$Box>]"
+      ],
+      "shared_regions": [
+        "[<Application,Lsample/MechanismProbe$Box>]"
+      ],
+      "fresh_negative_verdict": "blocked",
+      "fresh_entry_regions": [
+        "[<Application,Lsample/MechanismProbe$Box>]"
+      ],
+      "fresh_allocation_regions": [
+        "[<Application,Lsample/MechanismProbe$Box>]"
+      ]
+    },
+    "gate_missed_wala_representation": {
+      "verdict": "confirmed_only_after_real_summary_ir",
+      "state": "put -> HEAP_RET_CALLEE -> same-call HEAP_RET_CALLER -> get",
+      "alias": "summary return -> NORMAL_RET_CALLEE/CALLER -> caller put; PA region identity and put -> original-argument get HEAP_DATA_DEP"
+    }
+  },
+  "still_blocked": {
+    "general_unknown_may_write": "The bounded summary self-writes a field value. This proves state-effect plumbing, not arbitrary-value havoc.",
+    "normal_completion": "not_evaluated_by_current_two-probe_regression",
+    "write_before_throw": "not_evaluated_by_current_two-probe_regression",
+    "fresh_no_alias": "merged points-to regions; disjointness not proved",
+    "receiver_global_escaped_null_other_returns": "outside the bounded model",
+    "real_jib": "not rerun; no scale improvement for the known PDG population OOM"
+  },
+  "configuration_budget": {
+    "configuration_families": 2,
+    "config_a": "evidence-only baseline; semantics unchanged",
+    "config_b": "selector timing/exact-summary repair family; revisions changed the analysis path and are all retained below",
+    "attempt_count": 10,
+    "cost_scope": "total_probe_seconds excludes compilation, packaging, and input adaptation",
+    "wala": "1.7.2",
+    "java_heap_bytes": 2147483648,
+    "timeout_seconds": 180
+  },
+  "attempt_ledger": [
+    {
+      "attempt_id": "config_a",
+      "purpose": "evidence_export_only",
+      "path": "out/mockbench-study/issue23-propagation-20261111-config-a",
+      "status": "analysed",
+      "backend_sha256": "f275187a676dadc7b3969c7d999e71f58b5fda6683a65ff132aef6f25e278e38",
+      "probes": [
+        "visible",
+        "unknown_write",
+        "unknown_alias",
+        "unknown_completion",
+        "unknown_exception",
+        "unknown_fresh"
+      ],
+      "probe_results": {
+        "visible": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 30.528867614999854
+        },
+        "unknown_write": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 2.6365626250003515
+        },
+        "unknown_alias": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 2.6889179599997988
+        },
+        "unknown_completion": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 2.6305109250001806
+        },
+        "unknown_exception": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 2.5731748800003515
+        },
+        "unknown_fresh": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 2.632229929999994
+        }
+      },
+      "total_probe_seconds": 43.69026393500053
+    },
+    {
+      "attempt_id": "config_b_initial",
+      "purpose": "selector_before_builder",
+      "path": "out/mockbench-study/issue23-propagation-20261111-config-b",
+      "status": "analysed",
+      "backend_sha256": "49bc13c33bbfd8d81411b283598e4293242f129d07993f6c5049ec78b4d0b564",
+      "probes": [
+        "visible",
+        "unknown_write",
+        "unknown_alias",
+        "unknown_completion",
+        "unknown_exception",
+        "unknown_fresh"
+      ],
+      "probe_results": {
+        "visible": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 32.41577159999997
+        },
+        "unknown_write": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 2.4435954300001868
+        },
+        "unknown_alias": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 2.5388361800000894
+        },
+        "unknown_completion": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 3.4376546929997858
+        },
+        "unknown_exception": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 4.19262381200042
+        },
+        "unknown_fresh": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 4.416886847000114
+        }
+      },
+      "total_probe_seconds": 49.44536856200057
+    },
+    {
+      "attempt_id": "config_b_exact_r2",
+      "purpose": "accepts_bypass_empty_summary",
+      "path": "out/mockbench-study/issue23-propagation-20261111-config-b-r2",
+      "status": "analysed",
+      "backend_sha256": "4c3eb020a2be5cbb47c8d5861e693543071ef48d63bc81f30e6f733d5be4b9f9",
+      "probes": [
+        "unknown_write",
+        "unknown_alias"
+      ],
+      "probe_results": {
+        "unknown_write": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 2.446548024999629
+        },
+        "unknown_alias": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 2.427192729000126
+        }
+      },
+      "total_probe_seconds": 4.873740753999755
+    },
+    {
+      "attempt_id": "config_b_diag",
+      "purpose": "configured_ssa_receipt",
+      "path": "out/mockbench-study/issue23-propagation-20261111-config-b-diag",
+      "status": "analysed",
+      "backend_sha256": "dbbd967c19d5aeaeaba65fa5e8fa859935f52d4132cc43aa197dc1ef15f2956f",
+      "probes": [
+        "unknown_alias"
+      ],
+      "probe_results": {
+        "unknown_alias": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 2.5285278659998767
+        }
+      },
+      "total_probe_seconds": 2.5285278659998767
+    },
+    {
+      "attempt_id": "config_b_diag2",
+      "purpose": "selected_method_class_receipt",
+      "path": "out/mockbench-study/issue23-propagation-20261111-config-b-diag2",
+      "status": "analysed",
+      "backend_sha256": "7b2030874fe9b1821d3655bedd0a30a5e04791d74786349a50c328e1f0f7e364",
+      "probes": [
+        "unknown_alias"
+      ],
+      "probe_results": {
+        "unknown_alias": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 2.5803512730003604
+        }
+      },
+      "total_probe_seconds": 2.5803512730003604
+    },
+    {
+      "attempt_id": "config_b_final",
+      "purpose": "selector_after_builder_with_bypass",
+      "path": "out/mockbench-study/issue23-propagation-20261111-config-b-final",
+      "status": "analysis_failed",
+      "backend_sha256": "8174ad18a4a80458724e1f577787e38cf0435c1a175e2ea985936a510eaa81a8",
+      "probes": [
+        "unknown_write",
+        "unknown_alias"
+      ],
+      "probe_results": {
+        "unknown_write": {
+          "exit_code": 1,
+          "timed_out": false,
+          "seconds": 8.075433184999838
+        },
+        "unknown_alias": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 3.3050761819999934
+        }
+      },
+      "total_probe_seconds": 11.380509366999831
+    },
+    {
+      "attempt_id": "config_b_final2",
+      "purpose": "selector_after_builder_without_bypass",
+      "path": "out/mockbench-study/issue23-propagation-20261111-config-b-final2",
+      "status": "analysed",
+      "backend_sha256": "6cd6d6d59a24d86e684b69570bff042ed355cd5f9b2ae88b2a31ba2cb1437783",
+      "probes": [
+        "unknown_write"
+      ],
+      "probe_results": {
+        "unknown_write": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 62.274141182999756
+        }
+      },
+      "total_probe_seconds": 62.274141182999756
+    },
+    {
+      "attempt_id": "final_regression",
+      "purpose": "current_code_state_and_alias",
+      "path": "out/mockbench-study/issue23-propagation-20261111-final-regression",
+      "status": "analysed",
+      "backend_sha256": "6cd6d6d59a24d86e684b69570bff042ed355cd5f9b2ae88b2a31ba2cb1437783",
+      "probes": [
+        "unknown_write",
+        "unknown_alias"
+      ],
+      "probe_results": {
+        "unknown_write": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 58.14032046700004
+        },
+        "unknown_alias": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 5.190320874000008
+        }
+      },
+      "total_probe_seconds": 63.330641341000046
+    },
+    {
+      "attempt_id": "final_regression_r2",
+      "purpose": "exact_callsite_and_receiver_region_validation",
+      "path": "out/mockbench-study/issue23-propagation-20261111-final-regression-r2",
+      "status": "analysed",
+      "backend_sha256": "8f21c7de6081a22596854dd900ab96e67951dac08d5db34e647543d1f6314b14",
+      "probes": [
+        "unknown_write",
+        "unknown_alias"
+      ],
+      "probe_results": {
+        "unknown_write": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 35.97176842399995
+        },
+        "unknown_alias": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 2.7136158110001816
+        }
+      },
+      "total_probe_seconds": 38.68538423500013
+    },
+    {
+      "attempt_id": "final_regression_r3",
+      "purpose": "heap_callsite_identity_and_receiver_region_validation",
+      "path": "out/mockbench-study/issue23-propagation-20261111-final-regression-r3",
+      "status": "analysed",
+      "backend_sha256": "eea816e16e5f092ff123e506fb38958177eaa62f3e7a6faea3c5af437ecc44e6",
+      "probes": [
+        "unknown_write",
+        "unknown_alias"
+      ],
+      "probe_results": {
+        "unknown_write": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 37.20151434800027
+        },
+        "unknown_alias": {
+          "exit_code": 0,
+          "timed_out": false,
+          "seconds": 4.550711374999992
+        }
+      },
+      "total_probe_seconds": 41.752225723000265
+    }
+  ],
+  "decision": "Keep issue 23 blocked. Real summary SSA now participates and two bounded propagation mechanisms have strict witnesses, but the general unknown-effect and real-Jib gates remain incomplete."
+}

@@ -1,0 +1,67 @@
+{
+  "schema": "mockspec.jib-observation-registration/v1",
+  "target_executed": false,
+  "entry_origin": "diagnostic_override_mapped_from_original_observations",
+  "timeout_seconds": 180,
+  "java_heap": "2g",
+  "expectations_sha256": "6c9b4764b021af5767d1808d67aeb0a461d3a7f6bde7c9b3c856e8d4b69f5ca9",
+  "probe_sha256": "974e27fe7c056b4d8575db86e174126dbc247e6760e338429088e5574919f9ce",
+  "test_sha256": "0346159882e9a5e2731a3916096b5b52f2f8cd7ce8d0222eebbce257129a4885",
+  "visible_mut_sha256": "ff8ee22a4aa1bce7d61024a2d06fcb7983abc3e92751683cee598a92a0020140",
+  "container_builders": {
+    "origin": "reviewed_frozen_source",
+    "sha256": "be634365894eac648adb1135b966044b7bf4f45cc27aa4af9b8884aece69e68f",
+    "provenance": {
+      "source_id": "repository:bffb8e1dc5aa5586f3874308",
+      "logical_path": "src/main/java/com/google/cloud/tools/jib/cli/ContainerBuilders.java",
+      "start_line": 1,
+      "end_line": 82,
+      "sha256": "be634365894eac648adb1135b966044b7bf4f45cc27aa4af9b8884aece69e68f",
+      "snapshot_id": "5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4",
+      "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+      "manifest_sha256": "cb58b3275187e703d16b9b243b914c57eda0a9bf74df98932a072c37e46e3877"
+    }
+  },
+  "libraries": [
+    {
+      "path": "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/java-bechmark-strong/5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4/tree/repo/libs/module-deps.jar",
+      "sha256": "97d434315b940474c122146609e4a919f6a262df596eb67f96c17c3bddf36495"
+    },
+    {
+      "path": "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/java-bechmark-strong/5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4/tree/repo/libs/jib-build-plan-0.4.0.jar",
+      "sha256": "9b74d6be551b8bf079d711148769150d566512db5a50b1e9c7c445c69c08d182"
+    },
+    {
+      "path": "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/java-bechmark-strong/5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4/tree/repo/libs/jib-plugins-common-0.1.0-SNAPSHOT.jar",
+      "sha256": "16454db7431fca4ec900adbb967f2d89b4aa16939664d91658f94b0cd4e64089"
+    },
+    {
+      "path": "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/java-bechmark-strong/5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4/tree/repo/libs/guava-30.1.1-jre.jar",
+      "sha256": "44ce229ce26d880bf3afc362bbfcec34d7e6903d195bbb1db9f3b6e0d9834f06"
+    }
+  ],
+  "observations": [
+    {
+      "id": "line71.baseImage",
+      "line": 71,
+      "expression": "buildPlan.getBaseImage()",
+      "criterion": "baseImage",
+      "field": "baseImage",
+      "source_calls": [
+        "CommonContainerConfigCliOptions.getFrom",
+        "ArtifactProcessor.getJavaVersion"
+      ]
+    }
+  ],
+  "negative_gates": [
+    "same-receiver writes to a different builder field are not state support",
+    "wrong getter field is not state support",
+    "same method in a different context is not state support",
+    "removing a selected field write or explicit unknown-return edge invalidates support"
+  ],
+  "unknown_boundaries": [
+    "native structural collaborators may return null or throw",
+    "native collection contents and exact scalar values are unknown",
+    "Credentials.getFromCredentialRetrievers is a native structural boundary"
+  ]
+}

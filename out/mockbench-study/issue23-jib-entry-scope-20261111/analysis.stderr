@@ -1,0 +1,28 @@
+SCALE_STAGE call_graph_complete full_nodes=13086 scoped_nodes=11144 instances=4852
+SCALE_STAGE transitive_mod_complete
+SCALE_STAGE transitive_ref_complete
+SCALE_STAGE scoped_full_slice_started
+Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+	at java.base/java.util.HashMap.resize(HashMap.java:700)
+	at java.base/java.util.HashMap.putVal(HashMap.java:659)
+	at java.base/java.util.HashMap.put(HashMap.java:608)
+	at com.ibm.wala.util.intset.MutableMapping.add(MutableMapping.java:109)
+	at com.ibm.wala.util.graph.impl.SlowNumberedNodeManager.addNode(SlowNumberedNodeManager.java:67)
+	at com.ibm.wala.util.graph.AbstractGraph.addNode(AbstractGraph.java:101)
+	at com.ibm.wala.ipa.slicer.PDG.addParamPassingStatements(PDG.java:1036)
+	at com.ibm.wala.ipa.slicer.PDG.createNormalStatements(PDG.java:993)
+	at com.ibm.wala.ipa.slicer.PDG.createNodes(PDG.java:897)
+	at com.ibm.wala.ipa.slicer.PDG.populate(PDG.java:191)
+	at com.ibm.wala.ipa.slicer.PDG.getNumber(PDG.java:1264)
+	at com.ibm.wala.ipa.slicer.SDGSupergraph.getLocalBlockNumber(SDGSupergraph.java:126)
+	at com.ibm.wala.ipa.slicer.SDGSupergraph.getLocalBlockNumber(SDGSupergraph.java:26)
+	at com.ibm.wala.dataflow.IFDS.BackwardsSupergraph.getLocalBlockNumber(BackwardsSupergraph.java:300)
+	at com.ibm.wala.dataflow.IFDS.TabulationSolver.processParticularCallee(TabulationSolver.java:613)
+	at com.ibm.wala.dataflow.IFDS.TabulationSolver.processCall(TabulationSolver.java:517)
+	at com.ibm.wala.dataflow.IFDS.TabulationSolver.forwardTabulateSLRPs(TabulationSolver.java:250)
+	at com.ibm.wala.dataflow.IFDS.TabulationSolver.solve(TabulationSolver.java:190)
+	at com.ibm.wala.ipa.slicer.Slicer.slice(Slicer.java:265)
+	at com.ibm.wala.ipa.slicer.Slicer.slice(Slicer.java:242)
+	at com.ibm.wala.ipa.slicer.Slicer.computeSlice(Slicer.java:229)
+	at com.ibm.wala.ipa.slicer.Slicer.computeBackwardSlice(Slicer.java:206)
+	at org.mockspec.research.WalaScaleProbe.main(WalaScaleProbe.java:183)

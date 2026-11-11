@@ -1,0 +1,2608 @@
+{
+  "schema": "mockspec.jib-observation-summary/v1",
+  "target_executed": false,
+  "entry_origin": "diagnostic_override_mapped_from_original_observations",
+  "observations": [
+    {
+      "observation_id": "criterion:0",
+      "line": 71,
+      "end_line": 71,
+      "observed_line": 71,
+      "expression": "buildPlan.getBaseImage()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.baseImage(Ljava/lang/Object;)V",
+      "field": "baseImage",
+      "status": "verified_incomplete",
+      "state_evidence": {
+        "modality": "analysis_may",
+        "builder_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, builder()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, baseImage, <Extension,Ljava/lang/String> >]"
+        ],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, baseImage, <Extension,Ljava/lang/String> >]"
+        ],
+        "candidate_write_methods": [
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setBaseImage(Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;"
+        ],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "complete",
+        "checks": {
+          "entry_mut_to_plan": true,
+          "entry_plan_to_getter": true,
+          "entry_getter_to_sink": true,
+          "getter_read_to_return": true,
+          "builder_receiver_to_build": true,
+          "build_result_to_plan_return": true,
+          "build_read_actual_to_ctor_formal": true,
+          "setbase_actual_to_formal_write": true
+        },
+        "mechanism": "explicit IR def-use plus resolved actual/formal/return witnesses"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [],
+        "unknown_calls": [],
+        "getter_instruction_index": 11,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getFrom",
+          "in_ci_slice_only": false,
+          "dependency_status": "unknown",
+          "callsite": null,
+          "context": null,
+          "declared_target": null,
+          "result_points_to": null,
+          "empty_return_region": false,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        },
+        {
+          "call": "com.google.cloud.tools.jib.cli.ArtifactProcessor.getJavaVersion",
+          "in_ci_slice_only": false,
+          "dependency_status": "unknown",
+          "callsite": null,
+          "context": null,
+          "declared_target": null,
+          "result_points_to": null,
+          "empty_return_region": false,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [
+        {
+          "alternative": "getFrom present",
+          "status": "unknown_effect",
+          "evidence": {
+            "getFrom": false,
+            "isPresent": false,
+            "optional_get": false,
+            "real_container_builders": true
+          },
+          "blocker": "getFrom normal reference return has an empty points-to set; payload, null, and exception remain unknown"
+        },
+        {
+          "alternative": "getFrom absent and Java version <=8 or >8",
+          "status": "unknown_effect",
+          "evidence": {
+            "getFrom": false,
+            "isPresent": false,
+            "getJavaVersion": false,
+            "unbox": false,
+            "conditional_branch": false,
+            "jib_from": false
+          },
+          "blocker": "boxed Java-version return has an empty points-to set and branch/path feasibility is unknown"
+        }
+      ],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 0,
+        "examples": []
+      },
+      "missing": [],
+      "slice_statement_count": 107,
+      "retained_statement_count": 94
+    },
+    {
+      "observation_id": "criterion:1",
+      "line": 72,
+      "end_line": 72,
+      "observed_line": 72,
+      "expression": "buildPlan.getPlatforms()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.platforms(Ljava/lang/Object;)V",
+      "field": "platforms",
+      "status": "unknown",
+      "state_evidence": {
+        "modality": "unknown_effect",
+        "builder_region_intersection": [],
+        "plan_region_intersection": [],
+        "candidate_write_methods": [],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "incomplete",
+        "checks": {
+          "entry_plan_to_getter": false,
+          "getter_read_to_return": false,
+          "build_read_actual_to_ctor_formal": false
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [],
+        "unknown_calls": [],
+        "getter_instruction_index": 14,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 0,
+        "examples": []
+      },
+      "missing": [
+        "exact getter field read",
+        "plan constructor field write",
+        "Builder.build field read",
+        "candidate builder field write",
+        "builder write/read region intersection",
+        "plan write/getter region intersection"
+      ],
+      "slice_statement_count": 5,
+      "retained_statement_count": 5
+    },
+    {
+      "observation_id": "criterion:2",
+      "line": 73,
+      "end_line": 73,
+      "observed_line": 73,
+      "expression": "buildPlan.getCreationTime()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.creationTime(Ljava/lang/Object;)V",
+      "field": "creationTime",
+      "status": "verified_incomplete",
+      "state_evidence": {
+        "modality": "analysis_may",
+        "builder_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, builder()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, creationTime, <Extension,Ljava/time/Instant> >]"
+        ],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, creationTime, <Extension,Ljava/time/Instant> >]"
+        ],
+        "candidate_write_methods": [
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V"
+        ],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "complete",
+        "checks": {
+          "entry_plan_to_getter": true,
+          "getter_read_to_return": true,
+          "build_read_actual_to_ctor_formal": true
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [],
+        "unknown_calls": [],
+        "getter_instruction_index": 17,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getCreationTime",
+          "in_ci_slice_only": false,
+          "dependency_status": "unknown",
+          "callsite": null,
+          "context": null,
+          "declared_target": null,
+          "result_points_to": null,
+          "empty_return_region": false,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 0,
+        "examples": []
+      },
+      "missing": [],
+      "slice_statement_count": 81,
+      "retained_statement_count": 81
+    },
+    {
+      "observation_id": "criterion:3",
+      "line": 74,
+      "end_line": 74,
+      "observed_line": 74,
+      "expression": "buildPlan.getFormat()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.format(Ljava/lang/Object;)V",
+      "field": "format",
+      "status": "verified_incomplete",
+      "state_evidence": {
+        "modality": "analysis_may",
+        "builder_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, builder()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, format, <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ImageFormat> >]"
+        ],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, format, <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ImageFormat> >]"
+        ],
+        "candidate_write_methods": [
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V"
+        ],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "complete",
+        "checks": {
+          "entry_plan_to_getter": true,
+          "getter_read_to_return": true,
+          "build_read_actual_to_ctor_formal": true
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [],
+        "unknown_calls": [],
+        "getter_instruction_index": 20,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getFormat",
+          "in_ci_slice_only": false,
+          "dependency_status": "unknown",
+          "callsite": null,
+          "context": null,
+          "declared_target": null,
+          "result_points_to": null,
+          "empty_return_region": false,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 0,
+        "examples": []
+      },
+      "missing": [],
+      "slice_statement_count": 81,
+      "retained_statement_count": 81
+    },
+    {
+      "observation_id": "criterion:4",
+      "line": 75,
+      "end_line": 75,
+      "observed_line": 75,
+      "expression": "buildPlan.getEnvironment().size()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.environmentSize(Ljava/lang/Object;)V",
+      "field": "environment",
+      "status": "state_candidates_only",
+      "state_evidence": {
+        "modality": "analysis_may",
+        "builder_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, builder()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, environment, <Extension,Ljava/util/Map> >]"
+        ],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, environment, <Extension,Ljava/util/Map> >]"
+        ],
+        "candidate_write_methods": [
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEnvironment(Ljava/util/Map;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;"
+        ],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "incomplete",
+        "checks": {
+          "entry_plan_to_getter": true,
+          "getter_read_to_return": false,
+          "build_read_actual_to_ctor_formal": true
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [
+          {
+            "instruction_index": 24,
+            "instruction": "26 = invokeinterface < Application, Ljava/util/Map, size()I > 24 @55 exception:25",
+            "from_value": 24,
+            "to_value": 26
+          },
+          {
+            "instruction_index": 25,
+            "instruction": "28 = invokestatic < Application, Ljava/lang/Integer, valueOf(I)Ljava/lang/Integer; > 26 @60 exception:27",
+            "from_value": 26,
+            "to_value": 28
+          }
+        ],
+        "unknown_calls": [],
+        "getter_instruction_index": 23,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEnvironment",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokevirtual < Application, Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions, getEnvironment()Ljava/util/Map; >@131",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEnvironment()Ljava/util/Map;",
+          "result_points_to": {
+            "value_number": 58,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v58]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 12,
+        "examples": [
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 23"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setLayers(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> > = 5"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setPlatforms(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 21"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setExposedPorts(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 4"
+          }
+        ]
+      },
+      "missing": [],
+      "slice_statement_count": 225394,
+      "retained_statement_count": 916
+    },
+    {
+      "observation_id": "criterion:5",
+      "line": 76,
+      "end_line": 76,
+      "observed_line": 76,
+      "expression": "buildPlan.getLabels().size()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.labelsSize(Ljava/lang/Object;)V",
+      "field": "labels",
+      "status": "state_candidates_only",
+      "state_evidence": {
+        "modality": "analysis_may",
+        "builder_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, builder()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, labels, <Extension,Ljava/util/Map> >]"
+        ],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, labels, <Extension,Ljava/util/Map> >]"
+        ],
+        "candidate_write_methods": [
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setLabels(Ljava/util/Map;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;"
+        ],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "incomplete",
+        "checks": {
+          "entry_plan_to_getter": true,
+          "getter_read_to_return": false,
+          "build_read_actual_to_ctor_formal": true
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [
+          {
+            "instruction_index": 29,
+            "instruction": "33 = invokeinterface < Application, Ljava/util/Map, size()I > 31 @71 exception:32",
+            "from_value": 31,
+            "to_value": 33
+          },
+          {
+            "instruction_index": 30,
+            "instruction": "35 = invokestatic < Application, Ljava/lang/Integer, valueOf(I)Ljava/lang/Integer; > 33 @76 exception:34",
+            "from_value": 33,
+            "to_value": 35
+          }
+        ],
+        "unknown_calls": [],
+        "getter_instruction_index": 28,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getLabels",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokevirtual < Application, Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions, getLabels()Ljava/util/Map; >@138",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getLabels()Ljava/util/Map;",
+          "result_points_to": {
+            "value_number": 62,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v62]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 12,
+        "examples": [
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 23"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setLayers(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> > = 5"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setPlatforms(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 21"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setExposedPorts(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 4"
+          }
+        ]
+      },
+      "missing": [],
+      "slice_statement_count": 225394,
+      "retained_statement_count": 916
+    },
+    {
+      "observation_id": "criterion:6",
+      "line": 77,
+      "end_line": 77,
+      "observed_line": 77,
+      "expression": "buildPlan.getVolumes().size()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.volumesSize(Ljava/lang/Object;)V",
+      "field": "volumes",
+      "status": "state_candidates_only",
+      "state_evidence": {
+        "modality": "analysis_may",
+        "builder_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, builder()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> >]"
+        ],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, volumes, <Extension,Ljava/util/Set> >]"
+        ],
+        "candidate_write_methods": [
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setVolumes(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;"
+        ],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "incomplete",
+        "checks": {
+          "entry_plan_to_getter": true,
+          "getter_read_to_return": false,
+          "build_read_actual_to_ctor_formal": true
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [
+          {
+            "instruction_index": 34,
+            "instruction": "40 = invokeinterface < Application, Ljava/util/Set, size()I > 38 @87 exception:39",
+            "from_value": 38,
+            "to_value": 40
+          },
+          {
+            "instruction_index": 35,
+            "instruction": "42 = invokestatic < Application, Ljava/lang/Integer, valueOf(I)Ljava/lang/Integer; > 40 @92 exception:41",
+            "from_value": 40,
+            "to_value": 42
+          }
+        ],
+        "unknown_calls": [],
+        "getter_instruction_index": 33,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getVolumes",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokevirtual < Application, Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions, getVolumes()Ljava/util/Set; >@124",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getVolumes()Ljava/util/Set;",
+          "result_points_to": {
+            "value_number": 54,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v54]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 12,
+        "examples": [
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 23"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setLayers(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> > = 5"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setPlatforms(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 21"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setExposedPorts(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 4"
+          }
+        ]
+      },
+      "missing": [],
+      "slice_statement_count": 225394,
+      "retained_statement_count": 916
+    },
+    {
+      "observation_id": "criterion:7",
+      "line": 78,
+      "end_line": 78,
+      "observed_line": 78,
+      "expression": "buildPlan.getExposedPorts().size()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.exposedPortsSize(Ljava/lang/Object;)V",
+      "field": "exposedPorts",
+      "status": "state_candidates_only",
+      "state_evidence": {
+        "modality": "analysis_may",
+        "builder_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, builder()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> >]"
+        ],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, exposedPorts, <Extension,Ljava/util/Set> >]"
+        ],
+        "candidate_write_methods": [
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setExposedPorts(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;"
+        ],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "incomplete",
+        "checks": {
+          "entry_plan_to_getter": true,
+          "getter_read_to_return": false,
+          "build_read_actual_to_ctor_formal": true
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [
+          {
+            "instruction_index": 39,
+            "instruction": "47 = invokeinterface < Application, Ljava/util/Set, size()I > 45 @103 exception:46",
+            "from_value": 45,
+            "to_value": 47
+          },
+          {
+            "instruction_index": 40,
+            "instruction": "49 = invokestatic < Application, Ljava/lang/Integer, valueOf(I)Ljava/lang/Integer; > 47 @108 exception:48",
+            "from_value": 47,
+            "to_value": 49
+          }
+        ],
+        "unknown_calls": [],
+        "getter_instruction_index": 38,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getExposedPorts",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokevirtual < Application, Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions, getExposedPorts()Ljava/util/Set; >@117",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getExposedPorts()Ljava/util/Set;",
+          "result_points_to": {
+            "value_number": 50,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v50]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 12,
+        "examples": [
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 23"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setLayers(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> > = 5"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setPlatforms(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 19"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setVolumes(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 4"
+          }
+        ]
+      },
+      "missing": [],
+      "slice_statement_count": 225394,
+      "retained_statement_count": 916
+    },
+    {
+      "observation_id": "criterion:8",
+      "line": 79,
+      "end_line": 79,
+      "observed_line": 79,
+      "expression": "buildPlan.getUser()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.user(Ljava/lang/Object;)V",
+      "field": "user",
+      "status": "unknown",
+      "state_evidence": {
+        "modality": "unknown_effect",
+        "builder_region_intersection": [],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, user, <Extension,Ljava/lang/String> >]"
+        ],
+        "candidate_write_methods": [],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "complete",
+        "checks": {
+          "entry_plan_to_getter": true,
+          "getter_read_to_return": true,
+          "build_read_actual_to_ctor_formal": true
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [],
+        "unknown_calls": [],
+        "getter_instruction_index": 43,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getUser",
+          "in_ci_slice_only": false,
+          "dependency_status": "unknown",
+          "callsite": null,
+          "context": null,
+          "declared_target": null,
+          "result_points_to": null,
+          "empty_return_region": false,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 0,
+        "examples": []
+      },
+      "missing": [
+        "candidate builder field write",
+        "builder write/read region intersection"
+      ],
+      "slice_statement_count": 75,
+      "retained_statement_count": 75
+    },
+    {
+      "observation_id": "criterion:9",
+      "line": 80,
+      "end_line": 80,
+      "observed_line": 80,
+      "expression": "buildPlan.getWorkingDirectory()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.workingDirectory(Ljava/lang/Object;)V",
+      "field": "workingDirectory",
+      "status": "unknown",
+      "state_evidence": {
+        "modality": "unknown_effect",
+        "builder_region_intersection": [],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, workingDirectory, <Extension,Lcom/google/cloud/tools/jib/api/buildplan/AbsoluteUnixPath> >]"
+        ],
+        "candidate_write_methods": [],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "complete",
+        "checks": {
+          "entry_plan_to_getter": true,
+          "getter_read_to_return": true,
+          "build_read_actual_to_ctor_formal": true
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [],
+        "unknown_calls": [],
+        "getter_instruction_index": 46,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 0,
+        "examples": []
+      },
+      "missing": [
+        "candidate builder field write",
+        "builder write/read region intersection"
+      ],
+      "slice_statement_count": 75,
+      "retained_statement_count": 75
+    },
+    {
+      "observation_id": "criterion:10",
+      "line": 81,
+      "end_line": 81,
+      "observed_line": 81,
+      "expression": "buildPlan.getEntrypoint().size()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.entrypointSize(Ljava/lang/Object;)V",
+      "field": "entrypoint",
+      "status": "state_candidates_only",
+      "state_evidence": {
+        "modality": "analysis_may",
+        "builder_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, builder()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> >]"
+        ],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, entrypoint, <Extension,Ljava/util/List> >]"
+        ],
+        "candidate_write_methods": [
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;"
+        ],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "incomplete",
+        "checks": {
+          "entry_plan_to_getter": true,
+          "getter_read_to_return": false,
+          "build_read_actual_to_ctor_formal": true
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [
+          {
+            "instruction_index": 50,
+            "instruction": "60 = invokeinterface < Application, Ljava/util/List, size()I > 58 @135 exception:59",
+            "from_value": 58,
+            "to_value": 60
+          },
+          {
+            "instruction_index": 51,
+            "instruction": "62 = invokestatic < Application, Ljava/lang/Integer, valueOf(I)Ljava/lang/Integer; > 60 @140 exception:61",
+            "from_value": 60,
+            "to_value": 62
+          }
+        ],
+        "unknown_calls": [],
+        "getter_instruction_index": 49,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEntrypoint",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokevirtual < Application, Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions, getEntrypoint()Ljava/util/List; >@72",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEntrypoint()Ljava/util/List;",
+          "result_points_to": {
+            "value_number": 37,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v37]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        },
+        {
+          "call": "com.google.cloud.tools.jib.cli.ArtifactProcessor.computeEntrypoint",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokeinterface < Application, Lcom/google/cloud/tools/jib/cli/ArtifactProcessor, computeEntrypoint(Ljava/util/List;)Lcom/google/common/collect/ImmutableList; >@92",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.ArtifactProcessor.computeEntrypoint(Ljava/util/List;)Lcom/google/common/collect/ImmutableList;",
+          "result_points_to": {
+            "value_number": 43,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v43]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 12,
+        "examples": [
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 23"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setLayers(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setPlatforms(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 21"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setExposedPorts(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 19"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setVolumes(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 4"
+          }
+        ]
+      },
+      "missing": [],
+      "slice_statement_count": 225394,
+      "retained_statement_count": 916
+    },
+    {
+      "observation_id": "criterion:11",
+      "line": 82,
+      "end_line": 82,
+      "observed_line": 82,
+      "expression": "buildPlan.getEntrypoint().get(0)",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.entrypoint0(Ljava/lang/Object;)V",
+      "field": "entrypoint",
+      "status": "state_candidates_only",
+      "state_evidence": {
+        "modality": "analysis_may",
+        "builder_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, builder()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> >]"
+        ],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, entrypoint, <Extension,Ljava/util/List> >]"
+        ],
+        "candidate_write_methods": [
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;"
+        ],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "incomplete",
+        "checks": {
+          "entry_plan_to_getter": true,
+          "getter_read_to_return": false,
+          "build_read_actual_to_ctor_formal": true
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [
+          {
+            "instruction_index": 56,
+            "instruction": "68 = invokeinterface < Application, Ljava/util/List, get(I)Ljava/lang/Object; > 65,66 @152 exception:67",
+            "from_value": 65,
+            "to_value": 68
+          }
+        ],
+        "unknown_calls": [],
+        "getter_instruction_index": 54,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEntrypoint",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokevirtual < Application, Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions, getEntrypoint()Ljava/util/List; >@72",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEntrypoint()Ljava/util/List;",
+          "result_points_to": {
+            "value_number": 37,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v37]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        },
+        {
+          "call": "com.google.cloud.tools.jib.cli.ArtifactProcessor.computeEntrypoint",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokeinterface < Application, Lcom/google/cloud/tools/jib/cli/ArtifactProcessor, computeEntrypoint(Ljava/util/List;)Lcom/google/common/collect/ImmutableList; >@92",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.ArtifactProcessor.computeEntrypoint(Ljava/util/List;)Lcom/google/common/collect/ImmutableList;",
+          "result_points_to": {
+            "value_number": 43,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v43]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 12,
+        "examples": [
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 23"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setLayers(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setPlatforms(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 21"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setExposedPorts(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 19"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setVolumes(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 4"
+          }
+        ]
+      },
+      "missing": [],
+      "slice_statement_count": 225394,
+      "retained_statement_count": 916
+    },
+    {
+      "observation_id": "criterion:12",
+      "line": 83,
+      "end_line": 83,
+      "observed_line": 83,
+      "expression": "buildPlan.getEntrypoint().get(1)",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.entrypoint1(Ljava/lang/Object;)V",
+      "field": "entrypoint",
+      "status": "state_candidates_only",
+      "state_evidence": {
+        "modality": "analysis_may",
+        "builder_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, builder()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> >]"
+        ],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, entrypoint, <Extension,Ljava/util/List> >]"
+        ],
+        "candidate_write_methods": [
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;"
+        ],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "incomplete",
+        "checks": {
+          "entry_plan_to_getter": true,
+          "getter_read_to_return": false,
+          "build_read_actual_to_ctor_formal": true
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [
+          {
+            "instruction_index": 61,
+            "instruction": "74 = invokeinterface < Application, Ljava/util/List, get(I)Ljava/lang/Object; > 71,72 @166 exception:73",
+            "from_value": 71,
+            "to_value": 74
+          }
+        ],
+        "unknown_calls": [],
+        "getter_instruction_index": 59,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEntrypoint",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokevirtual < Application, Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions, getEntrypoint()Ljava/util/List; >@72",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEntrypoint()Ljava/util/List;",
+          "result_points_to": {
+            "value_number": 37,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v37]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        },
+        {
+          "call": "com.google.cloud.tools.jib.cli.ArtifactProcessor.computeEntrypoint",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokeinterface < Application, Lcom/google/cloud/tools/jib/cli/ArtifactProcessor, computeEntrypoint(Ljava/util/List;)Lcom/google/common/collect/ImmutableList; >@92",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.ArtifactProcessor.computeEntrypoint(Ljava/util/List;)Lcom/google/common/collect/ImmutableList;",
+          "result_points_to": {
+            "value_number": 43,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v43]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 12,
+        "examples": [
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 23"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setLayers(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setPlatforms(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 21"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setExposedPorts(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 19"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setVolumes(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 4"
+          }
+        ]
+      },
+      "missing": [],
+      "slice_statement_count": 225394,
+      "retained_statement_count": 916
+    },
+    {
+      "observation_id": "criterion:13",
+      "line": 84,
+      "end_line": 84,
+      "observed_line": 84,
+      "expression": "buildPlan.getEntrypoint().get(2)",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.entrypoint2(Ljava/lang/Object;)V",
+      "field": "entrypoint",
+      "status": "state_candidates_only",
+      "state_evidence": {
+        "modality": "analysis_may",
+        "builder_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, builder()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> >]"
+        ],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, entrypoint, <Extension,Ljava/util/List> >]"
+        ],
+        "candidate_write_methods": [
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;"
+        ],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "incomplete",
+        "checks": {
+          "entry_plan_to_getter": true,
+          "getter_read_to_return": false,
+          "build_read_actual_to_ctor_formal": true
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [
+          {
+            "instruction_index": 66,
+            "instruction": "80 = invokeinterface < Application, Ljava/util/List, get(I)Ljava/lang/Object; > 77,78 @180 exception:79",
+            "from_value": 77,
+            "to_value": 80
+          }
+        ],
+        "unknown_calls": [],
+        "getter_instruction_index": 64,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEntrypoint",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokevirtual < Application, Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions, getEntrypoint()Ljava/util/List; >@72",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEntrypoint()Ljava/util/List;",
+          "result_points_to": {
+            "value_number": 37,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v37]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        },
+        {
+          "call": "com.google.cloud.tools.jib.cli.ArtifactProcessor.computeEntrypoint",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokeinterface < Application, Lcom/google/cloud/tools/jib/cli/ArtifactProcessor, computeEntrypoint(Ljava/util/List;)Lcom/google/common/collect/ImmutableList; >@92",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.ArtifactProcessor.computeEntrypoint(Ljava/util/List;)Lcom/google/common/collect/ImmutableList;",
+          "result_points_to": {
+            "value_number": 43,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v43]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 12,
+        "examples": [
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 23"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setLayers(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setPlatforms(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 21"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setExposedPorts(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 19"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setVolumes(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 4"
+          }
+        ]
+      },
+      "missing": [],
+      "slice_statement_count": 225394,
+      "retained_statement_count": 916
+    },
+    {
+      "observation_id": "criterion:14",
+      "line": 85,
+      "end_line": 85,
+      "observed_line": 85,
+      "expression": "buildPlan.getEntrypoint().get(3)",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.entrypoint3(Ljava/lang/Object;)V",
+      "field": "entrypoint",
+      "status": "state_candidates_only",
+      "state_evidence": {
+        "modality": "analysis_may",
+        "builder_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, builder()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> >]"
+        ],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, entrypoint, <Extension,Ljava/util/List> >]"
+        ],
+        "candidate_write_methods": [
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;"
+        ],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "incomplete",
+        "checks": {
+          "entry_plan_to_getter": true,
+          "getter_read_to_return": false,
+          "build_read_actual_to_ctor_formal": true
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [
+          {
+            "instruction_index": 71,
+            "instruction": "86 = invokeinterface < Application, Ljava/util/List, get(I)Ljava/lang/Object; > 83,84 @194 exception:85",
+            "from_value": 83,
+            "to_value": 86
+          }
+        ],
+        "unknown_calls": [],
+        "getter_instruction_index": 69,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEntrypoint",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokevirtual < Application, Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions, getEntrypoint()Ljava/util/List; >@72",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEntrypoint()Ljava/util/List;",
+          "result_points_to": {
+            "value_number": 37,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v37]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        },
+        {
+          "call": "com.google.cloud.tools.jib.cli.ArtifactProcessor.computeEntrypoint",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokeinterface < Application, Lcom/google/cloud/tools/jib/cli/ArtifactProcessor, computeEntrypoint(Ljava/util/List;)Lcom/google/common/collect/ImmutableList; >@92",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.ArtifactProcessor.computeEntrypoint(Ljava/util/List;)Lcom/google/common/collect/ImmutableList;",
+          "result_points_to": {
+            "value_number": 43,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v43]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 12,
+        "examples": [
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 23"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setLayers(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setPlatforms(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 21"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setExposedPorts(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 19"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setVolumes(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 4"
+          }
+        ]
+      },
+      "missing": [],
+      "slice_statement_count": 225394,
+      "retained_statement_count": 916
+    },
+    {
+      "observation_id": "criterion:15",
+      "line": 86,
+      "end_line": 86,
+      "observed_line": 86,
+      "expression": "buildPlan.getLayers().size()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.layersSize(Ljava/lang/Object;)V",
+      "field": "layers",
+      "status": "state_candidates_only",
+      "state_evidence": {
+        "modality": "analysis_may",
+        "builder_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, builder()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, layers, <Extension,Ljava/util/List> >]"
+        ],
+        "plan_region_intersection": [
+          "[SITE_IN_NODE{< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, build()Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan; >:Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan:NEW <Extension,Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan>@0 in Everywhere},< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan, layers, <Extension,Ljava/util/List> >]"
+        ],
+        "candidate_write_methods": [
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+          "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setLayers(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;"
+        ],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "incomplete",
+        "checks": {
+          "entry_plan_to_getter": true,
+          "getter_read_to_return": false,
+          "build_read_actual_to_ctor_formal": true
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "complete",
+        "path": [
+          {
+            "instruction_index": 75,
+            "instruction": "91 = invokeinterface < Application, Ljava/util/List, size()I > 89 @207 exception:90",
+            "from_value": 89,
+            "to_value": 91
+          },
+          {
+            "instruction_index": 76,
+            "instruction": "93 = invokestatic < Application, Ljava/lang/Integer, valueOf(I)Ljava/lang/Integer; > 91 @212 exception:92",
+            "from_value": 91,
+            "to_value": 93
+          }
+        ],
+        "unknown_calls": [],
+        "getter_instruction_index": 74,
+        "mechanism": "entry-method SSA def-use from exact plan getter to exact observation sink"
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.ArtifactProcessor.createLayers",
+          "in_ci_slice_only": true,
+          "dependency_status": "unknown",
+          "callsite": "invokeinterface < Application, Lcom/google/cloud/tools/jib/cli/ArtifactProcessor, createLayers()Ljava/util/List; >@64",
+          "context": "Everywhere",
+          "declared_target": "com.google.cloud.tools.jib.cli.ArtifactProcessor.createLayers()Ljava/util/List;",
+          "result_points_to": {
+            "value_number": 35,
+            "pointer_key": "[Node: < Application, Lcom/google/cloud/tools/jib/cli/jar/JarFiles, toJibContainerBuilder(Lcom/google/cloud/tools/jib/cli/ArtifactProcessor;Lcom/google/cloud/tools/jib/cli/Jar;Lcom/google/cloud/tools/jib/cli/CommonCliOptions;Lcom/google/cloud/tools/jib/cli/CommonContainerConfigCliOptions;Lcom/google/cloud/tools/jib/plugins/common/logging/ConsoleLogger;)Lcom/google/cloud/tools/jib/api/JibContainerBuilder; > Context: Everywhere, v35]",
+            "points_to_count": 0,
+            "instance_keys": []
+          },
+          "empty_return_region": true,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 12,
+        "examples": [
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setEntrypoint(Ljava/util/List;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, entrypoint, <Extension,Ljava/util/List> > = 5"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setPlatforms(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, platforms, <Extension,Ljava/util/Set> > = 7"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 21"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setExposedPorts(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, exposedPorts, <Extension,Ljava/util/Set> > = 4"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 19"
+          },
+          {
+            "method": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setVolumes(Ljava/util/Set;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+            "instruction": "putfield 1.< Extension, Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder, volumes, <Extension,Ljava/util/Set> > = 4"
+          }
+        ]
+      },
+      "missing": [],
+      "slice_statement_count": 225394,
+      "retained_statement_count": 916
+    },
+    {
+      "observation_id": "criterion:16",
+      "line": 87,
+      "end_line": 87,
+      "observed_line": 87,
+      "expression": "buildPlan.getLayers().get(0).getName()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.layer0Name(Ljava/lang/Object;)V",
+      "field": "layers",
+      "status": "unknown",
+      "state_evidence": {
+        "modality": "unknown_effect",
+        "builder_region_intersection": [],
+        "plan_region_intersection": [],
+        "candidate_write_methods": [],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "incomplete",
+        "checks": {
+          "entry_plan_to_getter": false,
+          "getter_read_to_return": false,
+          "build_read_actual_to_ctor_formal": false
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "missing",
+        "path": [],
+        "unknown_calls": []
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.ArtifactProcessor.createLayers",
+          "in_ci_slice_only": false,
+          "dependency_status": "unknown",
+          "callsite": null,
+          "context": null,
+          "declared_target": null,
+          "result_points_to": null,
+          "empty_return_region": false,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 0,
+        "examples": []
+      },
+      "missing": [
+        "exact getter field read",
+        "plan constructor field write",
+        "Builder.build field read",
+        "candidate builder field write",
+        "builder write/read region intersection",
+        "plan write/getter region intersection"
+      ],
+      "slice_statement_count": 2,
+      "retained_statement_count": 2
+    },
+    {
+      "observation_id": "criterion:17",
+      "line": 88,
+      "end_line": 96,
+      "observed_line": 96,
+      "expression": "((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().toArray(new Object[0])",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.layer0Entries(Ljava/lang/Object;)V",
+      "field": "layers",
+      "status": "unknown",
+      "state_evidence": {
+        "modality": "unknown_effect",
+        "builder_region_intersection": [],
+        "plan_region_intersection": [],
+        "candidate_write_methods": [],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "incomplete",
+        "checks": {
+          "entry_plan_to_getter": false,
+          "getter_read_to_return": false,
+          "build_read_actual_to_ctor_formal": false
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "missing",
+        "path": [],
+        "unknown_calls": []
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.ArtifactProcessor.createLayers",
+          "in_ci_slice_only": false,
+          "dependency_status": "unknown",
+          "callsite": null,
+          "context": null,
+          "declared_target": null,
+          "result_points_to": null,
+          "empty_return_region": false,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 0,
+        "examples": []
+      },
+      "missing": [
+        "exact getter field read",
+        "plan constructor field write",
+        "Builder.build field read",
+        "candidate builder field write",
+        "builder write/read region intersection",
+        "plan write/getter region intersection"
+      ],
+      "slice_statement_count": 2,
+      "retained_statement_count": 2
+    },
+    {
+      "observation_id": "criterion:18",
+      "line": 97,
+      "end_line": 99,
+      "observed_line": 99,
+      "expression": "((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().get(0).getExtractionPath()",
+      "criterion": "com.google.cloud.tools.jib.cli.jar.ObservationSink.layer0Entry0ExtractionPath(Ljava/lang/Object;)V",
+      "field": "layers",
+      "status": "unknown",
+      "state_evidence": {
+        "modality": "unknown_effect",
+        "builder_region_intersection": [],
+        "plan_region_intersection": [],
+        "candidate_write_methods": [],
+        "overwritten_write_methods": [],
+        "overwrite_precision": "not established; defaults and conditional setters remain alternatives",
+        "mechanism": "exact field Mod/Ref chain through Builder.build and plan constructor"
+      },
+      "ssa_value_witness": {
+        "status": "incomplete",
+        "checks": {
+          "entry_plan_to_getter": false,
+          "getter_read_to_return": false,
+          "build_read_actual_to_ctor_formal": false
+        },
+        "mechanism": "exact getter return plus Builder.build actual/formal to plan-field write"
+      },
+      "observed_expression_witness": {
+        "status": "missing",
+        "path": [],
+        "unknown_calls": []
+      },
+      "source_boundaries": [
+        {
+          "call": "com.google.cloud.tools.jib.cli.ArtifactProcessor.createLayers",
+          "in_ci_slice_only": false,
+          "dependency_status": "unknown",
+          "callsite": null,
+          "context": null,
+          "declared_target": null,
+          "result_points_to": null,
+          "empty_return_region": false,
+          "value": "unknown",
+          "null": "possible",
+          "exception": "possible"
+        }
+      ],
+      "source_alternatives": [],
+      "execution_effects": {
+        "normal_completion": "analysis_may",
+        "exception_before_observation": "unknown_effect"
+      },
+      "channel": {
+        "control_dependence": "NONE",
+        "role": "value_state"
+      },
+      "excluded_from_state_support": {
+        "reason": "different builder field despite CI slice membership",
+        "count": 0,
+        "examples": []
+      },
+      "missing": [
+        "exact getter field read",
+        "plan constructor field write",
+        "Builder.build field read",
+        "candidate builder field write",
+        "builder write/read region intersection",
+        "plan write/getter region intersection"
+      ],
+      "slice_statement_count": 2,
+      "retained_statement_count": 2
+    }
+  ],
+  "raw_ci_warning": "CI slice membership is over-approximate and is never state support by itself.",
+  "raw_evidence": {
+    "path": "out/mockbench-study/issue25-jib-observations-all-none-20261111-r1/analysis.json",
+    "bytes": 87442848,
+    "sha256": "6492ca3eb66c4e3c6d9610dcdf1d6350e898500af3d3ead85c25e1fc9b57ba14",
+    "probe_sha256": "8fcd47b75381ed91d7fcf2e21f54303df6ef52e138c9972293bd859344043fa8",
+    "probe_source_transition": null
+  },
+  "outcome": {
+    "status": "partial",
+    "original_observation_count": 19,
+    "observed_expression_complete": 16,
+    "observed_expression_unknown_boundary": 0,
+    "observed_expression_missing": 3,
+    "state_flow_verified_incomplete": 3,
+    "state_region_candidates_only": 10,
+    "state_unknown": 6,
+    "closure_gate": "blocked",
+    "blockers": [
+      "native/no-IR dependency returns have empty points-to sets, so source value/control/exception influence remains unknown",
+      "three nested layer observations lose their plan/getter path in the NONE channel and cross unresolved library calls in FULL",
+      "collection getters cross unresolved copy/container calls; exact field regions are candidates, not complete value witnesses",
+      "user and workingDirectory have no retained candidate builder write in the NONE channel",
+      "FULL execution slices retain unrelated same-receiver setters; neither channel establishes overwrite or path feasibility alone"
+    ]
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+      "dataset": "Stub-Tester Java frozen snapshot",
+      "language": "java",
+      "snapshot_id": "5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4",
+      "masking_contract": "masked MOCK-STUB region retained",
+      "masked_test_sha256": "19e800bf8967238ef3b7772278e476186e509051e5021067b1f7234de0f68ed0",
+      "target_selector": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "src/test/java/com/google/cloud/tools/jib/cli/jar/JarFilesTest.java",
+        "sha256": "0346159882e9a5e2731a3916096b5b52f2f8cd7ce8d0222eebbce257129a4885",
+        "bytes": 4503,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "mut",
+        "logical_path": "src/main/java/com/google/cloud/tools/jib/cli/jar/JarFiles.java",
+        "sha256": "ff8ee22a4aa1bce7d61024a2d06fcb7983abc3e92751683cee598a92a0020140",
+        "bytes": 3996,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 71,
+          "end_line": 71
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getBaseImage()"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 72,
+          "end_line": 72
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getPlatforms()"
+      },
+      {
+        "observation_id": "criterion:2",
+        "location": {
+          "source_id": "test",
+          "start_line": 73,
+          "end_line": 73
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getCreationTime()"
+      },
+      {
+        "observation_id": "criterion:3",
+        "location": {
+          "source_id": "test",
+          "start_line": 74,
+          "end_line": 74
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getFormat()"
+      },
+      {
+        "observation_id": "criterion:4",
+        "location": {
+          "source_id": "test",
+          "start_line": 75,
+          "end_line": 75
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEnvironment().size()"
+      },
+      {
+        "observation_id": "criterion:5",
+        "location": {
+          "source_id": "test",
+          "start_line": 76,
+          "end_line": 76
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getLabels().size()"
+      },
+      {
+        "observation_id": "criterion:6",
+        "location": {
+          "source_id": "test",
+          "start_line": 77,
+          "end_line": 77
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getVolumes().size()"
+      },
+      {
+        "observation_id": "criterion:7",
+        "location": {
+          "source_id": "test",
+          "start_line": 78,
+          "end_line": 78
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getExposedPorts().size()"
+      },
+      {
+        "observation_id": "criterion:8",
+        "location": {
+          "source_id": "test",
+          "start_line": 79,
+          "end_line": 79
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getUser()"
+      },
+      {
+        "observation_id": "criterion:9",
+        "location": {
+          "source_id": "test",
+          "start_line": 80,
+          "end_line": 80
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getWorkingDirectory()"
+      },
+      {
+        "observation_id": "criterion:10",
+        "location": {
+          "source_id": "test",
+          "start_line": 81,
+          "end_line": 81
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEntrypoint().size()"
+      },
+      {
+        "observation_id": "criterion:11",
+        "location": {
+          "source_id": "test",
+          "start_line": 82,
+          "end_line": 82
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEntrypoint().get(0)"
+      },
+      {
+        "observation_id": "criterion:12",
+        "location": {
+          "source_id": "test",
+          "start_line": 83,
+          "end_line": 83
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEntrypoint().get(1)"
+      },
+      {
+        "observation_id": "criterion:13",
+        "location": {
+          "source_id": "test",
+          "start_line": 84,
+          "end_line": 84
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEntrypoint().get(2)"
+      },
+      {
+        "observation_id": "criterion:14",
+        "location": {
+          "source_id": "test",
+          "start_line": 85,
+          "end_line": 85
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getEntrypoint().get(3)"
+      },
+      {
+        "observation_id": "criterion:15",
+        "location": {
+          "source_id": "test",
+          "start_line": 86,
+          "end_line": 86
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getLayers().size()"
+      },
+      {
+        "observation_id": "criterion:16",
+        "location": {
+          "source_id": "test",
+          "start_line": 87,
+          "end_line": 87
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "buildPlan.getLayers().get(0).getName()"
+      },
+      {
+        "observation_id": "criterion:17",
+        "location": {
+          "source_id": "test",
+          "start_line": 88,
+          "end_line": 96
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().toArray(new Object[0])"
+      },
+      {
+        "observation_id": "criterion:18",
+        "location": {
+          "source_id": "test",
+          "start_line": 97,
+          "end_line": 99
+        },
+        "kind": "assertion_observed_expression",
+        "origin": "explicit",
+        "reason": "((FileEntriesLayer) buildPlan.getLayers().get(0)).getEntries().get(0).getExtractionPath()"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected frozen test method",
+      "reason": "the test is not parameterized"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+        "evidence": [
+          "0346159882e9a5e2731a3916096b5b52f2f8cd7ce8d0222eebbce257129a4885"
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "unique",
+        "candidates": [
+          "com.google.cloud.tools.jib.cli.jar.JarFiles.toJibContainerBuilder(com.google.cloud.tools.jib.cli.ArtifactProcessor,com.google.cloud.tools.jib.cli.Jar,com.google.cloud.tools.jib.cli.CommonCliOptions,com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions,com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger)"
+        ],
+        "evidence": [
+          {
+            "report_sha256": "f9e9f63797e5fd3a1a567a0cac3ce4de1b3bcc0a3f15ca3f0da92af275571d21",
+            "case_identity": {
+              "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+              "dataset": "java-bechmark-strong",
+              "snapshot_id": "5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4",
+              "masked_test_sha256": "19e800bf8967238ef3b7772278e476186e509051e5021067b1f7234de0f68ed0"
+            },
+            "target_call_site": "test:63:9:CtInvocationImpl",
+            "target_callee": "com.google.cloud.tools.jib.cli.jar.JarFiles.toJibContainerBuilder(com.google.cloud.tools.jib.cli.ArtifactProcessor,com.google.cloud.tools.jib.cli.Jar,com.google.cloud.tools.jib.cli.CommonCliOptions,com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions,com.google.cloud.tools.jib.plugins.common.logging.ConsoleLogger)",
+            "binding_count": 1,
+            "argument_parameter_indexes": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "return_binding_count": 1
+          }
+        ],
+        "assumptions": []
+      }
+    },
+    "relations": [
+      {
+        "kind": "state_flow",
+        "modality": "analysis_may",
+        "from": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V | com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.setBaseImage(Ljava/lang/String;)Lcom/google/cloud/tools/jib/api/buildplan/ContainerBuildPlan$Builder;",
+        "to": "buildPlan.getBaseImage()",
+        "provenance": "wala_modref_plus_frozen_library_bytecode",
+        "precision": "exact_field_and_intersecting_receiver_region",
+        "assumptions": [
+          "path feasibility and concrete value are not established"
+        ],
+        "observation_ids": [
+          "criterion:0"
+        ]
+      },
+      {
+        "kind": "state_flow",
+        "modality": "analysis_may",
+        "from": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+        "to": "buildPlan.getCreationTime()",
+        "provenance": "wala_modref_plus_frozen_library_bytecode",
+        "precision": "exact_field_and_intersecting_receiver_region",
+        "assumptions": [
+          "path feasibility and concrete value are not established"
+        ],
+        "observation_ids": [
+          "criterion:2"
+        ]
+      },
+      {
+        "kind": "state_flow",
+        "modality": "analysis_may",
+        "from": "com.google.cloud.tools.jib.api.buildplan.ContainerBuildPlan$Builder.<init>()V",
+        "to": "buildPlan.getFormat()",
+        "provenance": "wala_modref_plus_frozen_library_bytecode",
+        "precision": "exact_field_and_intersecting_receiver_region",
+        "assumptions": [
+          "path feasibility and concrete value are not established"
+        ],
+        "observation_ids": [
+          "criterion:3"
+        ]
+      }
+    ],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [
+        "diagnostic observation mapping is manual; issue21 supplies automatic MUT binding"
+      ],
+      "unknown_effects": [
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getFrom",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.ArtifactProcessor.getJavaVersion",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getCreationTime",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getFormat",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEnvironment",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getLabels",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getVolumes",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getExposedPorts",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getUser",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEntrypoint",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.ArtifactProcessor.computeEntrypoint",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEntrypoint",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.ArtifactProcessor.computeEntrypoint",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEntrypoint",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.ArtifactProcessor.computeEntrypoint",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEntrypoint",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.ArtifactProcessor.computeEntrypoint",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.CommonContainerConfigCliOptions.getEntrypoint",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.ArtifactProcessor.computeEntrypoint",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.ArtifactProcessor.createLayers",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.ArtifactProcessor.createLayers",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.ArtifactProcessor.createLayers",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "com.google.cloud.tools.jib.cli.ArtifactProcessor.createLayers",
+          "effect": "normal_return_null_state_exception",
+          "scope": "exact native call",
+          "provenance": "structural declaration",
+          "precision": "unknown",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": []
+    },
+    "completion": {
+      "status": "partial",
+      "stage": "jib_observation_state_mapping",
+      "failure_categories": [
+        "unknown_native_values_and_exceptions",
+        "unresolved_collection_copy_calls",
+        "nested_layer_path_missing_in_value_state_channel",
+        "overwrite_and_path_feasibility_not_established"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "verified_incomplete",
+      "reviewer": "mechanical_exact_field_gate",
+      "evidence": [
+        "field Mod/Ref intersections and mutation negatives"
+      ],
+      "notes": "Concrete values and native effects are deliberately unknown."
+    },
+    "cost": {
+      "timings_seconds": {
+        "scope_hierarchy_entry": 1.985,
+        "call_graph_pointer": 14.842,
+        "ci_graph": 1.286,
+        "total": 34.29
+      },
+      "total_seconds": 34.29,
+      "peak_memory": {
+        "status": "measured_by_usr_bin_time",
+        "bytes": 1538461696
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "OS and Maven caches were not isolated"
+      },
+      "input_size": {
+        "files": 2,
+        "bytes": 8499
+      },
+      "graph_size": {
+        "nodes": 11256,
+        "edges": null
+      },
+      "unavailable_phases": []
+    }
+  }
+}

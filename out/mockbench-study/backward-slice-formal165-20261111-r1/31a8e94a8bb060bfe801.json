@@ -1,0 +1,767 @@
+{
+  "status": "unsupported",
+  "failure_categories": [
+    "semantic_analysis_gap",
+    "semantic_backend_unsupported"
+  ],
+  "stage": "semantic_backend",
+  "input_context": {
+    "target_selector": "tests/test_314has_level_handler.py::test_has_level_handler_scenarios",
+    "masked_test_logical_path": "tests/test_314has_level_handler.py",
+    "masked_test_sha256": "65daeeae03741d2982d7538d37803ec7612f0b589fb0dcb717b52e80892c6291",
+    "masking_contract": "python-slot-v1"
+  },
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_314has_level_handler.py::test_has_level_handler_scenarios",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_has_level_handler_scenarios",
+          "start_line": 48,
+          "end_line": 118
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 115,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "logging",
+        "candidates": [
+          "src/src/flask/logging.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/flask/logging.py",
+        "hint_kind": "python_import",
+        "hint": "typing",
+        "candidates": [
+          "src/src/flask/typing.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [],
+    "source_rejections": [],
+    "dynamic_loader_bindings": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 8533,
+    "read_bytes": 8533,
+    "attempted_files": 2,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_314has_level_handler.py",
+      "sha256": "65daeeae03741d2982d7538d37803ec7612f0b589fb0dcb717b52e80892c6291",
+      "bytes": 3042
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/src/flask/logging.py",
+      "sha256": "f2c33758c4ee6e2d5c05bd9cfe53e45a937427c74c02aae029160b2e2d5d0952",
+      "bytes": 2377
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/src/flask/typing.py",
+      "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+      "bytes": 3114
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "dynamic_loader_bindings": [],
+    "edges": [
+      {
+        "from": "test:70:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:70:4:Name"
+      },
+      {
+        "from": "test:112:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:112:4:Name"
+      },
+      {
+        "from": "test:70:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:112:4:Assign",
+        "variable": "loggers"
+      },
+      {
+        "from": "test:112:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:115:4:Assert",
+        "variable": "result"
+      },
+      {
+        "from": "test:48:106:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:115:4:Assert",
+        "variable": "expected_result"
+      },
+      {
+        "callee": "has_level_handler",
+        "from": "source:1:40:12:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:112:4:Assign"
+      },
+      {
+        "callee": "has_level_handler",
+        "from": "source:1:47:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:112:4:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:39:11:Call",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:40:12:Return"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected",
+      "dynamic loader origins require a visible static path, namespace key, selected definition, and unrebound test callable"
+    ],
+    "nodes": [
+      {
+        "code": "any((handler.level <= level for handler in current.handlers))",
+        "end_line": 39,
+        "id": "source:1:39:11:Call",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 39
+      },
+      {
+        "code": "return True",
+        "end_line": 40,
+        "id": "source:1:40:12:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 40
+      },
+      {
+        "code": "return False",
+        "end_line": 47,
+        "id": "source:1:47:4:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 47
+      },
+      {
+        "code": "result = has_level_handler(loggers[0])",
+        "end_line": 112,
+        "exception_possible": true,
+        "id": "test:112:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 112
+      },
+      {
+        "code": "result",
+        "end_line": 112,
+        "id": "test:112:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 112
+      },
+      {
+        "code": "assert result == expected_result",
+        "end_line": 115,
+        "id": "test:115:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 115
+      },
+      {
+        "code": "expected_result",
+        "end_line": 48,
+        "id": "test:48:106:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 48
+      },
+      {
+        "code": "loggers = []",
+        "end_line": 70,
+        "id": "test:70:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 70
+      },
+      {
+        "code": "loggers",
+        "end_line": 70,
+        "id": "test:70:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 70
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:115:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:115:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 9,
+    "edges": 8,
+    "edge_kinds": {
+      "definition_value_candidate": 2,
+      "data_candidate": 3,
+      "call_target_candidate": 2,
+      "lexical_control": 1
+    },
+    "criteria": [
+      {
+        "seed": "test:115:4:Assert",
+        "node_ids": [
+          "source:1:39:11:Call",
+          "source:1:40:12:Return",
+          "source:1:47:4:Return",
+          "test:112:4:Assign",
+          "test:112:4:Name",
+          "test:115:4:Assert",
+          "test:48:106:arg",
+          "test:70:4:Assign",
+          "test:70:4:Name"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": []
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:115:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": false,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.1171,
+  "timings_seconds": {
+    "criterion_extraction": 0.000687,
+    "source_selection": 0.042851,
+    "backend_total": 0.073465,
+    "evidence_summary": 4.2e-05
+  },
+  "identity": {
+    "case_id": "flask_314",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "755451dea82b8a62736902aa2dd732e250f973f0069853dd55252c8ed3efcb31"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "flask_314",
+      "dataset": "python-benchmark-new",
+      "language": "python",
+      "snapshot_id": "755451dea82b8a62736902aa2dd732e250f973f0069853dd55252c8ed3efcb31",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "65daeeae03741d2982d7538d37803ec7612f0b589fb0dcb717b52e80892c6291",
+      "target_selector": "tests/test_314has_level_handler.py::test_has_level_handler_scenarios"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_314has_level_handler.py",
+        "sha256": "65daeeae03741d2982d7538d37803ec7612f0b589fb0dcb717b52e80892c6291",
+        "bytes": 3042,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:1",
+        "logical_path": "src/src/flask/logging.py",
+        "sha256": "f2c33758c4ee6e2d5c05bd9cfe53e45a937427c74c02aae029160b2e2d5d0952",
+        "bytes": 2377,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:2",
+        "logical_path": "src/src/flask/typing.py",
+        "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+        "bytes": 3114,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "the runner does not enumerate parameter rows"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_314has_level_handler.py::test_has_level_handler_scenarios",
+        "evidence": [
+          {
+            "symbol": "test_has_level_handler_scenarios",
+            "start_line": 48,
+            "end_line": 118
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "not_evaluated",
+        "candidates": [],
+        "evidence": [],
+        "assumptions": []
+      }
+    },
+    "relations": [],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [],
+      "unknown_effects": [],
+      "unanalysed_regions": [
+        {
+          "scope": "mature_backend_support_domain",
+          "reason": "semantic_backend_unsupported",
+          "details": [
+            "No authenticated Python semantic driver is registered for this case.",
+            "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+            "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+          ]
+        }
+      ]
+    },
+    "completion": {
+      "status": "unsupported",
+      "stage": "semantic_backend",
+      "failure_categories": [
+        "semantic_analysis_gap",
+        "semantic_backend_unsupported"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "not_evaluated",
+      "reviewer": null,
+      "evidence": [],
+      "notes": "candidate reachability is not semantic dependency validation"
+    },
+    "cost": {
+      "timings_seconds": {
+        "criterion_extraction": 0.000687,
+        "source_selection": 0.042851,
+        "backend_total": 0.073465,
+        "evidence_summary": 4.2e-05
+      },
+      "total_seconds": 0.1171,
+      "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+      "peak_memory": {
+        "status": "unavailable",
+        "bytes": null,
+        "reason": "case-level peak memory is not measured by this runner"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+      },
+      "input_size": {
+        "files": 3,
+        "bytes": 8533
+      },
+      "graph_size": {
+        "nodes": 9,
+        "edges": 8
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter admission occurs outside the per-case analysis timer"
+        },
+        {
+          "phase": "front_end",
+          "reason": "the candidate backend does not report parsing time separately"
+        },
+        {
+          "phase": "call_graph",
+          "reason": "the candidate backend does not report call-graph time separately"
+        },
+        {
+          "phase": "pointer_analysis",
+          "reason": "the candidate backend does not provide pointer analysis"
+        },
+        {
+          "phase": "dependency_analysis",
+          "reason": "backend_total combines parsing, graph construction, and slicing"
+        },
+        {
+          "phase": "slice",
+          "reason": "the candidate backend does not report semantic slicing time separately"
+        },
+        {
+          "phase": "source_mapping",
+          "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+        }
+      ]
+    }
+  },
+  "candidate_diagnostics": {
+    "status": "partial",
+    "failure_categories": [
+      "semantic_analysis_gap"
+    ],
+    "result_contract": {
+      "schema_version": "mock-spec.backward-analysis-case/v1",
+      "identity": {
+        "case_id": "flask_314",
+        "dataset": "python-benchmark-new",
+        "language": "python",
+        "snapshot_id": "755451dea82b8a62736902aa2dd732e250f973f0069853dd55252c8ed3efcb31",
+        "masking_contract": "python-slot-v1",
+        "masked_test_sha256": "65daeeae03741d2982d7538d37803ec7612f0b589fb0dcb717b52e80892c6291",
+        "target_selector": "tests/test_314has_level_handler.py::test_has_level_handler_scenarios"
+      },
+      "source_scope": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_314has_level_handler.py",
+          "sha256": "65daeeae03741d2982d7538d37803ec7612f0b589fb0dcb717b52e80892c6291",
+          "bytes": 3042,
+          "selection_role": "masked_test"
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/src/flask/logging.py",
+          "sha256": "f2c33758c4ee6e2d5c05bd9cfe53e45a937427c74c02aae029160b2e2d5d0952",
+          "bytes": 2377,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/src/flask/typing.py",
+          "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+          "bytes": 3114,
+          "selection_role": "candidate_product"
+        }
+      ],
+      "observations": [
+        {
+          "observation_id": "criterion:0",
+          "location": {
+            "source_id": "test",
+            "start_line": 115,
+            "end_line": 115
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        }
+      ],
+      "parameterization": {
+        "status": "not_expanded",
+        "coverage": "selected_test_definition",
+        "reason": "the runner does not enumerate parameter rows"
+      },
+      "entry_point": {
+        "test_selection": {
+          "origin": "task_provided",
+          "status": "unique",
+          "selector": "tests/test_314has_level_handler.py::test_has_level_handler_scenarios",
+          "evidence": [
+            {
+              "symbol": "test_has_level_handler_scenarios",
+              "start_line": 48,
+              "end_line": 118
+            }
+          ]
+        },
+        "mut_binding": {
+          "origin": "automatic",
+          "status": "not_evaluated",
+          "candidates": [],
+          "evidence": [],
+          "assumptions": []
+        }
+      },
+      "relations": [],
+      "relation_coverage": [
+        {
+          "kind": "call_binding",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "control_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "exception_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "function_origin",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "normal_return_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "state_flow",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "value_flow",
+          "status": "not_evaluated"
+        }
+      ],
+      "analysis_boundaries": {
+        "assumptions": [],
+        "unknown_effects": [],
+        "unanalysed_regions": [
+          {
+            "scope": "semantic_relations",
+            "reason": "candidate_graph_has_no_validated_dependency_semantics"
+          }
+        ]
+      },
+      "completion": {
+        "status": "partial",
+        "stage": "complete",
+        "failure_categories": [
+          "semantic_analysis_gap"
+        ],
+        "error": null
+      },
+      "semantic_validation": {
+        "status": "not_evaluated",
+        "reviewer": null,
+        "evidence": [],
+        "notes": "candidate reachability is not semantic dependency validation"
+      },
+      "cost": {
+        "timings_seconds": {
+          "criterion_extraction": 0.000687,
+          "source_selection": 0.042851,
+          "backend_total": 0.073465,
+          "evidence_summary": 4.2e-05
+        },
+        "total_seconds": 0.1171,
+        "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+        "peak_memory": {
+          "status": "unavailable",
+          "bytes": null,
+          "reason": "case-level peak memory is not measured by this runner"
+        },
+        "cache_state": {
+          "status": "unknown",
+          "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+        },
+        "input_size": {
+          "files": 3,
+          "bytes": 8533
+        },
+        "graph_size": {
+          "nodes": 9,
+          "edges": 8
+        },
+        "unavailable_phases": [
+          {
+            "phase": "input_admission",
+            "reason": "adapter admission occurs outside the per-case analysis timer"
+          },
+          {
+            "phase": "front_end",
+            "reason": "the candidate backend does not report parsing time separately"
+          },
+          {
+            "phase": "call_graph",
+            "reason": "the candidate backend does not report call-graph time separately"
+          },
+          {
+            "phase": "pointer_analysis",
+            "reason": "the candidate backend does not provide pointer analysis"
+          },
+          {
+            "phase": "dependency_analysis",
+            "reason": "backend_total combines parsing, graph construction, and slicing"
+          },
+          {
+            "phase": "slice",
+            "reason": "the candidate backend does not report semantic slicing time separately"
+          },
+          {
+            "phase": "source_mapping",
+            "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+          }
+        ]
+      }
+    },
+    "stage": "complete",
+    "error": null,
+    "elapsed_seconds": 0.1171,
+    "timings_seconds": {
+      "criterion_extraction": 0.000687,
+      "source_selection": 0.042851,
+      "backend_total": 0.073465,
+      "evidence_summary": 4.2e-05
+    },
+    "graph_and_evidence": "top-level graph/evidence/sources remain candidate diagnostics only"
+  },
+  "semantic_backend": {
+    "schema": "mock-spec.batch-semantic-backend/v1",
+    "status": "unsupported",
+    "backend": null,
+    "identity": {
+      "language": "python",
+      "dataset": "python-benchmark-new",
+      "case_id": "flask_314",
+      "inventory_revision": "0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc",
+      "snapshot_id": "755451dea82b8a62736902aa2dd732e250f973f0069853dd55252c8ed3efcb31",
+      "snapshot_root": "/home/haon/projects/Stub-Tester/.omx/developer-realistic-registry-max/formal-snapshots/python-benchmark-new/755451dea82b8a62736902aa2dd732e250f973f0069853dd55252c8ed3efcb31",
+      "admission_status": "frozen_candidate",
+      "admission_verified": false,
+      "reviewed_snapshot_id": null,
+      "target_selector": "tests/test_314has_level_handler.py::test_has_level_handler_scenarios",
+      "masked_test_logical_path": "tests/test_314has_level_handler.py",
+      "masked_test_sha256": "65daeeae03741d2982d7538d37803ec7612f0b589fb0dcb717b52e80892c6291",
+      "masking_contract": "python-slot-v1",
+      "input_context": {
+        "target_selector": "tests/test_314has_level_handler.py::test_has_level_handler_scenarios",
+        "masked_test_logical_path": "tests/test_314has_level_handler.py",
+        "masked_test_sha256": "65daeeae03741d2982d7538d37803ec7612f0b589fb0dcb717b52e80892c6291",
+        "masking_contract": "python-slot-v1"
+      },
+      "sources": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_314has_level_handler.py",
+          "sha256": "65daeeae03741d2982d7538d37803ec7612f0b589fb0dcb717b52e80892c6291",
+          "bytes": 3042
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/src/flask/logging.py",
+          "sha256": "f2c33758c4ee6e2d5c05bd9cfe53e45a937427c74c02aae029160b2e2d5d0952",
+          "bytes": 2377
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/src/flask/typing.py",
+          "sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+          "bytes": 3114
+        }
+      ]
+    },
+    "limitations": [
+      "No authenticated Python semantic driver is registered for this case.",
+      "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+      "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed."
+    ],
+    "source": null,
+    "provenance": {
+      "target_executed": false
+    },
+    "cost": null,
+    "terminal": {
+      "execution": "not_started",
+      "semantic_validation": "not_evaluated"
+    },
+    "driver_exit_code": 0,
+    "batch_dispatch_seconds": 0.078105,
+    "batch_dispatch_scope": "bridge process including support check, adapter and backend; excludes candidate diagnostics"
+  },
+  "batch_case_cost": {
+    "total_seconds": 0.31792,
+    "scope": "admission, candidate diagnostic, semantic-slot wait, dispatch and mapping; excludes case queue, shared compile and serialization"
+  },
+  "result_contract_sha256": "b4029ad3f0064708bdb39be19654817712e84f3fd960fea8339d831d05f6280a"
+}

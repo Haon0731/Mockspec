@@ -1,0 +1,127 @@
+69418:
+2026-11-11 04:09:20
+Full thread dump OpenJDK 64-Bit Server VM (11.0.33+9-post-1ubuntu1-26.04.1-Ubuntu mixed mode, sharing):
+
+Threads class SMR info:
+_java_thread_list=0x00007398e0000950, length=10, elements={
+0x0000739928016800, 0x0000739928181800, 0x0000739928184000, 0x000073992818b000,
+0x000073992818d000, 0x000073992818f800, 0x0000739928191800, 0x0000739928193800,
+0x00007399281de800, 0x00007398e0001000
+}
+
+"main" #1 prio=5 os_prio=0 cpu=55013.56ms elapsed=59.05s tid=0x0000739928016800 nid=0x10f2b runnable  [0x000073992ebfc000]
+   java.lang.Thread.State: RUNNABLE
+	at com.ibm.wala.ipa.slicer.HeapReachingDefs.allCalleesMod(HeapReachingDefs.java:464)
+	at com.ibm.wala.ipa.slicer.HeapReachingDefs$RDMap.computeResult(HeapReachingDefs.java:386)
+	at com.ibm.wala.ipa.slicer.HeapReachingDefs$RDMap.eagerPopulate(HeapReachingDefs.java:205)
+	at com.ibm.wala.ipa.slicer.HeapReachingDefs$RDMap.<init>(HeapReachingDefs.java:185)
+	at com.ibm.wala.ipa.slicer.HeapReachingDefs.makeResult(HeapReachingDefs.java:453)
+	at com.ibm.wala.ipa.slicer.HeapReachingDefs.computeReachingDefs(HeapReachingDefs.java:145)
+	at com.ibm.wala.ipa.slicer.PDG.createHeapDataDependenceEdges(PDG.java:698)
+	at com.ibm.wala.ipa.slicer.PDG.computeIncomingHeapDependencies(PDG.java:1133)
+	at com.ibm.wala.ipa.slicer.PDG.getPredNodes(PDG.java:1111)
+	at com.ibm.wala.ipa.slicer.SDG$Edges.getPredNodes(SDG.java:301)
+	at com.ibm.wala.ipa.slicer.SDG$Edges.getPredNodes(SDG.java:272)
+	at com.ibm.wala.util.graph.AbstractGraph.getPredNodes(AbstractGraph.java:71)
+	at com.ibm.wala.ipa.slicer.SDGSupergraph.getPredNodes(SDGSupergraph.java:347)
+	at com.ibm.wala.ipa.slicer.SDGSupergraph.getPredNodes(SDGSupergraph.java:26)
+	at com.ibm.wala.dataflow.IFDS.BackwardsSupergraph.getSuccNodes(BackwardsSupergraph.java:195)
+	at com.ibm.wala.dataflow.IFDS.TabulationSolver.processNormal(TabulationSolver.java:298)
+	at com.ibm.wala.dataflow.IFDS.TabulationSolver.forwardTabulateSLRPs(TabulationSolver.java:256)
+	at com.ibm.wala.dataflow.IFDS.TabulationSolver.solve(TabulationSolver.java:190)
+	at com.ibm.wala.ipa.slicer.Slicer.slice(Slicer.java:265)
+	at com.ibm.wala.ipa.slicer.Slicer.slice(Slicer.java:242)
+	at com.ibm.wala.ipa.slicer.Slicer.computeSlice(Slicer.java:229)
+	at com.ibm.wala.ipa.slicer.Slicer.computeBackwardSlice(Slicer.java:206)
+	at org.mockspec.research.WalaScaleProbe.main(WalaScaleProbe.java:213)
+
+"Reference Handler" #2 daemon prio=10 os_prio=0 cpu=8.57ms elapsed=59.04s tid=0x0000739928181800 nid=0x10f32 waiting on condition  [0x000073992c2ee000]
+   java.lang.Thread.State: RUNNABLE
+	at java.lang.ref.Reference.waitForReferencePendingList(java.base@11.0.33/Native Method)
+	at java.lang.ref.Reference.processPendingReferences(java.base@11.0.33/Reference.java:241)
+	at java.lang.ref.Reference$ReferenceHandler.run(java.base@11.0.33/Reference.java:213)
+
+"Finalizer" #3 daemon prio=8 os_prio=0 cpu=0.27ms elapsed=59.04s tid=0x0000739928184000 nid=0x10f33 in Object.wait()  [0x000073992c1ee000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.33/Native Method)
+	- waiting on <0x0000000080165038> (a java.lang.ref.ReferenceQueue$Lock)
+	at java.lang.ref.ReferenceQueue.remove(java.base@11.0.33/ReferenceQueue.java:155)
+	- waiting to re-lock in wait() <0x0000000080165038> (a java.lang.ref.ReferenceQueue$Lock)
+	at java.lang.ref.ReferenceQueue.remove(java.base@11.0.33/ReferenceQueue.java:176)
+	at java.lang.ref.Finalizer$FinalizerThread.run(java.base@11.0.33/Finalizer.java:170)
+
+"Signal Dispatcher" #4 daemon prio=9 os_prio=0 cpu=0.33ms elapsed=59.03s tid=0x000073992818b000 nid=0x10f34 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"Service Thread" #5 daemon prio=9 os_prio=0 cpu=0.10ms elapsed=59.03s tid=0x000073992818d000 nid=0x10f35 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"C2 CompilerThread0" #6 daemon prio=9 os_prio=0 cpu=18449.55ms elapsed=59.03s tid=0x000073992818f800 nid=0x10f36 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   No compile task
+
+"C1 CompilerThread0" #9 daemon prio=9 os_prio=0 cpu=2594.34ms elapsed=59.03s tid=0x0000739928191800 nid=0x10f37 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   No compile task
+
+"Sweeper thread" #10 daemon prio=9 os_prio=0 cpu=33.06ms elapsed=59.03s tid=0x0000739928193800 nid=0x10f38 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"Common-Cleaner" #11 daemon prio=8 os_prio=0 cpu=1.09ms elapsed=59.01s tid=0x00007399281de800 nid=0x10f3a in Object.wait()  [0x00007398fd5fd000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.33/Native Method)
+	- waiting on <0x00000000801654d0> (a java.lang.ref.ReferenceQueue$Lock)
+	at java.lang.ref.ReferenceQueue.remove(java.base@11.0.33/ReferenceQueue.java:155)
+	- waiting to re-lock in wait() <0x00000000801654d0> (a java.lang.ref.ReferenceQueue$Lock)
+	at jdk.internal.ref.CleanerImpl.run(java.base@11.0.33/CleanerImpl.java:148)
+	at java.lang.Thread.run(java.base@11.0.33/Thread.java:829)
+	at jdk.internal.misc.InnocuousThread.run(java.base@11.0.33/InnocuousThread.java:161)
+
+"Attach Listener" #12 daemon prio=9 os_prio=0 cpu=0.22ms elapsed=0.10s tid=0x00007398e0001000 nid=0x112ec waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"VM Thread" os_prio=0 cpu=130.94ms elapsed=59.04s tid=0x000073992817f000 nid=0x10f31 runnable  
+
+"GC Thread#0" os_prio=0 cpu=2892.00ms elapsed=59.05s tid=0x000073992802f800 nid=0x10f2c runnable  
+
+"GC Thread#1" os_prio=0 cpu=2755.77ms elapsed=58.83s tid=0x00007398f4001000 nid=0x10f3e runnable  
+
+"GC Thread#2" os_prio=0 cpu=2905.87ms elapsed=58.83s tid=0x00007398f4002800 nid=0x10f3f runnable  
+
+"GC Thread#3" os_prio=0 cpu=2935.10ms elapsed=58.83s tid=0x00007398f4004000 nid=0x10f40 runnable  
+
+"GC Thread#4" os_prio=0 cpu=2827.22ms elapsed=58.83s tid=0x00007398f4005800 nid=0x10f41 runnable  
+
+"GC Thread#5" os_prio=0 cpu=2931.69ms elapsed=58.37s tid=0x00007398f4054000 nid=0x10f43 runnable  
+
+"GC Thread#6" os_prio=0 cpu=2803.57ms elapsed=58.37s tid=0x00007398f4055800 nid=0x10f44 runnable  
+
+"GC Thread#7" os_prio=0 cpu=2720.55ms elapsed=57.84s tid=0x00007398f415f000 nid=0x10f48 runnable  
+
+"G1 Main Marker" os_prio=0 cpu=8.35ms elapsed=59.05s tid=0x0000739928062800 nid=0x10f2d runnable  
+
+"G1 Conc#0" os_prio=0 cpu=8238.91ms elapsed=59.05s tid=0x0000739928064800 nid=0x10f2e runnable  
+
+"G1 Conc#1" os_prio=0 cpu=8248.85ms elapsed=48.27s tid=0x0000739900001000 nid=0x11009 runnable  
+
+"G1 Refine#0" os_prio=0 cpu=2099.01ms elapsed=59.05s tid=0x000073992814a000 nid=0x10f2f runnable  
+
+"G1 Refine#1" os_prio=0 cpu=344.55ms elapsed=58.82s tid=0x00007398f8001000 nid=0x10f42 runnable  
+
+"G1 Refine#2" os_prio=0 cpu=106.74ms elapsed=58.23s tid=0x00007398b4001800 nid=0x10f45 runnable  
+
+"G1 Refine#3" os_prio=0 cpu=79.60ms elapsed=58.05s tid=0x00007398a0001800 nid=0x10f46 runnable  
+
+"G1 Refine#4" os_prio=0 cpu=53.19ms elapsed=58.05s tid=0x00007398a4001000 nid=0x10f47 runnable  
+
+"G1 Refine#5" os_prio=0 cpu=31.92ms elapsed=57.83s tid=0x0000739898001000 nid=0x10f49 runnable  
+
+"G1 Refine#6" os_prio=0 cpu=13.77ms elapsed=57.83s tid=0x0000739890001000 nid=0x10f4a runnable  
+
+"G1 Refine#7" os_prio=0 cpu=6.48ms elapsed=57.83s tid=0x0000739894001000 nid=0x10f4b runnable  
+
+"G1 Young RemSet Sampling" os_prio=0 cpu=34.82ms elapsed=59.05s tid=0x000073992814c000 nid=0x10f30 runnable  
+"VM Periodic Task Thread" os_prio=0 cpu=41.90ms elapsed=59.01s tid=0x00007399281dc000 nid=0x10f39 waiting on condition  
+
+JNI global refs: 10, weak refs: 0
+

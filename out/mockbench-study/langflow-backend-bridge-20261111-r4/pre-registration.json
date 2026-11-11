@@ -1,0 +1,73 @@
+{
+  "schema": "mock-spec.langflow-backend-pre-registration/v1",
+  "identity": {
+    "case_id": "langflow_189",
+    "dataset": "python-benchmark-new",
+    "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+    "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+    "masking_contract": "python-slot-v1"
+  },
+  "input_manifest_sha256": "40078ddbae52d63fd7e42cdc6d5a3ed5148c0509003fcc544a78cb8635346074",
+  "issue22_artifact": {
+    "path": "out/mockbench-study/backward-slice-issue22-langflow-20261110/5b83af29ea4ed3c9d4ce.json",
+    "sha256": "55367a2d7d150c127055bd7649d32ce56d908b2f2d83053a3a06e35a5c426b3a"
+  },
+  "dynamic_loader_binding": {
+    "status": "resolved",
+    "loader": "load_is_encrypted",
+    "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+    "path_line": 13,
+    "namespace": "namespace",
+    "exec_line": 36,
+    "return_line": 37,
+    "read_line": 27,
+    "function_key": "is_encrypted",
+    "return_index": 0,
+    "function_definition": {
+      "source_id": "source:1",
+      "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+      "name": "is_encrypted",
+      "start_line": 94,
+      "end_line": 118
+    },
+    "test_bindings": [
+      {
+        "name": "is_encrypted",
+        "line": 74
+      }
+    ],
+    "call_sites": [
+      {
+        "name": "is_encrypted",
+        "line": 104
+      }
+    ]
+  },
+  "expectations_sha256": "83a1d9e0a65c87ab87b0e1454cf678fb5e8d8c6baa0812b50f14bbbea08e144e",
+  "implementation_sha256": {
+    "/home/haon/projects/Mockspec/experiments/backward-slicing/python-backend-pilot/run_langflow_backend.py": "c71c66c3bb079df0c9576ace3e6251ca264c1bcaac4dd9819b02595e3413d4c2",
+    "/home/haon/projects/Mockspec/experiments/backward-slicing/python-backend-pilot/prepare_langflow.py": "480935dc20f1277055bdd603e4157711c810a298b48a0ff62c02e7263dc544df",
+    "/home/haon/projects/Mockspec/experiments/backward-slicing/python-backend-pilot/langflow_mapping.py": "c1b4c8841ea757380d302373890662f9f7095e12faf73d09100a15c58bece939",
+    "/home/haon/projects/Mockspec/experiments/backward-slicing/python-backend-pilot/langflow-origin-flow.ql": "69046d6d7517934a7f01a087f72c6076482fa4d452f171846f12a54936d306b2",
+    "/home/haon/projects/Mockspec/experiments/backward-slicing/python-backend-pilot/langflow_expectations.json": "83a1d9e0a65c87ab87b0e1454cf678fb5e8d8c6baa0812b50f14bbbea08e144e",
+    "/home/haon/projects/Mockspec/experiments/backward-slicing/source_selection.py": "16f698752ee24257c16ee6b338f7f60e8ec911e14bef0436e2689dca0cf5ef01"
+  },
+  "expected_relations": [
+    "authenticated visible loader origin to the exact product function",
+    "test call result may flow to criterion:0",
+    "product function returns and controlling guards",
+    "product function reference to the injected InvalidToken global for criterion:1"
+  ],
+  "expected_unknowns": [
+    "CodeQL does not resolve the exec-created function object to the test call without the authenticated frontend bridge",
+    "masked Mock values, decrypt outcomes, concrete exceptions, and path feasibility",
+    "unsupported dynamic namespace or callable rebinding"
+  ],
+  "configuration": {
+    "codeql_version": "2.27.4",
+    "threads": 2,
+    "ram_mb": 4096,
+    "timeout_seconds": 180
+  },
+  "target_executed": false
+}

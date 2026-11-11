@@ -1,0 +1,85 @@
+{
+  "schema_version": "mockspec.wala-capability-summary/v1",
+  "status": "blocked",
+  "gate_passed": false,
+  "case": {
+    "case_id": "com.google.cloud.tools.jib.cli.jar.JarFilesTest#testToJibContainerBuilder_explodedStandard_basicInfo@69ae66df",
+    "snapshot_id": "5b93995c794af0152854a01ddda2fe77948b5ab828b05282b00728f7729f64d4",
+    "target_executed": false
+  },
+  "artifact_storage": {
+    "durable_evidence": "out/mockbench-study/issue23-wala-evidence-20261110",
+    "generated_source_and_binary_workspace": "/tmp/mockspec-issue23-work-20261110",
+    "recorded_path_note": "Raw and expanded receipts preserve the command paths used when first run; the complete generated workspace was subsequently moved to /tmp and no dataset or binary was retained in the repository evidence directory."
+  },
+  "visible_mechanisms": {
+    "status": "passed",
+    "relations": {
+      "live_definition_and_cross_procedure_return": true,
+      "overwritten_definition_excluded": true,
+      "control_and_exception_structure": true,
+      "visible_field_write": true
+    },
+    "metrics": {
+      "slice_statements": 38,
+      "slice_edges": 57,
+      "edge_labels": {
+        "DATA_DEP": 32,
+        "CONTROL_DEP": 23,
+        "HEAP_DATA_DEP": 7
+      },
+      "call_graph_nodes": 12058,
+      "pointer_instance_keys": 4532,
+      "timings_millis": {
+        "scope": 81,
+        "class_hierarchy_and_entry": 2872,
+        "call_graph_and_pointer": 24655,
+        "sdg_initialization": 24967,
+        "backward_slice": 445,
+        "source_mapping": 127,
+        "total": 53153
+      }
+    }
+  },
+  "opaque_call_effects": {
+    "status": "blocked",
+    "observations": {
+      "unknown_write": {
+        "call_binding": "unresolved",
+        "possible_target_count": 0,
+        "direct_call_to_observed_field_heap_edges": 0
+      },
+      "unknown_alias": {
+        "call_binding": "unresolved",
+        "possible_target_count": 0,
+        "direct_call_to_observed_field_heap_edges": 0
+      },
+      "unknown_completion": {
+        "call_binding": "unresolved",
+        "possible_target_count": 0,
+        "direct_call_to_observed_field_heap_edges": 0
+      }
+    },
+    "reason": "The no-target interface calls remain syntactic call/SSA statements. WALA did not supply a conservative callee summary for possible argument writes, return aliasing, arbitrary exceptions, or write-before-throw effects."
+  },
+  "real_jib_input": {
+    "raw_masked_compile": "blocked",
+    "raw_masked_compile_seconds": 1.5884226460475475,
+    "parameter_harness_compile": "blocked",
+    "expanded_visible_source": "closure_incomplete",
+    "structure_only_skeleton": "compiled",
+    "entry_mode": "diagnostic_override",
+    "automatic_entry_recovery": "not_evaluated",
+    "wala_analysis": "resource_limit",
+    "wala_failure": "java.lang.OutOfMemoryError",
+    "wall_clock": "1:09.47",
+    "max_rss_kbytes": 2604696,
+    "configured_java_heap_bytes": 2147483648
+  },
+  "decision": "Do not integrate this WALA configuration as the MockSpec dependency backend yet. Keep the positive visible-code mechanisms, but add an explicit opaque-effect summary layer and a demand-driven/budgeted SDG strategy before repeating the Jib gate.",
+  "official_references": [
+    "https://wala.github.io/javadoc/com/ibm/wala/ipa/slicer/Slicer.html",
+    "https://wala.github.io/javadoc/com/ibm/wala/ipa/slicer/SDG.html",
+    "https://github.com/wala/WALA/blob/v1.7.2/core/src/main/java/com/ibm/wala/ipa/slicer/Slicer.java"
+  ]
+}

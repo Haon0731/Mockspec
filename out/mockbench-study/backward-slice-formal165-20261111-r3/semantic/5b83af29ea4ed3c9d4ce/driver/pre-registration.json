@@ -1,0 +1,96 @@
+{
+  "schema": "mock-spec.langflow-backend-pre-registration/v1",
+  "identity": {
+    "case_id": "langflow_189",
+    "dataset": "python-benchmark-new",
+    "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+    "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+    "masking_contract": "python-slot-v1"
+  },
+  "input_manifest_sha256": "95123f2de08595bfcdbd5d31e70e48328ca45f38caf59d75834676cf782567d2",
+  "issue22_artifact": {
+    "path": "/home/haon/projects/Mockspec/out/mockbench-study/backward-slice-issue22-langflow-20261110/5b83af29ea4ed3c9d4ce.json",
+    "sha256": "55367a2d7d150c127055bd7649d32ce56d908b2f2d83053a3a06e35a5c426b3a"
+  },
+  "dynamic_loader_binding": {
+    "status": "resolved",
+    "loader": "load_is_encrypted",
+    "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+    "path_line": 13,
+    "namespace": "namespace",
+    "exec_line": 36,
+    "return_line": 37,
+    "read_line": 27,
+    "function_key": "is_encrypted",
+    "return_index": 0,
+    "function_definition": {
+      "source_id": "source:1",
+      "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+      "name": "is_encrypted",
+      "start_line": 94,
+      "end_line": 118
+    },
+    "test_bindings": [
+      {
+        "name": "is_encrypted",
+        "line": 74
+      }
+    ],
+    "call_sites": [
+      {
+        "name": "is_encrypted",
+        "line": 104
+      }
+    ]
+  },
+  "invalid_token_identity_binding": {
+    "status": "resolved",
+    "loader_class": "LocalInvalidToken",
+    "namespace": "namespace",
+    "namespace_key": "InvalidToken",
+    "namespace_assignment_line": 35,
+    "loader_return_line": 37,
+    "return_slots": [
+      {
+        "index": 0,
+        "test_name": "is_encrypted"
+      },
+      {
+        "index": 1,
+        "test_name": "invalid_token_cls"
+      }
+    ],
+    "test_binding_line": 74,
+    "observation_line": 115,
+    "comparison": "invalid_token_cls is is_encrypted.__globals__['InvalidToken']",
+    "precision": "strict_supported_python_ast"
+  },
+  "expectations_sha256": "fa65087fe2a54b2afbfdc5de66df347f3a0c4b4e3e526cc6f6f84ff126cfc1b7",
+  "implementation_sha256": {
+    "/home/haon/projects/Mockspec/experiments/backward-slicing/python-backend-pilot/run_langflow_backend.py": "777bdf09687add53007254054d28dbad1241833e6f123c0e40b66d3619563935",
+    "/home/haon/projects/Mockspec/experiments/backward-slicing/python-backend-pilot/prepare_langflow.py": "1bdb7c3044a40f7255818e23110c03573ba9aa698c5e8ca8feff659976ca65ca",
+    "/home/haon/projects/Mockspec/experiments/backward-slicing/python-backend-pilot/langflow_mapping.py": "0f6e5d672e89d43f45c7ca035532fbaa9722f7f5ba302a4a55f5ccb353c1a7fa",
+    "/home/haon/projects/Mockspec/experiments/backward-slicing/python-backend-pilot/langflow_contract.py": "a7ba56a0e70e24e2669cbe5f26b988572e99efb0a050e8fb2c483c68768a4167",
+    "/home/haon/projects/Mockspec/experiments/backward-slicing/python-backend-pilot/langflow-origin-flow.ql": "0e5945d71d3c31f949c126aaf4c0992497dae65615a64eaafef9d0b91306e4c3",
+    "/home/haon/projects/Mockspec/experiments/backward-slicing/python-backend-pilot/langflow_expectations.json": "fa65087fe2a54b2afbfdc5de66df347f3a0c4b4e3e526cc6f6f84ff126cfc1b7",
+    "/home/haon/projects/Mockspec/experiments/backward-slicing/source_selection.py": "16f698752ee24257c16ee6b338f7f60e8ec911e14bef0436e2689dca0cf5ef01"
+  },
+  "expected_relations": [
+    "authenticated visible loader origin to the exact product function",
+    "test call result may flow to criterion:0",
+    "product function returns and controlling guards",
+    "product function reference to the injected InvalidToken global for criterion:1"
+  ],
+  "expected_unknowns": [
+    "CodeQL does not resolve the exec-created function object to the test call without the authenticated frontend bridge",
+    "masked Mock values, decrypt outcomes, concrete exceptions, and path feasibility",
+    "unsupported dynamic namespace or callable rebinding"
+  ],
+  "configuration": {
+    "codeql_version": "2.27.4",
+    "threads": 2,
+    "ram_mb": 4096,
+    "timeout_seconds": 180
+  },
+  "target_executed": false
+}

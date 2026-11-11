@@ -1,0 +1,77 @@
+{
+  "schema": "mock-spec.issue24-codeql-input/v2",
+  "case_id": "flask_308",
+  "dataset": "python-benchmark-new",
+  "inventory_revision": "0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc",
+  "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+  "target_selector": "tests/test_308abort.py::test_abort_scenarios",
+  "masking_contract": "python-slot-v1",
+  "adaptation": "selected visible files materialized without executing target code",
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_308abort.py::test_abort_scenarios",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_abort_scenarios",
+          "start_line": 48,
+          "end_line": 126
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 102,
+        "kind": "exception_observation",
+        "confidence": "explicit",
+        "reason": "raises in the selected test function",
+        "call": "raises"
+      },
+      {
+        "line": 120,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "line": 126,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "files": [
+    {
+      "logical_path": "tests/test_308abort.py",
+      "source_id": "test",
+      "sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+      "bytes": 3044,
+      "role": "masked_test"
+    },
+    {
+      "logical_path": "src/src/flask/__init__.py",
+      "source_id": "source:efe0a2dabe591bda",
+      "sha256": "2daebda4dc29fed5cb36c912a6115a234e9a4b5f9c33fd795e4bfeffd0cc9386",
+      "bytes": 2072,
+      "role": "visible_product_or_support"
+    },
+    {
+      "logical_path": "src/src/flask/globals.py",
+      "source_id": "source:0d48fae8b67acb9c",
+      "sha256": "1abe9a4e0a96c8bb28c232e2b08993fffdfb9bb694be2230755e54a46a40ca4d",
+      "bytes": 2414,
+      "role": "visible_product_or_support"
+    },
+    {
+      "logical_path": "src/src/flask/helpers.py",
+      "source_id": "source:f249c086e235096e",
+      "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+      "bytes": 23064,
+      "role": "visible_product_or_support"
+    }
+  ]
+}

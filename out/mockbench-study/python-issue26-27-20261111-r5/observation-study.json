@@ -1,0 +1,880 @@
+{
+  "schema": "mock-spec.python-observation-study/v1",
+  "case_result": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "flask_308",
+      "dataset": "python-benchmark-new",
+      "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+      "language": "python",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+      "target_selector": "tests/test_308abort.py::test_abort_scenarios"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_308abort.py",
+        "sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+        "bytes": 3044,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:efe0a2dabe591bda",
+        "logical_path": "src/src/flask/__init__.py",
+        "sha256": "2daebda4dc29fed5cb36c912a6115a234e9a4b5f9c33fd795e4bfeffd0cc9386",
+        "bytes": 2072,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:0d48fae8b67acb9c",
+        "logical_path": "src/src/flask/globals.py",
+        "sha256": "1abe9a4e0a96c8bb28c232e2b08993fffdfb9bb694be2230755e54a46a40ca4d",
+        "bytes": 2414,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:f249c086e235096e",
+        "logical_path": "src/src/flask/helpers.py",
+        "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+        "bytes": 23064,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 102,
+          "end_line": 102
+        },
+        "kind": "exception_observation",
+        "origin": "explicit",
+        "reason": "raises in the selected test function"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 120,
+          "end_line": 120
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:2",
+        "location": {
+          "source_id": "test",
+          "start_line": 126,
+          "end_line": 126
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "parameter rows are visible but not enumerated as path-feasible executions"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_308abort.py::test_abort_scenarios",
+        "evidence": [
+          {
+            "symbol": "test_abort_scenarios",
+            "start_line": 48,
+            "end_line": 126
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "unique",
+        "candidates": [],
+        "evidence": [
+          {
+            "logical_path": "src/src/flask/helpers.py",
+            "start_line": 265,
+            "end_line": 265
+          }
+        ],
+        "assumptions": []
+      }
+    },
+    "relations": [
+      {
+        "kind": "call_binding",
+        "modality": "certain",
+        "from": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 103,
+          "end_line": 103
+        },
+        "to": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 265,
+          "end_line": 265
+        },
+        "provenance": "CodeQL FunctionObject.getACall",
+        "precision": "unique selected-scope test-to-visible-product endpoint",
+        "assumptions": [],
+        "observation_ids": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 103,
+          "end_line": 103
+        },
+        "to": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 265,
+          "end_line": 265,
+          "parameter_index": 0
+        },
+        "provenance": "CodeQL Global data flow actual-to-formal",
+        "precision": "matched resolved call context",
+        "assumptions": [],
+        "observation_ids": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 111,
+          "end_line": 111
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 120,
+          "end_line": 120
+        },
+        "provenance": "CodeQL ConditionBlock.controls",
+        "precision": "backend control region: true branch",
+        "assumptions": [],
+        "observation_ids": [
+          "criterion:1"
+        ]
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 111,
+          "end_line": 111
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 126,
+          "end_line": 126
+        },
+        "provenance": "CodeQL ConditionBlock.controls",
+        "precision": "backend control region: false branch",
+        "assumptions": [],
+        "observation_ids": [
+          "criterion:2"
+        ]
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 283,
+          "end_line": 283
+        },
+        "to": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 285,
+          "end_line": 285
+        },
+        "provenance": "CodeQL normal CFG reachability",
+        "precision": "product-internal normal continuation",
+        "assumptions": [],
+        "observation_ids": []
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 285,
+          "end_line": 285
+        },
+        "to": {
+          "scope": "product_function_exceptional_exit"
+        },
+        "provenance": "CodeQL RaisingNode exceptional exit",
+        "precision": "product-internal; not linked to pytest observation",
+        "assumptions": [],
+        "observation_ids": []
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 283,
+          "end_line": 283
+        },
+        "to": {
+          "scope": "product_function_exceptional_exit"
+        },
+        "provenance": "CodeQL RaisingNode exceptional exit",
+        "precision": "product-internal; not linked to pytest observation",
+        "assumptions": [],
+        "observation_ids": []
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 282,
+          "end_line": 282
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 120,
+          "end_line": 120
+        },
+        "provenance": "CodeQL pytest.raises exception capture model",
+        "precision": "same with/capture SSA; type=unknown_may_match; .value to str membership",
+        "assumptions": [
+          "host pytest model version and source digests verified before analysis",
+          "frozen case pytest dependency version is unknown"
+        ],
+        "observation_ids": [
+          "criterion:0",
+          "criterion:1"
+        ]
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 282,
+          "end_line": 282
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 126,
+          "end_line": 126
+        },
+        "provenance": "CodeQL pytest.raises exception capture model",
+        "precision": "same with/capture SSA; type=unknown_may_match; .value to str membership",
+        "assumptions": [
+          "host pytest model version and source digests verified before analysis",
+          "frozen case pytest dependency version is unknown"
+        ],
+        "observation_ids": [
+          "criterion:0",
+          "criterion:2"
+        ]
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 283,
+          "end_line": 283
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 120,
+          "end_line": 120
+        },
+        "provenance": "CodeQL pytest.raises exception capture model",
+        "precision": "same with/capture SSA; type=unknown_may_match; .value to str membership",
+        "assumptions": [
+          "host pytest model version and source digests verified before analysis",
+          "frozen case pytest dependency version is unknown"
+        ],
+        "observation_ids": [
+          "criterion:0",
+          "criterion:1"
+        ]
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 283,
+          "end_line": 283
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 126,
+          "end_line": 126
+        },
+        "provenance": "CodeQL pytest.raises exception capture model",
+        "precision": "same with/capture SSA; type=unknown_may_match; .value to str membership",
+        "assumptions": [
+          "host pytest model version and source digests verified before analysis",
+          "frozen case pytest dependency version is unknown"
+        ],
+        "observation_ids": [
+          "criterion:0",
+          "criterion:2"
+        ]
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 285,
+          "end_line": 285
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 120,
+          "end_line": 120
+        },
+        "provenance": "CodeQL pytest.raises exception capture model",
+        "precision": "same with/capture SSA; type=unknown_may_match; .value to str membership",
+        "assumptions": [
+          "host pytest model version and source digests verified before analysis",
+          "frozen case pytest dependency version is unknown"
+        ],
+        "observation_ids": [
+          "criterion:0",
+          "criterion:1"
+        ]
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 285,
+          "end_line": 285
+        },
+        "to": {
+          "logical_path": "tests/test_308abort.py",
+          "start_line": 126,
+          "end_line": 126
+        },
+        "provenance": "CodeQL pytest.raises exception capture model",
+        "precision": "same with/capture SSA; type=unknown_may_match; .value to str membership",
+        "assumptions": [
+          "host pytest model version and source digests verified before analysis",
+          "frozen case pytest dependency version is unknown"
+        ],
+        "observation_ids": [
+          "criterion:0",
+          "criterion:2"
+        ]
+      }
+    ],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "verified_correct"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "verified_correct"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "verified_incomplete"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [
+        "selected visible Flask source scope only"
+      ],
+      "unknown_effects": [
+        {
+          "boundary_id": "product-call:282",
+          "effect": "may_write_or_raise",
+          "scope": "receiver",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:282",
+          "effect": "may_write_or_raise",
+          "scope": "direct_arguments",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:282",
+          "effect": "may_write_or_raise",
+          "scope": "return_alias",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:282",
+          "effect": "may_write_or_raise",
+          "scope": "global_or_escaped_state",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:282",
+          "effect": "may_write_or_raise",
+          "scope": "transitive_heap",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:283",
+          "effect": "may_write_or_raise",
+          "scope": "receiver",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:283",
+          "effect": "may_write_or_raise",
+          "scope": "direct_arguments",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:283",
+          "effect": "may_write_or_raise",
+          "scope": "return_alias",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:283",
+          "effect": "may_write_or_raise",
+          "scope": "global_or_escaped_state",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:283",
+          "effect": "may_write_or_raise",
+          "scope": "transitive_heap",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:285",
+          "effect": "may_write_or_raise",
+          "scope": "receiver",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:285",
+          "effect": "may_write_or_raise",
+          "scope": "direct_arguments",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:285",
+          "effect": "may_write_or_raise",
+          "scope": "return_alias",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:285",
+          "effect": "may_write_or_raise",
+          "scope": "global_or_escaped_state",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "product-call:285",
+          "effect": "may_write_or_raise",
+          "scope": "transitive_heap",
+          "provenance": "bounded unknown-effect model",
+          "precision": "unresolved",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "receiver, global, escaped, dynamic-field, and transitive-heap effects",
+          "reason": "outside bounded model"
+        },
+        {
+          "scope": "return-alias effects beyond the one-hop mechanism support domain",
+          "reason": "outside bounded model"
+        },
+        {
+          "scope": "exact exception type, text, and code-to-message construction",
+          "reason": "outside bounded model"
+        },
+        {
+          "scope": "frozen-case pytest version compatibility with the host-verified reference",
+          "reason": "outside bounded model"
+        },
+        {
+          "scope": "path satisfiability and hidden Mock behavior",
+          "reason": "outside bounded model"
+        },
+        {
+          "scope": "observation_exact_value",
+          "observation_id": "criterion:0",
+          "reason": "influence recovered, but exact exception type/text and code-to-message construction are not modeled"
+        },
+        {
+          "scope": "observation_exact_value",
+          "observation_id": "criterion:1",
+          "reason": "influence recovered, but exact exception type/text and code-to-message construction are not modeled"
+        },
+        {
+          "scope": "observation_exact_value",
+          "observation_id": "criterion:2",
+          "reason": "influence recovered, but exact exception type/text and code-to-message construction are not modeled"
+        }
+      ]
+    },
+    "completion": {
+      "status": "partial",
+      "stage": "observation_mapping",
+      "failure_categories": [
+        "observation_exact_value_unknown"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "verified_incomplete",
+      "reviewer": "pre_registered_source_oracle",
+      "evidence": [
+        {
+          "observation_id": "criterion:0",
+          "expectation_id": "raises-context:102",
+          "location": {
+            "logical_path": "tests/test_308abort.py",
+            "start_line": 102,
+            "end_line": 102
+          }
+        },
+        {
+          "observation_id": "criterion:1",
+          "expectation_id": "assert-exception:120",
+          "location": {
+            "logical_path": "tests/test_308abort.py",
+            "start_line": 120,
+            "end_line": 120
+          }
+        },
+        {
+          "observation_id": "criterion:2",
+          "expectation_id": "assert-exception:126",
+          "location": {
+            "logical_path": "tests/test_308abort.py",
+            "start_line": 126,
+            "end_line": 126
+          }
+        }
+      ],
+      "notes": "bounded exception influence recovered; exact observed values remain unknown"
+    },
+    "cost": {
+      "timings_seconds": {
+        "flask-control-flow": 4.9,
+        "flask-db": 7.32,
+        "flask-exceptions": 8.31,
+        "flask-flask-abort": 4.8,
+        "flask-flask-observation-flow": 7.51,
+        "flask-pytest-exception-flow": 6.4,
+        "flask-state-flow": 6.7
+      },
+      "total_seconds": 45.94,
+      "total_scope": "Flask database creation and Flask-prefixed queries only; mechanism cost is separate",
+      "timing_coverage": "complete",
+      "peak_memory": {
+        "status": "measured",
+        "bytes": 586395648,
+        "reason": "maximum of per-process max RSS; not a simultaneous whole-run peak"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "OS and CodeQL compilation caches not isolated"
+      },
+      "input_size": {
+        "files": 4,
+        "bytes": 30594
+      },
+      "graph_size": {
+        "nodes": null,
+        "edges": null,
+        "relation_count": 13,
+        "reason": "backend graph size is not exported by these queries"
+      },
+      "unavailable_phases": [
+        {
+          "phase": "input_admission",
+          "reason": "adapter preparation is not separately timed"
+        },
+        {
+          "phase": "criterion_extraction",
+          "reason": "included in adapter process, not separately timed"
+        },
+        {
+          "phase": "observation_mapping",
+          "reason": "mapper and serialization are not separately timed"
+        },
+        {
+          "phase": "path_feasibility",
+          "reason": "not evaluated"
+        },
+        {
+          "phase": "star_args_and_kwargs",
+          "reason": "only positional argument 0 has matched actual/formal evidence"
+        }
+      ]
+    }
+  },
+  "observation_aliases": [
+    {
+      "observation_id": "criterion:0",
+      "expectation_id": "raises-context:102",
+      "location": {
+        "logical_path": "tests/test_308abort.py",
+        "start_line": 102,
+        "end_line": 102
+      }
+    },
+    {
+      "observation_id": "criterion:1",
+      "expectation_id": "assert-exception:120",
+      "location": {
+        "logical_path": "tests/test_308abort.py",
+        "start_line": 120,
+        "end_line": 120
+      }
+    },
+    {
+      "observation_id": "criterion:2",
+      "expectation_id": "assert-exception:126",
+      "location": {
+        "logical_path": "tests/test_308abort.py",
+        "start_line": 126,
+        "end_line": 126
+      }
+    }
+  ],
+  "unknown_observation_mappings": [],
+  "unknown_value_constraints": [
+    {
+      "observation_id": "criterion:0",
+      "status": "unknown_value",
+      "reason": "influence recovered, but exact exception type/text and code-to-message construction are not modeled"
+    },
+    {
+      "observation_id": "criterion:1",
+      "status": "unknown_value",
+      "reason": "influence recovered, but exact exception type/text and code-to-message construction are not modeled"
+    },
+    {
+      "observation_id": "criterion:2",
+      "status": "unknown_value",
+      "reason": "influence recovered, but exact exception type/text and code-to-message construction are not modeled"
+    }
+  ],
+  "mechanism_validation": {
+    "status": "verified_bounded",
+    "positive_relations": [
+      "execution_effect_after_state_kill",
+      "return_alias_write_to_argument_read",
+      "unknown_may_write_to_read",
+      "unknown_state_killed_by_definite_write"
+    ],
+    "negative_relations": [
+      "conditional_write_not_a_kill",
+      "return_alias_other_field_excluded",
+      "trusted_fresh_argument_region_disjoint",
+      "trusted_fresh_return_alias_channel_disjoint"
+    ],
+    "exception_relations": [
+      "write_effect_exception_path_to_read"
+    ],
+    "scope": "mechanism probe only; not automatically attached to Flask observations",
+    "verdict_schema": "mock-spec.issue24-verdict/v2",
+    "pytest_capture_model": {
+      "status": "passed",
+      "required_paths_present": true,
+      "negative_paths_excluded": true,
+      "path_count": 3
+    },
+    "cost": {
+      "timings_seconds": {
+        "probe-control-flow": 5.81,
+        "probe-db": 5.71,
+        "probe-effects": 10.71,
+        "probe-exceptions": 4.91,
+        "probe-global-flow": 7.91,
+        "probe-local-flow": 10.22,
+        "probe-pytest-exception-flow": 6.6,
+        "probe-reachability": 4.61,
+        "probe-state-boundary-flow": 5.4,
+        "probe-state-flow": 6.51,
+        "probe-unknown-effect-flow": 6.31,
+        "probe-unknown-exception-state": 5.6
+      },
+      "total_seconds": 80.3,
+      "peak_memory": {
+        "status": "measured",
+        "bytes": 482193408,
+        "reason": "maximum of per-process max RSS; not a simultaneous whole-run peak"
+      },
+      "scope": "mechanism database and mechanism queries only",
+      "timing_coverage": "complete",
+      "missing_timings": []
+    }
+  },
+  "pre_registered_expectations": {
+    "schema": "mock-spec.python-observation-expectations/v1",
+    "case_id": "flask_308",
+    "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+    "observations": [
+      {
+        "observation_id": "raises-context:102",
+        "kind": "exception_context",
+        "logical_path": "tests/test_308abort.py",
+        "line": 102,
+        "expected_mapping": "bounded_exception_influence",
+        "reason": "the reviewed pytest summary and CodeQL exceptional CFG connect the selected call to this context; the concrete exception remains unknown"
+      },
+      {
+        "observation_id": "assert-exception:120",
+        "kind": "assertion",
+        "logical_path": "tests/test_308abort.py",
+        "line": 120,
+        "expected_mapping": "bounded_exception_influence",
+        "guard_line": 111,
+        "guard_branch": "true",
+        "reason": "the branch and product exception to the same capture's value membership observation are backend-verifiable within the registered summary boundary"
+      },
+      {
+        "observation_id": "assert-exception:126",
+        "kind": "assertion",
+        "logical_path": "tests/test_308abort.py",
+        "line": 126,
+        "expected_mapping": "bounded_exception_influence",
+        "guard_line": 111,
+        "guard_branch": "false",
+        "reason": "the branch and product exception to the same capture's value membership observation are backend-verifiable within the registered summary boundary"
+      }
+    ],
+    "preserve": [
+      "resolved test call to visible product function",
+      "actual to formal argument flow with backend context",
+      "test guard control of each visible assertion",
+      "product ctx branch, normal continuation to fallback, and exceptional exits",
+      "reviewed pytest suppression summary, post-with CFG continuation, and same-capture value flow"
+    ],
+    "exclude": [
+      "lexical nesting or source order as dependency evidence",
+      "automatic attachment of product-internal events to every test observation",
+      "equating test has_app_context with product ctx by variable name"
+    ],
+    "unknown": [
+      "receiver, global, escaped, dynamic-field, and transitive-heap effects",
+      "return-alias effects beyond the one-hop mechanism support domain",
+      "exact exception type, text, and code-to-message construction",
+      "frozen-case pytest version compatibility with the host-verified reference",
+      "path satisfiability and hidden Mock behavior"
+    ]
+  },
+  "pytest_model": {
+    "schema": "mock-spec.pytest-raises-model/v1",
+    "pytest_version": "9.1.1",
+    "source_role": "host_verified_reference",
+    "frozen_case_dependency_version": "unknown",
+    "version_scope_note": "The verified host sources justify the bounded summary but do not establish the dependency version used by the frozen case.",
+    "sources": [
+      {
+        "module": "_pytest.raises",
+        "sha256": "dc28805f1e1c2db835f1a5290218efee5d510d190ad333d61663d59bd6d1362c",
+        "facts": [
+          "RaisesExc.__enter__ returns an ExceptionInfo created for later filling",
+          "RaisesExc.__exit__ checks the expected type, fills ExceptionInfo from exc_type/exc_val/exc_tb, and returns true only on a match"
+        ]
+      },
+      {
+        "module": "_pytest._code.code",
+        "sha256": "63ec03d20e61d3ac2a0e9954be71a619dd742d009c2409b1e3168e2a6fad9096",
+        "facts": [
+          "ExceptionInfo.value returns element 1 of the filled exception tuple"
+        ]
+      }
+    ],
+    "modeled_boundary": "context-manager form with one expected exception type and a named capture; exception value to str membership observation",
+    "not_modeled": [
+      "pytest.raises function-call form",
+      "tuple expected types, match, or check",
+      "exact exception text or code-to-message construction",
+      "path satisfiability"
+    ]
+  },
+  "pytest_model_source_receipt": {
+    "schema": "mock-spec.pytest-model-source-receipt/v1",
+    "status": "passed",
+    "source_role": "host_verified_reference",
+    "frozen_case_dependency_version": "unknown",
+    "assumptions_sha256": "057dc62a34de77a2f0f37e50c37260352fa002b5f40b5086b9391f8e5e6fa930",
+    "actual_pytest_version": "9.1.1",
+    "actual_sources": [
+      {
+        "module": "_pytest.raises",
+        "path": "/home/haon/projects/Mockspec/.venv/lib/python3.12/site-packages/_pytest/raises.py",
+        "sha256": "dc28805f1e1c2db835f1a5290218efee5d510d190ad333d61663d59bd6d1362c"
+      },
+      {
+        "module": "_pytest._code.code",
+        "path": "/home/haon/projects/Mockspec/.venv/lib/python3.12/site-packages/_pytest/_code/code.py",
+        "sha256": "63ec03d20e61d3ac2a0e9954be71a619dd742d009c2409b1e3168e2a6fad9096"
+      }
+    ],
+    "failures": []
+  }
+}

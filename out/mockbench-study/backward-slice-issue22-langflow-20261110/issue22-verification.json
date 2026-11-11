@@ -1,0 +1,51 @@
+{
+  "schema_version": "mock-spec.backward-analysis.issue22-verification/v1",
+  "issue": 22,
+  "case_id": "langflow_189",
+  "dataset": "python-benchmark-new",
+  "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+  "baseline": {
+    "artifact": "../backward-slice-full-20261109-r3/5b83af29ea4ed3c9d4ce.json",
+    "selected_product_sources": 0,
+    "reaches_product_candidate": false,
+    "dynamic_function_origin_edges": 0
+  },
+  "frozen_expectations": {
+    "preserve": [
+      "MODULE_PATH -> src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+      "selected source -> is_encrypted definition at lines 94-118",
+      "namespace['is_encrypted'] -> load_is_encrypted return position 0",
+      "load_is_encrypted return -> test variable is_encrypted at line 74",
+      "test variable is_encrypted -> call at line 104"
+    ],
+    "exclude": [
+      "same-named functions in paths not selected by the visible path expression",
+      "definitions outside the visible extracted line interval",
+      "loader results or test variables rebound before the observed call"
+    ],
+    "unknown": [
+      "dynamic namespace keys",
+      "namespace keys overwritten after exec",
+      "paths that cannot be resolved from supported visible pathlib expressions"
+    ]
+  },
+  "actual": {
+    "artifact": "5b83af29ea4ed3c9d4ce.json",
+    "entry_source": "automatic_visible_test",
+    "binding_status": "resolved",
+    "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+    "function": "is_encrypted",
+    "function_start_line": 94,
+    "function_end_line": 118,
+    "loader": "load_is_encrypted",
+    "namespace": "namespace",
+    "test_binding_line": 74,
+    "call_line": 104,
+    "reaches_product_candidate": true,
+    "dynamic_function_origin_edges": 1,
+    "dynamic_source_text_edges": 1,
+    "dynamic_namespace_definition_edges": 1,
+    "dynamic_call_target_edges": 4
+  },
+  "interpretation": "The visible function-object provenance gate passes for issue 22. The case remains partial because unresolved dependency calls and broader semantic-analysis gaps are intentionally outside this issue. Final backend-path review remains required by issue 30."
+}

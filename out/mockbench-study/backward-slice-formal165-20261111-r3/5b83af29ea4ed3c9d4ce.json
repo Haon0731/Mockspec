@@ -1,0 +1,2487 @@
+{
+  "status": "partial",
+  "failure_categories": [
+    "bounded_unknown_effects",
+    "path_feasibility_not_evaluated"
+  ],
+  "stage": "langflow_contract_projection",
+  "input_context": {
+    "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+    "masked_test_logical_path": "tests/test_189is_encrypted.py",
+    "masked_test_sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+    "masking_contract": "python-slot-v1"
+  },
+  "target_extraction": {
+    "target_scope": {
+      "selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+      "status": "located",
+      "precision": "python_ast",
+      "locations": [
+        {
+          "symbol": "test_is_encrypted",
+          "start_line": 50,
+          "end_line": 115
+        }
+      ]
+    },
+    "criteria": [
+      {
+        "line": 106,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:0"
+      },
+      {
+        "line": 115,
+        "kind": "value_assertion",
+        "confidence": "explicit",
+        "reason": "Python assert in the selected test function",
+        "criterion_id": "criterion:1"
+      }
+    ],
+    "dynamic_loading": [],
+    "diagnostics": []
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_visible_source_path",
+        "hint": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "candidates": [
+          "src/src/backend/base/langflow/services/auth/mcp_encryption.py"
+        ],
+        "precision": "exact_visible_path"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "hint_kind": "python_import",
+        "hint": "lfx.log.logger",
+        "candidates": [
+          "src/src/lfx/src/lfx/log/logger.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "hint_kind": "python_import",
+        "hint": "langflow.services.auth",
+        "candidates": [
+          "src/src/backend/base/langflow/services/auth/__init__.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "hint_kind": "python_import",
+        "hint": "langflow.services.deps",
+        "candidates": [
+          "src/src/backend/base/langflow/services/deps.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [
+      "empty_source_rejected:src/src/backend/base/langflow/services/auth/__init__.py"
+    ],
+    "source_rejections": [
+      {
+        "logical_path": "src/src/backend/base/langflow/services/auth/__init__.py",
+        "reason": "frozen source is empty"
+      }
+    ],
+    "dynamic_loader_bindings": [
+      {
+        "status": "resolved",
+        "loader": "load_is_encrypted",
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "path_line": 13,
+        "namespace": "namespace",
+        "exec_line": 36,
+        "return_line": 37,
+        "read_line": 27,
+        "function_key": "is_encrypted",
+        "return_index": 0,
+        "function_definition": {
+          "source_id": "source:1",
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "name": "is_encrypted",
+          "start_line": 94,
+          "end_line": 118
+        },
+        "test_bindings": [
+          {
+            "name": "is_encrypted",
+            "line": 74
+          }
+        ],
+        "call_sites": [
+          {
+            "name": "is_encrypted",
+            "line": 104
+          }
+        ]
+      }
+    ],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 30532,
+    "read_bytes": 30532,
+    "attempted_files": 4,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_189is_encrypted.py",
+      "sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+      "bytes": 3541
+    },
+    {
+      "source_id": "source:1",
+      "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+      "sha256": "bfe36ac83538a629ee670c81b20ab9e3682688be7a031b7e61522b1779ea4c8b",
+      "bytes": 4547
+    },
+    {
+      "source_id": "source:2",
+      "logical_path": "src/src/lfx/src/lfx/log/logger.py",
+      "sha256": "af1183762ac97ea959a555ad5f866baade1219431b9befa0d7c9ba27781eb80b",
+      "bytes": 14421
+    },
+    {
+      "source_id": "source:3",
+      "logical_path": "src/src/backend/base/langflow/services/deps.py",
+      "sha256": "26c2b1b0e158d1f342923a242af795a91a6da119c6bb82e69c3e889eabb9fd59",
+      "bytes": 8023
+    }
+  ],
+  "graph": {
+    "backend": "python-ast-source-evidence-prototype",
+    "dynamic_loader_bindings": [
+      {
+        "call_sites": [
+          {
+            "line": 104,
+            "name": "is_encrypted"
+          }
+        ],
+        "exec_line": 36,
+        "function_definition": {
+          "end_line": 118,
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "name": "is_encrypted",
+          "source_id": "source:1",
+          "start_line": 94
+        },
+        "function_key": "is_encrypted",
+        "loader": "load_is_encrypted",
+        "namespace": "namespace",
+        "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "path_line": 13,
+        "read_line": 27,
+        "return_index": 0,
+        "return_line": 37,
+        "status": "resolved",
+        "test_bindings": [
+          {
+            "line": 74,
+            "name": "is_encrypted"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "test:27:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:27:4:Name"
+      },
+      {
+        "from": "test:28:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:28:4:Name"
+      },
+      {
+        "from": "test:29:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:29:4:Name"
+      },
+      {
+        "from": "test:30:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:30:4:Name"
+      },
+      {
+        "from": "test:27:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:30:4:Assign",
+        "variable": "source_lines"
+      },
+      {
+        "from": "test:28:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:30:4:Assign",
+        "variable": "start_line"
+      },
+      {
+        "from": "test:29:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:30:4:Assign",
+        "variable": "end_line"
+      },
+      {
+        "from": "test:35:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:35:4:Name"
+      },
+      {
+        "from": "test:28:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:36:4:Expr",
+        "variable": "start_line"
+      },
+      {
+        "from": "test:30:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:36:4:Expr",
+        "variable": "function_source"
+      },
+      {
+        "from": "test:35:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:36:4:Expr",
+        "variable": "namespace"
+      },
+      {
+        "from": "test:35:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:37:4:Return",
+        "variable": "namespace"
+      },
+      {
+        "from": "test:74:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:74:4:Name"
+      },
+      {
+        "from": "test:74:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:74:18:Name"
+      },
+      {
+        "from": "test:104:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "test:104:4:Name"
+      },
+      {
+        "from": "test:74:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:104:4:Assign",
+        "variable": "is_encrypted"
+      },
+      {
+        "from": "test:53:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:104:4:Assign",
+        "variable": "value"
+      },
+      {
+        "from": "test:104:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:106:4:Assert",
+        "variable": "result"
+      },
+      {
+        "from": "test:56:4:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:106:4:Assert",
+        "variable": "expected_result"
+      },
+      {
+        "from": "test:74:18:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:115:4:Assert",
+        "variable": "invalid_token_cls"
+      },
+      {
+        "from": "test:74:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "test:115:4:Assert",
+        "variable": "is_encrypted"
+      },
+      {
+        "callee": "load_is_encrypted",
+        "from": "test:37:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:74:4:Assign"
+      },
+      {
+        "callee": "load_is_encrypted",
+        "from": "test:36:4:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "test:74:4:Assign"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:104:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:104:4:Assign"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:112:12:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:104:4:Assign"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:115:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:104:4:Assign"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:118:8:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "test:104:4:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:103:7:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:104:8:Return"
+      },
+      {
+        "branch": "true",
+        "from": "source:1:111:11:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:1:112:12:Return"
+      },
+      {
+        "from": "source:1:106:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:106:4:Name"
+      },
+      {
+        "from": "source:1:109:8:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:1:109:8:Name"
+      },
+      {
+        "from": "source:1:94:17:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:109:8:Assign",
+        "variable": "value"
+      },
+      {
+        "from": "source:1:106:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:109:8:Assign",
+        "variable": "settings_service"
+      },
+      {
+        "from": "source:1:109:8:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:115:8:Return",
+        "variable": "decrypted"
+      },
+      {
+        "from": "source:1:94:17:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:1:115:8:Return",
+        "variable": "value"
+      },
+      {
+        "callee": "get_settings_service",
+        "from": "source:3:138:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:1:106:4:Assign"
+      },
+      {
+        "branch": "true",
+        "from": "source:3:49:7:UnaryOp",
+        "kind": "lexical_control",
+        "precision": "ast_ancestry",
+        "to": "source:3:54:8:Expr"
+      },
+      {
+        "from": "source:3:47:4:Assign",
+        "kind": "definition_value_candidate",
+        "precision": "assignment_syntax",
+        "to": "source:3:47:4:Name"
+      },
+      {
+        "from": "source:3:47:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:54:8:Expr",
+        "variable": "service_manager"
+      },
+      {
+        "from": "source:3:47:4:Name",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:55:4:Return",
+        "variable": "service_manager"
+      },
+      {
+        "from": "source:3:33:16:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:55:4:Return",
+        "variable": "service_type"
+      },
+      {
+        "from": "source:3:33:43:arg",
+        "kind": "data_candidate",
+        "precision": "prior_lexical_write",
+        "to": "source:3:55:4:Return",
+        "variable": "default"
+      },
+      {
+        "callee": "get_service",
+        "from": "source:3:55:4:Return",
+        "kind": "call_target_candidate",
+        "precision": "visible_name_candidate",
+        "to": "source:3:138:4:Return"
+      },
+      {
+        "callee": "get_service",
+        "from": "source:3:54:8:Expr",
+        "kind": "call_event_candidate",
+        "precision": "visible_callee_event_may_execute",
+        "to": "source:3:138:4:Return"
+      },
+      {
+        "from": "source:1:94:0:FunctionDef",
+        "function": "is_encrypted",
+        "kind": "dynamic_function_origin",
+        "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "precision": "visible_path_namespace_key_and_definition",
+        "to": "test:37:4:Return"
+      },
+      {
+        "from": "test:27:4:Assign",
+        "kind": "dynamic_source_text",
+        "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "precision": "visible_read_to_exec_compile",
+        "to": "test:36:4:Expr"
+      },
+      {
+        "from": "test:36:4:Expr",
+        "function": "is_encrypted",
+        "kind": "dynamic_namespace_definition",
+        "namespace": "namespace",
+        "precision": "visible_exec_namespace_to_literal_key",
+        "to": "test:37:4:Return"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:104:8:Return",
+        "kind": "dynamic_call_target",
+        "precision": "visible_loader_binding",
+        "to": "test:104:4:Assign"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:112:12:Return",
+        "kind": "dynamic_call_target",
+        "precision": "visible_loader_binding",
+        "to": "test:104:4:Assign"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:115:8:Return",
+        "kind": "dynamic_call_target",
+        "precision": "visible_loader_binding",
+        "to": "test:104:4:Assign"
+      },
+      {
+        "callee": "is_encrypted",
+        "from": "source:1:118:8:Return",
+        "kind": "dynamic_call_target",
+        "precision": "visible_loader_binding",
+        "to": "test:104:4:Assign"
+      }
+    ],
+    "limitations": [
+      "data_candidate edges use lexical name and ordering candidates, not sound reaching definitions",
+      "lexical_control edges are AST ancestry, not post-dominator control dependence",
+      "normal_predecessor records possible continuation after normal completion; it does not prove branch feasibility",
+      "an exception-capable call may prevent its normal successor from running",
+      "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
+      "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
+      "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected",
+      "dynamic loader origins require a visible static path, namespace key, selected definition, and unrebound test callable"
+    ],
+    "nodes": [
+      {
+        "code": "not value",
+        "end_line": 103,
+        "id": "source:1:103:7:UnaryOp",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 103
+      },
+      {
+        "code": "return False",
+        "end_line": 104,
+        "id": "source:1:104:8:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 104
+      },
+      {
+        "code": "settings_service = get_settings_service()",
+        "end_line": 106,
+        "exception_possible": true,
+        "id": "source:1:106:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 106
+      },
+      {
+        "code": "settings_service",
+        "end_line": 106,
+        "id": "source:1:106:4:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 106
+      },
+      {
+        "code": "decrypted = auth_utils.decrypt_api_key(value, settings_service)",
+        "contains_unresolved_call": true,
+        "end_line": 109,
+        "exception_possible": true,
+        "id": "source:1:109:8:Assign",
+        "kind": "Assign",
+        "source_id": "source:1",
+        "start_line": 109,
+        "unresolved_calls": [
+          "auth_utils.decrypt_api_key(value, settings_service)"
+        ]
+      },
+      {
+        "code": "decrypted",
+        "end_line": 109,
+        "id": "source:1:109:8:Name",
+        "kind": "Name",
+        "source_id": "source:1",
+        "start_line": 109
+      },
+      {
+        "code": "not decrypted",
+        "end_line": 111,
+        "id": "source:1:111:11:UnaryOp",
+        "kind": "if_condition",
+        "source_id": "source:1",
+        "start_line": 111
+      },
+      {
+        "code": "return True",
+        "end_line": 112,
+        "id": "source:1:112:12:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 112
+      },
+      {
+        "code": "return decrypted != value",
+        "end_line": 115,
+        "id": "source:1:115:8:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 115
+      },
+      {
+        "code": "return True",
+        "end_line": 118,
+        "id": "source:1:118:8:Return",
+        "kind": "Return",
+        "source_id": "source:1",
+        "start_line": 118
+      },
+      {
+        "code": "def is_encrypted(value: str) -> bool:\n    \"\"\"Check if a value appears to be encrypted.\n\n    Args:\n        value: String value to check\n\n    Returns:\n        True if the value appears to be encrypted (base64 Fernet token)\n    \"\"\"\n    if not value:\n        return False\n    settings_service = get_setti",
+        "end_line": 118,
+        "id": "source:1:94:0:FunctionDef",
+        "kind": "dynamic_function_definition",
+        "source_id": "source:1",
+        "start_line": 94
+      },
+      {
+        "code": "value: str",
+        "end_line": 94,
+        "id": "source:1:94:17:arg",
+        "kind": "name_definition",
+        "source_id": "source:1",
+        "start_line": 94
+      },
+      {
+        "code": "return get_service(ServiceType.SETTINGS_SERVICE, SettingsServiceFactory())",
+        "contains_unresolved_call": true,
+        "end_line": 138,
+        "exception_possible": true,
+        "id": "source:3:138:4:Return",
+        "kind": "Return",
+        "source_id": "source:3",
+        "start_line": 138,
+        "unresolved_calls": [
+          "SettingsServiceFactory()"
+        ]
+      },
+      {
+        "code": "service_type: ServiceType",
+        "end_line": 33,
+        "id": "source:3:33:16:arg",
+        "kind": "name_definition",
+        "source_id": "source:3",
+        "start_line": 33
+      },
+      {
+        "code": "default",
+        "end_line": 33,
+        "id": "source:3:33:43:arg",
+        "kind": "name_definition",
+        "source_id": "source:3",
+        "start_line": 33
+      },
+      {
+        "code": "service_manager = get_service_manager()",
+        "contains_unresolved_call": true,
+        "end_line": 47,
+        "exception_possible": true,
+        "id": "source:3:47:4:Assign",
+        "kind": "Assign",
+        "source_id": "source:3",
+        "start_line": 47,
+        "unresolved_calls": [
+          "get_service_manager()"
+        ]
+      },
+      {
+        "code": "service_manager",
+        "end_line": 47,
+        "id": "source:3:47:4:Name",
+        "kind": "Name",
+        "source_id": "source:3",
+        "start_line": 47
+      },
+      {
+        "code": "not service_manager.are_factories_registered()",
+        "end_line": 49,
+        "id": "source:3:49:7:UnaryOp",
+        "kind": "if_condition",
+        "source_id": "source:3",
+        "start_line": 49
+      },
+      {
+        "code": "service_manager.register_factories(ServiceManager.get_factories())",
+        "contains_unresolved_call": true,
+        "end_line": 54,
+        "exception_possible": true,
+        "id": "source:3:54:8:Expr",
+        "kind": "Expr",
+        "source_id": "source:3",
+        "start_line": 54,
+        "unresolved_calls": [
+          "service_manager.register_factories(ServiceManager.get_factories())",
+          "ServiceManager.get_factories()"
+        ]
+      },
+      {
+        "code": "return service_manager.get(service_type, default)",
+        "contains_unresolved_call": true,
+        "end_line": 55,
+        "exception_possible": true,
+        "id": "source:3:55:4:Return",
+        "kind": "Return",
+        "source_id": "source:3",
+        "start_line": 55,
+        "unresolved_calls": [
+          "service_manager.get(service_type, default)"
+        ]
+      },
+      {
+        "code": "result = is_encrypted(value)",
+        "end_line": 104,
+        "exception_possible": true,
+        "id": "test:104:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 104
+      },
+      {
+        "code": "result",
+        "end_line": 104,
+        "id": "test:104:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 104
+      },
+      {
+        "code": "assert result is expected_result",
+        "end_line": 106,
+        "id": "test:106:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 106
+      },
+      {
+        "code": "assert invalid_token_cls is is_encrypted.__globals__['InvalidToken']",
+        "end_line": 115,
+        "id": "test:115:4:Assert",
+        "kind": "Assert",
+        "source_id": "test",
+        "start_line": 115
+      },
+      {
+        "code": "source_lines = MODULE_PATH.read_text(encoding='utf-8').splitlines()",
+        "contains_unresolved_call": true,
+        "end_line": 27,
+        "exception_possible": true,
+        "id": "test:27:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 27,
+        "unresolved_calls": [
+          "MODULE_PATH.read_text(encoding='utf-8').splitlines()",
+          "MODULE_PATH.read_text(encoding='utf-8')"
+        ]
+      },
+      {
+        "code": "source_lines",
+        "end_line": 27,
+        "id": "test:27:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 27
+      },
+      {
+        "code": "start_line = 94",
+        "end_line": 28,
+        "id": "test:28:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 28
+      },
+      {
+        "code": "start_line",
+        "end_line": 28,
+        "id": "test:28:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 28
+      },
+      {
+        "code": "end_line = 118",
+        "end_line": 29,
+        "id": "test:29:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 29
+      },
+      {
+        "code": "end_line",
+        "end_line": 29,
+        "id": "test:29:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 29
+      },
+      {
+        "code": "function_source = '\\n'.join(source_lines[start_line - 1:end_line])",
+        "contains_unresolved_call": true,
+        "end_line": 30,
+        "exception_possible": true,
+        "id": "test:30:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 30,
+        "unresolved_calls": [
+          "'\\n'.join(source_lines[start_line - 1:end_line])"
+        ]
+      },
+      {
+        "code": "function_source",
+        "end_line": 30,
+        "id": "test:30:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 30
+      },
+      {
+        "code": "namespace = {'InvalidToken': LocalInvalidToken}",
+        "end_line": 35,
+        "id": "test:35:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 35
+      },
+      {
+        "code": "namespace",
+        "end_line": 35,
+        "id": "test:35:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 35
+      },
+      {
+        "code": "exec(compile('\\n' * (start_line - 1) + function_source, str(MODULE_PATH), 'exec'), namespace)",
+        "contains_unresolved_call": true,
+        "end_line": 36,
+        "exception_possible": true,
+        "id": "test:36:4:Expr",
+        "kind": "Expr",
+        "source_id": "test",
+        "start_line": 36,
+        "unresolved_calls": [
+          "exec(compile('\\n' * (start_line - 1) + function_source, str(MODULE_PATH), 'exec'), namespace)",
+          "compile('\\n' * (start_line - 1) + function_source, str(MODULE_PATH), 'exec')",
+          "str(MODULE_PATH)"
+        ]
+      },
+      {
+        "code": "return (namespace['is_encrypted'], LocalInvalidToken)",
+        "end_line": 37,
+        "id": "test:37:4:Return",
+        "kind": "Return",
+        "source_id": "test",
+        "start_line": 37
+      },
+      {
+        "code": "value",
+        "end_line": 53,
+        "id": "test:53:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 53
+      },
+      {
+        "code": "expected_result",
+        "end_line": 56,
+        "id": "test:56:4:arg",
+        "kind": "name_definition",
+        "source_id": "test",
+        "start_line": 56
+      },
+      {
+        "code": "invalid_token_cls",
+        "end_line": 74,
+        "id": "test:74:18:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 74
+      },
+      {
+        "code": "is_encrypted, invalid_token_cls = load_is_encrypted()",
+        "end_line": 74,
+        "exception_possible": true,
+        "id": "test:74:4:Assign",
+        "kind": "Assign",
+        "source_id": "test",
+        "start_line": 74
+      },
+      {
+        "code": "is_encrypted",
+        "end_line": 74,
+        "id": "test:74:4:Name",
+        "kind": "Name",
+        "source_id": "test",
+        "start_line": 74
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:106:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:115:4:Assert"
+      }
+    ],
+    "seeds": [
+      "test:106:4:Assert",
+      "test:115:4:Assert"
+    ],
+    "status": "ok"
+  },
+  "evidence": {
+    "nodes": 41,
+    "edges": 51,
+    "edge_kinds": {
+      "definition_value_candidate": 11,
+      "data_candidate": 21,
+      "call_target_candidate": 7,
+      "call_event_candidate": 2,
+      "lexical_control": 3,
+      "dynamic_function_origin": 1,
+      "dynamic_source_text": 1,
+      "dynamic_namespace_definition": 1,
+      "dynamic_call_target": 4
+    },
+    "criteria": [
+      {
+        "seed": "test:106:4:Assert",
+        "node_ids": [
+          "source:1:103:7:UnaryOp",
+          "source:1:104:8:Return",
+          "source:1:106:4:Assign",
+          "source:1:106:4:Name",
+          "source:1:109:8:Assign",
+          "source:1:109:8:Name",
+          "source:1:111:11:UnaryOp",
+          "source:1:112:12:Return",
+          "source:1:115:8:Return",
+          "source:1:118:8:Return",
+          "source:1:94:0:FunctionDef",
+          "source:1:94:17:arg",
+          "source:3:138:4:Return",
+          "source:3:33:16:arg",
+          "source:3:33:43:arg",
+          "source:3:47:4:Assign",
+          "source:3:47:4:Name",
+          "source:3:49:7:UnaryOp",
+          "source:3:54:8:Expr",
+          "source:3:55:4:Return",
+          "test:104:4:Assign",
+          "test:104:4:Name",
+          "test:106:4:Assert",
+          "test:27:4:Assign",
+          "test:27:4:Name",
+          "test:28:4:Assign",
+          "test:28:4:Name",
+          "test:29:4:Assign",
+          "test:29:4:Name",
+          "test:30:4:Assign",
+          "test:30:4:Name",
+          "test:35:4:Assign",
+          "test:35:4:Name",
+          "test:36:4:Expr",
+          "test:37:4:Return",
+          "test:53:4:arg",
+          "test:56:4:arg",
+          "test:74:4:Assign",
+          "test:74:4:Name"
+        ],
+        "product_source_candidates": [
+          "source:1",
+          "source:3"
+        ],
+        "unknown_call_nodes": [
+          "source:1:109:8:Assign",
+          "source:3:138:4:Return",
+          "source:3:47:4:Assign",
+          "source:3:54:8:Expr",
+          "source:3:55:4:Return",
+          "test:27:4:Assign",
+          "test:30:4:Assign",
+          "test:36:4:Expr"
+        ]
+      },
+      {
+        "seed": "test:115:4:Assert",
+        "node_ids": [
+          "source:1:94:0:FunctionDef",
+          "test:115:4:Assert",
+          "test:27:4:Assign",
+          "test:27:4:Name",
+          "test:28:4:Assign",
+          "test:28:4:Name",
+          "test:29:4:Assign",
+          "test:29:4:Name",
+          "test:30:4:Assign",
+          "test:30:4:Name",
+          "test:35:4:Assign",
+          "test:35:4:Name",
+          "test:36:4:Expr",
+          "test:37:4:Return",
+          "test:74:18:Name",
+          "test:74:4:Assign",
+          "test:74:4:Name"
+        ],
+        "product_source_candidates": [
+          "source:1"
+        ],
+        "unknown_call_nodes": [
+          "test:27:4:Assign",
+          "test:30:4:Assign",
+          "test:36:4:Expr"
+        ]
+      }
+    ],
+    "seed_bindings": [
+      {
+        "criterion_id": "criterion:0",
+        "seed": "test:106:4:Assert"
+      },
+      {
+        "criterion_id": "criterion:1",
+        "seed": "test:115:4:Assert"
+      }
+    ],
+    "reaches_product_candidate": true,
+    "has_unknown_call": true,
+    "semantic_validation": "not_evaluated",
+    "mock_boundary_identification": "unknown_calls_are_not_confirmed_mocks"
+  },
+  "elapsed_seconds": 0.3505,
+  "timings_seconds": {
+    "criterion_extraction": 0.000996,
+    "source_selection": 0.029173,
+    "backend_total": 0.32001,
+    "evidence_summary": 0.000193
+  },
+  "identity": {
+    "case_id": "langflow_189",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "langflow_189",
+      "dataset": "python-benchmark-new",
+      "language": "python",
+      "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+      "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_189is_encrypted.py",
+        "sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+        "bytes": 3541,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:1",
+        "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+        "sha256": "bfe36ac83538a629ee670c81b20ab9e3682688be7a031b7e61522b1779ea4c8b",
+        "bytes": 4547,
+        "selection_role": "visible_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "kind": "return_value_assertion",
+        "origin": "explicit",
+        "reason": "frozen explicit observation selected by extract_criteria"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "kind": "dynamic_global_identity_assertion",
+        "origin": "explicit",
+        "reason": "frozen explicit observation selected by extract_criteria"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected test definition",
+      "reason": "parameter rows and complete path feasibility were not evaluated"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+        "evidence": [
+          {
+            "symbol": "test_is_encrypted",
+            "start_line": 50,
+            "end_line": 115
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "unique",
+        "candidates": [],
+        "evidence": [
+          {
+            "status": "resolved",
+            "loader": "load_is_encrypted",
+            "path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+            "path_line": 13,
+            "namespace": "namespace",
+            "exec_line": 36,
+            "return_line": 37,
+            "read_line": 27,
+            "function_key": "is_encrypted",
+            "return_index": 0,
+            "function_definition": {
+              "source_id": "source:1",
+              "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+              "name": "is_encrypted",
+              "start_line": 94,
+              "end_line": 118
+            },
+            "test_bindings": [
+              {
+                "name": "is_encrypted",
+                "line": 74
+              }
+            ],
+            "call_sites": [
+              {
+                "name": "is_encrypted",
+                "line": 104
+              }
+            ]
+          }
+        ],
+        "assumptions": []
+      }
+    },
+    "relations": [
+      {
+        "kind": "function_origin",
+        "modality": "certain",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 118,
+          "end_line": 118
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_function",
+          "raw_modality": "certain"
+        },
+        "precision": "bounded langflow backend relation; is_encrypted",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 104,
+          "end_line": 104
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; is_encrypted",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 112,
+          "end_line": 112
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; is_encrypted",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; is_encrypted",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 118,
+          "end_line": 118
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; is_encrypted",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "function_origin",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 116,
+          "end_line": 116
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_global_reference",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; InvalidToken",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "call_binding",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 104,
+          "end_line": 104
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "authenticated_loader_bridge_plus_exact_codeql_endpoint",
+          "raw_relation_kind": "test_dynamic_call_syntax",
+          "raw_modality": "authenticated_external_bridge"
+        },
+        "precision": "bounded langflow backend relation; frontend_bridge_required; authenticated_external_bridge projected as analysis_may",
+        "observation_ids": [],
+        "assumptions": [
+          "CodeQL did not resolve the exec-created callable"
+        ]
+      },
+      {
+        "kind": "call_binding",
+        "modality": "unknown_effect",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_dependency_call",
+          "raw_modality": "unknown_effect"
+        },
+        "precision": "bounded langflow backend relation; get_settings_service",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "call_binding",
+        "modality": "unknown_effect",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "product_dependency_call",
+          "raw_modality": "unknown_effect"
+        },
+        "precision": "bounded langflow backend relation; decrypt_api_key",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 103,
+          "end_line": 103
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 104,
+          "end_line": 104
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "guard_controls_product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; true",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 103,
+          "end_line": 103
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 112,
+          "end_line": 112
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "guard_controls_product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; false",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 103,
+          "end_line": 103
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "guard_controls_product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; false",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 103,
+          "end_line": 103
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 118,
+          "end_line": 118
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "guard_controls_product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; false",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 111,
+          "end_line": 111
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 112,
+          "end_line": 112
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "guard_controls_product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; true",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 111,
+          "end_line": 111
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "guard_controls_product_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; false",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "parameter_to_return_value_use",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; return_comparison",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "settings_result_to_decrypt_argument",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; argument:1",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 111,
+          "end_line": 111
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "decrypt_result_to_downstream_use",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; guard",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "decrypt_result_to_downstream_use",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; return_comparison",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "parameter_to_decrypt_argument",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; argument:0",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 104,
+          "end_line": 104
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "test_call_result_to_observation",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 118,
+          "end_line": 118
+        },
+        "provenance": {
+          "source": "CodeQL 2.27.4",
+          "raw_relation_kind": "decrypt_exception_to_handler_return",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; caught_path_candidate",
+        "observation_ids": [],
+        "assumptions": []
+      },
+      {
+        "kind": "function_origin",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "to": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 94,
+          "end_line": 94
+        },
+        "provenance": {
+          "source": "authenticated_loader_bridge_plus_exact_codeql_endpoint",
+          "raw_relation_kind": "dynamic_global_identity_observation",
+          "raw_modality": "authenticated_external_bridge"
+        },
+        "precision": "bounded langflow backend relation; frontend_namespace_bridge_required; authenticated_external_bridge projected as analysis_may",
+        "observation_ids": [],
+        "assumptions": [
+          "CodeQL did not resolve the exec-created callable"
+        ]
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 104,
+          "end_line": 104
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL return + authenticated loader callable + CodeQL test result local flow",
+          "raw_relation_kind": "normal_return_dependence",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": [
+          "the authenticated exec-created callable is invoked at test line 104"
+        ]
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 112,
+          "end_line": 112
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL return + authenticated loader callable + CodeQL test result local flow",
+          "raw_relation_kind": "normal_return_dependence",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": [
+          "the authenticated exec-created callable is invoked at test line 104"
+        ]
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL return + authenticated loader callable + CodeQL test result local flow",
+          "raw_relation_kind": "normal_return_dependence",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": [
+          "the authenticated exec-created callable is invoked at test line 104"
+        ]
+      },
+      {
+        "kind": "normal_return_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 118,
+          "end_line": 118
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL return + authenticated loader callable + CodeQL test result local flow",
+          "raw_relation_kind": "normal_return_dependence",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": [
+          "the authenticated exec-created callable is invoked at test line 104"
+        ]
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL flow 106->109 plus downstream decrypt flows and product return composition",
+          "raw_relation_kind": "value_flow",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; get_settings_service normal result may influence criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": [
+          "the relevant normal or caught-exception path reaches a product return",
+          "external values, exceptions, and state effects remain unknown"
+        ]
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL flows 109->111/115 plus product return composition",
+          "raw_relation_kind": "value_flow",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; decrypt_api_key normal result may influence criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": [
+          "the relevant normal or caught-exception path reaches a product return",
+          "external values, exceptions, and state effects remain unknown"
+        ]
+      },
+      {
+        "kind": "exception_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 109,
+          "end_line": 109
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 106,
+          "end_line": 106
+        },
+        "provenance": {
+          "source": "CodeQL exceptional successor candidate 109->118 plus product return composition",
+          "raw_relation_kind": "exception_dependence",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; decrypt_api_key caught exception may influence criterion:0",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": [
+          "the relevant normal or caught-exception path reaches a product return",
+          "external values, exceptions, and state effects remain unknown"
+        ]
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "start_line": 116,
+          "end_line": 116
+        },
+        "to": {
+          "logical_path": "tests/test_189is_encrypted.py",
+          "start_line": 115,
+          "end_line": 115
+        },
+        "provenance": {
+          "source": "CodeQL global reference + exact loader namespace/tuple/destructuring proof + exact CodeQL identity-expression endpoint",
+          "raw_relation_kind": "value_flow",
+          "raw_modality": "analysis_may"
+        },
+        "precision": "bounded langflow backend relation; criterion:1",
+        "observation_ids": [
+          "criterion:1"
+        ],
+        "assumptions": [
+          "no unsupported runtime mutation occurs outside authenticated visible intervals",
+          "this is a may-influence chain, not proof of the runtime identity outcome"
+        ]
+      }
+    ],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "function_origin",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "verified_incomplete"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "verified_incomplete"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [
+        "authenticated frontend bridges are explicit inputs, not backend-native dynamic resolution"
+      ],
+      "unknown_effects": [
+        {
+          "boundary_id": "src/src/backend/base/langflow/services/auth/mcp_encryption.py:106:get_settings_service",
+          "effect": {
+            "normal_return": "may supply decrypt_api_key argument 1 and thereby influence criterion:0",
+            "exception": "may prevent the product call from returning and criterion:0 from being reached",
+            "state_alias_scope": "returned service object and externally reachable state are unknown"
+          },
+          "scope": {
+            "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+            "start_line": 106,
+            "call": "get_settings_service"
+          },
+          "provenance": "structured unknown supplied by langflow backend study",
+          "precision": "unresolved; copied without inferring concrete effects",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "src/src/backend/base/langflow/services/auth/mcp_encryption.py:109:auth_utils.decrypt_api_key",
+          "effect": {
+            "normal_return": "may influence guard line 111 and comparison return line 115",
+            "exception": "caught listed exceptions may select handler return line 118; other exceptions may prevent the product call from returning",
+            "state_alias_scope": "reachable argument, settings-service, and auth-utils state effects are unknown"
+          },
+          "scope": {
+            "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+            "start_line": 109,
+            "call": "auth_utils.decrypt_api_key"
+          },
+          "provenance": "structured unknown supplied by langflow backend study",
+          "precision": "unresolved; copied without inferring concrete effects",
+          "assumptions": []
+        },
+        {
+          "boundary_id": "tests/test_189is_encrypted.py:104:is_encrypted",
+          "effect": {
+            "normal_return": "may flow to criterion:0 at line 106",
+            "exception": "may prevent criteria at lines 106 and 115 from being reached",
+            "state_alias_scope": "dynamic callable effects beyond visible product facts are unknown"
+          },
+          "scope": {
+            "logical_path": "tests/test_189is_encrypted.py",
+            "start_line": 104,
+            "call": "is_encrypted"
+          },
+          "provenance": "structured unknown supplied by langflow backend study",
+          "precision": "unresolved; copied without inferring concrete effects",
+          "assumptions": []
+        }
+      ],
+      "unanalysed_regions": [
+        {
+          "scope": "pre_registered_unknown",
+          "reason": "CodeQL does not resolve the exec-created function object to the test call without the authenticated frontend bridge"
+        },
+        {
+          "scope": "pre_registered_unknown",
+          "reason": "masked Mock values, decrypt outcomes, concrete exceptions, and path feasibility"
+        },
+        {
+          "scope": "pre_registered_unknown",
+          "reason": "unsupported dynamic namespace or callable rebinding"
+        },
+        {
+          "scope": "study_unknown",
+          "reason": "CodeQL does not resolve the exec-created function object to the test call without the authenticated frontend bridge"
+        },
+        {
+          "scope": "study_unknown",
+          "reason": "masked Mock values, decrypt outcomes, concrete exceptions, and path feasibility"
+        },
+        {
+          "scope": "study_unknown",
+          "reason": "unsupported dynamic namespace or callable rebinding"
+        },
+        {
+          "scope": "study_unknown",
+          "reason": "The bridge establishes conditional may-influence chains, not concrete runtime values."
+        },
+        {
+          "scope": "study_unknown",
+          "reason": "CodeQL return/control facts do not establish complete path feasibility."
+        }
+      ]
+    },
+    "completion": {
+      "status": "partial",
+      "stage": "langflow_contract_projection",
+      "failure_categories": [
+        "bounded_unknown_effects",
+        "path_feasibility_not_evaluated"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "verified_incomplete",
+      "reviewer": "contract_projection",
+      "evidence": [
+        {
+          "backend_evidence_rows_exact": 23,
+          "criterion0_result_flow": true,
+          "criterion0_dependency_paths": [
+            "106->109",
+            "109->111/115",
+            "109~exception->118"
+          ],
+          "criterion1_exact_frontend_and_backend_expression_composed": true
+        }
+      ],
+      "notes": "typed bounded evidence projected; independent review remains separate"
+    },
+    "cost": {
+      "timings_seconds": {
+        "database": 9.730908470999566,
+        "query": 13.432663845000206,
+        "decode": 1.0738494229990465
+      },
+      "total_seconds": 25.420741792000626,
+      "total_scope": "bounded langflow backend bridge",
+      "peak_memory": {
+        "status": "measured_per_process_max",
+        "bytes": 621121536,
+        "reason": "maximum of phase process RSS values; not a simultaneous run peak"
+      },
+      "cache_state": {
+        "status": "unknown",
+        "reason": "cache isolation was not supplied"
+      },
+      "input_size": {
+        "files": 2,
+        "bytes": 8088
+      },
+      "graph_size": {
+        "nodes": null,
+        "edges": null,
+        "relation_count": 31,
+        "reason": "backend graph size is not exported"
+      },
+      "unavailable_phases": []
+    }
+  },
+  "candidate_diagnostics": {
+    "status": "partial",
+    "failure_categories": [
+      "empty_support_source_omitted",
+      "unresolved_calls",
+      "semantic_analysis_gap"
+    ],
+    "result_contract": {
+      "schema_version": "mock-spec.backward-analysis-case/v1",
+      "identity": {
+        "case_id": "langflow_189",
+        "dataset": "python-benchmark-new",
+        "language": "python",
+        "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+        "masking_contract": "python-slot-v1",
+        "masked_test_sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+        "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted"
+      },
+      "source_scope": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_189is_encrypted.py",
+          "sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+          "bytes": 3541,
+          "selection_role": "masked_test"
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "sha256": "bfe36ac83538a629ee670c81b20ab9e3682688be7a031b7e61522b1779ea4c8b",
+          "bytes": 4547,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:2",
+          "logical_path": "src/src/lfx/src/lfx/log/logger.py",
+          "sha256": "af1183762ac97ea959a555ad5f866baade1219431b9befa0d7c9ba27781eb80b",
+          "bytes": 14421,
+          "selection_role": "candidate_product"
+        },
+        {
+          "source_id": "source:3",
+          "logical_path": "src/src/backend/base/langflow/services/deps.py",
+          "sha256": "26c2b1b0e158d1f342923a242af795a91a6da119c6bb82e69c3e889eabb9fd59",
+          "bytes": 8023,
+          "selection_role": "candidate_product"
+        }
+      ],
+      "observations": [
+        {
+          "observation_id": "criterion:0",
+          "location": {
+            "source_id": "test",
+            "start_line": 106,
+            "end_line": 106
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        },
+        {
+          "observation_id": "criterion:1",
+          "location": {
+            "source_id": "test",
+            "start_line": 115,
+            "end_line": 115
+          },
+          "kind": "value_assertion",
+          "origin": "explicit",
+          "reason": "Python assert in the selected test function"
+        }
+      ],
+      "parameterization": {
+        "status": "not_expanded",
+        "coverage": "selected_test_definition",
+        "reason": "the runner does not enumerate parameter rows"
+      },
+      "entry_point": {
+        "test_selection": {
+          "origin": "task_provided",
+          "status": "unique",
+          "selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+          "evidence": [
+            {
+              "symbol": "test_is_encrypted",
+              "start_line": 50,
+              "end_line": 115
+            }
+          ]
+        },
+        "mut_binding": {
+          "origin": "automatic",
+          "status": "not_evaluated",
+          "candidates": [],
+          "evidence": [],
+          "assumptions": []
+        }
+      },
+      "relations": [],
+      "relation_coverage": [
+        {
+          "kind": "call_binding",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "control_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "exception_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "function_origin",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "normal_return_dependence",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "state_flow",
+          "status": "not_evaluated"
+        },
+        {
+          "kind": "value_flow",
+          "status": "not_evaluated"
+        }
+      ],
+      "analysis_boundaries": {
+        "assumptions": [],
+        "unknown_effects": [
+          {
+            "boundary_id": "source:1:109:8:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:3:138:4:Return",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:3:47:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:3:54:8:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "source:3:55:4:Return",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:27:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:30:4:Assign",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          },
+          {
+            "boundary_id": "test:36:4:Expr",
+            "effect": "unclassified_call_effect",
+            "scope": "unknown",
+            "provenance": "candidate_graph_marker",
+            "precision": "unresolved",
+            "assumptions": []
+          }
+        ],
+        "unanalysed_regions": [
+          {
+            "scope": "semantic_relations",
+            "reason": "candidate_graph_has_no_validated_dependency_semantics"
+          }
+        ]
+      },
+      "completion": {
+        "status": "partial",
+        "stage": "complete",
+        "failure_categories": [
+          "empty_support_source_omitted",
+          "unresolved_calls",
+          "semantic_analysis_gap"
+        ],
+        "error": null
+      },
+      "semantic_validation": {
+        "status": "not_evaluated",
+        "reviewer": null,
+        "evidence": [],
+        "notes": "candidate reachability is not semantic dependency validation"
+      },
+      "cost": {
+        "timings_seconds": {
+          "criterion_extraction": 0.000996,
+          "source_selection": 0.029173,
+          "backend_total": 0.32001,
+          "evidence_summary": 0.000193
+        },
+        "total_seconds": 0.3505,
+        "total_scope": "run_case only; excludes input admission, shared backend compilation and output serialization",
+        "peak_memory": {
+          "status": "unavailable",
+          "bytes": null,
+          "reason": "case-level peak memory is not measured by this runner"
+        },
+        "cache_state": {
+          "status": "unknown",
+          "reason": "the runner does not isolate OS, runtime, parser, or shared compilation caches"
+        },
+        "input_size": {
+          "files": 4,
+          "bytes": 30532
+        },
+        "graph_size": {
+          "nodes": 41,
+          "edges": 51
+        },
+        "unavailable_phases": [
+          {
+            "phase": "input_admission",
+            "reason": "adapter admission occurs outside the per-case analysis timer"
+          },
+          {
+            "phase": "front_end",
+            "reason": "the candidate backend does not report parsing time separately"
+          },
+          {
+            "phase": "call_graph",
+            "reason": "the candidate backend does not report call-graph time separately"
+          },
+          {
+            "phase": "pointer_analysis",
+            "reason": "the candidate backend does not provide pointer analysis"
+          },
+          {
+            "phase": "dependency_analysis",
+            "reason": "backend_total combines parsing, graph construction, and slicing"
+          },
+          {
+            "phase": "slice",
+            "reason": "the candidate backend does not report semantic slicing time separately"
+          },
+          {
+            "phase": "source_mapping",
+            "reason": "the backend does not report mapping separately; evidence_summary measures host reachability summarization"
+          }
+        ]
+      }
+    },
+    "stage": "complete",
+    "error": null,
+    "elapsed_seconds": 0.3505,
+    "timings_seconds": {
+      "criterion_extraction": 0.000996,
+      "source_selection": 0.029173,
+      "backend_total": 0.32001,
+      "evidence_summary": 0.000193
+    },
+    "graph_and_evidence": "top-level graph/evidence/sources remain candidate diagnostics only"
+  },
+  "semantic_backend": {
+    "schema": "mock-spec.batch-semantic-backend/v1",
+    "status": "complete",
+    "backend": "langflow_origin_flow",
+    "identity": {
+      "case_id": "langflow_189",
+      "dataset": "python-benchmark-new",
+      "language": "python",
+      "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+      "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted"
+    },
+    "source": {
+      "scope": [
+        {
+          "source_id": "test",
+          "logical_path": "tests/test_189is_encrypted.py",
+          "sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+          "bytes": 3541,
+          "selection_role": "masked_test"
+        },
+        {
+          "source_id": "source:1",
+          "logical_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+          "sha256": "bfe36ac83538a629ee670c81b20ab9e3682688be7a031b7e61522b1779ea4c8b",
+          "bytes": 4547,
+          "selection_role": "visible_product"
+        }
+      ],
+      "adapter_validation": "exact_paths_and_sha256"
+    },
+    "provenance": {
+      "driver": "experiments/backward-slicing/python-backend-pilot/run_langflow_backend.py",
+      "driver_sha256": "777bdf09687add53007254054d28dbad1241833e6f123c0e40b66d3619563935",
+      "driver_output": "/home/haon/projects/Mockspec/out/mockbench-study/backward-slice-formal165-20261111-r3/semantic/5b83af29ea4ed3c9d4ce/driver",
+      "artifacts": {
+        "terminal": {
+          "path": "/home/haon/projects/Mockspec/out/mockbench-study/backward-slice-formal165-20261111-r3/semantic/5b83af29ea4ed3c9d4ce/driver/receipt.json",
+          "sha256": "997817371c14809728d70bec2f23c9ef6eec69a040781c313db8d1244ff00fc7"
+        },
+        "case_study": {
+          "path": "/home/haon/projects/Mockspec/out/mockbench-study/backward-slice-formal165-20261111-r3/semantic/5b83af29ea4ed3c9d4ce/driver/study.json",
+          "sha256": "36c67fc4e771818a9e98d6a37a98ea9cbe10c7de4d9540be2f07a595d4be991d"
+        },
+        "input_manifest": {
+          "path": "/home/haon/projects/Mockspec/out/mockbench-study/backward-slice-formal165-20261111-r3/semantic/5b83af29ea4ed3c9d4ce/driver/input-manifest.json",
+          "sha256": "95123f2de08595bfcdbd5d31e70e48328ca45f38caf59d75834676cf782567d2"
+        }
+      },
+      "target_executed": false,
+      "loader_executed": false,
+      "mechanism_probes_counted_as_dataset_cases": false,
+      "driver_environment": {
+        "values": {
+          "LANG": "C.UTF-8",
+          "LC_ALL": "C.UTF-8",
+          "PATH": "/bin:/usr/bin"
+        },
+        "python_executable": "/home/haon/projects/Mockspec/.venv/bin/python",
+        "home": "omitted; neither accepted driver requires user configuration",
+        "policy": "fixed locale plus os.defpath; no inherited environment or credentials"
+      },
+      "precision": "Exact frozen adapter identity and source hashes; only the selected case_result is returned. Backend qualification probes, when used by the Flask driver, are not dataset cases."
+    },
+    "cost": {
+      "database": {
+        "exit_code": 0,
+        "seconds": 9.730908470999566,
+        "peak_rss_bytes": 223932416
+      },
+      "query": {
+        "exit_code": 0,
+        "seconds": 13.432663845000206,
+        "peak_rss_bytes": 621121536
+      },
+      "decode": {
+        "exit_code": 0,
+        "seconds": 1.0738494229990465,
+        "peak_rss_bytes": 91197440
+      },
+      "total_seconds": 25.420741792000626,
+      "cache_state": "cold; OS and CodeQL distribution caches not isolated"
+    },
+    "terminal": {
+      "execution": "complete",
+      "semantic_validation": "verified_incomplete",
+      "completion": "partial"
+    },
+    "driver_exit_code": 0,
+    "batch_dispatch_seconds": 25.74428,
+    "batch_dispatch_scope": "bridge process including support check, adapter and backend; excludes candidate diagnostics"
+  },
+  "error": null,
+  "batch_case_cost": {
+    "total_seconds": 26.252724,
+    "scope": "admission, candidate diagnostic, semantic-slot wait, dispatch and mapping; excludes case queue, shared compile and serialization"
+  },
+  "result_contract_sha256": "a85cb1bb682d3741edc23e776f16f935b115894602dc54c9a6b4c37783634528"
+}

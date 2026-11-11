@@ -1,0 +1,530 @@
+{
+  "schema_version" : "mockspec.wala-capability/v2",
+  "wala_version" : "1.7.2",
+  "configuration" : {
+    "call_graph" : "0-1-CFA",
+    "control_dependence" : "FULL",
+    "entry_origin" : "explicit_diagnostic",
+    "data_dependence" : "FULL",
+    "opaque_summary_mode" : true,
+    "reflection" : "NONE"
+  },
+  "opaque_effects" : [ {
+    "model_status" : "bounded_mechanism_only",
+    "target" : "UnknownDependency.mutate",
+    "semantics" : "field_modref_and_single_compatible_argument_alias_not_mock_behavior",
+    "summary_count" : 4,
+    "kind" : "state",
+    "provenance" : "wala_method_summary"
+  } ],
+  "application" : "/tmp/mockspec-issue23-wala-qgnmkwov/mechanism.jar",
+  "library_count" : 0,
+  "entry" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+  "criterion" : {
+    "query" : "RETURN",
+    "seed" : {
+      "kind" : "NORMAL",
+      "method" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+      "context" : "Everywhere",
+      "instruction" : "return 5",
+      "instruction_index" : 5,
+      "line" : 44,
+      "statement_text" : "NORMAL unknownObservation:return 5 Node: < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere",
+      "heap_location" : null
+    }
+  },
+  "class_hierarchy_classes" : 30707,
+  "unresolved_classes" : [ "<Primordial,Lcom/ibm/wala/FakeRootClass>", "<Primordial,Lcom/ibm/wala/Malleable>", "<Primordial,Ljava/lang/Thread$FieldHolder>" ],
+  "call_graph_nodes" : 12058,
+  "application_call_graph_nodes" : 4,
+  "call_graph_contexts" : 55,
+  "pointer_instance_keys" : 4533,
+  "entry_local_points_to" : [ {
+    "regions" : [ "[<Application,Lsample/MechanismProbe$OpaqueCarrier>]" ],
+    "value_number" : 1,
+    "pointer_key" : "[Node: < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere, v1]"
+  }, {
+    "regions" : [ "[<Application,Lsample/MechanismProbe$Box>]" ],
+    "value_number" : 2,
+    "pointer_key" : "[Node: < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere, v2]"
+  }, {
+    "regions" : [ "[<Primordial,Ljava/lang/ExceptionInInitializerError>]", "[<Primordial,Ljava/lang/NullPointerException>]", "[<Primordial,Ljava/lang/OutOfMemoryError>]", "[<Primordial,Ljava/lang/RuntimeException>]" ],
+    "value_number" : 4,
+    "pointer_key" : "[Node: < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere, v4]"
+  } ],
+  "entry_instruction_effects" : [ {
+    "instruction_index" : 2,
+    "instruction" : "invokeinterface < Application, Lsample/MechanismProbe$UnknownDependency, mutate(Lsample/MechanismProbe$Box;)V > 1,2 @2 exception:4",
+    "uses" : [ 1, 2 ],
+    "definitions" : [ 4 ],
+    "mod_regions" : [ ],
+    "ref_regions" : [ ]
+  }, {
+    "instruction_index" : 4,
+    "instruction" : "5 = getfield < Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > 2",
+    "uses" : [ 2 ],
+    "definitions" : [ 5 ],
+    "mod_regions" : [ ],
+    "ref_regions" : [ "[[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]" ]
+  } ],
+  "summary_targets" : [ {
+    "method" : "sample.MechanismProbe$OpaqueCarrier.mutate(Lsample/MechanismProbe$Box;)V",
+    "implementation_class" : "com.ibm.wala.ipa.summaries.SummarizedMethod",
+    "is_native" : false,
+    "is_abstract" : false,
+    "context" : "Everywhere",
+    "ir_instructions" : [ "3 = getfield < Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > 2", "putfield 2.< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > = 3", "conditional branch(eq, to iindex=4) 3,4", "return", "5 = new <Primordial,Ljava/lang/RuntimeException>@4", "throw 5" ],
+    "mod_regions" : [ "[[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]", "[[<Primordial,Ljava/lang/RuntimeException>],< Primordial, Ljava/lang/Throwable, backtrace, <Primordial,Ljava/lang/Object> >]", "[[<Primordial,Ljava/lang/RuntimeException>],< Primordial, Ljava/lang/Throwable, cause, <Primordial,Ljava/lang/Throwable> >]", "[[<Primordial,Ljava/lang/RuntimeException>],< Primordial, Ljava/lang/Throwable, depth, <Primordial,I> >]", "[[<Primordial,Ljava/lang/RuntimeException>],< Primordial, Ljava/lang/Throwable, detailMessage, <Primordial,Ljava/lang/String> >]", "[[<Primordial,Ljava/lang/RuntimeException>],< Primordial, Ljava/lang/Throwable, stackTrace, <Primordial,[Ljava/lang/StackTraceElement> >]", "[[<Primordial,Ljava/lang/RuntimeException>],< Primordial, Ljava/lang/Throwable, suppressedExceptions, <Primordial,Ljava/util/List> >]" ]
+  } ],
+  "configured_summaries" : [ {
+    "instructions" : [ "3 = getfield < Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > 2", "putfield 2.< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > = 3", "return 2" ],
+    "method" : "sample.MechanismProbe$UnknownDependency.alias(Lsample/MechanismProbe$Box;)Lsample/MechanismProbe$Box;"
+  }, {
+    "instructions" : [ "3 = getfield < Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > 2", "putfield 2.< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > = 3", "conditional branch(eq, to iindex=4) 3,4", "return", "5 = new <Primordial,Ljava/lang/RuntimeException>@4", "throw 5" ],
+    "method" : "sample.MechanismProbe$UnknownDependency.mutate(Lsample/MechanismProbe$Box;)V"
+  }, {
+    "instructions" : [ "3 = getfield < Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > 2", "putfield 2.< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > = 3", "return 2" ],
+    "method" : "sample.MechanismProbe$OpaqueCarrier.alias(Lsample/MechanismProbe$Box;)Lsample/MechanismProbe$Box;"
+  }, {
+    "instructions" : [ "3 = getfield < Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > 2", "putfield 2.< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > = 3", "conditional branch(eq, to iindex=4) 3,4", "return", "5 = new <Primordial,Ljava/lang/RuntimeException>@4", "throw 5" ],
+    "method" : "sample.MechanismProbe$OpaqueCarrier.mutate(Lsample/MechanismProbe$Box;)V"
+  } ],
+  "lazy_sdg_nodes_after_slice" : 99297,
+  "slice_statements" : [ {
+    "kind" : "NORMAL",
+    "method" : "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+    "context" : "Everywhere",
+    "instruction" : "3 = new <Application,Lsample/MechanismProbe$OpaqueCarrier>@1",
+    "instruction_index" : 1,
+    "line" : null,
+    "statement_text" : "NORMAL fakeRootMethod:3 = new <Application,Lsample/MechanismProbe$OpaqueCarrier>@1 Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere",
+    "heap_location" : null
+  }, {
+    "kind" : "NORMAL",
+    "method" : "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+    "context" : "Everywhere",
+    "instruction" : "5 = new <Application,Lsample/MechanismProbe$Box>@3",
+    "instruction_index" : 3,
+    "line" : null,
+    "statement_text" : "NORMAL fakeRootMethod:5 = new <Application,Lsample/MechanismProbe$Box>@3 Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere",
+    "heap_location" : null
+  }, {
+    "kind" : "NORMAL",
+    "method" : "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+    "context" : "Everywhere",
+    "instruction" : "7 = invokestatic < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > 3,5 @5 exception:8",
+    "instruction_index" : 5,
+    "line" : null,
+    "statement_text" : "NORMAL fakeRootMethod:7 = invokestatic < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > 3,5 @5 exception:8 Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere",
+    "heap_location" : null
+  }, {
+    "kind" : "NORMAL",
+    "method" : "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+    "context" : "Everywhere",
+    "instruction" : "invokespecial < Application, Lsample/MechanismProbe$Box, <init>()V > 5 @4 exception:6",
+    "instruction_index" : 4,
+    "line" : null,
+    "statement_text" : "NORMAL fakeRootMethod:invokespecial < Application, Lsample/MechanismProbe$Box, <init>()V > 5 @4 exception:6 Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere",
+    "heap_location" : null
+  }, {
+    "kind" : "NORMAL",
+    "method" : "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+    "context" : "Everywhere",
+    "instruction" : "invokespecial < Application, Lsample/MechanismProbe$OpaqueCarrier, <init>()V > 3 @2 exception:4",
+    "instruction_index" : 2,
+    "line" : null,
+    "statement_text" : "NORMAL fakeRootMethod:invokespecial < Application, Lsample/MechanismProbe$OpaqueCarrier, <init>()V > 3 @2 exception:4 Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere",
+    "heap_location" : null
+  }, {
+    "kind" : "PARAM_CALLER",
+    "method" : "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+    "context" : "Everywhere",
+    "instruction" : "7 = invokestatic < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > 3,5 @5 exception:8",
+    "instruction_index" : 5,
+    "line" : null,
+    "statement_text" : "PARAM_CALLER:Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere[5]7 = invokestatic < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > 3,5 @5 exception:8 v3",
+    "heap_location" : null
+  }, {
+    "kind" : "PARAM_CALLER",
+    "method" : "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+    "context" : "Everywhere",
+    "instruction" : "7 = invokestatic < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > 3,5 @5 exception:8",
+    "instruction_index" : 5,
+    "line" : null,
+    "statement_text" : "PARAM_CALLER:Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere[5]7 = invokestatic < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > 3,5 @5 exception:8 v5",
+    "heap_location" : null
+  }, {
+    "kind" : "HEAP_PARAM_CALLER",
+    "method" : "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+    "context" : "Everywhere",
+    "instruction" : null,
+    "instruction_index" : null,
+    "line" : null,
+    "statement_text" : "HEAP_PARAM_CALLER:Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere [[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >] call:7 = invokestatic < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > 3,5 @5 exception:8",
+    "heap_location" : "[[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]"
+  }, {
+    "kind" : "HEAP_PARAM_CALLEE",
+    "method" : "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+    "context" : "Everywhere",
+    "instruction" : null,
+    "instruction_index" : null,
+    "line" : null,
+    "statement_text" : "HEAP_PARAM_CALLEE:Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere [[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]",
+    "heap_location" : "[[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]"
+  }, {
+    "kind" : "METHOD_ENTRY",
+    "method" : "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+    "context" : "Everywhere",
+    "instruction" : null,
+    "instruction_index" : null,
+    "line" : null,
+    "statement_text" : "METHOD_ENTRY:Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere",
+    "heap_location" : null
+  }, {
+    "kind" : "NORMAL",
+    "method" : "sample.MechanismProbe$OpaqueCarrier.mutate(Lsample/MechanismProbe$Box;)V",
+    "context" : "Everywhere",
+    "instruction" : "3 = getfield < Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > 2",
+    "instruction_index" : 0,
+    "line" : null,
+    "statement_text" : "NORMAL mutate:3 = getfield < Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > 2 Node: synthetic < Application, Lsample/MechanismProbe$OpaqueCarrier, mutate(Lsample/MechanismProbe$Box;)V > Context: Everywhere",
+    "heap_location" : null
+  }, {
+    "kind" : "NORMAL",
+    "method" : "sample.MechanismProbe$OpaqueCarrier.mutate(Lsample/MechanismProbe$Box;)V",
+    "context" : "Everywhere",
+    "instruction" : "putfield 2.< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > = 3",
+    "instruction_index" : 1,
+    "line" : null,
+    "statement_text" : "NORMAL mutate:putfield 2.< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > = 3 Node: synthetic < Application, Lsample/MechanismProbe$OpaqueCarrier, mutate(Lsample/MechanismProbe$Box;)V > Context: Everywhere",
+    "heap_location" : null
+  }, {
+    "kind" : "PARAM_CALLEE",
+    "method" : "sample.MechanismProbe$OpaqueCarrier.mutate(Lsample/MechanismProbe$Box;)V",
+    "context" : "Everywhere",
+    "instruction" : null,
+    "instruction_index" : null,
+    "line" : null,
+    "statement_text" : "PARAM_CALLEE:Node: synthetic < Application, Lsample/MechanismProbe$OpaqueCarrier, mutate(Lsample/MechanismProbe$Box;)V > Context: Everywhere v2",
+    "heap_location" : null
+  }, {
+    "kind" : "HEAP_PARAM_CALLEE",
+    "method" : "sample.MechanismProbe$OpaqueCarrier.mutate(Lsample/MechanismProbe$Box;)V",
+    "context" : "Everywhere",
+    "instruction" : null,
+    "instruction_index" : null,
+    "line" : null,
+    "statement_text" : "HEAP_PARAM_CALLEE:Node: synthetic < Application, Lsample/MechanismProbe$OpaqueCarrier, mutate(Lsample/MechanismProbe$Box;)V > Context: Everywhere [[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]",
+    "heap_location" : "[[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]"
+  }, {
+    "kind" : "HEAP_RET_CALLEE",
+    "method" : "sample.MechanismProbe$OpaqueCarrier.mutate(Lsample/MechanismProbe$Box;)V",
+    "context" : "Everywhere",
+    "instruction" : null,
+    "instruction_index" : null,
+    "line" : null,
+    "statement_text" : "HEAP_RET_CALLEE:Node: synthetic < Application, Lsample/MechanismProbe$OpaqueCarrier, mutate(Lsample/MechanismProbe$Box;)V > Context: Everywhere [[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]",
+    "heap_location" : "[[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]"
+  }, {
+    "kind" : "METHOD_ENTRY",
+    "method" : "sample.MechanismProbe$OpaqueCarrier.mutate(Lsample/MechanismProbe$Box;)V",
+    "context" : "Everywhere",
+    "instruction" : null,
+    "instruction_index" : null,
+    "line" : null,
+    "statement_text" : "METHOD_ENTRY:Node: synthetic < Application, Lsample/MechanismProbe$OpaqueCarrier, mutate(Lsample/MechanismProbe$Box;)V > Context: Everywhere",
+    "heap_location" : null
+  }, {
+    "kind" : "NORMAL",
+    "method" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+    "context" : "Everywhere",
+    "instruction" : "5 = getfield < Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > 2",
+    "instruction_index" : 4,
+    "line" : 44,
+    "statement_text" : "NORMAL unknownObservation:5 = getfield < Application, Lsample/MechanismProbe$Box, value, <Primordial,I> > 2 Node: < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere",
+    "heap_location" : null
+  }, {
+    "kind" : "NORMAL",
+    "method" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+    "context" : "Everywhere",
+    "instruction" : "invokeinterface < Application, Lsample/MechanismProbe$UnknownDependency, mutate(Lsample/MechanismProbe$Box;)V > 1,2 @2 exception:4",
+    "instruction_index" : 2,
+    "line" : 43,
+    "statement_text" : "NORMAL unknownObservation:invokeinterface < Application, Lsample/MechanismProbe$UnknownDependency, mutate(Lsample/MechanismProbe$Box;)V > 1,2 @2 exception:4 Node: < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere",
+    "heap_location" : null
+  }, {
+    "kind" : "NORMAL",
+    "method" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+    "context" : "Everywhere",
+    "instruction" : "return 5",
+    "instruction_index" : 5,
+    "line" : 44,
+    "statement_text" : "NORMAL unknownObservation:return 5 Node: < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere",
+    "heap_location" : null
+  }, {
+    "kind" : "PARAM_CALLER",
+    "method" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+    "context" : "Everywhere",
+    "instruction" : "invokeinterface < Application, Lsample/MechanismProbe$UnknownDependency, mutate(Lsample/MechanismProbe$Box;)V > 1,2 @2 exception:4",
+    "instruction_index" : 2,
+    "line" : 43,
+    "statement_text" : "PARAM_CALLER:Node: < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere[2]invokeinterface < Application, Lsample/MechanismProbe$UnknownDependency, mutate(Lsample/MechanismProbe$Box;)V > 1,2 @2 exception:4 v2",
+    "heap_location" : null
+  }, {
+    "kind" : "PARAM_CALLEE",
+    "method" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+    "context" : "Everywhere",
+    "instruction" : null,
+    "instruction_index" : null,
+    "line" : null,
+    "statement_text" : "PARAM_CALLEE:Node: < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere v1",
+    "heap_location" : null
+  }, {
+    "kind" : "PARAM_CALLEE",
+    "method" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+    "context" : "Everywhere",
+    "instruction" : null,
+    "instruction_index" : null,
+    "line" : null,
+    "statement_text" : "PARAM_CALLEE:Node: < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere v2",
+    "heap_location" : null
+  }, {
+    "kind" : "HEAP_PARAM_CALLER",
+    "method" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+    "context" : "Everywhere",
+    "instruction" : null,
+    "instruction_index" : null,
+    "line" : null,
+    "statement_text" : "HEAP_PARAM_CALLER:Node: < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere [[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >] call:invokeinterface < Application, Lsample/MechanismProbe$UnknownDependency, mutate(Lsample/MechanismProbe$Box;)V > 1,2 @2 exception:4",
+    "heap_location" : "[[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]"
+  }, {
+    "kind" : "HEAP_PARAM_CALLEE",
+    "method" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+    "context" : "Everywhere",
+    "instruction" : null,
+    "instruction_index" : null,
+    "line" : null,
+    "statement_text" : "HEAP_PARAM_CALLEE:Node: < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere [[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]",
+    "heap_location" : "[[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]"
+  }, {
+    "kind" : "HEAP_RET_CALLER",
+    "method" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+    "context" : "Everywhere",
+    "instruction" : null,
+    "instruction_index" : null,
+    "line" : null,
+    "statement_text" : "HEAP_RET_CALLER:Node: < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere [[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >] call:invokeinterface < Application, Lsample/MechanismProbe$UnknownDependency, mutate(Lsample/MechanismProbe$Box;)V > 1,2 @2 exception:4",
+    "heap_location" : "[[<Application,Lsample/MechanismProbe$Box>],< Application, Lsample/MechanismProbe$Box, value, <Primordial,I> >]"
+  }, {
+    "kind" : "METHOD_ENTRY",
+    "method" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+    "context" : "Everywhere",
+    "instruction" : null,
+    "instruction_index" : null,
+    "line" : null,
+    "statement_text" : "METHOD_ENTRY:Node: < Application, Lsample/MechanismProbe, unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I > Context: Everywhere",
+    "heap_location" : null
+  } ],
+  "slice_statement_count" : 26,
+  "slice_edge_count" : 37,
+  "slice_edge_labels" : {
+    "DATA_DEP" : 22,
+    "CONTROL_DEP" : 12,
+    "HEAP_DATA_DEP" : 6
+  },
+  "slice_edges" : [ {
+    "from" : 0,
+    "to" : 4,
+    "labels" : [ "CONTROL_DEP", "DATA_DEP" ]
+  }, {
+    "from" : 0,
+    "to" : 2,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 0,
+    "to" : 5,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 1,
+    "to" : 3,
+    "labels" : [ "CONTROL_DEP", "DATA_DEP" ]
+  }, {
+    "from" : 1,
+    "to" : 2,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 1,
+    "to" : 6,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 1,
+    "to" : 7,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 2,
+    "to" : 25,
+    "labels" : [ "CONTROL_DEP" ]
+  }, {
+    "from" : 3,
+    "to" : 2,
+    "labels" : [ "CONTROL_DEP" ]
+  }, {
+    "from" : 4,
+    "to" : 1,
+    "labels" : [ "CONTROL_DEP" ]
+  }, {
+    "from" : 5,
+    "to" : 20,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 6,
+    "to" : 21,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 7,
+    "to" : 23,
+    "labels" : [ "HEAP_DATA_DEP" ]
+  }, {
+    "from" : 8,
+    "to" : 7,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 9,
+    "to" : 0,
+    "labels" : [ "CONTROL_DEP" ]
+  }, {
+    "from" : 10,
+    "to" : 11,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 11,
+    "to" : 14,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 12,
+    "to" : 10,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 12,
+    "to" : 11,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 13,
+    "to" : 10,
+    "labels" : [ "HEAP_DATA_DEP" ]
+  }, {
+    "from" : 13,
+    "to" : 14,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 14,
+    "to" : 24,
+    "labels" : [ "HEAP_DATA_DEP" ]
+  }, {
+    "from" : 15,
+    "to" : 10,
+    "labels" : [ "CONTROL_DEP" ]
+  }, {
+    "from" : 15,
+    "to" : 11,
+    "labels" : [ "CONTROL_DEP" ]
+  }, {
+    "from" : 16,
+    "to" : 18,
+    "labels" : [ "CONTROL_DEP", "DATA_DEP" ]
+  }, {
+    "from" : 17,
+    "to" : 15,
+    "labels" : [ "CONTROL_DEP" ]
+  }, {
+    "from" : 17,
+    "to" : 16,
+    "labels" : [ "CONTROL_DEP" ]
+  }, {
+    "from" : 19,
+    "to" : 12,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 20,
+    "to" : 17,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 21,
+    "to" : 17,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 21,
+    "to" : 19,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 21,
+    "to" : 16,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 22,
+    "to" : 13,
+    "labels" : [ "HEAP_DATA_DEP" ]
+  }, {
+    "from" : 23,
+    "to" : 22,
+    "labels" : [ "DATA_DEP" ]
+  }, {
+    "from" : 23,
+    "to" : 16,
+    "labels" : [ "HEAP_DATA_DEP" ]
+  }, {
+    "from" : 24,
+    "to" : 16,
+    "labels" : [ "HEAP_DATA_DEP" ]
+  }, {
+    "from" : 25,
+    "to" : 17,
+    "labels" : [ "CONTROL_DEP" ]
+  } ],
+  "call_bindings" : [ {
+    "caller" : "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+    "declared_target" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+    "possible_targets" : [ "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I" ],
+    "status" : "resolved_candidates"
+  }, {
+    "caller" : "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+    "declared_target" : "sample.MechanismProbe$Box.<init>()V",
+    "possible_targets" : [ "sample.MechanismProbe$Box.<init>()V" ],
+    "status" : "resolved_candidates"
+  }, {
+    "caller" : "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+    "declared_target" : "sample.MechanismProbe$OpaqueCarrier.<init>()V",
+    "possible_targets" : [ "sample.MechanismProbe$OpaqueCarrier.<init>()V" ],
+    "status" : "resolved_candidates"
+  }, {
+    "caller" : "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+    "declared_target" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+    "possible_targets" : [ "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I" ],
+    "status" : "resolved_candidates"
+  }, {
+    "caller" : "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+    "declared_target" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+    "possible_targets" : [ "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I" ],
+    "status" : "resolved_candidates"
+  }, {
+    "caller" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+    "declared_target" : "sample.MechanismProbe$UnknownDependency.mutate(Lsample/MechanismProbe$Box;)V",
+    "possible_targets" : [ "sample.MechanismProbe$OpaqueCarrier.mutate(Lsample/MechanismProbe$Box;)V" ],
+    "status" : "resolved_candidates"
+  }, {
+    "caller" : "sample.MechanismProbe.unknownObservation(Lsample/MechanismProbe$UnknownDependency;Lsample/MechanismProbe$Box;)I",
+    "declared_target" : "sample.MechanismProbe$UnknownDependency.mutate(Lsample/MechanismProbe$Box;)V",
+    "possible_targets" : [ "sample.MechanismProbe$OpaqueCarrier.mutate(Lsample/MechanismProbe$Box;)V" ],
+    "status" : "resolved_candidates"
+  } ],
+  "timings_millis" : {
+    "scope" : 93,
+    "class_hierarchy_and_entry" : 2896,
+    "call_graph_and_pointer" : 19396,
+    "sdg_initialization" : 23380,
+    "backward_slice" : 388,
+    "source_mapping" : 60,
+    "total" : 57463
+  },
+  "limitations" : [ "A slice member is a possible dependence under this call graph, not proof of path feasibility.", "The bounded summary probe does not cover fresh/null/other-argument/global returns or unknown-region overflow.", "The bounded exception branch is a mechanism probe, not a complete nondeterministic exception model.", "Bytecode line tables may not map synthetic or library statements to reviewed source." ]
+}

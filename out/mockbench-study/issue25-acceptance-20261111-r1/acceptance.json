@@ -1,0 +1,56 @@
+{
+  "schema": "mockspec.issue25-independent-acceptance/v1",
+  "issue": 25,
+  "status": "passed_bounded_diagnostic",
+  "reviewer": "parallel_design_review (independent critic)",
+  "summary_path": "out/mockbench-study/issue25-jib-observations-all-none-20261111-r6/summary.json",
+  "summary_sha256": "2e42e132eee479270d5d93750e235dec395995407d0967f5a76fcb2f6c577543",
+  "raw_sha256": "46612e7f0e9e59e03ec0effb4217beae21c5f0b87d21e73c1db9c6d7d4fa5626",
+  "outcome": {
+    "status": "partial",
+    "original_observation_count": 19,
+    "observed_expression_complete": 14,
+    "observed_expression_complete_with_opaque_may": 5,
+    "observed_expression_unknown_boundary": 0,
+    "observed_expression_missing": 0,
+    "state_flow_verified_incomplete": 19,
+    "state_region_candidates_only": 0,
+    "state_unknown": 0,
+    "closure_gate": "blocked",
+    "ticket_acceptance": "passed_bounded_diagnostic",
+    "failure_categories": [
+      "original_observation_mapping_remains_diagnostic_override"
+    ],
+    "blockers": [
+      "original observation mapping still uses a diagnostic override"
+    ],
+    "expected_unknown_boundaries": [
+      "masked dependency contents, aliasing, nullness, and concrete values deliberately remain unknown and are not treated as recovered facts",
+      "Optional source values are connected to exact callback setters, but presence and callback execution remain conditional"
+    ]
+  },
+  "verification": {
+    "targeted_tests": 48,
+    "ruff": "passed",
+    "mypy_six_modules": "passed",
+    "target_executed": false
+  },
+  "reviewed_relations": [
+    "exact MUT-to-dispatcher method/context actual-formal and normal return",
+    "source-derived dispatcher branches and typed constructors",
+    "same-builder receiver preservation and exact baseImage ModRef/write/read chain",
+    "19 observed expression and field-state may chains",
+    "three exact Optional bootstrap-to-setter conditional effects",
+    "control and exceptional continuation without dominance overclaims"
+  ],
+  "negative_evidence": [
+    "wrong actual/return/receiver/target/context",
+    "unresolved target",
+    "opaque-edge disabled at same compiled implementation r3"
+  ],
+  "remaining_boundaries": [
+    "Original observation adapter is diagnostic; #30 automatic input path still requires source-derived mapping.",
+    "Masked values, aliasing, nullness and Optional presence are expected unknowns, not missing concrete Mock answers.",
+    "Bounded ticket acceptance is not full analyzer correctness or 165-case semantic success."
+  ]
+}
