@@ -1,0 +1,108 @@
+{
+  "schema": "mockspec.generic-java-independent-review/v1",
+  "issue": 32,
+  "review_status": "passed_bounded",
+  "semantic_validation": "not_evaluated",
+  "scope": "Independent source-grounding review of the final two-case Java generic-backend intake gate. This review does not validate path feasibility, heap/control effects, concrete values, or semantic correctness.",
+  "implementation_sha256": {
+    "experiments/backward-slicing/wala-pilot/generic_backend.py": "3d8bf0013c47a4011dd826d36ae8906ff95538ae51a9318b0f666038a3b20e29",
+    "experiments/backward-slicing/wala-pilot/test_generic_backend.py": "b8dd34a2f0ee08dfda475ba6e9eb4875ea1a6de2bd31559e84cbf69126950f36",
+    "experiments/backward-slicing/wala-pilot/backend/src/main/java/org/mockspec/research/WalaSliceProbe.java": "9e85109ac3f8f3b3501db6517f0c27c708cbab4ec31be0357a61a11660b22c1a"
+  },
+  "gate": {
+    "required_non_jib_cases": 2,
+    "reviewed_non_jib_cases": 2,
+    "distinct_projects": 1,
+    "distinct_frozen_snapshots": 2,
+    "backend_completed": 2,
+    "original_observations_mapped": 4,
+    "unique_product_call_bindings": 2,
+    "observation_linked_cross_source_value_relations": 2,
+    "opaque_placeholder_crossings": 0,
+    "holds_for": "two distinct frozen non-Jib cases with an exact original assertion seed and a homogeneous DATA_DEP product-return path",
+    "does_not_establish": [
+      "semantic correctness of either new relation",
+      "diversity across Java projects or product methods",
+      "matched call/return feasibility",
+      "heap, control, state, or exception influence",
+      "concrete expected values",
+      "complete source or dependency coverage"
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "zipkin2.storage.cassandra.SchemaTest#getKeyspaceMetadata_passesWhenVersion3_11_3AndKeyspaceMetadataIsNotNull@9674c46f",
+      "snapshot_id": "ffc483e0363bcd70fc936f55e9d542d25f95905dee558ad876c80a2f73f6601a",
+      "run": {
+        "path": "out/mockbench-study/generic-entry-20261111-r1/java-zipkin-direct-r6/targeted-results.json",
+        "sha256": "5798d144665aad6d08f64e78176bc642e008703bf9727c83714c8775af8ad1d1"
+      },
+      "batch_result": {
+        "path": "out/mockbench-study/generic-entry-20261111-r1/java-zipkin-direct-r6/93218e5fbc887922f642/batch-result.json",
+        "sha256": "7bf94dda058a732a6ea5c58b7d8f50c13b37eb3c00b4aeba554a9f6aeec1ba18"
+      },
+      "input_provenance_sha256": "005985c6bf65341075a1d3937ef2494947ec6c0babc256a555608f33786c2ab1",
+      "masking_contract": "java-dual-region-v1",
+      "masked_test_sha256": "be90a1b338648c0bd89d333881ef4176564031a6c62b3db89766066e9097d42e",
+      "original_observations": [
+        {"id": "criterion:0", "path": "src/test/java/zipkin2/storage/cassandra/SchemaTest.java", "line": 38, "mapping": "exact_unique"},
+        {"id": "criterion:1", "path": "src/test/java/zipkin2/storage/cassandra/SchemaTest.java", "line": 39, "mapping": "exact_unique"}
+      ],
+      "accepted_relation": {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": "src/main/java/zipkin2/storage/cassandra/Schema.java:103",
+        "to": "src/test/java/zipkin2/storage/cassandra/SchemaTest.java:38",
+        "observation_id": "criterion:0",
+        "source_statement": 2,
+        "seed_statement": 6,
+        "dependency_edges": [[2, 3, "DATA_DEP"], [3, 5, "DATA_DEP"], [5, 8, "DATA_DEP"], [8, 6, "DATA_DEP"]],
+        "traversal_truncated": false,
+        "opaque_placeholder_crossing": false
+      },
+      "semantic_validation": "not_evaluated"
+    },
+    {
+      "case_id": "zipkin2.storage.cassandra.SchemaTest#getKeyspaceMetadata_passesWhenVersion3_11_4AndKeyspaceMetadataIsNotNull@9674c46f",
+      "snapshot_id": "200a12f4d1492aa2bdac2820f358950a63fdfc0479d7924fa8bd93ec5b29a9a4",
+      "run": {
+        "path": "out/mockbench-study/generic-entry-20261111-r1/java-zipkin-direct-r7/targeted-results.json",
+        "sha256": "71476c073feb7da854527ff0c8f305845b820a4052828a5e0ca9892fc7d45878"
+      },
+      "batch_result": {
+        "path": "out/mockbench-study/generic-entry-20261111-r1/java-zipkin-direct-r7/3631d3491c4e67c76634/batch-result.json",
+        "sha256": "d95ad54b77e829ec1b009ba0116d14f5641657f25b6ed913fbbd8bf170d51f32"
+      },
+      "input_provenance_sha256": "f0e128bfb0ca180140956e34df9a915bdcd22270c9424627a2aa6685a394371c",
+      "masking_contract": "java-dual-region-v1",
+      "masked_test_sha256": "2496577b1d5c20c3ba97d103d418fe987e9c7ec6030dfde4e386f342b33e27ac",
+      "original_observations": [
+        {"id": "criterion:0", "path": "src/test/java/zipkin2/storage/cassandra/SchemaTest.java", "line": 39, "mapping": "exact_unique"},
+        {"id": "criterion:1", "path": "src/test/java/zipkin2/storage/cassandra/SchemaTest.java", "line": 40, "mapping": "exact_unique"}
+      ],
+      "accepted_relation": {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": "src/main/java/zipkin2/storage/cassandra/Schema.java:103",
+        "to": "src/test/java/zipkin2/storage/cassandra/SchemaTest.java:39",
+        "observation_id": "criterion:0",
+        "source_statement": 2,
+        "seed_statement": 6,
+        "dependency_edges": [[2, 3, "DATA_DEP"], [3, 5, "DATA_DEP"], [5, 8, "DATA_DEP"], [8, 6, "DATA_DEP"]],
+        "traversal_truncated": false,
+        "opaque_placeholder_crossing": false
+      },
+      "semantic_validation": "not_evaluated"
+    }
+  ],
+  "review_findings": {
+    "frozen_identity_and_masks": "verified through FrozenDataset/FrozenCase read-through",
+    "product_endpoint": "Schema.java:103 is the visible return metadata.getKeyspace(keyspace).orElse(null)",
+    "edge_direction": "product checkcast -> product return -> callee return -> caller return -> exact assertSame seed",
+    "typed_projection": "all four projected edges are DATA_DEP; bare call binding is counted separately",
+    "placeholder_policy": "all admitted compile sources are scanned; known single-throw placeholder spans are retained as boundaries and suppress any typed path crossing them",
+    "target_executed": false,
+    "dependency_rehash": false
+  },
+  "conclusion": "The two-case Java targeted intake count passes within a narrow, source-grounded DATA_DEP scope. The cases are two frozen Zipkin snapshots of the same method shape, so this is entry evidence rather than broad Java generalization or semantic completion."
+}

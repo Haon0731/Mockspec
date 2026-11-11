@@ -1,0 +1,18 @@
+............F........................................................... [ 65%]
+......................................                                   [100%]
+=================================== FAILURES ===================================
+__ test_issue23_closure_uses_current_sources_and_preserves_unknown_boundaries __
+
+    def test_issue23_closure_uses_current_sources_and_preserves_unknown_boundaries():
+        study_root = HERE.parents[2] / "out/mockbench-study"
+        report = summarize_capability.summarize_issue23_expanded_effects(
+            study_root / "issue23-capability-closure-20261111-r4",
+            study_root / "issue23-jib-ci-original-20261111-r7/summary.json",
+        )
+>       assert report["gate_passed"] is True
+E       assert False is True
+
+experiments/backward-slicing/wala-pilot/test_capability.py:371: AssertionError
+=========================== short test summary info ============================
+FAILED experiments/backward-slicing/wala-pilot/test_capability.py::test_issue23_closure_uses_current_sources_and_preserves_unknown_boundaries
+1 failed, 109 passed in 90.92s (0:01:30)

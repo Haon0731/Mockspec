@@ -1,0 +1,834 @@
+{
+  "schema": "mockspec.generic-python-backend/v1",
+  "status": "complete",
+  "backend": "generic_codeql_python",
+  "identity": {
+    "case_id": "crawl4ai_448",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "39da18e6f8abd524d60e99bf1ab5ce42c5b3d38f97fde39da182ea4a0900b16b",
+    "masking_contract": "python-slot-v1",
+    "masked_test_sha256": "ce04ef68076c515b5490becb1e664728c8ab203b49df3d63ff314a27fb7665f0",
+    "target_selector": "tests/test_448fetch_docs.py::test_fetch_docs_prefers_local_files_and_falls_back_to_github"
+  },
+  "result_contract": {
+    "schema_version": "mock-spec.backward-analysis-case/v1",
+    "identity": {
+      "case_id": "crawl4ai_448",
+      "dataset": "python-benchmark-new",
+      "language": "python",
+      "snapshot_id": "39da18e6f8abd524d60e99bf1ab5ce42c5b3d38f97fde39da182ea4a0900b16b",
+      "masking_contract": "python-slot-v1",
+      "masked_test_sha256": "ce04ef68076c515b5490becb1e664728c8ab203b49df3d63ff314a27fb7665f0",
+      "target_selector": "tests/test_448fetch_docs.py::test_fetch_docs_prefers_local_files_and_falls_back_to_github"
+    },
+    "source_scope": [
+      {
+        "source_id": "test",
+        "logical_path": "tests/test_448fetch_docs.py",
+        "sha256": "ce04ef68076c515b5490becb1e664728c8ab203b49df3d63ff314a27fb7665f0",
+        "bytes": 2485,
+        "selection_role": "masked_test"
+      },
+      {
+        "source_id": "source:1",
+        "logical_path": "src/crawl4ai/types.py",
+        "sha256": "08aa497c55c461d46094b690733e80c52c52752590f6b496230f36f23fc9a7b3",
+        "bytes": 7284,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:2",
+        "logical_path": "src/crawl4ai/legacy/docs_manager.py",
+        "sha256": "3834d57215936570fdb32521efdc41a8fab0f62f749313d677d4001716b46d4e",
+        "bytes": 3002,
+        "selection_role": "candidate_product"
+      },
+      {
+        "source_id": "source:3",
+        "logical_path": "src/crawl4ai/async_logger.py",
+        "sha256": "ed275cacf70d3fc5192995930dd0e7acc1da32b06ddaeb09e68dfc051725ada2",
+        "bytes": 12973,
+        "selection_role": "candidate_product"
+      }
+    ],
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "location": {
+          "source_id": "test",
+          "start_line": 58,
+          "end_line": 58
+        },
+        "kind": "exception_observation",
+        "origin": "explicit",
+        "reason": "raises in the selected test function"
+      },
+      {
+        "observation_id": "criterion:1",
+        "location": {
+          "source_id": "test",
+          "start_line": 63,
+          "end_line": 63
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:2",
+        "location": {
+          "source_id": "test",
+          "start_line": 65,
+          "end_line": 65
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:3",
+        "location": {
+          "source_id": "test",
+          "start_line": 70,
+          "end_line": 70
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      },
+      {
+        "observation_id": "criterion:4",
+        "location": {
+          "source_id": "test",
+          "start_line": 75,
+          "end_line": 75
+        },
+        "kind": "value_assertion",
+        "origin": "explicit",
+        "reason": "Python assert in the selected test function"
+      }
+    ],
+    "parameterization": {
+      "status": "not_expanded",
+      "coverage": "selected_test_definition",
+      "reason": "generic backend does not enumerate parameter rows"
+    },
+    "entry_point": {
+      "test_selection": {
+        "origin": "task_provided",
+        "status": "unique",
+        "selector": "tests/test_448fetch_docs.py::test_fetch_docs_prefers_local_files_and_falls_back_to_github",
+        "evidence": [
+          {
+            "symbol": "test_fetch_docs_prefers_local_files_and_falls_back_to_github",
+            "start_line": 14,
+            "end_line": 77
+          }
+        ]
+      },
+      "mut_binding": {
+        "origin": "automatic",
+        "status": "unresolved",
+        "candidates": [],
+        "evidence": [],
+        "assumptions": []
+      }
+    },
+    "relations": [
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 58,
+          "end_line": 58
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 58,
+          "end_line": 58
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "call_result_to_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 63,
+          "end_line": 63
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 63,
+          "end_line": 63
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "call_result_to_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:1"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 65,
+          "end_line": 65
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 65,
+          "end_line": 65
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "call_result_to_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:2"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 70,
+          "end_line": 70
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 70,
+          "end_line": 70
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "call_result_to_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:3"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "value_flow",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 75,
+          "end_line": 75
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 75,
+          "end_line": 75
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "call_result_to_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:4"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 28,
+          "end_line": 28
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 58,
+          "end_line": 58
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 28,
+          "end_line": 28
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 58,
+          "end_line": 58
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 28,
+          "end_line": 28
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 63,
+          "end_line": 63
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:1"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 28,
+          "end_line": 28
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 63,
+          "end_line": 63
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:1"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 28,
+          "end_line": 28
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 65,
+          "end_line": 65
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:2"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 28,
+          "end_line": 28
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 65,
+          "end_line": 65
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:2"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 28,
+          "end_line": 28
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 70,
+          "end_line": 70
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:3"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 28,
+          "end_line": 28
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 70,
+          "end_line": 70
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:3"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 28,
+          "end_line": 28
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 75,
+          "end_line": 75
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:4"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 28,
+          "end_line": 28
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 75,
+          "end_line": 75
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:4"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 57,
+          "end_line": 57
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 58,
+          "end_line": 58
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:0"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 57,
+          "end_line": 57
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 63,
+          "end_line": 63
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:1"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 57,
+          "end_line": 57
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 65,
+          "end_line": 65
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:2"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 57,
+          "end_line": 57
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 70,
+          "end_line": 70
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:3"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 57,
+          "end_line": 57
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 75,
+          "end_line": 75
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:4"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 69,
+          "end_line": 69
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 70,
+          "end_line": 70
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:3"
+        ],
+        "assumptions": []
+      },
+      {
+        "kind": "control_dependence",
+        "modality": "analysis_may",
+        "from": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 69,
+          "end_line": 69
+        },
+        "to": {
+          "logical_path": "tests/test_448fetch_docs.py",
+          "start_line": 75,
+          "end_line": 75
+        },
+        "provenance": {
+          "backend": "CodeQL 2.27.4",
+          "query_relation": "guard_controls_observation",
+          "query_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6"
+        },
+        "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+        "observation_ids": [
+          "criterion:4"
+        ],
+        "assumptions": []
+      }
+    ],
+    "relation_coverage": [
+      {
+        "kind": "call_binding",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "control_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "exception_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "function_origin",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "normal_return_dependence",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "state_flow",
+        "status": "not_evaluated"
+      },
+      {
+        "kind": "value_flow",
+        "status": "not_evaluated"
+      }
+    ],
+    "analysis_boundaries": {
+      "assumptions": [
+        "selected source paths are candidates, not proof of full runtime module resolution"
+      ],
+      "unknown_effects": [],
+      "unanalysed_regions": [
+        {
+          "scope": "source_selection",
+          "reason": "unresolved_visible_source_path:75"
+        },
+        {
+          "scope": "path_feasibility",
+          "reason": "not evaluated"
+        },
+        {
+          "scope": "interprocedural_return_exception_state",
+          "reason": "generic query is incomplete"
+        }
+      ]
+    },
+    "completion": {
+      "status": "partial",
+      "stage": "generic_codeql_mapping",
+      "failure_categories": [
+        "semantic_validation_not_evaluated",
+        "generic_interprocedural_effects_incomplete"
+      ],
+      "error": null
+    },
+    "semantic_validation": {
+      "status": "not_evaluated",
+      "reviewer": null,
+      "evidence": [],
+      "notes": "relations are backend candidates; no case-specific gold or review used"
+    },
+    "cost": {
+      "timings_seconds": {
+        "database": 10.58668747000047,
+        "query": 132.4122834669979,
+        "decode": 2.0218964949999645
+      },
+      "total_seconds": 146.1448501699997,
+      "total_scope": "frozen admission, bounded selection, CodeQL database/query/decode and mapping",
+      "peak_memory": {
+        "status": "unavailable",
+        "bytes": null,
+        "reason": "generic runner does not yet collect per-process peak RSS"
+      },
+      "cache_state": {
+        "status": "cold",
+        "reason": "fresh temporary database; OS/tool distribution caches not isolated"
+      },
+      "input_size": {
+        "files": 4,
+        "bytes": 25744
+      },
+      "graph_size": {
+        "nodes": null,
+        "edges": 27
+      },
+      "unavailable_phases": []
+    }
+  },
+  "source_selection": {
+    "evidence": [
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_import",
+        "hint": "types",
+        "candidates": [
+          "src/crawl4ai/types.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      },
+      {
+        "stage": "masked_test",
+        "hint_kind": "python_dynamic_path",
+        "hint": "src/crawl4ai/legacy/docs_manager.py",
+        "candidates": [
+          "src/crawl4ai/legacy/docs_manager.py"
+        ],
+        "precision": "exact_visible_path"
+      },
+      {
+        "stage": "one_hop_import",
+        "from_path": "src/crawl4ai/legacy/docs_manager.py",
+        "hint_kind": "python_import",
+        "hint": "crawl4ai.async_logger",
+        "candidates": [
+          "src/crawl4ai/async_logger.py"
+        ],
+        "precision": "unique_path_match_candidate"
+      }
+    ],
+    "diagnostics": [
+      "unresolved_visible_source_path:75"
+    ],
+    "source_rejections": [],
+    "dynamic_loader_bindings": [],
+    "truncated": false,
+    "opaque_methods": [],
+    "selected_bytes": 25744,
+    "read_bytes": 25744,
+    "attempted_files": 3,
+    "limitations": [
+      "Selection uses visible imports, same-package Java type names, and statically resolved visible source paths.",
+      "A matching path is a source candidate, not proof that it is the MUT or reachable.",
+      "Only one import hop from masked-test-selected product sources is considered.",
+      "Opaque method detection recognizes only a narrow single-throw placeholder pattern.",
+      "Source reads are atomic; the final attempted file may make read_bytes exceed max_bytes."
+    ]
+  },
+  "raw_relation_count": 27,
+  "entry_evidence": {
+    "input_prepared": true,
+    "database_created": true,
+    "observations_total": 5,
+    "observations_mapped": 5,
+    "product_call_bindings": 0,
+    "cross_source_relations": 0,
+    "missing_observations": [],
+    "ambiguous_observation_lines": []
+  },
+  "provenance": {
+    "query_template_sha256": "085e0a84e4d1c26783b53417486e641fa9db60ebc02c0b2037fbe3e5f4c39df6",
+    "rendered_query_sha256": "9f8549d4b8ff64bf9b6409e172ca4ff4fd7632e20207727caf6ce9aca75628e4",
+    "codeql_version": "2.27.4",
+    "driver_environment": {
+      "LANG": "C.UTF-8",
+      "LC_ALL": "C.UTF-8",
+      "PATH": "/bin:/usr/bin"
+    },
+    "target_executed": false,
+    "loader_executed": false,
+    "selection": "case identity + visible imports/paths + extracted observations; no case allow-list"
+  }
+}

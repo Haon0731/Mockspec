@@ -1,0 +1,167 @@
+{
+  "schema": "mockspec.generic-python-independent-review/v1",
+  "issue": 32,
+  "review_status": "passed_bounded",
+  "semantic_validation": "not_evaluated",
+  "scope": "Independent source-grounding review of the final three-case Python generic-backend intake gate. This review does not validate internal product semantics or concrete outputs.",
+  "run": {
+    "path": "out/mockbench-study/generic-entry-20261111-r1/python-final-r4/targeted-results.json",
+    "sha256": "42b312817153bb3d7a58767dcbc93f4aa1c262ad47b403214a650d9d1ddf57dc",
+    "implementation_stable": true,
+    "dispatcher": "batch_slice.run_semantic_backend -> analysis_process.communicate",
+    "target_executed": false,
+    "loader_executed": false,
+    "implementation_sha256": {
+      "experiments/backward-slicing/python-backend-pilot/generic_backend.py": "450097e855086d9540b416c8de0b829180781cae8e060c73002fee8ff0632cde",
+      "experiments/backward-slicing/python-backend-pilot/generic-observation-flow.ql": "a2f51bbb3c57fe5f2223fbd4e4dcb14a09acef4c97a5c97ef4ae8eda38dd595d",
+      "experiments/backward-slicing/python-backend-pilot/test_generic_backend.py": "7ee55000bc4e184b9c65d88f0e40749e8b1fa6921ccf117b512bdbce3ad477b2"
+    }
+  },
+  "gate": {
+    "required_non_original_cases": 3,
+    "reviewed_non_original_cases": 3,
+    "distinct_projects": [
+      "click",
+      "stable-diffusion-webui",
+      "langflow"
+    ],
+    "binding_forms": {
+      "native_codeql_resolution": 1,
+      "authenticated_visible_loader_frontend": 2
+    },
+    "backend_completed": 3,
+    "unique_original_observations_mapped": 3,
+    "product_call_binding_present": 3,
+    "observation_linked_cross_source_relation": 3,
+    "holds_for": "bounded composed function binding plus CodeQL test-local result flow",
+    "does_not_establish": [
+      "semantic correctness of any new relation",
+      "internal product return-site data flow",
+      "path feasibility",
+      "exception or reachable-state effects",
+      "concrete expected values",
+      "full source or import coverage"
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "click_402",
+      "project": "click",
+      "binding_form": "native_codeql_resolution",
+      "test_form": "direct imported call assigned to a local result and compared by a Python assert",
+      "batch_result": {
+        "path": "out/mockbench-study/generic-entry-20261111-r1/python-final-r4/c73f32e32c73410abfe2/batch-result.json",
+        "sha256": "4ff3f8e9a90a919801e1ac3fcdf731ec5c7f0fbf9170db4cd028cb6a94275681"
+      },
+      "relations_csv_sha256": "44b270327bde4c472ae9044a94274c95b7b60b1e13400bf2cdaebaca5791b6b6",
+      "original_observation": {
+        "id": "criterion:0",
+        "path": "tests/test_402format_filename.py",
+        "line": 100,
+        "kind": "value_assertion",
+        "mapping": "unique"
+      },
+      "call": {
+        "path": "tests/test_402format_filename.py",
+        "start_line": 97,
+        "end_line": 97
+      },
+      "product_scope": {
+        "path": "src/click/utils.py",
+        "name": "format_filename",
+        "start_line": 407,
+        "end_line": 446
+      },
+      "review": "source_grounded_composed_flow",
+      "semantic_validation": "not_evaluated",
+      "retained_unknowns": [
+        "return, exception, and reachable-state effects are not fully modelled",
+        "path feasibility is not evaluated",
+        "function span is provenance scope rather than an internal return-site edge"
+      ]
+    },
+    {
+      "case_id": "stable-diffusion-webui_419",
+      "project": "stable-diffusion-webui",
+      "binding_form": "authenticated_visible_loader_frontend",
+      "test_form": "visible source loader, multiline keyword call, local result, explicit assert, and surrounding test control flow",
+      "batch_result": {
+        "path": "out/mockbench-study/generic-entry-20261111-r1/python-final-r4/0d7571f5dc1782e59005/batch-result.json",
+        "sha256": "ee6842be6ed68d08312363c52ca91bd2b8163d0aee839feccb03bbb2773398d2"
+      },
+      "relations_csv_sha256": "699bbf4359b216758329586f8b7f732b6321051cac3bf56dc097230b8a564016",
+      "original_observation": {
+        "id": "criterion:0",
+        "path": "tests/test_419load_file_from_url.py",
+        "line": 58,
+        "kind": "value_assertion",
+        "mapping": "unique"
+      },
+      "call": {
+        "path": "tests/test_419load_file_from_url.py",
+        "start_line": 50,
+        "end_line": 56
+      },
+      "product_scope": {
+        "path": "src/modules/modelloader.py",
+        "name": "load_file_from_url",
+        "start_line": 20,
+        "end_line": 41
+      },
+      "review": "source_grounded_composed_flow",
+      "semantic_validation": "not_evaluated",
+      "retained_unknowns": [
+        "visible loader namespace and runtime imports are assumptions",
+        "return, exception, and reachable-state effects are not fully modelled",
+        "path feasibility is not evaluated",
+        "empty src/modules/__init__.py was rejected and omitted",
+        "function span is provenance scope rather than an internal return-site edge"
+      ]
+    },
+    {
+      "case_id": "langflow_186",
+      "project": "langflow",
+      "binding_form": "authenticated_visible_loader_frontend",
+      "test_form": "visible sliced-source loader, explicit function-global helper injection, local result, and explicit assert",
+      "batch_result": {
+        "path": "out/mockbench-study/generic-entry-20261111-r1/python-final-r4/fa05f4819a06e59b05dc/batch-result.json",
+        "sha256": "89fccdf03bc19f7a1ebb250d98a0376a61fd53970c6cb8fc3590835f27b02ca7"
+      },
+      "relations_csv_sha256": "0e38d0b406d05b57aff38010199931f9fba1b552f6ee8fcad6e80d1c8392fb2e",
+      "original_observation": {
+        "id": "criterion:0",
+        "path": "tests/test_186get_best_access_host.py",
+        "line": 130,
+        "kind": "value_assertion",
+        "mapping": "unique"
+      },
+      "call": {
+        "path": "tests/test_186get_best_access_host.py",
+        "start_line": 128,
+        "end_line": 128
+      },
+      "product_scope": {
+        "path": "src/src/backend/base/langflow/__main__.py",
+        "name": "get_best_access_host",
+        "start_line": 487,
+        "end_line": 508
+      },
+      "review": "source_grounded_composed_flow",
+      "semantic_validation": "not_evaluated",
+      "retained_unknowns": [
+        "the test visibly replaces is_loopback_address and can_connect in the loaded function globals; their values and behavior are not inferred",
+        "return, exception, and reachable-state effects are not fully modelled",
+        "path feasibility is not evaluated",
+        "source selection exhausted the file budget for fourteen candidates",
+        "function span is provenance scope rather than an internal return-site edge"
+      ]
+    }
+  ],
+  "verification": {
+    "targeted_python_tests": "8 passed",
+    "ruff": "passed",
+    "frozen_sources_read_through": "FrozenDataset/FrozenCase only",
+    "new_relations_status": "not_evaluated"
+  },
+  "conclusion": "The targeted Python intake gate holds for three non-original projects and three source-grounded test forms within the limited composed-flow scope. It is an entry gate, not a semantic-correctness result."
+}
