@@ -1,0 +1,54 @@
+{
+  "schema": "mock-spec.python-observation-expectations/v1",
+  "case_id": "flask_308",
+  "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+  "observations": [
+    {
+      "observation_id": "raises-context:102",
+      "kind": "exception_context",
+      "logical_path": "tests/test_308abort.py",
+      "line": 102,
+      "expected_mapping": "bounded_exception_influence",
+      "reason": "the reviewed pytest summary and CodeQL exceptional CFG connect the selected call to this context; the concrete exception remains unknown"
+    },
+    {
+      "observation_id": "assert-exception:120",
+      "kind": "assertion",
+      "logical_path": "tests/test_308abort.py",
+      "line": 120,
+      "expected_mapping": "bounded_exception_influence",
+      "guard_line": 111,
+      "guard_branch": "true",
+      "reason": "the branch and product exception to the same capture's value membership observation are backend-verifiable within the registered summary boundary"
+    },
+    {
+      "observation_id": "assert-exception:126",
+      "kind": "assertion",
+      "logical_path": "tests/test_308abort.py",
+      "line": 126,
+      "expected_mapping": "bounded_exception_influence",
+      "guard_line": 111,
+      "guard_branch": "false",
+      "reason": "the branch and product exception to the same capture's value membership observation are backend-verifiable within the registered summary boundary"
+    }
+  ],
+  "preserve": [
+    "resolved test call to visible product function",
+    "actual to formal argument flow with backend context",
+    "test guard control of each visible assertion",
+    "product ctx branch, normal continuation to fallback, and exceptional exits",
+    "reviewed pytest suppression summary, post-with CFG continuation, and same-capture value flow"
+  ],
+  "exclude": [
+    "lexical nesting or source order as dependency evidence",
+    "automatic attachment of product-internal events to every test observation",
+    "equating test has_app_context with product ctx by variable name"
+  ],
+  "unknown": [
+    "receiver, global, escaped, dynamic-field, and transitive-heap effects",
+    "return-alias effects beyond the one-hop mechanism support domain",
+    "exact exception type, text, and code-to-message construction",
+    "frozen-case pytest version compatibility with the host-verified reference",
+    "path satisfiability and hidden Mock behavior"
+  ]
+}

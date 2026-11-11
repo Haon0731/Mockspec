@@ -74,7 +74,7 @@ class Client {
     assert any(node.get("contains_boundary_call") for node in result["nodes"])
     assert any(node["source_id"] == "service" for node in result["nodes"])
     assert any(node["source_id"] == "specialized" for node in result["nodes"])
-    assert any(edge.get("precision") == "name_arity_candidates" for edge in result["edges"])
+    assert any(edge["kind"] == "call_binding_candidate" for edge in result["edges"])
     assert any(node.get("contains_unknown_call") for node in result["nodes"])
     assert any("not a sound reaching-def" in item for item in result["limitations"])
 
@@ -179,3 +179,119 @@ def test_typed_seed_rejects_ambiguous_same_line_observations(tmp_path):
                        "call": "assertEquals", "criterion_id": "criterion-1"}],
         })
     assert "criterion seed is ambiguous" in raised.value.stderr
+
+
+def test_static_type_call_binds_exact_receiver_and_signature(tmp_path):
+    source = """
+package demo;
+class Exact {
+  static String select(String value, int count) { return value; }
+}
+class WrongReceiver {
+  static String select(String value, int count) { return "wrong receiver"; }
+}
+class Client {
+  String use(String input) {
+    String selected = demo.Exact.select(input, 1);
+    return selected;
+  }
+}
+"""
+    result = run_probe(tmp_path, {
+        "sources": [{"source_id": "one", "logical_path": "demo/Calls.java", "text": source}],
+        "seeds": [{"source_id": "one", "line": 12}],
+        "boundary_types": [],
+    })
+    bindings = [edge for edge in result["edges"] if edge["kind"] == "call_binding"]
+    assert [edge["callee"] for edge in bindings] == ["demo.Exact.select(java.lang.String,int)"]
+    assert bindings[0]["receiver"] == "demo.Exact"
+    assert bindings[0]["precision"] == "resolved_declaration"
+
+
+def test_static_overload_uses_argument_signature_and_excludes_same_arity_candidate(tmp_path):
+    source = """
+package demo;
+class Overloads {
+  static String choose(String value) { return value; }
+  static String choose(Integer value) { return "wrong overload"; }
+}
+class Client {
+  String use(String input) {
+    String selected = Overloads.choose(input);
+    return selected;
+  }
+}
+"""
+    result = run_probe(tmp_path, {
+        "sources": [{"source_id": "one", "logical_path": "demo/Overloads.java", "text": source}],
+        "seeds": [{"source_id": "one", "line": 10}],
+        "boundary_types": [],
+    })
+    callees = {
+        edge["callee"] for edge in result["edges"]
+        if edge["kind"] in {"call_binding", "call_return", "argument_binding_candidate"}
+        and ".choose(" in edge.get("callee", "")
+    }
+    assert callees == {"demo.Overloads.choose(java.lang.String)"}
+
+
+def test_call_binding_evidence_stays_with_selected_call_context(tmp_path):
+    source = """
+package demo;
+class Exact {
+  static String select(String value) { return value; }
+}
+class Client {
+  String use(String first, String second) {
+    String ignored = Exact.select(first);
+    String selected = Exact.select(second);
+    return selected;
+  }
+}
+"""
+    result = run_probe(tmp_path, {
+        "sources": [{"source_id": "one", "logical_path": "demo/Contexts.java", "text": source}],
+        "seeds": [{"source_id": "one", "line": 10}],
+        "boundary_types": [],
+    })
+    bindings = [edge for edge in result["edges"] if edge["kind"] == "call_binding"]
+    select_sites = {edge["call_site"] for edge in bindings if ".select(" in edge["callee"]}
+    assert len(select_sites) == 1
+    selected_site = select_sites.pop()
+    assert next(node["start_line"] for node in result["nodes"] if node["id"] == selected_site) == 9
+    argument_edges = [
+        edge for edge in result["edges"]
+        if edge["kind"] == "argument_binding_candidate" and edge["call_site"] == selected_site
+    ]
+    assert len(argument_edges) == 1
+    assert next(
+        node["start_line"] for node in result["nodes"]
+        if node["id"] == argument_edges[0]["from"]
+    ) == 9
+
+
+def test_reviewed_jib_binds_static_method_all_arguments_and_return(tmp_path):
+    request = json.loads((HERE / "results/jib/probe-input.json").read_text())
+    result = run_probe(tmp_path, request)
+    target = "com.google.cloud.tools.jib.cli.jar.JarFiles.toJibContainerBuilder("
+    bindings = [
+        edge for edge in result["edges"]
+        if edge["kind"] == "call_binding" and edge["callee"].startswith(target)
+    ]
+    arguments = [
+        edge for edge in result["edges"]
+        if edge["kind"] == "argument_binding_candidate" and edge["callee"].startswith(target)
+    ]
+    returned = [
+        edge for edge in result["edges"]
+        if edge["kind"] == "call_return" and edge["callee"].startswith(target)
+    ]
+    assert len(bindings) == 1
+    assert bindings[0]["receiver"] == "com.google.cloud.tools.jib.cli.jar.JarFiles"
+    assert bindings[0]["precision"] == "receiver_and_arity_signature_unknown"
+    assert [edge["parameter_index"] for edge in arguments] == [0, 1, 2, 3, 4]
+    assert [edge["parameter"] for edge in arguments] == [
+        "processor", "jarOptions", "commonCliOptions", "commonContainerConfigCliOptions", "logger"
+    ]
+    assert len(returned) == 1
+    assert {node["source_id"] for node in result["nodes"]} >= {"test", "mut"}

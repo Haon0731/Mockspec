@@ -1,0 +1,317 @@
+"""Strict batch adapter for the two authenticated Python semantic backends.
+
+This module is deliberately not a generic CodeQL dispatcher.  It reruns only the
+two frozen cases whose backend drivers and result mappings have been accepted.
+"""
+from __future__ import annotations
+
+import argparse
+import asyncio
+import hashlib
+import json
+from collections.abc import Mapping
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from result_contract import validate_result_contract  # noqa: E402
+
+
+HERE = Path(__file__).resolve().parent
+REPO = HERE.parents[2]
+FLASK_BASELINE = REPO / "out/mockbench-study/python-issue26-27-20261111-r12"
+LANGFLOW_ISSUE22 = (
+    REPO / "out/mockbench-study/backward-slice-issue22-langflow-20261110/"
+    "5b83af29ea4ed3c9d4ce.json"
+)
+INVENTORY_REVISION = "0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc"
+TRUSTED_DRIVER_ENV = {
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    # Python 3.14 multiprocessing derives a usable sys.executable for its resource tracker from
+    # PATH.  The host deliberately removes PATH, so restore only the platform's fixed system path.
+    "PATH": os.defpath,
+}
+
+SUPPORT_HASHES = {
+    FLASK_BASELINE / "observation-study.json":
+        "15d846afd2544d1f9e6f5dd7864af2acea15f95cac7d53410a03986ce10925ed",
+    FLASK_BASELINE / "state-observation-study.json":
+        "f11d91377e4d866990538c93b4749bfe8a1ffbc9b57edbbb89cad90308b0675c",
+    FLASK_BASELINE / "pytest-model-source-receipt.json":
+        "3658229a5f62859dd00ed11a1a04dcd10d6b5140ceb20c9cf20a64f1824e7617",
+    LANGFLOW_ISSUE22:
+        "55367a2d7d150c127055bd7649d32ce56d908b2f2d83053a3a06e35a5c426b3a",
+}
+
+SUPPORTED = {
+    "flask_308": {
+        "backend": "flask_demand",
+        "dataset": "python-benchmark-new",
+        "snapshot_id": "723639bebf43aa4f8a5c007ee21c31b0647d61488945905921fb2351be69b78c",
+        "target_selector": "tests/test_308abort.py::test_abort_scenarios",
+        "masking_contract": "python-slot-v1",
+        "masked_test_sha256": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+        "observations": [("criterion:0", 102), ("criterion:1", 120), ("criterion:2", 126)],
+        "sources": {
+            "tests/test_308abort.py": "e3fcbb5818788a9956e388cdd65a1beca1a6dc8ce408ac9903709921affdd5e5",
+            "src/src/flask/__init__.py": "2daebda4dc29fed5cb36c912a6115a234e9a4b5f9c33fd795e4bfeffd0cc9386",
+            "src/src/flask/globals.py": "1abe9a4e0a96c8bb28c232e2b08993fffdfb9bb694be2230755e54a46a40ca4d",
+            "src/src/flask/helpers.py": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+        },
+    },
+    "langflow_189": {
+        "backend": "langflow_origin_flow",
+        "dataset": "python-benchmark-new",
+        "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+        "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+        "masking_contract": "python-slot-v1",
+        "masked_test_sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+        "observations": [("criterion:0", 106), ("criterion:1", 115)],
+        "sources": {
+            "tests/test_189is_encrypted.py": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+            "src/src/backend/base/langflow/services/auth/mcp_encryption.py":
+                "bfe36ac83538a629ee670c81b20ab9e3682688be7a031b7e61522b1779ea4c8b",
+        },
+    },
+}
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _write(path: Path, value: Mapping[str, Any]) -> None:
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def _input_context(entry: Mapping[str, Any]) -> Mapping[str, Any]:
+    value = entry.get("input_context", {})
+    return value if isinstance(value, Mapping) else {}
+
+
+def _eligibility(entry: Mapping[str, Any]) -> tuple[dict[str, Any] | None, list[str]]:
+    case_id = entry.get("case_id")
+    spec = SUPPORTED.get(case_id) if isinstance(case_id, str) else None
+    if spec is None:
+        return None, [
+            "No authenticated Python semantic driver is registered for this case.",
+            "Current support is limited to flask_308 demand analysis and langflow_189 origin-flow analysis.",
+            "The generic batch path must retain candidate diagnostics; it must not label this input as CodeQL-analysed.",
+        ]
+    context = _input_context(entry)
+    checks = {
+        "language": (entry.get("language"), "python"),
+        "dataset": (entry.get("dataset"), spec["dataset"]),
+        "inventory_revision": (entry.get("inventory_revision"), INVENTORY_REVISION),
+        "snapshot_id": (entry.get("snapshot_id"), spec["snapshot_id"]),
+        "target_selector": (context.get("target_selector"), spec["target_selector"]),
+        "masking_contract": (context.get("masking_contract"), spec["masking_contract"]),
+        "masked_test_sha256": (context.get("masked_test_sha256"), spec["masked_test_sha256"]),
+    }
+    differences = [name for name, (actual, expected) in checks.items() if actual != expected]
+    if differences:
+        return None, [
+            f"Frozen admission identity differs for: {', '.join(differences)}.",
+            "The backend fails closed instead of selecting a driver from case name alone.",
+        ]
+    return spec, []
+
+
+def _validate_support_hashes(paths: list[Path]) -> None:
+    for path in paths:
+        if not path.is_file() or _sha256(path) != SUPPORT_HASHES[path]:
+            raise ValueError(f"authenticated backend support artifact differs: {path}")
+
+
+def _validate_case_result(case: dict[str, Any], entry: Mapping[str, Any],
+                          spec: Mapping[str, Any]) -> None:
+    validate_result_contract(case)
+    identity = case["identity"]
+    expected_identity = {
+        "case_id": entry["case_id"], "dataset": spec["dataset"], "language": "python",
+        "snapshot_id": spec["snapshot_id"], "masking_contract": spec["masking_contract"],
+        "masked_test_sha256": spec["masked_test_sha256"],
+        "target_selector": spec["target_selector"],
+    }
+    if any(identity.get(key) != value for key, value in expected_identity.items()):
+        raise ValueError("backend result identity differs from frozen admission")
+    sources = {row.get("logical_path"): row.get("sha256") for row in case["source_scope"]}
+    if sources != spec["sources"]:
+        raise ValueError("backend adapter source scope or hashes differ from registered input")
+    observations = [(row["observation_id"], row["location"]["start_line"])
+                    for row in case["observations"]]
+    if observations != spec["observations"]:
+        raise ValueError("backend observations differ from the registered dataset case")
+    if case["semantic_validation"]["status"] != "verified_incomplete" \
+            or case["completion"]["status"] != "partial":
+        raise ValueError("backend result has an unsupported semantic terminal state")
+
+
+def _completed(entry: Mapping[str, Any], spec: Mapping[str, Any], case: dict[str, Any],
+               driver_output: Path, driver: Path, cost: Mapping[str, Any],
+               artifacts: Mapping[str, Path]) -> dict[str, Any]:
+    return {
+        "schema": "mock-spec.batch-semantic-backend/v1", "status": "complete",
+        "backend": spec["backend"],
+        "identity": {key: case["identity"][key] for key in
+                     ("case_id", "dataset", "language", "snapshot_id", "masking_contract",
+                      "masked_test_sha256", "target_selector")},
+        "result_contract": case,
+        "source": {"scope": case["source_scope"], "adapter_validation": "exact_paths_and_sha256"},
+        "provenance": {
+            "driver": str(driver.relative_to(REPO)), "driver_sha256": _sha256(driver),
+            "driver_output": str(driver_output),
+            "artifacts": {name: {"path": str(path), "sha256": _sha256(path)}
+                          for name, path in artifacts.items()},
+            "target_executed": False, "loader_executed": False,
+            "mechanism_probes_counted_as_dataset_cases": False,
+            "driver_environment": {
+                "values": TRUSTED_DRIVER_ENV,
+                "python_executable": sys.executable,
+                "home": "omitted; neither accepted driver requires user configuration",
+                "policy": "fixed locale plus os.defpath; no inherited environment or credentials",
+            },
+            "precision": (
+                "Exact frozen adapter identity and source hashes; only the selected case_result is returned. "
+                "Backend qualification probes, when used by the Flask driver, are not dataset cases."
+            ),
+        },
+        "cost": dict(cost),
+        "terminal": {"execution": "complete", "semantic_validation": "verified_incomplete",
+                     "completion": "partial"},
+    }
+
+
+def _run_flask(entry: Mapping[str, Any], spec: Mapping[str, Any], registry_root: Path,
+               driver_output: Path, codeql_path: Path, log_root: Path) -> dict[str, Any]:
+    driver = HERE / "run_demand_analysis.py"
+    _validate_support_hashes([
+        FLASK_BASELINE / "observation-study.json",
+        FLASK_BASELINE / "state-observation-study.json",
+        FLASK_BASELINE / "pytest-model-source-receipt.json",
+    ])
+    with tempfile.TemporaryDirectory(prefix="mockspec-batch-flask-cache-") as cache:
+        command = [
+            sys.executable, str(driver), "--codeql", str(codeql_path),
+            "--registry-root", str(registry_root), "--baseline", str(FLASK_BASELINE),
+            "--cache", cache, "--output", str(driver_output),
+        ]
+        with (log_root / "driver.stdout").open("wb") as stdout, \
+                (log_root / "driver.stderr").open("wb") as stderr:
+            completed = subprocess.run(
+                command, stdout=stdout, stderr=stderr, timeout=900, check=False,
+                env=TRUSTED_DRIVER_ENV,
+            )
+    if completed.returncode:
+        raise RuntimeError(f"Flask demand driver failed with exit code {completed.returncode}")
+    terminal_path = driver_output / "result.json"
+    study_path = driver_output / "observation-study.json"
+    terminal = json.loads(terminal_path.read_text(encoding="utf-8"))
+    study = json.loads(study_path.read_text(encoding="utf-8"))
+    if terminal.get("status") != "passed":
+        raise ValueError("Flask demand driver did not pass its accepted mechanism gates")
+    case = study["case_result"]
+    _validate_case_result(case, entry, spec)
+    return _completed(entry, spec, case, driver_output, driver, terminal["cost"], {
+        "terminal": terminal_path, "case_study": study_path,
+        "mechanism_summary": driver_output / "demand-mechanism-summary.json",
+    })
+
+
+def _run_langflow(entry: Mapping[str, Any], spec: Mapping[str, Any], registry_root: Path,
+                  driver_output: Path, codeql_path: Path, log_root: Path) -> dict[str, Any]:
+    driver = HERE / "run_langflow_backend.py"
+    _validate_support_hashes([LANGFLOW_ISSUE22])
+    command = [
+        sys.executable, str(driver), "--codeql", str(codeql_path),
+        "--registry-root", str(registry_root), "--issue22", str(LANGFLOW_ISSUE22),
+        "--output", str(driver_output),
+    ]
+    with (log_root / "driver.stdout").open("wb") as stdout, \
+            (log_root / "driver.stderr").open("wb") as stderr:
+        completed = subprocess.run(
+            command, stdout=stdout, stderr=stderr, timeout=900, check=False,
+            env=TRUSTED_DRIVER_ENV,
+        )
+    if completed.returncode:
+        raise RuntimeError(f"Langflow backend driver failed with exit code {completed.returncode}")
+    study_path = driver_output / "study.json"
+    receipt_path = driver_output / "receipt.json"
+    manifest_path = driver_output / "input-manifest.json"
+    study = json.loads(study_path.read_text(encoding="utf-8"))
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    if receipt.get("status") != "verified_incomplete" or receipt.get("target_executed") is not False:
+        raise ValueError("Langflow driver receipt differs from its accepted terminal state")
+    case = study["case_result"]
+    _validate_case_result(case, entry, spec)
+    return _completed(entry, spec, case, driver_output, driver, study["cost"], {
+        "terminal": receipt_path, "case_study": study_path, "input_manifest": manifest_path,
+    })
+
+
+def run(entry: Mapping[str, Any], registry_root: Path, output: Path,
+        codeql_path: Path) -> dict[str, Any]:
+    """Run one supported frozen case, or return an explicit unsupported/failed terminal result."""
+    output.mkdir(parents=True, exist_ok=False)
+    spec, limitations = _eligibility(entry)
+    if spec is None:
+        result = {
+            "schema": "mock-spec.batch-semantic-backend/v1", "status": "unsupported",
+            "backend": None, "identity": dict(entry), "limitations": limitations,
+            "result_contract": None, "source": None, "provenance": {"target_executed": False},
+            "cost": None, "terminal": {"execution": "not_started", "semantic_validation": "not_evaluated"},
+        }
+        _write(output / "batch-result.json", result)
+        return result
+    try:
+        if not codeql_path.is_file():
+            raise ValueError(f"CodeQL executable does not exist: {codeql_path}")
+        driver_output = output / "driver"
+        if spec["backend"] == "flask_demand":
+            result = _run_flask(entry, spec, registry_root, driver_output, codeql_path, output)
+        else:
+            result = _run_langflow(entry, spec, registry_root, driver_output, codeql_path, output)
+    except Exception as exc:
+        result = {
+            "schema": "mock-spec.batch-semantic-backend/v1", "status": "failed",
+            "backend": spec["backend"], "identity": dict(entry),
+            "error": {"type": type(exc).__name__, "message": str(exc)},
+            "result_contract": None, "source": None,
+            "provenance": {"target_executed": False, "driver_output": str(output / "driver")},
+            "cost": None, "terminal": {"execution": "failed", "semantic_validation": "not_evaluated"},
+        }
+    _write(output / "batch-result.json", result)
+    return result
+
+
+async def run_async(entry: Mapping[str, Any], registry_root: Path, output: Path,
+                    codeql_path: Path) -> dict[str, Any]:
+    return await asyncio.to_thread(run, entry, registry_root, output, codeql_path)
+
+
+arun = run_async
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--entry", type=Path, required=True)
+    parser.add_argument("--registry-root", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--codeql", type=Path, required=True)
+    args = parser.parse_args()
+    entry = json.loads(args.entry.read_text(encoding="utf-8"))
+    if not isinstance(entry, dict):
+        raise ValueError("entry JSON must be an object")
+    result = run(entry, args.registry_root, args.output, args.codeql)
+    print(json.dumps({"status": result["status"], "backend": result.get("backend"),
+                      "output": str(args.output / "batch-result.json")}, ensure_ascii=False))
+    return 0 if result["status"] in {"complete", "unsupported"} else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

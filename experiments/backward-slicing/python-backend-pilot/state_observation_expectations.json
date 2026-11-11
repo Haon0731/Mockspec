@@ -1,0 +1,38 @@
+{
+  "schema": "mock-spec.python-state-observation-expectations/v1",
+  "source": "mechanism_probe.py",
+  "observations": [
+    {"observation_id": "state:visible-write", "function": "visible_write", "line": 60, "field": "ready", "relation": "visible_write_to_read", "scope": "direct_visible_write"},
+    {"observation_id": "state:direct-argument", "function": "unknown_may_write", "line": 81, "field": "ready", "relation": "unknown_may_write_to_read", "scope": "direct_argument"},
+    {"observation_id": "state:return-alias", "function": "returned_alias_write", "line": 87, "field": "ready", "relation": "return_alias_write_to_argument_read", "scope": "return_alias"},
+    {"observation_id": "state:receiver", "function": "receiver_may_write", "line": 132, "field": "configured", "relation": "unknown_receiver_write_to_read", "scope": "receiver"},
+    {"observation_id": "state:receiver-loop", "function": "receiver_loop_prewrite_is_not_a_kill", "line": 154, "field": "configured", "relation": "unknown_receiver_write_to_read", "scope": "receiver"},
+    {"observation_id": "state:module-global", "function": "global_may_write", "line": 159, "field": "active", "relation": "unknown_global_write_to_read", "scope": "module_global"},
+    {"observation_id": "state:escaped-argument", "function": "escaped_argument_may_write", "line": 177, "field": "sealed", "relation": "unknown_escaped_argument_write_to_read", "scope": "escaped_argument"},
+    {"observation_id": "state:exception-handler", "function": "caught_and_finally", "line": 51, "field": "ready", "relation": "write_effect_exception_path_to_read", "scope": "exception_handler"},
+    {"observation_id": "state:finally", "function": "caught_and_finally", "line": 53, "field": "ready", "relation": "write_effect_exception_path_to_read", "scope": "finally"}
+  ],
+  "exclude": [
+    {"function": "proven_fresh_write", "reason": "trusted fresh allocation is disjoint"},
+    {"function": "receiver_fresh_other", "reason": "fresh object is allocated after the receiver call and is not escaped"},
+    {"function": "receiver_effect_overwritten", "reason": "unconditional same-field write kills the earlier unknown effect"},
+    {"function": "local_object_is_not_global", "reason": "local allocation is not the named module-global region"},
+    {"function": "global_effect_overwritten", "reason": "unconditional same-field write kills the earlier unknown global effect"},
+    {"function": "escaped_fresh_other", "reason": "fresh object is allocated after both dependency calls and is not escaped"},
+    {"function": "escaped_effect_overwritten", "reason": "unconditional same-field write kills the earlier escaped-region effect"},
+    {"function": "visible_pure_then_observe", "reason": "visible pure call is not an opaque-effect boundary"}
+  ],
+  "unknown_cases": [
+    {"function": "global_rebind_boundary", "scope": "module_global_rebind", "relation": "global_rebind_boundary_unknown", "reason": "the re-bound global object may or may not alias the object affected before the rebind"},
+    {"function": "receiver_other_object", "scope": "parameter_alias", "relation": "parameter_alias_boundary_unknown", "reason": "distinct receiver and observed parameters may alias at runtime"},
+    {"function": "escaped_other_object", "scope": "parameter_alias", "relation": "parameter_alias_boundary_unknown", "reason": "the retained and observed parameters may alias at runtime"}
+  ],
+  "unknown": [
+    "dynamic attribute names",
+    "arbitrary transitive heap reachability",
+    "implicit escapes without a visible opaque argument-passing call",
+    "alias relation between distinct parameters in visible writes",
+    "concrete values written by opaque dependencies",
+    "path satisfiability"
+  ]
+}

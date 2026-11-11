@@ -20,10 +20,12 @@ import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLocalVariable;
 import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtStatement;
+import spoon.reflect.code.CtTypeAccess;
 import spoon.reflect.code.CtVariableAccess;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.ModifierKind;
 import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.reference.CtExecutableReference;
@@ -43,6 +45,8 @@ public final class SliceProbe {
     private final Set<String> boundaryTypes = new LinkedHashSet<>();
     private CtModel model;
     private List<Map<String, Object>> opaqueMethods = List.of();
+
+    private enum Compatibility { MATCH, UNKNOWN, MISMATCH }
 
     public static void main(String[] args) throws Exception {
         if (args.length != 0) throw new IllegalArgumentException("SliceProbe accepts stdin only");
@@ -97,6 +101,7 @@ public final class SliceProbe {
             seedBindings.add(binding);
         }
         Set<String> closure = backwardClosure(seedIds);
+        retainCallBindingEvidence(closure);
         List<Map<String, Object>> selectedNodes = nodes.entrySet().stream()
             .filter(entry -> closure.contains(entry.getKey())).map(Map.Entry::getValue)
             .sorted(Comparator.comparing(n -> String.valueOf(n.get("id")))).toList();
@@ -153,8 +158,9 @@ public final class SliceProbe {
                 String name = access.getVariable() == null ? "" : access.getVariable().getSimpleName();
                 if (name.isBlank()) continue;
                 CtElement declaration = safeDeclaration(access);
-                if (declaration != null && inInput(declaration)) {
-                    addEdge(node(declaration, "variable_declaration"), node(use, null),
+                String declarationId = declaration == null ? null : declarationNode(declaration);
+                if (declarationId != null) {
+                    addEdge(declarationId, node(use, null),
                         "data_candidate", Map.of("variable", name, "precision", "resolved_declaration"));
                 }
                 for (CtStatement candidate : statements) {
@@ -167,6 +173,17 @@ public final class SliceProbe {
         }
     }
 
+    private String declarationNode(CtElement declaration) {
+        if (declaration instanceof CtParameter<?> parameter) {
+            CtMethod<?> method = parameter.getParent(CtMethod.class);
+            if (method != null) {
+                int index = method.getParameters().indexOf(parameter);
+                if (index >= 0) return parameterNode(method, parameter, index);
+            }
+        }
+        return node(declaration, "variable_declaration");
+    }
+
     private void addCallEdges() {
         List<CtMethod<?>> methods = model.getElements(new TypeFilter<>(CtMethod.class));
         for (CtInvocation<?> call : model.getElements(new TypeFilter<>(CtInvocation.class))) {
@@ -174,6 +191,8 @@ public final class SliceProbe {
             if (caller == null) continue;
             String callerId = node(caller, null);
             if (callerId == null) continue;
+            String callSite = node(call, "call_invocation");
+            if (callSite == null) callSite = callerId;
             if (isBoundary(call)) {
                 Map<String, Object> marker = nodes.get(callerId);
                 marker.put("contains_boundary_call", true);
@@ -181,18 +200,33 @@ public final class SliceProbe {
                 continue;
             }
             LinkedHashSet<CtMethod<?>> targets = new LinkedHashSet<>();
+            LinkedHashSet<CtMethod<?>> directTargets = new LinkedHashSet<>();
+            Map<CtMethod<?>, Compatibility> candidateCompatibility = new HashMap<>();
             CtExecutableReference<?> executable = call.getExecutable();
             try {
                 if (executable != null && executable.getDeclaration() instanceof CtMethod<?> method
-                        && inInput(method)) targets.add(method);
+                        && inInput(method)) {
+                    targets.add(method);
+                    directTargets.add(method);
+                }
             } catch (RuntimeException ignored) {}
             String name = executable == null ? "" : executable.getSimpleName();
             int arity = call.getArguments().size();
             String receiver = receiverType(call);
-            for (CtMethod<?> method : methods) {
-                if (method.getSimpleName().equals(name) && method.getParameters().size() == arity
-                        && (receiver.isBlank() || relatedType(receiver, method.getDeclaringType()))) {
-                    targets.add(method);
+            boolean resolvedStatic = !directTargets.isEmpty()
+                && directTargets.stream().allMatch(method -> method.hasModifier(ModifierKind.STATIC));
+            if (!resolvedStatic) {
+                for (CtMethod<?> method : methods) {
+                    if (!method.getSimpleName().equals(name)
+                            || method.getParameters().size() != arity
+                            || (!receiver.isBlank() && !relatedType(receiver, method.getDeclaringType()))) {
+                        continue;
+                    }
+                    Compatibility compatibility = signatureCompatibility(call, method);
+                    if (compatibility != Compatibility.MISMATCH) {
+                        targets.add(method);
+                        candidateCompatibility.put(method, compatibility);
+                    }
                 }
             }
             if (targets.isEmpty()) {
@@ -202,37 +236,236 @@ public final class SliceProbe {
                 List<String> unknown = (List<String>) marker.computeIfAbsent(
                     "unknown_calls", ignored -> new ArrayList<String>());
                 unknown.add(compact(call.toString()));
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> details = (List<Map<String, Object>>) marker.computeIfAbsent(
+                    "unknown_call_details", ignored -> new ArrayList<Map<String, Object>>());
+                details.add(Map.of("call", compact(call.toString()), "name", name, "arity", arity,
+                    "receiver", receiver, "source_name_arity_candidates", methods.stream()
+                        .filter(method -> method.getSimpleName().equals(name)
+                            && method.getParameters().size() == arity)
+                        .map(method -> Map.of("callee", qualified(method), "receiver_related",
+                            receiver.isBlank() || relatedType(receiver, method.getDeclaringType()),
+                            "signature_compatibility", signatureCompatibility(call, method)
+                                .name().toLowerCase(), "arguments", argumentCompatibility(call, method)))
+                        .toList()));
             }
-            String precision = targets.size() == 1 ? "single_source_candidate" : "name_arity_candidates";
             for (CtMethod<?> target : targets) {
+                String precision = bindingPrecision(target, directTargets, candidateCompatibility,
+                    receiver, targets.size());
                 if (isOpaque(target)) {
                     nodes.get(callerId).put("contains_boundary_call", true);
                     appendString(nodes.get(callerId), "boundary_calls", compact(call.toString()));
                     continue;
                 }
+                boolean supportedUniqueBinding = targets.size() == 1
+                    && (directTargets.contains(target) || !receiver.isBlank());
+                addEdge(node(target, "method_declaration"), callSite,
+                    supportedUniqueBinding ? "call_binding" : "call_binding_candidate",
+                    Map.of("callee", qualified(target), "call_site", callSite, "receiver", receiver,
+                        "precision", precision));
                 for (CtReturn<?> returned : target.getElements(new TypeFilter<>(CtReturn.class))) {
                     addEdge(node(returned, "return"), callerId, "call_return",
-                        Map.of("callee", qualified(target), "precision", precision));
+                        Map.of("callee", qualified(target), "call_site", callSite,
+                            "precision", precision));
                 }
                 for (int i = 0; i < Math.min(arity, target.getParameters().size()); i++) {
                     CtParameter<?> parameter = target.getParameters().get(i);
                     addEdge(node(call.getArguments().get(i), "call_argument"),
-                        node(parameter, "parameter"), "argument_binding_candidate",
-                        Map.of("callee", qualified(target), "parameter", parameter.getSimpleName(),
+                        parameterNode(target, parameter, i), "argument_binding_candidate",
+                        Map.of("callee", qualified(target), "call_site", callSite,
+                            "parameter", parameter.getSimpleName(), "parameter_index", i,
                             "precision", precision));
                 }
             }
         }
     }
 
+    private String parameterNode(CtMethod<?> method, CtParameter<?> parameter, int index) {
+        SourcePosition methodPosition = method.getPosition();
+        if (methodPosition == null || !methodPosition.isValidPosition()
+                || methodPosition.getFile() == null) return null;
+        String sourceId = sourceId(methodPosition.getFile().getPath());
+        if (sourceId == null) return null;
+        SourcePosition parameterPosition = parameter.getPosition();
+        boolean exactPosition = parameterPosition != null && parameterPosition.isValidPosition()
+            && parameterPosition.getFile() != null
+            && sourceId.equals(sourceId(parameterPosition.getFile().getPath()));
+        SourcePosition position = exactPosition ? parameterPosition : methodPosition;
+        String id = sourceId + ":" + position.getLine() + ":" + position.getColumn()
+            + ":CtParameterImpl:" + index;
+        nodes.computeIfAbsent(id, ignored -> {
+            if (nodes.size() >= MAX_NODES) throw new IllegalStateException("node limit exceeded");
+            Map<String, Object> value = new LinkedHashMap<>();
+            value.put("id", id);
+            value.put("source_id", sourceId);
+            value.put("start_line", position.getLine());
+            value.put("end_line", position.getEndLine());
+            value.put("kind", "parameter");
+            value.put("code", compact(parameter.toString()));
+            value.put("parameter_index", index);
+            value.put("location_precision", exactPosition ? "parameter_position"
+                : "declaring_method_signature");
+            return value;
+        });
+        return id;
+    }
+
     private String receiverType(CtInvocation<?> call) {
         try {
+            if (call.getTarget() instanceof CtTypeAccess<?> access
+                    && access.getAccessedType() != null) {
+                return access.getAccessedType().getQualifiedName();
+            }
             if (call.getTarget() != null && call.getTarget().getType() != null)
                 return call.getTarget().getType().getQualifiedName();
             if (call.getExecutable() != null && call.getExecutable().getDeclaringType() != null)
                 return call.getExecutable().getDeclaringType().getQualifiedName();
         } catch (RuntimeException ignored) {}
         return "";
+    }
+
+    private String bindingPrecision(CtMethod<?> target, Set<CtMethod<?>> directTargets,
+            Map<CtMethod<?>, Compatibility> candidateCompatibility, String receiver,
+            int targetCount) {
+        if (directTargets.contains(target)) {
+            return targetCount == 1 ? "resolved_declaration" : "resolved_virtual_declaration";
+        }
+        Compatibility compatibility = candidateCompatibility.getOrDefault(
+            target, Compatibility.UNKNOWN);
+        String basis;
+        if (receiver.isBlank()) basis = "name_arity";
+        else if (compatibility == Compatibility.MATCH) basis = "receiver_and_signature";
+        else basis = "receiver_and_arity_signature_unknown";
+        return targetCount == 1 ? basis : basis + "_candidate";
+    }
+
+    private Compatibility signatureCompatibility(CtInvocation<?> call, CtMethod<?> method) {
+        Compatibility result = Compatibility.MATCH;
+        for (int i = 0; i < call.getArguments().size(); i++) {
+            Compatibility item = argumentCompatibility(call.getArguments().get(i),
+                method.getParameters().get(i));
+            if (item == Compatibility.MISMATCH) return item;
+            if (item == Compatibility.UNKNOWN) result = item;
+        }
+        return result;
+    }
+
+    private List<Map<String, Object>> argumentCompatibility(CtInvocation<?> call, CtMethod<?> method) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (int i = 0; i < call.getArguments().size(); i++) {
+            String actual = qualifiedType(call.getArguments().get(i).getType());
+            String formal = qualifiedType(method.getParameters().get(i).getType());
+            result.add(Map.of("index", i, "actual", actual, "formal", formal, "compatibility",
+                argumentCompatibility(call.getArguments().get(i), method.getParameters().get(i))
+                    .name().toLowerCase()));
+        }
+        return result;
+    }
+
+    private Compatibility argumentCompatibility(CtExpression<?> argument, CtParameter<?> parameter) {
+        if (argument instanceof CtVariableAccess<?> access && safeDeclaration(access) == null) {
+            return Compatibility.UNKNOWN;
+        }
+        return typeCompatibility(argument.getType(), parameter.getType());
+    }
+
+    private Compatibility typeCompatibility(spoon.reflect.reference.CtTypeReference<?> actualReference,
+            spoon.reflect.reference.CtTypeReference<?> formalReference) {
+        String actual = qualifiedType(actualReference);
+        String formal = qualifiedType(formalReference);
+        if (actual.isBlank() || formal.isBlank()) return Compatibility.UNKNOWN;
+        if (sameType(actual, formal)) return Compatibility.MATCH;
+        Compatibility primitive = primitiveCompatibility(actual, formal);
+        if (primitive != Compatibility.UNKNOWN) return primitive;
+        try {
+            if (actualReference.isSubtypeOf(formalReference)) return Compatibility.MATCH;
+        } catch (RuntimeException ignored) {}
+        if (hierarchyIncludes(actual, formal)) return Compatibility.MATCH;
+        CtType<?> actualType = model.getAllTypes().stream()
+            .filter(type -> sameType(actual, type.getQualifiedName())).findFirst().orElse(null);
+        CtType<?> formalType = model.getAllTypes().stream()
+            .filter(type -> sameType(formal, type.getQualifiedName())).findFirst().orElse(null);
+        if (actualType != null && formalType != null
+                && !hierarchyIncludes(actual, formal) && !hierarchyIncludes(formal, actual)) {
+            return Compatibility.MISMATCH;
+        }
+        return Compatibility.UNKNOWN;
+    }
+
+    private static Compatibility primitiveCompatibility(String actual, String formal) {
+        Map<String, Integer> numeric = Map.of("byte", 1, "short", 2, "char", 2, "int", 3,
+            "long", 4, "float", 5, "double", 6);
+        String unboxedActual = unboxed(actual);
+        String unboxedFormal = unboxed(formal);
+        if (unboxedActual.equals(unboxedFormal)) return Compatibility.MATCH;
+        boolean actualPrimitive = isPrimitive(actual);
+        boolean actualWrapper = !actual.equals(unboxedActual);
+        boolean formalWrapper = !formal.equals(unboxedFormal);
+        if ((actualWrapper && formalWrapper) || (actualPrimitive && formalWrapper)) {
+            return Compatibility.MISMATCH;
+        }
+        if (unboxedActual.equals("boolean") || unboxedFormal.equals("boolean")) {
+            return isPrimitive(actual) || isPrimitive(formal) || actualWrapper || formalWrapper
+                ? Compatibility.MISMATCH : Compatibility.UNKNOWN;
+        }
+        if (numeric.containsKey(unboxedActual) && numeric.containsKey(unboxedFormal)) {
+            if (unboxedActual.equals("char") && Set.of("byte", "short").contains(unboxedFormal))
+                return Compatibility.MISMATCH;
+            if (Set.of("byte", "short").contains(unboxedActual) && unboxedFormal.equals("char"))
+                return Compatibility.MISMATCH;
+            return numeric.get(unboxedActual) <= numeric.get(unboxedFormal)
+                ? Compatibility.MATCH : Compatibility.MISMATCH;
+        }
+        return Compatibility.UNKNOWN;
+    }
+
+    private static boolean isPrimitive(String type) {
+        return Set.of("boolean", "byte", "short", "int", "long", "char", "float", "double")
+            .contains(type);
+    }
+
+    private static String unboxed(String type) {
+        return switch (type) {
+            case "java.lang.Boolean" -> "boolean";
+            case "java.lang.Byte" -> "byte";
+            case "java.lang.Short" -> "short";
+            case "java.lang.Character" -> "char";
+            case "java.lang.Integer" -> "int";
+            case "java.lang.Long" -> "long";
+            case "java.lang.Float" -> "float";
+            case "java.lang.Double" -> "double";
+            default -> type;
+        };
+    }
+
+    private boolean hierarchyIncludes(String child, String ancestor) {
+        CtType<?> childType = model.getAllTypes().stream()
+            .filter(type -> sameType(child, type.getQualifiedName())).findFirst().orElse(null);
+        return childType != null && hierarchyIncludes(childType, ancestor, new HashSet<>());
+    }
+
+    private boolean hierarchyIncludes(CtType<?> child, String ancestor, Set<String> seen) {
+        if (child == null || !seen.add(child.getQualifiedName())) return false;
+        if (sameType(child.getQualifiedName(), ancestor)) return true;
+        List<spoon.reflect.reference.CtTypeReference<?>> parents = new ArrayList<>();
+        try {
+            if (child.getSuperclass() != null) parents.add(child.getSuperclass());
+            parents.addAll(child.getSuperInterfaces());
+        } catch (RuntimeException ignored) {}
+        for (spoon.reflect.reference.CtTypeReference<?> parent : parents) {
+            if (sameType(qualifiedType(parent), ancestor)) return true;
+            try {
+                if (parent.getTypeDeclaration() instanceof CtType<?> declaration
+                        && hierarchyIncludes(declaration, ancestor, seen)) return true;
+            } catch (RuntimeException ignored) {}
+        }
+        return false;
+    }
+
+    private static String qualifiedType(spoon.reflect.reference.CtTypeReference<?> type) {
+        if (type == null) return "";
+        try { return type.getQualifiedName(); }
+        catch (RuntimeException exception) { return ""; }
     }
 
     private boolean relatedType(String receiver, CtType<?> declaring) {
@@ -277,6 +510,23 @@ public final class SliceProbe {
             }
         }
         return found;
+    }
+
+    private void retainCallBindingEvidence(Set<String> closure) {
+        Set<String> callSites = new LinkedHashSet<>();
+        for (Map<String, Object> edge : edges) {
+            String kind = String.valueOf(edge.get("kind"));
+            if ((kind.equals("call_binding") || kind.equals("call_binding_candidate"))
+                    && closure.contains(String.valueOf(edge.get("to")))) {
+                callSites.add(String.valueOf(edge.get("call_site")));
+            }
+        }
+        for (Map<String, Object> edge : edges) {
+            if (callSites.contains(String.valueOf(edge.get("call_site")))) {
+                closure.add(String.valueOf(edge.get("from")));
+                closure.add(String.valueOf(edge.get("to")));
+            }
+        }
     }
 
     private String locateSeed(Map<String, Object> seed) {

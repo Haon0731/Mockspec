@@ -1,0 +1,44 @@
+{
+  "schema": "mock-spec.langflow-backend-expectations/v1",
+  "case_id": "langflow_189",
+  "dataset": "python-benchmark-new",
+  "inventory_revision": "0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc",
+  "snapshot_id": "ad1a48b67903bc78b2f0a57548d25bd47833f1f12813e0314a7307ccdd482d1f",
+  "target_selector": "tests/test_189is_encrypted.py::test_is_encrypted",
+  "masked_test_sha256": "b77d9766442751176a7b895dcd7e4d8ad7163aa034bc2bb7918624fa71143d44",
+  "product_path": "src/src/backend/base/langflow/services/auth/mcp_encryption.py",
+  "product_sha256": "bfe36ac83538a629ee670c81b20ab9e3682688be7a031b7e61522b1779ea4c8b",
+  "function": {"name": "is_encrypted", "start_line": 94, "end_line": 118},
+  "loader": {"name": "load_is_encrypted", "return_index": 0, "test_binding_line": 74, "call_line": 104},
+  "invalid_token_identity": {
+    "status": "resolved",
+    "loader_class": "LocalInvalidToken",
+    "namespace": "namespace",
+    "namespace_key": "InvalidToken",
+    "namespace_assignment_line": 35,
+    "loader_return_line": 37,
+    "return_slots": [
+      {"index": 0, "test_name": "is_encrypted"},
+      {"index": 1, "test_name": "invalid_token_cls"}
+    ],
+    "test_binding_line": 74,
+    "observation_line": 115,
+    "comparison": "invalid_token_cls is is_encrypted.__globals__['InvalidToken']",
+    "precision": "strict_supported_python_ast"
+  },
+  "observations": [
+    {"id": "criterion:0", "line": 106, "kind": "return_value_assertion"},
+    {"id": "criterion:1", "line": 115, "kind": "dynamic_global_identity_assertion"}
+  ],
+  "preserve": [
+    "authenticated visible loader origin to the exact product function",
+    "test call result may flow to criterion:0",
+    "product function returns and controlling guards",
+    "product function reference to the injected InvalidToken global for criterion:1"
+  ],
+  "unknown": [
+    "CodeQL does not resolve the exec-created function object to the test call without the authenticated frontend bridge",
+    "masked Mock values, decrypt outcomes, concrete exceptions, and path feasibility",
+    "unsupported dynamic namespace or callable rebinding"
+  ]
+}

@@ -5,6 +5,8 @@ import ast
 import json
 import sys
 
+from source_selection import python_dynamic_loader_evidence
+
 
 def compact(node: ast.AST) -> str:
     try:
@@ -91,12 +93,15 @@ class Probe:
                 self.walk_block(source, function.body)
                 self.add_local_data(source, function)
             self.add_calls(source, tree)
+        dynamic_loader_bindings = python_dynamic_loader_evidence(sources)
+        self.add_dynamic_loader_edges(dynamic_loader_bindings)
         seeds = self.resolve_seeds()
         closure = self.backward_closure(seeds)
         return {
             "status": "ok", "backend": "python-ast-source-evidence-prototype",
             "seeds": seeds,
             "seed_bindings": self.seed_bindings,
+            "dynamic_loader_bindings": dynamic_loader_bindings,
             "nodes": sorted((n for key, n in self.nodes.items() if key in closure), key=lambda n: n["id"]),
             "edges": [e for e in self.edges if e["from"] in closure and e["to"] in closure],
             "limitations": [
@@ -107,8 +112,92 @@ class Probe:
                 "call_target_candidate uses visible function names and does not resolve dynamic dispatch, aliases, decorators, or reflection",
                 "call_event_candidate exposes a visible callee event that may execute; it does not guarantee the event is reached or returns normally",
                 "unresolved calls are retained as dependency boundaries; no external implementation is executed or inspected",
+                "dynamic loader origins require a visible static path, namespace key, selected definition, and unrebound test callable",
             ],
         }
+
+    def item_at(self, source_id: str, line: int, kinds: tuple[type, ...]) -> tuple[dict, ast.AST] | None:
+        for source, tree in self.trees:
+            if source["source_id"] != source_id:
+                continue
+            for item in ast.walk(tree):
+                actual = source.get("start_line", 1) + getattr(item, "lineno", 0) - 1
+                if actual == line and isinstance(item, kinds):
+                    return source, item
+        return None
+
+    def add_dynamic_loader_edges(self, bindings: list[dict]):
+        resolved_calls: set[tuple[int, str]] = set()
+        for binding in bindings:
+            if binding["status"] != "resolved":
+                continue
+            definition = binding["function_definition"]
+            function_item = self.item_at(
+                definition["source_id"], definition["start_line"],
+                (ast.FunctionDef, ast.AsyncFunctionDef),
+            )
+            loader_return = self.item_at("test", binding["return_line"], (ast.Return,))
+            read_statement = self.item_at("test", binding["read_line"], (ast.stmt,))
+            exec_statement = self.item_at("test", binding["exec_line"], (ast.stmt,))
+            if function_item and loader_return:
+                function_id = self.node(
+                    function_item[0], function_item[1], "dynamic_function_definition"
+                )
+                if function_id:
+                    self.nodes[function_id]["kind"] = "dynamic_function_definition"
+                self.edge(
+                    function_id,
+                    self.node(loader_return[0], loader_return[1]),
+                    "dynamic_function_origin",
+                    precision="visible_path_namespace_key_and_definition",
+                    logical_path=definition["logical_path"],
+                    function=definition["name"],
+                )
+            if read_statement and exec_statement:
+                self.edge(
+                    self.node(read_statement[0], read_statement[1]),
+                    self.node(exec_statement[0], exec_statement[1]),
+                    "dynamic_source_text",
+                    precision="visible_read_to_exec_compile",
+                    logical_path=definition["logical_path"],
+                )
+            if exec_statement and loader_return:
+                self.edge(
+                    self.node(exec_statement[0], exec_statement[1]),
+                    self.node(loader_return[0], loader_return[1]),
+                    "dynamic_namespace_definition",
+                    precision="visible_exec_namespace_to_literal_key",
+                    namespace=binding["namespace"],
+                    function=binding["function_key"],
+                )
+            for call_site in binding["call_sites"]:
+                resolved_calls.add((call_site["line"], call_site["name"]))
+                call_statement = self.item_at("test", call_site["line"], (ast.stmt,))
+                if not call_statement or not function_item:
+                    continue
+                for returned in (node for node in scoped_nodes(function_item[1])
+                                 if isinstance(node, ast.Return)):
+                    self.edge(
+                        self.node(function_item[0], returned),
+                        self.node(call_statement[0], call_statement[1]),
+                        "dynamic_call_target",
+                        precision="visible_loader_binding",
+                        callee=definition["name"],
+                    )
+        if not resolved_calls:
+            return
+        for node in self.nodes.values():
+            unresolved = node.get("unresolved_calls")
+            if not unresolved:
+                continue
+            if node["source_id"] != "test":
+                continue
+            names = {name for line, name in resolved_calls if line == node["start_line"]}
+            node["unresolved_calls"] = [call for call in unresolved
+                                        if not any(call.startswith(name + "(") for name in names)]
+            if not node["unresolved_calls"]:
+                node.pop("unresolved_calls")
+                node.pop("contains_unresolved_call", None)
 
     def walk_block(self, source: dict, statements: list[ast.stmt]):
         for previous, current in zip(statements, statements[1:]):

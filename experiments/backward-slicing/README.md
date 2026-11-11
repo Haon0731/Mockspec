@@ -4,6 +4,140 @@
 后向切片主线，结合165例目标测试盘点重新提出验证设计。下文保留三例历史探索；其中的
 后端优先级属于当时建议，不代表当前已经选定 WALA 或符号执行。
 
+## 异常观察、未知效果与规模根因（2026-11-11）
+
+Python [#29按需查询冷运行](../../out/issue29-python-demand-cold-20261111-r3/result.json)
+及[独立核验](../../out/issue29-python-demand-cold-20261111-r3/acceptance-revalidation.json)
+已通过并关闭：观察根先连接实际产品方法，再限定关系查询；9项查询全部执行，
+Flask／状态关系与基线等价，递归观察保留明确边界。
+[暖运行](../../out/issue29-python-demand-warm-20261111-r3/result.json)9项缓存均命中；
+[预算截断](../../out/issue29-python-demand-budget-20261111-r1/result.json)
+保留2项证据和7项未展开边界。冷运行125.56秒，暖运行0.85秒且不含此前构建成本；
+完整数据库解析仍保留，不宣称CodeQL内部图节点已按需构建。
+旧r12源码已[逐文件核验归档](../../out/mockbench-study/issue29-baseline-source-preservation-20261111/README.md)。
+
+Jib [#25逐观察结果](../../out/mockbench-study/issue25-jib-observations-all-none-20261111-r6/summary.json)
+经[独立验收](../../out/mockbench-study/issue25-acceptance-20261111-r1/acceptance.json)通过并关闭：
+19个观察均有字段状态may影响证据，14条表达式精确恢复，5条经显式opaque边界恢复，0缺失。
+证据贯穿MUT调用目标／上下文、参数与返回、builder写入、buildPlan转换和观察；
+Optional回调只记录字段特定的条件式影响，不补造presence、payload或Mock行为。
+运行41.96秒（含编译），Java阶段38.85秒，峰值RSS 1,472,728 KiB；
+原始分析已无损压缩并保存[运行身份核验](../../out/mockbench-study/issue25-jib-observations-all-none-20261111-r6/run-identity-verification.json)。
+原r6沿用#21自动MUT绑定，观察adapter当时仍为诊断入口。
+后续[自动观察来源核验](../../out/mockbench-study/issue25-jib-observation-adapter-revalidation-20261111-r3/independent-review.json)
+已独立通过：从原测试提取MUT调用、plan绑定和19个实际观察表达式，生成源码与r6输入逐字节一致。
+重绑定、条件式断言及支持范围外语句明确拒绝；expected字面值不参与生成。
+此更新采用追加式收据，旧r6不变。未知Mock效果仍保留，统一契约继续为`partial/verified_incomplete`。
+#28亦已完成[独立验收](../../out/mockbench-study/issue28-java-demand-acceptance-20261111-r1/independent-review.json)：
+真实Jib的19个观察与r6严格等价，14 exact＋5 opaque保持不变；暖缓存19项命中，
+25方法预算保留已完成观察及明确前沿。冷运行48.62秒，暖运行9.73秒，均明确排除复用输入的历史准备成本。
+真实Jib仍需11,184/11,256个方法上下文，不宣称加速。
+[最终独立门禁#30](../../out/mockbench-study/issue30-final-gate-20261111-r1/acceptance.json)
+已通过；langflow的真实CodeQL输出恢复23条后端关系，统一契约保留31条类型化关系、
+两个原观察及3个未知边界。完整165例由#31另行执行和核验。
+
+Java [按需方法机制](../../out/mockbench-study/issue28-java-method-demand-mechanism-20261111-r3/report.md)
+已独立核验：标准CISlicer的numbered DFS会通过`getMaxNumber()`触发所有PDG构建；
+保留同一依赖图，使用WALA的hash-backed遍历后，小程序按需加载4/5个方法，
+与完整切片完全一致，并保留实际递归及方法预算前沿。CG／PA与全局Mod/Ref索引仍提前计算；
+真实Jib、缓存及成本的完整验收见上文#28收据。
+
+后端门禁收尾：[WALA #23 验收](../../out/mockbench-study/issue23-capability-closure-20261111-r4/report.md)
+在当前模型下通过8项真实探针和8项反例，并经独立复核关闭。
+未知写入现覆盖接收者直接整数属性、参数一跳可达对象、Application静态基本类型及静态逃逸对象；
+更深堆、引用字段替换、数组、库全局等仍未知。#20／#21／#22／#24也已按各自范围核验关闭。
+这解除#25的前置阻塞；其后续逐观察验收见上文。
+Python [#26逐观察接入](../../out/mockbench-study/python-issue26-27-20261111-r11/issue26-report.md)
+已独立核验关闭：真实Flask的3个原观察、13条关系通过12项验收检查，
+异常具体值及支持域外效果仍未知；不将机制状态观察混入真实Flask结果。
+Python [#27状态接入](../../out/mockbench-study/python-issue26-27-20261111-r12/issue27-report.md)
+亦已独立核验关闭：9个机制观察经统一契约输出，17项检查通过。
+可证明fresh或覆盖时才排除影响；参数可能别名与全局重绑定保留带路径证据的未知。
+最终r12同时复验#26，源码哈希、产物重建及28项回归通过。
+
+[根因与修复记录](../../out/mockbench-study/root-cause-repair-20261111/report.md)
+区分三个独立问题：pytest 捕获库边界缺失、未知调用效果与执行条件缺失、
+Jib 传递堆集合膨胀。数据接入不是这三项失败的根因，冻结输入保持不变。
+Python 使用有来源的 pytest 库摘要联合 CodeQL 异常出口、值流和后续 CFG；
+Java 联合实际摘要 IR、同调用点 CFG 与堆关系，不把缺少单条 SDG 边当成没有影响。
+Jib 的 `run_scale_diagnostic.py` 分阶段记录完整调用图、传递 Mod/Ref 压力和切片成本；
+诊断入口仍单列，不替代原测试验收。具体通过项和未解决边界见上述记录。
+该轮成本配置保留原始堆位置，使用入口可达图和 WALA `CISlicer` 的 Mod/Ref 堆
+may-dependence、FULL 控制关系；在2 GiB堆／180秒预算内35.78秒完成Jib诊断。
+后续#25预审发现其依赖选择遗漏冻结的`jib-build-plan-0.4.0.jar`，
+因此该成本只对应当时输入，不能代表完整转换实现已进入分析或补齐依赖后的成本。
+Python恢复6条真实异常观察影响；Java修正验收器后4项有界机制与4项反例通过。
+这段规模诊断是#25修复前的历史证据，不能替代上文的逐观察验收或正式165例对照。
+
+## 逐观察接入与摘要传播（2026-11-11）
+
+以下为前轮结果，后续修复见上一节。
+
+[Flask 单案例结果](../../out/mockbench-study/python-observation-integration-20261111-r3/observation-study.json)
+通过 `python-backend-pilot/observation_mapping.py` 映射到既有单案例契约，
+完整保留 line 102、120、126 的三个原始观察和身份。自动调用绑定、位置参数0传播、
+两个断言各自的分支条件已有后端证据；`*args`、`**kwargs` 和产品异常对象到
+`pytest.raises`／`exc_info.value` 的值传播仍未知，结果为 `partial / verified_incomplete`。
+产品内部 normal／exception 关系未自动关联断言；状态机制探针与真实案例分别报告。
+这推进了 #26／#27 的支持域接入，尚未完成两票全部验收。
+[报告与复现](../../out/mockbench-study/python-observation-integration-20261111-r3/report.md)
+记录预登记身份、失败重跑、源码映射以及分开的 Flask／机制成本。
+
+[WALA 摘要传播修复](../../out/mockbench-study/issue23-propagation-20261111/report.md)
+定位到 builder 重置提前安装的摘要选择器。当前在 builder 初始化后安装精确选择器，
+并导出实际方法实现、IR、指针区域和堆依赖证据；总体能力门仍阻塞。
+最终机制复验恢复了同调用、同字段区域的状态传播，以及返回别名写入到原实参读取的关系；
+验收同时核对精确调用位置、对象接收者的指针区域和字段 ModRef，拒绝名称相似调用串线。
+可见字段自写回的传播不等于任意未知值写入，真实 Jib 规模问题尚未修复。
+正式165例复跑继续等待核心门禁通过。
+
+## 后端能力门首轮修复（2026-11-11，历史结果）
+
+本轮保留165例冻结输入与r3，只修复两个后端试验及其验收器；未运行目标测试或正式全量对照。
+[Python 最新验收](../../out/mockbench-study/issue24-repair-20261111-r3/verdict.json)
+通过有界机制与真实 Flask 检查：在 CodeQL CFG／值流上显式计算直接参数区域的潜在写入、
+一次返回别名后的同字段写入、必然覆盖及异常到 handler／finally 的状态影响。
+验收绑定调用、字段、区域和路径身份，并检查条件写不构成必然覆盖等反例。
+fresh 负例只对已记录的探针构造模型和指定参数通道成立；receiver、global、escaped、
+动态属性及任意传递堆关系仍是未知。这是 #24 后端试验的支持范围，不代表165例关系恢复成功。
+
+[WALA 首轮修复结果](../../out/mockbench-study/issue23-repair-20261111/report.md)
+保持 blocked。后续检查纠正了其中“摘要已进入分析”的判断：当时调用虽有目标，
+目标实际仍是 native `ShrikeCTMethod` 的空 IR，不能算摘要方法体已参与传播。
+因此必须同时检查目标实现类型、实际 IR、指针区域及依赖路径，不能只计目标数量。
+结构骨架与原样编译按替代输入路线区分，诊断入口不计自动恢复；无 OOM 不等于分析完成。
+本轮没有改变 Jib 的规模机制，故未重复已在2 GiB下失败的 FULL/FULL 分析。
+新增阶段诊断保留其已知 `PDG.populate/addParamPassingStatements` 瓶颈。
+新摘要入口为 `wala-pilot/summarize_repair.py`；旧摘要入口保留用于2026-11-10历史结果复现。
+
+## 入口与证据修复（2026-11-10，历史结果）
+
+[规格 #19](https://github.com/Haon0731/Mockspec/issues/19)的首批任务保持原165例与r3不变。
+`result_contract.py` 为单案例结果增加版本化证据契约，旧候选关系仍明确未核验。
+静态 Java 调用现在读取 `CtTypeAccess` 的实际访问类型，Jib 测试到五参数方法、参数和
+返回接收位置已有局部验证；缺少类型的签名仍保留未知，尚未恢复完整 buildPlan 状态链。
+Python 静态加载来源连接可见路径、实际送入 compile／exec 的读取文本及提取区间、
+函数定义、namespace返回和测试变量。动态键、文本来源不明与重绑定保留未知。
+
+[三例集成证据](../../out/mockbench-study/backward-slice-issues20-22-integration-20261110/integration-verification.json)
+只执行 Jib、langflow_189、flask_308，其余162例未选择；
+[langflow 来源检查补充复验](../../out/mockbench-study/backward-slice-issue22-provenance-review-20261110/results.json)
+保留后续命名空间重绑定防护后的结果。它们不是新一轮正式165例实验。
+Java候选图仍共享形参节点，调用点标签不等于已实现上下文匹配的语义切片。
+WALA和Python成熟后端分别做独立能力验证；真实输入、未知效果或关键机制未通过时，
+对应能力门保持阻塞，不能由这些入口修复代替通过。
+
+[WALA 实测结论](../../out/mockbench-study/issue23-wala-evidence-20261110/report.json)：
+可见代码机制探针恢复了跨过程值、覆盖排除、控制和字段关系；不可见调用缺少保守效果摘要。
+原样 masked Jib 编译失败，结构骨架仅用于诊断且已单列；该诊断分析触及2 GiB堆预算，
+所以 #23 能力门未通过，不能据此开始 #25 的正式后端集成。
+
+[Python／CodeQL 实测结论](../../out/mockbench-study/issue24-python-backend-20261110/report.md)：
+真实 Flask 入口、正常／异常路径及小探针的覆盖定义、跨过程值流等查询取得正向证据。
+未知返回别名和潜在写入目前仅输出保守候选关系，尚未注入后端并验证后续状态传播；
+异常路径上的写入传播也未验证。因此 #24 保持 blocked，不解锁 #26／#27。
+查询、输入适配和复现入口位于 `python-backend-pilot/`，工具与数据库不纳入仓库。
+
 ## 全量候选切片入口（2026-11-09）
 
 已完成165例：[全量结果与失败归因](../../out/mockbench-study/backward-slice-full-20261109-r3/report.md)。

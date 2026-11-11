@@ -120,3 +120,66 @@ def test_loop_candidate_seed_is_not_confused_with_target_variable_nodes():
                    "call": "enumerate", "criterion_id": "criterion:0"}], "dependency_only": True})
     seed = result["seeds"][0]
     assert next(node for node in result["nodes"] if node["id"] == seed)["kind"] == "For"
+
+
+def test_static_exec_loader_connects_visible_function_to_bound_callable():
+    test_source = """from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = ROOT / 'src' / 'pkg' / 'encryption.py'
+def load_target():
+    lines = MODULE_PATH.read_text().splitlines()
+    start_line = 1
+    end_line = 2
+    function_source = '\\n'.join(lines[start_line - 1:end_line])
+    namespace = {}
+    exec(compile(function_source, str(MODULE_PATH), 'exec'), namespace)
+    return namespace['target']
+def test_target():
+    target_fn = load_target()
+    result = target_fn()
+    assert result
+"""
+    product_source = "def target():\n    return dependency.read()\n"
+    result = run_probe({
+        "sources": [
+            {"source_id": "test", "logical_path": "tests/test_target.py", "text": test_source},
+            {"source_id": "source:1", "logical_path": "src/pkg/encryption.py", "text": product_source},
+        ],
+        "seeds": [{"source_id": "test", "line": 15}],
+        "dependency_only": True,
+    })
+
+    assert result["dynamic_loader_bindings"][0]["status"] == "resolved"
+    edges = result["edges"]
+    assert any(edge["kind"] == "dynamic_function_origin"
+               and edge["precision"] == "visible_path_namespace_key_and_definition"
+               for edge in edges)
+    assert any(node["source_id"] == "source:1" and node["kind"] == "dynamic_function_definition"
+               for node in result["nodes"])
+    assert not any(node.get("unresolved_calls") == ["target_fn()"] for node in result["nodes"])
+
+
+def test_dynamic_namespace_key_remains_unknown_and_does_not_bind_same_named_definition():
+    test_source = """from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = ROOT / 'src' / 'pkg' / 'encryption.py'
+def load_target(key):
+    namespace = {}
+    exec(compile(MODULE_PATH.read_text(), str(MODULE_PATH), 'exec'), namespace)
+    return namespace[key]
+target_fn = load_target('target')
+assert target_fn()
+"""
+    result = run_probe({
+        "sources": [
+            {"source_id": "test", "logical_path": "tests/test_target.py", "text": test_source},
+            {"source_id": "source:1", "logical_path": "src/pkg/encryption.py",
+             "text": "def target():\n    return True\n"},
+        ],
+        "seeds": [{"source_id": "test", "line": 9}],
+        "dependency_only": True,
+    })
+
+    assert result["dynamic_loader_bindings"][0]["status"] == "unknown"
+    assert result["dynamic_loader_bindings"][0]["reason"] == "dynamic_namespace_key"
+    assert not any(edge["kind"] == "dynamic_function_origin" for edge in result["edges"])

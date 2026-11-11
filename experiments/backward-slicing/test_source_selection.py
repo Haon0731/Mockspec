@@ -52,6 +52,198 @@ target = load_function_from_source_ast(f"{root}/feature.py", "target")
         "source_id": "source:2", "name": "support", "start_line": 1, "end_line": 2}]
 
 
+def test_pathlib_read_exec_loader_selects_visible_source_and_reports_function_origin():
+    case = Case("python", "tests/test_encryption.py", """
+from pathlib import Path
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = PROJECT_ROOT / "src" / "pkg" / "encryption.py"
+
+def load_target():
+    source_lines = MODULE_PATH.read_text(encoding="utf-8").splitlines()
+    start_line = 3
+    end_line = 5
+    function_source = "\\n".join(source_lines[start_line - 1:end_line])
+    namespace = {}
+    exec(compile(function_source, str(MODULE_PATH), "exec"), namespace)
+    return namespace["target"]
+
+target_fn = load_target()
+assert target_fn("value")
+""", {
+        "src/pkg/encryption.py": "VALUE = 1\n\ndef target(value):\n    return bool(value)\n",
+        "src/pkg/other.py": "def target(value):\n    return False\n",
+    })
+
+    result = select_sources(case)
+
+    assert [source["logical_path"] for source in result["sources"]] == [
+        "tests/test_encryption.py", "src/pkg/encryption.py"]
+    assert result["evidence"][0] == {
+        "stage": "masked_test",
+        "hint_kind": "python_visible_source_path",
+        "hint": "src/pkg/encryption.py",
+        "candidates": ["src/pkg/encryption.py"],
+        "precision": "exact_visible_path",
+    }
+    binding = result["dynamic_loader_bindings"][0]
+    assert binding["status"] == "resolved"
+    assert binding["path"] == "src/pkg/encryption.py"
+    assert binding["loader"] == "load_target"
+    assert binding["namespace"] == "namespace"
+    assert binding["function_key"] == "target"
+    assert binding["function_definition"] == {
+        "source_id": "source:1", "logical_path": "src/pkg/encryption.py",
+        "name": "target", "start_line": 3, "end_line": 4,
+    }
+    assert binding["test_bindings"] == [{"name": "target_fn", "line": 15}]
+    assert binding["call_sites"] == [{"name": "target_fn", "line": 16}]
+
+
+def test_dynamic_loader_does_not_bind_wrong_file_or_dynamic_namespace_key():
+    case = Case("python", "tests/test_encryption.py", """
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = ROOT / "src" / "pkg" / "encryption.py"
+
+def load_target(key):
+    namespace = {}
+    exec(compile(MODULE_PATH.read_text(), str(MODULE_PATH), "exec"), namespace)
+    return namespace[key]
+
+loaded = load_target("target")
+assert loaded()
+""", {
+        "src/pkg/encryption.py": "def target():\n    return True\n",
+        "src/pkg/other.py": "def target():\n    return False\n",
+    })
+
+    result = select_sources(case)
+
+    assert [source["logical_path"] for source in result["sources"]] == [
+        "tests/test_encryption.py", "src/pkg/encryption.py"]
+    assert result["dynamic_loader_bindings"] == [{
+        "status": "unknown", "loader": "load_target",
+        "path": "src/pkg/encryption.py", "path_line": 4,
+        "namespace": "namespace", "exec_line": 8,
+        "return_line": 9, "reason": "dynamic_namespace_key",
+    }]
+    assert not any("other.py" in candidate for evidence in result["evidence"]
+                   for candidate in evidence["candidates"])
+
+
+@pytest.mark.parametrize(
+    ("loader_body", "reason"),
+    [
+        ("""source_lines = MODULE_PATH.read_text().splitlines()
+    start_line = 1
+    end_line = 2
+    function_source = "\\n".join(source_lines[start_line - 1:end_line])
+    namespace = {}
+    exec(compile(function_source, str(MODULE_PATH), "exec"), namespace)
+    return namespace["target"]""", "function_definition_not_unique"),
+        ("""namespace = {}
+    exec(compile(MODULE_PATH.read_text(), str(MODULE_PATH), "exec"), namespace)
+    namespace["target"] = replacement
+    return namespace["target"]""", "namespace_key_rebound"),
+        ("""namespace = {}
+    exec(compile(MODULE_PATH.read_text(), str(MODULE_PATH), "exec"), namespace)
+    namespace = other_namespace
+    return namespace["target"]""", "namespace_key_rebound"),
+        ("""namespace = {}
+    exec(compile(MODULE_PATH.read_text(), str(MODULE_PATH), "exec"), namespace)
+    namespace[dynamic_key] = replacement
+    return namespace["target"]""", "namespace_key_rebound"),
+    ],
+)
+def test_dynamic_loader_preserves_unknown_for_out_of_slice_or_rebound_key(loader_body, reason):
+    case = Case("python", "tests/test_encryption.py", f"""from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = ROOT / "src" / "pkg" / "encryption.py"
+def load_target():
+    {loader_body}
+target_fn = load_target()
+assert target_fn()
+""", {"src/pkg/encryption.py": "VALUE = 1\n\ndef target():\n    return True\n"})
+
+    result = select_sources(case)
+
+    assert result["dynamic_loader_bindings"][0]["status"] == "unknown"
+    assert result["dynamic_loader_bindings"][0]["reason"] == reason
+
+
+def test_dynamic_loader_preserves_unknown_after_test_callable_rebinding():
+    case = Case("python", "tests/test_encryption.py", """from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = ROOT / "src" / "pkg" / "encryption.py"
+def load_target():
+    namespace = {}
+    exec(compile(MODULE_PATH.read_text(), str(MODULE_PATH), "exec"), namespace)
+    return namespace["target"]
+target_fn = load_target()
+target_fn = replacement
+assert target_fn()
+""", {"src/pkg/encryption.py": "def target():\n    return True\n"})
+
+    result = select_sources(case)
+
+    assert result["dynamic_loader_bindings"][0]["status"] == "unknown"
+    assert result["dynamic_loader_bindings"][0]["reason"] == "test_callable_rebound"
+
+
+def test_unsupported_visible_path_is_unknown_and_does_not_select_by_function_name():
+    case = Case("python", "tests/test_encryption.py", """MODULE_PATH = locate_at_runtime()
+def load_target():
+    namespace = {}
+    exec(compile(MODULE_PATH.read_text(), str(MODULE_PATH), "exec"), namespace)
+    return namespace["target"]
+target_fn = load_target()
+assert target_fn()
+""", {"src/pkg/encryption.py": "def target():\n    return True\n"})
+
+    result = select_sources(case)
+
+    assert [source["logical_path"] for source in result["sources"]] == [
+        "tests/test_encryption.py"]
+    assert "unresolved_visible_source_path:4" in result["diagnostics"]
+    assert result["dynamic_loader_bindings"][0]["status"] == "unknown"
+    assert result["dynamic_loader_bindings"][0]["reason"] == "unresolved_visible_source_path"
+
+
+def test_loader_read_does_not_prove_exec_text_origin():
+    for code in ('"def target(): return False"', 'unrelated_text'):
+        case = Case("python", "tests/test_loader.py", f'''from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = ROOT / "src" / "target.py"
+def load_target():
+    source = MODULE_PATH.read_text()
+    namespace = {{}}
+    exec(compile({code}, str(MODULE_PATH), "exec"), namespace)
+    return namespace["target"]
+target = load_target()
+assert target()
+''', {"src/target.py": "def target():\n    return True\n"})
+        result = select_sources(case)
+        assert result["dynamic_loader_bindings"][0]["status"] == "unknown"
+        assert result["dynamic_loader_bindings"][0]["reason"] == "exec_source_provenance_not_supported"
+
+
+def test_loader_reassigned_source_text_loses_provenance():
+    case = Case("python", "tests/test_loader.py", '''from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = ROOT / "src" / "target.py"
+def load_target():
+    source = MODULE_PATH.read_text()
+    source = obtain_other_source()
+    namespace = {}
+    exec(compile(source, str(MODULE_PATH), "exec"), namespace)
+    return namespace["target"]
+target = load_target()
+assert target()
+''', {"src/target.py": "def target():\n    return True\n"})
+    result = select_sources(case)
+    assert result["dynamic_loader_bindings"][0]["status"] == "unknown"
+
+
 def test_java_import_and_same_package_type_are_candidates_without_mut_claim():
     case = Case("java", "src/test/java/demo/FeatureTest.java", """
 package demo;

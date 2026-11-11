@@ -1,0 +1,31 @@
+{
+  "schema": "mock-spec.pytest-raises-model/v1",
+  "pytest_version": "9.1.1",
+  "source_role": "host_verified_reference",
+  "frozen_case_dependency_version": "unknown",
+  "version_scope_note": "The verified host sources justify the bounded summary but do not establish the dependency version used by the frozen case.",
+  "sources": [
+    {
+      "module": "_pytest.raises",
+      "sha256": "dc28805f1e1c2db835f1a5290218efee5d510d190ad333d61663d59bd6d1362c",
+      "facts": [
+        "RaisesExc.__enter__ returns an ExceptionInfo created for later filling",
+        "RaisesExc.__exit__ checks the expected type, fills ExceptionInfo from exc_type/exc_val/exc_tb, and returns true only on a match"
+      ]
+    },
+    {
+      "module": "_pytest._code.code",
+      "sha256": "63ec03d20e61d3ac2a0e9954be71a619dd742d009c2409b1e3168e2a6fad9096",
+      "facts": [
+        "ExceptionInfo.value returns element 1 of the filled exception tuple"
+      ]
+    }
+  ],
+  "modeled_boundary": "context-manager form with one expected exception type and a named capture; exception value to str membership observation",
+  "not_modeled": [
+    "pytest.raises function-call form",
+    "tuple expected types, match, or check",
+    "exact exception text or code-to-message construction",
+    "path satisfiability"
+  ]
+}

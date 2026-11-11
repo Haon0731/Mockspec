@@ -129,7 +129,10 @@ if __name__ == "__main__":
     parser.add_argument("--inventory", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
-    report = survey(decode_json(args.inventory.read_text()))
+    inventory = decode_json(args.inventory.read_text())
+    if not isinstance(inventory, dict):
+        parser.error("inventory must be a JSON object")
+    report = survey(inventory)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("x") as stream:
         json.dump(report, stream, ensure_ascii=False, indent=2)
