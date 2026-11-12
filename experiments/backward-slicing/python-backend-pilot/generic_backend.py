@@ -26,16 +26,21 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(HERE.parent))
+sys.path.insert(0, str(HERE))
 
 from criteria import _FunctionBodyVisitor, extract_criteria  # noqa: E402
 from result_contract import RELATION_KINDS, RESULT_SCHEMA_VERSION, validate_result_contract  # noqa: E402
 from source_selection import select_sources  # noqa: E402
 from mock_spec.adapters.frozen_dataset import FrozenDataset  # noqa: E402
+from effect_projection import Observation as EffectObservation, project_effect_rows  # noqa: E402
+from opaque_facts import build_parameter_boundary_facts  # noqa: E402
 
 SCHEMA = "mockspec.generic-python-backend/v1"
 QUERY = HERE / "generic-observation-flow.ql"
+EFFECT_QUERY = HERE / "observation-effects.ql"
 QLPACK = HERE / "qlpack.yml"
 DRIVER_ENV = {"LANG": "C.UTF-8", "LC_ALL": "C.UTF-8", "PATH": os.defpath}
+MAX_EFFECT_OUTPUTS = 2_000
 
 
 def sha256_bytes(value: bytes) -> str:
@@ -103,6 +108,30 @@ def selector_locations(text: str, criteria: list[dict[str, Any]]) -> list[list[A
             facts.append([item["line"], node.lineno, len(prefix) + 1,
                           "call" if item.get("call") else "assert"])
     return facts
+
+
+def resolved_call_positions(text: str, scope: dict[str, Any],
+                            bindings: list[list[Any]]) -> list[tuple[int, int]]:
+    """Locate only the exact visible calls authenticated by a binding frontend."""
+    tree = ast.parse(text)
+    targets = [node for node in ast.walk(tree)
+               if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+               and node.name == scope["symbol"] and node.lineno == scope["start_line"]]
+    if len(targets) != 1:
+        return []
+    visitor = _FunctionBodyVisitor()
+    for statement in targets[0].body:
+        visitor.visit(statement)
+    requested = {(int(row[0]), str(row[1])) for row in bindings}
+    matches: dict[tuple[int, str], list[ast.Call]] = {key: [] for key in requested}
+    for node in visitor.nodes:
+        if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Name):
+            continue
+        key = (node.lineno, node.func.id)
+        if key in matches:
+            matches[key].append(node)
+    return sorted((nodes[0].lineno, nodes[0].col_offset + 1)
+                  for nodes in matches.values() if len(nodes) == 1)
 
 
 def _module_statement_binds(statement: ast.stmt, name: str) -> bool:
@@ -641,7 +670,7 @@ def support_loader_facts(sources: list[dict[str, Any]], selection: dict[str, Any
                                             "stage": "helper_start_line_not_authenticated"})
                     continue
                 product = selected_by_path.get(path)
-                if product is None or product.get("selection_role") == "loader_support":
+                if product is None or product.get("selection_role") != "candidate_product":
                     reject(loader_call, "loader_product_source_not_selected")
                     continue
                 product_tree = ast.parse(product["text"])
@@ -811,6 +840,37 @@ def loader_facts(sources: list[dict[str, Any]], selection: dict[str, Any],
     return [row for row in facts if counts[(row[0], row[1])] == 1]
 
 
+def _module_relative_paths(module: str) -> tuple[str, str]:
+    relative = module.replace(".", "/")
+    return f"{relative}.py", f"{relative}/__init__.py"
+
+
+def _authenticated_source_roots(selection: dict[str, Any]) -> set[str]:
+    roots: set[str] = set()
+    for row in selection.get("evidence", []):
+        module = row.get("hint")
+        candidates = row.get("candidates", [])
+        if (row.get("stage") != "masked_test" or row.get("hint_kind") != "python_import"
+                or not isinstance(module, str) or "." not in module
+                or len(candidates) != 1):
+            continue
+        candidate = candidates[0]
+        for relative in _module_relative_paths(module):
+            suffix = "/" + relative
+            if candidate.endswith(suffix):
+                roots.add(candidate[:-len(suffix)])
+    return roots
+
+
+def _module_path_authenticated(module: str, logical_path: str,
+                               source_roots: set[str]) -> bool:
+    return any(
+        logical_path == relative
+        or any(logical_path == f"{root}/{relative}" for root in source_roots)
+        for relative in _module_relative_paths(module)
+    )
+
+
 def import_facts(sources: list[dict[str, Any]], selection: dict[str, Any],
                  scope: dict[str, Any],
                  diagnostics: list[dict[str, Any]] | None = None) -> list[list[Any]]:
@@ -828,14 +888,20 @@ def import_facts(sources: list[dict[str, Any]], selection: dict[str, Any],
         visitor.visit(statement)
     target_nodes = visitor.nodes
     selected_by_path = {source["logical_path"]: source for source in sources}
-    exact_modules = {
-        row["hint"]: row["candidates"][0]
-        for row in selection.get("evidence", [])
-        if row.get("stage") == "masked_test"
-        and row.get("hint_kind") == "python_import"
-        and len(row.get("candidates", [])) == 1
-        and row["candidates"][0] in selected_by_path
-    }
+    source_roots = _authenticated_source_roots(selection)
+    exact_modules: dict[str, str] = {}
+    rejected_modules: set[str] = set()
+    for row in selection.get("evidence", []):
+        candidates = row.get("candidates", [])
+        module = row.get("hint")
+        if (row.get("stage") != "masked_test" or row.get("hint_kind") != "python_import"
+                or not isinstance(module, str) or len(candidates) != 1
+                or candidates[0] not in selected_by_path):
+            continue
+        if _module_path_authenticated(module, candidates[0], source_roots):
+            exact_modules[module] = candidates[0]
+        else:
+            rejected_modules.add(module)
     facts: list[list[Any]] = []
     parameters = {argument.arg for argument in (*target.args.posonlyargs, *target.args.args,
                                                  *target.args.kwonlyargs)}
@@ -846,12 +912,22 @@ def import_facts(sources: list[dict[str, Any]], selection: dict[str, Any],
     for statement in tree.body:
         if not isinstance(statement, ast.ImportFrom) or statement.level or statement.module is None:
             continue
+        if statement.module in rejected_modules:
+            if diagnostics is not None:
+                for imported in statement.names:
+                    local_name = imported.asname or imported.name
+                    diagnostics.extend({"scope": "visible_import_binding",
+                                        "path": test["logical_path"], "line": call.lineno,
+                                        "name": local_name,
+                                        "stage": "import_module_path_not_authenticated"}
+                                       for call in target_nodes if isinstance(call, ast.Call)
+                                       and isinstance(call.func, ast.Name)
+                                       and call.func.id == local_name)
+            continue
         product_path = exact_modules.get(statement.module)
         if product_path is None:
             continue
         product = selected_by_path[product_path]
-        if product.get("selection_role") == "loader_support":
-            continue
         product_tree = ast.parse(product["text"])
         for imported in statement.names:
             if imported.name == "*":
@@ -864,6 +940,9 @@ def import_facts(sources: list[dict[str, Any]], selection: dict[str, Any],
                     diagnostics.extend({"scope": "visible_import_binding",
                                         "path": test["logical_path"], "line": call.lineno,
                                         "name": local_name, "stage": stage} for call in calls)
+            if product.get("selection_role") != "candidate_product":
+                reject("import_product_source_not_candidate")
+                continue
             if local_name in parameters:
                 reject("import_name_is_parameter")
                 continue
@@ -962,9 +1041,11 @@ def summarize_entry_evidence(criteria: list[dict[str, Any]], rows: list[dict[str
         "product_body_controls": sum(
             row["relation"] == "product_guard_controls_return_to_observation" for row in rows),
         "product_body_exceptions": sum(
-            row["relation"] == "product_exception_exit_unknown" for row in rows),
+            row["relation"] in {"product_exception_exit_unknown",
+                                "product_rethrow_endpoint_unknown"} for row in rows),
         "product_unknown_effect_boundaries": sum(row["relation"] in {
-            "product_call_unknown_effect", "product_attribute_write_unknown_effect"}
+            "product_call_unknown_effect", "product_attribute_write_unknown_effect",
+            "product_external_state_unanalysed"}
             for row in rows),
         "missing_observations": [criterion["criterion_id"] for criterion in criteria
                                  if criterion["line"] not in mapped_lines],
@@ -995,9 +1076,9 @@ def build_contract(entry: dict[str, Any], context: dict[str, Any], sources: list
         )
     relations: list[dict[str, Any]] = []
     candidates: dict[tuple[str, int, str], dict[str, Any]] = {}
-    unknown_effects: dict[tuple[str, int, str], dict[str, Any]] = {}
+    unknown_effects: dict[tuple[Any, ...], dict[str, Any]] = {}
 
-    def add_unknown_effect(key: tuple[str, int, str], effect: dict[str, Any],
+    def add_unknown_effect(key: tuple[Any, ...], effect: dict[str, Any],
                            refs: list[str], observation: dict[str, Any] | None = None) -> None:
         current = unknown_effects.setdefault(key, effect)
         if refs:
@@ -1074,23 +1155,44 @@ def build_contract(entry: dict[str, Any], context: dict[str, Any], sources: list
                 "the branch is possible, not necessarily mandatory"
             )
             relations.append({"kind": "control_dependence", "modality": "analysis_may", **common})
-        elif kind == "product_exception_exit_unknown":
-            add_unknown_effect((row["sourcePath"], source_line, kind), {
-                "boundary_id": f"product:{row['sourcePath']}:{source_line}:exception_exit",
-                "effect": "product_exceptional_exit_expected_type_compatibility_unknown",
-                "scope": {"from": common["from"], "observations": []},
-                "provenance": "CodeQL exceptional exit plus authenticated pytest.raises shape",
-                "precision": "unknown_effect", "assumptions": [],
+        elif kind in {"product_exception_exit_unknown", "product_rethrow_endpoint_unknown"}:
+            detail_hash = sha256_bytes(row["detail"].encode())[:12]
+            endpoint_label = ("exception_exit" if kind == "product_exception_exit_unknown"
+                              else "bare_rethrow")
+            add_unknown_effect((row["sourcePath"], source_line, kind, row["detail"]), {
+                "boundary_id": (f"product:{row['sourcePath']}:{source_line}:"
+                                f"{endpoint_label}:{detail_hash}"),
+                "effect": ("product_exceptional_exit_expected_type_compatibility_unknown"
+                           if kind == "product_exception_exit_unknown" else
+                           "bare_rethrow_endpoint_outer_handler_and_type_compatibility_unknown"),
+                "scope": {"from": common["from"], "observations": [],
+                          "call_evidence": row["detail"]},
+                "provenance": common["provenance"],
+                "precision": ("unknown_effect; entry-reachable product endpoint is an "
+                              "observation-scoped frontier, not a proven influence"),
+                "assumptions": (["outer product handlers and expected exception type "
+                                 "compatibility are not proven"]
+                                if kind == "product_rethrow_endpoint_unknown" else
+                                ["same product execution route from endpoint to observation is "
+                                 "not proven"]),
             }, refs, target_endpoint)
-        elif kind in {"product_call_unknown_effect", "product_attribute_write_unknown_effect"}:
+        elif kind in {"product_call_unknown_effect", "product_attribute_write_unknown_effect",
+                      "product_external_state_unanalysed"}:
             effect = ("unknown_product_call_return_exception_and_reachable_state_effects"
                       if kind == "product_call_unknown_effect"
-                      else "visible_attribute_write_alias_region_and_overwrite_not_proven")
-            add_unknown_effect((row["sourcePath"], source_line, kind), {
-                "boundary_id": f"product:{row['sourcePath']}:{source_line}:{kind}",
-                "effect": effect, "scope": {"from": common["from"], "observations": []},
-                "provenance": "CodeQL product-body endpoint on authenticated observation chain",
-                "precision": "unknown_effect", "assumptions": [],
+                      else "visible_attribute_write_alias_region_and_overwrite_not_proven"
+                      if kind == "product_attribute_write_unknown_effect"
+                      else "visible_external_state_endpoint_to_observed_region_unproven")
+            detail_hash = sha256_bytes(row["detail"].encode())[:12]
+            add_unknown_effect((row["sourcePath"], source_line, kind, row["detail"]), {
+                "boundary_id": f"product:{row['sourcePath']}:{source_line}:{kind}:{detail_hash}",
+                "effect": effect, "scope": {"from": common["from"], "observations": [],
+                                             "call_evidence": row["detail"]},
+                "provenance": common["provenance"],
+                "precision": "unknown_effect",
+                "assumptions": (["receiver type and runtime region are unproven; the endpoint "
+                                 "does not establish an effect on the observed path"]
+                                if kind == "product_external_state_unanalysed" else []),
             }, refs, target_endpoint)
     candidate_values = list(candidates.values())
     binding_status = "unique" if len(candidate_values) == 1 else "ambiguous" if candidate_values else "unresolved"
@@ -1157,6 +1259,105 @@ def build_contract(entry: dict[str, Any], context: dict[str, Any], sources: list
     return contract
 
 
+def integrate_effect_rows(contract: dict[str, Any], criteria: list[dict[str, Any]],
+                          rows: list[dict[str, str]],
+                          *, product_paths: set[str],
+                          limit: int = MAX_EFFECT_OUTPUTS) -> dict[str, Any]:
+    """Append projected effect candidates without strengthening their modality."""
+    if limit < 1:
+        raise ValueError("effect output limit must be positive")
+    ordered_rows = sorted(rows, key=lambda row: tuple(sorted(row.items())))
+    projection = project_effect_rows(
+        [EffectObservation(criterion["criterion_id"], criterion["line"])
+         for criterion in criteria],
+        ordered_rows,
+        query_sha256=sha256_bytes(EFFECT_QUERY.read_bytes()),
+    )
+    grouped: dict[str, list[tuple[str, dict[str, Any]]]] = {}
+    for bucket in ("relations", "unknown_effects", "exclusions"):
+        for item in projection[bucket]:
+            observation_id = item.get("observation_ids", ["unattached"])[0]
+            grouped.setdefault(observation_id, []).append((bucket, item))
+    for items in grouped.values():
+        items.sort(key=lambda row: json.dumps(row[1], sort_keys=True, separators=(",", ":")))
+    published: list[tuple[str, dict[str, Any]]] = []
+    positions = {observation_id: 0 for observation_id in grouped}
+    while len(published) < limit:
+        progressed = False
+        for observation_id in sorted(grouped):
+            position = positions[observation_id]
+            if position >= len(grouped[observation_id]):
+                continue
+            published.append(grouped[observation_id][position])
+            positions[observation_id] += 1
+            progressed = True
+            if len(published) == limit:
+                break
+        if not progressed:
+            break
+    selected = {bucket: [item for item_bucket, item in published if item_bucket == bucket]
+                for bucket in ("relations", "unknown_effects", "exclusions")}
+    contract["relations"].extend(selected["relations"])
+    contract["analysis_boundaries"]["unknown_effects"].extend(
+        selected["unknown_effects"])
+    contract["analysis_boundaries"]["unanalysed_regions"].extend({
+        "scope": "effect_exclusion", "reason": exclusion["reason"],
+        "evidence": exclusion,
+    } for exclusion in selected["exclusions"])
+    projected_outputs = sum(len(items) for items in grouped.values())
+    omitted = projected_outputs - len(published)
+    if omitted:
+        omitted_by_observation = {
+            observation_id: len(items) - positions[observation_id]
+            for observation_id, items in sorted(grouped.items())
+            if len(items) > positions[observation_id]
+        }
+        contract["analysis_boundaries"]["unanalysed_regions"].append({
+            "scope": "effect_output_budget",
+            "reason": "effect_row_budget_exhausted",
+            "limit": limit,
+            "omitted_outputs": omitted,
+            "affected_observation_ids": list(omitted_by_observation),
+            "omitted_by_observation": omitted_by_observation,
+        })
+    validate_result_contract(contract)
+    cross_source = sum(
+        relation["from"]["logical_path"] in product_paths
+        and relation["from"]["logical_path"] != relation["to"]["logical_path"]
+        for relation in selected["relations"])
+    observation_linked = sum(
+        relation["from"]["logical_path"] in product_paths
+        and relation["from"]["logical_path"] != relation["to"]["logical_path"]
+        and bool(relation.get("observation_ids")) for relation in selected["relations"])
+    return {"relations": len(selected["relations"]),
+            "unknown_effects": len(selected["unknown_effects"]),
+            "exclusions": len(selected["exclusions"]),
+            "input_rows": len(ordered_rows), "projected_outputs": projected_outputs,
+            "published_outputs": len(published),
+            "omitted_outputs": omitted, "cross_source_relations": cross_source,
+            "observation_linked_cross_source_relations": observation_linked}
+
+
+def update_effect_evidence(entry_evidence: dict[str, Any], counts: dict[str, Any]) -> None:
+    entry_evidence["effect_projection"] = counts
+    entry_evidence["cross_source_relations"] += counts["cross_source_relations"]
+    entry_evidence["observation_linked_cross_source_relations"] += counts[
+        "observation_linked_cross_source_relations"]
+    if entry_evidence["observation_linked_cross_source_relations"]:
+        entry_evidence["analysis_entry_status"] = "observation_linked_to_product"
+
+
+def normalize_selected_sources(selected: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Attach the authoritative source role before any binding consumer runs."""
+    return [{"source_id": row["source_id"], "logical_path": row["logical_path"],
+             "sha256": sha256_bytes(row["text"].encode()),
+             "bytes": len(row["text"].encode()), "text": row["text"],
+             "selection_role": row.get(
+                 "selection_role", "masked_test" if row["source_id"] == "test"
+                 else "candidate_product")}
+            for row in selected]
+
+
 def execute(entry: dict[str, Any], registry_root: Path, output: Path, codeql: Path,
             *, max_files: int = 8, max_bytes: int = 200_000,
             database_timeout: int = 180, query_timeout: int = 360) -> dict[str, Any]:
@@ -1192,18 +1393,15 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, codeql: Pa
                 criterion["criterion_id"] = f"criterion:{index}"
             entry_evidence["observations_total"] = len(criteria)
             entry_evidence["missing_observations"] = [item["criterion_id"] for item in criteria]
+            entry_evidence["current_stage"] = "source_selection"
             selection = select_sources(case, max_files=max_files, max_bytes=max_bytes)
             selected = selection.pop("sources")
             context = {"target_selector": case.target_selector,
                        "target_scope": extraction["target_scope"]["locations"],
                        "masking_contract": case._masking_contract,
                        "masked_test_sha256": sha256_bytes(case.masked_test.text.encode())}
-        sources = [{"source_id": row["source_id"], "logical_path": row["logical_path"],
-                    "sha256": sha256_bytes(row["text"].encode()),
-                    "bytes": len(row["text"].encode()), "text": row["text"],
-                    "selection_role": row.get("selection_role", "masked_test"
-                                              if row["source_id"] == "test"
-                                              else "candidate_product")} for row in selected]
+        sources = normalize_selected_sources(selected)
+        entry_evidence["current_stage"] = "input_provenance"
         write_json(output / "input-provenance.json", {
             "identity": {key: entry[key] for key in ("case_id", "dataset", "language", "snapshot_id")},
             "input_context": context, "criteria": criteria,
@@ -1211,12 +1409,15 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, codeql: Pa
                 "source_id", "logical_path", "sha256", "bytes", "selection_role")}
                         for row in sources],
             "implementation_sha256": {str(path.relative_to(ROOT)): sha256_bytes(path.read_bytes())
-                                      for path in (Path(__file__), QUERY, HERE.parent / "source_selection.py",
+                                      for path in (Path(__file__), QUERY, EFFECT_QUERY,
+                                                   HERE / "effect_projection.py",
+                                                   HERE / "opaque_facts.py",
+                                                   HERE.parent / "source_selection.py",
                                                    HERE.parent / "criteria.py")},
         })
-        test_source = next(row for row in selected if row["source_id"] == "test")
+        test_source = next(row for row in sources if row["source_id"] == "test")
         entry_evidence["input_prepared"] = True
-        entry_evidence["current_stage"] = "database_create"
+        entry_evidence["current_stage"] = "source_materialization"
         with tempfile.TemporaryDirectory(prefix="mockspec-generic-python-") as temporary:
             work = Path(temporary)
             input_root, query_root = work / "input", work / "query"
@@ -1226,31 +1427,43 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, codeql: Pa
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 destination.write_text(source["text"])
             shutil.copy2(QLPACK, query_root / "qlpack.yml")
+            entry_evidence["current_stage"] = "selector_fact_preparation"
             query_text = QUERY.read_text()
             binding_diagnostics: list[dict[str, Any]] = []
             loader_bindings = [list(row) for row in sorted({
                 tuple(row) for row in [
-                    *loader_facts(selected, selection, context["target_scope"][0],
+                    *loader_facts(sources, selection, context["target_scope"][0],
                                   binding_diagnostics),
-                    *support_loader_facts(selected, selection, context["target_scope"][0],
+                    *support_loader_facts(sources, selection, context["target_scope"][0],
                                           binding_diagnostics),
                 ]
             })]
+            import_bindings = import_facts(
+                sources, selection, context["target_scope"][0], binding_diagnostics)
+            resolved_sites = resolved_call_positions(
+                test_source["text"], context["target_scope"][0],
+                [*loader_bindings, *import_bindings])
+            opaque_bindings = [[fact.line, fact.column, fact.origin] for fact in
+                               build_parameter_boundary_facts(
+                                   test_source["text"],
+                                   function_name=case.target_selector.rsplit("::", 1)[-1],
+                                   function_start_line=context["target_scope"][0]["start_line"],
+                                   resolved_call_sites=resolved_sites)]
             selector_facts = {
                 "test_path": test_source["logical_path"],
                 "test_function": case.target_selector.rsplit("::", 1)[-1],
                 "test_start_line": context["target_scope"][0]["start_line"],
                 "observations": [{"observation_id": criterion["criterion_id"],
                                   "line": criterion["line"]} for criterion in criteria],
-                "observation_expressions": selector_locations(selected[0]["text"], criteria),
+                "observation_expressions": selector_locations(test_source["text"], criteria),
                 "visible_loader_bindings": loader_bindings,
-                "visible_import_bindings": import_facts(
-                    selected, selection, context["target_scope"][0], binding_diagnostics),
+                "visible_import_bindings": import_bindings,
+                "opaque_call_bindings": opaque_bindings,
                 "binding_diagnostics": binding_diagnostics,
                 "loader_support_sources": [
                     {"logical_path": source["logical_path"],
                      "sha256": sha256_bytes(source["text"].encode())}
-                    for source in selected if source.get("selection_role") == "loader_support"
+                    for source in sources if source["selection_role"] == "loader_support"
                 ],
             }
             write_json(output / "selector-facts.json", selector_facts)
@@ -1264,6 +1477,7 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, codeql: Pa
                 "selectedSupportPathFact": output / "selector-support-paths.csv",
                 "visibleLoaderBindingFact": output / "selector-loader-bindings.csv",
                 "visibleImportBindingFact": output / "selector-import-bindings.csv",
+                "selectedOpaqueCallFact": output / "selector-opaque-calls.csv",
             }
             write_external_column(fact_files["selectedTestPathFact"], [selector_facts["test_path"]])
             write_external_column(fact_files["selectedTestFunctionFact"],
@@ -1277,14 +1491,19 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, codeql: Pa
                                    if source["selection_role"] == "loader_support"])
             for key, predicate in (("observation_expressions", "selectedObservationExprFact"),
                                    ("visible_loader_bindings", "visibleLoaderBindingFact"),
-                                   ("visible_import_bindings", "visibleImportBindingFact")):
+                                   ("visible_import_bindings", "visibleImportBindingFact"),
+                                   ("opaque_call_bindings", "selectedOpaqueCallFact")):
                 with fact_files[predicate].open("w", newline="") as stream:
                     csv.writer(stream).writerows(selector_facts[key])
             query = query_root / QUERY.name
             query.write_text(query_text)
+            effect_query_text = EFFECT_QUERY.read_text()
+            effect_query = query_root / EFFECT_QUERY.name
+            effect_query.write_text(effect_query_text)
             version = json.loads(subprocess.check_output(
                 [str(codeql), "version", "--format=json"], text=True, env=DRIVER_ENV, timeout=30))
             database, bqrs = work / "database", work / "result.bqrs"
+            entry_evidence["current_stage"] = "database_create"
             db_cost = run_tool([str(codeql), "database", "create", str(database), "--language=python",
                                 f"--source-root={input_root}", "--threads=2", "--ram=4096", "--overwrite"],
                                cwd=work, stdout=output / "database.stdout", stderr=output / "database.stderr",
@@ -1296,7 +1515,11 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, codeql: Pa
             entry_evidence["current_stage"] = "query"
             query_cost = run_tool([str(codeql), "query", "run", f"--database={database}", "--threads=2",
                                    "--ram=4096", f"--output={bqrs}",
-                                   *[f"--external={name}={path}" for name, path in fact_files.items()],
+                                   *[f"--external={name}={fact_files[name]}" for name in (
+                                       "selectedTestPathFact", "selectedTestFunctionFact",
+                                       "selectedTestStartLineFact", "selectedObservationLineFact",
+                                       "selectedObservationExprFact", "selectedSupportPathFact",
+                                       "visibleLoaderBindingFact", "visibleImportBindingFact")],
                                    str(query)], cwd=work,
                                   stdout=output / "query.stdout", stderr=output / "query.stderr",
                                   timeout=query_timeout)
@@ -1313,20 +1536,53 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, codeql: Pa
                 raise RuntimeError("generic CodeQL result decode failed")
             with csv_path.open(newline="") as stream:
                 rows = list(csv.DictReader(stream))
+            entry_evidence["current_stage"] = "effect_query"
+            effect_bqrs = work / "effect-result.bqrs"
+            effect_query_cost = run_tool([
+                str(codeql), "query", "run", f"--database={database}", "--threads=2",
+                "--ram=4096", f"--output={effect_bqrs}",
+                *[f"--external={name}={fact_files[name]}" for name in (
+                    "selectedTestPathFact", "selectedTestFunctionFact",
+                    "selectedTestStartLineFact", "selectedObservationLineFact",
+                    "selectedObservationExprFact", "selectedSupportPathFact",
+                    "selectedOpaqueCallFact",
+                    "visibleLoaderBindingFact", "visibleImportBindingFact")],
+                str(effect_query)], cwd=work, stdout=output / "effect-query.stdout",
+                stderr=output / "effect-query.stderr", timeout=query_timeout)
+            entry_evidence["tool_runs"]["effect_query"] = effect_query_cost
+            if effect_query_cost["status"] != "complete" or effect_query_cost["exit_code"]:
+                raise RuntimeError("effect CodeQL query failed")
+            entry_evidence["current_stage"] = "effect_decode"
+            effect_csv_path = output / "effect-relations.csv"
+            effect_decode_cost = run_tool([
+                str(codeql), "bqrs", "decode", "--format=csv",
+                f"--output={effect_csv_path}", str(effect_bqrs)], cwd=work,
+                stdout=output / "effect-decode.stdout", stderr=output / "effect-decode.stderr")
+            entry_evidence["tool_runs"]["effect_decode"] = effect_decode_cost
+            if effect_decode_cost["status"] != "complete" or effect_decode_cost["exit_code"]:
+                raise RuntimeError("effect CodeQL result decode failed")
+            with effect_csv_path.open(newline="") as stream:
+                effect_rows = list(csv.DictReader(stream))
+        mapping_started = time.monotonic()
         entry_evidence.update(summarize_entry_evidence(criteria, rows))
         entry_evidence["current_stage"] = "mapped"
         source_records = [{key: row[key] for key in (
             "source_id", "logical_path", "sha256", "bytes", "selection_role")}
                           for row in sources]
-        total = time.monotonic() - started
-        costs = {"timings_seconds": {"database": db_cost["seconds"], "query": query_cost["seconds"],
-                                     "decode": decode_cost["seconds"]}, "total_seconds": total,
-                 "total_scope": "frozen admission, bounded selection, CodeQL database/query/decode and mapping",
+        costs: dict[str, Any] = {"timings_seconds": {"database": db_cost["seconds"],
+                                     "query": query_cost["seconds"],
+                                     "decode": decode_cost["seconds"],
+                                     "effect_query": effect_query_cost["seconds"],
+                                     "effect_decode": effect_decode_cost["seconds"]},
+                 "total_seconds": 0.0,
+                 "total_scope": ("frozen admission, bounded selection, one CodeQL database, "
+                                 "generic/effect queries, decodes and mapping"),
                  "peak_memory": {"status": "unavailable", "bytes": None,
                                  "reason": "generic runner does not yet collect per-process peak RSS"},
                  "cache_state": {"status": "cold", "reason": "fresh temporary database; OS/tool distribution caches not isolated"},
                  "input_size": {"files": len(sources), "bytes": sum(row["bytes"] for row in sources)},
-                 "graph_size": {"nodes": None, "edges": len(rows)}, "unavailable_phases": []}
+                 "graph_size": {"nodes": None, "edges": len(rows) + len(effect_rows)},
+                 "unavailable_phases": []}
         boundaries = [{"scope": "source_selection", "reason": value}
                       for value in selection["diagnostics"]]
         boundaries.extend(binding_diagnostics)
@@ -1335,12 +1591,36 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, codeql: Pa
             {"scope": "interprocedural_return_exception_state", "reason": "generic query is incomplete"},
         ])
         contract = build_contract(entry, context, source_records, criteria, rows, costs, boundaries)
+        entry_evidence["current_stage"] = "effect_projection"
+        projection_started = time.monotonic()
+        product_paths = {
+            source["logical_path"] for source in source_records
+            if source["selection_role"] == "candidate_product"
+        }
+        effect_counts = integrate_effect_rows(
+            contract, criteria, effect_rows, product_paths=product_paths)
+        projection_seconds = time.monotonic() - projection_started
+        entry_evidence["effect_rows"] = len(effect_rows)
+        update_effect_evidence(entry_evidence, effect_counts)
+        costs["timings_seconds"]["mapping"] = projection_started - mapping_started
+        costs["timings_seconds"]["effect_projection"] = projection_seconds
+        costs["total_seconds"] = time.monotonic() - started
+        entry_evidence["current_stage"] = "mapped"
         result = {"schema": SCHEMA, "status": "complete", "backend": "generic_codeql_python",
                   "identity": contract["identity"], "result_contract": contract,
                   "source_selection": selection, "raw_relation_count": len(rows),
+                  "raw_effect_relation_count": len(effect_rows),
                   "entry_evidence": entry_evidence,
                   "provenance": {"query_template_sha256": sha256_bytes(QUERY.read_bytes()),
                                  "rendered_query_sha256": sha256_bytes(query_text.encode()),
+                                 "effect_query_template_sha256": sha256_bytes(
+                                     EFFECT_QUERY.read_bytes()),
+                                 "rendered_effect_query_sha256": sha256_bytes(
+                                     effect_query_text.encode()),
+                                 "effect_projection_sha256": sha256_bytes(
+                                     (HERE / "effect_projection.py").read_bytes()),
+                                 "opaque_facts_sha256": sha256_bytes(
+                                     (HERE / "opaque_facts.py").read_bytes()),
                                  "selector_facts_sha256": sha256_bytes(
                                      (output / "selector-facts.json").read_bytes()),
                                  "codeql_version": version["version"], "driver_environment": DRIVER_ENV,

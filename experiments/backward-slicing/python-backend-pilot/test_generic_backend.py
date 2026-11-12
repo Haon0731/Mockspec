@@ -35,6 +35,7 @@ def test_query_uses_external_selectors_and_has_no_case_allow_list():
     assert "product_guard_controls_return_to_observation" in query
     assert "product_exception_exit_unknown" in query
     assert "executedProductCall" in query
+    assert "observation = observedUse or observation.contains(observedUse)" in query
     assert 'API::moduleImport("asyncio").getMember("run")' in query
     assert "not selectedSupportPath" in query
     assert "case_id" not in query
@@ -90,6 +91,19 @@ def test_observation_selector_targets_assert_expression_not_nested_calls():
     assert backend.selector_locations(text, [{"line": 2}, {"line": 2}]) == []
 
 
+def test_resolved_call_positions_use_exact_selected_scope_line_and_name():
+    text = """def test_x():
+    loaded(value)
+    loaded(value); other(value)
+
+def test_x():
+    loaded(value)
+"""
+    bindings = [[2, "loaded"], [3, "loaded"], [3, "missing"]]
+    assert backend.resolved_call_positions(
+        text, {"symbol": "test_x", "start_line": 1}, bindings) == [(2, 5), (3, 5)]
+
+
 def test_multiple_backend_roots_do_not_count_as_a_unique_observation():
     criteria = [{"criterion_id": "criterion:0", "line": 7}]
     row = {"relation": "observation", "sourcePath": "test.py", "targetPath": "test.py",
@@ -142,7 +156,8 @@ def test_x():
     product = "def run():\n    return 1\n"
     sources = [
         {"source_id": "test", "logical_path": "tests/test_x.py", "text": test},
-        {"source_id": "source:1", "logical_path": "src/pkg/api.py", "text": product},
+        {"source_id": "source:1", "logical_path": "src/pkg/api.py", "text": product,
+         "selection_role": "candidate_product"},
     ]
     selection = {"evidence": [{"stage": "masked_test", "hint_kind": "python_import",
                                 "hint": "pkg.api", "candidates": ["src/pkg/api.py"]}]}
@@ -159,10 +174,39 @@ def test_x():
     sources[1]["selection_role"] = "loader_support"
     sources[0]["text"] = test
     assert backend.import_facts(sources, selection, scope) == []
-    sources[1].pop("selection_role")
+    sources[1]["selection_role"] = "masked_test"
+    assert backend.import_facts(sources, selection, scope) == []
+    sources[1]["selection_role"] = "candidate_product"
     sources[0]["text"] = test.replace(
         "\ndef test_x():", "\nexecute = other\n\ndef test_x():")
     assert backend.import_facts(sources, selection, {"symbol": "test_x", "start_line": 5}) == []
+
+
+def test_import_facts_reject_unrelated_suffix_module_path():
+    sources = [
+        {"source_id": "test", "logical_path": "tests/test_x.py", "text":
+         "from types import SimpleNamespace\ndef test_x():\n    assert SimpleNamespace()\n",
+         "selection_role": "masked_test"},
+        {"source_id": "source:1", "logical_path": "src/pkg/types.py", "text":
+         "def SimpleNamespace():\n    return object()\n",
+         "selection_role": "candidate_product"},
+        {"source_id": "source:2", "logical_path": "src/pkg/api.py", "text":
+         "def run():\n    return 1\n", "selection_role": "candidate_product"},
+    ]
+    selection = {"evidence": [
+        {"stage": "masked_test", "hint_kind": "python_import", "hint": "pkg.api",
+         "candidates": ["src/pkg/api.py"]},
+        {"stage": "masked_test", "hint_kind": "python_import", "hint": "types",
+         "candidates": ["src/pkg/types.py"]},
+    ]}
+    diagnostics = []
+
+    assert backend.import_facts(
+        sources, selection, {"symbol": "test_x", "start_line": 2}, diagnostics) == []
+    assert diagnostics == [{"scope": "visible_import_binding",
+                            "path": "tests/test_x.py", "line": 3,
+                            "name": "SimpleNamespace",
+                            "stage": "import_module_path_not_authenticated"}]
 
 
 def test_import_facts_mark_async_definition_for_explicit_await_query_path():
@@ -170,7 +214,7 @@ def test_import_facts_mark_async_definition_for_explicit_await_query_path():
         {"source_id": "test", "logical_path": "tests/test_x.py", "text":
          "from pkg.api import run\nasync def test_x():\n    result = await run()\n    assert result\n"},
         {"source_id": "source:1", "logical_path": "src/pkg/api.py", "text":
-         "async def run():\n    return 1\n"},
+         "async def run():\n    return 1\n", "selection_role": "candidate_product"},
     ]
     selection = {"evidence": [{"stage": "masked_test", "hint_kind": "python_import",
                                 "hint": "pkg.api", "candidates": ["src/pkg/api.py"]}]}
@@ -181,7 +225,7 @@ def test_import_facts_mark_async_definition_for_explicit_await_query_path():
 
 def test_asyncio_run_requires_unshadowed_module_and_raw_coroutine_stays_unwrapped():
     source = {"source_id": "source:1", "logical_path": "src/pkg/api.py", "text":
-              "async def run():\n    return 1\n"}
+              "async def run():\n    return 1\n", "selection_role": "candidate_product"}
     selection = {"evidence": [{"stage": "masked_test", "hint_kind": "python_import",
                                 "hint": "pkg.api", "candidates": ["src/pkg/api.py"]}]}
     wrapped = "import asyncio\nfrom pkg.api import run\ndef test_x():\n    assert asyncio.run(run()) == 1\n"
@@ -209,7 +253,7 @@ def test_mixed_awaited_and_raw_async_diagnostic_marks_only_raw_call():
         {"source_id": "test", "logical_path": "tests/test_x.py", "text":
          "from pkg.api import run\nasync def test_x():\n    value = await run()\n    raw = run()\n    assert value\n"},
         {"source_id": "source:1", "logical_path": "src/pkg/api.py", "text":
-         "async def run():\n    return 1\n"},
+         "async def run():\n    return 1\n", "selection_role": "candidate_product"},
     ]
     selection = {"evidence": [{"stage": "masked_test", "hint_kind": "python_import",
                                 "hint": "pkg.api", "candidates": ["src/pkg/api.py"]}]}
@@ -307,6 +351,112 @@ def test_unknown_effects_retain_all_observation_ids_and_endpoints():
         ]
 
 
+def test_effect_projection_cap_frontier_and_effect_only_entry_accounting():
+    entry = {"case_id": "case", "dataset": "dataset", "snapshot_id": "snapshot"}
+    context = {"masking_contract": "python-slot-v1", "masked_test_sha256": "a" * 64,
+               "target_selector": "tests/test_x.py::test_x", "target_scope": []}
+    sources = [
+        {"source_id": "test", "logical_path": "tests/test_x.py", "sha256": "a" * 64,
+         "bytes": 5},
+        {"source_id": "source:1", "logical_path": "src/x.py", "sha256": "b" * 64,
+         "bytes": 5},
+    ]
+    criteria = [
+        {"criterion_id": "criterion:0", "line": 7, "kind": "value_assertion",
+         "confidence": "explicit", "reason": "first"},
+        {"criterion_id": "criterion:1", "line": 8, "kind": "value_assertion",
+         "confidence": "explicit", "reason": "second"},
+    ]
+    observations = [{"relation": "observation", "sourcePath": "tests/test_x.py",
+                     "sourceLine": str(line), "sourceEndLine": str(line),
+                     "targetPath": "tests/test_x.py", "targetLine": str(line),
+                     "targetEndLine": str(line), "observationLine": str(line),
+                     "argumentIndex": "-1", "detail": "selected"} for line in (7, 8)]
+    contract = backend.build_contract(
+        entry, context, sources, criteria, observations, costs(), [])
+    effect_rows = [{
+        "relation": "visible_product_write_to_observation", "certainty": "candidate",
+        "route": "normal", "sourcePath": "src/x.py", "sourceLine": str(line),
+        "sourceEndLine": str(line), "sourceColumn": "5", "sourceEndColumn": "17",
+        "targetPath": "tests/test_x.py", "targetLine": str(observation),
+        "targetEndLine": str(observation), "targetColumn": "12", "targetEndColumn": "21",
+        "observationLine": str(observation),
+        "fieldName": "ready",
+        "regionKey": "parameter", "argumentIndex": "0", "detail": "visible write",
+        "callPath": "tests/test_x.py", "callLine": str(observation - 1),
+        "callEndLine": str(observation - 1), "callColumn": "5", "callEndColumn": "17",
+        "productPath": "src/x.py", "productLine": "1", "productEndLine": "30",
+        "productName": "fill",
+    } for line, observation in ((10, 7), (11, 7), (12, 7), (20, 8))]
+
+    counts = backend.integrate_effect_rows(
+        contract, criteria, effect_rows, product_paths={"src/x.py"}, limit=2)
+    evidence = {"cross_source_relations": 0,
+                "observation_linked_cross_source_relations": 0,
+                "analysis_entry_status": "observations_mapped_only"}
+    backend.update_effect_evidence(evidence, counts)
+
+    assert counts["published_outputs"] == 2 and counts["omitted_outputs"] == 2
+    state_rows = [row for row in contract["relations"] if row["kind"] == "state_flow"]
+    assert {tuple(row["observation_ids"]) for row in state_rows} == {
+        ("criterion:0",), ("criterion:1",)}
+    assert contract["analysis_boundaries"]["unanalysed_regions"][-1] == {
+        "scope": "effect_output_budget", "reason": "effect_row_budget_exhausted",
+        "limit": 2, "omitted_outputs": 2,
+        "affected_observation_ids": ["criterion:0"],
+        "omitted_by_observation": {"criterion:0": 2},
+    }
+    assert evidence["cross_source_relations"] == 2
+    assert evidence["observation_linked_cross_source_relations"] == 2
+    assert evidence["analysis_entry_status"] == "observation_linked_to_product"
+
+
+def test_effect_relation_from_non_product_role_does_not_promote_entry_status():
+    entry = {"case_id": "case", "dataset": "dataset", "snapshot_id": "snapshot"}
+    context = {"selected_source_ids": ["test", "source:0"], "target_scope": [],
+               "source_provenance": {}, "masking_contract": "python-slot-v1",
+               "masked_test_sha256": "a" * 64,
+               "target_selector": "tests/test_x.py::test_x"}
+    sources = [
+        {"source_id": "test", "logical_path": "tests/test_x.py", "sha256": "a" * 64,
+         "bytes": 5},
+        {"source_id": "source:0", "logical_path": "tests/helpers.py", "sha256": "b" * 64,
+         "bytes": 5},
+    ]
+    criteria = [{"criterion_id": "criterion:0", "line": 7, "kind": "value_assertion",
+                 "confidence": "explicit", "reason": "selected"}]
+    observations = [{"relation": "observation", "sourcePath": "tests/test_x.py",
+                     "sourceLine": "7", "sourceEndLine": "7",
+                     "targetPath": "tests/test_x.py", "targetLine": "7",
+                     "targetEndLine": "7", "observationLine": "7",
+                     "argumentIndex": "-1", "detail": "selected"}]
+    contract = backend.build_contract(
+        entry, context, sources, criteria, observations, costs(), [])
+    effect_rows = [{
+        "relation": "visible_product_write_to_observation", "certainty": "candidate",
+        "route": "normal", "sourcePath": "tests/helpers.py", "sourceLine": "3",
+        "sourceEndLine": "3", "sourceColumn": "5", "sourceEndColumn": "17",
+        "targetPath": "tests/test_x.py", "targetLine": "7", "targetEndLine": "7",
+        "targetColumn": "12", "targetEndColumn": "21", "observationLine": "7",
+        "fieldName": "ready", "regionKey": "parameter", "argumentIndex": "0",
+        "detail": "visible write",
+        "callPath": "tests/test_x.py", "callLine": "6", "callEndLine": "6",
+        "callColumn": "5", "callEndColumn": "17", "productPath": "tests/helpers.py",
+        "productLine": "1", "productEndLine": "5", "productName": "fill",
+    }]
+    counts = backend.integrate_effect_rows(
+        contract, criteria, effect_rows, product_paths=set())
+    evidence = {"cross_source_relations": 0,
+                "observation_linked_cross_source_relations": 0,
+                "analysis_entry_status": "observations_mapped_only"}
+    backend.update_effect_evidence(evidence, counts)
+
+    assert counts["relations"] == 1
+    assert counts["cross_source_relations"] == 0
+    assert counts["observation_linked_cross_source_relations"] == 0
+    assert evidence["analysis_entry_status"] == "observations_mapped_only"
+
+
 def test_loader_support_role_is_preserved_but_never_promoted_to_product_scope():
     entry = {"case_id": "case", "dataset": "dataset", "snapshot_id": "snapshot"}
     context = {"masking_contract": "python-slot-v1", "masked_test_sha256": "a" * 64,
@@ -327,6 +477,26 @@ def test_loader_support_role_is_preserved_but_never_promoted_to_product_scope():
         entry, context, sources, criteria, [observation], costs(), [])
     assert contract["source_scope"][1]["selection_role"] == "loader_support"
     assert contract["entry_point"]["mut_binding"]["status"] == "unresolved"
+
+
+def test_normalized_sources_feed_role_hardened_binding_consumers():
+    raw = [
+        {"source_id": "test", "logical_path": "tests/test_x.py", "text":
+         "from pkg.api import run\ndef test_x():\n    assert run()\n"},
+        {"source_id": "source:1", "logical_path": "src/pkg/api.py", "text":
+         "def run():\n    return 1\n"},
+        {"source_id": "source:2", "logical_path": "tests/helper.py", "text":
+         "def helper():\n    return 1\n", "selection_role": "loader_support"},
+    ]
+    sources = backend.normalize_selected_sources(raw)
+    selection = {"evidence": [{"stage": "masked_test", "hint_kind": "python_import",
+                                "hint": "pkg.api", "candidates": ["src/pkg/api.py"]}]}
+
+    assert [source["selection_role"] for source in sources] == [
+        "masked_test", "candidate_product", "loader_support"]
+    assert backend.import_facts(
+        sources, selection, {"symbol": "test_x", "start_line": 2}) == [
+            [3, "run", "src/pkg/api.py", 1, "run", 2, 0, ""]]
 
 
 def test_support_loader_facts_require_visible_verified_pipeline_and_unique_target():
@@ -369,6 +539,11 @@ def load_function_from_source_ast(module_path, function_name, namespace=None, st
     assert backend.support_loader_facts(sources, selection, scope) == [
         [6, "run", "src/pkg/api.py", 1, "run", 2, 2, "asyncio"]]
 
+    for non_product_role in ("loader_support", "masked_test"):
+        sources[2]["selection_role"] = non_product_role
+        assert backend.support_loader_facts(sources, selection, scope) == []
+    sources[2]["selection_role"] = "candidate_product"
+
     sources[1]["text"] = helper.replace('setdefault("__name__", "visible_source")',
                                          'setdefault("__builtins__", "visible_source")')
     assert backend.support_loader_facts(sources, selection, scope) == []
@@ -404,7 +579,8 @@ def test_x():
         {"source_id": "test", "logical_path": "tests/test_x.py", "text": base_test},
         {"source_id": "source:1", "logical_path": "tests/test_utils.py", "text": helper,
          "selection_role": "loader_support"},
-        {"source_id": "source:2", "logical_path": "src/x.py", "text": "def f():\n    return 1\n"},
+        {"source_id": "source:2", "logical_path": "src/x.py", "text": "def f():\n    return 1\n",
+         "selection_role": "candidate_product"},
     ]
     selection = {"evidence": [{"stage": "loader_support",
                                 "candidates": ["tests/test_utils.py"]}]}
@@ -453,7 +629,8 @@ def test_x():
         {"source_id": "test", "logical_path": "tests/test_x.py", "text": test},
         {"source_id": "support", "logical_path": "tests/test_utils.py", "text": helper,
          "selection_role": "loader_support"},
-        {"source_id": "product", "logical_path": "src/x.py", "text": "def f():\n    return 1\n"},
+        {"source_id": "product", "logical_path": "src/x.py", "text": "def f():\n    return 1\n",
+         "selection_role": "candidate_product"},
     ]
     selection = {"evidence": [{"stage": "loader_support",
                                 "candidates": ["tests/test_utils.py"]}]}
@@ -540,7 +717,8 @@ def test_x():
 
 def test_module_scope_conditional_delete_loop_and_invalid_async_wrapper_are_rejected():
     product = {"source_id": "source:1", "logical_path": "src/pkg/api.py",
-               "text": "async def run():\n    return 1\n"}
+               "text": "async def run():\n    return 1\n",
+               "selection_role": "candidate_product"}
     selection = {"evidence": [{"stage": "masked_test", "hint_kind": "python_import",
                                 "hint": "pkg.api", "candidates": ["src/pkg/api.py"]}]}
     base = "from pkg.api import run\ndef test_x():\n    assert run()\n"
@@ -572,4 +750,66 @@ def test_product_body_counts_exclude_unknown_effect_boundaries_from_typed_influe
     evidence = backend.summarize_entry_evidence(criteria, [observation, body, unknown])
     assert evidence["observation_linked_cross_source_relations"] == 1
     assert evidence["product_body_returns"] == 1
+    assert evidence["product_unknown_effect_boundaries"] == 1
+    unknown_only = backend.summarize_entry_evidence(criteria, [observation, unknown])
+    assert unknown_only["observation_linked_cross_source_relations"] == 0
+    assert unknown_only["analysis_entry_status"] == "observations_mapped_only"
+
+
+def test_rethrow_and_external_state_frontiers_preserve_call_evidence_without_influence():
+    entry = {"case_id": "case", "dataset": "dataset", "snapshot_id": "snapshot"}
+    context = {"masking_contract": "python-slot-v1", "masked_test_sha256": "a" * 64,
+               "target_selector": "tests/test_x.py::test_x", "target_scope": []}
+    sources = [
+        {"source_id": "test", "logical_path": "tests/test_x.py", "sha256": "a" * 64,
+         "bytes": 5},
+        {"source_id": "source:1", "logical_path": "src/x.py", "sha256": "b" * 64,
+         "bytes": 5},
+    ]
+    criteria = [{"criterion_id": "criterion:0", "line": 7, "kind": "value_assertion",
+                 "confidence": "explicit", "reason": "assert"}]
+    observation = {"relation": "observation", "sourcePath": "tests/test_x.py",
+                   "sourceLine": "7", "sourceEndLine": "7", "targetPath": "tests/test_x.py",
+                   "targetLine": "7", "targetEndLine": "7", "observationLine": "7",
+                   "argumentIndex": "-1", "detail": "selected"}
+    rows = [observation, {
+        "relation": "product_rethrow_endpoint_unknown", "sourcePath": "src/x.py",
+        "sourceLine": "38", "sourceEndLine": "38", "targetPath": "tests/test_x.py",
+        "targetLine": "7", "targetEndLine": "7", "observationLine": "7",
+        "argumentIndex": "-1",
+        "detail": "loader:test_call:6:6:9:30:bare_rethrow_outer_handler_unknown",
+    }, {
+        "relation": "product_external_state_unanalysed", "sourcePath": "src/x.py",
+        "sourceLine": "31", "sourceEndLine": "31", "targetPath": "tests/test_x.py",
+        "targetLine": "7", "targetEndLine": "7", "observationLine": "7",
+        "argumentIndex": "-1",
+        "detail": ("loader:test_call:6:6:9:30:normal_continuation_region_unproven:"
+                   "external_state_method_endpoint_region_type_unproven:unlink"),
+    }]
+
+    contract = backend.build_contract(entry, context, sources, criteria, rows, costs(), [])
+    effects = contract["analysis_boundaries"]["unknown_effects"]
+
+    assert {effect["effect"] for effect in effects} == {
+        "bare_rethrow_endpoint_outer_handler_and_type_compatibility_unknown",
+        "visible_external_state_endpoint_to_observed_region_unproven",
+    }
+    assert all(effect["observation_ids"] == ["criterion:0"] for effect in effects)
+    assert all("test_call:6:6:9:30" in effect["scope"]["call_evidence"]
+               for effect in effects)
+    by_effect = {effect["effect"]: effect for effect in effects}
+    assert by_effect[
+        "bare_rethrow_endpoint_outer_handler_and_type_compatibility_unknown"
+    ]["assumptions"] == [
+        "outer product handlers and expected exception type compatibility are not proven"
+    ]
+    assert by_effect[
+        "visible_external_state_endpoint_to_observed_region_unproven"
+    ]["assumptions"] == [
+        "receiver type and runtime region are unproven; the endpoint does not establish an effect "
+        "on the observed path"
+    ]
+    evidence = backend.summarize_entry_evidence(criteria, rows)
+    assert evidence["observation_linked_cross_source_relations"] == 0
+    assert evidence["product_body_exceptions"] == 1
     assert evidence["product_unknown_effect_boundaries"] == 1

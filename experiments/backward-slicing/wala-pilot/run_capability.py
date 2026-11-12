@@ -12,6 +12,7 @@ import time
 
 HERE = Path(__file__).resolve().parent
 BACKEND = HERE / "backend/src/main/java/org/mockspec/research/WalaSliceProbe.java"
+EFFECT_ANALYZER = HERE / "backend/src/main/java/org/mockspec/research/ObservationEffectAnalyzer.java"
 MECHANISM = HERE / "backend/src/testFixtures/java/sample/MechanismProbe.java"
 PROBES = (
     ("visible", "visibleObservation(ILsample/MechanismProbe$Box;)I"),
@@ -66,6 +67,7 @@ def run(
         raise ValueError("WALA classpath contains missing dependencies")
     input_hashes = {
         "backend_sha256": _sha256(BACKEND),
+        "effect_analyzer_sha256": _sha256(EFFECT_ANALYZER),
         "mechanism_sha256": _sha256(MECHANISM),
         "runner_sha256": _sha256(Path(__file__).resolve()),
         "dependency_sha256": {str(path): _sha256(path) for path in dependencies},
@@ -106,7 +108,8 @@ def run(
         mechanism_classes.mkdir()
         receipts = {
             "compile_backend": _run(
-                ["javac", "-g", "-cp", wala_classpath, "-d", str(backend_classes), str(BACKEND)],
+                ["javac", "-g", "-cp", wala_classpath, "-d", str(backend_classes),
+                 str(BACKEND), str(EFFECT_ANALYZER)],
                 timeout=90, stdout=output / "compile-backend.stdout.txt",
                 stderr=output / "compile-backend.stderr.txt"),
             "compile_mechanism": _run(

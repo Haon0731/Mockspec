@@ -1130,6 +1130,9 @@ def summarize_issue23_expanded_effects(run: Path, jib_summary_path: Path) -> dic
     source_identity_matches = (
         manifest.get("inputs", {}).get("backend_sha256")
         == _sha256(here / "backend/src/main/java/org/mockspec/research/WalaSliceProbe.java")
+        and (manifest.get("inputs", {}).get("effect_analyzer_sha256") is None
+             or manifest.get("inputs", {}).get("effect_analyzer_sha256")
+             == _sha256(here / "backend/src/main/java/org/mockspec/research/ObservationEffectAnalyzer.java"))
         and manifest.get("inputs", {}).get("mechanism_sha256")
         == _sha256(here / "backend/src/testFixtures/java/sample/MechanismProbe.java")
         and manifest.get("inputs", {}).get("runner_sha256")

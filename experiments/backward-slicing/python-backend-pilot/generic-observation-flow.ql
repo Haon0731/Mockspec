@@ -11,6 +11,7 @@ import semmle.python.types.FunctionObject
 import semmle.python.types.Exceptions
 import semmle.python.dataflow.new.DataFlow
 import semmle.python.dataflow.new.internal.Attributes
+private import LegacyPointsTo
 
 external string selectedTestPathFact();
 external string selectedTestFunctionFact();
@@ -54,7 +55,9 @@ predicate visibleLoaderCall(Call call, Function function, int functionEnd, int r
   visibleLoaderBindingFact(call.getLocation().getStartLine(), call.getFunc().(Name).getId(),
                           function.getLocation().getFile().getRelativePath(),
                           function.getLocation().getStartLine(), function.getName(),
-                          functionEnd, resultMode, runnerName)
+                          functionEnd, resultMode, runnerName) and
+  not selectedTestPath(function.getLocation().getFile().getRelativePath()) and
+  not selectedSupportPath(function.getLocation().getFile().getRelativePath())
 }
 
 predicate visibleImportCall(Call call, Function function, int functionEnd, int resultMode,
@@ -63,7 +66,9 @@ predicate visibleImportCall(Call call, Function function, int functionEnd, int r
   visibleImportBindingFact(call.getLocation().getStartLine(), call.getFunc().(Name).getId(),
                           function.getLocation().getFile().getRelativePath(),
                           function.getLocation().getStartLine(), function.getName(),
-                          functionEnd, resultMode, runnerName)
+                          functionEnd, resultMode, runnerName) and
+  not selectedTestPath(function.getLocation().getFile().getRelativePath()) and
+  not selectedSupportPath(function.getLocation().getFile().getRelativePath())
 }
 
 predicate visibleFrontendCall(Call call, Function function, int functionEnd, int resultMode,
@@ -146,7 +151,8 @@ predicate linkedProductResult(Call call, Function function, Expr resultExpr,
     (origin = "native" and nativeCallResultExpr(call, function, resultMode, runnerName, resultExpr)
      or origin != "native" and
         visibleCallResultExpr(call, resultMode, runnerName, resultExpr)) and
-    selectedObservationExpr(observation, observationLine) and observation.contains(observedUse) and
+    selectedObservationExpr(observation, observationLine) and
+    (observation = observedUse or observation.contains(observedUse)) and
     DataFlow::localFlow(DataFlow::exprNode(resultExpr), DataFlow::exprNode(observedUse))
   )
 }
@@ -158,8 +164,72 @@ predicate selectedPytestRaisesObservation(Call productCall, Expr observation, in
     context.getBody().contains(productCall) and
     apiCall = API::moduleImport("pytest").getMember("raises").getACall() and
     apiCall.asExpr() = raisesCall and raisesCall.getPositionalArgumentCount() = 1 and
-    not exists(raisesCall.getANamedArg()) and not exists(raisesCall.getStarArg()) and
+    forall(DictItem item | item = raisesCall.getANamedArg() |
+      item instanceof Keyword and item.(Keyword).getArg() = "match" and
+      item.(Keyword).getValue() instanceof ImmutableLiteral
+    ) and not exists(raisesCall.getStarArg()) and
     not exists(raisesCall.getKwargs())
+  )
+}
+
+predicate branchReaches(ControlFlowNode guardNode, ControlFlowNode target, boolean truth) {
+  truth = true and
+  (guardNode.getATrueSuccessor() = target or guardNode.getATrueSuccessor().strictlyReaches(target))
+  or
+  truth = false and
+  (guardNode.getAFalseSuccessor() = target or guardNode.getAFalseSuccessor().strictlyReaches(target))
+}
+
+predicate branchSelectsReturn(ControlFlowNode guardNode, ControlFlowNode returnNode, boolean truth) {
+  truth = true and branchReaches(guardNode, returnNode, true) and
+  not branchReaches(guardNode, returnNode, false)
+  or
+  truth = false and branchReaches(guardNode, returnNode, false) and
+  not branchReaches(guardNode, returnNode, true)
+}
+
+predicate selectedPathStateObservation(Expr observation, int observationLine) {
+  selectedObservationExpr(observation, observationLine) and
+  exists(Call stateCall, Attribute operation |
+    (observation = stateCall or observation.contains(stateCall)) and
+    stateCall.getFunc() = operation and
+    operation.getName() in ["exists", "read_text", "read_bytes", "glob", "iterdir"]
+  )
+}
+
+predicate productExternalStateEndpoint(Call effectCall, string category) {
+  exists(Attribute operation |
+    effectCall.getFunc() = operation and
+    operation.getName() in ["unlink", "write", "write_text", "write_bytes", "mkdir",
+                            "rmdir", "rename", "replace", "copy", "copy2", "move"] and
+    category = "external_state_method_endpoint_region_type_unproven:" + operation.getName()
+  )
+  or
+  effectCall.getFunc() instanceof Name and effectCall.getFunc().(Name).getId() = "open" and
+  category = "builtin_open_endpoint_mode_region_unproven"
+}
+
+predicate productExecutionPrecedesPathObservation(
+  Call productCall, Function function, Expr observation, int observationLine,
+  string origin, string route
+) {
+  exists(int visibleEnd, int resultMode, string runnerName, Expr resultExpr |
+    executedProductCall(productCall, function, visibleEnd, resultMode, runnerName, origin) and
+    (origin = "native" and nativeCallResultExpr(
+       productCall, function, resultMode, runnerName, resultExpr)
+     or origin != "native" and visibleCallResultExpr(
+       productCall, resultMode, runnerName, resultExpr)) and
+    selectedPathStateObservation(observation, observationLine) and
+    DataFlow::exprNode(resultExpr).asCfgNode().strictlyReaches(
+      DataFlow::exprNode(observation).asCfgNode()
+    ) and
+    (
+      selectedPytestRaisesObservation(productCall, _, _) and
+      route = "pytest_exception_continuation_region_unproven"
+      or
+      not selectedPytestRaisesObservation(productCall, _, _) and
+      route = "normal_continuation_region_unproven"
+    )
   )
 }
 
@@ -172,6 +242,24 @@ predicate linkedProductObservation(Call productCall, Function function, Expr obs
   exists(int visibleEnd, int resultMode, string runnerName |
     executedProductCall(productCall, function, visibleEnd, resultMode, runnerName, origin) and
     selectedPytestRaisesObservation(productCall, observation, observationLine)
+  )
+}
+
+/** An endpoint contained by source that the Python extractor proves unreachable. */
+predicate withinUnreachableStatement(AstNode endpoint) {
+  exists(Stmt statement |
+    (statement = endpoint or statement.contains(endpoint)) and statement.isUnreachable()
+  )
+}
+
+/** Every inferred raised type has a concrete exceptional successor that handles it. */
+predicate allKnownRaisedTypesHandled(RaisingNode raising) {
+  exists(ClassValue raised | raised = raising.getARaisedType()) and
+  not raising.raisesUnknownType() and
+  forall(ClassValue raised | raised = raising.getARaisedType() |
+    exists(ExceptFlowNodeWithPointsTo handler |
+      handler = raising.getAnExceptionalSuccessor() and handler.handles(raised)
+    )
   )
 }
 
@@ -301,13 +389,17 @@ where
     )
     or
     exists(Call call, Function function, Expr resultExpr, Expr observation,
-      Return returned, If guard, ControlFlowNode guardNode, ControlFlowNode returnNode,
-      boolean truth, string origin |
+      Return returned, If guard, ConditionBlock guardBlock, ControlFlowNode guardNode,
+      ControlFlowNode returnNode, boolean truth, string origin |
       linkedProductResult(call, function, resultExpr, observation, observationLine, origin) and
       returned.getScope() = function and guard.getScope() = function and
-      guardNode.getNode() = guard.getTest() and returnNode.getNode() = returned and
+      not guard.getTest() instanceof ImmutableLiteral and
+      guardNode = guardBlock.getLastNode() and
+      (guardNode.getNode() = guard.getTest() or guard.getTest().contains(guardNode.getNode())) and
+      returnNode.getNode() = returned and
       function.getEntryNode().strictlyReaches(returnNode) and
-      guardNode.getBasicBlock().(ConditionBlock).controls(returnNode.getBasicBlock(), truth) and
+      (guardBlock.controls(returnNode.getBasicBlock(), truth)
+       or branchSelectsReturn(guardNode, returnNode, truth)) and
       relation = "product_guard_controls_return_to_observation" and
       sourcePath = guard.getLocation().getFile().getRelativePath() and
       sourceLine = guard.getLocation().getStartLine() and
@@ -325,20 +417,46 @@ where
       executedProductCall(call, function, visibleEnd, resultMode, runnerName, origin) and
       selectedPytestRaisesObservation(call, observation, observationLine) and
       exceptionSource.getNode().getScope() = function and
-      exceptionSource.isExceptionalExit(function) and
-      relation = "product_exception_exit_unknown" and
+      function.getEntryNode().strictlyReaches(exceptionSource) and
+      not withinUnreachableStatement(exceptionSource.getNode()) and
+      ((exceptionSource.viableExceptionalExit(function, _)
+        or exists(Raise raised |
+          exceptionSource.getNode() = raised and exists(raised.getException()) and
+          not allKnownRaisedTypesHandled(exceptionSource)
+        )) and
+       relation = "product_exception_exit_unknown"
+       or
+       exists(Raise rethrow, ExceptionHandler handler |
+         exceptionSource.getNode() = rethrow and handler.contains(rethrow) and
+         not exists(rethrow.getException())
+       ) and relation = "product_rethrow_endpoint_unknown") and
       sourcePath = exceptionSource.getLocation().getFile().getRelativePath() and
       sourceLine = exceptionSource.getLocation().getStartLine() and
       sourceEndLine = exceptionSource.getLocation().getEndLine() and
       targetPath = observation.getLocation().getFile().getRelativePath() and
       targetLine = observation.getLocation().getStartLine() and
       targetEndLine = observation.getLocation().getEndLine() and
-      argumentIndex = -1 and detail = origin + ":exceptional_exit_type_compatibility_unknown"
+      argumentIndex = -1 and
+      (relation = "product_exception_exit_unknown" and
+       detail = origin + ":test_call:" + call.getLocation().getStartLine().toString() + ":" +
+                call.getLocation().getEndLine().toString() + ":" +
+                call.getLocation().getStartColumn().toString() + ":" +
+                call.getLocation().getEndColumn().toString() +
+                ":exceptional_exit_type_compatibility_unknown"
+       or relation = "product_rethrow_endpoint_unknown" and
+          detail = origin + ":test_call:" + call.getLocation().getStartLine().toString() + ":" +
+                   call.getLocation().getEndLine().toString() + ":" +
+                   call.getLocation().getStartColumn().toString() + ":" +
+                   call.getLocation().getEndColumn().toString() +
+                   ":bare_rethrow_outer_handler_and_type_compatibility_unknown")
     )
     or
-    exists(Call call, Function function, Expr observation, Call effectCall, string origin |
+    exists(Call call, Function function, Expr observation, Call effectCall,
+      ControlFlowNode effectNode, string origin |
       linkedProductObservation(call, function, observation, observationLine, origin) and
-      effectCall.getScope() = function and
+      effectCall.getScope() = function and effectNode.getNode() = effectCall and
+      function.getEntryNode().strictlyReaches(effectNode) and
+      not withinUnreachableStatement(effectCall) and
       relation = "product_call_unknown_effect" and
       sourcePath = effectCall.getLocation().getFile().getRelativePath() and
       sourceLine = effectCall.getLocation().getStartLine() and
@@ -346,13 +464,20 @@ where
       targetPath = observation.getLocation().getFile().getRelativePath() and
       targetLine = observation.getLocation().getStartLine() and
       targetEndLine = observation.getLocation().getEndLine() and
-      argumentIndex = -1 and detail = origin + ":return_exception_state_unknown"
+      argumentIndex = -1 and
+      detail = origin + ":test_call:" + call.getLocation().getStartLine().toString() + ":" +
+               call.getLocation().getEndLine().toString() + ":" +
+               call.getLocation().getStartColumn().toString() + ":" +
+               call.getLocation().getEndColumn().toString() +
+               ":return_exception_state_unknown"
     )
     or
     exists(Call call, Function function, Expr observation,
-      DataFlow::AttrWrite write, string origin |
+      DataFlow::AttrWrite write, ControlFlowNode writeNode, string origin |
       linkedProductObservation(call, function, observation, observationLine, origin) and
-      write.getScope() = function and
+      write.getScope() = function and writeNode = write.asCfgNode() and
+      function.getEntryNode().strictlyReaches(writeNode) and
+      not withinUnreachableStatement(writeNode.getNode()) and
       relation = "product_attribute_write_unknown_effect" and
       sourcePath = write.getLocation().getFile().getRelativePath() and
       sourceLine = write.getLocation().getStartLine() and
@@ -360,7 +485,35 @@ where
       targetPath = observation.getLocation().getFile().getRelativePath() and
       targetLine = observation.getLocation().getStartLine() and
       targetEndLine = observation.getLocation().getEndLine() and
-      argumentIndex = -1 and detail = origin + ":alias_and_overwrite_not_proven"
+      argumentIndex = -1 and
+      detail = origin + ":test_call:" + call.getLocation().getStartLine().toString() + ":" +
+               call.getLocation().getEndLine().toString() + ":" +
+               call.getLocation().getStartColumn().toString() + ":" +
+               call.getLocation().getEndColumn().toString() +
+               ":alias_and_overwrite_not_proven"
+    )
+    or
+    exists(Call call, Function function, Expr observation, Call effectCall,
+      ControlFlowNode effectNode, string origin, string category, string route |
+      productExecutionPrecedesPathObservation(
+        call, function, observation, observationLine, origin, route
+      ) and
+      effectCall.getScope() = function and productExternalStateEndpoint(effectCall, category) and
+      effectNode.getNode() = effectCall and function.getEntryNode().strictlyReaches(effectNode) and
+      not withinUnreachableStatement(effectCall) and
+      relation = "product_external_state_unanalysed" and
+      sourcePath = effectCall.getLocation().getFile().getRelativePath() and
+      sourceLine = effectCall.getLocation().getStartLine() and
+      sourceEndLine = effectCall.getLocation().getEndLine() and
+      targetPath = observation.getLocation().getFile().getRelativePath() and
+      targetLine = observation.getLocation().getStartLine() and
+      targetEndLine = observation.getLocation().getEndLine() and
+      argumentIndex = -1 and
+      detail = origin + ":test_call:" + call.getLocation().getStartLine().toString() + ":" +
+               call.getLocation().getEndLine().toString() + ":" +
+               call.getLocation().getStartColumn().toString() + ":" +
+               call.getLocation().getEndColumn().toString() +
+               ":" + route + ":" + category
     )
     or
     exists(If guard, Expr observation, ControlFlowNode guardNode,

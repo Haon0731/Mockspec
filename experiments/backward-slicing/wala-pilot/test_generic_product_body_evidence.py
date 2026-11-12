@@ -8,6 +8,7 @@ import pytest
 
 HERE = Path(__file__).resolve().parent
 MAIN = HERE / "backend/src/main/java/org/mockspec/research/WalaSliceProbe.java"
+EFFECT_ANALYZER = HERE / "backend/src/main/java/org/mockspec/research/ObservationEffectAnalyzer.java"
 FIXTURE = HERE / "backend/src/testFixtures/java/sample/GenericProductEvidenceFixture.java"
 
 
@@ -33,7 +34,8 @@ def test_generic_slice_keeps_product_return_and_dominating_guard_without_heap_cl
         check=True,
     )
     subprocess.run(
-        ["javac", "-g", "-proc:none", "-cp", classpath, "-d", str(probe_classes), str(MAIN)],
+        ["javac", "-g", "-proc:none", "-cp", classpath, "-d", str(probe_classes),
+         str(MAIN), str(EFFECT_ANALYZER)],
         check=True,
     )
     query = "SOURCE_LINE:22:-1:.assertEquals("

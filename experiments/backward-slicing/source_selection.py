@@ -299,15 +299,32 @@ def _java_hints(text: str) -> tuple[list[dict[str, str]], list[str]]:
     return hints, []
 
 
-def _matches(hint: dict[str, str], paths: tuple[str, ...], language: str) -> list[str]:
+def _python_source_roots(hints: list[dict[str, str]], paths: tuple[str, ...]) -> set[str]:
+    roots: set[str] = set()
+    for hint in hints:
+        value = hint["value"].replace("\\", "/").lstrip("./")
+        if hint["kind"] != "python_import" or "." not in value:
+            continue
+        module = value.replace(".", "/")
+        for suffix in (module + ".py", module + "/__init__.py"):
+            marker = "/" + suffix
+            roots.update(path[:-len(marker)] for path in paths if path.endswith(marker))
+    return roots
+
+
+def _matches(hint: dict[str, str], paths: tuple[str, ...], language: str,
+             python_source_roots: set[str] | None = None) -> list[str]:
     value = hint["value"].replace("\\", "/").lstrip("./")
     if hint["kind"] in {"python_dynamic_path", "python_visible_source_path"}:
         return [path for path in paths if path == value or path.endswith("/" + value)]
     if language == "python":
         module = value.replace(".", "/")
         suffixes = (module + ".py", module + "/__init__.py")
-        return [path for path in paths if any(path == suffix or path.endswith("/" + suffix)
-                                               for suffix in suffixes)]
+        roots = python_source_roots or set()
+        return [path for path in paths if any(
+            path == suffix or any(path == f"{root}/{suffix}" for root in roots)
+            or not roots and path.endswith("/" + suffix)
+            for suffix in suffixes)]
     suffix = value.replace(".", "/") + ".java"
     return [path for path in paths if path == suffix or path.endswith("/" + suffix)]
 
@@ -763,6 +780,8 @@ def select_sources(case: Any, *, max_files: int = 8, max_bytes: int = 200_000,
     else:
         initial_hints, initial_diagnostics = extract(test.text, test.logical_path)
     diagnostics.extend(initial_diagnostics)
+    python_source_roots = (_python_source_roots(initial_hints, available)
+                           if case.language == "python" else set())
     queue = deque((hint, "masked_test") for hint in initial_hints)
     considered: set[tuple[str, str]] = set()
     selected_paths: set[str] = set()
@@ -775,7 +794,8 @@ def select_sources(case: Any, *, max_files: int = 8, max_bytes: int = 200_000,
         if key in considered:
             continue
         considered.add(key)
-        candidates = sorted(set(_matches(hint, available, case.language)) - selected_paths)
+        candidates = sorted(set(_matches(
+            hint, available, case.language, python_source_roots)) - selected_paths)
         if not candidates:
             continue
         evidence.append({"stage": stage, "hint_kind": hint["kind"],
@@ -838,7 +858,8 @@ def select_sources(case: Any, *, max_files: int = 8, max_bytes: int = 200_000,
         hints, nested_diagnostics = extract(source["text"], source["logical_path"])
         diagnostics.extend(nested_diagnostics)
         for hint in hints:
-            candidates = sorted(set(_matches(hint, available, case.language)) - selected_paths)
+            candidates = sorted(set(_matches(
+                hint, available, case.language, python_source_roots)) - selected_paths)
             if not candidates:
                 continue
             evidence.append({"stage": "one_hop_import", "from_path": path,

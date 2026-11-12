@@ -52,6 +52,25 @@ target = load_function_from_source_ast(f"{root}/feature.py", "target")
         "source_id": "source:2", "name": "support", "start_line": 1, "end_line": 2}]
 
 
+def test_absolute_single_module_import_does_not_match_nested_project_suffix():
+    case = Case("python", "tests/test_feature.py", """
+from types import SimpleNamespace
+from crawl4ai.async_configs import AsyncConfig
+
+def test_feature():
+    assert AsyncConfig()
+""", {
+        "src/crawl4ai/async_configs.py": "class AsyncConfig:\n    pass\n",
+        "src/crawl4ai/types.py": "class SimpleNamespace:\n    pass\n",
+    })
+
+    result = select_sources(case)
+
+    assert [item["logical_path"] for item in result["sources"]] == [
+        "tests/test_feature.py", "src/crawl4ai/async_configs.py"]
+    assert "src/crawl4ai/types.py" not in case.reads
+
+
 def test_pathlib_read_exec_loader_selects_visible_source_and_reports_function_origin():
     case = Case("python", "tests/test_encryption.py", """
 from pathlib import Path

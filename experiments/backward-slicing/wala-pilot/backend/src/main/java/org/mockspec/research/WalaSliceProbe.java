@@ -36,10 +36,12 @@ import com.ibm.wala.ipa.slicer.GetCaughtExceptionStatement;
 import com.ibm.wala.ipa.summaries.MethodSummary;
 import com.ibm.wala.ipa.summaries.SummarizedMethod;
 import com.ibm.wala.ssa.IR;
+import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.ISSABasicBlock;
 import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAConditionalBranchInstruction;
+import com.ibm.wala.ssa.SSAGetInstruction;
 import com.ibm.wala.ssa.SSAPutInstruction;
 import com.ibm.wala.ssa.SSAReturnInstruction;
 import com.ibm.wala.ssa.SSAThrowInstruction;
@@ -77,9 +79,9 @@ public final class WalaSliceProbe {
   private WalaSliceProbe() {}
 
   public static void main(String[] args) throws Exception {
-    if (args.length < 5 || args.length > 8) {
+    if (args.length < 5 || args.length > 10) {
       throw new IllegalArgumentException(
-          "usage: <application-jar> <library-classpath-or-dash> <entry-class> <entry-selector> <criterion> [OPAQUE_SUMMARIES] [GENERIC_NO_HEAP] [ROOT_OUTPUT_DIR:<path>]");
+          "usage: <application-jar> <library-classpath-or-dash> <entry-class> <entry-selector> <criterion> [OPAQUE_SUMMARIES] [GENERIC_NO_HEAP] [OBSERVATION_EFFECT_SCAN] [OBSERVATION_EFFECTS] [ROOT_OUTPUT_DIR:<path>]");
     }
     Path application = Path.of(args[0]).toAbsolutePath().normalize();
     String libraryClasspath = args[1];
@@ -96,10 +98,17 @@ public final class WalaSliceProbe {
     }
     boolean opaqueSummaries = false;
     boolean genericNoHeap = false;
+    boolean observationEffects = false;
+    boolean observationEffectScan = false;
     Path rootOutputDirectory = null;
     for (int index = 5; index < args.length; index++) {
       if ("OPAQUE_SUMMARIES".equals(args[index])) opaqueSummaries = true;
       else if ("GENERIC_NO_HEAP".equals(args[index])) genericNoHeap = true;
+      else if ("OBSERVATION_EFFECT_SCAN".equals(args[index])) observationEffectScan = true;
+      else if ("OBSERVATION_EFFECTS".equals(args[index])) {
+        observationEffects = true;
+        observationEffectScan = true;
+      }
       else if (args[index].startsWith("ROOT_OUTPUT_DIR:")) {
         if (rootOutputDirectory != null) throw new IllegalArgumentException("duplicate root output directory");
         rootOutputDirectory = Path.of(args[index].substring("ROOT_OUTPUT_DIR:".length()))
@@ -208,13 +217,42 @@ public final class WalaSliceProbe {
         "WALA_STAGE sdg_initialized lazy_pdg=true elapsed_ms=%d%n",
         timings.get("sdg_initialization"));
 
+    Map<String, ObservationReads> observationReads = new LinkedHashMap<>();
+    boolean heapEffectsDemanded = false;
+    if (observationEffects) {
+      for (String query : criterionQueries) {
+        ObservationReads reads = directObservationFieldReads(entryNode, findSeed(entryNode, query));
+        observationReads.put(query, reads);
+        heapEffectsDemanded |= !reads.instanceReads.isEmpty();
+      }
+    }
+    SDG<InstanceKey> effectSdg = null;
+    if (heapEffectsDemanded) {
+      started = System.nanoTime();
+      effectSdg = genericNoHeap
+          ? new SDG<>(callGraph, pointerAnalysis, Slicer.DataDependenceOptions.FULL,
+                      Slicer.ControlDependenceOptions.FULL)
+          : sdg;
+      timings.put("observation_effect_full_sdg_initialization", elapsed(started));
+      System.err.printf(
+          "WALA_STAGE observation_effect_full_sdg_initialized demanded_roots=%d elapsed_ms=%d%n",
+          observationReads.values().stream().filter(reads -> !reads.instanceReads.isEmpty()).count(),
+          timings.get("observation_effect_full_sdg_initialization"));
+    }
+
     List<Map<String, Object>> rootAnalyses = new ArrayList<>();
     for (int rootIndex = 0; rootIndex < criterionQueries.size(); rootIndex++) {
       String query = criterionQueries.get(rootIndex);
       Map<String, Object> root;
       try {
+        ObservationReads reads = observationReads.getOrDefault(query, ObservationReads.EMPTY);
+        if (observationEffectScan && !observationEffects) {
+          reads = directObservationFieldReads(entryNode, findSeed(entryNode, query));
+        }
         root = analyzeRoot(
-            query, entryNode, entryMethod.getSignature(), callGraph, summaries, sdg, genericNoHeap);
+            query, entryNode, entryMethod.getSignature(), callGraph, summaries, sdg, genericNoHeap,
+            effectSdg, reads,
+            pointerAnalysis, observationEffectScan);
       } catch (Exception failure) {
         if (!criteriaFileMode) throw failure;
         root = Map.of(
@@ -232,15 +270,22 @@ public final class WalaSliceProbe {
     Map<String, Object> result = new LinkedHashMap<>();
     result.put("schema_version", "mockspec.wala-capability/v2");
     result.put("wala_version", "1.7.2");
-    result.put("configuration", Map.of(
-        "call_graph", "0-1-CFA",
-        "data_dependence", dataDependence.name(),
-        "control_dependence", controlDependence.name(),
-        "traversal", genericNoHeap ? "hash_backed_unmatched_context_predecessors" : "wala_matched_call",
-        "reflection", "NONE",
-        "opaque_effect_model", "bounded-effect-token-v1",
-        "entry_origin", "explicit_diagnostic",
-        "opaque_summary_mode", opaqueSummaries));
+    Map<String, Object> configuration = new LinkedHashMap<>();
+    configuration.put("call_graph", "0-1-CFA");
+    configuration.put("data_dependence", dataDependence.name());
+    configuration.put("control_dependence", controlDependence.name());
+    configuration.put("traversal", genericNoHeap
+        ? "hash_backed_unmatched_context_predecessors" : "wala_matched_call");
+    configuration.put("reflection", "NONE");
+    configuration.put("opaque_effect_model", "bounded-effect-token-v1");
+    configuration.put("observation_effects", observationEffects);
+    configuration.put("observation_effect_scan", observationEffectScan);
+    configuration.put("heap_effect_analysis_demanded", heapEffectsDemanded);
+    configuration.put("observation_effect_demand_scope",
+        "direct instance SSAGet definitions of exact original observation seed uses only; static/global fields, getter returns, phi chains and indirect reads remain unsupported");
+    configuration.put("entry_origin", "explicit_diagnostic");
+    configuration.put("opaque_summary_mode", opaqueSummaries);
+    result.put("configuration", configuration);
     List<Map<String, Object>> opaqueEffects = new ArrayList<>();
     if (opaqueSummaries) {
       String effectKind = effectKind(entrySelector);
@@ -352,7 +397,11 @@ public final class WalaSliceProbe {
       CallGraph callGraph,
       Map<MethodReference, MethodSummary> summaries,
       SDG<InstanceKey> sdg,
-      boolean genericNoHeap) throws CancelException {
+      boolean genericNoHeap,
+      SDG<InstanceKey> effectSdg,
+      ObservationReads observationReads,
+      PointerAnalysis<InstanceKey> pointerAnalysis,
+      boolean observationEffectScan) throws CancelException {
     NormalStatement seed = findSeed(entryNode, query);
     Map<String, Long> timings = new LinkedHashMap<>();
     long started = System.nanoTime();
@@ -378,6 +427,10 @@ public final class WalaSliceProbe {
         : describeEffectForwardSlices(callGraph, summaries, sdg, entrySignature);
     List<Map<String, Object>> productBodyEvidence =
         describeProductBodyEvidence(slice, sdg, entrySignature);
+    List<Map<String, Object>> observationEffectEvidence = effectSdg == null
+        ? List.of()
+        : describeObservationEffects(
+            seed, observationReads.instanceReads, effectSdg, callGraph, summaries, pointerAnalysis);
 
     started = System.nanoTime();
     List<Map<String, Object>> statements = new ArrayList<>();
@@ -436,6 +489,20 @@ public final class WalaSliceProbe {
     result.put("criterion", Map.of("query", query, "seed", describe(seed)));
     result.put("effect_forward_slices", effectForwardSlices);
     result.put("product_body_evidence", productBodyEvidence);
+    result.put("observation_effect_evidence", observationEffectEvidence);
+    String effectDemandStatus = !observationEffectScan
+        ? "not_scanned"
+        : !observationReads.instanceReads.isEmpty()
+            ? (effectSdg == null ? "demanded_instance_field" : "analyzed_full_heap")
+            : !observationReads.staticReads.isEmpty()
+                ? "not_demanded_static_field_unmodeled"
+                : "not_demanded_direct_read_absent";
+    result.put("observation_effect_demand", Map.of(
+        "status", effectDemandStatus,
+        "instance_read_count", observationReads.instanceReads.size(),
+        "static_read_count", observationReads.staticReads.size(),
+        "scope", "direct SSAGet definitions of exact original observation seed uses",
+        "unsupported", List.of("static/global fields", "getter-return reads", "phi-mediated reads", "indirect object-state observations")));
     result.put("lazy_sdg_nodes_after_slice", lazySdgNodes);
     result.put("slice_statements", statements);
     result.put("seed_index", indexes.get(seed));
@@ -447,6 +514,108 @@ public final class WalaSliceProbe {
     result.put("slice_edges", edges);
     result.put("call_bindings", callBindings);
     result.put("root_timings_millis", timings);
+    return result;
+  }
+
+  private static ObservationReads directObservationFieldReads(
+      CGNode entryNode, NormalStatement seed) {
+    IR ir = entryNode.getIR();
+    if (ir == null) return ObservationReads.EMPTY;
+    SSAInstruction instruction = seed.getInstruction();
+    DefUse defUse = new DefUse(ir);
+    List<NormalStatement> instanceReads = new ArrayList<>();
+    List<NormalStatement> staticReads = new ArrayList<>();
+    Set<Integer> indexes = new LinkedHashSet<>();
+    for (int use = 0; use < instruction.getNumberOfUses(); use++) {
+      SSAInstruction definition = defUse.getDef(instruction.getUse(use));
+      if (definition instanceof SSAGetInstruction && indexes.add(definition.iIndex())) {
+        NormalStatement read = new NormalStatement(entryNode, definition.iIndex());
+        if (((SSAGetInstruction) definition).isStatic()) staticReads.add(read);
+        else instanceReads.add(read);
+      }
+    }
+    return new ObservationReads(instanceReads, staticReads);
+  }
+
+  private static final class ObservationReads {
+    static final ObservationReads EMPTY = new ObservationReads(List.of(), List.of());
+    final List<NormalStatement> instanceReads;
+    final List<NormalStatement> staticReads;
+
+    ObservationReads(List<NormalStatement> instanceReads, List<NormalStatement> staticReads) {
+      this.instanceReads = instanceReads;
+      this.staticReads = staticReads;
+    }
+  }
+
+  private static List<Map<String, Object>> describeObservationEffects(
+      NormalStatement seed,
+      List<NormalStatement> observationReads,
+      SDG<InstanceKey> effectSdg,
+      CallGraph callGraph,
+      Map<MethodReference, MethodSummary> summaries,
+      PointerAnalysis<InstanceKey> pointerAnalysis) {
+    if (observationReads.isEmpty()) return List.of();
+    BackwardSliceResult fullSlice = hashBackedBackwardSlice(effectSdg, seed, 50_000);
+    Set<Statement> retained = new LinkedHashSet<>(fullSlice.statements);
+    List<Statement> writes = new ArrayList<>();
+    for (Statement statement : retained) {
+      if (!(statement instanceof StatementWithInstructionIndex)) continue;
+      if (!statement.getNode().getMethod().getDeclaringClass().getClassLoader().getReference()
+          .equals(ClassLoaderReference.Application)) continue;
+      if (((StatementWithInstructionIndex) statement).getInstruction() instanceof SSAPutInstruction) {
+        writes.add(statement);
+      }
+    }
+    List<Statement> opaqueCalls = new ArrayList<>();
+    List<Map<String, Object>> opaqueAuthentication = new ArrayList<>();
+    IR entryIr = seed.getNode().getIR();
+    if (entryIr != null) {
+      SSAInstruction[] instructions = entryIr.getInstructions();
+      for (int index = 0; index < instructions.length; index++) {
+        if (!(instructions[index] instanceof SSAAbstractInvokeInstruction)) continue;
+        SSAAbstractInvokeInstruction invoke = (SSAAbstractInvokeInstruction) instructions[index];
+        Set<CGNode> targets = callGraph.getPossibleTargets(seed.getNode(), invoke.getCallSite());
+        if (targets.isEmpty()) continue;
+        boolean allConfiguredSummaries = true;
+        List<String> targetMethods = new ArrayList<>();
+        for (CGNode target : targets) {
+          targetMethods.add(target.getMethod().getSignature());
+          allConfiguredSummaries &= summaries.containsKey(target.getMethod().getReference());
+        }
+        if (!allConfiguredSummaries) continue;
+        targetMethods.sort(String::compareTo);
+        NormalStatement call = new NormalStatement(seed.getNode(), index);
+        opaqueCalls.add(call);
+        opaqueAuthentication.add(Map.of(
+            "call", describe(call),
+            "declared_target", invoke.getDeclaredTarget().getSignature(),
+            "possible_targets", targetMethods,
+            "authentication", "all exact call-graph targets are configured opaque summaries"));
+      }
+    }
+    ModRef<InstanceKey> modRef = ModRef.make();
+    List<Map<String, Object>> result = new ArrayList<>();
+    for (NormalStatement read : observationReads) {
+      Map<String, Object> row = new LinkedHashMap<>();
+      row.put("read", describe(read));
+      row.put("full_slice_statements", retained.size());
+      row.put("full_slice_truncated", fullSlice.truncated);
+      row.put("full_slice_frontier_count", fullSlice.frontierCount);
+      row.put("candidate_write_count", writes.size());
+      row.put("authenticated_opaque_calls", opaqueAuthentication);
+      if (!retained.contains(read)) {
+        row.put("analysis", Map.of(
+            "schema_version", "mockspec.wala-observation-effects/v1",
+            "status", "partial",
+            "reason", "field_read_not_retained_before_full_slice_frontier"));
+      } else {
+        row.put("analysis", ObservationEffectAnalyzer.analyze(
+            effectSdg, pointerAnalysis, modRef, retained, seed, read, writes, opaqueCalls,
+            true, 20_000));
+      }
+      result.add(row);
+    }
     return result;
   }
 

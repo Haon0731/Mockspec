@@ -245,7 +245,7 @@ def test_product_body_paths_reject_self_guard_and_reconverged_branch():
         raw, {"p.Product": "src/main/java/p/Product.java"}) == ([], [])
 
 
-def test_probe_and_driver_use_one_shared_multi_root_graph_without_unioning_roots():
+def test_probe_and_driver_share_base_graph_then_isolate_demanded_effect_roots():
     probe = subject.BACKEND_SOURCE.read_text()
     driver = Path(subject.__file__).read_text()
     assert '"mockspec.wala-multi-root/v1"' in probe
@@ -256,8 +256,12 @@ def test_probe_and_driver_use_one_shared_multi_root_graph_without_unioning_roots
     assert "visited.size() < 10_000" not in probe
     assert "while (!pending.isEmpty())" in probe
     assert '"criteria-request.json"' in driver
-    assert "one shared WALA process per case" in driver
+    assert "one shared NO_HEAP base process plus one failure-contained FULL process" in driver
     assert "criteria_file.write_text(json.dumps(queries))" in driver
+    assert '"OBSERVATION_EFFECT_SCAN"' in driver
+    assert '"OBSERVATION_EFFECTS"' in driver
+    assert "for effect_index, (query, criterion, analysis) in enumerate(demanded)" in driver
+    assert "if (observationEffectScan && !observationEffects)" in probe
     assert '"ROOT_OUTPUT_DIR:"' in probe
 
 
@@ -344,6 +348,146 @@ def test_lazy_checkpoint_frontier_reaches_boundary_and_bounded_projection(tmp_pa
     assert projection["omitted_counts"] == {"statements": 0, "edges": 0}
 
 
+def test_effect_checkpoint_merge_preserves_base_root_and_failure_is_observation_scoped(tmp_path):
+    base_path = tmp_path / "base.json"
+    effect_path = tmp_path / "effect.json"
+    query = "SOURCE_LINE:10:-1:.assertEquals("
+    base_root = {
+        "criterion": {"query": query}, "seed_index": 0,
+        "slice_statements": [{"line": 10}], "slice_edges": [],
+        "observation_effect_demand": {"status": "demanded_instance_field"},
+    }
+    effect_root = {
+        "criterion": {"query": query},
+        "observation_effect_demand": {"status": "analyzed_full_heap"},
+        "observation_effect_evidence": [{"analysis": {"status": "linked"}}],
+    }
+    base_path.write_text(json.dumps({"root": base_root}))
+    effect_path.write_text(json.dumps({"root": effect_root}))
+    completed = {"observation_id": "criterion:0", "raw_path": str(base_path),
+                 "checkpoint_query": query, "effect_raw_path": str(effect_path),
+                 "effect_checkpoint_sha256": "a" * 64, "effect_seconds": 2.0}
+    merged = subject._analysis_raw(completed)
+    assert merged["slice_statements"] == [{"line": 10}]
+    assert merged["observation_effect_evidence"] == effect_root["observation_effect_evidence"]
+    assert merged["observation_effect_stage"]["status"] == "complete"
+
+    failed = {"observation_id": "criterion:1", "raw_path": str(base_path),
+              "checkpoint_query": query, "effect_status": "failed",
+              "effect_error": "OutOfMemoryError", "effect_seconds": 3.0}
+    preserved = subject._analysis_raw(failed)
+    assert preserved["slice_statements"] == [{"line": 10}]
+    assert preserved["observation_effect_error"] == "OutOfMemoryError"
+    relations, unknowns, boundaries = subject._project_observation_effects(
+        preserved, "criterion:1", {"logical_path": "p/Test.java"}, {})
+    assert relations == [] and unknowns == []
+    assert boundaries[0]["reason"] == "observation_effect_stage_frontier"
+    assert boundaries[0]["details"]["base_root_preserved"] is True
+
+
+def test_effect_failure_and_unattempted_frontiers_preserve_every_base_root(tmp_path):
+    query_by_index = [f"SOURCE_LINE:{line}:-1:.assertEquals(" for line in (10, 20, 30)]
+    analyses = []
+    for index, query in enumerate(query_by_index):
+        base_path = tmp_path / f"base-{index}.json"
+        base_path.write_text(json.dumps({"root": {
+            "criterion": {"query": query}, "seed_index": 0,
+            "slice_statements": [{"line": (index + 1) * 10}], "slice_edges": [],
+            "observation_effect_demand": {"status": "demanded_instance_field"},
+        }}))
+        analyses.append({
+            "observation_id": f"criterion:{index}", "raw_path": str(base_path),
+            "checkpoint_query": query, "root_mapped": True,
+        })
+
+    effect_path = tmp_path / "effect-0.json"
+    effect_path.write_text(json.dumps({"root": {
+        "criterion": {"query": query_by_index[0]},
+        "observation_effect_demand": {"status": "analyzed_full_heap"},
+        "observation_effect_evidence": [],
+    }}))
+    analyses[0].update({
+        "effect_raw_path": str(effect_path), "effect_checkpoint_sha256": "a" * 64,
+        "effect_status": "complete", "effect_seconds": 1.0,
+    })
+    analyses[1].update({
+        "effect_status": "failed", "effect_error": "OutOfMemoryError", "effect_seconds": 2.0,
+    })
+    analyses[2].update({
+        "effect_status": "not_attempted_total_deadline_frontier",
+        "effect_error": "effect phase not attempted: total deadline reserved for projection",
+        "effect_seconds": 0.0,
+    })
+
+    merged = [subject._analysis_raw(analysis) for analysis in analyses]
+    assert [root["slice_statements"][0]["line"] for root in merged] == [10, 20, 30]
+    assert merged[0]["observation_effect_stage"]["status"] == "complete"
+    for index in (1, 2):
+        _, _, boundaries = subject._project_observation_effects(
+            merged[index], f"criterion:{index}", {"logical_path": "p/Test.java"}, {})
+        assert boundaries[0]["reason"] == "observation_effect_stage_frontier"
+        assert boundaries[0]["details"]["base_root_preserved"] is True
+        assert boundaries[0]["details"]["stage"]["status"] == analyses[index]["effect_status"]
+
+
+def test_effect_error_checkpoint_is_failure_frontier_not_complete_effect(tmp_path):
+    query = "SOURCE_LINE:10:-1:.assertEquals("
+    effect_path = tmp_path / "root-00000.json"
+    effect_path.write_text(json.dumps({
+        "schema_version": "mockspec.wala-root-checkpoint/v1",
+        "root_index": 0,
+        "criterion_query": query,
+        "root": {"criterion_query": query, "error": "IllegalStateException: effect failed"},
+    }))
+    manifest = [{
+        "root_index": 0, "criterion_query": query,
+        "checkpoint_file": effect_path.name,
+        "checkpoint_sha256": hashlib.sha256(effect_path.read_bytes()).hexdigest(),
+        "status": "error",
+    }]
+    validated = subject._validated_root_checkpoint_paths(tmp_path, [query], manifest)
+    analysis = {"checkpoint_query": query}
+    status, error = subject._attach_effect_checkpoint(analysis, validated[query], query)
+    assert status == "failed"
+    assert error == "WALA effect root error: IllegalStateException: effect failed"
+    assert "effect_raw_path" not in analysis
+    assert "effect_checkpoint_sha256" not in analysis
+    assert analysis["effect_failed_checkpoint_sha256"] == hashlib.sha256(
+        effect_path.read_bytes()).hexdigest()
+
+    base_path = tmp_path / "base.json"
+    base_path.write_text(json.dumps({"root": {
+        "criterion": {"query": query}, "slice_statements": [{"line": 10}],
+        "observation_effect_demand": {"status": "demanded_instance_field"},
+    }}))
+    analysis.update({
+        "raw_path": str(base_path), "effect_status": status,
+        "effect_error": error, "effect_seconds": 0.5,
+    })
+    preserved = subject._analysis_raw(analysis)
+    assert preserved["slice_statements"] == [{"line": 10}]
+    _, _, boundaries = subject._project_observation_effects(
+        preserved, "criterion:0", {"logical_path": "p/Test.java"}, {})
+    assert boundaries[0]["reason"] == "observation_effect_stage_frontier"
+    assert boundaries[0]["details"]["base_root_preserved"] is True
+    assert boundaries[0]["details"]["stage"]["failed_authenticated_checkpoint_sha256"] == (
+        analysis["effect_failed_checkpoint_sha256"])
+
+
+def test_static_observation_field_is_explicitly_unmodeled_without_full_demand():
+    raw = {"observation_effect_demand": {
+        "status": "not_demanded_static_field_unmodeled", "static_read_count": 1,
+        "instance_read_count": 0,
+    }}
+    relations, unknowns, boundaries = subject._project_observation_effects(
+        raw, "criterion:0", {"logical_path": "p/Test.java"}, {})
+    assert relations == [] and unknowns == []
+    assert boundaries == [{
+        "scope": "criterion:0", "reason": "static_or_global_observation_field_unmodeled",
+        "details": raw["observation_effect_demand"],
+    }]
+
+
 def test_contract_writes_authenticated_success_and_failure_projections(tmp_path, monkeypatch):
     monkeypatch.setattr(subject, "validate_result_contract", lambda contract: None)
     root = {
@@ -403,6 +547,67 @@ def test_mapping_cost_finalization_uses_post_projection_clock(monkeypatch):
     assert contract["cost"]["total_seconds"] == 16.0
     assert contract["cost"]["graph_size"] == {"nodes": 3, "edges": 2}
     assert "excludes shared and final result JSON serialization" in costs["total_scope"]
+
+
+def test_observation_effect_projection_keeps_visible_writer_and_read_identity():
+    call = {"method": "p.Test.selected()V", "instruction_index": 4, "line": 10}
+    read_ready = {"method": "p.Test.selected()V", "instruction_index": 7,
+                  "declared_field": "Lp/Box.ready I", "line": 11}
+    read_other = {"method": "p.Test.selected()V", "instruction_index": 8,
+                  "declared_field": "Lp/Box.other I", "line": 11}
+    raw = {"observation_effect_demand": {"status": "demanded_full_heap"},
+           "observation_effect_evidence": [{
+               "read": read_ready, "authenticated_opaque_calls": [{"call": call}],
+               "analysis": {"status": "linked", "visible_state": [{
+                   "write": {"method": "p.Product.fill(Lp/Box;)V", "line": 5},
+                   "read": read_ready, "heap_path": [{"incoming_dependency_labels": ["HEAP_DATA_DEP"]}],
+               }], "opaque_state": [
+                   {"relation": "opaque_argument_rooted_state_effect", "certainty": "potential",
+                    "call": call, "read": read_ready},
+                   {"relation": "opaque_argument_rooted_state_effect", "certainty": "potential",
+                    "call": call, "read": read_other},
+               ], "exceptions": [], "cost": {"frontier": None}},
+           }]}
+    relations, unknowns, boundaries = subject._project_observation_effects(
+        raw, "criterion:0", {"logical_path": "p/Test.java", "start_line": 11, "end_line": 11},
+        {"p.Product": "src/main/java/p/Product.java"})
+    assert boundaries == []
+    assert relations[0]["kind"] == "state_flow"
+    assert relations[0]["from"]["logical_path"] == "src/main/java/p/Product.java"
+    assert relations[0]["from"]["start_line"] == 5
+    assert len(unknowns) == 2
+    assert len({row["boundary_id"] for row in unknowns}) == 2
+    assert all(row["observation_ids"] == ["criterion:0"] for row in unknowns)
+    assert subject._is_cross_source_relation(relations[0], "p/Test.java")
+    same_file = {**relations[0], "from": {"logical_path": "p/Test.java", "start_line": 5}}
+    assert not subject._is_cross_source_relation(same_file, "p/Test.java")
+
+
+def test_observation_unknown_projection_is_fairly_bounded_and_reports_omissions(monkeypatch):
+    monkeypatch.setattr(subject, "MAX_UNKNOWN_EFFECTS", 5)
+    effects = [{"boundary_id": f"effect:{index}"} for index in range(4)]
+    retained, omitted, limit = subject._bounded_observation_unknowns(effects, analysis_count=2)
+    assert limit == 2
+    assert retained == effects[:2]
+    assert omitted == 2
+
+
+def test_excluded_opaque_effect_boundaries_are_aggregated_with_bounded_samples():
+    excluded = [{"certainty": "excluded", "reason": "points_to_regions_disjoint",
+                 "call": {"instruction_index": index}} for index in range(25)]
+    raw = {"observation_effect_demand": {"status": "demanded_full_heap"},
+           "observation_effect_evidence": [{"read": {}, "analysis": {
+               "status": "linked", "visible_state": [], "opaque_state": excluded,
+               "exceptions": []}}]}
+    relations, unknowns, boundaries = subject._project_observation_effects(
+        raw, "criterion:0", {"logical_path": "p/Test.java"}, {})
+    assert relations == []
+    assert unknowns == []
+    assert boundaries == [{
+        "scope": "criterion:0", "reason": "opaque_effect_candidates_excluded",
+        "excluded_count": 25, "sample_limit": 10, "samples": excluded[:10],
+        "affected_observation_ids": ["criterion:0"],
+    }]
 
 
 def test_large_path_projection_builds_indexes_once_and_honors_edge_budget(monkeypatch):

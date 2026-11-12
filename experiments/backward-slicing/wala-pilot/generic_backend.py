@@ -32,9 +32,11 @@ from mock_spec.adapters.frozen_dataset import FrozenDataset  # noqa: E402
 
 SCHEMA = "mockspec.generic-java-wala-backend/v1"
 BACKEND_SOURCE = HERE / "backend/src/main/java/org/mockspec/research/WalaSliceProbe.java"
+EFFECT_ANALYZER_SOURCE = HERE / "backend/src/main/java/org/mockspec/research/ObservationEffectAnalyzer.java"
 TYPE_CONSTRAINT_SOURCE = HERE / "backend/src/main/java/org/mockspec/research/JavaTypeConstraints.java"
 TYPE_CONSTRAINT_CLASS = "org.mockspec.research.JavaTypeConstraints"
 MAX_RELATIONS = 1000
+MAX_UNKNOWN_EFFECTS = 1000
 MAX_RELATION_PATH_EDGES = 5_000
 MAX_OBSERVATION_PROJECTED_EDGES = 50_000
 DEFAULT_MAX_FILES = 8
@@ -165,6 +167,7 @@ def _validated_root_checkpoint_paths(
         paths[query] = path
         del checkpoint, root
     if manifest_by_query is not None:
+        assert manifest is not None
         if len(manifest_by_query) != len(manifest) or set(manifest_by_query) != expected:
             raise ValueError("WALA root manifest duplicated, omitted or substituted a criterion")
         if set(paths) != expected:
@@ -174,10 +177,54 @@ def _validated_root_checkpoint_paths(
 
 def _analysis_raw(analysis: dict[str, Any]) -> dict[str, Any] | None:
     raw = analysis.get("raw")
+    base: dict[str, Any] | None
     if isinstance(raw, dict):
-        return raw
-    raw_path = analysis.get("raw_path")
-    return _load_checkpoint_root(Path(raw_path)) if isinstance(raw_path, str) else None
+        base = raw
+    else:
+        raw_path = analysis.get("raw_path")
+        base = _load_checkpoint_root(Path(raw_path)) if isinstance(raw_path, str) else None
+    if base is None:
+        return None
+    effect_path = analysis.get("effect_raw_path")
+    effect_error = analysis.get("effect_error")
+    if isinstance(effect_path, str):
+        effect = _load_checkpoint_root(Path(effect_path))
+        if effect.get("criterion", {}).get("query") != analysis.get("checkpoint_query"):
+            raise ValueError("WALA effect checkpoint query differs from authenticated base root")
+        base = dict(base)
+        base["observation_effect_evidence"] = effect.get("observation_effect_evidence", [])
+        base["observation_effect_demand"] = effect.get("observation_effect_demand", {})
+        base["observation_effect_stage"] = {
+            "status": "complete", "checkpoint_sha256": analysis.get("effect_checkpoint_sha256"),
+            "cost_seconds": analysis.get("effect_seconds")}
+    elif isinstance(effect_error, str):
+        base = dict(base)
+        base["observation_effect_error"] = effect_error
+        base["observation_effect_stage"] = {
+            "status": analysis.get("effect_status", "failed"),
+            "cost_seconds": analysis.get("effect_seconds"),
+            "failed_authenticated_checkpoint_sha256": analysis.get(
+                "effect_failed_checkpoint_sha256")}
+    return base
+
+
+def _attach_effect_checkpoint(
+        analysis: dict[str, Any], path: Path, expected_query: str) -> tuple[str, str | None]:
+    checkpoint = json.loads(path.read_text())
+    root = checkpoint.get("root")
+    if checkpoint.get("criterion_query") != expected_query or not isinstance(root, dict):
+        raise ValueError("WALA effect checkpoint query differs from requested effect root")
+    error = root.get("error")
+    if error:
+        analysis.pop("effect_raw_path", None)
+        analysis.pop("effect_checkpoint_sha256", None)
+        analysis["effect_failed_checkpoint_sha256"] = _sha256_file(path)
+        return "failed", f"WALA effect root error: {error}"
+    if root.get("criterion", {}).get("query") != expected_query:
+        raise ValueError("WALA effect root query differs from requested effect root")
+    analysis["effect_raw_path"] = str(path)
+    analysis["effect_checkpoint_sha256"] = _sha256_file(path)
+    return "complete", None
 
 
 def _analysis_boundaries(analyses: list[dict[str, Any]],
@@ -771,7 +818,8 @@ def _product_body_paths(raw: dict[str, Any], classes: dict[str, str],
 
 def _write_root_evidence_projection(
         path: Path, analysis: dict[str, Any], raw: dict[str, Any] | None,
-        published_relations: list[dict[str, Any]], unknown_boundaries: list[dict[str, Any]]) -> None:
+        published_relations: list[dict[str, Any]], unknown_boundaries: list[dict[str, Any]],
+        unknown_effects: list[dict[str, Any]] | None = None) -> None:
     if raw is None:
         _write(path, {
             "schema": "mockspec.wala-root-evidence/v1",
@@ -784,6 +832,7 @@ def _write_root_evidence_projection(
             "checkpoint_identity": {"root_index": analysis.get("checkpoint_root_index"),
                                     "query": analysis.get("checkpoint_query")},
             "unknown_boundaries": unknown_boundaries,
+            "unknown_effects": unknown_effects or [],
         })
         return
     statements = raw.get("slice_statements", [])
@@ -835,6 +884,7 @@ def _write_root_evidence_projection(
         "edges": list(used_edges.values()),
         "relations": published_relations,
         "unknown_boundaries": unknown_boundaries,
+        "unknown_effects": unknown_effects or [],
         "frontier": {"truncated": raw.get("traversal_truncated", False),
                      "frontier_count": raw.get("traversal_frontier_count", 0)},
         "interpretation": "Omitted statements and edges were outside published relation witnesses; omission is not evidence of no influence.",
@@ -856,7 +906,8 @@ def _write_shared_evidence(path: Path, contract: dict[str, Any], costs: dict[str
             "schema_version", "wala_version", "configuration", "entry",
             "class_hierarchy_classes", "unresolved_classes", "call_graph_nodes",
             "application_call_graph_nodes", "call_graph_contexts", "pointer_instance_keys",
-            "timings_millis", "limitations", "generic_mode_boundary")},
+            "timings_millis", "limitations", "generic_mode_boundary",
+            "observation_effect_stage")},
         "semantic_validation": contract["semantic_validation"],
     })
 
@@ -905,6 +956,169 @@ def _observed_opaque_unknown_effects(boundaries: list[dict[str, Any]]) -> list[d
     return effects
 
 
+def _project_observation_effects(
+        raw: dict[str, Any], observation_id: str, observation_endpoint: dict[str, Any],
+        classes: dict[str, str], *, relation_limit: int = MAX_RELATIONS,
+        unknown_limit: int = MAX_UNKNOWN_EFFECTS,
+        ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    relations: list[dict[str, Any]] = []
+    unknowns: list[dict[str, Any]] = []
+    boundaries: list[dict[str, Any]] = []
+    excluded_effect_count = 0
+    excluded_effect_samples: list[dict[str, Any]] = []
+    unmapped_writer_count = 0
+    unmapped_writer_samples: list[dict[str, Any]] = []
+    omitted_relation_count = 0
+    omitted_unknown_count = 0
+    unknown_ids: set[str] = set()
+    demand = raw.get("observation_effect_demand", {})
+    if demand.get("status") == "not_demanded_direct_read_absent":
+        boundaries.append({"scope": observation_id,
+                           "reason": "heap_effect_not_demanded_without_direct_observation_field_read",
+                           "details": demand})
+    elif demand.get("status") == "not_demanded_static_field_unmodeled":
+        boundaries.append({"scope": observation_id,
+                           "reason": "static_or_global_observation_field_unmodeled",
+                           "details": demand})
+    effect_error = raw.get("observation_effect_error")
+    if isinstance(effect_error, str):
+        boundaries.append({"scope": observation_id,
+                           "reason": "observation_effect_stage_frontier",
+                           "details": {"error": effect_error,
+                                       "stage": raw.get("observation_effect_stage"),
+                                       "base_root_preserved": True},
+                           "affected_observation_ids": [observation_id]})
+    elif demand.get("status") == "demanded_instance_field" and not raw.get(
+            "observation_effect_evidence"):
+        boundaries.append({"scope": observation_id,
+                           "reason": "observation_effect_stage_missing",
+                           "details": {"demand": demand, "base_root_preserved": True},
+                           "affected_observation_ids": [observation_id]})
+    for evidence in raw.get("observation_effect_evidence", []):
+        analysis = evidence.get("analysis", {})
+        if analysis.get("status") == "partial":
+            boundaries.append({"scope": observation_id,
+                               "reason": "observation_effect_budget_frontier",
+                               "details": {"read": evidence.get("read"),
+                                           "full_slice_truncated": evidence.get("full_slice_truncated"),
+                                           "full_slice_frontier_count": evidence.get("full_slice_frontier_count"),
+                                           "cost": analysis.get("cost"),
+                                           "analysis_reason": analysis.get("reason")}})
+        for row in analysis.get("visible_state", []):
+            write = row.get("write", {})
+            source_path = _source_for_signature(write.get("method"), classes)
+            line = write.get("line")
+            if source_path is None or type(line) is not int or line < 1:
+                unmapped_writer_count += 1
+                if len(unmapped_writer_samples) < 10:
+                    unmapped_writer_samples.append(row)
+                continue
+            if len(relations) >= relation_limit:
+                omitted_relation_count += 1
+                continue
+            relations.append({
+                "kind": "state_flow", "modality": "analysis_may",
+                "from": _endpoint(source_path, line, symbol=write.get("method")),
+                "to": observation_endpoint,
+                "provenance": {"backend": "WALA 1.7.2 FULL heap SDG + ModRef/points-to",
+                               "observation_effect": row, "observed_read": evidence.get("read")},
+                "precision": "HEAP_DATA_DEP path plus equal typed Mod/Ref pointer key to the original observation",
+                "observation_ids": [observation_id],
+                "assumptions": ["static context-sensitive may-depend evidence is not runtime feasibility"],
+            })
+        for row in analysis.get("opaque_state", []):
+            if row.get("certainty") == "excluded":
+                excluded_effect_count += 1
+                if len(excluded_effect_samples) < 10:
+                    excluded_effect_samples.append(row)
+                continue
+            call = row.get("call", {})
+            read = row.get("read", evidence.get("read", {}))
+            boundary_id = (f"wala-opaque-state:{observation_id}:{call.get('method')}:"
+                           f"{call.get('instruction_index')}:{read.get('method')}:"
+                           f"{read.get('instruction_index')}:{read.get('declared_field')}:"
+                           f"{row.get('relation')}:{row.get('route', 'normal')}")
+            effect = {
+                "boundary_id": boundary_id,
+                "effect": "opaque_argument_rooted_state_effect",
+                "scope": {"observation_id": observation_id, "backend_evidence": row,
+                          "observed_read": evidence.get("read"),
+                          "authenticated_calls": evidence.get("authenticated_opaque_calls", [])},
+                "provenance": "WALA exact call-graph summary binding, CFG route and typed points-to regions",
+                "precision": "unknown_effect", "assumptions": [],
+                "observation_ids": [observation_id],
+            }
+            if boundary_id in unknown_ids:
+                continue
+            unknown_ids.add(boundary_id)
+            if len(unknowns) >= unknown_limit:
+                omitted_unknown_count += 1
+            else:
+                unknowns.append(effect)
+        for row in analysis.get("exceptions", []):
+            call = row.get("call", {})
+            read = row.get("read", evidence.get("read", {}))
+            boundary_id = (f"wala-opaque-exception:{observation_id}:{call.get('method')}:"
+                           f"{call.get('instruction_index')}:{read.get('method')}:"
+                           f"{read.get('instruction_index')}:{read.get('declared_field')}:"
+                           f"{row.get('relation')}")
+            effect = {
+                "boundary_id": boundary_id,
+                "effect": "opaque_exception_type_or_runtime_feasibility_unproved",
+                "scope": {"observation_id": observation_id, "backend_evidence": row,
+                          "authenticated_calls": evidence.get("authenticated_opaque_calls", [])},
+                "provenance": "WALA exact exceptional CFG route to original observation",
+                "precision": "unknown_effect",
+                "assumptions": ["caught-type compatibility is not proved"],
+                "observation_ids": [observation_id],
+            }
+            if boundary_id in unknown_ids:
+                continue
+            unknown_ids.add(boundary_id)
+            if len(unknowns) >= unknown_limit:
+                omitted_unknown_count += 1
+            else:
+                unknowns.append(effect)
+    if excluded_effect_count:
+        boundaries.append({"scope": observation_id,
+                           "reason": "opaque_effect_candidates_excluded",
+                           "excluded_count": excluded_effect_count,
+                           "sample_limit": 10,
+                           "samples": excluded_effect_samples,
+                           "affected_observation_ids": [observation_id]})
+    if unmapped_writer_count:
+        boundaries.append({"scope": observation_id,
+                           "reason": "visible_state_writers_source_unmapped",
+                           "unmapped_count": unmapped_writer_count,
+                           "sample_limit": 10,
+                           "samples": unmapped_writer_samples,
+                           "affected_observation_ids": [observation_id]})
+    if omitted_relation_count:
+        boundaries.append({"scope": observation_id,
+                           "reason": "observation_effect_relation_projection_budget",
+                           "omitted_relations": omitted_relation_count,
+                           "per_observation_limit": relation_limit,
+                           "affected_observation_ids": [observation_id]})
+    if omitted_unknown_count:
+        boundaries.append({"scope": observation_id,
+                           "reason": "observation_effect_unknown_projection_budget",
+                           "omitted_unknown_effects": omitted_unknown_count,
+                           "per_observation_limit": unknown_limit,
+                           "affected_observation_ids": [observation_id]})
+    return relations, unknowns, boundaries
+
+
+def _bounded_observation_unknowns(
+        effects: list[dict[str, Any]], analysis_count: int) -> tuple[list[dict[str, Any]], int, int]:
+    limit = max(1, MAX_UNKNOWN_EFFECTS // max(1, analysis_count))
+    retained = effects[:limit]
+    return retained, len(effects) - len(retained), limit
+
+
+def _is_cross_source_relation(relation: dict[str, Any], test_path: str) -> bool:
+    return relation.get("from", {}).get("logical_path") != test_path
+
+
 def _finalize_mapping_costs(costs: dict[str, Any], contract: dict[str, Any], *,
                             started: float, mapping_started: float) -> None:
     finished = time.monotonic()
@@ -940,9 +1154,12 @@ def _contract(entry: dict[str, Any], context: dict[str, Any], sources: list[dict
     relations: list[dict[str, Any]] = []
     relation_keys: set[tuple] = set()
     candidates: dict[tuple[str, str], dict[str, Any]] = {}
+    observation_unknown_effects: list[dict[str, Any]] = []
     mapped_ids = set()
     graph_nodes = graph_edges = raw_cross_source = typed_cross_source = 0
-    for analysis in analyses:
+    for analysis_index, analysis in enumerate(analyses):
+        remaining_observations = len(analyses) - analysis_index - 1
+        relation_capacity = max(0, MAX_RELATIONS - remaining_observations)
         observation_id = analysis["observation_id"]
         raw = _analysis_raw(analysis)
         if raw is None:
@@ -953,12 +1170,46 @@ def _contract(entry: dict[str, Any], context: dict[str, Any], sources: list[dict
             continue
         relation_start = len(relations)
         boundary_start = len(boundaries)
+        omitted_non_effect_relations = 0
         projected_path_edges = 0
         mapped_ids.add(observation_id)
         graph_nodes += int(raw.get("slice_statement_count", 0))
         graph_edges += int(raw.get("slice_edge_count", 0))
         observation = next(item for item in observations if item["observation_id"] == observation_id)
         observation_endpoint = _endpoint(context["test_path"], observation["location"]["start_line"])
+        effect_unknown_limit = max(1, MAX_UNKNOWN_EFFECTS // max(1, len(analyses)))
+        effect_relations, effect_unknowns, effect_boundaries = _project_observation_effects(
+            raw, observation_id, observation_endpoint, classes,
+            relation_limit=max(0, relation_capacity - len(relations)),
+            unknown_limit=effect_unknown_limit)
+        omitted_effect_relations = 0
+        for relation in effect_relations:
+            if len(relations) < relation_capacity:
+                relations.append(relation)
+                if _is_cross_source_relation(relation, context["test_path"]):
+                    typed_cross_source += 1
+            else:
+                omitted_effect_relations += 1
+        if omitted_effect_relations:
+            boundaries.append({"scope": observation_id,
+                               "reason": "observation_effect_relation_projection_budget",
+                               "omitted_relations": omitted_effect_relations,
+                               "global_limit": MAX_RELATIONS,
+                               "reserved_for_later_observations": remaining_observations,
+                               "affected_observation_ids": [observation_id]})
+        retained_effect_unknowns, omitted_effect_unknowns, per_observation_unknown_limit = (
+            _bounded_observation_unknowns(effect_unknowns, len(analyses)))
+        observation_unknown_effects.extend(retained_effect_unknowns)
+        if omitted_effect_unknowns:
+            boundaries.append({
+                "scope": observation_id,
+                "reason": "observation_effect_unknown_projection_budget",
+                "omitted_unknown_effects": omitted_effect_unknowns,
+                "per_observation_limit": per_observation_unknown_limit,
+                "global_limit": MAX_UNKNOWN_EFFECTS,
+                "affected_observation_ids": [observation_id],
+            })
+        boundaries.extend(effect_boundaries)
         path_indexes = _path_indexes(raw)
         path_budget = {"relations": MAX_RELATIONS, "edges": MAX_OBSERVATION_PROJECTED_EDGES,
                        "omitted_relations": 0, "omitted_path_edges": 0}
@@ -982,7 +1233,10 @@ def _contract(entry: dict[str, Any], context: dict[str, Any], sources: list[dict
                                "per_relation_edge_limit": MAX_RELATION_PATH_EDGES})
         for path in typed_paths:
             rkey = (path["kind"], path["source_path"], path["source_line"], observation_id)
-            if rkey in relation_keys or len(relations) >= MAX_RELATIONS:
+            if rkey in relation_keys:
+                continue
+            if len(relations) >= relation_capacity:
+                omitted_non_effect_relations += 1
                 continue
             path_edges = len(path["dependency_path"])
             if (path_edges > MAX_RELATION_PATH_EDGES
@@ -1028,7 +1282,7 @@ def _contract(entry: dict[str, Any], context: dict[str, Any], sources: list[dict
                     candidates[key] = {"logical_path": target_path, "symbol": target,
                                        "evidence": _endpoint(context["test_path"], line)}
                     rkey = ("call_binding", target, line, observation_id)
-                    if rkey not in relation_keys and len(relations) < MAX_RELATIONS:
+                    if rkey not in relation_keys and len(relations) < relation_capacity:
                         relation_keys.add(rkey)
                         relations.append({"kind": "call_binding", "modality": "analysis_may",
                                           "from": _endpoint(context["test_path"], line,
@@ -1039,10 +1293,19 @@ def _contract(entry: dict[str, Any], context: dict[str, Any], sources: list[dict
                                                          "ssa_instruction": statement.get("instruction")},
                                           "precision": "entry SSA call retained in exact observation slice",
                                           "observation_ids": [observation_id], "assumptions": []})
+                    elif rkey not in relation_keys:
+                        omitted_non_effect_relations += 1
+        if omitted_non_effect_relations:
+            boundaries.append({"scope": observation_id,
+                               "reason": "relation_fair_share_projection_budget",
+                               "omitted_relations": omitted_non_effect_relations,
+                               "global_limit": MAX_RELATIONS,
+                               "reserved_for_later_observations": remaining_observations,
+                               "affected_observation_ids": [observation_id]})
         if evidence_output is not None:
             _write_root_evidence_projection(
                 evidence_output / f"{observation_id}.json", analysis, raw,
-                relations[relation_start:], boundaries[boundary_start:])
+                relations[relation_start:], boundaries[boundary_start:], retained_effect_unknowns)
         del raw
     candidate_values = list(candidates.values())
     binding_status = "unique" if len(candidate_values) == 1 else "ambiguous" if candidate_values else "unresolved"
@@ -1061,6 +1324,7 @@ def _contract(entry: dict[str, Any], context: dict[str, Any], sources: list[dict
                         "precision": "unknown_effect", "assumptions": []}
                        for item in harness_parameters]
     unknown_effects.extend(_observed_opaque_unknown_effects(boundaries))
+    unknown_effects.extend(observation_unknown_effects)
     contract = {
         "schema_version": RESULT_SCHEMA_VERSION,
         "identity": {"case_id": entry["case_id"], "dataset": entry["dataset"], "language": "java",
@@ -1186,6 +1450,7 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
             "closure_evidence": closure_evidence, "opaque_methods": opaque_methods,
             "driver_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             "probe_sha256": hashlib.sha256(BACKEND_SOURCE.read_bytes()).hexdigest(),
+            "effect_analyzer_sha256": hashlib.sha256(EFFECT_ANALYZER_SOURCE.read_bytes()).hexdigest(),
             "type_constraint_helper_sha256": hashlib.sha256(TYPE_CONSTRAINT_SOURCE.read_bytes()).hexdigest(),
             "target_executed": False, "source_text_persisted": False,
         })
@@ -1251,7 +1516,8 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
                 raise RuntimeError("compiled application packaging failed")
             wala_cp = os.pathsep.join(map(str, wala_dependencies))
             backend_result, backend_seconds = _run(
-                ["javac", "-proc:none", "-g", "-cp", wala_cp, "-d", str(backend_classes), str(BACKEND_SOURCE)],
+                ["javac", "-proc:none", "-g", "-cp", wala_cp, "-d", str(backend_classes),
+                 str(BACKEND_SOURCE), str(EFFECT_ANALYZER_SOURCE)],
                 cwd=work, timeout=_remaining(deadline, compile_timeout))
             timings["backend_compilation"] = backend_seconds
             (output / "backend-compile.stderr").write_text(backend_result.stderr)
@@ -1276,21 +1542,21 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
             criteria_file.write_text(json.dumps(queries))
             checkpoint_directory = work / "root-checkpoints"
             checkpoint_directory.mkdir()
-            command = ["java", "-Xmx2g", "-cp", str(backend_classes) + os.pathsep + wala_cp,
-                       "org.mockspec.research.WalaSliceProbe", str(application), library_cp,
-                       entry_class, entry_selector, "CRITERIA_FILE:" + str(criteria_file),
-                       "OPAQUE_SUMMARIES", "GENERIC_NO_HEAP",
-                       "ROOT_OUTPUT_DIR:" + str(checkpoint_directory)]
+            base_command = ["java", "-Xmx2g", "-cp", str(backend_classes) + os.pathsep + wala_cp,
+                            "org.mockspec.research.WalaSliceProbe", str(application), library_cp,
+                            entry_class, entry_selector, "CRITERIA_FILE:" + str(criteria_file),
+                            "OPAQUE_SUMMARIES", "GENERIC_NO_HEAP", "OBSERVATION_EFFECT_SCAN",
+                            "ROOT_OUTPUT_DIR:" + str(checkpoint_directory)]
             analysis_started = time.monotonic()
+            shared: dict[str, Any] = {}
+            checkpoint_paths: dict[str, Path] = {}
             try:
                 completed, _ = _run(
-                    command, cwd=work,
+                    base_command, cwd=work,
                     timeout=_remaining(deadline, analysis_timeout * len(criteria)))
                 analysis_seconds = time.monotonic() - analysis_started
                 for criterion in criteria:
                     (output / f"{criterion['criterion_id']}.stderr").write_text(completed.stderr)
-                shared: dict[str, Any] = {}
-                checkpoint_paths: dict[str, Path]
                 if not completed.returncode:
                     multi = json.loads(completed.stdout)
                     if multi.get("schema_version") != "mockspec.wala-multi-root/v2":
@@ -1306,7 +1572,7 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
                         checkpoint_directory, queries)
                 analyses = _checkpoint_path_analyses(
                     queries, query_by_text, checkpoint_paths,
-                    missing_error="WALA process failed before root checkpoint\n"
+                    missing_error="WALA base phase failed before root checkpoint\n"
                                   + completed.stderr[-3000:],
                     graph_created="WALA_STAGE call_graph_complete" in completed.stderr)
             except subprocess.TimeoutExpired as exc:
@@ -1319,10 +1585,112 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
                 checkpoint_paths = _validated_root_checkpoint_paths(checkpoint_directory, queries)
                 analyses = _checkpoint_path_analyses(
                     queries, query_by_text, checkpoint_paths,
-                    missing_error="WALA shared multi-root timeout before root checkpoint\n"
+                    missing_error="WALA base phase timeout before root checkpoint\n"
                                   + stderr[-3000:],
                     graph_created="WALA_STAGE call_graph_complete" in stderr)
-            timings["wala_analysis"] = analysis_seconds
+            timings["wala_base_analysis"] = analysis_seconds
+
+            effect_receipts: list[dict[str, Any]] = []
+            demanded: list[tuple[str, dict[str, Any], dict[str, Any]]] = []
+            if len(checkpoint_paths) == len(queries) and all(
+                    item.get("root_mapped") for item in analyses):
+                analyses_by_observation = {item["observation_id"]: item for item in analyses}
+                for query, criterion in query_by_text.items():
+                    analysis = analyses_by_observation[criterion["criterion_id"]]
+                    raw = _analysis_raw(analysis)
+                    if raw and raw.get("observation_effect_demand", {}).get(
+                            "status") == "demanded_instance_field":
+                        demanded.append((query, criterion, analysis))
+                    del raw
+            effect_seconds_total = 0.0
+            for effect_index, (query, criterion, analysis) in enumerate(demanded):
+                remaining = deadline - time.monotonic() - 30.0
+                if remaining < 1:
+                    analysis.update({
+                        "effect_status": "not_attempted_total_deadline_frontier",
+                        "effect_error": "effect phase not attempted: total deadline reserved for projection",
+                        "effect_seconds": 0.0,
+                    })
+                    effect_receipts.append({"observation_id": criterion["criterion_id"],
+                                            "query": query,
+                                            "status": analysis["effect_status"],
+                                            "seconds": 0.0,
+                                            "error": analysis["effect_error"],
+                                            "stderr_artifact": None})
+                    continue
+                effect_request = work / f"effect-request-{effect_index:05d}.json"
+                effect_request.write_text(json.dumps([query]))
+                effect_directory = work / f"effect-root-{effect_index:05d}"
+                effect_directory.mkdir()
+                effect_command = [
+                    "java", "-Xmx2g", "-cp", str(backend_classes) + os.pathsep + wala_cp,
+                    "org.mockspec.research.WalaSliceProbe", str(application), library_cp,
+                    entry_class, entry_selector, "CRITERIA_FILE:" + str(effect_request),
+                    "OPAQUE_SUMMARIES", "GENERIC_NO_HEAP", "OBSERVATION_EFFECTS",
+                    "ROOT_OUTPUT_DIR:" + str(effect_directory),
+                ]
+                effect_started = time.monotonic()
+                effect_status = "failed"
+                effect_error = "effect process failed before checkpoint"
+                effect_stderr = ""
+                try:
+                    effect_completed, _ = _run(
+                        effect_command, cwd=work,
+                        timeout=max(1, int(min(analysis_timeout, remaining))))
+                    effect_stderr = effect_completed.stderr
+                    effect_manifest = None
+                    if not effect_completed.returncode:
+                        effect_multi = json.loads(effect_completed.stdout)
+                        if effect_multi.get("schema_version") != "mockspec.wala-multi-root/v2":
+                            raise ValueError("WALA effect response schema differs")
+                        effect_manifest = effect_multi.get("root_manifest")
+                        if not isinstance(effect_manifest, list):
+                            raise ValueError("WALA effect manifest is malformed")
+                    effect_paths = _validated_root_checkpoint_paths(
+                        effect_directory, [query], effect_manifest)
+                    effect_path = effect_paths.get(query)
+                    if effect_path is None:
+                        effect_error = ("effect process failed before checkpoint\n"
+                                        + effect_stderr[-3000:])
+                    else:
+                        effect_status, checkpoint_error = _attach_effect_checkpoint(
+                            analysis, effect_path, query)
+                        if checkpoint_error is not None:
+                            effect_error = checkpoint_error
+                except subprocess.TimeoutExpired as exc:
+                    effect_status = "timeout"
+                    timeout_stderr = exc.stderr or ""
+                    effect_stderr = (timeout_stderr.decode("utf-8", "replace")
+                                     if isinstance(timeout_stderr, bytes) else timeout_stderr)
+                    effect_error = "effect process timeout before checkpoint\n" + effect_stderr[-3000:]
+                except Exception as effect_failure:
+                    effect_error = (f"effect process {type(effect_failure).__name__}: {effect_failure}\n"
+                                    + effect_stderr[-3000:])
+                effect_seconds = time.monotonic() - effect_started
+                effect_seconds_total += effect_seconds
+                (output / f"{criterion['criterion_id']}.effects.stderr").write_text(effect_stderr)
+                analysis.update({"effect_status": effect_status, "effect_seconds": effect_seconds})
+                if effect_status != "complete":
+                    analysis["effect_error"] = effect_error
+                effect_receipts.append({
+                    "observation_id": criterion["criterion_id"], "query": query,
+                    "status": effect_status, "seconds": effect_seconds,
+                    "checkpoint_sha256": analysis.get("effect_checkpoint_sha256"),
+                    "failed_authenticated_checkpoint_sha256": analysis.get(
+                        "effect_failed_checkpoint_sha256"),
+                    "error": None if effect_status == "complete" else effect_error,
+                    "stderr_artifact": f"{criterion['criterion_id']}.effects.stderr",
+                })
+            timings["wala_effect_analysis"] = effect_seconds_total
+            timings["wala_analysis"] = analysis_seconds + effect_seconds_total
+            shared["observation_effect_stage"] = {
+                "schema": "mockspec.wala-effect-stage/v1",
+                "isolation": "one fresh JVM per demanded instance-field root",
+                "base_checkpoint_count": len(checkpoint_paths),
+                "base_expected_count": len(queries),
+                "demanded_count": len(demanded),
+                "receipts": effect_receipts,
+            }
             entry_evidence["graph_created"] = any(item.get("graph_created") for item in analyses)
             entry_evidence["observation_roots_mapped"] = sum(
                 item.get("root_mapped") is True for item in analyses)
@@ -1332,7 +1700,7 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
                      "total_scope": "provisional through WALA analysis; finalized after relationship mapping and evidence projection",
                      "peak_memory": {"status": "unavailable", "bytes": None,
                                      "reason": "runner enforces -Xmx2g but does not collect child peak RSS"},
-                     "cache_state": {"status": "cold", "reason": "fresh source/classes/application and one shared WALA process per case; CG/PA/SDG reused across observation roots"},
+                     "cache_state": {"status": "cold", "reason": "fresh source/classes/application; one shared NO_HEAP base process plus one failure-contained FULL process per demanded instance-field root"},
                      "input_size": {"files": len(source_rows), "bytes": total_bytes},
                      "unavailable_phases": [{"phase": "semantic_validation", "reason": "not performed"}]}
             contract, evidence = _contract(
@@ -1362,6 +1730,7 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
                                  "entry_selector": entry_selector, "runtime_lock_digest": runtime["digest"],
                                  "driver_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                                  "probe_sha256": hashlib.sha256(BACKEND_SOURCE.read_bytes()).hexdigest(),
+                                 "effect_analyzer_sha256": hashlib.sha256(EFFECT_ANALYZER_SOURCE.read_bytes()).hexdigest(),
                                  "type_constraint_helper_sha256": hashlib.sha256(TYPE_CONSTRAINT_SOURCE.read_bytes()).hexdigest(),
                                  "dependency_count": len(dependencies), "dependency_rehash": False,
                                  "target_executed": False, "selection": "no case allow-list"}}
@@ -1373,6 +1742,7 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
                   "provenance": {"target_executed": False, "dependency_rehash": False,
                                  "driver_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                                  "probe_sha256": hashlib.sha256(BACKEND_SOURCE.read_bytes()).hexdigest(),
+                                 "effect_analyzer_sha256": hashlib.sha256(EFFECT_ANALYZER_SOURCE.read_bytes()).hexdigest(),
                                  "type_constraint_helper_sha256": hashlib.sha256(TYPE_CONSTRAINT_SOURCE.read_bytes()).hexdigest()},
                   "elapsed_seconds": time.monotonic() - started}
     _write(output / "batch-result.json", result)
