@@ -27,6 +27,26 @@ _PYTHON_LOADER_NAMES = {
 _JAVA_IMPORT = re.compile(r"(?m)^\s*import\s+(?:static\s+)?([\w.]+)(?:\.\*)?\s*;")
 _JAVA_PACKAGE = re.compile(r"(?m)^\s*package\s+([\w.]+)\s*;")
 _JAVA_TYPE_NAME = re.compile(r"\b[A-Z][A-Za-z0-9_]*\b")
+_JAVA_CONSTRUCTOR_OWNER = re.compile(r"\bnew\s+([A-Z][A-Za-z0-9_]*)\b")
+_JAVA_CALL_OWNER = re.compile(
+    r"\b([A-Z][A-Za-z0-9_]*)\s*\.\s*[A-Za-z_$][A-Za-z0-9_$]*\s*\(")
+_JAVA_VARIABLE_DECLARATION = re.compile(
+    r"\b([A-Z][A-Za-z0-9_]*(?:\.[A-Z][A-Za-z0-9_]*)*)\s+"
+    r"([a-z_$][A-Za-z0-9_$]*)\s*=")
+_JAVA_VARIABLE_RECEIVER = re.compile(
+    r"\b([a-z_$][A-Za-z0-9_$]*)\s*\.")
+_JAVA_IDENTIFIER = re.compile(r"\b[A-Za-z_$][A-Za-z0-9_$]*\b")
+_JAVA_CALL_NAME = re.compile(r"\b([A-Za-z_$][A-Za-z0-9_$]*)\s*\(")
+_JAVA_MEMBER_NAME = re.compile(r"\.\s*([A-Za-z_$][A-Za-z0-9_$]*)\b")
+_JAVA_KEYWORDS = {
+    "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char",
+    "class", "const", "continue", "default", "do", "double", "else", "enum",
+    "extends", "false", "final", "finally", "float", "for", "goto", "if",
+    "implements", "import", "instanceof", "int", "interface", "long", "native",
+    "new", "null", "package", "private", "protected", "public", "return", "short",
+    "static", "strictfp", "super", "switch", "synchronized", "this", "throw",
+    "throws", "transient", "true", "try", "void", "volatile", "while",
+}
 
 
 def _strip_java_comments_and_literals(text: str) -> str:
@@ -286,7 +306,99 @@ def _python_hints(text: str, logical_path: str = "test.py", *,
     return [hint for _, _, hint in sorted(ranked_hints)], diagnostics
 
 
-def _java_hints(text: str) -> tuple[list[dict[str, str]], list[str]]:
+def _java_priority_types(text: str, target_selector: str | None) -> list[str]:
+    """Rank visible constructor/call owners on the observation dependency chain.
+
+    This is source-intake priority only. It neither binds a call nor proves that
+    a selected type reaches an observation.
+    """
+    if target_selector is None:
+        return []
+    extraction = extract_criteria(text, "java", target_selector)
+    locations = extraction["target_scope"]["locations"]
+    if len(locations) != 1 or not extraction["criteria"]:
+        return []
+    location = locations[0]
+    code_lines = _strip_java_comments_and_literals(text).splitlines(keepends=True)
+    start_line, end_line = location["start_line"], location["end_line"]
+    method = "".join(code_lines[start_line - 1:end_line])
+    raw_statements: list[tuple[int, int, str]] = []
+    cursor = 0
+    for match in re.finditer(r"[^;]*;", method):
+        statement = match.group()
+        begin = start_line + method.count("\n", 0, match.start())
+        finish = begin + statement.count("\n")
+        raw_statements.append((begin, finish, statement))
+        cursor = match.end()
+    if cursor < len(method) and method[cursor:].strip():
+        statement = method[cursor:]
+        begin = start_line + method.count("\n", 0, cursor)
+        raw_statements.append((begin, begin + statement.count("\n"), statement))
+
+    declaration_types: dict[str, set[str]] = {}
+    for _, _, statement in raw_statements:
+        for type_name, variable in _JAVA_VARIABLE_DECLARATION.findall(statement):
+            declaration_types.setdefault(variable, set()).add(type_name.rsplit(".", 1)[-1])
+    ambiguous_variables = {
+        variable for variable, types in declaration_types.items() if len(types) != 1}
+
+    def variable_references(statement: str) -> set[str]:
+        excluded = {
+            *_JAVA_CALL_NAME.findall(statement),
+            *_JAVA_MEMBER_NAME.findall(statement),
+            *_JAVA_KEYWORDS,
+        }
+        return {
+            name for name in _JAVA_IDENTIFIER.findall(statement)
+            if not name[0].isupper() and name not in excluded
+            and name not in ambiguous_variables
+        }
+
+    statements = [
+        (begin, finish, statement, variable_references(statement))
+        for begin, finish, statement in raw_statements
+    ]
+
+    observation_lines = {criterion["line"] for criterion in extraction["criteria"]}
+    relevant_statements = {
+        index for index, (begin, finish, _, _) in enumerate(statements)
+        if any(begin <= line <= finish for line in observation_lines)
+    }
+    relevant_names = set().union(*(
+        statements[index][3] for index in relevant_statements
+    )) if relevant_statements else set()
+    changed = True
+    while changed:
+        changed = False
+        for index, (_, _, _, names) in enumerate(statements):
+            if index in relevant_statements or not names & relevant_names:
+                continue
+            relevant_statements.add(index)
+            before = len(relevant_names)
+            relevant_names.update(names)
+            changed = changed or len(relevant_names) != before
+
+    declared_receivers = {
+        variable: next(iter(types))
+        for variable, types in declaration_types.items() if len(types) == 1
+    }
+    ranked: list[str] = []
+    for index, (_, _, statement, _) in enumerate(statements):
+        if index not in relevant_statements:
+            continue
+        for receiver in _JAVA_VARIABLE_RECEIVER.findall(statement):
+            name = declared_receivers.get(receiver)
+            if name is not None and name not in ranked:
+                ranked.append(name)
+        for pattern in (_JAVA_CONSTRUCTOR_OWNER, _JAVA_CALL_OWNER):
+            for name in pattern.findall(statement):
+                if name not in ranked:
+                    ranked.append(name)
+    return ranked
+
+
+def _java_hints(text: str, *, target_selector: str | None = None
+                ) -> tuple[list[dict[str, str]], list[str]]:
     code = _strip_java_comments_and_literals(text)
     hints = [{"kind": "java_import", "value": name}
              for name in _JAVA_IMPORT.findall(code) if not name.endswith(".*")]
@@ -296,6 +408,16 @@ def _java_hints(text: str) -> tuple[list[dict[str, str]], list[str]]:
         for name in sorted(set(_JAVA_TYPE_NAME.findall(code)) - imported):
             hints.append({"kind": "java_same_package_type",
                           "value": package.group(1) + "." + name})
+    priority = _java_priority_types(text, target_selector)
+    priority_index = {name: index for index, name in enumerate(priority)}
+    for hint in hints:
+        simple_name = hint["value"].rsplit(".", 1)[-1]
+        if simple_name in priority_index:
+            hint["selection_priority"] = "selected_method_lexical_priority_candidate"
+    hints.sort(key=lambda hint: (
+        priority_index.get(hint["value"].rsplit(".", 1)[-1], len(priority)),
+        0 if hint["kind"] == "java_import" else 1,
+    ))
     return hints, []
 
 
@@ -782,7 +904,9 @@ def select_sources(case: Any, *, max_files: int = 8, max_bytes: int = 200_000,
             test.text, test.logical_path,
             target_symbol=selector.rsplit("::", 1)[-1] if selector else None)
     else:
-        initial_hints, initial_diagnostics = extract(test.text, test.logical_path)
+        selector = getattr(case, "target_selector", None)
+        initial_hints, initial_diagnostics = _java_hints(
+            test.text, target_selector=selector)
     diagnostics.extend(initial_diagnostics)
     python_source_roots = (_python_source_roots(initial_hints, available)
                            if case.language == "python" else set())
@@ -802,9 +926,12 @@ def select_sources(case: Any, *, max_files: int = 8, max_bytes: int = 200_000,
             hint, available, case.language, python_source_roots)) - selected_paths)
         if not candidates:
             continue
-        evidence.append({"stage": stage, "hint_kind": hint["kind"],
-                         "hint": hint["value"], "candidates": candidates,
-                         "precision": _precision(hint, candidates)})
+        selection_evidence = {"stage": stage, "hint_kind": hint["kind"],
+                              "hint": hint["value"], "candidates": candidates,
+                              "precision": _precision(hint, candidates)}
+        if "selection_priority" in hint:
+            selection_evidence["selection_priority"] = hint["selection_priority"]
+        evidence.append(selection_evidence)
         for path in candidates:
             if path in attempted_paths:
                 continue

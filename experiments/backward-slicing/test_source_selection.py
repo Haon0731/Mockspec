@@ -312,6 +312,161 @@ class FeatureTest { void testIt() { Feature feature = new Feature(); } }
     )
 
 
+def test_java_selected_method_dependency_owners_precede_unrelated_imports():
+    case = Case("java", "src/test/java/demo/FeatureTest.java", """
+package demo;
+import demo.UnrelatedOne;
+import demo.UnrelatedTwo;
+class FeatureTest {
+  void helper() { new HelperOnly(); }
+  void testIt() {
+    Executor executor = factory.create(Dependency.options());
+    executor.run(missingInput);
+    assertTrue(missingInput.done());
+  }
+}
+""", {
+        "src/main/java/demo/UnrelatedOne.java": "package demo; class UnrelatedOne {}",
+        "src/main/java/demo/UnrelatedTwo.java": "package demo; class UnrelatedTwo {}",
+        "src/main/java/demo/HelperOnly.java": "package demo; class HelperOnly {}",
+        "src/main/java/demo/Executor.java": "package demo; class Executor {}",
+        "src/main/java/demo/Dependency.java": "package demo; class Dependency {}",
+    })
+    case.target_selector = "demo.FeatureTest#testIt"
+
+    result = select_sources(case, max_files=3)
+
+    assert case.reads == ["src/main/java/demo/Dependency.java",
+                          "src/main/java/demo/Executor.java"]
+    assert [item["selection_priority"] for item in result["evidence"][:2]] == [
+        "selected_method_lexical_priority_candidate",
+        "selected_method_lexical_priority_candidate",
+    ]
+    assert "file_budget_exhausted" in result["diagnostics"]
+
+
+def test_java_same_named_member_is_not_treated_as_a_type_owner():
+    case = Case("java", "src/test/java/demo/FeatureTest.java", """
+package demo;
+import demo.Unrelated;
+class FeatureTest {
+  void testIt() {
+    Priority value = new Priority();
+    factory.Decoy();
+    assertNotNull(value);
+  }
+}
+""", {
+        "src/main/java/demo/Unrelated.java": "package demo; class Unrelated {}",
+        "src/main/java/demo/Priority.java": "package demo; class Priority {}",
+        "src/main/java/demo/Decoy.java": "package demo; class Decoy {}",
+    })
+    case.target_selector = "demo.FeatureTest#testIt"
+
+    result = select_sources(case, max_files=2)
+
+    assert case.reads == ["src/main/java/demo/Priority.java"]
+    assert all(item["hint"] != "demo.Decoy" for item in result["evidence"])
+
+
+def test_java_unrelated_constructor_before_chain_does_not_gain_priority():
+    case = Case("java", "src/test/java/demo/FeatureTest.java", """
+package demo;
+class FeatureTest {
+  void testIt() {
+    Irrelevant noise = new Irrelevant();
+    Relevant value = new Relevant();
+    assertNotNull(value);
+  }
+}
+""", {
+        "src/main/java/demo/Irrelevant.java": "package demo; class Irrelevant {}",
+        "src/main/java/demo/Relevant.java": "package demo; class Relevant {}",
+    })
+    case.target_selector = "demo.FeatureTest#testIt"
+
+    result = select_sources(case, max_files=2)
+
+    assert case.reads == ["src/main/java/demo/Relevant.java"]
+    assert result["evidence"][0]["selection_priority"] == (
+        "selected_method_lexical_priority_candidate")
+
+
+def test_java_shared_static_method_name_does_not_link_unrelated_owner():
+    case = Case("java", "src/test/java/demo/FeatureTest.java", """
+package demo;
+class FeatureTest {
+  void testIt() {
+    Unrelated.create();
+    Relevant value = Relevant.create();
+    assertNotNull(value);
+  }
+}
+""", {
+        "src/main/java/demo/Unrelated.java": "package demo; class Unrelated {}",
+        "src/main/java/demo/Relevant.java": "package demo; class Relevant {}",
+    })
+    case.target_selector = "demo.FeatureTest#testIt"
+
+    result = select_sources(case, max_files=2)
+
+    assert case.reads == ["src/main/java/demo/Relevant.java"]
+    unrelated = next(item for item in result["evidence"]
+                     if item["hint"] == "demo.Unrelated")
+    assert "selection_priority" not in unrelated
+
+
+def test_java_ambiguous_receiver_declarations_do_not_choose_last_type():
+    case = Case("java", "src/test/java/demo/FeatureTest.java", """
+package demo;
+import demo.Fallback;
+class FeatureTest {
+  void testIt() {
+    if (left) {
+      First worker = factory.first();
+      assertTrue(worker.ready());
+    }
+    if (right) {
+      Second worker = factory.second();
+      assertTrue(worker.ready());
+    }
+  }
+}
+""", {
+        "src/main/java/demo/Fallback.java": "package demo; class Fallback {}",
+        "src/main/java/demo/First.java": "package demo; class First {}",
+        "src/main/java/demo/Second.java": "package demo; class Second {}",
+    })
+    case.target_selector = "demo.FeatureTest#testIt"
+
+    result = select_sources(case, max_files=2)
+
+    assert case.reads == ["src/main/java/demo/Fallback.java"]
+    assert all("selection_priority" not in item for item in result["evidence"])
+
+
+def test_java_direct_static_observation_owner_keeps_priority():
+    case = Case("java", "src/test/java/demo/FeatureTest.java", """
+package demo;
+import demo.Unrelated;
+class FeatureTest {
+  void testIt() {
+    assertTrue(Product.ready());
+  }
+}
+""", {
+        "src/main/java/demo/Unrelated.java": "package demo; class Unrelated {}",
+        "src/main/java/demo/Product.java": "package demo; class Product {}",
+    })
+    case.target_selector = "demo.FeatureTest#testIt"
+
+    result = select_sources(case, max_files=2)
+
+    assert case.reads == ["src/main/java/demo/Product.java"]
+    assert result["evidence"][0]["selection_priority"] == (
+        "selected_method_lexical_priority_candidate")
+
+
 def test_ambiguous_import_preserved_and_file_budget_stops_further_reads():
     case = Case("python", "tests/test_feature.py", "import shared\n", {
         "src/one/shared.py": "VALUE = 1\n",
