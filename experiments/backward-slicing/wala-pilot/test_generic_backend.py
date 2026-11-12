@@ -59,10 +59,96 @@ def test_structural_harness_rejects_missing_constraint_resolver():
         subject._prepare_harness(source, "selected", lambda _: None, lambda: result)
 
 
-def test_observation_requires_one_assertion_on_source_line():
-    assert subject._assertion_fragment("assertEquals(1, actual);", 1) == ".assertEquals("
-    with pytest.raises(ValueError, match="one assertion"):
-        subject._assertion_fragment("assertTrue(a); assertTrue(b);", 1)
+def test_criterion_query_uses_exact_candidate_call_and_owner_qualified_constructor():
+    source = """new Random().nextBytes(data);
+assertAppendRequestParameters(appendInvocations(client).get(0), expected);
+"""
+    assert subject._criterion_query(source, {
+        "line": 1, "kind": "candidate_event", "call": "Random",
+    }) == "SOURCE_LINE:1:-1:.Random.<init>("
+    assert subject._criterion_query(source, {
+        "line": 1, "kind": "candidate_event", "call": "nextBytes",
+    }) == "SOURCE_LINE:1:-1:.nextBytes("
+    assert subject._criterion_query(source, {
+        "line": 2, "kind": "candidate_event", "call": "assertAppendRequestParameters",
+    }) == "SOURCE_LINE:2:-1:.assertAppendRequestParameters("
+    assert subject._criterion_query(source, {
+        "line": 2, "kind": "candidate_event", "call": "appendInvocations",
+    }) == "SOURCE_LINE:2:-1:.appendInvocations("
+    assert subject._criterion_query(source, {
+        "line": 2, "kind": "candidate_event", "call": "get",
+    }) == "SOURCE_LINE:2:-1:.get("
+
+
+def test_criterion_query_rejects_unsupported_and_repeated_seed_shapes():
+    with pytest.raises(ValueError, match="supported observation"):
+        subject._criterion_query("assert actual;", {
+            "line": 1, "kind": "value_assertion",
+        })
+    with pytest.raises(ValueError, match="absent or repeated"):
+        subject._criterion_query("target.run(); target.run();", {
+            "line": 1, "kind": "candidate_event", "call": "run",
+        })
+    with pytest.raises(ValueError, match="qualified or nested"):
+        subject._criterion_query("new Outer.Inner();", {
+            "line": 1, "kind": "candidate_event", "call": "Inner",
+        })
+
+
+def test_query_preflight_excludes_every_duplicate_and_preserves_all_invalid():
+    duplicate = [
+        {"criterion_id": "criterion:0", "line": 1,
+         "kind": "candidate_event", "call": "run"},
+        {"criterion_id": "criterion:1", "line": 1,
+         "kind": "candidate_event", "call": "run"},
+    ]
+    queries, query_by_text, failures, records = subject._preflight_criterion_queries(
+        "target.run();", duplicate)
+    assert queries == []
+    assert query_by_text == {}
+    assert [item["observation_id"] for item in failures] == ["criterion:0", "criterion:1"]
+    assert [item["status"] for item in records] == ["duplicate", "duplicate"]
+
+    invalid = [{"criterion_id": "criterion:0", "line": 1,
+                "kind": "value_assertion"}]
+    queries, query_by_text, failures, records = subject._preflight_criterion_queries(
+        "consume(value);", invalid)
+    assert queries == [] and query_by_text == {}
+    assert failures[0]["error"].startswith("unsupported_seed_shape:")
+    assert records[0]["status"] == "unsupported"
+    merged = subject._merge_criterion_analyses(invalid, [], failures)
+    assert [item["observation_id"] for item in merged] == ["criterion:0"]
+    assert merged[0]["graph_created"] is False
+
+
+def test_filtered_supported_roots_keep_request_indices_effect_demand_and_original_order(tmp_path):
+    criteria = [
+        {"criterion_id": "criterion:0"},
+        {"criterion_id": "criterion:1"},
+        {"criterion_id": "criterion:2"},
+    ]
+    queries = ["q1", "q2"]
+    query_by_text = {"q1": criteria[1], "q2": criteria[2]}
+    supported = [
+        {"observation_id": "criterion:1", "raw": {
+            "observation_effect_demand": {"status": "demanded_instance_field"}},
+         "root_mapped": True, "checkpoint_root_index": 0, "checkpoint_query": "q1"},
+        {"observation_id": "criterion:2", "raw": {
+            "observation_effect_demand": {"status": "not_demanded"}},
+         "root_mapped": True, "checkpoint_root_index": 1, "checkpoint_query": "q2"},
+    ]
+    demanded = subject._demanded_effect_roots(
+        queries, query_by_text, supported,
+        {"q1": tmp_path / "root-00000.json", "q2": tmp_path / "root-00001.json"})
+    assert [(query, criterion["criterion_id"], analysis["checkpoint_root_index"])
+            for query, criterion, analysis in demanded] == [("q1", "criterion:1", 0)]
+    unsupported = [{"observation_id": "criterion:0", "raw": None,
+                    "error": "unsupported_seed_shape", "root_mapped": False}]
+    merged = subject._merge_criterion_analyses(criteria, supported, unsupported)
+    assert [item["observation_id"] for item in merged] == [
+        "criterion:0", "criterion:1", "criterion:2"]
+    assert [item.get("checkpoint_root_index") for item in merged] == [None, 0, 1]
+    assert [item.get("checkpoint_query") for item in merged] == [None, "q1", "q2"]
 
 
 def test_java_compilation_disables_annotation_processors():

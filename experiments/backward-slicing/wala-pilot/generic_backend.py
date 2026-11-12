@@ -227,6 +227,25 @@ def _attach_effect_checkpoint(
     return "complete", None
 
 
+def _demanded_effect_roots(
+        queries: list[str], query_by_text: dict[str, dict[str, Any]],
+        analyses: list[dict[str, Any]], checkpoint_paths: dict[str, Path]
+        ) -> list[tuple[str, dict[str, Any], dict[str, Any]]]:
+    if len(checkpoint_paths) != len(queries) or not all(
+            item.get("root_mapped") for item in analyses):
+        return []
+    analyses_by_observation = {item["observation_id"]: item for item in analyses}
+    demanded = []
+    for query, criterion in query_by_text.items():
+        analysis = analyses_by_observation[criterion["criterion_id"]]
+        raw = _analysis_raw(analysis)
+        if raw and raw.get("observation_effect_demand", {}).get(
+                "status") == "demanded_instance_field":
+            demanded.append((query, criterion, analysis))
+        del raw
+    return demanded
+
+
 def _analysis_boundaries(analyses: list[dict[str, Any]],
                          closure_evidence: list[dict[str, Any]]) -> list[dict[str, Any]]:
     boundaries = [{"scope": item["observation_id"], "reason": item["error"]}
@@ -542,12 +561,110 @@ def _entry_descriptor(classes: Path, entry_class: str, method: str) -> str:
     return method + descriptors[0]
 
 
-def _assertion_fragment(test_text: str, line: int) -> str:
-    source_line = test_text.splitlines()[line - 1]
-    matches = re.findall(r"\b(assert[A-Za-z0-9_$]*)\s*\(", source_line)
-    if len(matches) != 1:
-        raise ValueError(f"observation line {line} does not contain one assertion invocation")
-    return "." + matches[0] + "("
+_OBSERVATION_CALLS = {
+    "value_assertion": (
+        "assertEquals", "assertNotEquals", "assertThat", "assertTrue", "assertFalse",
+        "assertNull", "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals"),
+    "exception_observation": (
+        "assertThrows", "assertDoesNotThrow", "assertThatThrownBy",
+        "assertThatExceptionOfType", "assertThatCode", "expectThrows"),
+    "interaction_observation": (
+        "verify", "verifyZeroInteractions", "verifyNoInteractions",
+        "verifyNoMoreInteractions", "inOrder"),
+}
+
+
+def _criterion_query(test_text: str, criterion: dict[str, Any]) -> str:
+    lines = test_text.splitlines()
+    line = criterion.get("line")
+    if type(line) is not int or line < 1 or line > len(lines):
+        raise ValueError("criterion has no valid source line")
+    source_line = _java_code(lines[line - 1])
+    kind = criterion.get("kind")
+    if kind == "candidate_event":
+        call = criterion.get("call")
+        if not isinstance(call, str) or re.fullmatch(r"[A-Za-z_$][A-Za-z0-9_$]*", call) is None:
+            raise ValueError("candidate event has no exact visible call name")
+        occurrences = re.findall(rf"\b{re.escape(call)}\s*\(", source_line)
+        constructor_owners = re.findall(
+            r"\bnew\s+([A-Za-z_$][A-Za-z0-9_$]*(?:\.[A-Za-z_$][A-Za-z0-9_$]*)*)\s*\(",
+            source_line)
+        matching_constructors = [owner for owner in constructor_owners
+                                 if owner.rsplit(".", 1)[-1] == call]
+        if len(occurrences) != 1 or len(matching_constructors) > 1:
+            raise ValueError("candidate event call is absent or repeated on its source line")
+        if matching_constructors and matching_constructors[0] != call:
+            raise ValueError("qualified or nested constructor owner is not an exact WALA seed")
+        # WALA MethodReference.getSignature() is authenticated in existing probe output as
+        # `package.SimpleType.<init>(...)`, so retain the visible constructor owner.
+        fragment = f".{call}.<init>(" if matching_constructors else f".{call}("
+    elif kind in _OBSERVATION_CALLS:
+        allowed = _OBSERVATION_CALLS[kind]
+        matches = re.findall(
+            rf"\b({'|'.join(map(re.escape, allowed))})\s*\(", source_line)
+        if len(matches) != 1:
+            raise ValueError(f"{kind} line does not contain one supported observation invocation")
+        fragment = "." + matches[0] + "("
+    else:
+        raise ValueError(f"unsupported Java observation kind: {kind}")
+    return f"SOURCE_LINE:{line}:-1:{fragment}"
+
+
+def _preflight_criterion_queries(
+        test_text: str, criteria: list[dict[str, Any]]) -> tuple[
+            list[str], dict[str, dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    candidates: list[tuple[dict[str, Any], str]] = []
+    failures: list[dict[str, Any]] = []
+    records: dict[str, dict[str, Any]] = {}
+    for criterion in criteria:
+        observation_id = criterion["criterion_id"]
+        if not isinstance(observation_id, str) or observation_id in records:
+            raise ValueError("criteria contain an invalid or duplicate observation identity")
+        try:
+            query = _criterion_query(test_text, criterion)
+            candidates.append((criterion, query))
+            records[observation_id] = {
+                "observation_id": observation_id, "query": query, "status": "candidate"}
+        except ValueError as exc:
+            error = f"unsupported_seed_shape: {exc}"
+            failures.append({"observation_id": observation_id, "raw": None,
+                             "error": error, "graph_created": False, "root_mapped": False})
+            records[observation_id] = {
+                "observation_id": observation_id, "query": None,
+                "status": "unsupported", "error": error}
+    counts: dict[str, int] = {}
+    for _, query in candidates:
+        counts[query] = counts.get(query, 0) + 1
+    queries: list[str] = []
+    query_by_text: dict[str, dict[str, Any]] = {}
+    for criterion, query in candidates:
+        observation_id = criterion["criterion_id"]
+        if counts[query] != 1:
+            error = f"duplicate_seed_query: {query}"
+            failures.append({"observation_id": observation_id, "raw": None,
+                             "error": error, "graph_created": False, "root_mapped": False})
+            records[observation_id].update(status="duplicate", error=error)
+        else:
+            queries.append(query)
+            query_by_text[query] = criterion
+            records[observation_id]["status"] = "ready"
+    return (queries, query_by_text, failures,
+            [records[criterion["criterion_id"]] for criterion in criteria])
+
+
+def _merge_criterion_analyses(
+        criteria: list[dict[str, Any]], analyses: list[dict[str, Any]],
+        preflight_failures: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    by_id: dict[str, dict[str, Any]] = {}
+    for item in [*analyses, *preflight_failures]:
+        observation_id = item.get("observation_id")
+        if not isinstance(observation_id, str) or observation_id in by_id:
+            raise ValueError("criterion analyses contain an invalid or duplicate observation identity")
+        by_id[observation_id] = item
+    expected = [criterion["criterion_id"] for criterion in criteria]
+    if set(by_id) != set(expected) or len(expected) != len(set(expected)):
+        raise ValueError("criterion analyses do not cover the original observation identities")
+    return [by_id[observation_id] for observation_id in expected]
 
 
 def _class_source_map(source_records: list[dict[str, Any]]) -> dict[str, str]:
@@ -1527,81 +1644,76 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
             analyses: list[dict[str, Any]] = []
             library_cp = os.pathsep.join(map(str, dependencies))
             analysis_seconds = 0.0
-            queries = [f"SOURCE_LINE:{criterion['line']}:-1:"
-                       f"{_assertion_fragment(harness, criterion['line'])}"
-                       for criterion in criteria]
-            query_by_text = dict(zip(queries, criteria, strict=True))
-            if len(query_by_text) != len(criteria):
-                raise ValueError("multiple observations resolved to the same WALA criterion")
+            queries, query_by_text, preflight_failures, query_records = (
+                _preflight_criterion_queries(harness, criteria))
             _write(output / "criteria-request.json", {
                 "schema": "mockspec.wala-multi-root-request/v1",
-                "criteria": [{"observation_id": criterion["criterion_id"], "query": query}
-                             for query, criterion in query_by_text.items()],
+                "criteria": [{"observation_id": record["observation_id"],
+                              "query": record["query"]}
+                             for record in query_records if record["status"] == "ready"],
+                "excluded_criteria": [record for record in query_records
+                                      if record["status"] != "ready"],
             })
+            for failure in preflight_failures:
+                (output / f"{failure['observation_id']}.stderr").write_text(failure["error"])
             criteria_file = work / "criteria-request.json"
             criteria_file.write_text(json.dumps(queries))
             checkpoint_directory = work / "root-checkpoints"
             checkpoint_directory.mkdir()
-            base_command = ["java", "-Xmx2g", "-cp", str(backend_classes) + os.pathsep + wala_cp,
-                            "org.mockspec.research.WalaSliceProbe", str(application), library_cp,
-                            entry_class, entry_selector, "CRITERIA_FILE:" + str(criteria_file),
-                            "OPAQUE_SUMMARIES", "GENERIC_NO_HEAP", "OBSERVATION_EFFECT_SCAN",
-                            "ROOT_OUTPUT_DIR:" + str(checkpoint_directory)]
-            analysis_started = time.monotonic()
             shared: dict[str, Any] = {}
             checkpoint_paths: dict[str, Path] = {}
-            try:
-                completed, _ = _run(
-                    base_command, cwd=work,
-                    timeout=_remaining(deadline, analysis_timeout * len(criteria)))
-                analysis_seconds = time.monotonic() - analysis_started
-                for criterion in criteria:
-                    (output / f"{criterion['criterion_id']}.stderr").write_text(completed.stderr)
-                if not completed.returncode:
-                    multi = json.loads(completed.stdout)
-                    if multi.get("schema_version") != "mockspec.wala-multi-root/v2":
-                        raise ValueError("WALA multi-root response schema differs")
-                    shared = multi.get("shared")
-                    manifest = multi.get("root_manifest")
-                    if not isinstance(shared, dict) or not isinstance(manifest, list):
-                        raise ValueError("WALA multi-root response is malformed")
-                    checkpoint_paths = _validated_root_checkpoint_paths(
-                        checkpoint_directory, queries, manifest)
-                else:
+            if queries:
+                base_command = [
+                    "java", "-Xmx2g", "-cp", str(backend_classes) + os.pathsep + wala_cp,
+                    "org.mockspec.research.WalaSliceProbe", str(application), library_cp,
+                    entry_class, entry_selector, "CRITERIA_FILE:" + str(criteria_file),
+                    "OPAQUE_SUMMARIES", "GENERIC_NO_HEAP", "OBSERVATION_EFFECT_SCAN",
+                    "ROOT_OUTPUT_DIR:" + str(checkpoint_directory)]
+                analysis_started = time.monotonic()
+                try:
+                    completed, _ = _run(
+                        base_command, cwd=work,
+                        timeout=_remaining(deadline, analysis_timeout * len(queries)))
+                    analysis_seconds = time.monotonic() - analysis_started
+                    for criterion in query_by_text.values():
+                        (output / f"{criterion['criterion_id']}.stderr").write_text(completed.stderr)
+                    if not completed.returncode:
+                        multi = json.loads(completed.stdout)
+                        if multi.get("schema_version") != "mockspec.wala-multi-root/v2":
+                            raise ValueError("WALA multi-root response schema differs")
+                        shared = multi.get("shared")
+                        manifest = multi.get("root_manifest")
+                        if not isinstance(shared, dict) or not isinstance(manifest, list):
+                            raise ValueError("WALA multi-root response is malformed")
+                        checkpoint_paths = _validated_root_checkpoint_paths(
+                            checkpoint_directory, queries, manifest)
+                    else:
+                        checkpoint_paths = _validated_root_checkpoint_paths(
+                            checkpoint_directory, queries)
+                    analyses = _checkpoint_path_analyses(
+                        queries, query_by_text, checkpoint_paths,
+                        missing_error="WALA base phase failed before root checkpoint\n"
+                                      + completed.stderr[-3000:],
+                        graph_created="WALA_STAGE call_graph_complete" in completed.stderr)
+                except subprocess.TimeoutExpired as exc:
+                    analysis_seconds = time.monotonic() - analysis_started
+                    stderr = exc.stderr or ""
+                    if isinstance(stderr, bytes):
+                        stderr = stderr.decode("utf-8", "replace")
+                    for criterion in query_by_text.values():
+                        (output / f"{criterion['criterion_id']}.stderr").write_text(stderr)
                     checkpoint_paths = _validated_root_checkpoint_paths(
                         checkpoint_directory, queries)
-                analyses = _checkpoint_path_analyses(
-                    queries, query_by_text, checkpoint_paths,
-                    missing_error="WALA base phase failed before root checkpoint\n"
-                                  + completed.stderr[-3000:],
-                    graph_created="WALA_STAGE call_graph_complete" in completed.stderr)
-            except subprocess.TimeoutExpired as exc:
-                analysis_seconds = time.monotonic() - analysis_started
-                stderr = exc.stderr or ""
-                if isinstance(stderr, bytes):
-                    stderr = stderr.decode("utf-8", "replace")
-                for criterion in criteria:
-                    (output / f"{criterion['criterion_id']}.stderr").write_text(stderr)
-                checkpoint_paths = _validated_root_checkpoint_paths(checkpoint_directory, queries)
-                analyses = _checkpoint_path_analyses(
-                    queries, query_by_text, checkpoint_paths,
-                    missing_error="WALA base phase timeout before root checkpoint\n"
-                                  + stderr[-3000:],
-                    graph_created="WALA_STAGE call_graph_complete" in stderr)
+                    analyses = _checkpoint_path_analyses(
+                        queries, query_by_text, checkpoint_paths,
+                        missing_error="WALA base phase timeout before root checkpoint\n"
+                                      + stderr[-3000:],
+                        graph_created="WALA_STAGE call_graph_complete" in stderr)
             timings["wala_base_analysis"] = analysis_seconds
 
             effect_receipts: list[dict[str, Any]] = []
-            demanded: list[tuple[str, dict[str, Any], dict[str, Any]]] = []
-            if len(checkpoint_paths) == len(queries) and all(
-                    item.get("root_mapped") for item in analyses):
-                analyses_by_observation = {item["observation_id"]: item for item in analyses}
-                for query, criterion in query_by_text.items():
-                    analysis = analyses_by_observation[criterion["criterion_id"]]
-                    raw = _analysis_raw(analysis)
-                    if raw and raw.get("observation_effect_demand", {}).get(
-                            "status") == "demanded_instance_field":
-                        demanded.append((query, criterion, analysis))
-                    del raw
+            demanded = _demanded_effect_roots(
+                queries, query_by_text, analyses, checkpoint_paths)
             effect_seconds_total = 0.0
             for effect_index, (query, criterion, analysis) in enumerate(demanded):
                 remaining = deadline - time.monotonic() - 30.0
@@ -1691,6 +1803,7 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, *, max_fil
                 "demanded_count": len(demanded),
                 "receipts": effect_receipts,
             }
+            analyses = _merge_criterion_analyses(criteria, analyses, preflight_failures)
             entry_evidence["graph_created"] = any(item.get("graph_created") for item in analyses)
             entry_evidence["observation_roots_mapped"] = sum(
                 item.get("root_mapped") is True for item in analyses)
