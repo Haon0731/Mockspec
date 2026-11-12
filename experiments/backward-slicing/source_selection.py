@@ -766,8 +766,12 @@ def select_sources(case: Any, *, max_files: int = 8, max_bytes: int = 200_000,
                              "hint": path, "candidates": [path],
                              "precision": "support_source_only_not_product_binding"})
 
-    available = tuple(path for path in case.source_paths
-                      if _is_product_source(path, test.logical_path) and path not in support_paths)
+    available = tuple(
+        path for path in case.source_paths
+        if _is_product_source(path, test.logical_path)
+        and (case.language != "java" or path.startswith("src/main/"))
+        and path not in support_paths
+    )
     def extract(text: str, logical_path: str):
         return (_python_hints(text, logical_path) if case.language == "python"
                 else _java_hints(text))

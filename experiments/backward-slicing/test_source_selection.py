@@ -284,6 +284,34 @@ class FeatureTest { void testIt() { Feature feature = new Feature(); } }
     assert result["opaque_methods"][0]["name"] == "run"
 
 
+def test_java_selection_excludes_setup_prefixed_product_copies():
+    test_path = "src/test/java/demo/FeatureTest.java"
+    feature_path = "src/main/java/demo/Feature.java"
+    helper_path = "src/main/java/demo/Helper.java"
+    setup_root = "FeatureTest_setUp_deadbeef/src/main/java/demo/"
+    case = Case("java", test_path, """
+package demo;
+import demo.Helper;
+class FeatureTest { void testIt() { Feature feature = new Feature(); } }
+""", {
+        setup_root + "Feature.java": "package demo; class Feature {}",
+        feature_path: "package demo; class Feature {}",
+        setup_root + "Helper.java": "package demo; class Helper {}",
+        helper_path: "package demo; class Helper {}",
+    })
+
+    result = select_sources(case)
+
+    assert [item["logical_path"] for item in result["sources"]] == [
+        test_path, helper_path, feature_path]
+    assert case.reads == [helper_path, feature_path]
+    assert all(
+        not candidate.startswith("FeatureTest_setUp_")
+        for item in result["evidence"]
+        for candidate in item["candidates"]
+    )
+
+
 def test_ambiguous_import_preserved_and_file_budget_stops_further_reads():
     case = Case("python", "tests/test_feature.py", "import shared\n", {
         "src/one/shared.py": "VALUE = 1\n",
