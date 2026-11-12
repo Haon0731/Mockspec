@@ -228,7 +228,8 @@ public final class JavaTypeConstraints {
             ? !fields.isEmpty()
             : members.stream().anyMatch(candidate -> compatible(callArguments, selectPath, candidate.type));
         if (matches) {
-          candidates.add(new TypeCandidate(imported.getQualifiedName().toString(), imported,
+          candidates.add(new TypeCandidate(
+              imported.getQualifiedName().toString(), imported.asType(), imported,
               kind.equals("field_receiver") ? fields.stream()
                   .map(field -> field.getEnclosingElement() + "." + field.getSimpleName() + ":" + field.asType())
                   .sorted().collect(Collectors.joining(" | "))
@@ -253,7 +254,8 @@ public final class JavaTypeConstraints {
           .filter(candidate -> compatible(arguments, invocationPath, candidate.type))
           .filter(candidate -> argumentIndex < candidate.type.getParameterTypes().size())
           .map(candidate -> new TypeCandidate(
-              render(candidate.type.getParameterTypes().get(argumentIndex)), candidate.owner,
+              render(candidate.type.getParameterTypes().get(argumentIndex)),
+              candidate.type.getParameterTypes().get(argumentIndex), candidate.owner,
               candidate.signature(), List.of(candidate.element.getEnclosingElement().toString())))
           .filter(candidate -> candidate.type != null)
           .collect(Collectors.toList());
@@ -384,24 +386,31 @@ public final class JavaTypeConstraints {
       List<String> unresolved = new ArrayList<>();
       for (String name : missing) {
         List<UseEvidence> uses = evidence.get(name);
-        Set<String> intersection = null;
+        Map<String, TypeMirror> candidateTypes = new LinkedHashMap<>();
         for (UseEvidence use : uses) {
-          Set<String> types = use.candidates.stream().map(TypeCandidate::type)
-              .collect(Collectors.toCollection(LinkedHashSet::new));
-          if (types.isEmpty()) continue;
-          if (intersection == null) intersection = new LinkedHashSet<>(types);
-          else intersection.retainAll(types);
+          for (TypeCandidate candidate : use.candidates) {
+            candidateTypes.putIfAbsent(candidate.type, candidate.mirror);
+          }
         }
-        if (intersection == null || intersection.size() != 1) {
+        Set<String> viable = candidateTypes.entrySet().stream()
+            .filter(candidate -> uses.stream()
+                .filter(use -> !use.candidates.isEmpty())
+                .allMatch(use -> use.candidates.stream()
+                    .anyMatch(formal -> assignable(candidate.getValue(), formal.mirror))))
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+        if (candidateTypes.isEmpty() || viable.size() != 1) {
           unresolved.add(object(Map.of("name", name, "reason",
-              intersection == null ? "no_structural_type_evidence" : "ambiguous_or_conflicting_type_domain",
-              "candidate_types", intersection == null ? List.of() : intersection,
+              candidateTypes.isEmpty() ? "no_structural_type_evidence" : "ambiguous_or_conflicting_type_domain",
+              "candidate_types", viable,
               "evidence", uses)));
           continue;
         }
-        String type = intersection.iterator().next();
+        String type = viable.iterator().next();
+        TypeMirror selected = candidateTypes.get(type);
         List<UseEvidence> supporting = uses.stream()
-            .filter(use -> use.candidates.stream().anyMatch(candidate -> candidate.type.equals(type)))
+            .filter(use -> use.candidates.stream()
+                .anyMatch(formal -> assignable(selected, formal.mirror)))
             .collect(Collectors.toList());
         parameters.add(object(Map.of("name", name, "type", type, "evidence", supporting)));
       }
@@ -428,18 +437,20 @@ public final class JavaTypeConstraints {
 
   private static final class TypeCandidate {
     final String type;
+    final TypeMirror mirror;
     final TypeElement owner;
     final String signature;
     final List<String> declaringOwners;
 
-    TypeCandidate(String type, TypeElement owner, String signature, List<String> declaringOwners) {
+    TypeCandidate(
+        String type, TypeMirror mirror, TypeElement owner, String signature,
+        List<String> declaringOwners) {
       this.type = type;
+      this.mirror = mirror;
       this.owner = owner;
       this.signature = signature;
       this.declaringOwners = declaringOwners;
     }
-
-    String type() { return type; }
   }
 
   private static final class UseEvidence {

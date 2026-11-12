@@ -141,6 +141,46 @@ def test_explicit_object_formal_is_evidence_not_fallback(tmp_path):
     assert "java.lang.Object" in result["parameters"][0]["evidence"][0]["candidates"][0]["signature"]
 
 
+def test_specific_formal_satisfies_object_supertype_use_without_fallback(tmp_path):
+    result = run_constraints(tmp_path, {
+        "p/Test.java": """package p;
+final class Test {
+  void selected() { Product.consume(request); Assert.same(request); }
+}
+""",
+        "p/Product.java": "package p; final class Product { static void consume(q.Request request) {} }\n",
+        "p/Assert.java": "package p; final class Assert { static void same(Object value) {} }\n",
+        "q/Request.java": "package q; public interface Request {}\n",
+    }, ["request"])
+    assert result["unresolved"] == []
+    parameter = result["parameters"][0]
+    assert parameter["type"] == "q.Request"
+    assert [use["line"] for use in parameter["evidence"]] == [3, 3]
+    assert {candidate["type"] for use in parameter["evidence"] for candidate in use["candidates"]} == {
+        "q.Request", "java.lang.Object"}
+
+
+def test_conflicting_and_alternative_type_domains_remain_unresolved(tmp_path):
+    conflicting = run_constraints(tmp_path / "conflicting", {
+        "p/Test.java": "package p; final class Test { void selected() { A.use(value); B.use(value); } }\n",
+        "p/A.java": "package p; final class A { static void use(String value) {} }\n",
+        "p/B.java": "package p; final class B { static void use(Integer value) {} }\n",
+    }, ["value"])
+    assert conflicting["parameters"] == []
+    assert conflicting["unresolved"][0]["candidate_types"] == []
+
+    alternative = run_constraints(tmp_path / "alternative", {
+        "p/Test.java": "package p; final class Test { void selected() { Product.use(value); } }\n",
+        "p/Product.java": """package p;
+final class Product { static void use(q.First value) {} static void use(q.Second value) {} }
+""",
+        "q/First.java": "package q; public interface First {}\n",
+        "q/Second.java": "package q; public interface Second {}\n",
+    }, ["value"])
+    assert alternative["parameters"] == []
+    assert set(alternative["unresolved"][0]["candidate_types"]) == {"q.First", "q.Second"}
+
+
 def test_constructor_and_imported_inherited_field_keep_declaring_provenance(tmp_path):
     result = run_constraints(tmp_path, {
         'p/Test.java': '''package p;
