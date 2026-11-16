@@ -17,6 +17,35 @@ def completed(code, stderr=""):
     return subprocess.CompletedProcess(["javac"], code, "", stderr)
 
 
+def route_transition(modality, caller, callee, instruction_index, *,
+                     normal=(), exceptional=(), catch_throwable=False,
+                     call_identity=None, targets=None):
+    call_identity = call_identity or f"{caller}#{instruction_index}->{callee}"
+    cfg = {
+        "status": "available",
+        "normal_reachable": [
+            {"instruction_index": index, "basic_block": index} for index in normal],
+        "exceptional_reachable": [
+            *([{"instruction_index": None, "basic_block": 2}] if catch_throwable else []),
+            *[{"instruction_index": index, "basic_block": index} for index in exceptional],
+        ],
+        "exceptional_catches": ([{"basic_block": 2, "caught_types": ["Ljava/lang/Throwable"]}]
+                                if catch_throwable else []),
+    }
+    return {
+        "modality": modality,
+        "caller": caller,
+        "caller_context": "C",
+        "callee": callee,
+        "callee_context": "C",
+        "instruction_index": instruction_index,
+        "call_identity": call_identity,
+        "exact_call_graph_target": True,
+        "possible_target_nodes": targets or [{"method": callee, "context": "C"}],
+        "caller_cfg": cfg,
+    }
+
+
 def test_structural_harness_uses_only_source_attributed_parameters():
     source = "void selected() { Product.run(dependency); }"
     results = iter([
@@ -329,6 +358,143 @@ def test_product_body_paths_reject_self_guard_and_reconverged_branch():
     }
     assert subject._product_body_paths(
         raw, {"p.Product": "src/main/java/p/Product.java"}) == ([], [])
+
+
+def test_exception_path_requires_matched_call_identity_not_same_target_return():
+    product = "p.Product.fail()V"
+    helper = "p.Helper.size()I"
+    caller = "p.Caller.run()V"
+    test = "p.Test.test()V"
+    entered = route_transition("call", caller, helper, 20, call_identity="caller#20->helper")
+    wrong_return = route_transition(
+        "normal_return", test, helper, 30, normal=(31,), call_identity="test#30->helper")
+    initial_exception = route_transition(
+        "exceptional_return", caller, product, 10, exceptional=(20,),
+        catch_throwable=True, call_identity="caller#10->product")
+    raw = {
+        "seed_index": 8,
+        "slice_statements": [
+            {"kind": "NORMAL", "method": product, "context": "C", "instruction_index": 1, "line": 7},
+            {"kind": "EXC_RET_CALLEE", "method": product, "context": "C"},
+            {"kind": "EXC_RET_CALLER", "method": caller, "context": "C", "instruction_index": 10},
+            {"kind": "PARAM_CALLER", "method": caller, "context": "C", "instruction_index": 20, "basic_block": 20},
+            {"kind": "PARAM_CALLEE", "method": helper, "context": "C"},
+            {"kind": "NORMAL_RET_CALLEE", "method": helper, "context": "C"},
+            {"kind": "NORMAL_RET_CALLER", "method": test, "context": "C", "instruction_index": 30},
+            {"kind": "NORMAL", "method": test, "context": "C", "instruction_index": 31, "basic_block": 31},
+            {"kind": "NORMAL", "method": test, "context": "C", "instruction_index": 32, "basic_block": 32},
+        ],
+        "slice_edges": [
+            {"from": 0, "to": 1, "labels": ["DATA_DEP"]},
+            {"from": 1, "to": 2, "labels": ["DATA_DEP"], "interprocedural_transition": initial_exception},
+            {"from": 2, "to": 3, "labels": ["CONTROL_DEP"]},
+            {"from": 3, "to": 4, "labels": ["DATA_DEP"], "interprocedural_transition": entered},
+            {"from": 4, "to": 5, "labels": ["DATA_DEP"]},
+            {"from": 5, "to": 6, "labels": ["DATA_DEP"], "interprocedural_transition": wrong_return},
+            {"from": 6, "to": 7, "labels": ["DATA_DEP"]},
+            {"from": 7, "to": 8, "labels": ["DATA_DEP"]},
+        ],
+        "product_body_evidence": [{"kind": "exceptional_exit", "method": product,
+                                   "context": "C", "instruction_index": 1, "line": 7}],
+    }
+    paths, boundaries = subject._product_body_paths(
+        raw, {"p.Product": "src/main/java/p/Product.java"})
+    assert paths == []
+    assert boundaries[0]["reason"] == "no_authenticated_matched_call_return_path"
+    assert boundaries[0]["route_evidence"]["pruned_transition"] >= 1
+
+
+def test_exception_path_requires_own_exception_and_catch_all_cfg_route():
+    product = "p.Product.fail()V"
+    caller = "p.Test.test()V"
+    exceptional = route_transition(
+        "exceptional_return", caller, product, 10, exceptional=(11, 12),
+        catch_throwable=True)
+    raw = {
+        "seed_index": 4,
+        "slice_statements": [
+            {"kind": "NORMAL", "method": product, "context": "C", "instruction_index": 1, "line": 7},
+            {"kind": "EXC_RET_CALLEE", "method": product, "context": "C"},
+            {"kind": "EXC_RET_CALLER", "method": caller, "context": "C", "instruction_index": 10},
+            {"kind": "CATCH", "method": caller, "context": "C", "basic_block": 2},
+            {"kind": "NORMAL", "method": caller, "context": "C", "instruction_index": 12, "basic_block": 12},
+        ],
+        "slice_edges": [
+            {"from": 0, "to": 1, "labels": ["DATA_DEP"]},
+            {"from": 1, "to": 2, "labels": ["DATA_DEP"], "interprocedural_transition": exceptional},
+            {"from": 2, "to": 3, "labels": ["CONTROL_DEP"]},
+            {"from": 3, "to": 4, "labels": ["DATA_DEP"]},
+        ],
+        "product_body_evidence": [{"kind": "exceptional_exit", "method": product,
+                                   "context": "C", "instruction_index": 1, "line": 7}],
+    }
+    paths, boundaries = subject._product_body_paths(
+        raw, {"p.Product": "src/main/java/p/Product.java"})
+    assert [(row["kind"], row["source_line"]) for row in paths] == [("exception_dependence", 7)]
+    assert boundaries == []
+
+    # A later unrelated exception cannot authenticate the starting product method.
+    raw["slice_edges"][1]["interprocedural_transition"] = route_transition(
+        "normal_return", caller, product, 10, normal=(11, 12))
+    paths, boundaries = subject._product_body_paths(
+        raw, {"p.Product": "src/main/java/p/Product.java"})
+    assert paths == []
+    assert boundaries[0]["reason"] == "no_authenticated_matched_call_return_path"
+
+
+def test_normal_return_uses_cfg_chronology_and_multitarget_stays_unknown():
+    product = "p.Product.value()I"
+    caller = "p.Test.test()V"
+    normal = route_transition("normal_return", caller, product, 10, normal=(12,))
+    raw = {
+        "seed_index": 3,
+        "slice_statements": [
+            {"kind": "NORMAL", "method": product, "context": "C", "instruction_index": 1, "line": 9},
+            {"kind": "NORMAL_RET_CALLEE", "method": product, "context": "C"},
+            {"kind": "NORMAL_RET_CALLER", "method": caller, "context": "C", "instruction_index": 10},
+            {"kind": "NORMAL", "method": caller, "context": "C", "instruction_index": 12, "basic_block": 12},
+        ],
+        "slice_edges": [
+            {"from": 0, "to": 1, "labels": ["DATA_DEP"]},
+            {"from": 1, "to": 2, "labels": ["DATA_DEP"], "interprocedural_transition": normal},
+            {"from": 2, "to": 3, "labels": ["DATA_DEP"]},
+        ],
+        "product_body_evidence": [{"kind": "value_return", "method": product,
+                                   "context": "C", "instruction_index": 1, "line": 9}],
+    }
+    paths, boundaries = subject._product_body_paths(
+        raw, {"p.Product": "src/main/java/p/Product.java"})
+    assert [(row["kind"], row["source_line"]) for row in paths] == [("normal_return_dependence", 9)]
+    assert boundaries == []
+
+    raw["slice_edges"][1]["interprocedural_transition"]["possible_target_nodes"].append(
+        {"method": "p.Other.value()I", "context": "C"})
+    paths, boundaries = subject._product_body_paths(
+        raw, {"p.Product": "src/main/java/p/Product.java"})
+    assert paths == []
+    assert boundaries[0]["route_evidence"]["pruned_ambiguous"] == 1
+
+
+def test_base_slice_frontier_prevents_exhaustive_no_route_claim():
+    raw = {
+        "seed_index": 1,
+        "traversal_truncated": True,
+        "traversal_frontier_count": 4,
+        "slice_statements": [
+            {"kind": "NORMAL", "method": "p.Product.value()I", "context": "C",
+             "instruction_index": 1, "line": 9},
+            {"kind": "NORMAL", "method": "p.Test.test()V", "context": "C",
+             "instruction_index": 2, "line": 20},
+        ],
+        "slice_edges": [{"from": 0, "to": 1, "labels": ["DATA_DEP"]}],
+        "product_body_evidence": [{"kind": "value_return", "method": "p.Product.value()I",
+                                   "context": "C", "instruction_index": 1, "line": 9}],
+    }
+    paths, boundaries = subject._product_body_paths(
+        raw, {"p.Product": "src/main/java/p/Product.java"})
+    assert paths == []
+    assert boundaries[0]["reason"] == "base_slice_or_realizable_path_frontier"
+    assert boundaries[0]["route_evidence"]["exhaustive"] is False
 
 
 def test_probe_and_driver_share_base_graph_then_isolate_demanded_effect_roots():

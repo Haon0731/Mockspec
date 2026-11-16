@@ -39,6 +39,8 @@ MAX_RELATIONS = 1000
 MAX_UNKNOWN_EFFECTS = 1000
 MAX_RELATION_PATH_EDGES = 5_000
 MAX_OBSERVATION_PROJECTED_EDGES = 50_000
+MAX_AUTHENTICATED_PATH_STATES = 100_000
+MAX_AUTHENTICATED_CALL_DEPTH = 128
 DEFAULT_MAX_FILES = 8
 DEFAULT_MAX_BYTES = 200_000
 DEFAULT_COMPILE_MAX_FILES = 400
@@ -794,6 +796,205 @@ def _outgoing_index(raw: dict[str, Any], allowed_labels: set[str]
     return outgoing
 
 
+def _authenticated_dependency_path(
+        raw: dict[str, Any], start: int, target: int, allowed_labels: set[str],
+        *, max_edges: int = MAX_RELATION_PATH_EDGES,
+        max_states: int = MAX_AUTHENTICATED_PATH_STATES,
+        max_depth: int = MAX_AUTHENTICATED_CALL_DEPTH,
+        require_exception_route: bool = False,
+        ) -> tuple[list[dict[str, Any]] | None, dict[str, Any]]:
+    """Find a bounded call/return-matched SDG path with exact probe authentication."""
+    statements = raw.get("slice_statements", [])
+    if not (0 <= start < len(statements) and 0 <= target < len(statements)):
+        return None, {"reason": "invalid_path_endpoint", "exhaustive": True}
+    outgoing = _outgoing_index(raw, allowed_labels)
+    transitions = {row.get("transition_id"): row
+                   for row in raw.get("interprocedural_transitions", [])
+                   if isinstance(row, dict) and isinstance(row.get("transition_id"), str)}
+    control_flows = {row.get("caller_cfg_id"): row
+                     for row in raw.get("call_control_flows", [])
+                     if isinstance(row, dict) and isinstance(row.get("caller_cfg_id"), str)}
+    State = tuple[int, tuple[str, ...], tuple[Any, ...] | None, bool]
+    initial: State = (start, (), None, False)
+    queue: list[State] = [initial]
+    parents: dict[State, tuple[State, dict[str, Any]]] = {}
+    seen = {initial}
+    pruned_depth = 0
+    pruned_transition = 0
+    pruned_cfg = 0
+    pruned_ambiguous = 0
+
+    def statement_identity(index: int) -> tuple[Any, Any]:
+        item = statements[index]
+        return item.get("method"), item.get("context")
+
+    def reachable_indexes(cfg: dict[str, Any], modality: str) -> tuple[int, ...]:
+        rows = cfg.get(f"{modality}_reachable", [])
+        return tuple(sorted({row["instruction_index"] for row in rows
+                             if type(row.get("instruction_index")) is int}))
+
+    def reachable_blocks(cfg: dict[str, Any], modality: str) -> tuple[int, ...]:
+        rows = cfg.get(f"{modality}_reachable", [])
+        return tuple(sorted({row["basic_block"] for row in rows
+                             if type(row.get("basic_block")) is int}))
+
+    def catches_throwable(cfg: dict[str, Any]) -> bool:
+        return any("Ljava/lang/Throwable" in row.get("caught_types", [])
+                   for row in cfg.get("exceptional_catches", []))
+
+    for state in queue:
+        current, stack, pending, saw_exception = state
+        current_statement = statements[current]
+        current_identity = statement_identity(current)
+        if pending is not None and current_identity == (pending[0], pending[1]):
+            instruction_index = current_statement.get("instruction_index")
+            basic_block = current_statement.get("basic_block")
+            if (type(instruction_index) is int and instruction_index != pending[3]
+                    and instruction_index not in pending[4]):
+                pruned_cfg += 1
+                continue
+            if (instruction_index is None and type(basic_block) is int
+                    and basic_block not in pending[5]):
+                pruned_cfg += 1
+                continue
+            if instruction_index is None and basic_block is None:
+                pruned_cfg += 1
+                continue
+            if (pending[2] == "exceptional" and type(instruction_index) is int
+                    and instruction_index != pending[3] and not pending[6]):
+                pruned_cfg += 1
+                continue
+        if current == target and (not require_exception_route or saw_exception):
+            path: list[dict[str, Any]] = []
+            cursor = state
+            while cursor != initial:
+                previous, edge = parents[cursor]
+                path.append(edge)
+                cursor = previous
+            return list(reversed(path)), {
+                "reason": "authenticated_path", "exhaustive": True,
+                "searched_states": len(seen), "pruned_depth": pruned_depth,
+                "pruned_transition": pruned_transition, "pruned_cfg": pruned_cfg,
+                "pruned_ambiguous": pruned_ambiguous,
+            }
+        for edge in sorted(outgoing.get(current, []),
+                           key=lambda item: (int(item["to"]), tuple(item.get("labels", [])))):
+            reached = int(edge["to"])
+            next_statement = statements[reached]
+            next_identity = statement_identity(reached)
+            transition = edge.get("interprocedural_transition")
+            if not isinstance(transition, dict):
+                transition = transitions.get(edge.get("interprocedural_transition_id"))
+            cross_node = current_identity != next_identity
+            if cross_node and not isinstance(transition, dict):
+                pruned_transition += 1
+                continue
+            next_stack = stack
+            next_pending = pending
+            next_saw_exception = saw_exception
+
+            if isinstance(transition, dict):
+                targets = transition.get("possible_target_nodes", [])
+                if (transition.get("exact_call_graph_target") is not True
+                        or len(targets) != 1):
+                    pruned_ambiguous += 1
+                    continue
+                call_identity = transition.get("call_identity")
+                modality = transition.get("modality")
+                if not isinstance(call_identity, str):
+                    pruned_transition += 1
+                    continue
+                if modality == "call":
+                    if len(stack) >= max_depth:
+                        pruned_depth += 1
+                        continue
+                    next_stack = (*stack, call_identity)
+                    next_pending = None
+                elif modality in {"normal_return", "exceptional_return"}:
+                    if (require_exception_route and not saw_exception
+                            and current_identity == statement_identity(start)
+                            and modality != "exceptional_return"):
+                        pruned_transition += 1
+                        continue
+                    if stack:
+                        if stack[-1] != call_identity:
+                            pruned_transition += 1
+                            continue
+                        next_stack = stack[:-1]
+                    cfg = transition.get("caller_cfg", {})
+                    if not isinstance(cfg, dict) or not cfg:
+                        cfg = control_flows.get(transition.get("caller_cfg_id"), {})
+                    route = "exceptional" if modality == "exceptional_return" else "normal"
+                    if cfg.get("status") != "available":
+                        pruned_cfg += 1
+                        continue
+                    next_pending = (
+                        transition.get("caller"), transition.get("caller_context"), route,
+                        transition.get("instruction_index"), reachable_indexes(cfg, route),
+                        reachable_blocks(cfg, route),
+                        catches_throwable(cfg) if route == "exceptional" else True,
+                    )
+                    if current_identity == statement_identity(start):
+                        next_saw_exception |= modality == "exceptional_return"
+                else:
+                    pruned_transition += 1
+                    continue
+
+            next_state: State = (reached, next_stack, next_pending, next_saw_exception)
+            if next_state in seen:
+                continue
+            # Bound path length independently from graph-state count.
+            depth = 1
+            cursor = state
+            while cursor != initial and depth <= max_edges:
+                cursor = parents[cursor][0]
+                depth += 1
+            if depth > max_edges:
+                pruned_depth += 1
+                continue
+            if len(seen) >= max_states:
+                return None, {
+                    "reason": "realizable_path_search_frontier", "exhaustive": False,
+                    "searched_states": len(seen), "state_limit": max_states,
+                    "pruned_depth": pruned_depth, "pruned_transition": pruned_transition,
+                    "pruned_cfg": pruned_cfg, "pruned_ambiguous": pruned_ambiguous,
+                }
+            seen.add(next_state)
+            parents[next_state] = (state, edge)
+            queue.append(next_state)
+    return None, {
+        "reason": "no_authenticated_matched_call_return_path", "exhaustive": True,
+        "searched_states": len(seen), "pruned_depth": pruned_depth,
+        "pruned_transition": pruned_transition, "pruned_cfg": pruned_cfg,
+        "pruned_ambiguous": pruned_ambiguous,
+    }
+
+
+def _consume_authenticated_path(
+        raw: dict[str, Any], start: int, seed: int, allowed_labels: set[str],
+        budget: dict[str, int], *, require_exception_route: bool = False,
+        ) -> tuple[list[dict[str, Any]] | None, dict[str, Any]]:
+    if budget["relations"] <= 0:
+        budget["omitted_relations"] += 1
+        return None, {"reason": "dependency_path_discovery_budget", "exhaustive": False}
+    path, evidence = _authenticated_dependency_path(
+        raw, start, seed, allowed_labels, require_exception_route=require_exception_route)
+    if path and (len(path) > budget["edges"] or len(path) > MAX_RELATION_PATH_EDGES):
+        budget["omitted_relations"] += 1
+        budget["omitted_path_edges"] += len(path)
+        return None, {"reason": "dependency_path_discovery_budget", "exhaustive": False,
+                      "path_edges": len(path)}
+    if path:
+        budget["relations"] -= 1
+        budget["edges"] -= len(path)
+    elif raw.get("traversal_truncated") or raw.get("traversal_frontier_count", 0):
+        evidence = {**evidence, "reason": "base_slice_or_realizable_path_frontier",
+                    "exhaustive": False,
+                    "base_slice_truncated": bool(raw.get("traversal_truncated")),
+                    "base_frontier_count": raw.get("traversal_frontier_count", 0)}
+    return path, evidence
+
+
 def _indexed_path_between(outgoing: dict[int, list[dict[str, Any]]], start: int, target: int,
                           max_edges: int) -> list[dict[str, Any]] | None:
     queue: list[int] = [start]
@@ -841,7 +1042,14 @@ def _typed_product_paths(raw: dict[str, Any], classes: dict[str, str],
         if path is None or type(line) is not int or line < 1:
             continue
         for relation_kind, family in families:
-            dependency_path = _consume_indexed_path(indexes, family, index, seed, budget)
+            if index not in indexes[family][1]:
+                continue
+            allowed = ({"DATA_DEP", "HEAP_DATA_DEP"} if family == "data"
+                       else {"CONTROL_DEP"})
+            # Generic NO_HEAP evidence must never acquire heap meaning from projection.
+            allowed.discard("HEAP_DATA_DEP")
+            dependency_path, route = _consume_authenticated_path(
+                raw, index, seed, allowed, budget)
             if dependency_path:
                 statement_indexes = [index, *(int(edge["to"]) for edge in dependency_path)]
                 opaque_hits: list[dict[str, Any]] = []
@@ -862,6 +1070,10 @@ def _typed_product_paths(raw: dict[str, Any], classes: dict[str, str],
                 results.append({"kind": relation_kind, "source_path": path,
                                 "source_line": line, "source_statement": index,
                                 "seed_statement": seed, "dependency_path": dependency_path})
+            elif route.get("pruned_transition") or route.get("pruned_ambiguous") or not route.get("exhaustive", True):
+                suppressed.append({"reason": route["reason"], "kind": relation_kind,
+                                   "source_path": path, "source_line": line,
+                                   "route_evidence": route})
     return results, suppressed
 
 
@@ -899,37 +1111,53 @@ def _product_body_paths(raw: dict[str, Any], classes: dict[str, str],
                                "evidence": evidence})
             continue
         if kind == "value_return":
-            dependency_path = _consume_indexed_path(indexes, "data", statement_index, seed, budget)
+            dependency_path, route = _consume_authenticated_path(
+                raw, statement_index, seed, {"DATA_DEP"}, budget)
             if dependency_path:
                 relations.append({"kind": "normal_return_dependence", "source_path": path,
                                   "source_line": line, "source_statement": statement_index,
                                   "seed_statement": seed, "dependency_path": dependency_path,
                                   "product_body_evidence": evidence})
+            elif statement_index in indexes["data"][1]:
+                boundaries.append({"source_path": path, "source_line": line,
+                                   "reason": route["reason"], "evidence": evidence,
+                                   "route_evidence": route})
             continue
         if kind == "exceptional_exit":
-            dependency_path = _consume_indexed_path(
-                indexes, "mixed", statement_index, seed, budget)
-            if dependency_path and any("CONTROL_DEP" in edge["labels"]
-                                       for edge in dependency_path):
+            dependency_path, route = _consume_authenticated_path(
+                raw, statement_index, seed, {"DATA_DEP", "CONTROL_DEP"}, budget,
+                require_exception_route=True)
+            if dependency_path:
                 relations.append({"kind": "exception_dependence", "source_path": path,
                                   "source_line": line, "source_statement": statement_index,
                                   "seed_statement": seed, "dependency_path": dependency_path,
                                   "product_body_evidence": evidence})
+            elif statement_index in indexes["mixed"][1]:
+                boundaries.append({"source_path": path, "source_line": line,
+                                   "reason": route["reason"], "evidence": evidence,
+                                   "route_evidence": route})
             continue
         if kind == "control_guard":
             controlled_index = indexed.get((method, evidence.get("context"),
                                             evidence.get("retained_instruction_index")))
             if controlled_index is None or controlled_index == statement_index:
                 continue
-            downstream = _consume_indexed_path(indexes, "mixed", controlled_index, seed, budget)
-            control_path = _indexed_path_between(
-                control_outgoing, statement_index, controlled_index, MAX_RELATION_PATH_EDGES)
+            downstream, downstream_route = _consume_authenticated_path(
+                raw, controlled_index, seed, {"DATA_DEP", "CONTROL_DEP"}, budget)
+            control_path, control_route = _authenticated_dependency_path(
+                raw, statement_index, controlled_index, {"CONTROL_DEP"})
             if control_path and downstream is not None:
                 relations.append({"kind": "control_dependence", "source_path": path,
                                   "source_line": line, "source_statement": statement_index,
                                   "seed_statement": seed,
                                   "dependency_path": [*control_path, *downstream],
                                   "product_body_evidence": evidence})
+            elif (statement_index in indexes["control"][1]
+                  or controlled_index in indexes["mixed"][1]):
+                route = control_route if not control_path else downstream_route
+                boundaries.append({"source_path": path, "source_line": line,
+                                   "reason": route["reason"], "evidence": evidence,
+                                   "route_evidence": route})
     return relations, boundaries
 
 
@@ -1336,7 +1564,8 @@ def _contract(entry: dict[str, Any], context: dict[str, Any], sources: list[dict
             raw, classes, opaque_by_path, path_indexes, path_budget)
         typed_paths = [*body_paths, *typed_paths]
         boundaries.extend({"scope": observation_id,
-                           "reason": "typed_path_crosses_opaque_placeholder",
+                           "reason": suppressed.get(
+                               "reason", "typed_path_crosses_opaque_placeholder"),
                            "details": suppressed} for suppressed in suppressed_paths)
         boundaries.extend({"scope": observation_id, **boundary}
                           for boundary in body_boundaries)

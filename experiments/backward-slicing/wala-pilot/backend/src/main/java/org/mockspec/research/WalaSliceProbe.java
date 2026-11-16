@@ -447,6 +447,8 @@ public final class WalaSliceProbe {
     Set<Statement> sliceSet = new LinkedHashSet<>(slice);
     Map<String, Integer> edgeKinds = new LinkedHashMap<>();
     List<Map<String, Object>> edges = new ArrayList<>();
+    Map<String, Map<String, Object>> interproceduralTransitions = new LinkedHashMap<>();
+    Map<String, Map<String, Object>> callControlFlows = new LinkedHashMap<>();
     List<Map<String, Object>> callBindings = new ArrayList<>();
     int edgeCount = 0;
     for (Statement source : ordered) {
@@ -481,7 +483,23 @@ public final class WalaSliceProbe {
           labels.add(label.name());
         }
         labels.sort(String::compareTo);
-        edges.add(Map.of("from", indexes.get(source), "to", indexes.get(target), "labels", labels));
+        Map<String, Object> edge = new LinkedHashMap<>();
+        edge.put("from", indexes.get(source));
+        edge.put("to", indexes.get(target));
+        edge.put("labels", labels);
+        Map<String, Object> transition = describeInterproceduralTransition(source, target, callGraph);
+        if (transition != null) {
+          String transitionId = (String) transition.get("transition_id");
+          String controlFlowId = (String) transition.get("caller_cfg_id");
+          edge.put("interprocedural_transition_id", transitionId);
+          interproceduralTransitions.putIfAbsent(transitionId, transition);
+          if (!callControlFlows.containsKey(controlFlowId)) {
+            callControlFlows.put(controlFlowId, describeCallControlFlow(
+                target.getKind() == Statement.Kind.PARAM_CALLEE ? source.getNode() : target.getNode(),
+                (Integer) transition.get("instruction_index")));
+          }
+        }
+        edges.add(edge);
       }
     }
     timings.put("source_mapping", elapsed(started));
@@ -512,6 +530,8 @@ public final class WalaSliceProbe {
     result.put("slice_edge_count", edgeCount);
     result.put("slice_edge_labels", edgeKinds);
     result.put("slice_edges", edges);
+    result.put("interprocedural_transitions", new ArrayList<>(interproceduralTransitions.values()));
+    result.put("call_control_flows", new ArrayList<>(callControlFlows.values()));
     result.put("call_bindings", callBindings);
     result.put("root_timings_millis", timings);
     return result;
@@ -789,6 +809,124 @@ public final class WalaSliceProbe {
       row.put("mod_regions", pointerKeys(mods.get(node)));
       result.add(row);
     }
+    return result;
+  }
+
+  /**
+   * Authenticate a retained interprocedural SDG edge against the exact caller instruction and
+   * call-graph target.  The host uses the stable call identity to reject context-insensitive paths
+   * that enter a callee at one call site and return through another.
+   */
+  private static Map<String, Object> describeInterproceduralTransition(
+      Statement source, Statement target, CallGraph callGraph) {
+    Statement callerStatement;
+    Statement calleeStatement;
+    String modality;
+    boolean entering;
+    if (source.getKind() == Statement.Kind.PARAM_CALLER
+        && target.getKind() == Statement.Kind.PARAM_CALLEE) {
+      callerStatement = source;
+      calleeStatement = target;
+      modality = "call";
+      entering = true;
+    } else if (source.getKind() == Statement.Kind.NORMAL_RET_CALLEE
+        && target.getKind() == Statement.Kind.NORMAL_RET_CALLER) {
+      callerStatement = target;
+      calleeStatement = source;
+      modality = "normal_return";
+      entering = false;
+    } else if (source.getKind() == Statement.Kind.EXC_RET_CALLEE
+        && target.getKind() == Statement.Kind.EXC_RET_CALLER) {
+      callerStatement = target;
+      calleeStatement = source;
+      modality = "exceptional_return";
+      entering = false;
+    } else {
+      return null;
+    }
+    if (!(callerStatement instanceof StatementWithInstructionIndex)) return null;
+    StatementWithInstructionIndex indexedCaller = (StatementWithInstructionIndex) callerStatement;
+    SSAInstruction instruction = indexedCaller.getInstruction();
+    if (!(instruction instanceof SSAAbstractInvokeInstruction)) return null;
+    SSAAbstractInvokeInstruction invocation = (SSAAbstractInvokeInstruction) instruction;
+    Set<CGNode> possibleTargets =
+        callGraph.getPossibleTargets(callerStatement.getNode(), invocation.getCallSite());
+    boolean exactTarget = possibleTargets.contains(calleeStatement.getNode());
+    List<Map<String, Object>> targetNodes = new ArrayList<>();
+    for (CGNode possibleTarget : possibleTargets) {
+      targetNodes.add(Map.of(
+          "method", possibleTarget.getMethod().getSignature(),
+          "context", possibleTarget.getContext().toString()));
+    }
+    targetNodes.sort(Comparator.comparing(row -> row.get("method") + " @ " + row.get("context")));
+    String caller = callerStatement.getNode().getMethod().getSignature();
+    String callerContext = callerStatement.getNode().getContext().toString();
+    int instructionIndex = indexedCaller.getInstructionIndex();
+    String callSite = invocation.getCallSite().toString();
+    Map<String, Object> result = new LinkedHashMap<>();
+    result.put("modality", modality);
+    result.put("direction", entering ? "caller_to_callee" : "callee_to_caller");
+    result.put("caller", caller);
+    result.put("caller_context", callerContext);
+    result.put("instruction_index", instructionIndex);
+    result.put("call_site", callSite);
+    result.put("declared_target", invocation.getDeclaredTarget().getSignature());
+    result.put("callee", calleeStatement.getNode().getMethod().getSignature());
+    result.put("callee_context", calleeStatement.getNode().getContext().toString());
+    result.put("exact_call_graph_target", exactTarget);
+    result.put("possible_target_nodes", targetNodes);
+    String callerCfgId = caller + " @ " + callerContext + " #" + instructionIndex + " " + callSite;
+    String callIdentity = callerCfgId
+        + " -> " + calleeStatement.getNode().getMethod().getSignature()
+        + " @ " + calleeStatement.getNode().getContext();
+    result.put("call_identity", callIdentity);
+    result.put("caller_cfg_id", callerCfgId);
+    result.put("transition_id", modality + " " + callIdentity);
+    return result;
+  }
+
+  private static Map<String, Object> describeCallControlFlow(CGNode callerNode, int index) {
+    IR ir = callerNode.getIR();
+    if (ir == null) return Map.of("status", "caller_ir_unavailable");
+    SSAInstruction[] instructions = ir.getInstructions();
+    if (index < 0 || index >= instructions.length
+        || !(instructions[index] instanceof SSAAbstractInvokeInstruction)) {
+      return Map.of("status", "caller_invoke_unavailable");
+    }
+    SSAAbstractInvokeInstruction invoke = (SSAAbstractInvokeInstruction) instructions[index];
+    var cfg = ir.getControlFlowGraph();
+    ISSABasicBlock callBlock = cfg.getBlockForInstruction(index);
+    Collection<ISSABasicBlock> normal = cfg.getNormalSuccessors(callBlock);
+    Collection<ISSABasicBlock> exceptional = cfg.getExceptionalSuccessors(callBlock);
+    Map<String, Object> row = new LinkedHashMap<>();
+    row.put("status", "available");
+    row.put("caller", callerNode.getMethod().getSignature());
+    row.put("caller_context", callerNode.getContext().toString());
+    row.put("instruction_index", index);
+    row.put("call_site", invoke.getCallSite().toString());
+    row.put("caller_cfg_id", callerNode.getMethod().getSignature() + " @ "
+        + callerNode.getContext() + " #" + index + " " + invoke.getCallSite());
+    row.put("call_block", callBlock.getNumber());
+    row.put("normal_successor_blocks", blockNumbers(normal));
+    row.put("exceptional_successor_blocks", blockNumbers(exceptional));
+    row.put("exceptional_catches", caughtExceptionTypes(exceptional));
+    row.put("normal_reachable", reachableInstructions(cfg, normal));
+    row.put("exceptional_reachable", reachableInstructions(cfg, exceptional));
+    return row;
+  }
+
+  private static List<Map<String, Object>> caughtExceptionTypes(
+      Collection<ISSABasicBlock> blocks) {
+    List<Map<String, Object>> result = new ArrayList<>();
+    for (ISSABasicBlock block : blocks) {
+      if (!block.isCatchBlock()) continue;
+      List<String> types = new ArrayList<>();
+      var caught = block.getCaughtExceptionTypes();
+      while (caught.hasNext()) types.add(caught.next().getName().toString());
+      types.sort(String::compareTo);
+      result.add(Map.of("basic_block", block.getNumber(), "caught_types", types));
+    }
+    result.sort(Comparator.comparingInt(row -> (Integer) row.get("basic_block")));
     return result;
   }
 
