@@ -13,6 +13,11 @@
 
 ## 独立研究验证
 
+研究方向：[后向分析与条件化 Mock 行为规格](adr/0002-mock-oriented-backward-evidence.md)。
+本轮从观察—依赖链与近似符号分析形成共同约束、条件化分支规格和证据／不确定性；Mock 代码生成、Agent 对照及缺陷实验留到后续。
+实施依据：[输出契约与验收规格](backward-analysis-spec.md)、[案例验收清单](../experiments/backward-slicing/spec-acceptance.md)、[实现差距表](../experiments/backward-slicing/spec-gaps.md)。
+这些是后续实施的要求，不代表现有分析器已满足。
+
 [#32 通用成熟后端接入全量报告](https://github.com/Haon0731/Mockspec/blob/41e4fab/out/mockbench-study/generic-entry-full165-20261111-r1/report.md)
 已保留原165例：124例驱动完成、120例全部原观察映射、26例有观察关联跨源候选，
 全部新语义仍未核验。后续[#33 观察关系修复](../experiments/backward-slicing/README.md)

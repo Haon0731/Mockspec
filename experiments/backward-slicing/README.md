@@ -1,5 +1,12 @@
 # 测试目标导向后向切片与 Mock 生成：有界探索
 
+当前方法与实施依据见[后向分析输出契约](../../docs/backward-analysis-spec.md)、
+[真实案例与反例验收清单](spec-acceptance.md)和[实现差距表](spec-gaps.md)。
+当前目标是有证据分级和覆盖边界的条件化规格，本轮不生成 Mock。
+下列运行与能力描述按各历史版本解释；特别是通用 Java 图路径不能自动认证跨过程依赖，
+已否定的关系见[全量r5路径审查](../../out/mockbench-study/entry-repair-20261111/verification/java-exception-route-review-r5.md)。
+旧自动修复与批运行保持暂停，不能用历史门禁替新规格背书。
+
 2026-11-09 更新：[完整 MockBench 上的方案调研](full-benchmark-research.md)回到测试目标导向
 后向切片主线，结合165例目标测试盘点重新提出验证设计。下文保留三例历史探索；其中的
 后端优先级属于当时建议，不代表当前已经选定 WALA 或符号执行。
