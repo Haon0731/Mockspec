@@ -278,7 +278,7 @@ def _wire_outputs(outputs: list[dict]) -> list[dict]:
     for output in rendered:
         version = output["schema_version"]
         if version == "staged-extract/v0.1":
-            output["schema_version"] = "staged-extract/v0.2"
+            output["schema_version"] = "staged-extract/v0.3"
             output["original_goals"] = [
                 _source_locator(item) for item in output["original_goals"]
             ]
@@ -286,8 +286,21 @@ def _wire_outputs(outputs: list[dict]) -> list[dict]:
                 candidate["evidence"] = [
                     _source_locator(item) for item in candidate["evidence"]
                 ]
+            output["unresolved"] = [{
+                "question": question,
+                "goal_indexes": [0],
+                "impact": (
+                    "Both remain candidates; the ambiguity blocks selection only."
+                    if "cache-hit" in question else
+                    "The missing selection basis prevents choosing either candidate."
+                    if "does not distinguish" in question else
+                    "No safe response constraint can be delivered."
+                    if "no safe response" in question else
+                    "This missing semantic fact may change the dependency behavior needed for the visible goal."
+                ),
+            } for question in output["unresolved"]]
         elif version == "staged-query/v0.1":
-            output["schema_version"] = "staged-query/v0.4"
+            output["schema_version"] = "staged-query/v0.6"
             assessment = output.get("previous_receipt_assessment")
             if assessment is not None:
                 assessment.pop("attempt_sequence", None)
@@ -317,27 +330,91 @@ def _wire_outputs(outputs: list[dict]) -> list[dict]:
                         # observed behavior affected by the inaccessible gap;
                         # it does not claim to resolve the blocking question.
                         "evidence": list(stop["evidence"]),
-                        "acquisition": "unavailable" if unknown["blocking"] else "not_needed",
                         "attempted_sequences": [],
                     })
+                    if unknown["blocking"]:
+                        updates[-1]["acquisition"] = "unavailable"
+                    else:
+                        updates[-1].pop("attempted_sequences")
+                    if question_id is not None:
+                        updates[-1]["question"] = None
+                        updates[-1]["goal_indexes"] = None
+                        updates[-1]["impact"] = None
                 output["question_updates"] = updates
+                stop.pop("remaining_unknowns")
             else:
                 output["question_updates"] = []
             output["candidate_updates"] = []
         elif version == "staged-construct/v0.1":
-            output["schema_version"] = "staged-construct/v0.3"
-            output["contract"] = _contract_selection(output["contract"])
-            output.setdefault("investigation_requests", [])
+            _construct_selection(output)
+        elif version == "staged-contrast/v0.3":
+            output["schema_version"] = "staged-contrast/v0.4"
+            output.pop("support", None)
         elif version == "staged-revise/v0.1":
-            output["schema_version"] = "staged-revise/v0.2"
+            output["schema_version"] = "staged-revise/v0.3"
+            output.pop("modified_objects", None)
             revised = output["revised_construct"]
-            revised["schema_version"] = "staged-construct/v0.3"
-            revised["contract"] = _contract_selection(revised["contract"])
-            revised.setdefault("investigation_requests", [])
-        elif version == "staged-deliver/v0.1":
-            output["schema_version"] = "staged-deliver/v0.3"
-            output["contract"] = _contract_selection(output["contract"])
+            _construct_selection(revised)
     return rendered
+
+
+def _construct_selection(output: dict) -> None:
+    """Convert legacy fixture artifacts to the current stable-ref wire DTO."""
+    output["schema_version"] = "staged-construct/v0.4"
+    output.pop("claim_basis", None)
+    output.pop("critical_behaviors", None)
+    output.pop("allowed_variations", None)
+    unresolved = output.pop("unresolved", [])
+    nonblocking = output.pop("nonblocking_unknowns", [])
+    output["fallback_unknowns"] = ([
+        {"question": item, "blocking": True} for item in unresolved
+    ] + [
+        {"question": item, "blocking": False} for item in nonblocking
+    ]) if output.get("spec") is None else []
+    output.setdefault("investigation_requests", [])
+    contract = output.get("contract")
+    if contract is None:
+        return
+    output["contract"] = _contract_selection(contract)
+    output["contract"]["schema_version"] = "staged-contract-selection/v0.1"
+    output["contract"].pop("case_id")
+    output["contract"].pop("language")
+    refs: dict[str, list[str]] = {}
+    for key, prefix in (
+        ("test_objectives", "goal"),
+        ("dependency_constraints", "constraint"),
+        ("uncertainty", "uncertainty"),
+    ):
+        refs[key] = []
+        for index, item in enumerate(output["contract"][key]):
+            ref = f"{prefix}-{index + 1}"
+            item["ref"] = ref
+            refs[key].append(ref)
+    spec = output.get("spec")
+    if spec is None:
+        return
+    spec["schema_version"] = "staged-spec-semantics/v0.2"
+    for item in spec["fixed_inputs"]:
+        item["goal_refs"] = [refs["test_objectives"][i] for i in item.pop("goal_indexes")]
+    for item in spec["constraint_basis"]:
+        item["constraint_ref"] = refs["dependency_constraints"][item.pop("constraint_index")]
+    for item in spec["goal_coverage"]:
+        item["goal_ref"] = refs["test_objectives"][item.pop("goal_index")]
+        item["constraint_refs"] = [
+            refs["dependency_constraints"][i] for i in item.pop("constraint_indexes")
+        ]
+    for item in spec["unknowns"]:
+        item["goal_refs"] = [refs["test_objectives"][i] for i in item.pop("goal_indexes")]
+        item["constraint_refs"] = [
+            refs["dependency_constraints"][i] for i in item.pop("constraint_indexes")
+        ]
+        item["formal_uncertainty_refs"] = [
+            refs["uncertainty"][i] for i in item.pop("formal_uncertainty_indexes")
+        ]
+    for item in spec["allowed_variations"]:
+        item["constraint_refs"] = [
+            refs["dependency_constraints"][i] for i in item.pop("constraint_indexes")
+        ]
 
 
 def _contract(*, ambiguous: bool = False) -> dict:
@@ -608,7 +685,6 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
         ],
         "unresolved": construct["unresolved"],
     }
-    deliver_construct = construct
     outputs: list[dict] = [
         extract,
         {"schema_version": "staged-query/v0.1", "decision": "finish_queries",
@@ -640,8 +716,7 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
     ]
     if variant == "C":
         contrast = {
-            "schema_version": "staged-contrast/v0.2", "status": "proposed",
-            "execution_status": "not_executed",
+            "schema_version": "staged-contrast/v0.3", "status": "proposed",
             "alternative": "Mock cache.get('k') to return the asserted record directly.",
             "bypass_behavior": "The correct return bypasses backend.fetch and cache.set.",
             "evidence_ids": ["hit_branch", "assertion"] + ([] if ambiguous else ["miss_requirement"]),
@@ -683,7 +758,6 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
                 "evidence_ids": ["miss_requirement", "miss_branch", "refill", "assertion"],
                 "request_another_revision": replay_case == "second_revision",
             })
-            deliver_construct = revised
             if replay_case == "second_revision":
                 # A request for another semantic pass now re-enters QUERY; it
                 # is not a protocol error or a fixed one-revision ceiling.
@@ -696,6 +770,7 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
                         "alternative": None,
                         "bypass_behavior": None,
                         "evidence_ids": [],
+                        "assumption_reason": "No further supported finding was identified after revision.",
                         "distinguishing_observation": None,
                         "revision_requested": False,
                         "revision_reason": None,
@@ -704,20 +779,17 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
                         "observation_limits": "No further static counterexample is established by this fixture.",
                     },
                 ])
-    outputs.append({
-        "schema_version": "staged-deliver/v0.1",
-        "result_status": deliver_construct["result_status"],
-        "selected_scenario_id": deliver_construct["selected_scenario_id"],
-        "contract": deliver_construct["contract"],
-    })
     rendered = _wire_outputs(outputs)
     if replay_case == "second_revision" and variant == "C":
         query_outputs = [
             output for output in rendered
-            if output["schema_version"] == "staged-query/v0.4"
+            if output["schema_version"] == "staged-query/v0.6"
         ]
         for update in query_outputs[1]["question_updates"]:
             update["question_id"] = "q1"
+            update["question"] = None
+            update["goal_indexes"] = None
+            update["impact"] = None
     return rendered
 
 
@@ -819,6 +891,10 @@ def scripted_outputs(
         "investigation_requests": [],
         "contract": None if replay_case == "inconclusive" else contract,
     }
+    if replay_case == "error":
+        # Host DELIVER does not consume a model copy.  Keep the error fixture at
+        # the semantic CONSTRUCT boundary where invalid evidence is rejected.
+        contract["test_objectives"][0]["evidence_ids"] = ["missing"]
     extract_candidates = [{
         "scenario_id": "dependency_returns_two",
         "description": "Dependency returns the value observed by the ordinary oracle.",
@@ -836,15 +912,6 @@ def scripted_outputs(
             "Dependency returns float 2.0, also accepted by the ordinary equality."
         )
         extract_candidates.append(float_candidate)
-    deliver = {
-        "schema_version": "staged-deliver/v0.1", "result_status": result_status,
-        "selected_scenario_id": selected_scenario_id,
-        "contract": None if replay_case == "inconclusive" else contract,
-    }
-    if replay_case == "error":
-        forged_contract = deepcopy(contract)
-        forged_contract["case_id"] = "forged_case_id"
-        deliver["contract"] = forged_contract
     outputs: list[dict] = [
         {
             "schema_version": "staged-extract/v0.1",
@@ -886,8 +953,8 @@ def scripted_outputs(
     ]
     if variant == "C" and result_status in ("SELECTED", "AMBIGUOUS"):
         outputs.append({
-            "schema_version": "staged-contrast/v0.2", "status": "none_identified",
-            "execution_status": "not_executed", "alternative": None,
+            "schema_version": "staged-contrast/v0.3", "status": "none_identified",
+            "alternative": None,
             "bypass_behavior": None, "evidence_ids": [],
             "distinguishing_observation": None, "revision_requested": False,
             "revision_reason": None,
@@ -899,7 +966,6 @@ def scripted_outputs(
             "observation_limits": "The static review does not prove the contract globally correct.",
             "investigation_requests": [],
         })
-    outputs.append(deliver)
     return _wire_outputs(outputs)
 
 
@@ -912,7 +978,8 @@ def query_script(
     outputs = scripted_outputs(replay_case, variant=variant)
     final_query = deepcopy(outputs[1])
     for update in final_query["question_updates"]:
-        update["attempted_sequences"] = list(range(1, count + 1))
+        if update["state"] == "open":
+            update["attempted_sequences"] = list(range(1, count + 1))
     queries = []
     for index in range(count + 1):
         assessment = None if index == 0 else {
@@ -932,7 +999,7 @@ def query_script(
                 "arguments_json": json.dumps(arguments),
             }
         queries.append({
-            "schema_version": "staged-query/v0.4",
+            "schema_version": "staged-query/v0.6",
             "decision": "finish_queries" if attempt is None else "request_query",
             "query_attempt": attempt, "previous_receipt_assessment": assessment,
             "impact": (

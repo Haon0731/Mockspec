@@ -25,7 +25,7 @@ from controller import (  # noqa: E402
     StagedInferenceError, StagedRunConfig, _call_stage, execute_staged_run,
 )
 from stage_protocol import QueryResult  # noqa: E402
-from scripted import FixedScriptModel, scripted_outputs, synthetic_task  # noqa: E402
+from scripted import FixedScriptModel, query_script, scripted_outputs, synthetic_task  # noqa: E402
 def _ledger(config: StagedRunConfig) -> UsageLedger:
     return UsageLedger(InferenceBudget(
         max_turns=config.max_model_calls,
@@ -136,12 +136,12 @@ def test_api_failure_trace_preserves_safe_provider_diagnostics() -> None:
         "model_request_started": True,
         "model_name": "scripted-offline",
         "output_type": "QueryResult",
-        "prompt_version": "staged-scenario-inference-prompts/v0.4",
+        "prompt_version": "staged-scenario-inference-prompts/v0.6",
         "payload_bytes": 17,
     }
     assert call["payload_sha256"]
     assert call["payload"] == {"stage": "QUERY"}
-    assert call["instructions"].startswith("staged-scenario-inference-prompts/v0.4")
+    assert call["instructions"].startswith("staged-scenario-inference-prompts/v0.6")
     assert call["requested_output_schema"]["title"] == "QueryResult"
     assert call["request_start_basis"] == "usage_ledger_before_model_call_hook"
     assert call["timeout_seconds"] == pytest.approx(5, abs=0.1)
@@ -239,7 +239,7 @@ def test_completed_run_persists_replayable_model_call_trace(tmp_path: Path) -> N
     calls = result["record"]["model_calls"]
     assert persisted["model_calls"] == calls
     assert [call["stage"] for call in calls] == [
-        "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER"
+        "EXTRACT", "QUERY", "CONSTRUCT"
     ]
     assert all(call["status"] == "completed" for call in calls)
     assert all(call["model_request_started"] is True for call in calls)
@@ -266,3 +266,33 @@ def test_pre_request_budget_gate_is_distinct_from_provider_failure() -> None:
     assert calls[0]["model_request_started"] is False
     assert calls[0]["exception"]["classification"] == "host_budget"
     assert calls[0]["exception"]["error_code"] == "model_call_limit"
+
+
+@pytest.mark.parametrize("query_count", [0, 1])
+def test_diagnostic_run_has_no_model_wait_or_run_budget_limits(tmp_path: Path, query_count: int) -> None:
+    class SlowScript(FixedScriptModel):
+        async def get_response(self, *args, **kwargs):
+            await asyncio.sleep(0.01)
+            return await super().get_response(*args, **kwargs)
+
+    model = SlowScript(query_script(query_count, "selected", variant="B"))
+    result = asyncio.run(execute_staged_run(
+        synthetic_task(), output_dir=tmp_path / "diagnostic", model=model,
+        config=StagedRunConfig(
+            no_run_resource_limits=True, max_total_tokens=None, timeout_seconds=None,
+            max_model_calls=1, parsing_timeout_seconds=0.001,
+        ),
+    ))
+
+    assert result["record"]["error"] is None
+    assert result["spec"].semantics.delivery_status == "ready"
+    calls = result["record"]["model_calls"]
+    assert len(calls) == 3 + query_count
+    assert all(call["timeout_seconds"] is None for call in calls)
+    manifest = result["manifest"]
+    assert manifest["deadline"]["absolute"] is None
+    assert manifest["deadline"]["wall_clock_deadline_unix"] is None
+    assert manifest["controller_limits"]["model_calls"] is None
+    assert manifest["controller_limits"]["query_attempts"] is None
+    assert manifest["usage"]["requests_completed"] == 3 + query_count
+    assert manifest["usage"]["total_tokens"] > 0

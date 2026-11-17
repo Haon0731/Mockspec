@@ -80,6 +80,14 @@ PRD 不作为当前能力或已通过验收的说明。
 输出减负及截断计量留证。当前研究实现已增加原目标问题账本、构造/对照后的继续调查、
 自包含 `dependency_spec.json` 和 provider 失败响应留证；离线工程验证与真实 M2 仍分别报告，
 不能据此宣称真实模型的规格推导效果已经提高。
+2026-10-28 的[单次取消宿主运行资源上限诊断](../out/staged-inference/resource-diagnostic-cloudfoundry-20261028/report.md)
+保留了 8 次完整模型响应与 6 次自主查询；首次失败位于 QUERY 问题更新的证据回执关联，
+离线对照另暴露非阻塞状态与取证状态不一致。未进入 CONSTRUCT，也未产生最终 spec；
+本次定位协议停止点，不构成真实规格推导验收通过。
+后续单次复验分别保存在 [CloudFoundry 协议复验](../out/staged-inference/revalidation-cloudfoundry-20261102/report.md)、
+[QUERY v0.5 复验](../out/staged-inference/revalidation-query-v05-20261102/report.md)和
+[宿主交付改造复验](../out/staged-inference/host-mechanics-live-20261102/report.md)。
+各目录保留当时的代码补丁、响应和终态；这些历史记录不代表当前 v0.6 或结构化输出修订已通过真实验收。
 
 以下研究结果不等于生产 Agent 已具备对应能力；阅读案例分析也不能作为未来无指导生成的输入。
 

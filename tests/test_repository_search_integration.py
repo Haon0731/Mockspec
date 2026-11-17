@@ -198,13 +198,11 @@ def test_public_staged_controller_mixes_seven_repository_queries_and_cites(
     }
     expected_quote = "SEARCH_CONTRACT = 'dependency result is 2'"
     construct = outputs[9]
-    deliver = outputs[10]
     construct["contract"] = deepcopy(construct["contract"])
     construct["contract"]["evidence"].append(dynamic_evidence)
     construct["contract"]["dependency_constraints"][0]["evidence_ids"].append(
         dynamic_evidence["id"]
     )
-    deliver["contract"] = deepcopy(construct["contract"])
 
     result = asyncio.run(execute_staged_run(
         output_dir=tmp_path / "staged-search-run",

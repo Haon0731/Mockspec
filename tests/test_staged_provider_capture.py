@@ -313,7 +313,7 @@ def test_capture_truncation_turns_completed_sdk_response_into_failure() -> None:
 
 def test_call_stage_records_incomplete_response_without_format_repair() -> None:
     value = {
-        "schema_version": "staged-query/v0.4",
+        "schema_version": "staged-query/v0.6",
         "decision": "finish_queries",
         "query_attempt": None,
         "previous_receipt_assessment": None,

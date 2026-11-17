@@ -214,14 +214,14 @@ def test_legal_alternative_can_replace_candidate_without_changing_original_goal(
     after["spec"]["allowed_variations"][0]["scenario_ids"] = ["equivalent_return"]
     after["spec"]["unknowns"][0]["scenario_ids"] = ["equivalent_return"]
     outputs[3] = {
-        "schema_version": "staged-contrast/v0.2", "status": "proposed",
-        "execution_status": "not_executed", "alternative": "Return 2.0 rather than integer 2.",
+            "schema_version": "staged-contrast/v0.4", "status": "proposed",
+ "alternative": "Return 2.0 rather than integer 2.",
         "bypass_behavior": "This challenges the draft's integer construction, not the original equality.",
         "evidence_ids": ["assertion"],
         "distinguishing_observation": "A type check would distinguish them, but is not an original goal.",
         "revision_requested": True,
         "revision_reason": "The proposed alternative is actually legal under ordinary equality.",
-        "support": "evidence", "assumption_reason": None,
+            "assumption_reason": None,
         "semantic_role": "dependency_contract",
         "weakness_review": "The integer-only draft excludes an equality-compatible value.",
         "overconstraint_review": "The original objective does not require a concrete numeric type.",
@@ -229,14 +229,10 @@ def test_legal_alternative_can_replace_candidate_without_changing_original_goal(
         "investigation_requests": [],
     }
     outputs.insert(4, {
-        "schema_version": "staged-revise/v0.2", "revised_construct": after,
-        "modified_objects": [
-            "contract", "selected_scenario_id", "selection_rationale", "spec",
-        ],
+        "schema_version": "staged-revise/v0.3", "revised_construct": after,
         "evidence_reason": "The same original equality accepts 2.0; rebind the unchanged goal.",
         "evidence_ids": ["assertion"], "request_another_revision": False,
     })
-    outputs[-1].update(selected_scenario_id="equivalent_return", contract=contract)
     result = asyncio.run(execute_staged_run(
         task_for_replay_case("selected"), output_dir=tmp_path / "replacement",
         model=FixedScriptModel(outputs), config=StagedRunConfig(variant="C"),
@@ -249,7 +245,7 @@ def test_legal_alternative_can_replace_candidate_without_changing_original_goal(
     )
     task = UnifiedTask.from_dict(task_for_replay_case("selected"))
     expected_before = materialize_construct(
-        ConstructSelection.model_validate(before), SourceStore(task)
+            ConstructSelection.model_validate(before), SourceStore(task), task,
     )
     assert result["record"]["revision_log"][0]["before"]["contract"] == (
         expected_before.contract.model_dump(mode="json")

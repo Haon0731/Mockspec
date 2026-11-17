@@ -30,6 +30,43 @@ def test_live_configuration_requires_priced_cost_budget() -> None:
         StagedRunConfig(run_mode="live_inference", model_name="unused-model")
 
 
+def test_live_diagnostic_cli_disables_http_wait_and_preserves_accounting(monkeypatch, tmp_path) -> None:
+    import openai
+    import run as staged_cli
+
+    clients = []
+    real_client = openai.AsyncOpenAI
+
+    def capture_client(**kwargs):
+        client = real_client(**kwargs)
+        clients.append(client)
+        return client
+
+    async def capture_run(**kwargs):
+        config = kwargs["config"]
+        assert config.no_run_resource_limits is True
+        assert config.max_total_tokens is None
+        assert config.timeout_seconds is None
+        assert config.max_cost_usd is None
+        assert config.max_output_tokens == 393216
+        assert config.input_cost_per_million == Decimal("0.30")
+        assert kwargs["model"].response_capture.max_body_bytes is None
+        assert clients[0].timeout is None
+        await clients[0].close()
+        return {"manifest": {"result_status": "SELECTED"}}
+
+    monkeypatch.setenv("OPENAI_API_KEY", "unused-test-key")
+    monkeypatch.setattr(openai, "AsyncOpenAI", capture_client)
+    monkeypatch.setattr(staged_cli, "execute_staged_run", capture_run)
+    assert staged_cli.main([
+        "--mode", "live_inference", "--variant", "C", "--model", "unused-model",
+        "--snapshot", str(tmp_path), "--case-id", "flask_308", "--repository-read",
+        "--output-dir", str(tmp_path / "run"), "--no-run-resource-limits",
+        "--max-output-tokens", "393216", "--input-cost-per-million", "0.30",
+        "--output-cost-per-million", "1.20",
+    ]) == 0
+
+
 def test_live_cli_missing_configuration_never_creates_run(tmp_path) -> None:
     output_dir = tmp_path / "live"
     env = os.environ.copy()

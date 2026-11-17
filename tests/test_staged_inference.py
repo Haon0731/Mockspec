@@ -103,11 +103,12 @@ def test_legacy_extract_quote_is_rejected_without_conversion(tmp_path):
         "source_id": "test:0", "start_line": 5, "end_line": 5,
         "quote": "    assert target(1) == 2",
     }]
+    outputs.insert(1, deepcopy(outputs[0]))
     result, model, output_dir = _run(tmp_path, outputs)
     assert result["manifest"]["error_stage"] == "EXTRACT"
     assert result["record"]["stop_reason"] == "output_invalid"
     assert result["record"]["stages"] == []
-    assert model.calls == 1
+    assert model.calls == 2
     assert not (output_dir / "scenario_contract.json").exists()
 
 
@@ -164,16 +165,20 @@ def test_variant_b_replay_preserves_identity_stages_and_artifact_hashes(tmp_path
     assert [item["stage"] for item in record["stages"]] == [
         "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER"
     ]
-    assert record["schema_version"] == "scenario-inference-record/v0.4"
+    assert record["schema_version"] == "scenario-inference-record/v0.6"
     assert record["citation_mode"] == "source_locator_host_materialized_quote/v1"
     assert manifest["versions"]["citation_mode"] == record["citation_mode"]
-    assert [item["model_call_sequence"] for item in record["stages"]] == [1, 2, 3, 4]
-    for stage in record["stages"]:
+    assert [item["model_call_sequence"] for item in record["stages"][:3]] == [1, 2, 3]
+    for stage in record["stages"][:3]:
         assert stage["citation_mode"] == record["citation_mode"]
         assert '"quote"' not in json.dumps(stage["wire_result"])
         assert '"quote"' in json.dumps(stage["result"])
+    assert record["stages"][3]["owner"] == "host"
+    assert record["stages"][3]["action"] == "validate_and_publish"
+    assert "model_call_sequence" not in record["stages"][3]
+    assert "wire_result" not in record["stages"][3]
+    assert '"quote"' in json.dumps(record["stages"][3]["result"])
     assert record["query_log"] == []
-    assert 1 <= len(record["critical_behaviors"]) <= 3
     assert record["unresolved"] == []
     assert record["revision_log"] == []
     assert record["degeneracy_contrast"] == {
@@ -202,15 +207,15 @@ def test_variant_b_replay_preserves_identity_stages_and_artifact_hashes(tmp_path
     assert result["record"] == record
     assert result["manifest"]["run_id"] == manifest["run_id"]
 
-    assert model.calls == 4
-    assert manifest["usage"]["requests_started"] == 4
-    assert manifest["usage"]["requests_completed"] == 4
-    assert len(manifest["usage"]["gate_events"]) == 4
+    assert model.calls == 3
+    assert manifest["usage"]["requests_started"] == 3
+    assert manifest["usage"]["requests_completed"] == 3
+    assert len(manifest["usage"]["gate_events"]) == 3
     assert all(event["status"] == "allowed"
                for event in manifest["usage"]["gate_events"])
 
     assert [_model_payload(item)["stage"] for item in model.inputs] == [
-        "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER"
+        "EXTRACT", "QUERY", "CONSTRUCT"
     ]
     for model_input in model.inputs:
         payload = _model_payload(model_input)
@@ -285,7 +290,8 @@ def _invalid_outputs(kind: str) -> tuple[list[dict], str, int]:
         return outputs, "EXTRACT", 1
     if kind == "bad_quote":
         outputs[0]["original_goals"][0]["quote"] = "invented oracle"
-        return outputs, "EXTRACT", 1
+        outputs.insert(1, deepcopy(outputs[0]))
+        return outputs, "EXTRACT", 2
     if kind == "out_of_range":
         outputs[0]["original_goals"][0]["start_line"] = 6
         outputs[0]["original_goals"][0]["end_line"] = 6
@@ -298,8 +304,14 @@ def _invalid_outputs(kind: str) -> tuple[list[dict], str, int]:
         construct["contract"]["language"] = "java"
     elif kind == "unknown_evidence_id":
         construct["contract"]["test_objectives"][0]["evidence_ids"] = ["missing"]
-    elif kind == "critical_behavior_unknown_evidence":
-        construct["critical_behaviors"][0]["evidence_ids"] = ["missing"]
+    elif kind == "duplicate_goal_ref":
+        construct["contract"]["test_objectives"].append(
+            deepcopy(construct["contract"]["test_objectives"][0])
+        )
+    elif kind == "unknown_constraint_ref":
+        construct["spec"]["constraint_basis"][0]["constraint_ref"] = "missing"
+    elif kind == "duplicate_constraint_ref":
+        construct["spec"]["goal_coverage"][0]["constraint_refs"] *= 2
     elif kind == "selected_not_candidate":
         construct["selected_scenario_id"] = "missing_candidate"
     elif kind == "selected_hypothesis_unknown":
@@ -310,24 +322,17 @@ def _invalid_outputs(kind: str) -> tuple[list[dict], str, int]:
             candidate["id"] = f"dependency_returns_{suffix}"
             candidate["description"] = f"A distinct candidate named {suffix}."
             construct["contract"]["scenario_hypotheses"].append(candidate)
-    elif kind == "zero_critical_behaviors":
-        construct["critical_behaviors"] = []
-        # The self-contained spec must still map every formal dependency constraint.
+    elif kind == "missing_constraint_basis":
         construct["spec"]["constraint_basis"] = []
-    elif kind == "four_critical_behaviors":
-        construct["critical_behaviors"] = construct["critical_behaviors"] * 4
-    elif kind == "blocking_unresolved":
-        construct["unresolved"] = ["The selected dependency binding is unresolved."]
-    elif kind == "deliver_changes_contract":
-        # scripted_outputs intentionally shares the contract object between stages;
-        # sever that alias so this mutation exercises DELIVER alone.
-        outputs[3]["contract"] = deepcopy(outputs[3]["contract"])
-        outputs[3]["contract"]["evidence"][0]["rationale"] = (
-            "DELIVER attempted to replace the constructed rationale."
-        )
-        return outputs, "DELIVER", 4
+    elif kind == "competing_fallback_unknown":
+        construct["fallback_unknowns"] = [{
+            "question": "A second mechanical source of truth.", "blocking": False,
+        }]
     else:  # pragma: no cover - protects the test table itself
         raise AssertionError(kind)
+    if kind in {"case_id", "language"}:
+        outputs.insert(3, deepcopy(construct))
+        return outputs, "CONSTRUCT", 4
     return outputs, "CONSTRUCT", 3
 
 
@@ -338,14 +343,14 @@ def _invalid_outputs(kind: str) -> tuple[list[dict], str, int]:
     "case_id",
     "language",
     "unknown_evidence_id",
-    "critical_behavior_unknown_evidence",
+    "duplicate_goal_ref",
+    "unknown_constraint_ref",
+    "duplicate_constraint_ref",
     "selected_not_candidate",
     "selected_hypothesis_unknown",
     "three_candidates",
-    "zero_critical_behaviors",
-    "four_critical_behaviors",
-    "blocking_unresolved",
-    "deliver_changes_contract",
+    "missing_constraint_basis",
+    "competing_fallback_unknown",
 ])
 def test_invalid_model_claims_leave_error_evidence_without_contract(
     tmp_path, kind: str
@@ -400,7 +405,7 @@ def test_invalid_configuration_object_is_rejected_before_model_use() -> None:
     assert model.calls == 0
 
 
-def test_model_call_budget_is_shared_across_stages(tmp_path) -> None:
+def test_three_model_call_budget_covers_all_model_owned_stages(tmp_path) -> None:
     model = FixedScriptModel()
     output_dir = tmp_path / "budgeted-run"
 
@@ -410,11 +415,11 @@ def test_model_call_budget_is_shared_across_stages(tmp_path) -> None:
     ))
 
     assert model.calls == 3
-    assert result["contract"] is None
-    assert result["manifest"]["result_status"] == "INCONCLUSIVE"
-    assert result["manifest"]["stop_reason"] == "budget_exhausted"
+    assert result["contract"] is not None
+    assert result["manifest"]["result_status"] == "SELECTED"
+    assert result["manifest"]["stop_reason"] == "completed"
     assert result["manifest"]["usage"]["requests_started"] == 3
-    assert not (output_dir / "scenario_contract.json").exists()
+    assert (output_dir / "scenario_contract.json").exists()
 
 
 def test_total_token_gate_blocks_first_request_and_leaves_evidence(tmp_path) -> None:
@@ -474,9 +479,10 @@ def test_four_results_through_cli(tmp_path, case, status, has_contract) -> None:
     assert (output_dir / "scenario_contract.json").exists() == has_contract
     if status != "SELECTED":
         assert record["selected_scenario_id"] is None
-    assert [stage["stage"] for stage in record["stages"]] == [
-        "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER"
-    ]
+    expected_stages = ["EXTRACT", "QUERY", "CONSTRUCT"]
+    if status != "ERROR":
+        expected_stages.append("DELIVER")
+    assert [stage["stage"] for stage in record["stages"]] == expected_stages
     if status == "AMBIGUOUS":
         contract = _read(output_dir / "scenario_contract.json")
         assert len(contract["scenario_hypotheses"]) == 2
@@ -487,7 +493,7 @@ def test_four_results_through_cli(tmp_path, case, status, has_contract) -> None:
         assert manifest["stop_reason"] == "evidence_exhausted"
     if status == "ERROR":
         assert record["error"]
-        assert manifest["error_stage"] == "DELIVER"
+        assert manifest["error_stage"] == "CONSTRUCT"
 
 
 @pytest.mark.parametrize("contents", ["{", "[]", '{"case_id":"unreviewed"}'])
@@ -514,7 +520,7 @@ def test_cli_rejected_input_has_registered_attempt(tmp_path, contents) -> None:
 
 @pytest.mark.parametrize("kind", [
     "ambiguous_selected", "ambiguous_one", "ambiguous_unknown", "ambiguous_no_contract",
-    "inconclusive_selected", "inconclusive_no_reason", "deliver_status",
+    "inconclusive_selected", "inconclusive_no_reason",
     "host_run_id", "host_usage", "host_stop_reason",
 ])
 def test_result_invariants_reject_model_forgery(tmp_path, kind) -> None:
@@ -531,14 +537,14 @@ def test_result_invariants_reject_model_forgery(tmp_path, kind) -> None:
         construct["contract"] = None
     elif kind == "inconclusive_no_reason":
         construct["unresolved"] = []
-    elif kind == "deliver_status":
-        outputs[3]["result_status"] = "INCONCLUSIVE"
     elif kind == "host_run_id":
         construct["run_id"] = "forged"
     elif kind == "host_usage":
         construct["usage"] = {"requests_started": 0}
     elif kind == "host_stop_reason":
         construct["stop_reason"] = "completed"
+    if kind in {"inconclusive_no_reason", "host_run_id", "host_usage", "host_stop_reason"}:
+        outputs.insert(3, deepcopy(construct))
     result, _, output_dir = _run(tmp_path, outputs)
     assert result["contract"] is None
     record, manifest = _assert_artifacts(output_dir)
@@ -550,9 +556,8 @@ def test_result_invariants_reject_model_forgery(tmp_path, kind) -> None:
 
 def test_inconclusive_can_retain_valid_diagnostic_contract(tmp_path) -> None:
     outputs = deepcopy(scripted_outputs("ambiguous"))
-    for output in outputs[2:]:
-        output["result_status"] = "INCONCLUSIVE"
-        output["selected_scenario_id"] = None
+    outputs[2]["result_status"] = "INCONCLUSIVE"
+    outputs[2]["selected_scenario_id"] = None
     result, _, output_dir = _run(tmp_path, outputs)
     record, manifest = _assert_artifacts(output_dir)
     assert record["result_status"] == "INCONCLUSIVE"
@@ -638,14 +643,14 @@ def test_budget_exhaustion_keeps_draft_without_publishing_contract(tmp_path, cas
     result = asyncio.run(execute_staged_run(
         synthetic_task(), output_dir=output_dir,
         model=FixedScriptModel(scripted_outputs(case)),
-        config=StagedRunConfig(max_model_calls=3),
+        config=StagedRunConfig(max_model_calls=2),
     ))
     record, manifest = _assert_artifacts(output_dir)
     assert record["result_status"] == "INCONCLUSIVE"
     assert record["selected_scenario_id"] is None
     assert manifest["stop_reason"] == "budget_exhausted"
     assert result["contract"] is None
-    assert any(stage["stage"] == "CONSTRUCT" for stage in record["stages"])
+    assert all(stage["stage"] != "CONSTRUCT" for stage in record["stages"])
 
 
 def test_missing_input_file_is_registered_before_read(tmp_path) -> None:
@@ -665,13 +670,16 @@ def test_missing_input_file_is_registered_before_read(tmp_path) -> None:
 
 def test_selected_allows_explicit_nonblocking_unknowns(tmp_path) -> None:
     outputs = deepcopy(scripted_outputs())
-    outputs[2]["nonblocking_unknowns"] = [
+    question = (
         "Unobserved dependency cache internals are unknown and do not affect the visible result."
-    ]
+    )
+    impact = "This does not change the selected observable dependency behavior."
+    outputs[1]["question_updates"][0].update(question=question, impact=impact)
+    outputs[2]["spec"]["unknowns"][0].update(question=question, impact=impact)
     _, _, output_dir = _run(tmp_path, outputs)
     record, _ = _assert_artifacts(output_dir)
     assert record["result_status"] == "SELECTED"
-    assert record["nonblocking_unknowns"] == outputs[2]["nonblocking_unknowns"]
+    assert record["nonblocking_unknowns"] == [question]
     assert record["unresolved"] == []
 
 
@@ -682,10 +690,12 @@ def test_extract_inconclusive_marker_does_not_shrink_later_investigation(tmp_pat
     })
     result, model, output_dir = _run(tmp_path, outputs)
     record, manifest = _assert_artifacts(output_dir)
-    assert model.calls == 4
+    assert model.calls == 3
     assert result["contract"] is None
     assert record["result_status"] == "INCONCLUSIVE"
-    assert record["unresolved"] == outputs[0]["unresolved"]
+    assert record["unresolved"] == [
+        item["question"] for item in outputs[0]["unresolved"]
+    ]
     assert [stage["stage"] for stage in record["stages"]] == [
         "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER",
     ]
@@ -738,7 +748,7 @@ def test_query_limits_through_cli(tmp_path, count, seen, status):
         assert manifest["stop_reason"] == "budget_exhausted"
         assert manifest["usage"]["requests_started"] == 8
     else:
-        assert manifest["usage"]["requests_started"] == 4 + count
+        assert manifest["usage"]["requests_started"] == 3 + count
 
 
 def _query_run(tmp_path, outputs, *, model=None, config=None):
@@ -912,7 +922,7 @@ def test_model_assessments_are_preserved(tmp_path, impact):
     assert receipt["result"]["text"] == synthetic_task()["mut_source"]["text"]
 
 
-@pytest.mark.parametrize("stage_index", [0, 3, 4])
+@pytest.mark.parametrize("stage_index", [0, 3])
 def test_query_action_outside_query_stage_is_rejected(tmp_path, stage_index, monkeypatch):
     from scripted import query_script
     from mock_spec.source_analysis import SourceAnalysis
@@ -924,6 +934,7 @@ def test_query_action_outside_query_stage_is_rejected(tmp_path, stage_index, mon
     monkeypatch.setattr(SourceAnalysis, "inspect_source", observe)
     outputs = query_script(1)
     outputs[stage_index]["query_attempt"] = deepcopy(outputs[1]["query_attempt"])
+    outputs.insert(stage_index + 1, deepcopy(outputs[stage_index]))
     result, _ = _query_run(tmp_path, outputs)
     assert result["manifest"]["stop_reason"] == "output_invalid"
     assert result["record"]["result_status"] == "ERROR"

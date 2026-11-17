@@ -10,6 +10,8 @@
 需要 Python 3.10+；运行依赖为 Pydantic 和 OpenAI Agents SDK。
 `test` extra 提供 pytest；`dev` extra 另含固定版本的 Ruff 和 mypy。
 推荐在项目内 `.venv` 安装，避免修改系统 Python 或旧项目环境。
+仓库的 `uv.lock` 保存依赖解析快照；使用 `uv sync --frozen --extra dev`
+可按该快照安装，下面的 `uv pip install` 则按 `pyproject.toml` 声明重新解析。
 
 ```bash
 uv venv .venv
@@ -411,7 +413,8 @@ Token/费用门禁采用请求前估算和响应后累计，不能保证远端�
 `--max-cost-usd` 和宿主核实的输入/输出每百万 Token 价格。
 账本限制四个首轮运行、最多两次技术故障重试和全轮 US$5 目标；未知费用或未完成尝试
 阻止后续运行。单独诊断必须显式选择 `--standalone`，不冒充正式对照。
-V0.1 核心保持冻结，原有 Token 上限与传输重试差异会在产物中注明。
+V0.1 的历史冻结基线按原提交复现；当前输出解析支持最多一次格式重试，
+与原有 Token 上限、传输重试差异一起按代码身份区分，见[架构说明](architecture.md#llm-结构化输出边界)。
 
 两版本均不自动按质量重试。结果目录必须不存在；失败保存轨迹与可得用量，
 不伪造 Contract。详情见 [Step 6 规格](step6/spec.md) 和
@@ -446,12 +449,12 @@ MYPYPATH=src .venv/bin/python -m mypy --follow-untyped-imports \
 研究代码类型检查显式使用本仓 `src`，避免误读环境中其他安装版本；
 它仍会报告所引用生产模块的既有诊断，应与上方生产基线比较。
 
-本轮模型效果尚未做真实评估。后续可在单独确认付费预算后预登记：仅使用现有审核的
-flask_308 与 CloudFoundry 各一次 C 运行，模型 deepseek-flash，开启 repository-read；
-每例共享上限为 200,000 Token、600 秒、单调用 120 秒及 US$1 估算门禁，输出上限 8192。
-运行前核对实际服务费率、配置和最终代码版本，分别写入全新输出目录；失败、截断、歧义和未决均计入结果，
+真实规格推导尚未通过验收。[2026-10-28 CloudFoundry 诊断](../out/staged-inference/resource-diagnostic-cloudfoundry-20261028/report.md)
+在取消宿主运行资源上限后完成自主取证，但因 QUERY 问题更新的协议一致性校验停止，未交付最终 spec。
+后续真实运行可使用现有审核的 flask_308 与 CloudFoundry，须有相应调用授权并预登记：
+运行前核对实际服务费率、配置和代码版本，分别写入全新输出目录；失败、截断、歧义和未决均计入结果，
 不重跑挑成功样本、不执行目标测试。人工/隔离评阅关注目标覆盖、依赖语义、过强/过弱约束与未知影响，
-不以 JSON 合法或查询次数替代规格质量。这是待执行方案，不是两次成功或模型效果改善的证据。
+不以 JSON 合法或查询次数替代规格质量。文档中的运行配置不自动构成费用授权。
 
 输出目录必须不存在。有效语义结果（SELECTED、ALTERNATIVES、AMBIGUOUS、INCONCLUSIVE）退出码为 0，
 ERROR 为 1，命令或无法完成的产物写入错误为 2；
@@ -491,6 +494,13 @@ content_changed/identity_mismatch；后端或畸形结果为 backend_error/analy
 可显式配置 `--max-model-calls`、`--max-output-tokens`、`--max-total-tokens`、
 `--max-tool-output-chars`、`--timeout-seconds` 和 `--parsing-timeout-seconds`。
 配置与请求前估算的局限写入 manifest；Token 估算不是远端费用硬上限。
+真实故障诊断可显式使用 `--no-run-resource-limits`：取消整次 Token、费用、模型/查询次数、
+总时限、模型等待与 HTTP 客户端超时，并完整保存供应商响应；仍记录实际用量和估费，
+live 模式仍要求输入/输出单价。该选项不能与 `--max-cost-usd` 同用，且不代表费用授权。
+单次模型输出仍由 `--max-output-tokens` 明确配置；诊断时应核对服务商最高值，
+不能把省略参数误认为无限输出。授权读取范围、单次源码工具的输出/解析边界、
+无进展保护、协议校验及一次格式修复规则保持原义。此模式用于定位首次真实停止点，
+不自动重试，也不证明规格质量；默认运行配置不变。
 未知用量保留 null/不完整并阻止继续请求；总时限到期后取消并回收解析进程，
 不额外请求模型收尾，仅执行本地验证和留证。
 这些 Token 用量来自脚本模型的固定回执，不是远端计费证据。
@@ -502,7 +512,7 @@ content_changed/identity_mismatch；后端或畸形结果为 backend_error/analy
 | `input_snapshot.json` | 完整可见任务的确定性 UTF-8 JSON；排序键、紧凑分隔，保持源码与普通 oracle 字符串 |
 | `scenario_contract.json` | 通过正式 v0.1 校验的契约；无效输出不发布此文件 |
 | `dependency_spec.json` | `mock-spec.dependency/v0.1` 自包含消费规格；绑定本次完整 task、正式契约、运行/输入身份、范围、依据、分支、允许变化、未知、冲突及停止摘要；合成回放不因此获得真实准入 |
-| `inference_record.json` | 阶段结果与可见模型响应、选择、关键行为、允许变化、错误；B 对照固定为 `disabled_by_variant/not_executed` |
+| `inference_record.json` | 阶段结果与可见模型响应、选择、宿主投影的允许变化、错误；B 对照固定为 `disabled_by_variant/not_executed` |
 | `run_manifest.json` | 宿主身份、配置、版本、预算和用量、终态，以及前述产物实际字节的 SHA256；最后写入且不哈希自身 |
 
 `controller.execute_staged_run` 是研究流程与统一产物边界，负责阶段次序、共享预算、格式修复、
@@ -516,7 +526,7 @@ CONSTRUCT/CONTRAST 状态校验；`investigation.py` 的 `InvestigationLedger` �
 无法写入时以非零退出码和 stderr 报告，不声称成功留证。
 
 可用 `--replay-case selected|ambiguous|inconclusive|error` 分别复现四种结果，默认 selected。
-每次指定不同的输出目录；error 回放在 DELIVER 注入身份篡改，验证已完成草案留证但不发布最终契约。
+每次指定不同的输出目录；error 回放在 CONSTRUCT 注入无效证据引用，验证草案留证但宿主 DELIVER 不发布最终契约。
 
 | 结果 | 最终契约与下游含义 |
 | --- | --- |
@@ -578,7 +588,7 @@ PYTHONPATH=src .venv/bin/python experiments/staged-inference/run.py \
 输出目录不可创建或写入失败时明确非成功退出，不保证存储故障下产物齐全。
 
 当前完成范围是 EXTRACT → QUERY（片段模式零至六次，仓库模式按证据与资源终止）→ CONSTRUCT →
-CONTRAST（仅 C）→ REVISE（可选一次）→ DELIVER
+CONTRAST（仅 C）→ REVISE（按需）→ DELIVER（宿主确定性校验并发布）
 的 B/C 四状态回放，不是整个 M1。synthetic_replay 分支不审核真实 Adapter 输入；
 live_inference 分支见下方 M1-5 说明。两者均不生成 Mock、不执行目标测试。
 脚本回放通过仅证明控制器和校验边界，不证明真实模型的场景选择或语义推导质量。
@@ -655,7 +665,7 @@ HTTP 400，已修复；逐调用诊断位于 `inference_record.json.model_calls`
 
 研究入口现使用 v0.2 引用选择协议：模型选择来源与行范围，宿主从本次已可见证据
 生成精确 `quote`，最终仍使用原契约验证器。`inference_record.json` 的版本为
-`scenario-inference-record/v0.4`，`citation_mode` 为
+`scenario-inference-record/v0.6`，`citation_mode` 为
 `source_locator_host_materialized_quote/v1`；阶段的 `wire_result` 与 `result`
 分别记录模型选择和宿主标准结果。旧模型响应中的 `quote` 不自动转换；
 历史运行按对应提交复现，不能把旧失败送入新协议后改称成功。
@@ -671,9 +681,9 @@ G4 未通过；没有放宽 Schema、删除额外字段或自动重跑。
 捕获实际 HTTP 请求并确认 strict/完整 Schema 保留；单次对抗请求合规，不能据此宣称
 原复杂任务问题已修复或恢复 M2。该探针属于单独留证的一次性诊断，不是生产入口。
 
-研究 QUERY v0.4 使用严格嵌套类型，回执编号由宿主绑定，并增加问题及候选更新；历史 v0.3
-响应仍按原运行记录解释，不静默升级。整次运行的 QUERY_FORMAT_REPAIR
-与 DELIVER FORMAT_REPAIR 共用一次名额；预留后即使用量门禁拒绝或请求失败也不退回。
+研究 QUERY v0.6 使用严格嵌套类型，回执编号由宿主绑定，并增加问题及候选更新；历史 v0.3-v0.5
+响应仍按原运行记录解释，不静默升级。整次运行仅 QUERY_FORMAT_REPAIR
+保留一次名额；预留后即使用量门禁拒绝或请求失败也不退回。
 QUERY 只允许纠正回执评估对象内未知的 null 字段，模型必须完整重发且保持规定字段逐值一致。
 参数、引用、身份、旧版本、缺字段或语义变化均终止；格式纠正不补读源码、不重置预算，
 原无效尝试保留，成功纠正后的查询另计一次尝试。详见 PRD 第 10 节。

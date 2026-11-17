@@ -31,6 +31,25 @@ budget.py                  inference_v02.py               source_tools.py
 SDK 轮数上限，由运行超时与共享用量账本停止。
 `InferenceBudget` 定义在 `budget.py`，原 `inference_v02.InferenceBudget` 导入仍可用。
 
+## LLM 结构化输出边界
+
+所有活动的 LLM 契约和阶段诊断正文统一经过
+[`structured_output.py`](../src/mock_spec/structured_output.py)：通过 Agents SDK 的严格输出 Schema
+发送供应商原生约束，正文用 Pydantic `model_validate_json` 校验。正则只剥离完整包裹正文的
+` ```json ` 围栏，不截取说明文字中的 JSON，不用裸 `json.loads` 接受模型正文。
+原生约束不能代替本地引用、任务身份与源码证据检查。
+
+格式校验失败使用有界重试；生产入口最多追加一次模型请求，共享原运行截止时间，
+V0.2 同时共享用量账本与源码访问状态。证据校验失败、取消、供应商错误和预算耗尽
+不按格式错误重试。研究非 QUERY 阶段也最多重新请求一次，失败与重试分别留证；新输出必须重新经过全部
+引用及语义校验，不将重新生成宣称为语义等价修复。研究 QUERY 保留更严格的既有回执身份、语义快照与修复准入门禁，
+不能通过公共解析器绕过；诊断性读取失败正文也不等于接受一份有效阶段结果。
+传输响应、宿主文件和分析子进程的 JSON 不属于模型正文，继续使用各自的协议校验。
+
+2026-11-17 的统一输出要求调整了当前 V0.1 的输出解析与格式重试边界；Prompt 和
+契约字段未改变，但当前代码不再是 Step 6 的逐字冻结基线。历史实验仍按记录的提交复现，
+不能将本次修改后的运行冒充原基线。新解析模块纳入执行元数据的文件指纹。
+
 ## 一次输入如何流动
 
 ```mermaid
@@ -117,9 +136,9 @@ V0.1 的冻结异常没有这个类型，历史文案识别只保留在审计入
 | `python -m mock_spec.live` | 仅 V0.1 | 保留早期留证协议与复现命令 |
 
 V0.1 无工具，V0.2 有三个只读工具；两版都使用正式 ScenarioContract。
-[Step 6 已确认的约定](step6/decisions.md#保留与范围)要求 V0.1 核心逐字冻结，
-因此两版之间少量重复处理是保留基线的代价，不能把 `inference.py` 当成死代码删除。
-旧入口仍有测试和历史复现用途。V0.1 保持冻结；V0.2 入口和预算的兼容导入保留，
+[Step 6 当时的约定](step6/decisions.md#保留与范围)要求 V0.1 核心逐字冻结；
+历史版本仍须按原提交复现，不能把 `inference.py` 当成死代码删除。
+旧入口仍有测试和历史复现用途。当前 V0.1 输出边界的调整见上文；V0.2 入口和预算的兼容导入保留，
 内部预算定义与工具注册已按职责迁移，不再在推断入口重复保留实现。
 
 ## 命名迁移与保留的依赖
@@ -254,7 +273,7 @@ CONSTRUCT、CONTRAST 或 REVISE 发现会实质改变规格的证据缺口时，
 返回 QUERY；原始目标、问题账本、查询回执、SourceStore 和整次预算均不重置。
 EXTRACT 声明 INCONCLUSIVE 也不再提前结束：只要已定位原始目标，就把缺口作为问题进入
 QUERY/CONSTRUCT，以便在证据受限时形成诚实的 partial 规格。候选为空不等于没有原始任务。
-QUERY_FORMAT_REPAIR 与 DELIVER 的 FORMAT_REPAIR 共用整次运行一次的纠正名额。
+QUERY_FORMAT_REPAIR 保留整次运行一次的回执评估纠正名额；DELIVER 不再调用模型或进入格式修复。
 固定脚本模型仍经过 Agents SDK Runner；控制器复用生产 `UsageLedger`、
 `validate_contract`（含 `SourceStore` 原文校验）及运行身份采集组件。
 研究阶段协议、Prompt 与产物写入位于研究目录，生产包不反向依赖它。
@@ -273,14 +292,12 @@ QueryExecutor 和各阶段契约检查共用本次 Store，观察记录随研究
 `provider_capture.py` 负责供应商响应留证。`controller.py` 通过这些接口组织阶段次序、续查、
 共享预算、格式修复、partial checkpoint 和最终发布。CONSTRUCT、CONTRAST、REVISE 对检查点的处理
 不同，仍由控制器显式编排，不隐藏在统一续查包装中。
-阶段类型和引用校验的 Python 导入位置改为 `stage_protocol`，问题账本从 `investigation`
-导入；当前研究调用者和测试随迁移更新，CLI 参数、阶段 JSON 版本和正式契约保持不变。
-现有 `budget.estimate_known_request_tokens` 对 SDK 输出包装类型使用 `repr` 估算，
-因此本次模块名迁移使每次预检多计 4 字节、约 1 Token；极限预算附近可能更早触发门禁。
-发送的 Schema 和提示词未变。修正这一生产预算估算路径需要独立验证两版生产入口，
-本次研究整理保留该行为，不伪装类型所属模块来维持旧估值。
+阶段类型和引用校验的 Python 导入位置为 `stage_protocol`，问题账本从 `investigation`
+导入；当前 wire 显式版本化，历史运行按原版本回放，不静默升级；正式契约仍为 v0.1。
+`budget.estimate_known_request_tokens` 从 SDK 输出包装类型取得实际 JSON Schema，
+将其纳入请求前估算；该估算仍不是供应商实际 Token 计量。
 模型经 QUERY 结构化消息请求工具，SDK 阶段 Agent 不注册可绕过计数的工具。
-QUERY v0.4 的供应商 Schema 与本地严格类型一致；模型只输出回执评估的 impact/rationale，
+QUERY v0.6 的供应商 Schema 与本地严格类型一致；模型只输出回执评估的 impact/rationale，
 并显式更新原目标问题和候选；宿主绑定本轮唯一待评估回执的编号。SDK 解析失败仍保存原始响应与无效 stage，
 按原请求谓词登记并拒绝尝试，避免非法参数绕过计数。
 仅评估对象内未知直接子字段全部为 null 的错误可申请一次模型纠正，旧编号不在允许范围。
@@ -293,21 +310,26 @@ QUERY v0.4 的供应商 Schema 与本地严格类型一致；模型只输出回�
 不扩大证据范围。研究 v0.2 的模型响应只选择 `source_id` 和闭合行范围，
 不输出 `quote`；控制器用同一运行 Store 中已可见的原文构造标准阶段结果和正式证据，
 再执行原严格契约校验。引用选择解析不读取新文件、不调整坐标、不修补旧响应。
-EXTRACT、QUERY 停止说明、CONSTRUCT、REVISE、DELIVER 共用该边界；CONTRAST 沿用证据 ID。
+EXTRACT、QUERY 停止说明、CONSTRUCT 与 REVISE 共用该边界；CONTRAST 沿用证据 ID，
+DELIVER 由宿主从已验证 CONSTRUCT 确定性发布。
 轨迹分别保留 `wire_result` 与宿主生成的 `result`，并声明
 `citation_mode=source_locator_host_materialized_quote/v1`。新协议拒绝旧响应的 `quote`，
 历史运行仍使用原提交复现，不自动降级或改写历史失败。
 研究输出 Schema 在 SDK 边界展开联合类型中的引用，
 兼容供应商的显式类型要求；本地仍由原 Pydantic 类型严格解析，轨迹保存实际发送的 Schema。
-后续 QUERY 评估上一回执，CONSTRUCT/DELIVER 接收累计回执；未完成判断明确留证。
-QUERY v0.4 还接收宿主能力视图、原目标问题账本和 continuation；候选是可更新的工作假设，
+后续 QUERY 评估上一回执，CONSTRUCT 接收累计回执；未完成判断明确留证。
+QUERY v0.6 还接收宿主能力视图、原目标问题账本和 continuation；候选是可更新的工作假设，
 初始来源清单只在片段模式代表全部可见范围。停止检查要求每项原目标相关问题已解决、
 有依据转为 nonblocking，或因实际取证限制保留为阻塞未知；可访问的重要证据仍存在时拒绝停止。
 构造结果分别使用 SELECTED、ALTERNATIVES、AMBIGUOUS 和 INCONCLUSIVE：
 ALTERNATIVES 表示多个分支均已正向支持且可由消费者选一，AMBIGUOUS 表示分支合法性或选择依据仍未解决。
 阶段切换和 SDK 对象重建不重置账本、模型请求数、查询数或绝对截止时间。
-仓库模式的 QUERY 正常结束须提交 `stop_explanation`：停止理由、可校验原文引用、
-剩余未知及影响。控制器只验证协议和引用，不证明语义充分；有阻塞未知不能发布 SELECTED。
+仓库模式的 QUERY 正常结束须提交 `stop_explanation` 的停止理由与可校验原文引用；
+剩余未知及影响由宿主从问题账本投影。控制器只验证协议和引用，不证明语义充分；有阻塞未知不能发布 SELECTED。
+QUERY v0.6 将问题更新分成开放与闭合两种模型 wire：只有开放问题声明证据仍可获取或经尝试后
+不可获取；resolved/nonblocking 不携带 acquisition。宿主将闭合更新投影为内部
+`acquisition=not_needed`，在 `wire_result` 之外另存 `host_question_updates` 后再写调查账本。
+这样不会让模型重复维护可推导字段，也不放宽证据、查询回执关联、原目标绑定或停止充分性校验。
 `query.py` 比较规范化查询、位置/页游标和返回证据，持续无进展时保护终止；阈值按
 连续无进展计算，不是总探索次数。生产 SDK 入口同样记录并检测无进展循环。
 `termination` 区分 agent / controller / caller，超时、预算和重复终止均不发布最终契约。
@@ -316,7 +338,7 @@ ALTERNATIVES 表示多个分支均已正向支持且可由消费者选一，AMBI
 宿主在输入加载/校验前登记运行身份和独立输出目录，校验后保存确定性输入快照；
 请求前检查显式配置与整次运行的预算。输入拒绝保留请求身份，有效任务身份与哈希为 null。
 模型只接收完整可见任务及阶段上下文，宿主配置、物理输入目录和评价材料不进入初始输入。
-DELIVER 本地校验选择、引用及任务身份后，先写契约与记录，再写含实际文件哈希的清单；
+DELIVER 是确定性的宿主阶段：再次校验选择、规格、引用及任务身份后，先写契约与记录，再写含实际文件哈希的清单；
 SELECTED、ALTERNATIVES 与 AMBIGUOUS 必须有有效契约；INCONCLUSIVE 可保留完整契约供诊断；
 ERROR 只保留阶段草案与错误，不发布最终契约。状态与停止原因分别保存；已有输出目录拒绝覆盖。
 正式 `ScenarioContract` 保持 v0.1 字段；研究选择状态、运行身份和对照状态由旁路记录承载。
@@ -343,6 +365,10 @@ live 入口在本次 AsyncOpenAI 客户端上安装非流式 HTTP response hook�
 input/output/total/reasoning 计量分别保留 reported/not_reported/unavailable；reasoning 不重复计入总用量。
 初始源码只在 source_line_index 中按原坐标出现一次；记录 legacy_payload_bytes 与实际 payload_bytes，
 这是字节测量，不是供应商 Token 实测或对截断已解决的证明。
+研究 CLI 的显式 `--no-run-resource-limits` 诊断模式复用同一控制器和用量账本，
+取消整次资源门禁与模型/HTTP 等待超时；清单将累计 Token 上限、费用上限和绝对截止时间记为 null，
+仍记录实际用量和估费，响应捕获不裁剪正文。单次输出使用显式供应商参数，读取授权、单次源码工具边界、
+协议检查和无进展保护继续生效。默认及冻结生产路径不因此改为无上限。
 
 这条路径验证 B/C 五状态流程、静态对照、继续调查、修订修复、定向查询、共享预算及失败留证边界；
 合成任务不经过真实 Adapter 审核，不构成真实数据准入、目标测试执行或模型推断质量证据。
