@@ -1,0 +1,77 @@
+[
+  {
+    "name": "exact-response-replay",
+    "evidence_type": "fixed_response_replay_not_live_generation",
+    "changes": [],
+    "error": {
+      "type": "ValueError",
+      "message": "question evidence must be associated with its observed query receipt"
+    },
+    "error_stage": "QUERY",
+    "model_calls": 8,
+    "final_spec_exists": false
+  },
+  {
+    "name": "receipt-link-counterfactual",
+    "evidence_type": "fixed_response_replay_not_live_generation",
+    "changes": [
+      {
+        "field": "question_updates[q1].attempted_sequences",
+        "before": [
+          1
+        ],
+        "after": [
+          1,
+          2,
+          6
+        ]
+      }
+    ],
+    "error": {
+      "type": "ValueError",
+      "message": "nonblocking question must explain why acquisition is not needed"
+    },
+    "error_stage": "QUERY",
+    "model_calls": 8,
+    "final_spec_exists": false
+  },
+  {
+    "name": "state-field-counterfactual",
+    "evidence_type": "fixed_response_replay_not_live_generation",
+    "changes": [
+      {
+        "field": "question_updates[q1].attempted_sequences",
+        "before": [
+          1
+        ],
+        "after": [
+          1,
+          2,
+          6
+        ]
+      },
+      {
+        "field": "question_updates[q1].acquisition",
+        "before": "unavailable",
+        "after": "not_needed"
+      },
+      {
+        "field": "question_updates[q2].acquisition",
+        "before": "unavailable",
+        "after": "not_needed"
+      },
+      {
+        "field": "question_updates[q4].acquisition",
+        "before": "available",
+        "after": "not_needed"
+      }
+    ],
+    "error": {
+      "type": "StagedInferenceError",
+      "message": "stage model call failed"
+    },
+    "error_stage": "CONSTRUCT",
+    "model_calls": 9,
+    "final_spec_exists": false
+  }
+]

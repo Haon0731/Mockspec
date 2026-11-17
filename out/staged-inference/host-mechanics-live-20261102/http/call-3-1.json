@@ -1,0 +1,824 @@
+{
+  "call_sequence": 3,
+  "http_status": 200,
+  "request_id": null,
+  "response_id": "e9449e5e-5ac6-46b9-8b66-dd1e1f9a24cb",
+  "body_encoding": "json",
+  "body_truncated": false,
+  "body": {
+    "id": "e9449e5e-5ac6-46b9-8b66-dd1e1f9a24cb",
+    "object": "response",
+    "created_at": 1793616597,
+    "status": "completed",
+    "background": false,
+    "completed_at": 1793616604,
+    "content_filters": null,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "incomplete_details": null,
+    "instructions": "staged-scenario-inference-prompts/v0.6\nStage: QUERY. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. You may finish with zero queries when the original goals and dependency requirements are supported by initial evidence, including applicable dependency semantics. Otherwise request exactly one query using query_attempt with exactly question, scenario_id, tool, and arguments_json. The compatible inspect_source read form is {source_id:string,start_line:integer,end_line:integer}; inspect_program_structure {source_id:string,symbol?:string}; inspect_dependency_usage {source_id:string,symbol?:string}. Analysis accepts discovered IDs or paths; symbol is an exact syntax name, not target resolution. Read source lines before citing them. arguments_json must encode the named argument object. After a receipt, previous_receipt_assessment classifies its candidate impact as supports, weakens, or no_new_information; the host binds it to the one pending receipt, so previous_receipt_assessment never includes receipt identity or attempt_sequence. errors and incomplete results still require an assessment. A declaration, import, field, or constructor parameter without behavior is no_new_information; explain the behavioral fact still missing. Investigate observable dependency behavior, branch conditions, return values, exceptions, and interactions that affect the original goals. Do not search for or reconstruct hidden Mock/VERIFY text, exact framework syntax, call counts, or ordering unless visible production behavior makes that detail independently necessary. Preserve such hidden text as nonblocking unknown once the behavior and its supported alternatives are sufficient for a downstream coding agent. On finish_queries provide stop_explanation with reason evidence_sufficient, unknowns_nonblocking, or no_further_evidence; a concrete rationale, exact source references in evidence. The host projects remaining_unknowns from the question ledger. Preserve unknowns rather than treating failed exploration as proof. Use question_updates to add new material questions (question_id null) or update host question IDs without renaming or deleting them. For an existing question, return only its question_id and current semantic assessment; the host restores its immutable question, goal_indexes, and impact. New questions map to original goal_indexes. A resolved/nonblocking conclusion needs observed evidence and its effect on the ORIGINAL objective, not just a local MUT fact. Only an open update includes acquisition (available or unavailable); resolved/nonblocking updates omit it because the host records acquisition=not_needed. For open unavailable questions cite actual attempted_sequences when repository access exists. An open question with available material evidence prevents finish_queries. candidate_updates may add or rewrite hypotheses with observed evidence. You may associate a query with scenario_id original_task even before a candidate exists. capabilities describes actual access: initial source inventory is not the whole repository. Queries and new hypotheses may go beyond the initial candidates. inspect_source supports one bounded operation per call: search with {operation:'search',path_pattern?:string,text?:string,cursor?:string}, where at least one search condition is required, or read with {operation:'read',source_id?:string,path?:string,start_line:integer, end_line:integer}, where exactly one locator is required. Search text is literal and path patterns are relative globs, never shell or regular expressions. Follow next_cursor with the identical query when incomplete. Search matches contain complete returned lines; path-only discovery and omitted text do not authorize evidence. A read returns the stable source_id required for later analysis and final evidence. Host paths are forbidden. Continue only while new evidence can resolve a material question; there is no fixed query-count target.",
+    "max_output_tokens": 24576,
+    "max_tool_calls": null,
+    "model": "deepseek-flash",
+    "moderation": null,
+    "output": [
+      {
+        "type": "reasoning",
+        "id": "42f2e219-b297-4e11-ba0d-35b6dbfa385b",
+        "status": "completed",
+        "content": [
+          {
+            "type": "reasoning_text",
+            "text": "We need decide query or finish. We have pending receipt? The query_receipts shows sequence 1 with assessment null, status incomplete, and continuation empty. Our response must include previous_receipt_assessment for the pending receipt. Then can request exactly one query or finish. We need assess the search result: it found DefaultApplicationFactory.java but access_denied / no lines. It supports that file exists but no behavior. Impact probably no_new_information regarding specific question, but it found path. Actually prior question asked how DefaultApplicationFactory uses collaborators. The result is incomplete access denied, no text. So no_new_information? Maybe weakens? We need answer. Then likely request read DefaultApplicationFactory source. Need discover source_id. Search match gives source_id repository:f1cbe4e7534b595de231fa4a and logical path. We can use inspect_source read with source_id. This is directly material for q1 (factory requirements). Need read lines. Let's request read DefaultApplicationFactory lines maybe 1-200. We need use query_attempt exactly. scenario_id could be original_task? They instruct may associate with original_task even before candidate. We have candidate. Use scenario_id \"cloudfoundry_application_uri_base_url\". Tool inspect_source. arguments_json read source_id \"repository:f1cbe4e7534b595de231fa4a\", start 1 end maybe 200. Need not include quote. One query.\n\nQuestion: \"What does DefaultApplicationFactory.createApplication do with PathMappedEndpoints and other collaborators to build management/health/service URLs, including handling of serviceBaseUrl, management context path and endpoint base path?\" We need source lines. Read full file maybe 1-220. Max file bytes okay. Let's do 1-200. But actual file might be >200. We can read 1-250. Need bounded. We don't know. Use 1-240. Query attempt.\n\nprevious_receipt_assessment: impact no_new_information? It did find path, new location, but not behavior. The search result is incomplete access denied. For question, no behavioral info. Should be no_new_information (with rationale: only confirms file exists; access denied no contents). However it did provide a source_id and path enabling next read. Yet impact options are supports/weakens/no_new_information. Since question asks behavior, no_new_information. Could be supports? It supports existence of the class, which was already known from imports/extends. Not enough. no_new_information.\n\nNeed include impact field (same as previous? The schema requires impact string). This likely current overall query impact? We can set \"no_new_information\" or \"request further behavior\". Hmm \"impact\" top-level required. In prior stages maybe it's impact of query attempt? We need use something. Since request query, impact maybe \"Need DefaultApplicationFactory behavior to infer hidden PathMappedEndpoints setup\". Use concrete. But impact maybe short. We'll set \"DefaultApplicationFactory createApplication logic determines hidden PathMappedEndpoints requirements.\" Good.\n\nquestion_updates? For existing q1 maybe keep open? We are requesting evidence; no need update? It already open. But if no update, host ledger unchanged. Fine. Could update q1 rationale? Not necessary. But the schema allows empty. Candidate updates empty. Stop_explanation null because request_query. query_attempt nonnull.\n\nNeed ensure previous_receipt_assessment not null. Query attempt exactly fields. Let's craft.\n\nWait \"After a receipt, previous_receipt_assessment classifies its candidate impact...\" Candidate impact maybe q1? Fine.\n\nNeed inspect source line numbers before citing. We won't cite yet, only query. Good.\n\nLet's produce strict JSON."
+          }
+        ],
+        "summary": [],
+        "encrypted_content": "e9449e5e-5ac6-46b9-8b66-dd1e1f9a24cb-0"
+      },
+      {
+        "type": "message",
+        "id": "1bab8ece-2838-4d10-8ad9-cd053ad05f09",
+        "status": "completed",
+        "content": [
+          {
+            "type": "output_text",
+            "annotations": [],
+            "logprobs": [],
+            "text": "{\"schema_version\":\"staged-query/v0.6\",\"decision\":\"request_query\",\"query_attempt\":{\"question\":\"How does DefaultApplicationFactory.createApplication use PathMappedEndpoints, management/server/web endpoint properties, and the overridden getServiceBaseUrl to build management, health, and service URLs, including the management context path and endpoint base path rules?\",\"scenario_id\":\"cloudfoundry_application_uri_base_url\",\"tool\":\"inspect_source\",\"arguments_json\":\"{\\\"operation\\\":\\\"read\\\",\\\"source_id\\\":\\\"repository:f1cbe4e7534b595de231fa4a\\\",\\\"start_line\\\":1,\\\"end_line\\\":240}\"},\"previous_receipt_assessment\":{\"impact\":\"no_new_information\",\"rationale\":\"The search only located DefaultApplicationFactory.java and then hit access_denied without returning any source lines. It confirms the relevant production class exists but provides no behavioral evidence about PathMappedEndpoints or URL construction.\"},\"impact\":\"DefaultApplicationFactory.createApplication logic determines the hidden PathMappedEndpoints setup and the URL derivation needed to reproduce the asserted management and health URLs.\",\"stop_explanation\":null,\"question_updates\":[],\"candidate_updates\":[]}"
+          }
+        ],
+        "phase": "final_answer",
+        "role": "assistant"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "prompt_cache_retention": null,
+    "reasoning": {
+      "effort": null,
+      "summary": null
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "store": false,
+    "temperature": 1.0,
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "name": "final_output",
+        "schema": {
+          "$defs": {
+            "CandidateSelection": {
+              "additionalProperties": false,
+              "properties": {
+                "scenario_id": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Scenario Id",
+                  "type": "string"
+                },
+                "description": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Description",
+                  "type": "string"
+                },
+                "evidence": {
+                  "items": {
+                    "$ref": "#/$defs/SourceLocator"
+                  },
+                  "title": "Evidence",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "scenario_id",
+                "description",
+                "evidence"
+              ],
+              "title": "CandidateSelection",
+              "type": "object"
+            },
+            "ClosedQuestionUpdateSelection": {
+              "additionalProperties": false,
+              "description": "Model-facing update whose acquisition state is owned by the host.",
+              "properties": {
+                "rationale": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Rationale",
+                  "type": "string"
+                },
+                "evidence": {
+                  "items": {
+                    "$ref": "#/$defs/SourceLocator"
+                  },
+                  "title": "Evidence",
+                  "type": "array"
+                },
+                "question_id": {
+                  "anyOf": [
+                    {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Question Id"
+                },
+                "question": {
+                  "anyOf": [
+                    {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Question"
+                },
+                "goal_indexes": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Goal Indexes"
+                },
+                "impact": {
+                  "anyOf": [
+                    {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Impact"
+                },
+                "state": {
+                  "enum": [
+                    "resolved",
+                    "nonblocking"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "rationale",
+                "evidence",
+                "question_id",
+                "question",
+                "goal_indexes",
+                "impact",
+                "state"
+              ],
+              "title": "ClosedQuestionUpdateSelection",
+              "type": "object"
+            },
+            "ExplorationStopSelection": {
+              "additionalProperties": false,
+              "properties": {
+                "reason": {
+                  "enum": [
+                    "evidence_sufficient",
+                    "unknowns_nonblocking",
+                    "no_further_evidence"
+                  ],
+                  "title": "Reason",
+                  "type": "string"
+                },
+                "rationale": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Rationale",
+                  "type": "string"
+                },
+                "evidence": {
+                  "items": {
+                    "$ref": "#/$defs/SourceLocator"
+                  },
+                  "title": "Evidence",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "reason",
+                "rationale",
+                "evidence"
+              ],
+              "title": "ExplorationStopSelection",
+              "type": "object"
+            },
+            "OpenQuestionUpdateSelection": {
+              "additionalProperties": false,
+              "description": "Existing questions use null immutable fields; new questions provide them.",
+              "properties": {
+                "rationale": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Rationale",
+                  "type": "string"
+                },
+                "evidence": {
+                  "items": {
+                    "$ref": "#/$defs/SourceLocator"
+                  },
+                  "title": "Evidence",
+                  "type": "array"
+                },
+                "question_id": {
+                  "anyOf": [
+                    {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Question Id"
+                },
+                "question": {
+                  "anyOf": [
+                    {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Question"
+                },
+                "goal_indexes": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Goal Indexes"
+                },
+                "impact": {
+                  "anyOf": [
+                    {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Impact"
+                },
+                "state": {
+                  "const": "open",
+                  "title": "State",
+                  "type": "string"
+                },
+                "acquisition": {
+                  "enum": [
+                    "available",
+                    "unavailable"
+                  ],
+                  "title": "Acquisition",
+                  "type": "string"
+                },
+                "attempted_sequences": {
+                  "items": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "title": "Attempted Sequences",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "rationale",
+                "evidence",
+                "question_id",
+                "question",
+                "goal_indexes",
+                "impact",
+                "state",
+                "acquisition",
+                "attempted_sequences"
+              ],
+              "title": "OpenQuestionUpdateSelection",
+              "type": "object"
+            },
+            "QueryAssessmentSelection": {
+              "additionalProperties": false,
+              "description": "Model-facing assessment; the host owns receipt association.",
+              "properties": {
+                "impact": {
+                  "enum": [
+                    "supports",
+                    "weakens",
+                    "no_new_information"
+                  ],
+                  "title": "Impact",
+                  "type": "string"
+                },
+                "rationale": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Rationale",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "impact",
+                "rationale"
+              ],
+              "title": "QueryAssessmentSelection",
+              "type": "object"
+            },
+            "QueryAttempt": {
+              "additionalProperties": false,
+              "description": "Provider-facing shape; host validation still follows attempt registration.",
+              "properties": {
+                "question": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Question",
+                  "type": "string"
+                },
+                "scenario_id": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Scenario Id",
+                  "type": "string"
+                },
+                "tool": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Tool",
+                  "type": "string"
+                },
+                "arguments_json": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Arguments Json",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "question",
+                "scenario_id",
+                "tool",
+                "arguments_json"
+              ],
+              "title": "QueryAttempt",
+              "type": "object"
+            },
+            "SourceLocator": {
+              "additionalProperties": false,
+              "properties": {
+                "source_id": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "title": "Source Id",
+                  "type": "string"
+                },
+                "start_line": {
+                  "minimum": 1,
+                  "title": "Start Line",
+                  "type": "integer"
+                },
+                "end_line": {
+                  "minimum": 1,
+                  "title": "End Line",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "source_id",
+                "start_line",
+                "end_line"
+              ],
+              "title": "SourceLocator",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "schema_version": {
+              "const": "staged-query/v0.6",
+              "title": "Schema Version",
+              "type": "string"
+            },
+            "decision": {
+              "enum": [
+                "request_query",
+                "finish_queries"
+              ],
+              "title": "Decision",
+              "type": "string"
+            },
+            "query_attempt": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "description": "Provider-facing shape; host validation still follows attempt registration.",
+                  "properties": {
+                    "question": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Question",
+                      "type": "string"
+                    },
+                    "scenario_id": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Scenario Id",
+                      "type": "string"
+                    },
+                    "tool": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Tool",
+                      "type": "string"
+                    },
+                    "arguments_json": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Arguments Json",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "question",
+                    "scenario_id",
+                    "tool",
+                    "arguments_json"
+                  ],
+                  "title": "QueryAttempt",
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "previous_receipt_assessment": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "description": "Model-facing assessment; the host owns receipt association.",
+                  "properties": {
+                    "impact": {
+                      "enum": [
+                        "supports",
+                        "weakens",
+                        "no_new_information"
+                      ],
+                      "title": "Impact",
+                      "type": "string"
+                    },
+                    "rationale": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Rationale",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "impact",
+                    "rationale"
+                  ],
+                  "title": "QueryAssessmentSelection",
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "impact": {
+              "minLength": 1,
+              "pattern": "\\S",
+              "title": "Impact",
+              "type": "string"
+            },
+            "stop_explanation": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "evidence_sufficient",
+                        "unknowns_nonblocking",
+                        "no_further_evidence"
+                      ],
+                      "title": "Reason",
+                      "type": "string"
+                    },
+                    "rationale": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Rationale",
+                      "type": "string"
+                    },
+                    "evidence": {
+                      "items": {
+                        "$ref": "#/$defs/SourceLocator"
+                      },
+                      "title": "Evidence",
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "reason",
+                    "rationale",
+                    "evidence"
+                  ],
+                  "title": "ExplorationStopSelection",
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "question_updates": {
+              "items": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "description": "Existing questions use null immutable fields; new questions provide them.",
+                    "properties": {
+                      "rationale": {
+                        "minLength": 1,
+                        "pattern": "\\S",
+                        "title": "Rationale",
+                        "type": "string"
+                      },
+                      "evidence": {
+                        "items": {
+                          "$ref": "#/$defs/SourceLocator"
+                        },
+                        "title": "Evidence",
+                        "type": "array"
+                      },
+                      "question_id": {
+                        "anyOf": [
+                          {
+                            "minLength": 1,
+                            "pattern": "\\S",
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "title": "Question Id"
+                      },
+                      "question": {
+                        "anyOf": [
+                          {
+                            "minLength": 1,
+                            "pattern": "\\S",
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "title": "Question"
+                      },
+                      "goal_indexes": {
+                        "anyOf": [
+                          {
+                            "items": {
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "type": "array"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "title": "Goal Indexes"
+                      },
+                      "impact": {
+                        "anyOf": [
+                          {
+                            "minLength": 1,
+                            "pattern": "\\S",
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "title": "Impact"
+                      },
+                      "state": {
+                        "const": "open",
+                        "title": "State",
+                        "type": "string"
+                      },
+                      "acquisition": {
+                        "enum": [
+                          "available",
+                          "unavailable"
+                        ],
+                        "title": "Acquisition",
+                        "type": "string"
+                      },
+                      "attempted_sequences": {
+                        "items": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "title": "Attempted Sequences",
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "rationale",
+                      "evidence",
+                      "question_id",
+                      "question",
+                      "goal_indexes",
+                      "impact",
+                      "state",
+                      "acquisition",
+                      "attempted_sequences"
+                    ],
+                    "title": "OpenQuestionUpdateSelection",
+                    "type": "object"
+                  },
+                  {
+                    "additionalProperties": false,
+                    "description": "Model-facing update whose acquisition state is owned by the host.",
+                    "properties": {
+                      "rationale": {
+                        "minLength": 1,
+                        "pattern": "\\S",
+                        "title": "Rationale",
+                        "type": "string"
+                      },
+                      "evidence": {
+                        "items": {
+                          "$ref": "#/$defs/SourceLocator"
+                        },
+                        "title": "Evidence",
+                        "type": "array"
+                      },
+                      "question_id": {
+                        "anyOf": [
+                          {
+                            "minLength": 1,
+                            "pattern": "\\S",
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "title": "Question Id"
+                      },
+                      "question": {
+                        "anyOf": [
+                          {
+                            "minLength": 1,
+                            "pattern": "\\S",
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "title": "Question"
+                      },
+                      "goal_indexes": {
+                        "anyOf": [
+                          {
+                            "items": {
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "type": "array"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "title": "Goal Indexes"
+                      },
+                      "impact": {
+                        "anyOf": [
+                          {
+                            "minLength": 1,
+                            "pattern": "\\S",
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "title": "Impact"
+                      },
+                      "state": {
+                        "enum": [
+                          "resolved",
+                          "nonblocking"
+                        ],
+                        "title": "State",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "rationale",
+                      "evidence",
+                      "question_id",
+                      "question",
+                      "goal_indexes",
+                      "impact",
+                      "state"
+                    ],
+                    "title": "ClosedQuestionUpdateSelection",
+                    "type": "object"
+                  }
+                ]
+              },
+              "title": "Question Updates",
+              "type": "array"
+            },
+            "candidate_updates": {
+              "items": {
+                "$ref": "#/$defs/CandidateSelection"
+              },
+              "title": "Candidate Updates",
+              "type": "array"
+            }
+          },
+          "required": [
+            "schema_version",
+            "decision",
+            "query_attempt",
+            "previous_receipt_assessment",
+            "impact",
+            "stop_explanation",
+            "question_updates",
+            "candidate_updates"
+          ],
+          "title": "QuerySelection",
+          "type": "object"
+        },
+        "description": null,
+        "strict": true
+      },
+      "verbosity": null
+    },
+    "tool_choice": "auto",
+    "tools": [],
+    "top_logprobs": 0,
+    "top_p": 1.0,
+    "truncation": "disabled",
+    "usage": {
+      "input_tokens": 8104,
+      "input_tokens_details": {
+        "cached_tokens": 4736
+      },
+      "output_tokens": 1039,
+      "output_tokens_details": {
+        "reasoning_tokens": 784
+      },
+      "total_tokens": 9143
+    },
+    "user": null,
+    "metadata": {}
+  }
+}

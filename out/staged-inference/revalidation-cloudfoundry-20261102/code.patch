@@ -1,0 +1,669 @@
+diff --git a/docs/README.md b/docs/README.md
+index cc647ac..f7e072e 100644
+--- a/docs/README.md
++++ b/docs/README.md
+@@ -31,6 +31,10 @@ PRD 不作为当前能力或已通过验收的说明。
+ 输出减负及截断计量留证。当前研究实现已增加原目标问题账本、构造/对照后的继续调查、
+ 自包含 `dependency_spec.json` 和 provider 失败响应留证；离线工程验证与真实 M2 仍分别报告，
+ 不能据此宣称真实模型的规格推导效果已经提高。
++2026-10-28 的[单次取消宿主运行资源上限诊断](../out/staged-inference/resource-diagnostic-cloudfoundry-20261028/report.md)
++保留了 8 次完整模型响应与 6 次自主查询；首次失败位于 QUERY 问题更新的证据回执关联，
++离线对照另暴露非阻塞状态与取证状态不一致。未进入 CONSTRUCT，也未产生最终 spec；
++本次定位协议停止点，不构成真实规格推导验收通过。
+ 
+ 以下研究结果不等于生产 Agent 已具备对应能力；阅读案例分析也不能作为未来无指导生成的输入。
+ 
+diff --git a/docs/architecture.md b/docs/architecture.md
+index 835ac8b..ccfe421 100644
+--- a/docs/architecture.md
++++ b/docs/architecture.md
+@@ -241,6 +241,10 @@ live 入口在本次 AsyncOpenAI 客户端上安装非流式 HTTP response hook
+ input/output/total/reasoning 计量分别保留 reported/not_reported/unavailable；reasoning 不重复计入总用量。
+ 初始源码只在 source_line_index 中按原坐标出现一次；记录 legacy_payload_bytes 与实际 payload_bytes，
+ 这是字节测量，不是供应商 Token 实测或对截断已解决的证明。
++研究 CLI 的显式 `--no-run-resource-limits` 诊断模式复用同一控制器和用量账本，
++取消整次资源门禁与模型/HTTP 等待超时；清单将累计 Token、费用和绝对截止时间记为 null，
++响应捕获不裁剪正文。单次输出使用显式供应商参数，读取授权、单次源码工具边界、
++协议检查和无进展保护继续生效。默认及冻结生产路径不因此改为无上限。
+ 
+ 这条路径验证 B/C 五状态流程、静态对照、继续调查、修订修复、定向查询、共享预算及失败留证边界；
+ 合成任务不经过真实 Adapter 审核，不构成真实数据准入、目标测试执行或模型推断质量证据。
+diff --git a/docs/usage.md b/docs/usage.md
+index a35b14e..7e42e3a 100644
+--- a/docs/usage.md
++++ b/docs/usage.md
+@@ -236,12 +236,12 @@ MYPYPATH=src .venv/bin/python -m mypy --follow-untyped-imports \
+ 研究代码类型检查显式使用本仓 `src`，避免误读环境中其他安装版本；
+ 它仍会报告所引用生产模块的既有诊断，应与上方生产基线比较。
+ 
+-本轮模型效果尚未做真实评估。后续可在单独确认付费预算后预登记：仅使用现有审核的
+-flask_308 与 CloudFoundry 各一次 C 运行，模型 deepseek-flash，开启 repository-read；
+-每例共享上限为 200,000 Token、600 秒、单调用 120 秒及 US$1 估算门禁，输出上限 8192。
+-运行前核对实际服务费率、配置和最终代码版本，分别写入全新输出目录；失败、截断、歧义和未决均计入结果，
++真实规格推导尚未通过验收。[2026-10-28 CloudFoundry 诊断](../out/staged-inference/resource-diagnostic-cloudfoundry-20261028/report.md)
++在取消宿主运行资源上限后完成自主取证，但因 QUERY 问题更新的协议一致性校验停止，未交付最终 spec。
++后续真实运行可使用现有审核的 flask_308 与 CloudFoundry，须有相应调用授权并预登记：
++运行前核对实际服务费率、配置和代码版本，分别写入全新输出目录；失败、截断、歧义和未决均计入结果，
+ 不重跑挑成功样本、不执行目标测试。人工/隔离评阅关注目标覆盖、依赖语义、过强/过弱约束与未知影响，
+-不以 JSON 合法或查询次数替代规格质量。这是待执行方案，不是两次成功或模型效果改善的证据。
++不以 JSON 合法或查询次数替代规格质量。文档中的运行配置不自动构成费用授权。
+ 
+ 输出目录必须不存在。有效语义结果（SELECTED、ALTERNATIVES、AMBIGUOUS、INCONCLUSIVE）退出码为 0，
+ ERROR 为 1，命令或无法完成的产物写入错误为 2；
+@@ -281,6 +281,13 @@ content_changed/identity_mismatch；后端或畸形结果为 backend_error/analy
+ 可显式配置 `--max-model-calls`、`--max-output-tokens`、`--max-total-tokens`、
+ `--max-tool-output-chars`、`--timeout-seconds` 和 `--parsing-timeout-seconds`。
+ 配置与请求前估算的局限写入 manifest；Token 估算不是远端费用硬上限。
++真实故障诊断可显式使用 `--no-run-resource-limits`：取消整次 Token、费用、模型/查询次数、
++总时限、模型等待与 HTTP 客户端超时，并完整保存供应商响应；仍记录实际用量和估费，
++live 模式仍要求输入/输出单价。该选项不能与 `--max-cost-usd` 同用，且不代表费用授权。
++单次模型输出仍由 `--max-output-tokens` 明确配置；诊断时应核对服务商最高值，
++不能把省略参数误认为无限输出。授权读取范围、单次源码工具的输出/解析边界、
++无进展保护、协议校验及一次格式修复规则保持原义。此模式用于定位首次真实停止点，
++不自动重试，也不证明规格质量；默认运行配置不变。
+ 未知用量保留 null/不完整并阻止继续请求；总时限到期后取消并回收解析进程，
+ 不额外请求模型收尾，仅执行本地验证和留证。
+ 这些 Token 用量来自脚本模型的固定回执，不是远端计费证据。
+diff --git a/experiments/staged-inference/controller.py b/experiments/staged-inference/controller.py
+index 7380b43..56cd59e 100644
+--- a/experiments/staged-inference/controller.py
++++ b/experiments/staged-inference/controller.py
+@@ -80,13 +80,14 @@ class StagedRunConfig:
+     run_mode: Literal["synthetic_replay", "live_inference"] = "synthetic_replay"
+     model_name: str = "scripted-offline"
+     repository_read: bool = False
++    no_run_resource_limits: bool = False
+     max_model_calls: int = 10
+     max_query_attempts: int = 6
+     repetition_threshold: int = 4
+     max_output_tokens: int = 4_096
+-    max_total_tokens: int = 60_000
++    max_total_tokens: int | None = 60_000
+     max_tool_output_chars: int = 16_000
+-    timeout_seconds: float = 120
++    timeout_seconds: float | None = 120
+     parsing_timeout_seconds: float = 15
+     max_cost_usd: Decimal | None = None
+     input_cost_per_million: Decimal | None = None
+@@ -101,6 +102,13 @@ class StagedRunConfig:
+             raise ValueError("run_mode must be synthetic_replay or live_inference")
+         if type(self.repository_read) is not bool:
+             raise ValueError("repository_read must be a boolean")
++        if type(self.no_run_resource_limits) is not bool:
++            raise ValueError("no_run_resource_limits must be a boolean")
++        if self.no_run_resource_limits and any(
++            value is not None
++            for value in (self.max_total_tokens, self.timeout_seconds, self.max_cost_usd)
++        ):
++            raise ValueError("no_run_resource_limits requires null total-token, timeout and cost limits")
+         if self.repository_read and self.run_mode != "live_inference":
+             raise ValueError("repository_read requires live_inference")
+         if self.run_mode == "synthetic_replay" and self.model_name != "scripted-offline":
+@@ -115,14 +123,18 @@ class StagedRunConfig:
+             raise ValueError("max_query_attempts cannot exceed six")
+         for name in ("max_output_tokens", "max_total_tokens"):
+             value = getattr(self, name)
++            if name == "max_total_tokens" and value is None and self.no_run_resource_limits:
++                continue
+             if type(value) is not int or value < 1:
+                 raise ValueError(f"{name} must be a positive integer")
+         if type(self.max_tool_output_chars) is not int or self.max_tool_output_chars < 512:
+             raise ValueError("max_tool_output_chars must be an integer >= 512")
+-        if self.max_output_tokens > self.max_total_tokens:
++        if self.max_total_tokens is not None and self.max_output_tokens > self.max_total_tokens:
+             raise ValueError("max_output_tokens cannot exceed max_total_tokens")
+         for name in ("timeout_seconds", "parsing_timeout_seconds"):
+             value = getattr(self, name)
++            if name == "timeout_seconds" and value is None and self.no_run_resource_limits:
++                continue
+             if (not isinstance(value, (int, float)) or isinstance(value, bool)
+                     or not math.isfinite(value) or value <= 0):
+                 raise ValueError(f"{name} must be positive")
+@@ -130,7 +142,7 @@ class StagedRunConfig:
+         if (prices[0] is None) != (prices[1] is None):
+             raise ValueError("input and output prices must be configured together")
+         if self.run_mode == "live_inference" and (
+-            self.max_cost_usd is None or None in prices
++            (self.max_cost_usd is None and not self.no_run_resource_limits) or None in prices
+         ):
+             raise ValueError("live inference requires cost limit and input/output prices")
+ 
+@@ -463,7 +475,7 @@ async def _call_stage(
+     ledger: UsageLedger,
+     responses: list[dict],
+     model_calls: list[dict],
+-    deadline: float,
++    deadline: float | None,
+     model_call_limit: int | None = None,
+ ) -> StageResult:
+     legacy_payload_bytes = None
+@@ -525,7 +537,8 @@ async def _call_stage(
+     }
+     model_calls.append(event)
+     effective_call_limit = (
+-        config.max_model_calls if model_call_limit is None else model_call_limit
++        -1 if config.no_run_resource_limits
++        else config.max_model_calls if model_call_limit is None else model_call_limit
+     )
+     if effective_call_limit >= 0 and ledger.requests_started >= effective_call_limit:
+         event["status"] = "blocked"
+@@ -545,8 +558,8 @@ async def _call_stage(
+         raise StagedInferenceError(
+             "model-call limit exhausted", stage=stage, stop_reason="budget_exhausted"
+         )
+-    remaining = deadline - time.monotonic()
+-    if remaining <= 0:
++    remaining = None if deadline is None else deadline - time.monotonic()
++    if remaining is not None and remaining <= 0:
+         event["status"] = "blocked"
+         event["exception"] = {
+             "classification": "host_deadline",
+@@ -564,7 +577,11 @@ async def _call_stage(
+         raise StagedInferenceError(
+             "run deadline exhausted", stage=stage, stop_reason="run_timeout"
+         )
+-    timeout_seconds = min(remaining, config.parsing_timeout_seconds)
++    timeout_seconds = (
++        None if config.no_run_resource_limits
++        else min(remaining, config.parsing_timeout_seconds)
++        if remaining is not None else config.parsing_timeout_seconds
++    )
+     event["timeout_seconds"] = timeout_seconds
+     capture = getattr(model, "response_capture", None)
+     if isinstance(capture, ResponseCapture):
+@@ -602,7 +619,10 @@ async def _call_stage(
+         )
+         raise StagedInferenceError(
+             "stage timed out", stage=stage,
+-            stop_reason="run_timeout" if remaining <= config.parsing_timeout_seconds else "timeout"
++            stop_reason=(
++                "run_timeout" if remaining is not None and remaining <= config.parsing_timeout_seconds
++                else "timeout"
++            )
+         ) from None
+     except InferenceError as exc:
+         event["status"] = "failed"
+@@ -936,7 +956,7 @@ async def _repair_query_output(
+     source_store: SourceStore, model: Model, config: StagedRunConfig,
+     ledger: UsageLedger, responses: list[dict], model_calls: list[dict],
+     stages: list[dict], repair_log: list[dict], allowance: FormatRepairAllowance,
+-    deadline: float, model_call_limit: int,
++    deadline: float | None, model_call_limit: int,
+ ) -> QuerySelection:
+     entry: dict[str, object] = {
+         "stage": "QUERY_FORMAT_REPAIR",
+@@ -981,9 +1001,9 @@ async def _repair_query_output(
+     known_budget_failure = None
+     if not ledger.usage_complete:
+         known_budget_failure = "prior_usage_unknown"
+-    elif time.monotonic() >= deadline:
++    elif deadline is not None and time.monotonic() >= deadline:
+         known_budget_failure = "run_deadline"
+-    elif ledger.total_tokens >= config.max_total_tokens:
++    elif config.max_total_tokens is not None and ledger.total_tokens >= config.max_total_tokens:
+         known_budget_failure = "total_token_limit"
+     elif (
+         config.max_cost_usd is not None
+@@ -1142,7 +1162,7 @@ async def _deliver_with_repair(
+     model: Model, config: StagedRunConfig, ledger: UsageLedger,
+     responses: list[dict], model_calls: list[dict], stages: list[dict],
+     repair_log: list[dict], allowance: FormatRepairAllowance,
+-    deadline: float, model_call_limit: int,
++    deadline: float | None, model_call_limit: int,
+ ) -> DeliverResult:
+     expected = DeliverResult(
+         schema_version="staged-deliver/v0.1", result_status=constructed.result_status,
+@@ -1225,9 +1245,9 @@ async def _deliver_with_repair(
+         known_budget_failure = None
+         if not ledger.usage_complete:
+             known_budget_failure = "prior_usage_unknown"
+-        elif time.monotonic() >= deadline:
++        elif deadline is not None and time.monotonic() >= deadline:
+             known_budget_failure = "run_deadline"
+-        elif ledger.total_tokens >= config.max_total_tokens:
++        elif config.max_total_tokens is not None and ledger.total_tokens >= config.max_total_tokens:
+             known_budget_failure = "total_token_limit"
+         elif (
+             config.max_cost_usd is not None
+@@ -1353,9 +1373,8 @@ async def execute_staged_run(
+     run_id = str(uuid4())
+     started = time.monotonic()
+     started_wall = time.time()
+-    deadline = started + (
+-        config.timeout_seconds if isinstance(config, StagedRunConfig) else 120
+-    )
++    run_timeout = config.timeout_seconds if isinstance(config, StagedRunConfig) else 120
++    deadline = None if run_timeout is None else started + run_timeout
+     stages: list[dict] = []
+     responses: list[dict] = []
+     model_calls: list[dict] = []
+@@ -1525,7 +1544,9 @@ async def execute_staged_run(
+             raise ValueError("task payload must be an object")
+         task = UnifiedTask.from_dict(task_payload)
+         source_store = SourceStore(task, repository=repository)
+-        model_call_limit = -1 if repository is not None else config.max_model_calls
++        model_call_limit = (
++            -1 if repository is not None or config.no_run_resource_limits else config.max_model_calls
++        )
+         canonical_task = task.to_dict()
+         input_bytes = canonical_json(canonical_task)
+         input_hash = sha256_bytes(input_bytes)
+@@ -1568,7 +1589,9 @@ async def execute_staged_run(
+         query_executor = QueryExecutor(
+             task,
+             source_store=source_store,
+-            max_attempts=(None if repository is not None else config.max_query_attempts),
++            max_attempts=(
++                None if repository is not None or config.no_run_resource_limits else config.max_query_attempts
++            ),
+             max_no_progress_attempts=config.repetition_threshold,
+             max_output_chars=config.max_tool_output_chars,
+             analysis_timeout_seconds=config.parsing_timeout_seconds,
+@@ -1781,6 +1804,7 @@ async def execute_staged_run(
+ 
+                 if (
+                     observed_attempt is not None
++                    and config.max_total_tokens is not None
+                     and ledger.total_tokens >= config.max_total_tokens
+                 ):
+                     query_executor.reject(
+@@ -2204,7 +2228,7 @@ async def execute_staged_run(
+             "budgeted_attempts": 0 if query_executor is None else query_executor.budgeted_attempts,
+             "limit": (
+                 None
+-                if repository is not None
++                if repository is not None or (isinstance(config, StagedRunConfig) and config.no_run_resource_limits)
+                 else (config.max_query_attempts if isinstance(config, StagedRunConfig) else None)
+             ),
+         },
+@@ -2308,15 +2332,17 @@ async def execute_staged_run(
+         },
+         "controller_limits": {
+             "model_calls": (
+-                None if repository is not None
++                None if repository is not None or (valid_config is not None and valid_config.no_run_resource_limits)
+                 else (None if valid_config is None else valid_config.max_model_calls)
+             ),
+             "query_attempts": (
+-                None if repository is not None
++                None if repository is not None or (valid_config is not None and valid_config.no_run_resource_limits)
+                 else (None if valid_config is None else valid_config.max_query_attempts)
+             ),
+             "termination": (
+-                "shared_deadline_token_cost_and_repetition_protection"
++                "protocol_and_repetition_protection_without_run_resource_limits"
++                if valid_config is not None and valid_config.no_run_resource_limits
++                else "shared_deadline_token_cost_and_repetition_protection"
+                 if repository is not None else "configured_call_limits_and_shared_budgets"
+             ),
+         },
+@@ -2360,7 +2386,7 @@ async def execute_staged_run(
+             "observed_attempts": 0 if query_executor is None else query_executor.observed_attempts,
+             "budgeted_attempts": 0 if query_executor is None else query_executor.budgeted_attempts,
+             "limit": (
+-                None if repository is not None
++                None if repository is not None or (valid_config is not None and valid_config.no_run_resource_limits)
+                 else (None if valid_config is None else valid_config.max_query_attempts)
+             ),
+         },
+@@ -2369,7 +2395,7 @@ async def execute_staged_run(
+             "started": started,
+             "absolute": deadline,
+             "wall_clock_started_unix": started_wall,
+-            "wall_clock_deadline_unix": started_wall + (deadline - started),
++            "wall_clock_deadline_unix": None if deadline is None else started_wall + (deadline - started),
+         },
+         "elapsed_seconds": time.monotonic() - started,
+         "artifact_sha256": artifact_hashes,
+diff --git a/experiments/staged-inference/provider_capture.py b/experiments/staged-inference/provider_capture.py
+index 8d5f14a..c7d4683 100644
+--- a/experiments/staged-inference/provider_capture.py
++++ b/experiments/staged-inference/provider_capture.py
+@@ -120,7 +120,7 @@ class ResponseCapture:
+     response-hook events.  Request headers and request bodies are never retained.
+     """
+ 
+-    max_body_bytes: int = 2_000_000
++    max_body_bytes: int | None = 2_000_000
+     _active_sequence: int | None = None
+     _captures: dict[int, list[dict[str, object]]] = field(default_factory=dict)
+ 
+@@ -137,7 +137,7 @@ class ResponseCapture:
+         if sequence is None:
+             raise RuntimeError("provider response arrived without an active model call")
+         content = await response.aread()
+-        truncated = len(content) > self.max_body_bytes
++        truncated = self.max_body_bytes is not None and len(content) > self.max_body_bytes
+         retained = content[: self.max_body_bytes]
+         try:
+             decoded: object = json.loads(retained)
+diff --git a/experiments/staged-inference/query.py b/experiments/staged-inference/query.py
+index 8d73607..75bc351 100644
+--- a/experiments/staged-inference/query.py
++++ b/experiments/staged-inference/query.py
+@@ -110,7 +110,7 @@ class QueryExecutor:
+         max_attempts: int | None,
+         max_output_chars: int,
+         analysis_timeout_seconds: float,
+-        deadline: float,
++        deadline: float | None,
+         max_no_progress_attempts: int = 3,
+     ) -> None:
+         if type(max_no_progress_attempts) is not int or max_no_progress_attempts < 1:
+@@ -124,7 +124,8 @@ class QueryExecutor:
+         self.max_attempts = max_attempts
+         self.deadline = deadline
+         self.max_no_progress_attempts = max_no_progress_attempts
+-        self.analysis.store.limit_deadline(deadline)
++        if deadline is not None:
++            self.analysis.store.limit_deadline(deadline)
+         self.attempts: list[dict[str, Any]] = []
+         self._seen_operations: set[str] = set()
+         self._seen_evidence: set[str] = set()
+@@ -217,8 +218,8 @@ class QueryExecutor:
+         assert validated.tool is not None
+         assert validated.arguments is not None
+ 
+-        remaining = self.deadline - time.monotonic()
+-        if remaining <= 0:
++        remaining = None if self.deadline is None else self.deadline - time.monotonic()
++        if remaining is not None and remaining <= 0:
+             return self._finish(
+                 record, started, "budget_exhausted",
+                 self._error("run_deadline_exhausted", "The shared run deadline is exhausted."),
+diff --git a/experiments/staged-inference/run.py b/experiments/staged-inference/run.py
+index ddbb0cc..bab6224 100644
+--- a/experiments/staged-inference/run.py
++++ b/experiments/staged-inference/run.py
+@@ -63,6 +63,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+     parser.add_argument("--repetition-threshold", type=int, default=4,
+                         help="consecutive repeated queries without new evidence before protection")
+     parser.add_argument("--max-output-tokens", type=int, default=4096)
++    parser.add_argument(
++        "--no-run-resource-limits", action="store_true",
++        help="diagnostic run without total token/cost/call limits or model/run/HTTP timeouts; "
++             "provider output and individual source-tool limits remain explicit",
++    )
+     parser.add_argument("--max-total-tokens", type=int, default=60000)
+     parser.add_argument("--max-tool-output-chars", type=int, default=16000)
+     parser.add_argument("--timeout-seconds", type=float, default=120)
+@@ -77,6 +82,8 @@ def main(argv: list[str] | None = None) -> int:
+     args = parse_args(argv)
+     model: Model
+     try:
++        if args.no_run_resource_limits and args.max_cost_usd is not None:
++            raise ValueError("--no-run-resource-limits cannot be combined with --max-cost-usd")
+         if args.mode == "live_inference":
+             if args.task_json is not None:
+                 raise ValueError("live inference does not accept --task-json")
+@@ -88,13 +95,18 @@ def main(argv: list[str] | None = None) -> int:
+             from agents.models.openai_responses import OpenAIResponsesModel
+             from openai import AsyncOpenAI, DefaultAsyncHttpxClient
+ 
+-            response_capture = ResponseCapture()
++            response_capture = ResponseCapture(
++                max_body_bytes=None if args.no_run_resource_limits else 2_000_000
++            )
+             http_client = DefaultAsyncHttpxClient(
+                 event_hooks={"response": [response_capture.on_response]}
+             )
+             model = OpenAIResponsesModel(
+                 model=args.model.strip(),
+-                openai_client=AsyncOpenAI(max_retries=0, http_client=http_client),
++                openai_client=AsyncOpenAI(
++                    max_retries=0, http_client=http_client,
++                    timeout=None if args.no_run_resource_limits else http_client.timeout,
++                ),
+             )
+             setattr(model, "response_capture", response_capture)
+             requested_case_id = args.case_id
+@@ -125,12 +137,13 @@ def main(argv: list[str] | None = None) -> int:
+             config=StagedRunConfig(
+                 variant=args.variant, run_mode=args.mode, model_name=model_name,
+                 repository_read=args.repository_read,
++                no_run_resource_limits=args.no_run_resource_limits,
+                 max_model_calls=args.max_model_calls,
+                 max_output_tokens=args.max_output_tokens,
+-                max_total_tokens=args.max_total_tokens,
++                max_total_tokens=None if args.no_run_resource_limits else args.max_total_tokens,
+                 max_tool_output_chars=args.max_tool_output_chars,
+                 repetition_threshold=args.repetition_threshold,
+-                timeout_seconds=args.timeout_seconds,
++                timeout_seconds=None if args.no_run_resource_limits else args.timeout_seconds,
+                 parsing_timeout_seconds=args.parsing_timeout_seconds,
+                 max_cost_usd=args.max_cost_usd,
+                 input_cost_per_million=args.input_cost_per_million,
+diff --git a/src/mock_spec/budget.py b/src/mock_spec/budget.py
+index 3d1ee4d..13b84d6 100644
+--- a/src/mock_spec/budget.py
++++ b/src/mock_spec/budget.py
+@@ -22,7 +22,7 @@ class InferenceBudget:
+     max_tool_calls: int = 8
+     max_repeated_no_progress: int = 2
+     max_output_tokens: int = 4_096
+-    max_total_tokens: int = 24_000
++    max_total_tokens: int | None = 24_000
+     max_tool_output_chars: int = 16_000
+     analysis_timeout_seconds: float = 15
+     max_cost_usd: Decimal | None = None
+@@ -32,12 +32,22 @@ class InferenceBudget:
+     def __post_init__(self) -> None:
+         for name in (
+             "max_turns", "max_tool_calls", "max_repeated_no_progress",
+-            "max_output_tokens", "max_total_tokens",
++            "max_output_tokens",
+         ):
+             value = getattr(self, name)
+             if type(value) is not int or value < 1:
+                 raise InferenceError(f"scenario inference {name} must be a positive integer")
+-        if self.max_output_tokens > self.max_total_tokens:
++        if (
++            self.max_total_tokens is not None
++            and (type(self.max_total_tokens) is not int or self.max_total_tokens < 1)
++        ):
++            raise InferenceError(
++                "scenario inference max_total_tokens must be a positive integer"
++            )
++        if (
++            self.max_total_tokens is not None
++            and self.max_output_tokens > self.max_total_tokens
++        ):
+             raise InferenceError(
+                 "scenario inference max_output_tokens cannot exceed max_total_tokens"
+             )
+@@ -211,7 +221,10 @@ class UsageLedger:
+         self.estimates.append(estimate)
+ 
+         reason = None
+-        if projected_total > self.budget.max_total_tokens:
++        if (
++            self.budget.max_total_tokens is not None
++            and projected_total > self.budget.max_total_tokens
++        ):
+             reason = "projected_token_limit"
+         elif (
+             self.budget.max_cost_usd is not None
+@@ -270,7 +283,11 @@ class UsageLedger:
+         })
+ 
+         reason = None
+-        if known and self.total_tokens > self.budget.max_total_tokens:
++        if (
++            known
++            and self.budget.max_total_tokens is not None
++            and self.total_tokens > self.budget.max_total_tokens
++        ):
+             reason = "actual_token_limit"
+         elif (
+             self.budget.max_cost_usd is not None
+diff --git a/tests/test_budget.py b/tests/test_budget.py
+index c2597fb..47dec20 100644
+--- a/tests/test_budget.py
++++ b/tests/test_budget.py
+@@ -4,6 +4,7 @@ from __future__ import annotations
+ 
+ import asyncio
+ from decimal import Decimal
++from types import SimpleNamespace
+ 
+ import pytest
+ from agents.usage import Usage
+@@ -32,6 +33,63 @@ def test_budget_requires_complete_explicit_prices_for_cost_limit() -> None:
+         inference_v02.InferenceBudget(input_cost_per_million=Decimal("1"))
+ 
+ 
++@pytest.mark.parametrize("value", [0, -1, 1.5, "100"])
++def test_optional_total_token_limit_still_rejects_invalid_values(value) -> None:
++    with pytest.raises(InferenceError, match="max_total_tokens must be a positive integer"):
++        inference_v02.InferenceBudget(max_total_tokens=value)
++
++
++def test_no_total_token_limit_keeps_accounting_and_allows_later_calls(monkeypatch) -> None:
++    budget = inference_v02.InferenceBudget(
++        max_output_tokens=100,
++        max_total_tokens=None,
++    )
++    ledger = UsageLedger(budget)
++    agent = SimpleNamespace(tools=[], output_type=None)
++    monkeypatch.setattr(
++        "mock_spec.budget.estimate_known_request_tokens",
++        lambda **_kwargs: (30_000, 120_000),
++    )
++
++    ledger.before_model_call(system_prompt=None, input_items=[], agent=agent)
++    ledger.after_model_call(SimpleNamespace(
++        usage=Usage(
++            requests=1, input_tokens=30_000, output_tokens=2_000, total_tokens=32_000
++        ),
++        raw_usage={"total_tokens": 32_000},
++    ))
++    ledger.before_model_call(system_prompt=None, input_items=[], agent=agent)
++
++    assert ledger.requests_started == 2
++    assert ledger.total_tokens == 32_000
++    assert ledger.gate_events[-1]["status"] == "allowed"
++
++
++def test_no_total_token_limit_still_enforces_explicit_cost_limit(monkeypatch) -> None:
++    budget = inference_v02.InferenceBudget(
++        max_output_tokens=100,
++        max_total_tokens=None,
++        max_cost_usd=Decimal("0.01"),
++        input_cost_per_million=Decimal("1"),
++        output_cost_per_million=Decimal("1"),
++    )
++    ledger = UsageLedger(budget)
++    monkeypatch.setattr(
++        "mock_spec.budget.estimate_known_request_tokens",
++        lambda **_kwargs: (20_000, 80_000),
++    )
++
++    with pytest.raises(InferenceError) as caught:
++        ledger.before_model_call(
++            system_prompt=None,
++            input_items=[],
++            agent=SimpleNamespace(tools=[], output_type=None),
++        )
++
++    assert caught.value.category == "budget_exhausted"
++    assert ledger.gate_events[-1]["reason"] == "projected_cost_limit"
++
++
+ def test_preflight_token_gate_blocks_before_model_call(monkeypatch) -> None:
+     task = _task()
+     budget = inference_v02.InferenceBudget(
+diff --git a/tests/test_staged_live.py b/tests/test_staged_live.py
+index fe62877..f08effa 100644
+--- a/tests/test_staged_live.py
++++ b/tests/test_staged_live.py
+@@ -30,6 +30,43 @@ def test_live_configuration_requires_priced_cost_budget() -> None:
+         StagedRunConfig(run_mode="live_inference", model_name="unused-model")
+ 
+ 
++def test_live_diagnostic_cli_disables_http_wait_and_preserves_accounting(monkeypatch, tmp_path) -> None:
++    import openai
++    import run as staged_cli
++
++    clients = []
++    real_client = openai.AsyncOpenAI
++
++    def capture_client(**kwargs):
++        client = real_client(**kwargs)
++        clients.append(client)
++        return client
++
++    async def capture_run(**kwargs):
++        config = kwargs["config"]
++        assert config.no_run_resource_limits is True
++        assert config.max_total_tokens is None
++        assert config.timeout_seconds is None
++        assert config.max_cost_usd is None
++        assert config.max_output_tokens == 393216
++        assert config.input_cost_per_million == Decimal("0.30")
++        assert kwargs["model"].response_capture.max_body_bytes is None
++        assert clients[0].timeout is None
++        await clients[0].close()
++        return {"manifest": {"result_status": "SELECTED"}}
++
++    monkeypatch.setenv("OPENAI_API_KEY", "unused-test-key")
++    monkeypatch.setattr(openai, "AsyncOpenAI", capture_client)
++    monkeypatch.setattr(staged_cli, "execute_staged_run", capture_run)
++    assert staged_cli.main([
++        "--mode", "live_inference", "--variant", "C", "--model", "unused-model",
++        "--snapshot", str(tmp_path), "--case-id", "flask_308", "--repository-read",
++        "--output-dir", str(tmp_path / "run"), "--no-run-resource-limits",
++        "--max-output-tokens", "393216", "--input-cost-per-million", "0.30",
++        "--output-cost-per-million", "1.20",
++    ]) == 0
++
++
+ def test_live_cli_missing_configuration_never_creates_run(tmp_path) -> None:
+     output_dir = tmp_path / "live"
+     env = os.environ.copy()
+diff --git a/tests/test_staged_trace.py b/tests/test_staged_trace.py
+index 7cdc679..a184861 100644
+--- a/tests/test_staged_trace.py
++++ b/tests/test_staged_trace.py
+@@ -25,7 +25,7 @@ from controller import (  # noqa: E402
+     StagedInferenceError, StagedRunConfig, _call_stage, execute_staged_run,
+ )
+ from stage_protocol import QueryResult  # noqa: E402
+-from scripted import FixedScriptModel, scripted_outputs, synthetic_task  # noqa: E402
++from scripted import FixedScriptModel, query_script, scripted_outputs, synthetic_task  # noqa: E402
+ def _ledger(config: StagedRunConfig) -> UsageLedger:
+     return UsageLedger(InferenceBudget(
+         max_turns=config.max_model_calls,
+@@ -266,3 +266,33 @@ def test_pre_request_budget_gate_is_distinct_from_provider_failure() -> None:
+     assert calls[0]["model_request_started"] is False
+     assert calls[0]["exception"]["classification"] == "host_budget"
+     assert calls[0]["exception"]["error_code"] == "model_call_limit"
++
++
++@pytest.mark.parametrize("query_count", [0, 1])
++def test_diagnostic_run_has_no_model_wait_or_run_budget_limits(tmp_path: Path, query_count: int) -> None:
++    class SlowScript(FixedScriptModel):
++        async def get_response(self, *args, **kwargs):
++            await asyncio.sleep(0.01)
++            return await super().get_response(*args, **kwargs)
++
++    model = SlowScript(query_script(query_count, "selected", variant="B"))
++    result = asyncio.run(execute_staged_run(
++        synthetic_task(), output_dir=tmp_path / "diagnostic", model=model,
++        config=StagedRunConfig(
++            no_run_resource_limits=True, max_total_tokens=None, timeout_seconds=None,
++            max_model_calls=1, parsing_timeout_seconds=0.001,
++        ),
++    ))
++
++    assert result["record"]["error"] is None
++    assert result["spec"].semantics.delivery_status == "ready"
++    calls = result["record"]["model_calls"]
++    assert len(calls) == 4 + query_count
++    assert all(call["timeout_seconds"] is None for call in calls)
++    manifest = result["manifest"]
++    assert manifest["deadline"]["absolute"] is None
++    assert manifest["deadline"]["wall_clock_deadline_unix"] is None
++    assert manifest["controller_limits"]["model_calls"] is None
++    assert manifest["controller_limits"]["query_attempts"] is None
++    assert manifest["usage"]["requests_completed"] == 4 + query_count
++    assert manifest["usage"]["total_tokens"] > 0

@@ -1,0 +1,1622 @@
+{
+  "model": "deepseek-flash",
+  "include": [],
+  "input": [
+    {
+      "content": "{\"continuation\":{},\"extract\":{\"candidates\":[{\"description\":\"Production DefaultApplicationFactory.createApplication calls serviceUrl(getServiceUrl()), and getServiceUrl appends '/' to getServiceBaseUrl(). CloudFoundryApplicationFactory overrides getServiceBaseUrl to return 'http://' plus the first URI when the URI list is nonempty. With the visible singleton URI, the asserted serviceUrl follows.\",\"evidence\":[{\"end_line\":55,\"quote\":\"        CloudFoundryApplicationProperties cfApplicationProperties = new CloudFoundryApplicationProperties();\\n        // === MOCK-STUB-START ===\\n        // === MOCK-STUB-END ===\\n        CloudFoundryApplicationFactory factory = new CloudFoundryApplicationFactory(instanceProperties, management,\\n            server, pathMappedEndpoints, webEndpoint, () -> singletonMap(\\\"contributor\\\", \\\"test\\\"), cfApplicationProperties);\\n        cfApplicationProperties.setUris(singletonList(\\\"application/Uppercase\\\"));\\n\\n        Application app = factory.createApplication();\\n\\n        assertEquals(\\\"http://application/Uppercase/actuator\\\", app.getManagementUrl());\\n        assertEquals(\\\"http://application/Uppercase/actuator/health\\\", app.getHealthUrl());\\n        assertEquals(\\\"http://application/Uppercase/\\\", app.getServiceUrl());\",\"source_id\":\"test\",\"start_line\":44},{\"end_line\":50,\"quote\":\"    protected String getServiceBaseUrl() {\\n        if (cfApplicationProperties.getUris().isEmpty()) {\\n            return null;\\n        }\\n\\n        String uri = cfApplicationProperties.getUris().get(0);\\n        return \\\"http://\\\" + uri;\\n    }\",\"source_id\":\"mut\",\"start_line\":43},{\"end_line\":77,\"quote\":\"    public Application createApplication() {\\n        return Application.create(getName())\\n                          .healthUrl(getHealthUrl())\\n                          .managementUrl(getManagementUrl())\\n                          .serviceUrl(getServiceUrl())\\n                          .metadata(getMetadata())\\n                          .build();\\n    }\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":70},{\"end_line\":89,\"quote\":\"    protected String getServiceUrl() {\\n        if (instance.getServiceUrl() != null) {\\n            return instance.getServiceUrl();\\n        }\\n\\n        return UriComponentsBuilder.fromUriString(getServiceBaseUrl()).path(\\\"/\\\").toUriString();\\n    }\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":83}],\"scenario_id\":\"cf_uri_to_service_base_url\"},{\"description\":\"DefaultApplicationFactory builds managementUrl from getManagementBaseUrl plus the webEndpoint base path, and builds healthUrl from the management base plus pathMappedEndpoints.getPath(health). When the management port is null or equal, getManagementBaseUrl returns getServiceUrl(). This observed flow supports the asserted management and health URLs, though the hidden pathMappedEndpoints stub text remains masked.\",\"evidence\":[{\"end_line\":54,\"quote\":\"        assertEquals(\\\"http://application/Uppercase/actuator\\\", app.getManagementUrl());\\n        assertEquals(\\\"http://application/Uppercase/actuator/health\\\", app.getHealthUrl());\",\"source_id\":\"test\",\"start_line\":53},{\"end_line\":155,\"quote\":\"    protected String getManagementUrl() {\\n        if (instance.getManagementUrl() != null) {\\n            return instance.getManagementUrl();\\n        }\\n\\n        return UriComponentsBuilder.fromUriString(getManagementBaseUrl())\\n                                   .path(\\\"/\\\")\\n                                   .path(getEndpointsWebPath())\\n                                   .toUriString();\\n    }\\n\\n    protected String getManagementBaseUrl() {\\n        String baseUrl = instance.getManagementBaseUrl();\\n\\n        if (!StringUtils.isEmpty(baseUrl)) {\\n            return baseUrl;\\n        }\\n\\n        if (isManagementPortEqual()) {\\n            return this.getServiceUrl();\\n        }\\n\\n        Ssl ssl = management.getSsl() != null ? management.getSsl() : server.getSsl();\\n        return UriComponentsBuilder.newInstance()\\n                                   .scheme(getScheme(ssl))\\n                                   .host(getManagementHost())\\n                                   .port(getLocalManagementPort())\\n                                   .toUriString();\\n    }\\n\\n    protected boolean isManagementPortEqual() {\\n        return getLocalManagementPort() == null || getLocalManagementPort().equals(getLocalServerPort());\\n    }\\n\\n    protected String getEndpointsWebPath() {\\n        return webEndpoint.getBasePath();\\n    }\\n\\n    protected String getHealthUrl() {\\n        if (instance.getHealthUrl() != null) {\\n            return instance.getHealthUrl();\\n        }\\n        return UriComponentsBuilder.fromHttpUrl(getManagementBaseUrl())\\n                                   .path(\\\"/\\\")\\n                                   .path(getHealthEndpointPath())\\n                                   .toUriString();\\n    }\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":109},{\"end_line\":206,\"quote\":\"    protected String getHealthEndpointPath() {\\n        String health = pathMappedEndpoints.getPath(EndpointId.of(\\\"health\\\"));\\n        if (StringUtils.hasText(health)) {\\n            return health;\\n        }\\n        String status = pathMappedEndpoints.getPath(EndpointId.of(\\\"status\\\"));\\n        if (StringUtils.hasText(status)) {\\n            return status;\\n        }\\n        throw new IllegalStateException(\\\"Either health or status endpoint must be enabled!\\\");\\n    }\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":196}],\"scenario_id\":\"management_health_url_path_mapping\"},{\"description\":\"DefaultApplicationFactory.getMetadata merges metadataContributor.getMetadata() into a LinkedHashMap and then merges instance metadata. The visible lambda contributes 'contributor' -> 'test', so the asserted application metadata value follows.\",\"evidence\":[{\"end_line\":57,\"quote\":\"        CloudFoundryApplicationFactory factory = new CloudFoundryApplicationFactory(instanceProperties, management,\\n            server, pathMappedEndpoints, webEndpoint, () -> singletonMap(\\\"contributor\\\", \\\"test\\\"), cfApplicationProperties);\\n        cfApplicationProperties.setUris(singletonList(\\\"application/Uppercase\\\"));\\n\\n        Application app = factory.createApplication();\\n\\n        assertEquals(\\\"http://application/Uppercase/actuator\\\", app.getManagementUrl());\\n        assertEquals(\\\"http://application/Uppercase/actuator/health\\\", app.getHealthUrl());\\n        assertEquals(\\\"http://application/Uppercase/\\\", app.getServiceUrl());\\n        assertEquals(\\\"test\\\", app.getName());\\n        assertEquals(\\\"test\\\", app.getMetadata().get(\\\"contributor\\\"));\",\"source_id\":\"test\",\"start_line\":47},{\"end_line\":161,\"quote\":\"    protected Map<String, String> getMetadata() {\\n        Map<String, String> metadata = new LinkedHashMap<>();\\n        metadata.putAll(metadataContributor.getMetadata());\\n        metadata.putAll(instance.getMetadata());\\n        return metadata;\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":157}],\"scenario_id\":\"metadata_contributor_map\"}],\"original_goals\":[{\"end_line\":60,\"quote\":\"    @Test\\n    public void should_use_application_uri() {\\n        InstanceProperties instanceProperties = new InstanceProperties();\\n        instanceProperties.setName(\\\"test\\\");\\n        ServerProperties server = new ServerProperties();\\n        ManagementServerProperties management = new ManagementServerProperties();\\n        WebEndpointProperties webEndpoint = new WebEndpointProperties();\\n        CloudFoundryApplicationProperties cfApplicationProperties = new CloudFoundryApplicationProperties();\\n        // === MOCK-STUB-START ===\\n        // === MOCK-STUB-END ===\\n        CloudFoundryApplicationFactory factory = new CloudFoundryApplicationFactory(instanceProperties, management,\\n            server, pathMappedEndpoints, webEndpoint, () -> singletonMap(\\\"contributor\\\", \\\"test\\\"), cfApplicationProperties);\\n        cfApplicationProperties.setUris(singletonList(\\\"application/Uppercase\\\"));\\n\\n        Application app = factory.createApplication();\\n\\n        assertEquals(\\\"http://application/Uppercase/actuator\\\", app.getManagementUrl());\\n        assertEquals(\\\"http://application/Uppercase/actuator/health\\\", app.getHealthUrl());\\n        assertEquals(\\\"http://application/Uppercase/\\\", app.getServiceUrl());\\n        assertEquals(\\\"test\\\", app.getName());\\n        assertEquals(\\\"test\\\", app.getMetadata().get(\\\"contributor\\\"));\\n        // === VERIFY-START ===\\n        // === VERIFY-END ===\\n    }\",\"source_id\":\"test\",\"start_line\":37}],\"result_status\":\"CONTINUE\",\"schema_version\":\"staged-extract/v0.1\",\"unresolved\":[\"The masked region at test lines 45-46 leaves `pathMappedEndpoints` undeclared in the visible source; its type, initialization, stub values, and any verification are not established.\",\"The DefaultApplicationFactory superclass and its exact use of PathMappedEndpoints, WebEndpointProperties, and server/management properties are not provided, so the conditional dependency for managementUrl and healthUrl cannot be confirmed.\",\"No visible evidence establishes whether the mutation boundary is getServiceBaseUrl, URI ordering, URL joining, or another behavior; the listed candidates remain working hypotheses.\",\"The empty-URI branch in getServiceBaseUrl is not exercised by the visible non-empty URI input, so expected fallback behavior and its interaction with DefaultApplicationFactory are unresolved.\",\"Imports, test name, and final assertions alone do not establish any hidden Mockito call count or verification target.\"]},\"query\":{\"decision\":\"finish_queries\",\"impact\":\"Production behavior now supports the Cloud Foundry URI, management/health URL, and metadata candidate flows; remaining hidden stub and verification details are nonblocking for the expected assertions.\",\"previous_receipt_assessment\":{\"attempt_sequence\":2,\"impact\":\"supports\",\"rationale\":\"Reading DefaultApplicationFactory shows createApplication delegates to getHealthUrl, getManagementUrl, and getServiceUrl; getServiceUrl appends a trailing slash to getServiceBaseUrl; management and health URLs are built from management/service base URLs plus endpoint paths; and metadata merges the contributor map before instance metadata. This directly supports the candidate URL and metadata flows.\"},\"query_attempt\":null,\"schema_version\":\"staged-query/v0.1\",\"stop_explanation\":{\"evidence\":[{\"end_line\":77,\"quote\":\"    public Application createApplication() {\\n        return Application.create(getName())\\n                          .healthUrl(getHealthUrl())\\n                          .managementUrl(getManagementUrl())\\n                          .serviceUrl(getServiceUrl())\\n                          .metadata(getMetadata())\\n                          .build();\\n    }\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":70},{\"end_line\":89,\"quote\":\"    protected String getServiceUrl() {\\n        if (instance.getServiceUrl() != null) {\\n            return instance.getServiceUrl();\\n        }\\n\\n        return UriComponentsBuilder.fromUriString(getServiceBaseUrl()).path(\\\"/\\\").toUriString();\\n    }\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":83},{\"end_line\":155,\"quote\":\"    protected String getManagementUrl() {\\n        if (instance.getManagementUrl() != null) {\\n            return instance.getManagementUrl();\\n        }\\n\\n        return UriComponentsBuilder.fromUriString(getManagementBaseUrl())\\n                                   .path(\\\"/\\\")\\n                                   .path(getEndpointsWebPath())\\n                                   .toUriString();\\n    }\\n\\n    protected String getManagementBaseUrl() {\\n        String baseUrl = instance.getManagementBaseUrl();\\n\\n        if (!StringUtils.isEmpty(baseUrl)) {\\n            return baseUrl;\\n        }\\n\\n        if (isManagementPortEqual()) {\\n            return this.getServiceUrl();\\n        }\\n\\n        Ssl ssl = management.getSsl() != null ? management.getSsl() : server.getSsl();\\n        return UriComponentsBuilder.newInstance()\\n                                   .scheme(getScheme(ssl))\\n                                   .host(getManagementHost())\\n                                   .port(getLocalManagementPort())\\n                                   .toUriString();\\n    }\\n\\n    protected boolean isManagementPortEqual() {\\n        return getLocalManagementPort() == null || getLocalManagementPort().equals(getLocalServerPort());\\n    }\\n\\n    protected String getEndpointsWebPath() {\\n        return webEndpoint.getBasePath();\\n    }\\n\\n    protected String getHealthUrl() {\\n        if (instance.getHealthUrl() != null) {\\n            return instance.getHealthUrl();\\n        }\\n        return UriComponentsBuilder.fromHttpUrl(getManagementBaseUrl())\\n                                   .path(\\\"/\\\")\\n                                   .path(getHealthEndpointPath())\\n                                   .toUriString();\\n    }\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":109},{\"end_line\":206,\"quote\":\"    protected String getHealthEndpointPath() {\\n        String health = pathMappedEndpoints.getPath(EndpointId.of(\\\"health\\\"));\\n        if (StringUtils.hasText(health)) {\\n            return health;\\n        }\\n        String status = pathMappedEndpoints.getPath(EndpointId.of(\\\"status\\\"));\\n        if (StringUtils.hasText(status)) {\\n            return status;\\n        }\\n        throw new IllegalStateException(\\\"Either health or status endpoint must be enabled!\\\");\\n    }\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":196},{\"end_line\":50,\"quote\":\"    protected String getServiceBaseUrl() {\\n        if (cfApplicationProperties.getUris().isEmpty()) {\\n            return null;\\n        }\\n\\n        String uri = cfApplicationProperties.getUris().get(0);\\n        return \\\"http://\\\" + uri;\\n    }\",\"source_id\":\"mut\",\"start_line\":43},{\"end_line\":57,\"quote\":\"        cfApplicationProperties.setUris(singletonList(\\\"application/Uppercase\\\"));\\n\\n        Application app = factory.createApplication();\\n\\n        assertEquals(\\\"http://application/Uppercase/actuator\\\", app.getManagementUrl());\\n        assertEquals(\\\"http://application/Uppercase/actuator/health\\\", app.getHealthUrl());\\n        assertEquals(\\\"http://application/Uppercase/\\\", app.getServiceUrl());\\n        assertEquals(\\\"test\\\", app.getName());\\n        assertEquals(\\\"test\\\", app.getMetadata().get(\\\"contributor\\\"));\",\"source_id\":\"test\",\"start_line\":49}],\"rationale\":\"DefaultApplicationFactory establishes the URL construction behavior: createApplication calls getHealthUrl, getManagementUrl, and getServiceUrl; getServiceUrl appends '/' to getServiceBaseUrl; CloudFoundryApplicationFactory returns 'http://' plus the first URI; managementUrl combines the management base with the web endpoint base path; when the management port is unset or equal it uses the service URL; healthUrl combines the management base with the pathMappedEndpoints health path; metadata merges contributor metadata. These observed paths explain the visible expected service, management, health, and metadata values. The remaining gaps concern masked test setup and exact verification text, not production behavior needed for the original assertions.\",\"reason\":\"unknowns_nonblocking\",\"remaining_unknowns\":[{\"blocking\":false,\"impact\":\"Exact hidden declaration/stub values are not needed: production getHealthUrl requires pathMappedEndpoints.getPath(health) to return the health path; visible assertions plus production behavior determine the expected health URL.\",\"question\":\"The masked region at test lines 45-46 leaves `pathMappedEndpoints` undeclared in the visible source; its type, initialization, stub values, and any verification are not established.\"},{\"blocking\":false,\"impact\":\"The production flow identifies the likely behavioral boundary: CloudFoundryApplicationFactory overrides getServiceBaseUrl using the first URI, while DefaultApplicationFactory appends a trailing slash and derives management/health URLs. Exact hidden mutation labeling is not needed for downstream behavior.\",\"question\":\"No visible evidence establishes whether the mutation boundary is getServiceBaseUrl, URI ordering, URL joining, or another behavior; the listed candidates remain working hypotheses.\"},{\"blocking\":false,\"impact\":\"Empty URI fallback is not exercised by the visible input; production returns null there, but the test uses a singleton nonempty URI, so this branch does not affect the expected assertions.\",\"question\":\"The empty-URI branch in getServiceBaseUrl is not exercised by the visible non-empty URI input, so expected fallback behavior and its interaction with DefaultApplicationFactory are unresolved.\"},{\"blocking\":false,\"impact\":\"Exact hidden Mockito call counts or verification targets are not needed; production behavior and visible assertions determine the expected service, management, health, and metadata outputs.\",\"question\":\"Imports, test name, and final assertions alone do not establish any hidden Mockito call count or verification target.\"}]}},\"query_receipts\":[{\"arguments_json\":\"{\\\"operation\\\":\\\"search\\\",\\\"path_pattern\\\":\\\"**/DefaultApplicationFactory.java\\\"}\",\"assessment\":{\"attempt_sequence\":1,\"impact\":\"supports\",\"rationale\":\"The prior search did not return source text, but it located the exact DefaultApplicationFactory.java source with a usable source_id. That supports investigating the production URL-construction behavior despite the access-denied incompleteness.\"},\"assessment_status\":\"complete\",\"duration_seconds\":0.007186027010902762,\"exploration_progress\":{\"consecutive_no_progress\":0,\"evidence_digest\":\"afcc63e6b7c60afe6edbd1d2c833d5aaeeb20b0fd9e4c02ff7546a47fa185dcc\",\"made_progress\":true,\"new_evidence\":true,\"new_operation_or_position\":true,\"new_question_review\":true,\"operation_digest\":\"7751225df3875469117c7ea7b9d1b749f89a70e0acd65a3829717c147fa94181\",\"termination_initiator\":null,\"termination_reason\":null,\"threshold\":4,\"triggered\":false},\"question\":\"What is the production behavior of DefaultApplicationFactory in computing service, management, and health URLs from PathMappedEndpoints, WebEndpointProperties, server/management properties, and getServiceBaseUrl?\",\"raw_request\":{\"arguments_json\":\"{\\\"operation\\\":\\\"search\\\",\\\"path_pattern\\\":\\\"**/DefaultApplicationFactory.java\\\"}\",\"question\":\"What is the production behavior of DefaultApplicationFactory in computing service, management, and health URLs from PathMappedEndpoints, WebEndpointProperties, server/management properties, and getServiceBaseUrl?\",\"scenario_id\":\"original_task\",\"tool\":\"inspect_source\"},\"response_id\":\"query:1\",\"result\":{\"complete\":false,\"error_code\":null,\"limit_reason\":\"access_denied\",\"limits\":{\"max_bytes\":2097152,\"max_entries\":2000,\"max_file_bytes\":262144,\"max_matches\":50,\"timeout_seconds\":2.0},\"matches\":[{\"end_line\":null,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":null,\"text\":null}],\"next_cursor\":null,\"policy_id\":\"reviewed-repository-search/v1\",\"status\":\"incomplete\",\"usage\":{\"bytes\":8280,\"elapsed_seconds\":0.006904758047312498,\"entries\":42,\"excluded\":5}},\"scenario_id\":\"original_task\",\"semantic_category\":\"scope_limit\",\"sequence\":1,\"status\":\"incomplete\",\"tool\":\"inspect_source\",\"within_budget\":true},{\"arguments_json\":\"{\\\"source_id\\\":\\\"repository:f1cbe4e7534b595de231fa4a\\\",\\\"start_line\\\":1,\\\"end_line\\\":220}\",\"assessment\":{\"attempt_sequence\":2,\"impact\":\"supports\",\"rationale\":\"Reading DefaultApplicationFactory shows createApplication delegates to getHealthUrl, getManagementUrl, and getServiceUrl; getServiceUrl appends a trailing slash to getServiceBaseUrl; management and health URLs are built from management/service base URLs plus endpoint paths; and metadata merges the contributor map before instance metadata. This directly supports the candidate URL and metadata flows.\"},\"assessment_status\":\"complete\",\"duration_seconds\":0.000789690064266324,\"exploration_progress\":{\"consecutive_no_progress\":0,\"evidence_digest\":\"5e2f14409aeeedf4906f9ecf14bd822edbd8aaac60d415b32febbf9fb9a79b05\",\"made_progress\":true,\"new_evidence\":true,\"new_operation_or_position\":true,\"new_question_review\":true,\"operation_digest\":\"ac4a20d0855398fdd1d65c053513ec7b407dab5de366fc0fa8307b30c0a9928c\",\"termination_initiator\":null,\"termination_reason\":null,\"threshold\":4,\"triggered\":false},\"question\":\"What does DefaultApplicationFactory actually do in createApplication and its URL helpers to derive serviceUrl, managementUrl, and healthUrl from getServiceBaseUrl, PathMappedEndpoints, WebEndpointProperties, and server/management properties?\",\"raw_request\":{\"arguments_json\":\"{\\\"source_id\\\":\\\"repository:f1cbe4e7534b595de231fa4a\\\",\\\"start_line\\\":1,\\\"end_line\\\":220}\",\"question\":\"What does DefaultApplicationFactory actually do in createApplication and its URL helpers to derive serviceUrl, managementUrl, and healthUrl from getServiceBaseUrl, PathMappedEndpoints, WebEndpointProperties, and server/management properties?\",\"scenario_id\":\"original_task\",\"tool\":\"inspect_source\"},\"response_id\":\"query:2\",\"result\":{\"backend\":\"source_store\",\"end_line\":220,\"limitations\":[],\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":1,\"status\":\"ok\",\"text\":\"/*\\n * Copyright 2014-2018 the original author or authors.\\n *\\n * Licensed under the Apache License, Version 2.0 (the \\\"License\\\");\\n * you may not use this file except in compliance with the License.\\n * You may obtain a copy of the License at\\n *\\n *     http://www.apache.org/licenses/LICENSE-2.0\\n *\\n * Unless required by applicable law or agreed to in writing, software\\n * distributed under the License is distributed on an \\\"AS IS\\\" BASIS,\\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\\n * See the License for the specific language governing permissions and\\n * limitations under the License.\\n */\\n\\npackage de.codecentric.boot.admin.client.registration;\\n\\nimport de.codecentric.boot.admin.client.config.InstanceProperties;\\nimport de.codecentric.boot.admin.client.registration.metadata.MetadataContributor;\\n\\nimport java.net.InetAddress;\\nimport java.net.UnknownHostException;\\nimport java.util.LinkedHashMap;\\nimport java.util.Map;\\nimport org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;\\nimport org.springframework.boot.actuate.autoconfigure.web.server.ManagementServerProperties;\\nimport org.springframework.boot.actuate.endpoint.EndpointId;\\nimport org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\\nimport org.springframework.boot.autoconfigure.web.ServerProperties;\\nimport org.springframework.boot.web.context.WebServerInitializedEvent;\\nimport org.springframework.boot.web.server.Ssl;\\nimport org.springframework.context.event.EventListener;\\nimport org.springframework.util.StringUtils;\\nimport org.springframework.web.util.UriComponentsBuilder;\\n\\n/**\\n * Default implementation for creating the {@link Application} instance which gets registered at the\\n * admin server.\\n *\\n * @author Johannes Edmeier\\n * @author Rene Felgenträger\\n */\\npublic class DefaultApplicationFactory implements ApplicationFactory {\\n    private final InstanceProperties instance;\\n    private final ServerProperties server;\\n    private final ManagementServerProperties management;\\n    private final PathMappedEndpoints pathMappedEndpoints;\\n    private final WebEndpointProperties webEndpoint;\\n    private final MetadataContributor metadataContributor;\\n    private Integer localServerPort;\\n    private Integer localManagementPort;\\n\\n\\n    public DefaultApplicationFactory(InstanceProperties instance,\\n                                     ManagementServerProperties management,\\n                                     ServerProperties server,\\n                                     PathMappedEndpoints pathMappedEndpoints,\\n                                     WebEndpointProperties webEndpoint,\\n                                     MetadataContributor metadataContributor) {\\n        this.instance = instance;\\n        this.management = management;\\n        this.server = server;\\n        this.pathMappedEndpoints = pathMappedEndpoints;\\n        this.webEndpoint = webEndpoint;\\n        this.metadataContributor = metadataContributor;\\n    }\\n\\n    @Override\\n    public Application createApplication() {\\n        return Application.create(getName())\\n                          .healthUrl(getHealthUrl())\\n                          .managementUrl(getManagementUrl())\\n                          .serviceUrl(getServiceUrl())\\n                          .metadata(getMetadata())\\n                          .build();\\n    }\\n\\n    protected String getName() {\\n        return instance.getName();\\n    }\\n\\n    protected String getServiceUrl() {\\n        if (instance.getServiceUrl() != null) {\\n            return instance.getServiceUrl();\\n        }\\n\\n        return UriComponentsBuilder.fromUriString(getServiceBaseUrl()).path(\\\"/\\\").toUriString();\\n    }\\n\\n    protected String getServiceBaseUrl() {\\n        String baseUrl = instance.getServiceBaseUrl();\\n\\n        if (!StringUtils.isEmpty(baseUrl)) {\\n            return baseUrl;\\n        }\\n\\n        if (getLocalServerPort() == null) {\\n            throw new IllegalStateException(\\\"couldn't determine local port. Please set spring.boot.admin.client.instance.service-base-url.\\\");\\n        }\\n\\n        return UriComponentsBuilder.newInstance()\\n                                   .scheme(getScheme(server.getSsl()))\\n                                   .host(getServiceHost())\\n                                   .port(getLocalServerPort())\\n                                   .toUriString();\\n    }\\n\\n    protected String getManagementUrl() {\\n        if (instance.getManagementUrl() != null) {\\n            return instance.getManagementUrl();\\n        }\\n\\n        return UriComponentsBuilder.fromUriString(getManagementBaseUrl())\\n                                   .path(\\\"/\\\")\\n                                   .path(getEndpointsWebPath())\\n                                   .toUriString();\\n    }\\n\\n    protected String getManagementBaseUrl() {\\n        String baseUrl = instance.getManagementBaseUrl();\\n\\n        if (!StringUtils.isEmpty(baseUrl)) {\\n            return baseUrl;\\n        }\\n\\n        if (isManagementPortEqual()) {\\n            return this.getServiceUrl();\\n        }\\n\\n        Ssl ssl = management.getSsl() != null ? management.getSsl() : server.getSsl();\\n        return UriComponentsBuilder.newInstance()\\n                                   .scheme(getScheme(ssl))\\n                                   .host(getManagementHost())\\n                                   .port(getLocalManagementPort())\\n                                   .toUriString();\\n    }\\n\\n    protected boolean isManagementPortEqual() {\\n        return getLocalManagementPort() == null || getLocalManagementPort().equals(getLocalServerPort());\\n    }\\n\\n    protected String getEndpointsWebPath() {\\n        return webEndpoint.getBasePath();\\n    }\\n\\n    protected String getHealthUrl() {\\n        if (instance.getHealthUrl() != null) {\\n            return instance.getHealthUrl();\\n        }\\n        return UriComponentsBuilder.fromHttpUrl(getManagementBaseUrl())\\n                                   .path(\\\"/\\\")\\n                                   .path(getHealthEndpointPath())\\n                                   .toUriString();\\n    }\\n\\n    protected Map<String, String> getMetadata() {\\n        Map<String, String> metadata = new LinkedHashMap<>();\\n        metadata.putAll(metadataContributor.getMetadata());\\n        metadata.putAll(instance.getMetadata());\\n        return metadata;\\n    }\\n\\n    protected String getServiceHost() {\\n        InetAddress address = server.getAddress();\\n        if (address == null) {\\n            address = getLocalHost();\\n        }\\n        return getHost(address);\\n    }\\n\\n    protected String getManagementHost() {\\n        InetAddress address = management.getAddress();\\n        if (address != null) {\\n            return getHost(address);\\n        }\\n        return getServiceHost();\\n    }\\n\\n    protected InetAddress getLocalHost() {\\n        try {\\n            return InetAddress.getLocalHost();\\n        } catch (UnknownHostException ex) {\\n            throw new IllegalArgumentException(ex.getMessage(), ex);\\n        }\\n    }\\n\\n    protected Integer getLocalServerPort() {\\n        return localServerPort;\\n    }\\n\\n    protected Integer getLocalManagementPort() {\\n        return localManagementPort;\\n    }\\n\\n    protected String getHealthEndpointPath() {\\n        String health = pathMappedEndpoints.getPath(EndpointId.of(\\\"health\\\"));\\n        if (StringUtils.hasText(health)) {\\n            return health;\\n        }\\n        String status = pathMappedEndpoints.getPath(EndpointId.of(\\\"status\\\"));\\n        if (StringUtils.hasText(status)) {\\n            return status;\\n        }\\n        throw new IllegalStateException(\\\"Either health or status endpoint must be enabled!\\\");\\n    }\\n\\n    protected String getScheme(Ssl ssl) {\\n        return ssl != null && ssl.isEnabled() ? \\\"https\\\" : \\\"http\\\";\\n    }\\n\\n    protected String getHost(InetAddress address) {\\n        return instance.isPreferIp() ? address.getHostAddress() : address.getCanonicalHostName();\\n    }\\n\\n    @EventListener\\n    public void onWebServerInitialized(WebServerInitializedEvent event) {\\n        String name = event.getApplicationContext().getServerNamespace();\\n        if (\\\"server\\\".equals(name) || !StringUtils.hasText(name)) {\\n            localServerPort = event.getWebServer().getPort();\",\"usage\":{\"bytes\":8280,\"elapsed_seconds\":0.000464258948341012}},\"scenario_id\":\"original_task\",\"semantic_category\":\"success\",\"sequence\":2,\"status\":\"ok\",\"tool\":\"inspect_source\",\"within_budget\":true}],\"questions\":[{\"acquisition\":\"not_needed\",\"attempted_sequences\":[1,2],\"evidence\":[{\"end_line\":48,\"source_id\":\"test\",\"start_line\":45},{\"end_line\":206,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":196},{\"end_line\":54,\"source_id\":\"test\",\"start_line\":54}],\"goal_indexes\":[0],\"impact\":\"Exact hidden declaration/stub values are not needed: production getHealthUrl requires pathMappedEndpoints.getPath(health) to return the health path; visible assertions plus production behavior determine the expected health URL.\",\"origin\":\"EXTRACT\",\"question\":\"The masked region at test lines 45-46 leaves `pathMappedEndpoints` undeclared in the visible source; its type, initialization, stub values, and any verification are not established.\",\"question_id\":\"q1\",\"rationale\":\"The masked test setup hides the pathMappedEndpoints declaration, but DefaultApplicationFactory uses PathMappedEndpoints only to obtain the health or status endpoint path. With the expected health URL, the required behavior is determined and exact stub text is nonblocking.\",\"state\":\"nonblocking\"},{\"acquisition\":\"not_needed\",\"attempted_sequences\":[2],\"evidence\":[{\"end_line\":77,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":70},{\"end_line\":118,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":109},{\"end_line\":129,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":120},{\"end_line\":145,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":139},{\"end_line\":155,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":147},{\"end_line\":206,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":196}],\"goal_indexes\":[0],\"impact\":\"Confirms DefaultApplicationFactory URL flow: managementUrl uses the management base plus the web endpoint base path; when the local management port is null or equal, the management base is the service URL; healthUrl uses the management base plus the health endpoint path. Under the visible input this supports the expected managementUrl and healthUrl.\",\"origin\":\"EXTRACT\",\"question\":\"The DefaultApplicationFactory superclass and its exact use of PathMappedEndpoints, WebEndpointProperties, and server/management properties are not provided, so the conditional dependency for managementUrl and healthUrl cannot be confirmed.\",\"question_id\":\"q2\",\"rationale\":\"The production source was read directly. createApplication calls getHealthUrl, getManagementUrl, and getServiceUrl; getManagementBaseUrl falls back to getServiceUrl when the management port is null/equal; getEndpointsWebPath returns webEndpoint.getBasePath(); getHealthUrl appends the pathMappedEndpoints health path.\",\"state\":\"resolved\"},{\"acquisition\":\"not_needed\",\"attempted_sequences\":[1,2],\"evidence\":[{\"end_line\":50,\"source_id\":\"mut\",\"start_line\":43},{\"end_line\":89,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":83},{\"end_line\":77,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":70},{\"end_line\":55,\"source_id\":\"test\",\"start_line\":49}],\"goal_indexes\":[0],\"impact\":\"The production flow identifies the likely behavioral boundary: CloudFoundryApplicationFactory overrides getServiceBaseUrl using the first URI, while DefaultApplicationFactory appends a trailing slash and derives management/health URLs. Exact hidden mutation labeling is not needed for downstream behavior.\",\"origin\":\"EXTRACT\",\"question\":\"No visible evidence establishes whether the mutation boundary is getServiceBaseUrl, URI ordering, URL joining, or another behavior; the listed candidates remain working hypotheses.\",\"question_id\":\"q3\",\"rationale\":\"Production behavior shows CloudFoundryApplicationFactory choosing the first URI and prefixing it with http://, while DefaultApplicationFactory appends / for the service URL. The exact hidden mutation boundary remains hidden but is nonblocking because the required behavior is observed.\",\"state\":\"nonblocking\"},{\"acquisition\":\"not_needed\",\"attempted_sequences\":[2],\"evidence\":[{\"end_line\":50,\"source_id\":\"mut\",\"start_line\":43},{\"end_line\":49,\"source_id\":\"test\",\"start_line\":49}],\"goal_indexes\":[0],\"impact\":\"Empty URI fallback is not exercised by the visible input; production returns null there, but the test uses a singleton nonempty URI, so this branch does not affect the expected assertions.\",\"origin\":\"EXTRACT\",\"question\":\"The empty-URI branch in getServiceBaseUrl is not exercised by the visible non-empty URI input, so expected fallback behavior and its interaction with DefaultApplicationFactory are unresolved.\",\"question_id\":\"q4\",\"rationale\":\"CloudFoundryApplicationFactory returns null for an empty URI list, but the visible test sets a singleton nonempty URI. Thus the branch is unexercised and does not alter the asserted service, management, or health URLs.\",\"state\":\"nonblocking\"},{\"acquisition\":\"not_needed\",\"attempted_sequences\":[2],\"evidence\":[{\"end_line\":59,\"source_id\":\"test\",\"start_line\":58},{\"end_line\":77,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":70},{\"end_line\":161,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":157}],\"goal_indexes\":[0],\"impact\":\"Exact hidden Mockito call counts or verification targets are not needed; production behavior and visible assertions determine the expected service, management, health, and metadata outputs.\",\"origin\":\"EXTRACT\",\"question\":\"Imports, test name, and final assertions alone do not establish any hidden Mockito call count or verification target.\",\"question_id\":\"q5\",\"rationale\":\"The production helpers establish the observable output values used by the assertions. Exact hidden verification text or call counts are not required to explain those values.\",\"state\":\"nonblocking\"}],\"source_line_index\":{\"mut\":[{\"line\":1,\"text\":\"/*\"},{\"line\":2,\"text\":\" * Copyright 2014-2018 the original author or authors.\"},{\"line\":3,\"text\":\" *\"},{\"line\":4,\"text\":\" * Licensed under the Apache License, Version 2.0 (the \\\"License\\\");\"},{\"line\":5,\"text\":\" * you may not use this file except in compliance with the License.\"},{\"line\":6,\"text\":\" * You may obtain a copy of the License at\"},{\"line\":7,\"text\":\" *\"},{\"line\":8,\"text\":\" *     http://www.apache.org/licenses/LICENSE-2.0\"},{\"line\":9,\"text\":\" *\"},{\"line\":10,\"text\":\" * Unless required by applicable law or agreed to in writing, software\"},{\"line\":11,\"text\":\" * distributed under the License is distributed on an \\\"AS IS\\\" BASIS,\"},{\"line\":12,\"text\":\" * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\"},{\"line\":13,\"text\":\" * See the License for the specific language governing permissions and\"},{\"line\":14,\"text\":\" * limitations under the License.\"},{\"line\":15,\"text\":\" */\"},{\"line\":16,\"text\":\"\"},{\"line\":17,\"text\":\"package de.codecentric.boot.admin.client.registration;\"},{\"line\":18,\"text\":\"\"},{\"line\":19,\"text\":\"import de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties;\"},{\"line\":20,\"text\":\"import de.codecentric.boot.admin.client.config.InstanceProperties;\"},{\"line\":21,\"text\":\"import de.codecentric.boot.admin.client.registration.metadata.MetadataContributor;\"},{\"line\":22,\"text\":\"\"},{\"line\":23,\"text\":\"import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;\"},{\"line\":24,\"text\":\"import org.springframework.boot.actuate.autoconfigure.web.server.ManagementServerProperties;\"},{\"line\":25,\"text\":\"import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\"},{\"line\":26,\"text\":\"import org.springframework.boot.autoconfigure.web.ServerProperties;\"},{\"line\":27,\"text\":\"\"},{\"line\":28,\"text\":\"public class CloudFoundryApplicationFactory extends DefaultApplicationFactory {\"},{\"line\":29,\"text\":\"    private final CloudFoundryApplicationProperties cfApplicationProperties;\"},{\"line\":30,\"text\":\"\"},{\"line\":31,\"text\":\"    public CloudFoundryApplicationFactory(InstanceProperties instance,\"},{\"line\":32,\"text\":\"                                          ManagementServerProperties management,\"},{\"line\":33,\"text\":\"                                          ServerProperties server,\"},{\"line\":34,\"text\":\"                                          PathMappedEndpoints pathMappedEndpoints,\"},{\"line\":35,\"text\":\"                                          WebEndpointProperties webEndpoint,\"},{\"line\":36,\"text\":\"                                          MetadataContributor metadataContributor,\"},{\"line\":37,\"text\":\"                                          CloudFoundryApplicationProperties cfApplicationProperties) {\"},{\"line\":38,\"text\":\"        super(instance, management, server, pathMappedEndpoints, webEndpoint, metadataContributor);\"},{\"line\":39,\"text\":\"        this.cfApplicationProperties = cfApplicationProperties;\"},{\"line\":40,\"text\":\"    }\"},{\"line\":41,\"text\":\"\"},{\"line\":42,\"text\":\"    @Override\"},{\"line\":43,\"text\":\"    protected String getServiceBaseUrl() {\"},{\"line\":44,\"text\":\"        if (cfApplicationProperties.getUris().isEmpty()) {\"},{\"line\":45,\"text\":\"            return null;\"},{\"line\":46,\"text\":\"        }\"},{\"line\":47,\"text\":\"\"},{\"line\":48,\"text\":\"        String uri = cfApplicationProperties.getUris().get(0);\"},{\"line\":49,\"text\":\"        return \\\"http://\\\" + uri;\"},{\"line\":50,\"text\":\"    }\"},{\"line\":51,\"text\":\"}\"}],\"test\":[{\"line\":1,\"text\":\"/*\"},{\"line\":2,\"text\":\" * Copyright 2014-2018 the original author or authors.\"},{\"line\":3,\"text\":\" *\"},{\"line\":4,\"text\":\" * Licensed under the Apache License, Version 2.0 (the \\\"License\\\");\"},{\"line\":5,\"text\":\" * you may not use this file except in compliance with the License.\"},{\"line\":6,\"text\":\" * You may obtain a copy of the License at\"},{\"line\":7,\"text\":\" *\"},{\"line\":8,\"text\":\" *     http://www.apache.org/licenses/LICENSE-2.0\"},{\"line\":9,\"text\":\" *\"},{\"line\":10,\"text\":\" * Unless required by applicable law or agreed to in writing, software\"},{\"line\":11,\"text\":\" * distributed under the License is distributed on an \\\"AS IS\\\" BASIS,\"},{\"line\":12,\"text\":\" * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\"},{\"line\":13,\"text\":\" * See the License for the specific language governing permissions and\"},{\"line\":14,\"text\":\" * limitations under the License.\"},{\"line\":15,\"text\":\" */\"},{\"line\":16,\"text\":\"\"},{\"line\":17,\"text\":\"package de.codecentric.boot.admin.client.registration;\"},{\"line\":18,\"text\":\"\"},{\"line\":19,\"text\":\"import static java.util.Collections.singletonList;\"},{\"line\":20,\"text\":\"import static java.util.Collections.singletonMap;\"},{\"line\":21,\"text\":\"import static org.junit.Assert.assertEquals;\"},{\"line\":22,\"text\":\"import static org.mockito.Mockito.mock;\"},{\"line\":23,\"text\":\"import static org.mockito.Mockito.verify;\"},{\"line\":24,\"text\":\"import static org.mockito.Mockito.when;\"},{\"line\":25,\"text\":\"\"},{\"line\":26,\"text\":\"import de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties;\"},{\"line\":27,\"text\":\"import de.codecentric.boot.admin.client.config.InstanceProperties;\"},{\"line\":28,\"text\":\"import org.junit.Test;\"},{\"line\":29,\"text\":\"import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;\"},{\"line\":30,\"text\":\"import org.springframework.boot.actuate.autoconfigure.web.server.ManagementServerProperties;\"},{\"line\":31,\"text\":\"import org.springframework.boot.actuate.endpoint.EndpointId;\"},{\"line\":32,\"text\":\"import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\"},{\"line\":33,\"text\":\"import org.springframework.boot.autoconfigure.web.ServerProperties;\"},{\"line\":34,\"text\":\"\"},{\"line\":35,\"text\":\"public class CloudFoundryApplicationFactoryTest {\"},{\"line\":36,\"text\":\"\"},{\"line\":37,\"text\":\"    @Test\"},{\"line\":38,\"text\":\"    public void should_use_application_uri() {\"},{\"line\":39,\"text\":\"        InstanceProperties instanceProperties = new InstanceProperties();\"},{\"line\":40,\"text\":\"        instanceProperties.setName(\\\"test\\\");\"},{\"line\":41,\"text\":\"        ServerProperties server = new ServerProperties();\"},{\"line\":42,\"text\":\"        ManagementServerProperties management = new ManagementServerProperties();\"},{\"line\":43,\"text\":\"        WebEndpointProperties webEndpoint = new WebEndpointProperties();\"},{\"line\":44,\"text\":\"        CloudFoundryApplicationProperties cfApplicationProperties = new CloudFoundryApplicationProperties();\"},{\"line\":45,\"text\":\"        // === MOCK-STUB-START ===\"},{\"line\":46,\"text\":\"        // === MOCK-STUB-END ===\"},{\"line\":47,\"text\":\"        CloudFoundryApplicationFactory factory = new CloudFoundryApplicationFactory(instanceProperties, management,\"},{\"line\":48,\"text\":\"            server, pathMappedEndpoints, webEndpoint, () -> singletonMap(\\\"contributor\\\", \\\"test\\\"), cfApplicationProperties);\"},{\"line\":49,\"text\":\"        cfApplicationProperties.setUris(singletonList(\\\"application/Uppercase\\\"));\"},{\"line\":50,\"text\":\"\"},{\"line\":51,\"text\":\"        Application app = factory.createApplication();\"},{\"line\":52,\"text\":\"\"},{\"line\":53,\"text\":\"        assertEquals(\\\"http://application/Uppercase/actuator\\\", app.getManagementUrl());\"},{\"line\":54,\"text\":\"        assertEquals(\\\"http://application/Uppercase/actuator/health\\\", app.getHealthUrl());\"},{\"line\":55,\"text\":\"        assertEquals(\\\"http://application/Uppercase/\\\", app.getServiceUrl());\"},{\"line\":56,\"text\":\"        assertEquals(\\\"test\\\", app.getName());\"},{\"line\":57,\"text\":\"        assertEquals(\\\"test\\\", app.getMetadata().get(\\\"contributor\\\"));\"},{\"line\":58,\"text\":\"        // === VERIFY-START ===\"},{\"line\":59,\"text\":\"        // === VERIFY-END ===\"},{\"line\":60,\"text\":\"    }\"},{\"line\":61,\"text\":\"\"},{\"line\":62,\"text\":\"}\"}]},\"stage\":\"CONSTRUCT\",\"visible_task\":{\"case_id\":\"de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri@d0085edf\",\"execution_context\":{\"runtime_name\":\"openjdk-javac\",\"runtime_version\":\"11.0.31\",\"test_framework\":\"JUnit\",\"test_framework_version\":null},\"input_policy\":{\"masking_contract\":\"java-dual-region-v1\",\"policy_id\":\"mock-spec-reviewed-frozen/v1\",\"protocol_version\":\"developer_realistic_workspace_v1\",\"visibility\":\"reviewed_frozen_sources\"},\"language\":\"java\",\"masked_test\":{\"end_line\":62,\"logical_path\":\"src/test/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactoryTest.java\",\"resolution_status\":\"partial\",\"source_id\":\"test\",\"start_line\":1,\"symbol\":\"de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri\",\"target_precision\":\"method\"},\"mut_source\":{\"end_line\":51,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactory.java\",\"resolution_status\":\"partial\",\"source_id\":\"mut\",\"start_line\":1,\"symbol\":\"de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactory\",\"target_precision\":\"class\"},\"permitted_interfaces\":[],\"schema_version\":\"mock-spec.task/v1\",\"sources\":[{\"logical_path\":\"src/test/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactoryTest.java\",\"role\":\"masked_test\",\"source_id\":\"test\"},{\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactory.java\",\"role\":\"mut\",\"source_id\":\"mut\"}],\"supporting_sources\":[]}}",
+      "role": "user"
+    }
+  ],
+  "instructions": "staged-scenario-inference-prompts/v0.5\nStage: CONSTRUCT. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. Infer conditional dependency constraints, not hidden Mock setup or hidden verification text. Imports, test names, and final assertions alone do not prove hidden behavior or counts; preserve unsupported details as unresolved. Preserve test_objectives as only the original visible goals; place newly inferred checks in verification_candidates. Every dependency constraint must state its condition, target call, parameter relationship, allowed return or exception, and relevant state effect. Require exact values, counts, or order only when cited evidence supports them. Describe supported same-scenario variations, or explicitly say none were identified without claiming uniqueness. Keep expected_interactions assertion_policy as not_implied. A test name or an implementation branch alone does not make an interaction required. For every claim_basis and critical_behavior, classify semantic_role as dependency_contract, mut_path_condition, or test_objective, and state whether support is evidence or assumption. Evidence support requires formal evidence IDs; assumption support requires an explicit reason and no evidence IDs. Each critical behavior must point by zero-based formal_claim_index to the matching dependency constraint, scenario hypothesis, or test objective for its role. Map every remaining blocking and nonblocking unknown through claim_basis target unresolved or nonblocking_unknown and its zero-based index. Populate spec as a self-contained consumer interpretation: fixed inputs, replacement bindings, preserved real code, dependency semantics, premise-to-constraint links, each goal's coverage, allowed alternatives, assumptions and unknown impacts. Use ALTERNATIVES with selected_scenario_id null for multiple positively supported legal branches. Equal final outputs or absence of counterevidence does not establish their legality. AMBIGUOUS means unresolved material ambiguity, never mere multiple legal values. Real-code-only objectives may add no dependency constraint. Do not assume that setting a mock to satisfy an assertion respects its API. Check applicable dependency evidence and retain conflicts. The frozen MUT is only the stated regression reference, not proven business truth. If a material gap emerges, return investigation_requests with original goal_indexes and impacts (contract/spec may be null); QUERY resumes under the SAME budget. Preserve open questions in spec.unknowns verbatim with their impact; no log-only conditions. A partial specification is useful but is not ready for generation.",
+  "max_output_tokens": 24576,
+  "store": false,
+  "text": {
+    "format": {
+      "type": "json_schema",
+      "name": "final_output",
+      "schema": {
+        "$defs": {
+          "AllowedVariation": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Id",
+                "type": "string"
+              },
+              "statement": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Statement",
+                "type": "string"
+              },
+              "scenario_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "minItems": 1,
+                "title": "Scenario Ids",
+                "type": "array"
+              },
+              "constraint_indexes": {
+                "items": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "minItems": 1,
+                "title": "Constraint Indexes",
+                "type": "array"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              },
+              "premise_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Premise Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "id",
+              "statement",
+              "scenario_ids",
+              "constraint_indexes",
+              "evidence_ids",
+              "premise_ids"
+            ],
+            "title": "AllowedVariation",
+            "type": "object"
+          },
+          "BranchDecision": {
+            "additionalProperties": false,
+            "properties": {
+              "scenario_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Scenario Id",
+                "type": "string"
+              },
+              "disposition": {
+                "enum": [
+                  "allowed",
+                  "unresolved"
+                ],
+                "title": "Disposition",
+                "type": "string"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              },
+              "premise_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Premise Ids",
+                "type": "array"
+              },
+              "unknown_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Unknown Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "scenario_id",
+              "disposition",
+              "rationale",
+              "evidence_ids",
+              "premise_ids",
+              "unknown_ids"
+            ],
+            "title": "BranchDecision",
+            "type": "object"
+          },
+          "Claim": {
+            "additionalProperties": false,
+            "properties": {
+              "statement": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Statement",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "required",
+                  "candidate",
+                  "unknown"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "scenario_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Scenario Ids",
+                "type": "array"
+              },
+              "condition": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Condition"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "statement",
+              "status",
+              "scenario_ids",
+              "condition",
+              "evidence_ids"
+            ],
+            "title": "Claim",
+            "type": "object"
+          },
+          "ClaimBasis": {
+            "additionalProperties": false,
+            "properties": {
+              "claim": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Claim",
+                "type": "string"
+              },
+              "basis": {
+                "enum": [
+                  "task_requirement",
+                  "implementation_fact",
+                  "scenario_inference"
+                ],
+                "title": "Basis",
+                "type": "string"
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "selection_rationale",
+                      "allowed_variation",
+                      "unresolved",
+                      "nonblocking_unknown",
+                      "formal_claim"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Target"
+              },
+              "target_index": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Target Index"
+              },
+              "semantic_role": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "dependency_contract",
+                      "mut_path_condition",
+                      "test_objective"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Semantic Role"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              },
+              "support": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "evidence",
+                      "assumption"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Support"
+              },
+              "assumption_reason": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Assumption Reason"
+              }
+            },
+            "required": [
+              "claim",
+              "basis",
+              "target",
+              "target_index",
+              "semantic_role",
+              "evidence_ids",
+              "support",
+              "assumption_reason"
+            ],
+            "title": "ClaimBasis",
+            "type": "object"
+          },
+          "ConstraintBasis": {
+            "additionalProperties": false,
+            "properties": {
+              "constraint_index": {
+                "minimum": 0,
+                "title": "Constraint Index",
+                "type": "integer"
+              },
+              "premise_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "minItems": 1,
+                "title": "Premise Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "constraint_index",
+              "premise_ids"
+            ],
+            "title": "ConstraintBasis",
+            "type": "object"
+          },
+          "CriticalBehavior": {
+            "additionalProperties": false,
+            "properties": {
+              "behavior": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Behavior",
+                "type": "string"
+              },
+              "observation": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Observation",
+                "type": "string"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              },
+              "semantic_role": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "dependency_contract",
+                      "mut_path_condition",
+                      "test_objective"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Semantic Role"
+              },
+              "formal_claim_index": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Formal Claim Index"
+              },
+              "support": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "evidence",
+                      "assumption"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Support"
+              },
+              "assumption_reason": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Assumption Reason"
+              }
+            },
+            "required": [
+              "behavior",
+              "observation",
+              "evidence_ids",
+              "semantic_role",
+              "formal_claim_index",
+              "support",
+              "assumption_reason"
+            ],
+            "title": "CriticalBehavior",
+            "type": "object"
+          },
+          "EvidenceSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "source_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Source Id",
+                "type": "string"
+              },
+              "start_line": {
+                "minimum": 1,
+                "title": "Start Line",
+                "type": "integer"
+              },
+              "end_line": {
+                "minimum": 1,
+                "title": "End Line",
+                "type": "integer"
+              },
+              "id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Id",
+                "type": "string"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "start_line",
+              "end_line",
+              "id",
+              "rationale"
+            ],
+            "title": "EvidenceSelection",
+            "type": "object"
+          },
+          "FixedInput": {
+            "additionalProperties": false,
+            "properties": {
+              "statement": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Statement",
+                "type": "string"
+              },
+              "goal_indexes": {
+                "items": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "minItems": 1,
+                "title": "Goal Indexes",
+                "type": "array"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "minItems": 1,
+                "title": "Evidence Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "statement",
+              "goal_indexes",
+              "evidence_ids"
+            ],
+            "title": "FixedInput",
+            "type": "object"
+          },
+          "GoalCoverage": {
+            "additionalProperties": false,
+            "properties": {
+              "goal_index": {
+                "minimum": 0,
+                "title": "Goal Index",
+                "type": "integer"
+              },
+              "disposition": {
+                "enum": [
+                  "constrained",
+                  "real_code",
+                  "blocked"
+                ],
+                "title": "Disposition",
+                "type": "string"
+              },
+              "constraint_indexes": {
+                "items": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "title": "Constraint Indexes",
+                "type": "array"
+              },
+              "unknown_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Unknown Ids",
+                "type": "array"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "minItems": 1,
+                "title": "Evidence Ids",
+                "type": "array"
+              },
+              "premise_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Premise Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "goal_index",
+              "disposition",
+              "constraint_indexes",
+              "unknown_ids",
+              "rationale",
+              "evidence_ids",
+              "premise_ids"
+            ],
+            "title": "GoalCoverage",
+            "type": "object"
+          },
+          "Hypothesis": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Id",
+                "type": "string"
+              },
+              "description": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Description",
+                "type": "string"
+              },
+              "condition": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Condition",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "candidate",
+                  "unknown"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "id",
+              "description",
+              "condition",
+              "status",
+              "evidence_ids"
+            ],
+            "title": "Hypothesis",
+            "type": "object"
+          },
+          "Interaction": {
+            "additionalProperties": false,
+            "properties": {
+              "statement": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Statement",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "required",
+                  "candidate",
+                  "unknown"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "scenario_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Scenario Ids",
+                "type": "array"
+              },
+              "condition": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Condition"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              },
+              "assertion_policy": {
+                "const": "not_implied",
+                "title": "Assertion Policy",
+                "type": "string"
+              }
+            },
+            "required": [
+              "statement",
+              "status",
+              "scenario_ids",
+              "condition",
+              "evidence_ids",
+              "assertion_policy"
+            ],
+            "title": "Interaction",
+            "type": "object"
+          },
+          "InvestigationRequest": {
+            "additionalProperties": false,
+            "properties": {
+              "question": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Question",
+                "type": "string"
+              },
+              "goal_indexes": {
+                "items": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "minItems": 1,
+                "title": "Goal Indexes",
+                "type": "array"
+              },
+              "impact": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Impact",
+                "type": "string"
+              }
+            },
+            "required": [
+              "question",
+              "goal_indexes",
+              "impact"
+            ],
+            "title": "InvestigationRequest",
+            "type": "object"
+          },
+          "Premise": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Id",
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "implementation_fact",
+                  "test_requirement",
+                  "dependency_semantics",
+                  "assumption"
+                ],
+                "title": "Kind",
+                "type": "string"
+              },
+              "statement": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Statement",
+                "type": "string"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              },
+              "assumption_impact": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Assumption Impact"
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "statement",
+              "evidence_ids",
+              "assumption_impact"
+            ],
+            "title": "Premise",
+            "type": "object"
+          },
+          "PreservedRealLogic": {
+            "additionalProperties": false,
+            "properties": {
+              "statement": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Statement",
+                "type": "string"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              },
+              "premise_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Premise Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "statement",
+              "evidence_ids",
+              "premise_ids"
+            ],
+            "title": "PreservedRealLogic",
+            "type": "object"
+          },
+          "ReplacementBoundary": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Id",
+                "type": "string"
+              },
+              "target": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Target",
+                "type": "string"
+              },
+              "replaceable_behavior": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Replaceable Behavior",
+                "type": "string"
+              },
+              "preserved_behavior": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Preserved Behavior",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "confirmed",
+                  "assumed",
+                  "unresolved"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              },
+              "premise_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Premise Ids",
+                "type": "array"
+              },
+              "unknown_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Unknown Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "id",
+              "target",
+              "replaceable_behavior",
+              "preserved_behavior",
+              "status",
+              "evidence_ids",
+              "premise_ids",
+              "unknown_ids"
+            ],
+            "title": "ReplacementBoundary",
+            "type": "object"
+          },
+          "ScenarioContractSelection": {
+            "additionalProperties": false,
+            "description": "Formal contract wire DTO that changes only evidence representation.",
+            "properties": {
+              "schema_version": {
+                "const": "mock-spec.scenario/v0.1",
+                "title": "Schema Version",
+                "type": "string"
+              },
+              "case_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Case Id",
+                "type": "string"
+              },
+              "language": {
+                "enum": [
+                  "java",
+                  "python"
+                ],
+                "title": "Language",
+                "type": "string"
+              },
+              "test_objectives": {
+                "items": {
+                  "$ref": "#/$defs/Claim"
+                },
+                "minItems": 1,
+                "title": "Test Objectives",
+                "type": "array"
+              },
+              "scenario_hypotheses": {
+                "items": {
+                  "$ref": "#/$defs/Hypothesis"
+                },
+                "minItems": 1,
+                "title": "Scenario Hypotheses",
+                "type": "array"
+              },
+              "dependency_constraints": {
+                "items": {
+                  "$ref": "#/$defs/Claim"
+                },
+                "title": "Dependency Constraints",
+                "type": "array"
+              },
+              "expected_interactions": {
+                "items": {
+                  "$ref": "#/$defs/Interaction"
+                },
+                "title": "Expected Interactions",
+                "type": "array"
+              },
+              "verification_candidates": {
+                "items": {
+                  "$ref": "#/$defs/VerificationCandidate"
+                },
+                "title": "Verification Candidates",
+                "type": "array"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/EvidenceSelection"
+                },
+                "title": "Evidence",
+                "type": "array"
+              },
+              "uncertainty": {
+                "items": {
+                  "$ref": "#/$defs/Claim"
+                },
+                "title": "Uncertainty",
+                "type": "array"
+              }
+            },
+            "required": [
+              "schema_version",
+              "case_id",
+              "language",
+              "test_objectives",
+              "scenario_hypotheses",
+              "dependency_constraints",
+              "expected_interactions",
+              "verification_candidates",
+              "evidence",
+              "uncertainty"
+            ],
+            "title": "ScenarioContractSelection",
+            "type": "object"
+          },
+          "SpecConflict": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Id",
+                "type": "string"
+              },
+              "statement": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Statement",
+                "type": "string"
+              },
+              "impact": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Impact",
+                "type": "string"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "minItems": 1,
+                "title": "Evidence Ids",
+                "type": "array"
+              },
+              "premise_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "minItems": 1,
+                "title": "Premise Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "id",
+              "statement",
+              "impact",
+              "evidence_ids",
+              "premise_ids"
+            ],
+            "title": "SpecConflict",
+            "type": "object"
+          },
+          "SpecSemantics": {
+            "additionalProperties": false,
+            "properties": {
+              "schema_version": {
+                "const": "staged-spec-semantics/v0.1",
+                "title": "Schema Version",
+                "type": "string"
+              },
+              "delivery_status": {
+                "enum": [
+                  "ready",
+                  "partial",
+                  "conflict"
+                ],
+                "title": "Delivery Status",
+                "type": "string"
+              },
+              "fixed_inputs": {
+                "items": {
+                  "$ref": "#/$defs/FixedInput"
+                },
+                "minItems": 1,
+                "title": "Fixed Inputs",
+                "type": "array"
+              },
+              "replacement_boundary": {
+                "items": {
+                  "$ref": "#/$defs/ReplacementBoundary"
+                },
+                "title": "Replacement Boundary",
+                "type": "array"
+              },
+              "preserved_real_logic": {
+                "items": {
+                  "$ref": "#/$defs/PreservedRealLogic"
+                },
+                "title": "Preserved Real Logic",
+                "type": "array"
+              },
+              "premises": {
+                "items": {
+                  "$ref": "#/$defs/Premise"
+                },
+                "minItems": 1,
+                "title": "Premises",
+                "type": "array"
+              },
+              "constraint_basis": {
+                "items": {
+                  "$ref": "#/$defs/ConstraintBasis"
+                },
+                "title": "Constraint Basis",
+                "type": "array"
+              },
+              "branches": {
+                "items": {
+                  "$ref": "#/$defs/BranchDecision"
+                },
+                "minItems": 1,
+                "title": "Branches",
+                "type": "array"
+              },
+              "goal_coverage": {
+                "items": {
+                  "$ref": "#/$defs/GoalCoverage"
+                },
+                "title": "Goal Coverage",
+                "type": "array"
+              },
+              "unknowns": {
+                "items": {
+                  "$ref": "#/$defs/SpecUnknown"
+                },
+                "title": "Unknowns",
+                "type": "array"
+              },
+              "allowed_variations": {
+                "items": {
+                  "$ref": "#/$defs/AllowedVariation"
+                },
+                "title": "Allowed Variations",
+                "type": "array"
+              },
+              "conflicts": {
+                "items": {
+                  "$ref": "#/$defs/SpecConflict"
+                },
+                "title": "Conflicts",
+                "type": "array"
+              }
+            },
+            "required": [
+              "schema_version",
+              "delivery_status",
+              "fixed_inputs",
+              "replacement_boundary",
+              "preserved_real_logic",
+              "premises",
+              "constraint_basis",
+              "branches",
+              "goal_coverage",
+              "unknowns",
+              "allowed_variations",
+              "conflicts"
+            ],
+            "title": "SpecSemantics",
+            "type": "object"
+          },
+          "SpecUnknown": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Id",
+                "type": "string"
+              },
+              "question": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Question",
+                "type": "string"
+              },
+              "impact": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Impact",
+                "type": "string"
+              },
+              "disposition": {
+                "enum": [
+                  "blocking",
+                  "nonblocking",
+                  "out_of_scope"
+                ],
+                "title": "Disposition",
+                "type": "string"
+              },
+              "goal_indexes": {
+                "items": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "title": "Goal Indexes",
+                "type": "array"
+              },
+              "constraint_indexes": {
+                "items": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "title": "Constraint Indexes",
+                "type": "array"
+              },
+              "scenario_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Scenario Ids",
+                "type": "array"
+              },
+              "formal_uncertainty_indexes": {
+                "items": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "title": "Formal Uncertainty Indexes",
+                "type": "array"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "question",
+              "impact",
+              "disposition",
+              "goal_indexes",
+              "constraint_indexes",
+              "scenario_ids",
+              "formal_uncertainty_indexes",
+              "rationale"
+            ],
+            "title": "SpecUnknown",
+            "type": "object"
+          },
+          "VerificationCandidate": {
+            "additionalProperties": false,
+            "properties": {
+              "statement": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Statement",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "candidate",
+                  "unknown"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "scenario_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Scenario Ids",
+                "type": "array"
+              },
+              "condition": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Condition"
+              },
+              "evidence_ids": {
+                "items": {
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "type": "string"
+                },
+                "title": "Evidence Ids",
+                "type": "array"
+              }
+            },
+            "required": [
+              "statement",
+              "status",
+              "scenario_ids",
+              "condition",
+              "evidence_ids"
+            ],
+            "title": "VerificationCandidate",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "result_status": {
+            "enum": [
+              "SELECTED",
+              "ALTERNATIVES",
+              "AMBIGUOUS",
+              "INCONCLUSIVE"
+            ],
+            "title": "Result Status",
+            "type": "string"
+          },
+          "selected_scenario_id": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Scenario Id"
+          },
+          "selection_rationale": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Selection Rationale",
+            "type": "string"
+          },
+          "claim_basis": {
+            "items": {
+              "$ref": "#/$defs/ClaimBasis"
+            },
+            "title": "Claim Basis",
+            "type": "array"
+          },
+          "critical_behaviors": {
+            "items": {
+              "$ref": "#/$defs/CriticalBehavior"
+            },
+            "maxItems": 3,
+            "title": "Critical Behaviors",
+            "type": "array"
+          },
+          "allowed_variations": {
+            "items": {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            "title": "Allowed Variations",
+            "type": "array"
+          },
+          "unresolved": {
+            "items": {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            "title": "Unresolved",
+            "type": "array"
+          },
+          "nonblocking_unknowns": {
+            "items": {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            "title": "Nonblocking Unknowns",
+            "type": "array"
+          },
+          "spec": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "schema_version": {
+                    "const": "staged-spec-semantics/v0.1",
+                    "title": "Schema Version",
+                    "type": "string"
+                  },
+                  "delivery_status": {
+                    "enum": [
+                      "ready",
+                      "partial",
+                      "conflict"
+                    ],
+                    "title": "Delivery Status",
+                    "type": "string"
+                  },
+                  "fixed_inputs": {
+                    "items": {
+                      "$ref": "#/$defs/FixedInput"
+                    },
+                    "minItems": 1,
+                    "title": "Fixed Inputs",
+                    "type": "array"
+                  },
+                  "replacement_boundary": {
+                    "items": {
+                      "$ref": "#/$defs/ReplacementBoundary"
+                    },
+                    "title": "Replacement Boundary",
+                    "type": "array"
+                  },
+                  "preserved_real_logic": {
+                    "items": {
+                      "$ref": "#/$defs/PreservedRealLogic"
+                    },
+                    "title": "Preserved Real Logic",
+                    "type": "array"
+                  },
+                  "premises": {
+                    "items": {
+                      "$ref": "#/$defs/Premise"
+                    },
+                    "minItems": 1,
+                    "title": "Premises",
+                    "type": "array"
+                  },
+                  "constraint_basis": {
+                    "items": {
+                      "$ref": "#/$defs/ConstraintBasis"
+                    },
+                    "title": "Constraint Basis",
+                    "type": "array"
+                  },
+                  "branches": {
+                    "items": {
+                      "$ref": "#/$defs/BranchDecision"
+                    },
+                    "minItems": 1,
+                    "title": "Branches",
+                    "type": "array"
+                  },
+                  "goal_coverage": {
+                    "items": {
+                      "$ref": "#/$defs/GoalCoverage"
+                    },
+                    "title": "Goal Coverage",
+                    "type": "array"
+                  },
+                  "unknowns": {
+                    "items": {
+                      "$ref": "#/$defs/SpecUnknown"
+                    },
+                    "title": "Unknowns",
+                    "type": "array"
+                  },
+                  "allowed_variations": {
+                    "items": {
+                      "$ref": "#/$defs/AllowedVariation"
+                    },
+                    "title": "Allowed Variations",
+                    "type": "array"
+                  },
+                  "conflicts": {
+                    "items": {
+                      "$ref": "#/$defs/SpecConflict"
+                    },
+                    "title": "Conflicts",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "schema_version",
+                  "delivery_status",
+                  "fixed_inputs",
+                  "replacement_boundary",
+                  "preserved_real_logic",
+                  "premises",
+                  "constraint_basis",
+                  "branches",
+                  "goal_coverage",
+                  "unknowns",
+                  "allowed_variations",
+                  "conflicts"
+                ],
+                "title": "SpecSemantics",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "investigation_requests": {
+            "items": {
+              "$ref": "#/$defs/InvestigationRequest"
+            },
+            "title": "Investigation Requests",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "staged-construct/v0.3",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "contract": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Formal contract wire DTO that changes only evidence representation.",
+                "properties": {
+                  "schema_version": {
+                    "const": "mock-spec.scenario/v0.1",
+                    "title": "Schema Version",
+                    "type": "string"
+                  },
+                  "case_id": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Case Id",
+                    "type": "string"
+                  },
+                  "language": {
+                    "enum": [
+                      "java",
+                      "python"
+                    ],
+                    "title": "Language",
+                    "type": "string"
+                  },
+                  "test_objectives": {
+                    "items": {
+                      "$ref": "#/$defs/Claim"
+                    },
+                    "minItems": 1,
+                    "title": "Test Objectives",
+                    "type": "array"
+                  },
+                  "scenario_hypotheses": {
+                    "items": {
+                      "$ref": "#/$defs/Hypothesis"
+                    },
+                    "minItems": 1,
+                    "title": "Scenario Hypotheses",
+                    "type": "array"
+                  },
+                  "dependency_constraints": {
+                    "items": {
+                      "$ref": "#/$defs/Claim"
+                    },
+                    "title": "Dependency Constraints",
+                    "type": "array"
+                  },
+                  "expected_interactions": {
+                    "items": {
+                      "$ref": "#/$defs/Interaction"
+                    },
+                    "title": "Expected Interactions",
+                    "type": "array"
+                  },
+                  "verification_candidates": {
+                    "items": {
+                      "$ref": "#/$defs/VerificationCandidate"
+                    },
+                    "title": "Verification Candidates",
+                    "type": "array"
+                  },
+                  "evidence": {
+                    "items": {
+                      "$ref": "#/$defs/EvidenceSelection"
+                    },
+                    "title": "Evidence",
+                    "type": "array"
+                  },
+                  "uncertainty": {
+                    "items": {
+                      "$ref": "#/$defs/Claim"
+                    },
+                    "title": "Uncertainty",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "schema_version",
+                  "case_id",
+                  "language",
+                  "test_objectives",
+                  "scenario_hypotheses",
+                  "dependency_constraints",
+                  "expected_interactions",
+                  "verification_candidates",
+                  "evidence",
+                  "uncertainty"
+                ],
+                "title": "ScenarioContractSelection",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "result_status",
+          "selected_scenario_id",
+          "selection_rationale",
+          "claim_basis",
+          "critical_behaviors",
+          "allowed_variations",
+          "unresolved",
+          "nonblocking_unknowns",
+          "spec",
+          "investigation_requests",
+          "schema_version",
+          "contract"
+        ],
+        "title": "ConstructSelection",
+        "type": "object"
+      },
+      "strict": true
+    }
+  },
+  "tools": []
+}

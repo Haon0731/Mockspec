@@ -1,0 +1,133 @@
+{
+  "model": "deepseek-flash",
+  "include": [],
+  "input": [
+    {
+      "content": "{\"source_line_index\":{\"mut\":[{\"line\":1,\"text\":\"/*\"},{\"line\":2,\"text\":\" * Copyright 2014-2018 the original author or authors.\"},{\"line\":3,\"text\":\" *\"},{\"line\":4,\"text\":\" * Licensed under the Apache License, Version 2.0 (the \\\"License\\\");\"},{\"line\":5,\"text\":\" * you may not use this file except in compliance with the License.\"},{\"line\":6,\"text\":\" * You may obtain a copy of the License at\"},{\"line\":7,\"text\":\" *\"},{\"line\":8,\"text\":\" *     http://www.apache.org/licenses/LICENSE-2.0\"},{\"line\":9,\"text\":\" *\"},{\"line\":10,\"text\":\" * Unless required by applicable law or agreed to in writing, software\"},{\"line\":11,\"text\":\" * distributed under the License is distributed on an \\\"AS IS\\\" BASIS,\"},{\"line\":12,\"text\":\" * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\"},{\"line\":13,\"text\":\" * See the License for the specific language governing permissions and\"},{\"line\":14,\"text\":\" * limitations under the License.\"},{\"line\":15,\"text\":\" */\"},{\"line\":16,\"text\":\"\"},{\"line\":17,\"text\":\"package de.codecentric.boot.admin.client.registration;\"},{\"line\":18,\"text\":\"\"},{\"line\":19,\"text\":\"import de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties;\"},{\"line\":20,\"text\":\"import de.codecentric.boot.admin.client.config.InstanceProperties;\"},{\"line\":21,\"text\":\"import de.codecentric.boot.admin.client.registration.metadata.MetadataContributor;\"},{\"line\":22,\"text\":\"\"},{\"line\":23,\"text\":\"import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;\"},{\"line\":24,\"text\":\"import org.springframework.boot.actuate.autoconfigure.web.server.ManagementServerProperties;\"},{\"line\":25,\"text\":\"import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\"},{\"line\":26,\"text\":\"import org.springframework.boot.autoconfigure.web.ServerProperties;\"},{\"line\":27,\"text\":\"\"},{\"line\":28,\"text\":\"public class CloudFoundryApplicationFactory extends DefaultApplicationFactory {\"},{\"line\":29,\"text\":\"    private final CloudFoundryApplicationProperties cfApplicationProperties;\"},{\"line\":30,\"text\":\"\"},{\"line\":31,\"text\":\"    public CloudFoundryApplicationFactory(InstanceProperties instance,\"},{\"line\":32,\"text\":\"                                          ManagementServerProperties management,\"},{\"line\":33,\"text\":\"                                          ServerProperties server,\"},{\"line\":34,\"text\":\"                                          PathMappedEndpoints pathMappedEndpoints,\"},{\"line\":35,\"text\":\"                                          WebEndpointProperties webEndpoint,\"},{\"line\":36,\"text\":\"                                          MetadataContributor metadataContributor,\"},{\"line\":37,\"text\":\"                                          CloudFoundryApplicationProperties cfApplicationProperties) {\"},{\"line\":38,\"text\":\"        super(instance, management, server, pathMappedEndpoints, webEndpoint, metadataContributor);\"},{\"line\":39,\"text\":\"        this.cfApplicationProperties = cfApplicationProperties;\"},{\"line\":40,\"text\":\"    }\"},{\"line\":41,\"text\":\"\"},{\"line\":42,\"text\":\"    @Override\"},{\"line\":43,\"text\":\"    protected String getServiceBaseUrl() {\"},{\"line\":44,\"text\":\"        if (cfApplicationProperties.getUris().isEmpty()) {\"},{\"line\":45,\"text\":\"            return null;\"},{\"line\":46,\"text\":\"        }\"},{\"line\":47,\"text\":\"\"},{\"line\":48,\"text\":\"        String uri = cfApplicationProperties.getUris().get(0);\"},{\"line\":49,\"text\":\"        return \\\"http://\\\" + uri;\"},{\"line\":50,\"text\":\"    }\"},{\"line\":51,\"text\":\"}\"}],\"test\":[{\"line\":1,\"text\":\"/*\"},{\"line\":2,\"text\":\" * Copyright 2014-2018 the original author or authors.\"},{\"line\":3,\"text\":\" *\"},{\"line\":4,\"text\":\" * Licensed under the Apache License, Version 2.0 (the \\\"License\\\");\"},{\"line\":5,\"text\":\" * you may not use this file except in compliance with the License.\"},{\"line\":6,\"text\":\" * You may obtain a copy of the License at\"},{\"line\":7,\"text\":\" *\"},{\"line\":8,\"text\":\" *     http://www.apache.org/licenses/LICENSE-2.0\"},{\"line\":9,\"text\":\" *\"},{\"line\":10,\"text\":\" * Unless required by applicable law or agreed to in writing, software\"},{\"line\":11,\"text\":\" * distributed under the License is distributed on an \\\"AS IS\\\" BASIS,\"},{\"line\":12,\"text\":\" * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\"},{\"line\":13,\"text\":\" * See the License for the specific language governing permissions and\"},{\"line\":14,\"text\":\" * limitations under the License.\"},{\"line\":15,\"text\":\" */\"},{\"line\":16,\"text\":\"\"},{\"line\":17,\"text\":\"package de.codecentric.boot.admin.client.registration;\"},{\"line\":18,\"text\":\"\"},{\"line\":19,\"text\":\"import static java.util.Collections.singletonList;\"},{\"line\":20,\"text\":\"import static java.util.Collections.singletonMap;\"},{\"line\":21,\"text\":\"import static org.junit.Assert.assertEquals;\"},{\"line\":22,\"text\":\"import static org.mockito.Mockito.mock;\"},{\"line\":23,\"text\":\"import static org.mockito.Mockito.verify;\"},{\"line\":24,\"text\":\"import static org.mockito.Mockito.when;\"},{\"line\":25,\"text\":\"\"},{\"line\":26,\"text\":\"import de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties;\"},{\"line\":27,\"text\":\"import de.codecentric.boot.admin.client.config.InstanceProperties;\"},{\"line\":28,\"text\":\"import org.junit.Test;\"},{\"line\":29,\"text\":\"import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;\"},{\"line\":30,\"text\":\"import org.springframework.boot.actuate.autoconfigure.web.server.ManagementServerProperties;\"},{\"line\":31,\"text\":\"import org.springframework.boot.actuate.endpoint.EndpointId;\"},{\"line\":32,\"text\":\"import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\"},{\"line\":33,\"text\":\"import org.springframework.boot.autoconfigure.web.ServerProperties;\"},{\"line\":34,\"text\":\"\"},{\"line\":35,\"text\":\"public class CloudFoundryApplicationFactoryTest {\"},{\"line\":36,\"text\":\"\"},{\"line\":37,\"text\":\"    @Test\"},{\"line\":38,\"text\":\"    public void should_use_application_uri() {\"},{\"line\":39,\"text\":\"        InstanceProperties instanceProperties = new InstanceProperties();\"},{\"line\":40,\"text\":\"        instanceProperties.setName(\\\"test\\\");\"},{\"line\":41,\"text\":\"        ServerProperties server = new ServerProperties();\"},{\"line\":42,\"text\":\"        ManagementServerProperties management = new ManagementServerProperties();\"},{\"line\":43,\"text\":\"        WebEndpointProperties webEndpoint = new WebEndpointProperties();\"},{\"line\":44,\"text\":\"        CloudFoundryApplicationProperties cfApplicationProperties = new CloudFoundryApplicationProperties();\"},{\"line\":45,\"text\":\"        // === MOCK-STUB-START ===\"},{\"line\":46,\"text\":\"        // === MOCK-STUB-END ===\"},{\"line\":47,\"text\":\"        CloudFoundryApplicationFactory factory = new CloudFoundryApplicationFactory(instanceProperties, management,\"},{\"line\":48,\"text\":\"            server, pathMappedEndpoints, webEndpoint, () -> singletonMap(\\\"contributor\\\", \\\"test\\\"), cfApplicationProperties);\"},{\"line\":49,\"text\":\"        cfApplicationProperties.setUris(singletonList(\\\"application/Uppercase\\\"));\"},{\"line\":50,\"text\":\"\"},{\"line\":51,\"text\":\"        Application app = factory.createApplication();\"},{\"line\":52,\"text\":\"\"},{\"line\":53,\"text\":\"        assertEquals(\\\"http://application/Uppercase/actuator\\\", app.getManagementUrl());\"},{\"line\":54,\"text\":\"        assertEquals(\\\"http://application/Uppercase/actuator/health\\\", app.getHealthUrl());\"},{\"line\":55,\"text\":\"        assertEquals(\\\"http://application/Uppercase/\\\", app.getServiceUrl());\"},{\"line\":56,\"text\":\"        assertEquals(\\\"test\\\", app.getName());\"},{\"line\":57,\"text\":\"        assertEquals(\\\"test\\\", app.getMetadata().get(\\\"contributor\\\"));\"},{\"line\":58,\"text\":\"        // === VERIFY-START ===\"},{\"line\":59,\"text\":\"        // === VERIFY-END ===\"},{\"line\":60,\"text\":\"    }\"},{\"line\":61,\"text\":\"\"},{\"line\":62,\"text\":\"}\"}]},\"stage\":\"EXTRACT\",\"visible_task\":{\"case_id\":\"de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri@d0085edf\",\"execution_context\":{\"runtime_name\":\"openjdk-javac\",\"runtime_version\":\"11.0.31\",\"test_framework\":\"JUnit\",\"test_framework_version\":null},\"input_policy\":{\"masking_contract\":\"java-dual-region-v1\",\"policy_id\":\"mock-spec-reviewed-frozen/v1\",\"protocol_version\":\"developer_realistic_workspace_v1\",\"visibility\":\"reviewed_frozen_sources\"},\"language\":\"java\",\"masked_test\":{\"end_line\":62,\"logical_path\":\"src/test/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactoryTest.java\",\"resolution_status\":\"partial\",\"source_id\":\"test\",\"start_line\":1,\"symbol\":\"de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri\",\"target_precision\":\"method\"},\"mut_source\":{\"end_line\":51,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactory.java\",\"resolution_status\":\"partial\",\"source_id\":\"mut\",\"start_line\":1,\"symbol\":\"de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactory\",\"target_precision\":\"class\"},\"permitted_interfaces\":[],\"schema_version\":\"mock-spec.task/v1\",\"sources\":[{\"logical_path\":\"src/test/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactoryTest.java\",\"role\":\"masked_test\",\"source_id\":\"test\"},{\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactory.java\",\"role\":\"mut\",\"source_id\":\"mut\"}],\"supporting_sources\":[]}}",
+      "role": "user"
+    }
+  ],
+  "instructions": "staged-scenario-inference-prompts/v0.5\nStage: EXTRACT. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. Preserve ALL original fixed inputs, assertions and scenario requirements as original_goals source ranges. Candidates are revisable working hypotheses, not the task boundary; list material missing dependency semantics in unresolved. Infer conditional dependency constraints, not hidden Mock setup or hidden verification text. State unconfirmed behavior as an if-then hypothesis and preserve its missing basis in unresolved. Imports, test names, and final assertions alone do not establish a hidden substitute, stub value, or call count.",
+  "max_output_tokens": 24576,
+  "store": false,
+  "text": {
+    "format": {
+      "type": "json_schema",
+      "name": "final_output",
+      "schema": {
+        "$defs": {
+          "CandidateSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "scenario_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Scenario Id",
+                "type": "string"
+              },
+              "description": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Description",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/SourceLocator"
+                },
+                "title": "Evidence",
+                "type": "array"
+              }
+            },
+            "required": [
+              "scenario_id",
+              "description",
+              "evidence"
+            ],
+            "title": "CandidateSelection",
+            "type": "object"
+          },
+          "SourceLocator": {
+            "additionalProperties": false,
+            "properties": {
+              "source_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Source Id",
+                "type": "string"
+              },
+              "start_line": {
+                "minimum": 1,
+                "title": "Start Line",
+                "type": "integer"
+              },
+              "end_line": {
+                "minimum": 1,
+                "title": "End Line",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "source_id",
+              "start_line",
+              "end_line"
+            ],
+            "title": "SourceLocator",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": "staged-extract/v0.2",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "result_status": {
+            "default": "CONTINUE",
+            "enum": [
+              "CONTINUE",
+              "INCONCLUSIVE"
+            ],
+            "title": "Result Status",
+            "type": "string"
+          },
+          "original_goals": {
+            "items": {
+              "$ref": "#/$defs/SourceLocator"
+            },
+            "title": "Original Goals",
+            "type": "array"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/$defs/CandidateSelection"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "unresolved": {
+            "items": {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            "title": "Unresolved",
+            "type": "array"
+          }
+        },
+        "required": [
+          "schema_version",
+          "result_status",
+          "original_goals",
+          "candidates",
+          "unresolved"
+        ],
+        "title": "ExtractSelection",
+        "type": "object"
+      },
+      "strict": true
+    }
+  },
+  "tools": []
+}

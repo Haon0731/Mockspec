@@ -1,0 +1,1187 @@
+diff --git a/docs/PRD.md b/docs/PRD.md
+index 75c9c62..478945f 100644
+--- a/docs/PRD.md
++++ b/docs/PRD.md
+@@ -183,7 +183,7 @@ M2接入后，总模型预算覆盖推断、生成及修复。M1阶段推断预
+ 
+ | 字段 | 内容 |
+ |---|---|
+-| `schema_version` | 当前研究记录版本 `scenario-inference-record/v0.4`；历史运行按各自产物中的版本解释 |
++| `schema_version` | 当前研究记录版本 `scenario-inference-record/v0.5`；历史运行按各自产物中的版本解释 |
+ | `run_id, case_id, input_hash` | 与运行清单及输入快照一致 |
+ | `result_status` | SELECTED / ALTERNATIVES / AMBIGUOUS / INCONCLUSIVE / ERROR |
+ | `selected_scenario_id` | 仅SELECTED时必填，其余为null |
+diff --git a/docs/README.md b/docs/README.md
+index cc647ac..f7e072e 100644
+--- a/docs/README.md
++++ b/docs/README.md
+@@ -31,6 +31,10 @@ PRD 不作为当前能力或已通过验收的说明。
+ 输出减负及截断计量留证。当前研究实现已增加原目标问题账本、构造/对照后的继续调查、
+ 自包含 `dependency_spec.json` 和 provider 失败响应留证；离线工程验证与真实 M2 仍分别报告，
+ 不能据此宣称真实模型的规格推导效果已经提高。
++2026-10-28 的[单次取消宿主运行资源上限诊断](../out/staged-inference/resource-diagnostic-cloudfoundry-20261028/report.md)
++保留了 8 次完整模型响应与 6 次自主查询；首次失败位于 QUERY 问题更新的证据回执关联，
++离线对照另暴露非阻塞状态与取证状态不一致。未进入 CONSTRUCT，也未产生最终 spec；
++本次定位协议停止点，不构成真实规格推导验收通过。
+ 
+ 以下研究结果不等于生产 Agent 已具备对应能力；阅读案例分析也不能作为未来无指导生成的输入。
+ 
+diff --git a/docs/architecture.md b/docs/architecture.md
+index 835ac8b..3853fca 100644
+--- a/docs/architecture.md
++++ b/docs/architecture.md
+@@ -206,6 +206,10 @@ ALTERNATIVES 表示多个分支均已正向支持且可由消费者选一，AMBI
+ 阶段切换和 SDK 对象重建不重置账本、模型请求数、查询数或绝对截止时间。
+ 仓库模式的 QUERY 正常结束须提交 `stop_explanation`：停止理由、可校验原文引用、
+ 剩余未知及影响。控制器只验证协议和引用，不证明语义充分；有阻塞未知不能发布 SELECTED。
++QUERY v0.5 将问题更新分成开放与闭合两种模型 wire：只有开放问题声明证据仍可获取或经尝试后
++不可获取；resolved/nonblocking 不携带 acquisition。宿主将闭合更新投影为内部
++`acquisition=not_needed`，在 `wire_result` 之外另存 `host_question_updates` 后再写调查账本。
++这样不会让模型重复维护可推导字段，也不放宽证据、查询回执关联、原目标绑定或停止充分性校验。
+ `query.py` 比较规范化查询、位置/页游标和返回证据，持续无进展时保护终止；阈值按
+ 连续无进展计算，不是总探索次数。生产 SDK 入口同样记录并检测无进展循环。
+ `termination` 区分 agent / controller / caller，超时、预算和重复终止均不发布最终契约。
+@@ -241,6 +245,10 @@ live 入口在本次 AsyncOpenAI 客户端上安装非流式 HTTP response hook
+ input/output/total/reasoning 计量分别保留 reported/not_reported/unavailable；reasoning 不重复计入总用量。
+ 初始源码只在 source_line_index 中按原坐标出现一次；记录 legacy_payload_bytes 与实际 payload_bytes，
+ 这是字节测量，不是供应商 Token 实测或对截断已解决的证明。
++研究 CLI 的显式 `--no-run-resource-limits` 诊断模式复用同一控制器和用量账本，
++取消整次资源门禁与模型/HTTP 等待超时；清单将累计 Token、费用和绝对截止时间记为 null，
++响应捕获不裁剪正文。单次输出使用显式供应商参数，读取授权、单次源码工具边界、
++协议检查和无进展保护继续生效。默认及冻结生产路径不因此改为无上限。
+ 
+ 这条路径验证 B/C 五状态流程、静态对照、继续调查、修订修复、定向查询、共享预算及失败留证边界；
+ 合成任务不经过真实 Adapter 审核，不构成真实数据准入、目标测试执行或模型推断质量证据。
+diff --git a/docs/scenario-inference.md b/docs/scenario-inference.md
+index 286674f..e1e8ae9 100644
+--- a/docs/scenario-inference.md
++++ b/docs/scenario-inference.md
+@@ -56,13 +56,18 @@ V0.2 的源码工具只补充已有可见输入的事实，不写验证成功状
+ 正式 Evidence 和以下映射不变，最终契约继续通过原逐字校验；
+ 原文真实不意味着它支持模型结论，证据相关性仍需独立审查。
+ 
+-QUERY wire 在此基础上使用 `staged-query/v0.4`：模型评估仍仅含 impact/rationale，
++QUERY wire 在此基础上使用 `staged-query/v0.5`：模型评估仍仅含 impact/rationale，
+ 另用独立字段更新与原目标关联的问题及当前候选；宿主关联唯一 pending receipt 后补入
+ 内部 v0.1 assessment 的 attempt_sequence。
++开放问题由模型声明证据仍 `available` 或经实际尝试后 `unavailable`；已解决或非阻塞问题
++不再让模型重复填写 acquisition，宿主固定投影为 `not_needed`，并在阶段记录中同时保留
++原始 wire 与 `host_question_updates`。证据、回执关联、原目标绑定和停止充分性校验不变。
+ 原始 wire、宿主关联和宿主 quote 分别留证。未知 null 字段的有限纠正不接受宿主投影为结果；
+ 模型重发须与比较快照精确一致，且与 DELIVER 共用一次名额。
+ 候选表达有条件的依赖约束；imports、测试名与最终断言不能独自证明隐藏 Mock 配置，
+-仅取得声明行且未确定行为时评估为 no_new_information。语义充分性由独立评阅判定。
++仅取得声明行且未确定行为时评估为 no_new_information。QUERY 查询可观察依赖行为及合法替代，
++不会为恢复隐藏 Mock/VERIFY 文本、框架写法或无证据的调用次数继续探索。
++语义充分性由独立评阅判定。
+ 
+ 分阶段研究控制器保持正式 `mock-spec.scenario/v0.1` 不变，并在
+ `inference_record.json` 保存场景卡所需的研究旁路信息：
+diff --git a/docs/usage.md b/docs/usage.md
+index a35b14e..ff7dd5a 100644
+--- a/docs/usage.md
++++ b/docs/usage.md
+@@ -236,12 +236,12 @@ MYPYPATH=src .venv/bin/python -m mypy --follow-untyped-imports \
+ 研究代码类型检查显式使用本仓 `src`，避免误读环境中其他安装版本；
+ 它仍会报告所引用生产模块的既有诊断，应与上方生产基线比较。
+ 
+-本轮模型效果尚未做真实评估。后续可在单独确认付费预算后预登记：仅使用现有审核的
+-flask_308 与 CloudFoundry 各一次 C 运行，模型 deepseek-flash，开启 repository-read；
+-每例共享上限为 200,000 Token、600 秒、单调用 120 秒及 US$1 估算门禁，输出上限 8192。
+-运行前核对实际服务费率、配置和最终代码版本，分别写入全新输出目录；失败、截断、歧义和未决均计入结果，
++真实规格推导尚未通过验收。[2026-10-28 CloudFoundry 诊断](../out/staged-inference/resource-diagnostic-cloudfoundry-20261028/report.md)
++在取消宿主运行资源上限后完成自主取证，但因 QUERY 问题更新的协议一致性校验停止，未交付最终 spec。
++后续真实运行可使用现有审核的 flask_308 与 CloudFoundry，须有相应调用授权并预登记：
++运行前核对实际服务费率、配置和代码版本，分别写入全新输出目录；失败、截断、歧义和未决均计入结果，
+ 不重跑挑成功样本、不执行目标测试。人工/隔离评阅关注目标覆盖、依赖语义、过强/过弱约束与未知影响，
+-不以 JSON 合法或查询次数替代规格质量。这是待执行方案，不是两次成功或模型效果改善的证据。
++不以 JSON 合法或查询次数替代规格质量。文档中的运行配置不自动构成费用授权。
+ 
+ 输出目录必须不存在。有效语义结果（SELECTED、ALTERNATIVES、AMBIGUOUS、INCONCLUSIVE）退出码为 0，
+ ERROR 为 1，命令或无法完成的产物写入错误为 2；
+@@ -281,6 +281,13 @@ content_changed/identity_mismatch；后端或畸形结果为 backend_error/analy
+ 可显式配置 `--max-model-calls`、`--max-output-tokens`、`--max-total-tokens`、
+ `--max-tool-output-chars`、`--timeout-seconds` 和 `--parsing-timeout-seconds`。
+ 配置与请求前估算的局限写入 manifest；Token 估算不是远端费用硬上限。
++真实故障诊断可显式使用 `--no-run-resource-limits`：取消整次 Token、费用、模型/查询次数、
++总时限、模型等待与 HTTP 客户端超时，并完整保存供应商响应；仍记录实际用量和估费，
++live 模式仍要求输入/输出单价。该选项不能与 `--max-cost-usd` 同用，且不代表费用授权。
++单次模型输出仍由 `--max-output-tokens` 明确配置；诊断时应核对服务商最高值，
++不能把省略参数误认为无限输出。授权读取范围、单次源码工具的输出/解析边界、
++无进展保护、协议校验及一次格式修复规则保持原义。此模式用于定位首次真实停止点，
++不自动重试，也不证明规格质量；默认运行配置不变。
+ 未知用量保留 null/不完整并阻止继续请求；总时限到期后取消并回收解析进程，
+ 不额外请求模型收尾，仅执行本地验证和留证。
+ 这些 Token 用量来自脚本模型的固定回执，不是远端计费证据。
+@@ -445,7 +452,7 @@ HTTP 400，已修复；逐调用诊断位于 `inference_record.json.model_calls`
+ 
+ 研究入口现使用 v0.2 引用选择协议：模型选择来源与行范围，宿主从本次已可见证据
+ 生成精确 `quote`，最终仍使用原契约验证器。`inference_record.json` 的版本为
+-`scenario-inference-record/v0.4`，`citation_mode` 为
++`scenario-inference-record/v0.5`，`citation_mode` 为
+ `source_locator_host_materialized_quote/v1`；阶段的 `wire_result` 与 `result`
+ 分别记录模型选择和宿主标准结果。旧模型响应中的 `quote` 不自动转换；
+ 历史运行按对应提交复现，不能把旧失败送入新协议后改称成功。
+@@ -461,7 +468,7 @@ G4 未通过；没有放宽 Schema、删除额外字段或自动重跑。
+ 捕获实际 HTTP 请求并确认 strict/完整 Schema 保留；单次对抗请求合规，不能据此宣称
+ 原复杂任务问题已修复或恢复 M2。该探针属于单独留证的一次性诊断，不是生产入口。
+ 
+-研究 QUERY v0.4 使用严格嵌套类型，回执编号由宿主绑定，并增加问题及候选更新；历史 v0.3
++研究 QUERY v0.5 使用严格嵌套类型，回执编号由宿主绑定，并增加问题及候选更新；历史 v0.3/v0.4
+ 响应仍按原运行记录解释，不静默升级。整次运行的 QUERY_FORMAT_REPAIR
+ 与 DELIVER FORMAT_REPAIR 共用一次名额；预留后即使用量门禁拒绝或请求失败也不退回。
+ QUERY 只允许纠正回执评估对象内未知的 null 字段，模型必须完整重发且保持规定字段逐值一致。
+diff --git a/experiments/staged-inference/acceptance.py b/experiments/staged-inference/acceptance.py
+index 323ce1e..1458f09 100644
+--- a/experiments/staged-inference/acceptance.py
++++ b/experiments/staged-inference/acceptance.py
+@@ -22,7 +22,7 @@ from scripted import FixedScriptModel, query_script, scripted_outputs, synthetic
+ 
+ REPORT_VERSION = "m1-staged-inference-acceptance/v0.2"
+ MANIFEST_VERSION = "scenario-inference-manifest/v0.1"
+-RECORD_VERSION = "scenario-inference-record/v0.4"
++RECORD_VERSION = "scenario-inference-record/v0.5"
+ CONTRACT_VERSION = "mock-spec.scenario/v0.1"
+ 
+ 
+@@ -229,8 +229,8 @@ def _verify_run(case: dict[str, object], run_dir: Path) -> dict[str, object]:
+     if manifest["stop_reason"] != case["expected_stop_reason"]:
+         raise ValueError(f"{case['name']}: unexpected stop reason")
+     if manifest["versions"] != {
+-        "policy": "staged-scenario-inference/v0.4",
+-        "prompts": "staged-scenario-inference-prompts/v0.4",
++        "policy": "staged-scenario-inference/v0.5",
++        "prompts": "staged-scenario-inference-prompts/v0.5",
+         "record": RECORD_VERSION,
+         "contract": CONTRACT_VERSION,
+         "citation_mode": "source_locator_host_materialized_quote/v1",
+diff --git a/experiments/staged-inference/controller.py b/experiments/staged-inference/controller.py
+index 7380b43..87467f9 100644
+--- a/experiments/staged-inference/controller.py
++++ b/experiments/staged-inference/controller.py
+@@ -46,14 +46,14 @@ from stage_protocol import (
+     QuerySelection, RevisionSelection, StageModel, StageResult,
+     check_source_reference, contract_selection, materialize_construct,
+     materialize_delivery, materialize_extract, materialize_query, materialize_reference,
+-    materialize_revision, validate_constructed, validate_contrast,
++    materialize_revision, project_question_updates, validate_constructed, validate_contrast,
+ )
+ 
+ 
+-RECORD_VERSION = "scenario-inference-record/v0.4"
++RECORD_VERSION = "scenario-inference-record/v0.5"
+ MANIFEST_VERSION = "scenario-inference-manifest/v0.1"
+-POLICY_VERSION = "staged-scenario-inference/v0.4"
+-PROMPT_VERSION = "staged-scenario-inference-prompts/v0.4"
++POLICY_VERSION = "staged-scenario-inference/v0.5"
++PROMPT_VERSION = "staged-scenario-inference-prompts/v0.5"
+ CITATION_MODE = "source_locator_host_materialized_quote/v1"
+ FLASK_ABORT_CASE_ID = "flask_308"
+ CLOUDFOUNDRY_APPLICATION_URI_CASE_ID = (
+@@ -80,13 +80,14 @@ class StagedRunConfig:
+     run_mode: Literal["synthetic_replay", "live_inference"] = "synthetic_replay"
+     model_name: str = "scripted-offline"
+     repository_read: bool = False
++    no_run_resource_limits: bool = False
+     max_model_calls: int = 10
+     max_query_attempts: int = 6
+     repetition_threshold: int = 4
+     max_output_tokens: int = 4_096
+-    max_total_tokens: int = 60_000
++    max_total_tokens: int | None = 60_000
+     max_tool_output_chars: int = 16_000
+-    timeout_seconds: float = 120
++    timeout_seconds: float | None = 120
+     parsing_timeout_seconds: float = 15
+     max_cost_usd: Decimal | None = None
+     input_cost_per_million: Decimal | None = None
+@@ -101,6 +102,13 @@ class StagedRunConfig:
+             raise ValueError("run_mode must be synthetic_replay or live_inference")
+         if type(self.repository_read) is not bool:
+             raise ValueError("repository_read must be a boolean")
++        if type(self.no_run_resource_limits) is not bool:
++            raise ValueError("no_run_resource_limits must be a boolean")
++        if self.no_run_resource_limits and any(
++            value is not None
++            for value in (self.max_total_tokens, self.timeout_seconds, self.max_cost_usd)
++        ):
++            raise ValueError("no_run_resource_limits requires null total-token, timeout and cost limits")
+         if self.repository_read and self.run_mode != "live_inference":
+             raise ValueError("repository_read requires live_inference")
+         if self.run_mode == "synthetic_replay" and self.model_name != "scripted-offline":
+@@ -115,14 +123,18 @@ class StagedRunConfig:
+             raise ValueError("max_query_attempts cannot exceed six")
+         for name in ("max_output_tokens", "max_total_tokens"):
+             value = getattr(self, name)
++            if name == "max_total_tokens" and value is None and self.no_run_resource_limits:
++                continue
+             if type(value) is not int or value < 1:
+                 raise ValueError(f"{name} must be a positive integer")
+         if type(self.max_tool_output_chars) is not int or self.max_tool_output_chars < 512:
+             raise ValueError("max_tool_output_chars must be an integer >= 512")
+-        if self.max_output_tokens > self.max_total_tokens:
++        if self.max_total_tokens is not None and self.max_output_tokens > self.max_total_tokens:
+             raise ValueError("max_output_tokens cannot exceed max_total_tokens")
+         for name in ("timeout_seconds", "parsing_timeout_seconds"):
+             value = getattr(self, name)
++            if name == "timeout_seconds" and value is None and self.no_run_resource_limits:
++                continue
+             if (not isinstance(value, (int, float)) or isinstance(value, bool)
+                     or not math.isfinite(value) or value <= 0):
+                 raise ValueError(f"{name} must be positive")
+@@ -130,7 +142,7 @@ class StagedRunConfig:
+         if (prices[0] is None) != (prices[1] is None):
+             raise ValueError("input and output prices must be configured together")
+         if self.run_mode == "live_inference" and (
+-            self.max_cost_usd is None or None in prices
++            (self.max_cost_usd is None and not self.no_run_resource_limits) or None in prices
+         ):
+             raise ValueError("live inference requires cost limit and input/output prices")
+ 
+@@ -347,6 +359,12 @@ def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
+             " errors and incomplete results still require an assessment."
+             " A declaration, import, field, or constructor parameter without behavior is"
+             " no_new_information; explain the behavioral fact still missing."
++            " Investigate observable dependency behavior, branch conditions, return values,"
++            " exceptions, and interactions that affect the original goals. Do not search for"
++            " or reconstruct hidden Mock/VERIFY text, exact framework syntax, call counts, or"
++            " ordering unless visible production behavior makes that detail independently"
++            " necessary. Preserve such hidden text as nonblocking unknown once the behavior"
++            " and its supported alternatives are sufficient for a downstream coding agent."
+             " On finish_queries provide stop_explanation with reason evidence_sufficient,"
+             " unknowns_nonblocking, or no_further_evidence; a concrete rationale, exact"
+             " source references in evidence, and remaining_unknowns with question, impact,"
+@@ -354,7 +372,9 @@ def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
+             " Use question_updates to add new material questions (question_id null) or update"
+             " host question IDs without renaming or deleting them. Map each question to original"
+             " goal_indexes. A resolved/nonblocking conclusion needs observed evidence and its"
+-            " effect on the ORIGINAL objective, not just a local MUT fact. For open unavailable"
++            " effect on the ORIGINAL objective, not just a local MUT fact. Only an open update"
++            " includes acquisition (available or unavailable); resolved/nonblocking updates"
++            " omit it because the host records acquisition=not_needed. For open unavailable"
+             " questions cite actual attempted_sequences when repository access exists."
+             " remaining_unknowns must exactly retain every open/nonblocking question and impact."
+             " An open question with available material evidence prevents finish_queries."
+@@ -463,7 +483,7 @@ async def _call_stage(
+     ledger: UsageLedger,
+     responses: list[dict],
+     model_calls: list[dict],
+-    deadline: float,
++    deadline: float | None,
+     model_call_limit: int | None = None,
+ ) -> StageResult:
+     legacy_payload_bytes = None
+@@ -525,7 +545,8 @@ async def _call_stage(
+     }
+     model_calls.append(event)
+     effective_call_limit = (
+-        config.max_model_calls if model_call_limit is None else model_call_limit
++        -1 if config.no_run_resource_limits
++        else config.max_model_calls if model_call_limit is None else model_call_limit
+     )
+     if effective_call_limit >= 0 and ledger.requests_started >= effective_call_limit:
+         event["status"] = "blocked"
+@@ -545,8 +566,8 @@ async def _call_stage(
+         raise StagedInferenceError(
+             "model-call limit exhausted", stage=stage, stop_reason="budget_exhausted"
+         )
+-    remaining = deadline - time.monotonic()
+-    if remaining <= 0:
++    remaining = None if deadline is None else deadline - time.monotonic()
++    if remaining is not None and remaining <= 0:
+         event["status"] = "blocked"
+         event["exception"] = {
+             "classification": "host_deadline",
+@@ -564,7 +585,11 @@ async def _call_stage(
+         raise StagedInferenceError(
+             "run deadline exhausted", stage=stage, stop_reason="run_timeout"
+         )
+-    timeout_seconds = min(remaining, config.parsing_timeout_seconds)
++    timeout_seconds = (
++        None if config.no_run_resource_limits
++        else min(remaining, config.parsing_timeout_seconds)
++        if remaining is not None else config.parsing_timeout_seconds
++    )
+     event["timeout_seconds"] = timeout_seconds
+     capture = getattr(model, "response_capture", None)
+     if isinstance(capture, ResponseCapture):
+@@ -602,7 +627,10 @@ async def _call_stage(
+         )
+         raise StagedInferenceError(
+             "stage timed out", stage=stage,
+-            stop_reason="run_timeout" if remaining <= config.parsing_timeout_seconds else "timeout"
++            stop_reason=(
++                "run_timeout" if remaining is not None and remaining <= config.parsing_timeout_seconds
++                else "timeout"
++            )
+         ) from None
+     except InferenceError as exc:
+         event["status"] = "failed"
+@@ -936,7 +964,7 @@ async def _repair_query_output(
+     source_store: SourceStore, model: Model, config: StagedRunConfig,
+     ledger: UsageLedger, responses: list[dict], model_calls: list[dict],
+     stages: list[dict], repair_log: list[dict], allowance: FormatRepairAllowance,
+-    deadline: float, model_call_limit: int,
++    deadline: float | None, model_call_limit: int,
+ ) -> QuerySelection:
+     entry: dict[str, object] = {
+         "stage": "QUERY_FORMAT_REPAIR",
+@@ -981,9 +1009,9 @@ async def _repair_query_output(
+     known_budget_failure = None
+     if not ledger.usage_complete:
+         known_budget_failure = "prior_usage_unknown"
+-    elif time.monotonic() >= deadline:
++    elif deadline is not None and time.monotonic() >= deadline:
+         known_budget_failure = "run_deadline"
+-    elif ledger.total_tokens >= config.max_total_tokens:
++    elif config.max_total_tokens is not None and ledger.total_tokens >= config.max_total_tokens:
+         known_budget_failure = "total_token_limit"
+     elif (
+         config.max_cost_usd is not None
+@@ -1020,7 +1048,7 @@ async def _repair_query_output(
+                 ],
+                 "comparison_snapshot": snapshot,
+                 "repair_rule": (
+-                    "Return the complete staged-query/v0.4 object. Remove only the listed"
++                    "Return the complete staged-query/v0.5 object. Remove only the listed"
+                     " unknown null fields and preserve every listed value exactly; do not"
+                     " add evidence, source text, tools, or new reasoning."
+                 ),
+@@ -1142,7 +1170,7 @@ async def _deliver_with_repair(
+     model: Model, config: StagedRunConfig, ledger: UsageLedger,
+     responses: list[dict], model_calls: list[dict], stages: list[dict],
+     repair_log: list[dict], allowance: FormatRepairAllowance,
+-    deadline: float, model_call_limit: int,
++    deadline: float | None, model_call_limit: int,
+ ) -> DeliverResult:
+     expected = DeliverResult(
+         schema_version="staged-deliver/v0.1", result_status=constructed.result_status,
+@@ -1225,9 +1253,9 @@ async def _deliver_with_repair(
+         known_budget_failure = None
+         if not ledger.usage_complete:
+             known_budget_failure = "prior_usage_unknown"
+-        elif time.monotonic() >= deadline:
++        elif deadline is not None and time.monotonic() >= deadline:
+             known_budget_failure = "run_deadline"
+-        elif ledger.total_tokens >= config.max_total_tokens:
++        elif config.max_total_tokens is not None and ledger.total_tokens >= config.max_total_tokens:
+             known_budget_failure = "total_token_limit"
+         elif (
+             config.max_cost_usd is not None
+@@ -1353,9 +1381,8 @@ async def execute_staged_run(
+     run_id = str(uuid4())
+     started = time.monotonic()
+     started_wall = time.time()
+-    deadline = started + (
+-        config.timeout_seconds if isinstance(config, StagedRunConfig) else 120
+-    )
++    run_timeout = config.timeout_seconds if isinstance(config, StagedRunConfig) else 120
++    deadline = None if run_timeout is None else started + run_timeout
+     stages: list[dict] = []
+     responses: list[dict] = []
+     model_calls: list[dict] = []
+@@ -1525,7 +1552,9 @@ async def execute_staged_run(
+             raise ValueError("task payload must be an object")
+         task = UnifiedTask.from_dict(task_payload)
+         source_store = SourceStore(task, repository=repository)
+-        model_call_limit = -1 if repository is not None else config.max_model_calls
++        model_call_limit = (
++            -1 if repository is not None or config.no_run_resource_limits else config.max_model_calls
++        )
+         canonical_task = task.to_dict()
+         input_bytes = canonical_json(canonical_task)
+         input_hash = sha256_bytes(input_bytes)
+@@ -1568,7 +1597,9 @@ async def execute_staged_run(
+         query_executor = QueryExecutor(
+             task,
+             source_store=source_store,
+-            max_attempts=(None if repository is not None else config.max_query_attempts),
++            max_attempts=(
++                None if repository is not None or config.no_run_resource_limits else config.max_query_attempts
++            ),
+             max_no_progress_attempts=config.repetition_threshold,
+             max_output_chars=config.max_tool_output_chars,
+             analysis_timeout_seconds=config.parsing_timeout_seconds,
+@@ -1661,7 +1692,7 @@ async def execute_staged_run(
+                         "citation_mode": CITATION_MODE,
+                         "wire_result": raw,
+                         "result": None,
+-                        "validation_error": raw_error or "strict staged-query/v0.4 validation failed",
++                        "validation_error": raw_error or "strict staged-query/v0.5 validation failed",
+                     })
+                     if isinstance(raw, dict) and (
+                         raw.get("decision") == "request_query"
+@@ -1760,8 +1791,12 @@ async def execute_staged_run(
+                     )
+                     pending_receipt["assessment_status"] = "complete"
+                 _complete_stage_entry(query_entry, query)
++                host_question_updates = project_question_updates(query_wire.question_updates)
++                query_entry["host_question_updates"] = [
++                    item.model_dump(mode="json") for item in host_question_updates
++                ]
+                 questions.apply_updates(
+-                    query_wire.question_updates, store=source_store,
++                    host_question_updates, store=source_store,
+                     attempts=query_executor.attempts, task=task,
+                 )
+                 updates = query_wire.candidate_updates
+@@ -1781,6 +1816,7 @@ async def execute_staged_run(
+ 
+                 if (
+                     observed_attempt is not None
++                    and config.max_total_tokens is not None
+                     and ledger.total_tokens >= config.max_total_tokens
+                 ):
+                     query_executor.reject(
+@@ -2204,7 +2240,7 @@ async def execute_staged_run(
+             "budgeted_attempts": 0 if query_executor is None else query_executor.budgeted_attempts,
+             "limit": (
+                 None
+-                if repository is not None
++                if repository is not None or (isinstance(config, StagedRunConfig) and config.no_run_resource_limits)
+                 else (config.max_query_attempts if isinstance(config, StagedRunConfig) else None)
+             ),
+         },
+@@ -2308,15 +2344,17 @@ async def execute_staged_run(
+         },
+         "controller_limits": {
+             "model_calls": (
+-                None if repository is not None
++                None if repository is not None or (valid_config is not None and valid_config.no_run_resource_limits)
+                 else (None if valid_config is None else valid_config.max_model_calls)
+             ),
+             "query_attempts": (
+-                None if repository is not None
++                None if repository is not None or (valid_config is not None and valid_config.no_run_resource_limits)
+                 else (None if valid_config is None else valid_config.max_query_attempts)
+             ),
+             "termination": (
+-                "shared_deadline_token_cost_and_repetition_protection"
++                "protocol_and_repetition_protection_without_run_resource_limits"
++                if valid_config is not None and valid_config.no_run_resource_limits
++                else "shared_deadline_token_cost_and_repetition_protection"
+                 if repository is not None else "configured_call_limits_and_shared_budgets"
+             ),
+         },
+@@ -2360,7 +2398,7 @@ async def execute_staged_run(
+             "observed_attempts": 0 if query_executor is None else query_executor.observed_attempts,
+             "budgeted_attempts": 0 if query_executor is None else query_executor.budgeted_attempts,
+             "limit": (
+-                None if repository is not None
++                None if repository is not None or (valid_config is not None and valid_config.no_run_resource_limits)
+                 else (None if valid_config is None else valid_config.max_query_attempts)
+             ),
+         },
+@@ -2369,7 +2407,7 @@ async def execute_staged_run(
+             "started": started,
+             "absolute": deadline,
+             "wall_clock_started_unix": started_wall,
+-            "wall_clock_deadline_unix": started_wall + (deadline - started),
++            "wall_clock_deadline_unix": None if deadline is None else started_wall + (deadline - started),
+         },
+         "elapsed_seconds": time.monotonic() - started,
+         "artifact_sha256": artifact_hashes,
+diff --git a/experiments/staged-inference/provider_capture.py b/experiments/staged-inference/provider_capture.py
+index 8d5f14a..c7d4683 100644
+--- a/experiments/staged-inference/provider_capture.py
++++ b/experiments/staged-inference/provider_capture.py
+@@ -120,7 +120,7 @@ class ResponseCapture:
+     response-hook events.  Request headers and request bodies are never retained.
+     """
+ 
+-    max_body_bytes: int = 2_000_000
++    max_body_bytes: int | None = 2_000_000
+     _active_sequence: int | None = None
+     _captures: dict[int, list[dict[str, object]]] = field(default_factory=dict)
+ 
+@@ -137,7 +137,7 @@ class ResponseCapture:
+         if sequence is None:
+             raise RuntimeError("provider response arrived without an active model call")
+         content = await response.aread()
+-        truncated = len(content) > self.max_body_bytes
++        truncated = self.max_body_bytes is not None and len(content) > self.max_body_bytes
+         retained = content[: self.max_body_bytes]
+         try:
+             decoded: object = json.loads(retained)
+diff --git a/experiments/staged-inference/query.py b/experiments/staged-inference/query.py
+index 8d73607..75bc351 100644
+--- a/experiments/staged-inference/query.py
++++ b/experiments/staged-inference/query.py
+@@ -110,7 +110,7 @@ class QueryExecutor:
+         max_attempts: int | None,
+         max_output_chars: int,
+         analysis_timeout_seconds: float,
+-        deadline: float,
++        deadline: float | None,
+         max_no_progress_attempts: int = 3,
+     ) -> None:
+         if type(max_no_progress_attempts) is not int or max_no_progress_attempts < 1:
+@@ -124,7 +124,8 @@ class QueryExecutor:
+         self.max_attempts = max_attempts
+         self.deadline = deadline
+         self.max_no_progress_attempts = max_no_progress_attempts
+-        self.analysis.store.limit_deadline(deadline)
++        if deadline is not None:
++            self.analysis.store.limit_deadline(deadline)
+         self.attempts: list[dict[str, Any]] = []
+         self._seen_operations: set[str] = set()
+         self._seen_evidence: set[str] = set()
+@@ -217,8 +218,8 @@ class QueryExecutor:
+         assert validated.tool is not None
+         assert validated.arguments is not None
+ 
+-        remaining = self.deadline - time.monotonic()
+-        if remaining <= 0:
++        remaining = None if self.deadline is None else self.deadline - time.monotonic()
++        if remaining is not None and remaining <= 0:
+             return self._finish(
+                 record, started, "budget_exhausted",
+                 self._error("run_deadline_exhausted", "The shared run deadline is exhausted."),
+diff --git a/experiments/staged-inference/run.py b/experiments/staged-inference/run.py
+index ddbb0cc..bab6224 100644
+--- a/experiments/staged-inference/run.py
++++ b/experiments/staged-inference/run.py
+@@ -63,6 +63,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+     parser.add_argument("--repetition-threshold", type=int, default=4,
+                         help="consecutive repeated queries without new evidence before protection")
+     parser.add_argument("--max-output-tokens", type=int, default=4096)
++    parser.add_argument(
++        "--no-run-resource-limits", action="store_true",
++        help="diagnostic run without total token/cost/call limits or model/run/HTTP timeouts; "
++             "provider output and individual source-tool limits remain explicit",
++    )
+     parser.add_argument("--max-total-tokens", type=int, default=60000)
+     parser.add_argument("--max-tool-output-chars", type=int, default=16000)
+     parser.add_argument("--timeout-seconds", type=float, default=120)
+@@ -77,6 +82,8 @@ def main(argv: list[str] | None = None) -> int:
+     args = parse_args(argv)
+     model: Model
+     try:
++        if args.no_run_resource_limits and args.max_cost_usd is not None:
++            raise ValueError("--no-run-resource-limits cannot be combined with --max-cost-usd")
+         if args.mode == "live_inference":
+             if args.task_json is not None:
+                 raise ValueError("live inference does not accept --task-json")
+@@ -88,13 +95,18 @@ def main(argv: list[str] | None = None) -> int:
+             from agents.models.openai_responses import OpenAIResponsesModel
+             from openai import AsyncOpenAI, DefaultAsyncHttpxClient
+ 
+-            response_capture = ResponseCapture()
++            response_capture = ResponseCapture(
++                max_body_bytes=None if args.no_run_resource_limits else 2_000_000
++            )
+             http_client = DefaultAsyncHttpxClient(
+                 event_hooks={"response": [response_capture.on_response]}
+             )
+             model = OpenAIResponsesModel(
+                 model=args.model.strip(),
+-                openai_client=AsyncOpenAI(max_retries=0, http_client=http_client),
++                openai_client=AsyncOpenAI(
++                    max_retries=0, http_client=http_client,
++                    timeout=None if args.no_run_resource_limits else http_client.timeout,
++                ),
+             )
+             setattr(model, "response_capture", response_capture)
+             requested_case_id = args.case_id
+@@ -125,12 +137,13 @@ def main(argv: list[str] | None = None) -> int:
+             config=StagedRunConfig(
+                 variant=args.variant, run_mode=args.mode, model_name=model_name,
+                 repository_read=args.repository_read,
++                no_run_resource_limits=args.no_run_resource_limits,
+                 max_model_calls=args.max_model_calls,
+                 max_output_tokens=args.max_output_tokens,
+-                max_total_tokens=args.max_total_tokens,
++                max_total_tokens=None if args.no_run_resource_limits else args.max_total_tokens,
+                 max_tool_output_chars=args.max_tool_output_chars,
+                 repetition_threshold=args.repetition_threshold,
+-                timeout_seconds=args.timeout_seconds,
++                timeout_seconds=None if args.no_run_resource_limits else args.timeout_seconds,
+                 parsing_timeout_seconds=args.parsing_timeout_seconds,
+                 max_cost_usd=args.max_cost_usd,
+                 input_cost_per_million=args.input_cost_per_million,
+diff --git a/experiments/staged-inference/scripted.py b/experiments/staged-inference/scripted.py
+index 6b7c074..1fea9d8 100644
+--- a/experiments/staged-inference/scripted.py
++++ b/experiments/staged-inference/scripted.py
+@@ -287,7 +287,7 @@ def _wire_outputs(outputs: list[dict]) -> list[dict]:
+                     _source_locator(item) for item in candidate["evidence"]
+                 ]
+         elif version == "staged-query/v0.1":
+-            output["schema_version"] = "staged-query/v0.4"
++            output["schema_version"] = "staged-query/v0.5"
+             assessment = output.get("previous_receipt_assessment")
+             if assessment is not None:
+                 assessment.pop("attempt_sequence", None)
+@@ -317,9 +317,10 @@ def _wire_outputs(outputs: list[dict]) -> list[dict]:
+                         # observed behavior affected by the inaccessible gap;
+                         # it does not claim to resolve the blocking question.
+                         "evidence": list(stop["evidence"]),
+-                        "acquisition": "unavailable" if unknown["blocking"] else "not_needed",
+                         "attempted_sequences": [],
+                     })
++                    if unknown["blocking"]:
++                        updates[-1]["acquisition"] = "unavailable"
+                 output["question_updates"] = updates
+             else:
+                 output["question_updates"] = []
+@@ -714,7 +715,7 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
+     if replay_case == "second_revision" and variant == "C":
+         query_outputs = [
+             output for output in rendered
+-            if output["schema_version"] == "staged-query/v0.4"
++            if output["schema_version"] == "staged-query/v0.5"
+         ]
+         for update in query_outputs[1]["question_updates"]:
+             update["question_id"] = "q1"
+@@ -932,7 +933,7 @@ def query_script(
+                 "arguments_json": json.dumps(arguments),
+             }
+         queries.append({
+-            "schema_version": "staged-query/v0.4",
++            "schema_version": "staged-query/v0.5",
+             "decision": "finish_queries" if attempt is None else "request_query",
+             "query_attempt": attempt, "previous_receipt_assessment": assessment,
+             "impact": (
+diff --git a/experiments/staged-inference/stage_protocol.py b/experiments/staged-inference/stage_protocol.py
+index 8cdfefb..945a180 100644
+--- a/experiments/staged-inference/stage_protocol.py
++++ b/experiments/staged-inference/stage_protocol.py
+@@ -98,15 +98,36 @@ class InvestigationRequest(StageModel):
+     impact: Text
+ 
+ 
+-class QuestionUpdate(InvestigationRequest):
++class QuestionUpdateBase(InvestigationRequest):
+     question_id: Text | None
+-    state: Literal["open", "resolved", "nonblocking"]
+     rationale: Text
+     evidence: list[SourceLocator]
+-    acquisition: Literal["available", "unavailable", "not_needed"]
+     attempted_sequences: list[Annotated[int, Field(ge=1)]]
+ 
+ 
++class OpenQuestionUpdateSelection(QuestionUpdateBase):
++    """Model-facing update for a material question that remains open."""
++
++    state: Literal["open"]
++    acquisition: Literal["available", "unavailable"]
++
++
++class ClosedQuestionUpdateSelection(QuestionUpdateBase):
++    """Model-facing update whose acquisition state is owned by the host."""
++
++    state: Literal["resolved", "nonblocking"]
++
++
++QuestionUpdateSelection = OpenQuestionUpdateSelection | ClosedQuestionUpdateSelection
++
++
++class QuestionUpdate(QuestionUpdateBase):
++    """Host-owned ledger update after projecting the model-facing selection."""
++
++    state: Literal["open", "resolved", "nonblocking"]
++    acquisition: Literal["available", "unavailable", "not_needed"]
++
++
+ class RemainingUnknown(StageModel):
+     question: Text
+     impact: Text
+@@ -137,13 +158,13 @@ class QueryResult(StageModel):
+ 
+ 
+ class QuerySelection(StageModel):
+-    schema_version: Literal["staged-query/v0.4"]
++    schema_version: Literal["staged-query/v0.5"]
+     decision: Literal["request_query", "finish_queries"]
+     query_attempt: QueryAttempt | None
+     previous_receipt_assessment: QueryAssessmentSelection | None
+     impact: Text
+     stop_explanation: ExplorationStopSelection | None
+-    question_updates: list[QuestionUpdate] = Field(default_factory=list)
++    question_updates: list[QuestionUpdateSelection] = Field(default_factory=list)
+     candidate_updates: list[CandidateSelection] = Field(default_factory=list)
+ 
+ 
+@@ -395,6 +416,19 @@ def materialize_query(
+     )
+ 
+ 
++def project_question_updates(
++    updates: list[QuestionUpdateSelection],
++) -> list[QuestionUpdate]:
++    """Add host-owned acquisition state without changing the retained wire result."""
++    projected: list[QuestionUpdate] = []
++    for update in updates:
++        values = update.model_dump(mode="json")
++        if isinstance(update, ClosedQuestionUpdateSelection):
++            values["acquisition"] = "not_needed"
++        projected.append(QuestionUpdate.model_validate(values))
++    return projected
++
++
+ def materialize_construct(
+     wire: ConstructSelection, store: SourceStore, *, field_path: str = "",
+ ) -> ConstructResult:
+@@ -620,10 +654,11 @@ __all__ = [
+     "ClaimBasis", "ConstructResult", "ConstructSelection", "ContrastResult",
+     "DeliverResult", "DeliverSelection", "ExplorationStop", "ExtractResult",
+     "ExtractSelection", "InvestigationRequest", "QueryAttempt", "QueryResult",
+-    "QuerySelection", "QuestionUpdate", "RevisionResult", "RevisionSelection",
++    "QuerySelection", "QuestionUpdate", "QuestionUpdateSelection", "RevisionResult", "RevisionSelection",
+     "ScenarioContractSelection", "SourceLocator", "SourceReference", "StageModel",
+     "StageResult", "check_source_reference", "contract_selection",
+     "materialize_construct", "materialize_contract", "materialize_delivery",
+     "materialize_extract", "materialize_query", "materialize_reference",
++    "project_question_updates",
+     "materialize_revision", "validate_constructed", "validate_contrast",
+ ]
+diff --git a/src/mock_spec/budget.py b/src/mock_spec/budget.py
+index 3d1ee4d..13b84d6 100644
+--- a/src/mock_spec/budget.py
++++ b/src/mock_spec/budget.py
+@@ -22,7 +22,7 @@ class InferenceBudget:
+     max_tool_calls: int = 8
+     max_repeated_no_progress: int = 2
+     max_output_tokens: int = 4_096
+-    max_total_tokens: int = 24_000
++    max_total_tokens: int | None = 24_000
+     max_tool_output_chars: int = 16_000
+     analysis_timeout_seconds: float = 15
+     max_cost_usd: Decimal | None = None
+@@ -32,12 +32,22 @@ class InferenceBudget:
+     def __post_init__(self) -> None:
+         for name in (
+             "max_turns", "max_tool_calls", "max_repeated_no_progress",
+-            "max_output_tokens", "max_total_tokens",
++            "max_output_tokens",
+         ):
+             value = getattr(self, name)
+             if type(value) is not int or value < 1:
+                 raise InferenceError(f"scenario inference {name} must be a positive integer")
+-        if self.max_output_tokens > self.max_total_tokens:
++        if (
++            self.max_total_tokens is not None
++            and (type(self.max_total_tokens) is not int or self.max_total_tokens < 1)
++        ):
++            raise InferenceError(
++                "scenario inference max_total_tokens must be a positive integer"
++            )
++        if (
++            self.max_total_tokens is not None
++            and self.max_output_tokens > self.max_total_tokens
++        ):
+             raise InferenceError(
+                 "scenario inference max_output_tokens cannot exceed max_total_tokens"
+             )
+@@ -211,7 +221,10 @@ class UsageLedger:
+         self.estimates.append(estimate)
+ 
+         reason = None
+-        if projected_total > self.budget.max_total_tokens:
++        if (
++            self.budget.max_total_tokens is not None
++            and projected_total > self.budget.max_total_tokens
++        ):
+             reason = "projected_token_limit"
+         elif (
+             self.budget.max_cost_usd is not None
+@@ -270,7 +283,11 @@ class UsageLedger:
+         })
+ 
+         reason = None
+-        if known and self.total_tokens > self.budget.max_total_tokens:
++        if (
++            known
++            and self.budget.max_total_tokens is not None
++            and self.total_tokens > self.budget.max_total_tokens
++        ):
+             reason = "actual_token_limit"
+         elif (
+             self.budget.max_cost_usd is not None
+diff --git a/tests/test_budget.py b/tests/test_budget.py
+index c2597fb..47dec20 100644
+--- a/tests/test_budget.py
++++ b/tests/test_budget.py
+@@ -4,6 +4,7 @@ from __future__ import annotations
+ 
+ import asyncio
+ from decimal import Decimal
++from types import SimpleNamespace
+ 
+ import pytest
+ from agents.usage import Usage
+@@ -32,6 +33,63 @@ def test_budget_requires_complete_explicit_prices_for_cost_limit() -> None:
+         inference_v02.InferenceBudget(input_cost_per_million=Decimal("1"))
+ 
+ 
++@pytest.mark.parametrize("value", [0, -1, 1.5, "100"])
++def test_optional_total_token_limit_still_rejects_invalid_values(value) -> None:
++    with pytest.raises(InferenceError, match="max_total_tokens must be a positive integer"):
++        inference_v02.InferenceBudget(max_total_tokens=value)
++
++
++def test_no_total_token_limit_keeps_accounting_and_allows_later_calls(monkeypatch) -> None:
++    budget = inference_v02.InferenceBudget(
++        max_output_tokens=100,
++        max_total_tokens=None,
++    )
++    ledger = UsageLedger(budget)
++    agent = SimpleNamespace(tools=[], output_type=None)
++    monkeypatch.setattr(
++        "mock_spec.budget.estimate_known_request_tokens",
++        lambda **_kwargs: (30_000, 120_000),
++    )
++
++    ledger.before_model_call(system_prompt=None, input_items=[], agent=agent)
++    ledger.after_model_call(SimpleNamespace(
++        usage=Usage(
++            requests=1, input_tokens=30_000, output_tokens=2_000, total_tokens=32_000
++        ),
++        raw_usage={"total_tokens": 32_000},
++    ))
++    ledger.before_model_call(system_prompt=None, input_items=[], agent=agent)
++
++    assert ledger.requests_started == 2
++    assert ledger.total_tokens == 32_000
++    assert ledger.gate_events[-1]["status"] == "allowed"
++
++
++def test_no_total_token_limit_still_enforces_explicit_cost_limit(monkeypatch) -> None:
++    budget = inference_v02.InferenceBudget(
++        max_output_tokens=100,
++        max_total_tokens=None,
++        max_cost_usd=Decimal("0.01"),
++        input_cost_per_million=Decimal("1"),
++        output_cost_per_million=Decimal("1"),
++    )
++    ledger = UsageLedger(budget)
++    monkeypatch.setattr(
++        "mock_spec.budget.estimate_known_request_tokens",
++        lambda **_kwargs: (20_000, 80_000),
++    )
++
++    with pytest.raises(InferenceError) as caught:
++        ledger.before_model_call(
++            system_prompt=None,
++            input_items=[],
++            agent=SimpleNamespace(tools=[], output_type=None),
++        )
++
++    assert caught.value.category == "budget_exhausted"
++    assert ledger.gate_events[-1]["reason"] == "projected_cost_limit"
++
++
+ def test_preflight_token_gate_blocks_before_model_call(monkeypatch) -> None:
+     task = _task()
+     budget = inference_v02.InferenceBudget(
+diff --git a/tests/test_staged_inference.py b/tests/test_staged_inference.py
+index 4931e45..9a37e3f 100644
+--- a/tests/test_staged_inference.py
++++ b/tests/test_staged_inference.py
+@@ -164,7 +164,7 @@ def test_variant_b_replay_preserves_identity_stages_and_artifact_hashes(tmp_path
+     assert [item["stage"] for item in record["stages"]] == [
+         "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER"
+     ]
+-    assert record["schema_version"] == "scenario-inference-record/v0.4"
++    assert record["schema_version"] == "scenario-inference-record/v0.5"
+     assert record["citation_mode"] == "source_locator_host_materialized_quote/v1"
+     assert manifest["versions"]["citation_mode"] == record["citation_mode"]
+     assert [item["model_call_sequence"] for item in record["stages"]] == [1, 2, 3, 4]
+diff --git a/tests/test_staged_live.py b/tests/test_staged_live.py
+index fe62877..f08effa 100644
+--- a/tests/test_staged_live.py
++++ b/tests/test_staged_live.py
+@@ -30,6 +30,43 @@ def test_live_configuration_requires_priced_cost_budget() -> None:
+         StagedRunConfig(run_mode="live_inference", model_name="unused-model")
+ 
+ 
++def test_live_diagnostic_cli_disables_http_wait_and_preserves_accounting(monkeypatch, tmp_path) -> None:
++    import openai
++    import run as staged_cli
++
++    clients = []
++    real_client = openai.AsyncOpenAI
++
++    def capture_client(**kwargs):
++        client = real_client(**kwargs)
++        clients.append(client)
++        return client
++
++    async def capture_run(**kwargs):
++        config = kwargs["config"]
++        assert config.no_run_resource_limits is True
++        assert config.max_total_tokens is None
++        assert config.timeout_seconds is None
++        assert config.max_cost_usd is None
++        assert config.max_output_tokens == 393216
++        assert config.input_cost_per_million == Decimal("0.30")
++        assert kwargs["model"].response_capture.max_body_bytes is None
++        assert clients[0].timeout is None
++        await clients[0].close()
++        return {"manifest": {"result_status": "SELECTED"}}
++
++    monkeypatch.setenv("OPENAI_API_KEY", "unused-test-key")
++    monkeypatch.setattr(openai, "AsyncOpenAI", capture_client)
++    monkeypatch.setattr(staged_cli, "execute_staged_run", capture_run)
++    assert staged_cli.main([
++        "--mode", "live_inference", "--variant", "C", "--model", "unused-model",
++        "--snapshot", str(tmp_path), "--case-id", "flask_308", "--repository-read",
++        "--output-dir", str(tmp_path / "run"), "--no-run-resource-limits",
++        "--max-output-tokens", "393216", "--input-cost-per-million", "0.30",
++        "--output-cost-per-million", "1.20",
++    ]) == 0
++
++
+ def test_live_cli_missing_configuration_never_creates_run(tmp_path) -> None:
+     output_dir = tmp_path / "live"
+     env = os.environ.copy()
+diff --git a/tests/test_staged_provider_capture.py b/tests/test_staged_provider_capture.py
+index 4ec596f..efb2732 100644
+--- a/tests/test_staged_provider_capture.py
++++ b/tests/test_staged_provider_capture.py
+@@ -313,7 +313,7 @@ def test_capture_truncation_turns_completed_sdk_response_into_failure() -> None:
+ 
+ def test_call_stage_records_incomplete_response_without_format_repair() -> None:
+     value = {
+-        "schema_version": "staged-query/v0.4",
++        "schema_version": "staged-query/v0.5",
+         "decision": "finish_queries",
+         "query_attempt": None,
+         "previous_receipt_assessment": None,
+diff --git a/tests/test_staged_query_recovery_boundaries.py b/tests/test_staged_query_recovery_boundaries.py
+index 2ea845d..81171e6 100644
+--- a/tests/test_staged_query_recovery_boundaries.py
++++ b/tests/test_staged_query_recovery_boundaries.py
+@@ -16,7 +16,7 @@ from controller import _completed_response_json, _query_repair_snapshot  # noqa:
+ 
+ def _query_with_extra(*, extra_name: str = "attempt_sequence_note", value=None) -> dict:
+     return {
+-        "schema_version": "staged-query/v0.4",
++        "schema_version": "staged-query/v0.5",
+         "decision": "request_query",
+         "query_attempt": {
+             "question": "What behavior constrains this candidate?",
+@@ -94,8 +94,8 @@ def test_completed_response_rejects_ambiguous_or_incomplete_output(mutation: str
+ 
+ def test_completed_response_rejects_duplicate_json_keys() -> None:
+     response = _response(
+-        '{"schema_version":"staged-query/v0.4",'
+-        '"schema_version":"staged-query/v0.4"}'
++        '{"schema_version":"staged-query/v0.5",'
++        '"schema_version":"staged-query/v0.5"}'
+     )
+ 
+     with pytest.raises(ValueError):
+diff --git a/tests/test_staged_query_repair_budget.py b/tests/test_staged_query_repair_budget.py
+index 53d10dc..6944eea 100644
+--- a/tests/test_staged_query_repair_budget.py
++++ b/tests/test_staged_query_repair_budget.py
+@@ -28,7 +28,7 @@ from scripted import FixedScriptModel, synthetic_task  # noqa: E402
+ 
+ def _raw_query() -> dict:
+     return {
+-        "schema_version": "staged-query/v0.4",
++        "schema_version": "staged-query/v0.5",
+         "decision": "request_query",
+         "query_attempt": {
+             "question": "Which exact behavior constrains the candidate?",
+diff --git a/tests/test_staged_query_schema.py b/tests/test_staged_query_schema.py
+index 2824935..003ee08 100644
+--- a/tests/test_staged_query_schema.py
++++ b/tests/test_staged_query_schema.py
+@@ -31,7 +31,7 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
+     requests: list[dict] = []
+     calls: list[dict] = []
+     result = {
+-        "schema_version": "staged-query/v0.4",
++        "schema_version": "staged-query/v0.5",
+         "decision": "finish_queries",
+         "query_attempt": None,
+         "previous_receipt_assessment": None,
+@@ -88,6 +88,23 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
+     assert calls[0]["requested_output_schema"] == requests[0]["text"]["format"]["schema"]
+ 
+ 
++def test_question_update_schema_assigns_acquisition_only_to_open_questions() -> None:
++    schema = _StageOutputSchema(QuerySelection).json_schema()
++    branches = schema["properties"]["question_updates"]["items"]["anyOf"]
++
++    assert len(branches) == 2
++    assert all(branch["type"] == "object" for branch in branches)
++    assert all(branch["additionalProperties"] is False for branch in branches)
++    open_branch = next(branch for branch in branches
++                       if branch["properties"]["state"].get("const") == "open")
++    closed_branch = next(branch for branch in branches
++                         if branch["properties"]["state"].get("enum") == ["resolved", "nonblocking"])
++    assert open_branch["properties"]["acquisition"]["enum"] == ["available", "unavailable"]
++    assert "acquisition" in open_branch["required"]
++    assert "acquisition" not in closed_branch["properties"]
++    assert "acquisition" not in closed_branch["required"]
++
++
+ @pytest.mark.parametrize("invalid", [
+     {"schema_version": "staged-query/v0.2"},
+     {"previous_receipt_assessment": {"attempt_sequence": 1, "impact": "supports",
+@@ -97,7 +114,7 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
+ ])
+ def test_query_wire_strictly_rejects_legacy_or_unknown_fields(invalid) -> None:
+     value = {
+-        "schema_version": "staged-query/v0.4", "decision": "finish_queries",
++        "schema_version": "staged-query/v0.5", "decision": "finish_queries",
+         "query_attempt": None, "previous_receipt_assessment": None,
+         "impact": "inspect", "stop_explanation": None,
+         "question_updates": [], "candidate_updates": [],
+diff --git a/tests/test_staged_repository_exploration.py b/tests/test_staged_repository_exploration.py
+index 5b5e037..db7b3b3 100644
+--- a/tests/test_staged_repository_exploration.py
++++ b/tests/test_staged_repository_exploration.py
+@@ -54,7 +54,7 @@ def test_repair_qualification_allows_future_read_after_disjoint_search_matches(
+         assert [match["start_line"] for match in search["matches"]] == [2, 5]
+         before = store.observations()
+         wire = QuerySelection.model_validate({
+-            "schema_version": "staged-query/v0.4",
++            "schema_version": "staged-query/v0.5",
+             "decision": "request_query",
+             "query_attempt": {
+                 "question": "What do the intervening lines establish?",
+diff --git a/tests/test_staged_semantic_loop.py b/tests/test_staged_semantic_loop.py
+index ca170ad..2e1fe5b 100644
+--- a/tests/test_staged_semantic_loop.py
++++ b/tests/test_staged_semantic_loop.py
+@@ -149,7 +149,7 @@ def locator(source, start, end):
+ 
+ 
+ def finish(*, update=None, remaining=None, assessment=None):
+-    return {"schema_version": "staged-query/v0.4", "decision": "finish_queries", "query_attempt": None,
++    return {"schema_version": "staged-query/v0.5", "decision": "finish_queries", "query_attempt": None,
+             "previous_receipt_assessment": assessment, "impact": "Assess the original goal and dependency relation.",
+             "question_updates": [] if update is None else [update], "candidate_updates": [],
+             "stop_explanation": {"reason": "no_further_evidence" if remaining else "evidence_sufficient",
+@@ -158,9 +158,12 @@ def finish(*, update=None, remaining=None, assessment=None):
+ 
+ 
+ def question_update(*, state, evidence, acquisition, sequences=(), question_id="q1"):
+-    return {"question_id": question_id, "question": QUESTION, "goal_indexes": [0], "impact": IMPACT,
++    update = {"question_id": question_id, "question": QUESTION, "goal_indexes": [0], "impact": IMPACT,
+             "state": state, "rationale": "The original result depends on the real transformation.",
+-            "evidence": evidence, "acquisition": acquisition, "attempted_sequences": list(sequences)}
++            "evidence": evidence, "attempted_sequences": list(sequences)}
++    if state == "open":
++        update["acquisition"] = acquisition
++    return update
+ 
+ 
+ def contrast(*, investigate=False):
+@@ -262,7 +265,7 @@ def test_material_gap_reopens_queries_and_changes_the_relation(tmp_path, origin)
+         {"operation": "search", "path_pattern": "helper.py"},
+         {"operation": "read", "source_id": dynamic_id, "start_line": 1, "end_line": 2},
+     ]):
+-        outputs.append({"schema_version": "staged-query/v0.4", "decision": "request_query",
++        outputs.append({"schema_version": "staged-query/v0.5", "decision": "request_query",
+                         "query_attempt": {"question": QUESTION, "scenario_id": "original_task",
+                                           "tool": "inspect_source", "arguments_json": json.dumps(args)},
+                         "previous_receipt_assessment": None if index == 0 else assessment,
+@@ -319,13 +322,17 @@ def test_scope_external_unknown_does_not_force_an_irrelevant_query(tmp_path):
+     stopped["question_updates"] = [{
+         "question_id": None, "question": question, "goal_indexes": [0], "impact": impact,
+         "state": "nonblocking", "rationale": "The test's fixed input excludes other keys.",
+-        "evidence": [locator("test:0", 2, 2)], "acquisition": "not_needed", "attempted_sequences": [],
++        "evidence": [locator("test:0", 2, 2)], "attempted_sequences": [],
+     }]
+     result, model = run(tmp_path, task, [extract(constructed), stopped, constructed, contrast(), deliver(constructed)])
+     assert result["record"]["error"] is None
+     assert result["spec"].semantics.delivery_status == "ready"
+     assert model.calls == 5
+     assert not result["record"]["query_log"]
++    query_stage = result["record"]["stages"][1]
++    assert "acquisition" not in query_stage["wire_result"]["question_updates"][0]
++    assert query_stage["host_question_updates"][0]["acquisition"] == "not_needed"
++    assert query_stage["questions_after"][0]["state"] == "nonblocking"
+ 
+ 
+ def test_supported_alternative_branches_are_not_conjoined_or_ambiguous(tmp_path):
+@@ -472,11 +479,11 @@ def test_question_citing_combined_read_ranges_requires_both_receipts(tmp_path):
+                                  sequences=[1], question_id=None)
+         questions = InvestigationLedger(1, repository_available=True)
+         with pytest.raises(ValueError, match="associated with its observed query receipt"):
+-            questions.apply_updates([QuestionUpdate.model_validate(update)],
++            questions.apply_updates([QuestionUpdate.model_validate({**update, "acquisition": "not_needed"})],
+                                     store=store, attempts=executor.attempts, task=task)
+         assert questions.snapshot() == []
+         update["attempted_sequences"] = [1, 2]
+-        questions.apply_updates([QuestionUpdate.model_validate(update)],
++        questions.apply_updates([QuestionUpdate.model_validate({**update, "acquisition": "not_needed"})],
+                                 store=store, attempts=executor.attempts, task=task)
+         assert questions.snapshot()[0]["state"] == "resolved"
+     finally:
+@@ -493,7 +500,7 @@ def test_reopening_question_cannot_erase_original_association(origin):
+     update = question_update(state="resolved", evidence=[locator("mut:0", 1, 5)],
+                              acquisition="not_needed", sequences=[1], question_id="q1")
+     questions.apply_updates(
+-        [QuestionUpdate.model_validate(update)], store=SourceStore(task), task=task,
++        [QuestionUpdate.model_validate({**update, "acquisition": "not_needed"})], store=SourceStore(task), task=task,
+         attempts=[{"sequence": 1, "status": "ok", "result": {}, "response_id": "read-1"}],
+     )
+     before = questions.snapshot()
+diff --git a/tests/test_staged_trace.py b/tests/test_staged_trace.py
+index 7cdc679..167b5b8 100644
+--- a/tests/test_staged_trace.py
++++ b/tests/test_staged_trace.py
+@@ -25,7 +25,7 @@ from controller import (  # noqa: E402
+     StagedInferenceError, StagedRunConfig, _call_stage, execute_staged_run,
+ )
+ from stage_protocol import QueryResult  # noqa: E402
+-from scripted import FixedScriptModel, scripted_outputs, synthetic_task  # noqa: E402
++from scripted import FixedScriptModel, query_script, scripted_outputs, synthetic_task  # noqa: E402
+ def _ledger(config: StagedRunConfig) -> UsageLedger:
+     return UsageLedger(InferenceBudget(
+         max_turns=config.max_model_calls,
+@@ -136,12 +136,12 @@ def test_api_failure_trace_preserves_safe_provider_diagnostics() -> None:
+         "model_request_started": True,
+         "model_name": "scripted-offline",
+         "output_type": "QueryResult",
+-        "prompt_version": "staged-scenario-inference-prompts/v0.4",
++        "prompt_version": "staged-scenario-inference-prompts/v0.5",
+         "payload_bytes": 17,
+     }
+     assert call["payload_sha256"]
+     assert call["payload"] == {"stage": "QUERY"}
+-    assert call["instructions"].startswith("staged-scenario-inference-prompts/v0.4")
++    assert call["instructions"].startswith("staged-scenario-inference-prompts/v0.5")
+     assert call["requested_output_schema"]["title"] == "QueryResult"
+     assert call["request_start_basis"] == "usage_ledger_before_model_call_hook"
+     assert call["timeout_seconds"] == pytest.approx(5, abs=0.1)
+@@ -266,3 +266,33 @@ def test_pre_request_budget_gate_is_distinct_from_provider_failure() -> None:
+     assert calls[0]["model_request_started"] is False
+     assert calls[0]["exception"]["classification"] == "host_budget"
+     assert calls[0]["exception"]["error_code"] == "model_call_limit"
++
++
++@pytest.mark.parametrize("query_count", [0, 1])
++def test_diagnostic_run_has_no_model_wait_or_run_budget_limits(tmp_path: Path, query_count: int) -> None:
++    class SlowScript(FixedScriptModel):
++        async def get_response(self, *args, **kwargs):
++            await asyncio.sleep(0.01)
++            return await super().get_response(*args, **kwargs)
++
++    model = SlowScript(query_script(query_count, "selected", variant="B"))
++    result = asyncio.run(execute_staged_run(
++        synthetic_task(), output_dir=tmp_path / "diagnostic", model=model,
++        config=StagedRunConfig(
++            no_run_resource_limits=True, max_total_tokens=None, timeout_seconds=None,
++            max_model_calls=1, parsing_timeout_seconds=0.001,
++        ),
++    ))
++
++    assert result["record"]["error"] is None
++    assert result["spec"].semantics.delivery_status == "ready"
++    calls = result["record"]["model_calls"]
++    assert len(calls) == 4 + query_count
++    assert all(call["timeout_seconds"] is None for call in calls)
++    manifest = result["manifest"]
++    assert manifest["deadline"]["absolute"] is None
++    assert manifest["deadline"]["wall_clock_deadline_unix"] is None
++    assert manifest["controller_limits"]["model_calls"] is None
++    assert manifest["controller_limits"]["query_attempts"] is None
++    assert manifest["usage"]["requests_completed"] == 4 + query_count
++    assert manifest["usage"]["total_tokens"] > 0

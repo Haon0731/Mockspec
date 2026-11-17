@@ -1,0 +1,3818 @@
+diff --git a/docs/PRD.md b/docs/PRD.md
+index 75c9c62..c684384 100644
+--- a/docs/PRD.md
++++ b/docs/PRD.md
+@@ -183,17 +183,15 @@ M2接入后，总模型预算覆盖推断、生成及修复。M1阶段推断预
+ 
+ | 字段 | 内容 |
+ |---|---|
+-| `schema_version` | 当前研究记录版本 `scenario-inference-record/v0.4`；历史运行按各自产物中的版本解释 |
++| `schema_version` | 当前研究记录版本 `scenario-inference-record/v0.6`；历史运行按各自产物中的版本解释 |
+ | `run_id, case_id, input_hash` | 与运行清单及输入快照一致 |
+ | `result_status` | SELECTED / ALTERNATIVES / AMBIGUOUS / INCONCLUSIVE / ERROR |
+ | `selected_scenario_id` | 仅SELECTED时必填，其余为null |
+ | `selection_rationale` | 选择或不选择的原因，关联证据与候选 |
+-| `claim_basis` | 相关命题的任务要求/实现事实/场景推断分类及引用 |
+ | `query_log` | 轮次、问题、候选、工具参数、返回引用、影响 |
+-| `critical_behaviors` | 行为描述、场景id、目标/证据关联、观察方式；每次构造最多突出3项，不替代完整依赖约束 |
+ | `allowed_variations` | 可变值/构造/次数等；若无已知变化可列，显式说明未识别，不推断唯一 |
+ | `degeneracy_contrast` | 状态、替代Mock方案、绕过行为、依据、预期区分观察；执行状态固定为not_executed |
+-| `revision_log` | 修改对象、前后内容、证据原因；未修订为空数组 |
++| `revision_log` | 宿主计算的实际修改路径、前后内容、模型给出的证据原因；未修订为空数组 |
+ | `unresolved` | 未决问题、影响与所需信息 |
+ 
+ 每条依赖关系必须能读出目标接口或调用位置、适用条件、参数关联、允许返回/异常，以及相关状态影响；无关的状态字段可写不涉及。符号无法解析且影响实现时标为关键未决，不能编造具体调用绑定。
+diff --git a/docs/README.md b/docs/README.md
+index cc647ac..f7e072e 100644
+--- a/docs/README.md
++++ b/docs/README.md
+@@ -31,6 +31,10 @@ PRD 不作为当前能力或已通过验收的说明。
+ 输出减负及截断计量留证。当前研究实现已增加原目标问题账本、构造/对照后的继续调查、
+ 自包含 `dependency_spec.json` 和 provider 失败响应留证；离线工程验证与真实 M2 仍分别报告，
+ 不能据此宣称真实模型的规格推导效果已经提高。
++2026-10-28 的[单次取消宿主运行资源上限诊断](../out/staged-inference/resource-diagnostic-cloudfoundry-20261028/report.md)
++保留了 8 次完整模型响应与 6 次自主查询；首次失败位于 QUERY 问题更新的证据回执关联，
++离线对照另暴露非阻塞状态与取证状态不一致。未进入 CONSTRUCT，也未产生最终 spec；
++本次定位协议停止点，不构成真实规格推导验收通过。
+ 
+ 以下研究结果不等于生产 Agent 已具备对应能力；阅读案例分析也不能作为未来无指导生成的输入。
+ 
+diff --git a/docs/architecture.md b/docs/architecture.md
+index 835ac8b..fbe3b93 100644
+--- a/docs/architecture.md
++++ b/docs/architecture.md
+@@ -152,7 +152,7 @@ CONSTRUCT、CONTRAST 或 REVISE 发现会实质改变规格的证据缺口时，
+ 返回 QUERY；原始目标、问题账本、查询回执、SourceStore 和整次预算均不重置。
+ EXTRACT 声明 INCONCLUSIVE 也不再提前结束：只要已定位原始目标，就把缺口作为问题进入
+ QUERY/CONSTRUCT，以便在证据受限时形成诚实的 partial 规格。候选为空不等于没有原始任务。
+-QUERY_FORMAT_REPAIR 与 DELIVER 的 FORMAT_REPAIR 共用整次运行一次的纠正名额。
++QUERY_FORMAT_REPAIR 保留整次运行一次的回执评估纠正名额；DELIVER 不再调用模型或进入格式修复。
+ 固定脚本模型仍经过 Agents SDK Runner；控制器复用生产 `UsageLedger`、
+ `validate_contract`（含 `SourceStore` 原文校验）及运行身份采集组件。
+ 研究阶段协议、Prompt 与产物写入位于研究目录，生产包不反向依赖它。
+@@ -171,8 +171,8 @@ QueryExecutor 和各阶段契约检查共用本次 Store，观察记录随研究
+ `provider_capture.py` 负责供应商响应留证。`controller.py` 通过这些接口组织阶段次序、续查、
+ 共享预算、格式修复、partial checkpoint 和最终发布。CONSTRUCT、CONTRAST、REVISE 对检查点的处理
+ 不同，仍由控制器显式编排，不隐藏在统一续查包装中。
+-阶段类型和引用校验的 Python 导入位置改为 `stage_protocol`，问题账本从 `investigation`
+-导入；当前研究调用者和测试随迁移更新，CLI 参数、阶段 JSON 版本和正式契约保持不变。
++阶段类型和引用校验的 Python 导入位置为 `stage_protocol`，问题账本从 `investigation`
++导入；当前 wire 显式版本化，历史运行按原版本回放，不静默升级；正式契约仍为 v0.1。
+ 现有 `budget.estimate_known_request_tokens` 对 SDK 输出包装类型使用 `repr` 估算，
+ 因此本次模块名迁移使每次预检多计 4 字节、约 1 Token；极限预算附近可能更早触发门禁。
+ 发送的 Schema 和提示词未变。修正这一生产预算估算路径需要独立验证两版生产入口，
+@@ -191,21 +191,26 @@ QUERY v0.4 的供应商 Schema 与本地严格类型一致；模型只输出回
+ 不扩大证据范围。研究 v0.2 的模型响应只选择 `source_id` 和闭合行范围，
+ 不输出 `quote`；控制器用同一运行 Store 中已可见的原文构造标准阶段结果和正式证据，
+ 再执行原严格契约校验。引用选择解析不读取新文件、不调整坐标、不修补旧响应。
+-EXTRACT、QUERY 停止说明、CONSTRUCT、REVISE、DELIVER 共用该边界；CONTRAST 沿用证据 ID。
++EXTRACT、QUERY 停止说明、CONSTRUCT 与 REVISE 共用该边界；CONTRAST 沿用证据 ID，
++DELIVER 由宿主从已验证 CONSTRUCT 确定性发布。
+ 轨迹分别保留 `wire_result` 与宿主生成的 `result`，并声明
+ `citation_mode=source_locator_host_materialized_quote/v1`。新协议拒绝旧响应的 `quote`，
+ 历史运行仍使用原提交复现，不自动降级或改写历史失败。
+ 研究输出 Schema 在 SDK 边界展开联合类型中的引用，
+ 兼容供应商的显式类型要求；本地仍由原 Pydantic 类型严格解析，轨迹保存实际发送的 Schema。
+-后续 QUERY 评估上一回执，CONSTRUCT/DELIVER 接收累计回执；未完成判断明确留证。
+-QUERY v0.4 还接收宿主能力视图、原目标问题账本和 continuation；候选是可更新的工作假设，
++后续 QUERY 评估上一回执，CONSTRUCT 接收累计回执；未完成判断明确留证。
++QUERY v0.6 还接收宿主能力视图、原目标问题账本和 continuation；候选是可更新的工作假设，
+ 初始来源清单只在片段模式代表全部可见范围。停止检查要求每项原目标相关问题已解决、
+ 有依据转为 nonblocking，或因实际取证限制保留为阻塞未知；可访问的重要证据仍存在时拒绝停止。
+ 构造结果分别使用 SELECTED、ALTERNATIVES、AMBIGUOUS 和 INCONCLUSIVE：
+ ALTERNATIVES 表示多个分支均已正向支持且可由消费者选一，AMBIGUOUS 表示分支合法性或选择依据仍未解决。
+ 阶段切换和 SDK 对象重建不重置账本、模型请求数、查询数或绝对截止时间。
+-仓库模式的 QUERY 正常结束须提交 `stop_explanation`：停止理由、可校验原文引用、
+-剩余未知及影响。控制器只验证协议和引用，不证明语义充分；有阻塞未知不能发布 SELECTED。
++仓库模式的 QUERY 正常结束须提交 `stop_explanation` 的停止理由与可校验原文引用；
++剩余未知及影响由宿主从问题账本投影。控制器只验证协议和引用，不证明语义充分；有阻塞未知不能发布 SELECTED。
++QUERY v0.6 将问题更新分成开放与闭合两种模型 wire：只有开放问题声明证据仍可获取或经尝试后
++不可获取；resolved/nonblocking 不携带 acquisition。宿主将闭合更新投影为内部
++`acquisition=not_needed`，在 `wire_result` 之外另存 `host_question_updates` 后再写调查账本。
++这样不会让模型重复维护可推导字段，也不放宽证据、查询回执关联、原目标绑定或停止充分性校验。
+ `query.py` 比较规范化查询、位置/页游标和返回证据，持续无进展时保护终止；阈值按
+ 连续无进展计算，不是总探索次数。生产 SDK 入口同样记录并检测无进展循环。
+ `termination` 区分 agent / controller / caller，超时、预算和重复终止均不发布最终契约。
+@@ -214,7 +219,7 @@ ALTERNATIVES 表示多个分支均已正向支持且可由消费者选一，AMBI
+ 宿主在输入加载/校验前登记运行身份和独立输出目录，校验后保存确定性输入快照；
+ 请求前检查显式配置与整次运行的预算。输入拒绝保留请求身份，有效任务身份与哈希为 null。
+ 模型只接收完整可见任务及阶段上下文，宿主配置、物理输入目录和评价材料不进入初始输入。
+-DELIVER 本地校验选择、引用及任务身份后，先写契约与记录，再写含实际文件哈希的清单；
++DELIVER 是确定性的宿主阶段：再次校验选择、规格、引用及任务身份后，先写契约与记录，再写含实际文件哈希的清单；
+ SELECTED、ALTERNATIVES 与 AMBIGUOUS 必须有有效契约；INCONCLUSIVE 可保留完整契约供诊断；
+ ERROR 只保留阶段草案与错误，不发布最终契约。状态与停止原因分别保存；已有输出目录拒绝覆盖。
+ 正式 `ScenarioContract` 保持 v0.1 字段；研究选择状态、运行身份和对照状态由旁路记录承载。
+@@ -241,6 +246,10 @@ live 入口在本次 AsyncOpenAI 客户端上安装非流式 HTTP response hook
+ input/output/total/reasoning 计量分别保留 reported/not_reported/unavailable；reasoning 不重复计入总用量。
+ 初始源码只在 source_line_index 中按原坐标出现一次；记录 legacy_payload_bytes 与实际 payload_bytes，
+ 这是字节测量，不是供应商 Token 实测或对截断已解决的证明。
++研究 CLI 的显式 `--no-run-resource-limits` 诊断模式复用同一控制器和用量账本，
++取消整次资源门禁与模型/HTTP 等待超时；清单将累计 Token、费用和绝对截止时间记为 null，
++响应捕获不裁剪正文。单次输出使用显式供应商参数，读取授权、单次源码工具边界、
++协议检查和无进展保护继续生效。默认及冻结生产路径不因此改为无上限。
+ 
+ 这条路径验证 B/C 五状态流程、静态对照、继续调查、修订修复、定向查询、共享预算及失败留证边界；
+ 合成任务不经过真实 Adapter 审核，不构成真实数据准入、目标测试执行或模型推断质量证据。
+diff --git a/docs/scenario-inference.md b/docs/scenario-inference.md
+index 286674f..0446530 100644
+--- a/docs/scenario-inference.md
++++ b/docs/scenario-inference.md
+@@ -56,13 +56,21 @@ V0.2 的源码工具只补充已有可见输入的事实，不写验证成功状
+ 正式 Evidence 和以下映射不变，最终契约继续通过原逐字校验；
+ 原文真实不意味着它支持模型结论，证据相关性仍需独立审查。
+ 
+-QUERY wire 在此基础上使用 `staged-query/v0.4`：模型评估仍仅含 impact/rationale，
++QUERY wire 在此基础上使用 `staged-query/v0.6`：模型评估仍仅含 impact/rationale，
+ 另用独立字段更新与原目标关联的问题及当前候选；宿主关联唯一 pending receipt 后补入
+ 内部 v0.1 assessment 的 attempt_sequence。
++开放问题由模型声明证据仍 `available` 或经实际尝试后 `unavailable`；已解决或非阻塞问题
++不再让模型重复填写 acquisition，宿主固定投影为 `not_needed`，并在阶段记录中同时保留
++原始 wire 与 `host_question_updates`。证据、回执关联、原目标绑定和停止充分性校验不变。
++既有问题只回传宿主 `question_id` 与本轮语义判断；question、goal_indexes、impact 由宿主从账本恢复。
++闭合问题的回执序号由已观察证据反推，开放问题的既有尝试历史与本轮相关尝试由宿主做去重并集，
++模型不能通过后续更新抹掉已有 provenance。停止时的 remaining_unknowns 同样从更新后的账本投影。
+ 原始 wire、宿主关联和宿主 quote 分别留证。未知 null 字段的有限纠正不接受宿主投影为结果；
+-模型重发须与比较快照精确一致，且与 DELIVER 共用一次名额。
++模型重发须与比较快照精确一致。DELIVER 为宿主确定性发布，不占用模型或修复名额。
+ 候选表达有条件的依赖约束；imports、测试名与最终断言不能独自证明隐藏 Mock 配置，
+-仅取得声明行且未确定行为时评估为 no_new_information。语义充分性由独立评阅判定。
++仅取得声明行且未确定行为时评估为 no_new_information。QUERY 查询可观察依赖行为及合法替代，
++不会为恢复隐藏 Mock/VERIFY 文本、框架写法或无证据的调用次数继续探索。
++语义充分性由独立评阅判定。
+ 
+ 分阶段研究控制器保持正式 `mock-spec.scenario/v0.1` 不变，并在
+ `inference_record.json` 保存场景卡所需的研究旁路信息：
+@@ -72,18 +80,15 @@ QUERY wire 在此基础上使用 `staged-query/v0.4`：模型评估仍仅含 imp
+ | scenario | `scenario_hypotheses` |
+ | evidence | 正式 `evidence`；动态引用还须属于本次运行的 observed 范围 |
+ | dependency_behavior | `dependency_constraints` |
+-| key_behaviors | `critical_behaviors`，最多三项，并用 `semantic_role` 与 `formal_claim_index` 关联正式 Claim |
++| key_behaviors | 正式 `dependency_constraints`、`test_objectives` 与消费规格中的 goal/constraint 关系 |
+ | counterfactual / discriminator | `degeneracy_contrast`；`execution_status` 固定为 `not_executed` |
+ | allowed_variations | `allowed_variations` |
+ | unknowns | 正式 `uncertainty` 加旁路 `unresolved` / `nonblocking_unknowns` |
+ 
+-仓库探索模式下，每项重要旁路判断还记录 `semantic_role`，区分
+-`dependency_contract`、`mut_path_condition` 和 `test_objective`。判断须以
+-`support=evidence` 关联正式 evidence ID，或以 `support=assumption` 给出明确的
+-`assumption_reason`；不能两者混用。`claim_basis` 进一步用 `target` 和
+-`target_index` 覆盖选择理由、允许变化、阻塞未知与非阻塞未知；静态反事实也须
+-声明 `semantic_role`。上述字段用于复核内容来源，
+-不扩展或改写冻结的正式契约 Schema。
++CONSTRUCT wire 不再要求模型维护 `claim_basis`、前三项 `critical_behaviors` 或数组索引。
++模型为正式目标、依赖约束和 uncertainty 声明稳定 ref，并在消费规格中用 ref 表达语义关系；
++宿主只校验唯一性、解析为发布 artifact 的局部索引并从 `spec` 投影允许变化与未知摘要，
++不推断 `semantic_role`、证据蕴含或目标关系。正式契约 Schema 不变。
+ 
+ ## 能证明和不能证明的事项
+ 
+diff --git a/docs/usage.md b/docs/usage.md
+index a35b14e..dba567d 100644
+--- a/docs/usage.md
++++ b/docs/usage.md
+@@ -236,12 +236,12 @@ MYPYPATH=src .venv/bin/python -m mypy --follow-untyped-imports \
+ 研究代码类型检查显式使用本仓 `src`，避免误读环境中其他安装版本；
+ 它仍会报告所引用生产模块的既有诊断，应与上方生产基线比较。
+ 
+-本轮模型效果尚未做真实评估。后续可在单独确认付费预算后预登记：仅使用现有审核的
+-flask_308 与 CloudFoundry 各一次 C 运行，模型 deepseek-flash，开启 repository-read；
+-每例共享上限为 200,000 Token、600 秒、单调用 120 秒及 US$1 估算门禁，输出上限 8192。
+-运行前核对实际服务费率、配置和最终代码版本，分别写入全新输出目录；失败、截断、歧义和未决均计入结果，
++真实规格推导尚未通过验收。[2026-10-28 CloudFoundry 诊断](../out/staged-inference/resource-diagnostic-cloudfoundry-20261028/report.md)
++在取消宿主运行资源上限后完成自主取证，但因 QUERY 问题更新的协议一致性校验停止，未交付最终 spec。
++后续真实运行可使用现有审核的 flask_308 与 CloudFoundry，须有相应调用授权并预登记：
++运行前核对实际服务费率、配置和代码版本，分别写入全新输出目录；失败、截断、歧义和未决均计入结果，
+ 不重跑挑成功样本、不执行目标测试。人工/隔离评阅关注目标覆盖、依赖语义、过强/过弱约束与未知影响，
+-不以 JSON 合法或查询次数替代规格质量。这是待执行方案，不是两次成功或模型效果改善的证据。
++不以 JSON 合法或查询次数替代规格质量。文档中的运行配置不自动构成费用授权。
+ 
+ 输出目录必须不存在。有效语义结果（SELECTED、ALTERNATIVES、AMBIGUOUS、INCONCLUSIVE）退出码为 0，
+ ERROR 为 1，命令或无法完成的产物写入错误为 2；
+@@ -281,6 +281,13 @@ content_changed/identity_mismatch；后端或畸形结果为 backend_error/analy
+ 可显式配置 `--max-model-calls`、`--max-output-tokens`、`--max-total-tokens`、
+ `--max-tool-output-chars`、`--timeout-seconds` 和 `--parsing-timeout-seconds`。
+ 配置与请求前估算的局限写入 manifest；Token 估算不是远端费用硬上限。
++真实故障诊断可显式使用 `--no-run-resource-limits`：取消整次 Token、费用、模型/查询次数、
++总时限、模型等待与 HTTP 客户端超时，并完整保存供应商响应；仍记录实际用量和估费，
++live 模式仍要求输入/输出单价。该选项不能与 `--max-cost-usd` 同用，且不代表费用授权。
++单次模型输出仍由 `--max-output-tokens` 明确配置；诊断时应核对服务商最高值，
++不能把省略参数误认为无限输出。授权读取范围、单次源码工具的输出/解析边界、
++无进展保护、协议校验及一次格式修复规则保持原义。此模式用于定位首次真实停止点，
++不自动重试，也不证明规格质量；默认运行配置不变。
+ 未知用量保留 null/不完整并阻止继续请求；总时限到期后取消并回收解析进程，
+ 不额外请求模型收尾，仅执行本地验证和留证。
+ 这些 Token 用量来自脚本模型的固定回执，不是远端计费证据。
+@@ -292,7 +299,7 @@ content_changed/identity_mismatch；后端或畸形结果为 backend_error/analy
+ | `input_snapshot.json` | 完整可见任务的确定性 UTF-8 JSON；排序键、紧凑分隔，保持源码与普通 oracle 字符串 |
+ | `scenario_contract.json` | 通过正式 v0.1 校验的契约；无效输出不发布此文件 |
+ | `dependency_spec.json` | `mock-spec.dependency/v0.1` 自包含消费规格；绑定本次完整 task、正式契约、运行/输入身份、范围、依据、分支、允许变化、未知、冲突及停止摘要；合成回放不因此获得真实准入 |
+-| `inference_record.json` | 阶段结果与可见模型响应、选择、关键行为、允许变化、错误；B 对照固定为 `disabled_by_variant/not_executed` |
++| `inference_record.json` | 阶段结果与可见模型响应、选择、宿主投影的允许变化、错误；B 对照固定为 `disabled_by_variant/not_executed` |
+ | `run_manifest.json` | 宿主身份、配置、版本、预算和用量、终态，以及前述产物实际字节的 SHA256；最后写入且不哈希自身 |
+ 
+ `controller.execute_staged_run` 是研究流程与统一产物边界，负责阶段次序、共享预算、格式修复、
+@@ -306,7 +313,7 @@ CONSTRUCT/CONTRAST 状态校验；`investigation.py` 的 `InvestigationLedger` 
+ 无法写入时以非零退出码和 stderr 报告，不声称成功留证。
+ 
+ 可用 `--replay-case selected|ambiguous|inconclusive|error` 分别复现四种结果，默认 selected。
+-每次指定不同的输出目录；error 回放在 DELIVER 注入身份篡改，验证已完成草案留证但不发布最终契约。
++每次指定不同的输出目录；error 回放在 CONSTRUCT 注入无效证据引用，验证草案留证但宿主 DELIVER 不发布最终契约。
+ 
+ | 结果 | 最终契约与下游含义 |
+ | --- | --- |
+@@ -368,7 +375,7 @@ PYTHONPATH=src .venv/bin/python experiments/staged-inference/run.py \
+ 输出目录不可创建或写入失败时明确非成功退出，不保证存储故障下产物齐全。
+ 
+ 当前完成范围是 EXTRACT → QUERY（片段模式零至六次，仓库模式按证据与资源终止）→ CONSTRUCT →
+-CONTRAST（仅 C）→ REVISE（可选一次）→ DELIVER
++CONTRAST（仅 C）→ REVISE（按需）→ DELIVER（宿主确定性校验并发布）
+ 的 B/C 四状态回放，不是整个 M1。synthetic_replay 分支不审核真实 Adapter 输入；
+ live_inference 分支见下方 M1-5 说明。两者均不生成 Mock、不执行目标测试。
+ 脚本回放通过仅证明控制器和校验边界，不证明真实模型的场景选择或语义推导质量。
+@@ -445,7 +452,7 @@ HTTP 400，已修复；逐调用诊断位于 `inference_record.json.model_calls`
+ 
+ 研究入口现使用 v0.2 引用选择协议：模型选择来源与行范围，宿主从本次已可见证据
+ 生成精确 `quote`，最终仍使用原契约验证器。`inference_record.json` 的版本为
+-`scenario-inference-record/v0.4`，`citation_mode` 为
++`scenario-inference-record/v0.6`，`citation_mode` 为
+ `source_locator_host_materialized_quote/v1`；阶段的 `wire_result` 与 `result`
+ 分别记录模型选择和宿主标准结果。旧模型响应中的 `quote` 不自动转换；
+ 历史运行按对应提交复现，不能把旧失败送入新协议后改称成功。
+@@ -461,9 +468,9 @@ G4 未通过；没有放宽 Schema、删除额外字段或自动重跑。
+ 捕获实际 HTTP 请求并确认 strict/完整 Schema 保留；单次对抗请求合规，不能据此宣称
+ 原复杂任务问题已修复或恢复 M2。该探针属于单独留证的一次性诊断，不是生产入口。
+ 
+-研究 QUERY v0.4 使用严格嵌套类型，回执编号由宿主绑定，并增加问题及候选更新；历史 v0.3
+-响应仍按原运行记录解释，不静默升级。整次运行的 QUERY_FORMAT_REPAIR
+-与 DELIVER FORMAT_REPAIR 共用一次名额；预留后即使用量门禁拒绝或请求失败也不退回。
++研究 QUERY v0.6 使用严格嵌套类型，回执编号由宿主绑定，并增加问题及候选更新；历史 v0.3-v0.5
++响应仍按原运行记录解释，不静默升级。整次运行仅 QUERY_FORMAT_REPAIR
++保留一次名额；预留后即使用量门禁拒绝或请求失败也不退回。
+ QUERY 只允许纠正回执评估对象内未知的 null 字段，模型必须完整重发且保持规定字段逐值一致。
+ 参数、引用、身份、旧版本、缺字段或语义变化均终止；格式纠正不补读源码、不重置预算，
+ 原无效尝试保留，成功纠正后的查询另计一次尝试。详见 PRD 第 10 节。
+diff --git a/experiments/staged-inference/acceptance.py b/experiments/staged-inference/acceptance.py
+index 323ce1e..94fb426 100644
+--- a/experiments/staged-inference/acceptance.py
++++ b/experiments/staged-inference/acceptance.py
+@@ -22,7 +22,7 @@ from scripted import FixedScriptModel, query_script, scripted_outputs, synthetic
+ 
+ REPORT_VERSION = "m1-staged-inference-acceptance/v0.2"
+ MANIFEST_VERSION = "scenario-inference-manifest/v0.1"
+-RECORD_VERSION = "scenario-inference-record/v0.4"
++RECORD_VERSION = "scenario-inference-record/v0.6"
+ CONTRACT_VERSION = "mock-spec.scenario/v0.1"
+ 
+ 
+@@ -229,8 +229,8 @@ def _verify_run(case: dict[str, object], run_dir: Path) -> dict[str, object]:
+     if manifest["stop_reason"] != case["expected_stop_reason"]:
+         raise ValueError(f"{case['name']}: unexpected stop reason")
+     if manifest["versions"] != {
+-        "policy": "staged-scenario-inference/v0.4",
+-        "prompts": "staged-scenario-inference-prompts/v0.4",
++        "policy": "staged-scenario-inference/v0.6",
++        "prompts": "staged-scenario-inference-prompts/v0.6",
+         "record": RECORD_VERSION,
+         "contract": CONTRACT_VERSION,
+         "citation_mode": "source_locator_host_materialized_quote/v1",
+diff --git a/experiments/staged-inference/controller.py b/experiments/staged-inference/controller.py
+index 7380b43..1b02283 100644
+--- a/experiments/staged-inference/controller.py
++++ b/experiments/staged-inference/controller.py
+@@ -30,7 +30,7 @@ from pydantic import ValidationError
+ from mock_spec.budget import BudgetHooks, InferenceBudget, UsageLedger
+ from mock_spec.execution_metadata import collect_execution_metadata
+ from mock_spec.inference import InferenceError
+-from mock_spec.scenario import ScenarioContract, validate_contract
++from mock_spec.scenario import ScenarioContract
+ from mock_spec.schemas import UnifiedTask
+ from mock_spec.source_repository import ReviewedRepository
+ from mock_spec.validation import SourceStore
+@@ -41,19 +41,19 @@ from provider_capture import ResponseCapture
+ from specification import build_dependency_spec, original_goal_mapping, validate_semantics
+ from stage_protocol import (
+     CandidateDraft, CitationMaterializationError, ConstructResult, ConstructSelection,
+-    ContrastResult, DeliverResult, DeliverSelection, ExplorationStop, ExtractResult,
+-    ExtractSelection, InvestigationRequest, QueryAssessmentSelection, QueryResult,
++    ContrastResult, ContrastSelection, DeliverResult, ExplorationStop, ExtractResult,
++    ExtractSelection, InvestigationRequest, QueryAssessmentSelection, QueryResult, RemainingUnknown,
+     QuerySelection, RevisionSelection, StageModel, StageResult,
+-    check_source_reference, contract_selection, materialize_construct,
+-    materialize_delivery, materialize_extract, materialize_query, materialize_reference,
+-    materialize_revision, validate_constructed, validate_contrast,
++    check_source_reference, materialize_construct,
++    materialize_contrast, materialize_extract, materialize_query, materialize_reference,
++    materialize_revision, project_question_updates, validate_constructed, validate_contrast,
+ )
+ 
+ 
+-RECORD_VERSION = "scenario-inference-record/v0.4"
++RECORD_VERSION = "scenario-inference-record/v0.6"
+ MANIFEST_VERSION = "scenario-inference-manifest/v0.1"
+-POLICY_VERSION = "staged-scenario-inference/v0.4"
+-PROMPT_VERSION = "staged-scenario-inference-prompts/v0.4"
++POLICY_VERSION = "staged-scenario-inference/v0.6"
++PROMPT_VERSION = "staged-scenario-inference-prompts/v0.6"
+ CITATION_MODE = "source_locator_host_materialized_quote/v1"
+ FLASK_ABORT_CASE_ID = "flask_308"
+ CLOUDFOUNDRY_APPLICATION_URI_CASE_ID = (
+@@ -80,13 +80,14 @@ class StagedRunConfig:
+     run_mode: Literal["synthetic_replay", "live_inference"] = "synthetic_replay"
+     model_name: str = "scripted-offline"
+     repository_read: bool = False
++    no_run_resource_limits: bool = False
+     max_model_calls: int = 10
+     max_query_attempts: int = 6
+     repetition_threshold: int = 4
+     max_output_tokens: int = 4_096
+-    max_total_tokens: int = 60_000
++    max_total_tokens: int | None = 60_000
+     max_tool_output_chars: int = 16_000
+-    timeout_seconds: float = 120
++    timeout_seconds: float | None = 120
+     parsing_timeout_seconds: float = 15
+     max_cost_usd: Decimal | None = None
+     input_cost_per_million: Decimal | None = None
+@@ -101,6 +102,13 @@ class StagedRunConfig:
+             raise ValueError("run_mode must be synthetic_replay or live_inference")
+         if type(self.repository_read) is not bool:
+             raise ValueError("repository_read must be a boolean")
++        if type(self.no_run_resource_limits) is not bool:
++            raise ValueError("no_run_resource_limits must be a boolean")
++        if self.no_run_resource_limits and any(
++            value is not None
++            for value in (self.max_total_tokens, self.timeout_seconds, self.max_cost_usd)
++        ):
++            raise ValueError("no_run_resource_limits requires null total-token, timeout and cost limits")
+         if self.repository_read and self.run_mode != "live_inference":
+             raise ValueError("repository_read requires live_inference")
+         if self.run_mode == "synthetic_replay" and self.model_name != "scripted-offline":
+@@ -115,14 +123,18 @@ class StagedRunConfig:
+             raise ValueError("max_query_attempts cannot exceed six")
+         for name in ("max_output_tokens", "max_total_tokens"):
+             value = getattr(self, name)
++            if name == "max_total_tokens" and value is None and self.no_run_resource_limits:
++                continue
+             if type(value) is not int or value < 1:
+                 raise ValueError(f"{name} must be a positive integer")
+         if type(self.max_tool_output_chars) is not int or self.max_tool_output_chars < 512:
+             raise ValueError("max_tool_output_chars must be an integer >= 512")
+-        if self.max_output_tokens > self.max_total_tokens:
++        if self.max_total_tokens is not None and self.max_output_tokens > self.max_total_tokens:
+             raise ValueError("max_output_tokens cannot exceed max_total_tokens")
+         for name in ("timeout_seconds", "parsing_timeout_seconds"):
+             value = getattr(self, name)
++            if name == "timeout_seconds" and value is None and self.no_run_resource_limits:
++                continue
+             if (not isinstance(value, (int, float)) or isinstance(value, bool)
+                     or not math.isfinite(value) or value <= 0):
+                 raise ValueError(f"{name} must be positive")
+@@ -130,14 +142,14 @@ class StagedRunConfig:
+         if (prices[0] is None) != (prices[1] is None):
+             raise ValueError("input and output prices must be configured together")
+         if self.run_mode == "live_inference" and (
+-            self.max_cost_usd is None or None in prices
++            (self.max_cost_usd is None and not self.no_run_resource_limits) or None in prices
+         ):
+             raise ValueError("live inference requires cost limit and input/output prices")
+ 
+ 
+ @dataclass
+ class FormatRepairAllowance:
+-    """One irreversible reservation shared by QUERY and DELIVER repair."""
++    """One irreversible reservation for QUERY receipt-assessment repair."""
+ 
+     state: Literal["available", "reserved"] = "available"
+     category: str | None = None
+@@ -307,7 +319,8 @@ def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
+         stage_protocol = (
+             " Preserve ALL original fixed inputs, assertions and scenario requirements as"
+             " original_goals source ranges. Candidates are revisable working hypotheses,"
+-            " not the task boundary; list material missing dependency semantics in unresolved."
++            " not the task boundary; list material missing dependency semantics in unresolved,"
++            " with the affected original goal_indexes and concrete decision impact."
+             " Infer conditional dependency constraints, not hidden Mock setup or hidden"
+             " verification text. State unconfirmed behavior as an if-then hypothesis and"
+             " preserve its missing basis in unresolved. Imports, test names, and final"
+@@ -343,20 +356,30 @@ def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
+             " arguments_json must encode the named argument object."
+             " After a receipt, previous_receipt_assessment classifies its candidate impact"
+             " as supports, weakens, or no_new_information; the host binds it to the one"
+-            " pending receipt, so never return a receipt or attempt sequence field."
++            " pending receipt, so previous_receipt_assessment never includes receipt identity"
++            " or attempt_sequence."
+             " errors and incomplete results still require an assessment."
+             " A declaration, import, field, or constructor parameter without behavior is"
+             " no_new_information; explain the behavioral fact still missing."
++            " Investigate observable dependency behavior, branch conditions, return values,"
++            " exceptions, and interactions that affect the original goals. Do not search for"
++            " or reconstruct hidden Mock/VERIFY text, exact framework syntax, call counts, or"
++            " ordering unless visible production behavior makes that detail independently"
++            " necessary. Preserve such hidden text as nonblocking unknown once the behavior"
++            " and its supported alternatives are sufficient for a downstream coding agent."
+             " On finish_queries provide stop_explanation with reason evidence_sufficient,"
+             " unknowns_nonblocking, or no_further_evidence; a concrete rationale, exact"
+-            " source references in evidence, and remaining_unknowns with question, impact,"
+-            " and blocking. Preserve unknowns rather than treating failed exploration as proof."
++            " source references in evidence. The host projects remaining_unknowns from the"
++            " question ledger. Preserve unknowns rather than treating failed exploration as proof."
+             " Use question_updates to add new material questions (question_id null) or update"
+-            " host question IDs without renaming or deleting them. Map each question to original"
++            " host question IDs without renaming or deleting them. For an existing question,"
++            " return only its question_id and current semantic assessment; the host restores its"
++            " immutable question, goal_indexes, and impact. New questions map to original"
+             " goal_indexes. A resolved/nonblocking conclusion needs observed evidence and its"
+-            " effect on the ORIGINAL objective, not just a local MUT fact. For open unavailable"
++            " effect on the ORIGINAL objective, not just a local MUT fact. Only an open update"
++            " includes acquisition (available or unavailable); resolved/nonblocking updates"
++            " omit it because the host records acquisition=not_needed. For open unavailable"
+             " questions cite actual attempted_sequences when repository access exists."
+-            " remaining_unknowns must exactly retain every open/nonblocking question and impact."
+             " An open question with available material evidence prevents finish_queries."
+             " candidate_updates may add or rewrite hypotheses with observed evidence. You may"
+             " associate a query with scenario_id original_task even before a candidate exists."
+@@ -377,14 +400,10 @@ def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
+             " variations, or explicitly say none were identified without claiming uniqueness."
+             " Keep expected_interactions assertion_policy as not_implied. A test name or an"
+             " implementation branch alone does not make an interaction required."
+-            " For every claim_basis and critical_behavior, classify semantic_role as"
+-            " dependency_contract, mut_path_condition, or test_objective, and state whether"
+-            " support is evidence or assumption. Evidence support requires formal evidence"
+-            " IDs; assumption support requires an explicit reason and no evidence IDs. Each"
+-            " critical behavior must point by zero-based formal_claim_index to the matching"
+-            " dependency constraint, scenario hypothesis, or test objective for its role."
+-            " Map every remaining blocking and nonblocking unknown through claim_basis target"
+-            " unresolved or nonblocking_unknown and its zero-based index."
++            " Assign stable ref strings to formal goals, dependency constraints, and formal"
++            " uncertainties. Use those refs throughout spec; do not maintain array indexes."
++            " The host resolves refs and projects allowed variations and unknown summaries from"
++            " spec. Do not emit duplicate claim_basis or critical_behavior summaries."
+             " Populate spec as a self-contained consumer interpretation: fixed inputs, replacement"
+             " bindings, preserved real code, dependency semantics, premise-to-constraint links,"
+             " each goal's coverage, allowed alternatives, assumptions and unknown impacts."
+@@ -407,23 +426,24 @@ def _stage_agent(stage: str, output_type: type[StageResult], model: Model,
+             " attempts, not proof. A spec-legal Mock with weaker defect discrimination remains"
+             " legal; distinguishing observations are suggestions unless original requirements"
+             " establish them. Return investigation_requests if evidence could change the spec."
+-            " For proposed, identify an"
+-            " alternative Mock plan, the supported behavior it bypasses, evidence IDs, and the"
+-            " smallest distinguishing observation. Use none_identified only after completing"
+-            " the attempt without an evidence-backed alternative. An AMBIGUOUS result may be"
++            " A proposed finding may directly describe an omitted obligation or unjustified"
++            " restriction in the review fields and request revision. Include the optional"
++            " alternative/bypass/distinguishing-observation bundle only when all three are"
++            " actually supported; do not invent a Mock plan to populate it. Use none_identified"
++            " only after completing the attempt without a supported finding. An AMBIGUOUS result may be"
+             " contrasted without selecting either candidate. Request semantic revision only"
+             " when supported evidence reveals an omitted obligation or an unjustified"
+             " restriction. A defect-discrimination suggestion alone must not exclude a legal Mock."
+-            " Mark the contrast as evidence-supported with evidence_ids, or as an explicit"
+-            " assumption with an assumption_reason and no evidence IDs. It remains a static"
+-            " prediction with execution_status not_executed."
++            " Provide evidence_ids, or an explicit assumption_reason with no evidence IDs;"
++            " the host projects the mutually exclusive support label. It remains a static"
++            " prediction; the host records that no target execution occurred."
+             " Classify its semantic_role using the same three-way distinction."
+         )
+     elif stage == "REVISE":
+         stage_protocol = (
+             " Make an evidence-based semantic revision. Preserve the"
+-            " original test_objectives. Record every changed field using its exact dotted path"
+-            " in modified_objects and cite the evidence reason. Put new checks only in"
++            " original test_objectives. Cite the evidence reason; the host computes the exact"
++            " changed field paths. Put new checks only in"
+             " verification_candidates, keep expected_interactions assertion_policy not_implied,"
+             " and preserve supported alternatives. Return revised_construct.investigation_requests"
+             " for material evidence gaps. request_another_revision reopens construction and"
+@@ -463,7 +483,7 @@ async def _call_stage(
+     ledger: UsageLedger,
+     responses: list[dict],
+     model_calls: list[dict],
+-    deadline: float,
++    deadline: float | None,
+     model_call_limit: int | None = None,
+ ) -> StageResult:
+     legacy_payload_bytes = None
+@@ -525,7 +545,8 @@ async def _call_stage(
+     }
+     model_calls.append(event)
+     effective_call_limit = (
+-        config.max_model_calls if model_call_limit is None else model_call_limit
++        -1 if config.no_run_resource_limits
++        else config.max_model_calls if model_call_limit is None else model_call_limit
+     )
+     if effective_call_limit >= 0 and ledger.requests_started >= effective_call_limit:
+         event["status"] = "blocked"
+@@ -545,8 +566,8 @@ async def _call_stage(
+         raise StagedInferenceError(
+             "model-call limit exhausted", stage=stage, stop_reason="budget_exhausted"
+         )
+-    remaining = deadline - time.monotonic()
+-    if remaining <= 0:
++    remaining = None if deadline is None else deadline - time.monotonic()
++    if remaining is not None and remaining <= 0:
+         event["status"] = "blocked"
+         event["exception"] = {
+             "classification": "host_deadline",
+@@ -564,7 +585,11 @@ async def _call_stage(
+         raise StagedInferenceError(
+             "run deadline exhausted", stage=stage, stop_reason="run_timeout"
+         )
+-    timeout_seconds = min(remaining, config.parsing_timeout_seconds)
++    timeout_seconds = (
++        None if config.no_run_resource_limits
++        else min(remaining, config.parsing_timeout_seconds)
++        if remaining is not None else config.parsing_timeout_seconds
++    )
+     event["timeout_seconds"] = timeout_seconds
+     capture = getattr(model, "response_capture", None)
+     if isinstance(capture, ResponseCapture):
+@@ -602,7 +627,10 @@ async def _call_stage(
+         )
+         raise StagedInferenceError(
+             "stage timed out", stage=stage,
+-            stop_reason="run_timeout" if remaining <= config.parsing_timeout_seconds else "timeout"
++            stop_reason=(
++                "run_timeout" if remaining is not None and remaining <= config.parsing_timeout_seconds
++                else "timeout"
++            )
+         ) from None
+     except InferenceError as exc:
+         event["status"] = "failed"
+@@ -689,7 +717,9 @@ def _record_citation_error(
+     }
+ 
+ 
+-def _validate_exploration_stop(stop: ExplorationStop, store: SourceStore) -> None:
++def _validate_exploration_stop(
++    stop: ExplorationStop, store: SourceStore, *, require_unknown_projection: bool = True,
++) -> None:
+     for reference in stop.evidence:
+         check_source_reference(reference, store)
+     if stop.reason in {"evidence_sufficient", "unknowns_nonblocking"}:
+@@ -697,9 +727,11 @@ def _validate_exploration_stop(stop: ExplorationStop, store: SourceStore) -> Non
+             raise ValueError("supported exploration stop requires evidence")
+         if any(item.blocking for item in stop.remaining_unknowns):
+             raise ValueError("evidence-sufficient stop cannot hide blocking unknowns")
+-    if stop.reason == "unknowns_nonblocking" and not stop.remaining_unknowns:
++    if (require_unknown_projection and stop.reason == "unknowns_nonblocking"
++            and not stop.remaining_unknowns):
+         raise ValueError("nonblocking stop must explain the remaining unknowns")
+-    if stop.reason == "no_further_evidence" and not stop.remaining_unknowns:
++    if (require_unknown_projection and stop.reason == "no_further_evidence"
++            and not stop.remaining_unknowns):
+         raise ValueError("no-further-evidence stop must preserve unknowns and their impact")
+ 
+ 
+@@ -767,11 +799,16 @@ def _construct_investigations(
+             for question in questions
+         ):
+             continue
++        goal_indexes = [
++            int(original) for original, goals in mapping.items()
++            if set(goals) & set(item.goal_indexes)
++        ]
++        if not goal_indexes:
++            raise ValueError(
++                "blocking specification unknown must explicitly map to an original goal"
++            )
+         requests.append(InvestigationRequest(
+-            question=item.question, impact=item.impact,
+-            goal_indexes=[int(original) for original, goals in mapping.items()
+-                          if set(goals) & set(item.goal_indexes)]
+-            or list(range(len(extract.original_goals))),
++            question=item.question, impact=item.impact, goal_indexes=goal_indexes,
+         ))
+     return requests
+ 
+@@ -925,7 +962,9 @@ def _validate_repairable_query(
+     source_store.validate_task(task)
+     query = materialize_query(wire, source_store, assessment_sequence=sequence)
+     if query.decision == "finish_queries" and query.stop_explanation is not None:
+-        _validate_exploration_stop(query.stop_explanation, source_store)
++        _validate_exploration_stop(
++            query.stop_explanation, source_store, require_unknown_projection=False,
++        )
+     return query
+ 
+ 
+@@ -936,7 +975,7 @@ async def _repair_query_output(
+     source_store: SourceStore, model: Model, config: StagedRunConfig,
+     ledger: UsageLedger, responses: list[dict], model_calls: list[dict],
+     stages: list[dict], repair_log: list[dict], allowance: FormatRepairAllowance,
+-    deadline: float, model_call_limit: int,
++    deadline: float | None, model_call_limit: int,
+ ) -> QuerySelection:
+     entry: dict[str, object] = {
+         "stage": "QUERY_FORMAT_REPAIR",
+@@ -981,9 +1020,9 @@ async def _repair_query_output(
+     known_budget_failure = None
+     if not ledger.usage_complete:
+         known_budget_failure = "prior_usage_unknown"
+-    elif time.monotonic() >= deadline:
++    elif deadline is not None and time.monotonic() >= deadline:
+         known_budget_failure = "run_deadline"
+-    elif ledger.total_tokens >= config.max_total_tokens:
++    elif config.max_total_tokens is not None and ledger.total_tokens >= config.max_total_tokens:
+         known_budget_failure = "total_token_limit"
+     elif (
+         config.max_cost_usd is not None
+@@ -1020,7 +1059,7 @@ async def _repair_query_output(
+                 ],
+                 "comparison_snapshot": snapshot,
+                 "repair_rule": (
+-                    "Return the complete staged-query/v0.4 object. Remove only the listed"
++                    "Return the complete staged-query/v0.6 object. Remove only the listed"
+                     " unknown null fields and preserve every listed value exactly; do not"
+                     " add evidence, source text, tools, or new reasoning."
+                 ),
+@@ -1109,215 +1148,28 @@ async def _repair_query_output(
+     return repaired
+ 
+ 
+-def _delivery_snapshot(raw: object) -> dict:
+-    """Accept only unambiguous envelope/version and decimal-line formatting repairs.
+-
+-    All semantic fields remain mandatory. A malformed JSON document, unknown
+-    field, missing claim, or changed source/range cannot establish a snapshot.
+-    """
+-    from copy import deepcopy
+-
+-    if not isinstance(raw, dict) or set(raw) - {
+-        "schema_version", "result_status", "selected_scenario_id", "contract"
+-    }:
+-        raise ValueError("cannot establish delivery selection snapshot")
+-    normalized = deepcopy(raw)
+-    normalized["schema_version"] = "staged-deliver/v0.3"
+-    contract = normalized.get("contract")
+-    if isinstance(contract, dict):
+-        contract["schema_version"] = "mock-spec.scenario/v0.1"
+-        for reference in contract.get("evidence", []):
+-            if not isinstance(reference, dict):
+-                raise ValueError("cannot establish evidence snapshot")
+-            for key in ("start_line", "end_line"):
+-                value = reference.get(key)
+-                if isinstance(value, str) and value.isascii() and value.isdecimal():
+-                    reference[key] = int(value)
+-    return DeliverSelection.model_validate(normalized).model_dump(mode="json")
+-
+-
+-async def _deliver_with_repair(
+-    payload: dict, *, constructed: ConstructResult, task: UnifiedTask,
+-    source_store: SourceStore,
+-    model: Model, config: StagedRunConfig, ledger: UsageLedger,
+-    responses: list[dict], model_calls: list[dict], stages: list[dict],
+-    repair_log: list[dict], allowance: FormatRepairAllowance,
+-    deadline: float, model_call_limit: int,
++def _host_deliver(
++    constructed: ConstructResult, task: UnifiedTask, source_store: SourceStore,
++    extract: ExtractResult, questions: list[dict], stages: list[dict],
+ ) -> DeliverResult:
+-    expected = DeliverResult(
+-        schema_version="staged-deliver/v0.1", result_status=constructed.result_status,
+-        selected_scenario_id=constructed.selected_scenario_id, contract=constructed.contract,
+-    ).model_dump(mode="json")
+-    expected_wire = {
+-        "schema_version": "staged-deliver/v0.3",
+-        "result_status": constructed.result_status,
+-        "selected_scenario_id": constructed.selected_scenario_id,
+-        "contract": contract_selection(constructed.contract),
+-    }
+-    response_start = len(responses)
+-    raw: object
+-    try:
+-        wire = await _call_stage(
+-            "DELIVER", DeliverSelection, payload, model=model, config=config,
+-            ledger=ledger, responses=responses, model_calls=model_calls, deadline=deadline,
+-            model_call_limit=model_call_limit,
+-        )
+-    except StagedInferenceError as exc:
+-        if exc.stop_reason != "output_invalid" and not (
+-            exc.stop_reason == "budget_exhausted" and len(responses) > response_start
+-        ):
+-            raise
+-        from mock_spec.validation import decode_json
+-
+-        # Hooks preserve raw responses even when SDK structured parsing fails.
+-        if len(responses) != response_start + 1:
+-            raise ValueError("cannot establish delivery snapshot without one response") from None
+-        output = responses[-1]["output"]
+-        if len(output) != 1 or output[0].get("type") != "message":
+-            raise ValueError("cannot establish delivery snapshot from non-message output") from None
+-        content = output[0].get("content", [])
+-        if len(content) != 1 or content[0].get("type") != "output_text":
+-            raise ValueError("cannot establish delivery snapshot from mixed content") from None
+-        raw = decode_json(content[0]["text"])
+-        if exc.stop_reason == "budget_exhausted":
+-            # Actual usage can exhaust the budget before SDK output validation.
+-            # Never let that ordering publish a known-invalid final response.
+-            stages.append({"stage": "DELIVER", "unvalidated_result": raw})
+-            exhausted_delivery = DeliverSelection.model_validate(raw)
+-            if exhausted_delivery.model_dump(mode="json") != expected_wire:
+-                raise ValueError("budget-exhausted DELIVER changed semantics or evidence")
+-            raise exc
+-        stages.append({"stage": "DELIVER", "invalid_result": raw})
+-    else:
+-        stage_entry = _wire_stage_entry(
+-            "DELIVER", wire, model_call_sequence=int(model_calls[-1]["sequence"])
+-        )
+-        stages.append(stage_entry)
+-        source_store.validate_task(task)
+-        try:
+-            delivered = materialize_delivery(wire, source_store)
+-        except CitationMaterializationError as exc:
+-            _record_citation_error(stage_entry, exc)
+-            raise
+-        _complete_stage_entry(stage_entry, delivered)
+-        raw = None
+-    if raw is not None:
+-        entry = {
+-            "stage": "FORMAT_REPAIR", "category": "delivery_format",
+-            "original_call_sequence": int(model_calls[-1]["sequence"]),
+-            "original_attempt_sequence": None, "repaired_attempt_sequence": None,
+-            "repair_call_sequence": None, "before": raw,
+-            "semantic_snapshot": None, "after": None, "status": "requested",
+-            "allowance_use": allowance.state, "budget_reason": None,
+-        }
+-        repair_log.append(entry)
+-        try:
+-            snapshot = _delivery_snapshot(raw)
+-            if snapshot != expected_wire:
+-                raise ValueError("invalid DELIVER changed semantics or evidence")
+-        except (ValueError, TypeError) as snapshot_exc:
+-            entry["status"] = "ineligible"
+-            entry["budget_reason"] = _safe_external_text(snapshot_exc, limit=200)
+-            raise ValueError("invalid DELIVER changed semantics or evidence") from None
+-        entry["semantic_snapshot"] = snapshot
+-        # Exact equality includes source ID and normalized range; the already
+-        # validated construct supplies the source identity proof.
+-        known_budget_failure = None
+-        if not ledger.usage_complete:
+-            known_budget_failure = "prior_usage_unknown"
+-        elif time.monotonic() >= deadline:
+-            known_budget_failure = "run_deadline"
+-        elif ledger.total_tokens >= config.max_total_tokens:
+-            known_budget_failure = "total_token_limit"
+-        elif (
+-            config.max_cost_usd is not None
+-            and ledger.rate_estimated_cost_usd is not None
+-            and ledger.rate_estimated_cost_usd >= config.max_cost_usd
+-        ):
+-            known_budget_failure = "cost_limit"
+-        elif model_call_limit >= 0 and ledger.requests_started >= model_call_limit:
+-            known_budget_failure = "model_call_limit"
+-        if known_budget_failure is not None:
+-            entry["status"] = "blocked_budget"
+-            entry["budget_reason"] = known_budget_failure
+-            raise StagedInferenceError(
+-                "final format repair budget is unavailable", stage="FORMAT_REPAIR",
+-                stop_reason=(
+-                    "run_timeout" if known_budget_failure == "run_deadline"
+-                    else "budget_exhausted"
+-                ),
+-            )
+-        if not allowance.reserve("FORMAT_REPAIR"):
+-            entry["status"] = "allowance_exhausted"
+-            entry["allowance_use"] = allowance.state
+-            raise StagedInferenceError(
+-                "format repair allowance is exhausted",
+-                stage="FORMAT_REPAIR", stop_reason="output_invalid",
+-            )
+-        entry["allowance_use"] = allowance.state
+-        repair_response_start = len(responses)
+-        try:
+-            wire = await _call_stage(
+-                "FORMAT_REPAIR", DeliverSelection,
+-                {**payload, "stage": "FORMAT_REPAIR", "invalid_delivery": raw,
+-                 "semantic_snapshot": snapshot,
+-                 "repair_rule": "Repair envelope/version or decimal line formatting only; "
+-                                "preserve every semantic field and evidence source/range."},
+-                model=model, config=config, ledger=ledger, responses=responses,
+-                model_calls=model_calls, deadline=deadline,
+-                model_call_limit=model_call_limit,
+-            )
+-        except asyncio.CancelledError:
+-            entry["status"] = "cancelled"
+-            if model_calls and model_calls[-1].get("stage") == "FORMAT_REPAIR":
+-                entry["repair_call_sequence"] = int(model_calls[-1]["sequence"])
+-            if len(responses) == repair_response_start + 1:
+-                try:
+-                    entry["after"] = _completed_response_json(responses[-1])
+-                except (ValueError, TypeError) as raw_exc:
+-                    entry["after_error"] = _safe_external_text(raw_exc, limit=200)
+-            raise
+-        except StagedInferenceError as exc:
+-            entry["status"] = (
+-                "blocked_budget" if exc.stop_reason == "budget_exhausted" else "failed"
+-            )
+-            entry["repair_call_sequence"] = int(model_calls[-1]["sequence"])
+-            if len(responses) == repair_response_start + 1:
+-                try:
+-                    entry["after"] = _completed_response_json(responses[-1])
+-                except (ValueError, TypeError) as raw_exc:
+-                    entry["after_error"] = _safe_external_text(raw_exc, limit=200)
+-            if exc.stop_reason in {"budget_exhausted", "run_timeout", "timeout"}:
+-                raise
+-            raise StagedInferenceError(
+-                "final format repair failed or its shared budget was exhausted",
+-                stage="FORMAT_REPAIR", stop_reason="output_invalid",
+-            ) from None
+-        entry["after"] = wire.model_dump(mode="json")
+-        entry["repair_call_sequence"] = int(model_calls[-1]["sequence"])
+-        stage_entry = _wire_stage_entry(
+-            "FORMAT_REPAIR", wire,
+-            model_call_sequence=int(model_calls[-1]["sequence"]),
+-        )
+-        stages.append(stage_entry)
+-        if wire.model_dump(mode="json") != expected_wire:
+-            entry["status"] = "rejected_semantic_change"
+-            raise StagedInferenceError(
+-                "FORMAT_REPAIR changed semantics or evidence",
+-                stage="FORMAT_REPAIR", stop_reason="output_invalid",
+-            )
+-        source_store.validate_task(task)
+-        try:
+-            delivered = materialize_delivery(wire, source_store)
+-        except CitationMaterializationError as exc:
+-            _record_citation_error(stage_entry, exc)
+-            raise
+-        _complete_stage_entry(stage_entry, delivered)
+-        entry["status"] = "completed"
+-    if delivered.model_dump(mode="json") != expected:
+-        raise ValueError("DELIVER changed the constructed semantics")
++    """Validate and publish the already-selected construct without another model call."""
++    delivered = DeliverResult(
++        schema_version="staged-deliver/v0.1",
++        result_status=constructed.result_status,
++        selected_scenario_id=constructed.selected_scenario_id,
++        contract=constructed.contract,
++    )
++    source_store.validate_task(task)
+     if delivered.contract is not None:
+-        validate_contract(delivered.contract, task, source_store=source_store)
++        validate_constructed(constructed, task, source_store)
++        _validate_goal_preservation(delivered.contract, extract)
++        _validate_spec_delivery(constructed, questions, extract)
++    stages.append({
++        "stage": "DELIVER",
++        "owner": "host",
++        "action": "validate_and_publish",
++        "result": delivered.model_dump(mode="json"),
++    })
+     return delivered
+ 
+ 
+@@ -1353,9 +1205,8 @@ async def execute_staged_run(
+     run_id = str(uuid4())
+     started = time.monotonic()
+     started_wall = time.time()
+-    deadline = started + (
+-        config.timeout_seconds if isinstance(config, StagedRunConfig) else 120
+-    )
++    run_timeout = config.timeout_seconds if isinstance(config, StagedRunConfig) else 120
++    deadline = None if run_timeout is None else started + run_timeout
+     stages: list[dict] = []
+     responses: list[dict] = []
+     model_calls: list[dict] = []
+@@ -1525,7 +1376,9 @@ async def execute_staged_run(
+             raise ValueError("task payload must be an object")
+         task = UnifiedTask.from_dict(task_payload)
+         source_store = SourceStore(task, repository=repository)
+-        model_call_limit = -1 if repository is not None else config.max_model_calls
++        model_call_limit = (
++            -1 if repository is not None or config.no_run_resource_limits else config.max_model_calls
++        )
+         canonical_task = task.to_dict()
+         input_bytes = canonical_json(canonical_task)
+         input_hash = sha256_bytes(input_bytes)
+@@ -1568,7 +1421,9 @@ async def execute_staged_run(
+         query_executor = QueryExecutor(
+             task,
+             source_store=source_store,
+-            max_attempts=(None if repository is not None else config.max_query_attempts),
++            max_attempts=(
++                None if repository is not None or config.no_run_resource_limits else config.max_query_attempts
++            ),
+             max_no_progress_attempts=config.repetition_threshold,
+             max_output_chars=config.max_tool_output_chars,
+             analysis_timeout_seconds=config.parsing_timeout_seconds,
+@@ -1576,10 +1431,14 @@ async def execute_staged_run(
+         )
+         candidate_ids = {item.scenario_id for item in extract.candidates} | {"original_task"}
+         questions = InvestigationLedger(len(extract.original_goals), repository_available=repository is not None)
+-        questions.register([InvestigationRequest(
+-            question=item, goal_indexes=list(range(len(extract.original_goals))),
+-            impact="Unresolved EXTRACT question may change the original goal's dependency requirements.",
+-        ) for item in extract.unresolved], origin="EXTRACT")
++        questions.register([
++            InvestigationRequest(
++                question=item.question,
++                goal_indexes=item.goal_indexes,
++                impact=item.impact,
++            )
++            for item in extract_wire.unresolved
++        ], origin="EXTRACT")
+         while True:
+             current_stage = "QUERY"
+             pending_receipt: dict[str, object] | None = None
+@@ -1661,7 +1520,7 @@ async def execute_staged_run(
+                         "citation_mode": CITATION_MODE,
+                         "wire_result": raw,
+                         "result": None,
+-                        "validation_error": raw_error or "strict staged-query/v0.4 validation failed",
++                        "validation_error": raw_error or "strict staged-query/v0.6 validation failed",
+                     })
+                     if isinstance(raw, dict) and (
+                         raw.get("decision") == "request_query"
+@@ -1759,11 +1618,29 @@ async def execute_staged_run(
+                         query.previous_receipt_assessment.model_dump(mode="json")
+                     )
+                     pending_receipt["assessment_status"] = "complete"
+-                _complete_stage_entry(query_entry, query)
++                host_question_updates = project_question_updates(
++                    query_wire.question_updates,
++                    existing_questions=questions.snapshot(),
++                    attempts=query_executor.attempts,
++                    store=source_store,
++                )
++                query_entry["host_question_updates"] = [
++                    item.model_dump(mode="json") for item in host_question_updates
++                ]
+                 questions.apply_updates(
+-                    query_wire.question_updates, store=source_store,
++                    host_question_updates, store=source_store,
+                     attempts=query_executor.attempts, task=task,
+                 )
++                if query.stop_explanation is not None:
++                    query.stop_explanation.remaining_unknowns = [
++                        RemainingUnknown(
++                            question=item["question"], impact=item["impact"],
++                            blocking=item["state"] == "open",
++                        )
++                        for item in questions.snapshot()
++                        if item["state"] != "resolved"
++                    ]
++                _complete_stage_entry(query_entry, query)
+                 updates = query_wire.candidate_updates
+                 if len({item.scenario_id for item in updates}) != len(updates):
+                     raise ValueError("duplicate candidate update")
+@@ -1781,6 +1658,7 @@ async def execute_staged_run(
+ 
+                 if (
+                     observed_attempt is not None
++                    and config.max_total_tokens is not None
+                     and ledger.total_tokens >= config.max_total_tokens
+                 ):
+                     query_executor.reject(
+@@ -1864,7 +1742,7 @@ async def execute_staged_run(
+             stages.append(construct_entry)
+             source_store.validate_task(task)
+             try:
+-                constructed = materialize_construct(construct_wire, source_store)
++                constructed = materialize_construct(construct_wire, source_store, task)
+             except CitationMaterializationError as exc:
+                 _record_citation_error(construct_entry, exc)
+                 raise
+@@ -1897,8 +1775,8 @@ async def execute_staged_run(
+ 
+             if config.variant == "C" and constructed_contract is not None:
+                 current_stage = "CONTRAST"
+-                contrast = await _call_stage(
+-                    "CONTRAST", ContrastResult,
++                contrast_wire = await _call_stage(
++                    "CONTRAST", ContrastSelection,
+                     {"stage": "CONTRAST", "visible_task": canonical_task,
+                      "extract": extract.model_dump(mode="json"),
+                      "query_receipts": query_executor.attempts,
+@@ -1907,9 +1785,15 @@ async def execute_staged_run(
+                     model_calls=model_calls,
+                     model_call_limit=model_call_limit,
+                 )
+-                stages.append({
+-                    "stage": "CONTRAST", "result": contrast.model_dump(mode="json")
+-                })
++                contrast = materialize_contrast(contrast_wire)
++                contrast_entry = _wire_stage_entry(
++                    "CONTRAST", contrast_wire,
++                    model_call_sequence=int(model_calls[-1]["sequence"]),
++                )
++                _complete_stage_entry(contrast_entry, contrast)
++                assert isinstance(contrast_entry["result"], dict)
++                contrast_entry["result"]["execution_status"] = "not_executed"
++                stages.append(contrast_entry)
+                 validate_contrast(contrast, constructed_contract,
+                                    strict_mapping=repository is not None)
+                 if contrast.investigation_requests:
+@@ -1941,7 +1825,7 @@ async def execute_staged_run(
+                     stages.append(revision_entry)
+                     source_store.validate_task(task)
+                     try:
+-                        revision = materialize_revision(revision_wire, source_store)
++                        revision = materialize_revision(revision_wire, source_store, task)
+                     except CitationMaterializationError as exc:
+                         _record_citation_error(revision_entry, exc)
+                         raise
+@@ -1951,6 +1835,8 @@ async def execute_staged_run(
+                     changed_objects = _changed_paths(before_dump, after_dump)
+                     if not changed_objects:
+                         raise ValueError("semantic revision must modify the constructed result")
++                    revision.modified_objects = sorted(changed_objects)
++                    revision_entry["host_modified_objects"] = revision.modified_objects
+                     revised_contract = validate_constructed(
+                         revision.revised_construct, task, source_store,
+                         strict_mapping=repository is not None,
+@@ -1981,24 +1867,6 @@ async def execute_staged_run(
+                             or not new_bindings - old_bindings <= new_ids - old_ids
+                         ):
+                             raise ValueError("original goal bindings may only track candidate replacement")
+-                    declared_objects = set(revision.modified_objects)
+-                    if (
+-                        any(
+-                            not any(
+-                                changed == declared or changed.startswith(f"{declared}.")
+-                                for declared in declared_objects
+-                            )
+-                            for changed in changed_objects
+-                        )
+-                        or any(
+-                            not any(
+-                                changed == declared or changed.startswith(f"{declared}.")
+-                                for changed in changed_objects
+-                            )
+-                            for declared in declared_objects
+-                        )
+-                    ):
+-                        raise ValueError("revision modified_objects does not match the semantic diff")
+                     known_revision_evidence = {
+                         item.id for item in (
+                             *constructed_contract.evidence, *revised_contract.evidence
+@@ -2036,20 +1904,8 @@ async def execute_staged_run(
+             break
+ 
+         current_stage = "DELIVER"
+-        delivered = await _deliver_with_repair(
+-            {"stage": "DELIVER", "visible_task": canonical_task,
+-             "extract": extract.model_dump(mode="json"),
+-             "query": query.model_dump(mode="json"),
+-             "query_receipts": query_executor.attempts,
+-             "construct": constructed.model_dump(mode="json"),
+-             "host": {"run_id": run_id, "case_id": case_id, "language": language,
+-                      "input_hash": input_hash, "variant": config.variant}}, model=model,
+-            constructed=constructed, task=task, stages=stages, repair_log=format_repair_log,
+-            allowance=format_repair_allowance,
+-            source_store=source_store,
+-            config=config, ledger=ledger, responses=responses,
+-            model_calls=model_calls, deadline=deadline,
+-            model_call_limit=model_call_limit,
++        delivered = _host_deliver(
++            constructed, task, source_store, extract, questions.snapshot(), stages,
+         )
+         contract = delivered.contract
+         if contract is not None:
+@@ -2145,7 +2001,10 @@ async def execute_staged_run(
+ 
+     contrast_enabled = isinstance(config, StagedRunConfig) and config.variant == "C"
+     if contrast_enabled and contrast is not None:
+-        degeneracy_contrast = contrast.model_dump(mode="json", exclude={"schema_version"})
++        degeneracy_contrast = {
++            **contrast.model_dump(mode="json", exclude={"schema_version"}),
++            "execution_status": "not_executed",
++        }
+     else:
+         degeneracy_contrast = {
+             "status": "unavailable" if contrast_enabled else "disabled_by_variant",
+@@ -2177,9 +2036,6 @@ async def execute_staged_run(
+         "error_stage": error_stage,
+         "selected_scenario_id": selected_scenario_id,
+         "selection_rationale": None if constructed is None else constructed.selection_rationale,
+-        "claim_basis": [] if constructed is None else [
+-            item.model_dump(mode="json") for item in constructed.claim_basis
+-        ],
+         "exploration_stop": (
+             None if exploration_stop is None else exploration_stop.model_dump(mode="json")
+         ),
+@@ -2204,7 +2060,7 @@ async def execute_staged_run(
+             "budgeted_attempts": 0 if query_executor is None else query_executor.budgeted_attempts,
+             "limit": (
+                 None
+-                if repository is not None
++                if repository is not None or (isinstance(config, StagedRunConfig) and config.no_run_resource_limits)
+                 else (config.max_query_attempts if isinstance(config, StagedRunConfig) else None)
+             ),
+         },
+@@ -2219,9 +2075,6 @@ async def execute_staged_run(
+         "source_observations": (
+             [] if source_store is None else list(source_store.observations())
+         ),
+-        "critical_behaviors": [] if constructed is None else [
+-            item.model_dump(mode="json") for item in constructed.critical_behaviors
+-        ],
+         "allowed_variations": [] if constructed is None else constructed.allowed_variations,
+         "nonblocking_unknowns": (
+             [] if constructed is None else constructed.nonblocking_unknowns
+@@ -2308,15 +2161,17 @@ async def execute_staged_run(
+         },
+         "controller_limits": {
+             "model_calls": (
+-                None if repository is not None
++                None if repository is not None or (valid_config is not None and valid_config.no_run_resource_limits)
+                 else (None if valid_config is None else valid_config.max_model_calls)
+             ),
+             "query_attempts": (
+-                None if repository is not None
++                None if repository is not None or (valid_config is not None and valid_config.no_run_resource_limits)
+                 else (None if valid_config is None else valid_config.max_query_attempts)
+             ),
+             "termination": (
+-                "shared_deadline_token_cost_and_repetition_protection"
++                "protocol_and_repetition_protection_without_run_resource_limits"
++                if valid_config is not None and valid_config.no_run_resource_limits
++                else "shared_deadline_token_cost_and_repetition_protection"
+                 if repository is not None else "configured_call_limits_and_shared_budgets"
+             ),
+         },
+@@ -2360,7 +2215,7 @@ async def execute_staged_run(
+             "observed_attempts": 0 if query_executor is None else query_executor.observed_attempts,
+             "budgeted_attempts": 0 if query_executor is None else query_executor.budgeted_attempts,
+             "limit": (
+-                None if repository is not None
++                None if repository is not None or (valid_config is not None and valid_config.no_run_resource_limits)
+                 else (None if valid_config is None else valid_config.max_query_attempts)
+             ),
+         },
+@@ -2369,7 +2224,7 @@ async def execute_staged_run(
+             "started": started,
+             "absolute": deadline,
+             "wall_clock_started_unix": started_wall,
+-            "wall_clock_deadline_unix": started_wall + (deadline - started),
++            "wall_clock_deadline_unix": None if deadline is None else started_wall + (deadline - started),
+         },
+         "elapsed_seconds": time.monotonic() - started,
+         "artifact_sha256": artifact_hashes,
+diff --git a/experiments/staged-inference/provider_capture.py b/experiments/staged-inference/provider_capture.py
+index 8d5f14a..c7d4683 100644
+--- a/experiments/staged-inference/provider_capture.py
++++ b/experiments/staged-inference/provider_capture.py
+@@ -120,7 +120,7 @@ class ResponseCapture:
+     response-hook events.  Request headers and request bodies are never retained.
+     """
+ 
+-    max_body_bytes: int = 2_000_000
++    max_body_bytes: int | None = 2_000_000
+     _active_sequence: int | None = None
+     _captures: dict[int, list[dict[str, object]]] = field(default_factory=dict)
+ 
+@@ -137,7 +137,7 @@ class ResponseCapture:
+         if sequence is None:
+             raise RuntimeError("provider response arrived without an active model call")
+         content = await response.aread()
+-        truncated = len(content) > self.max_body_bytes
++        truncated = self.max_body_bytes is not None and len(content) > self.max_body_bytes
+         retained = content[: self.max_body_bytes]
+         try:
+             decoded: object = json.loads(retained)
+diff --git a/experiments/staged-inference/query.py b/experiments/staged-inference/query.py
+index 8d73607..75bc351 100644
+--- a/experiments/staged-inference/query.py
++++ b/experiments/staged-inference/query.py
+@@ -110,7 +110,7 @@ class QueryExecutor:
+         max_attempts: int | None,
+         max_output_chars: int,
+         analysis_timeout_seconds: float,
+-        deadline: float,
++        deadline: float | None,
+         max_no_progress_attempts: int = 3,
+     ) -> None:
+         if type(max_no_progress_attempts) is not int or max_no_progress_attempts < 1:
+@@ -124,7 +124,8 @@ class QueryExecutor:
+         self.max_attempts = max_attempts
+         self.deadline = deadline
+         self.max_no_progress_attempts = max_no_progress_attempts
+-        self.analysis.store.limit_deadline(deadline)
++        if deadline is not None:
++            self.analysis.store.limit_deadline(deadline)
+         self.attempts: list[dict[str, Any]] = []
+         self._seen_operations: set[str] = set()
+         self._seen_evidence: set[str] = set()
+@@ -217,8 +218,8 @@ class QueryExecutor:
+         assert validated.tool is not None
+         assert validated.arguments is not None
+ 
+-        remaining = self.deadline - time.monotonic()
+-        if remaining <= 0:
++        remaining = None if self.deadline is None else self.deadline - time.monotonic()
++        if remaining is not None and remaining <= 0:
+             return self._finish(
+                 record, started, "budget_exhausted",
+                 self._error("run_deadline_exhausted", "The shared run deadline is exhausted."),
+diff --git a/experiments/staged-inference/run.py b/experiments/staged-inference/run.py
+index ddbb0cc..bab6224 100644
+--- a/experiments/staged-inference/run.py
++++ b/experiments/staged-inference/run.py
+@@ -63,6 +63,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+     parser.add_argument("--repetition-threshold", type=int, default=4,
+                         help="consecutive repeated queries without new evidence before protection")
+     parser.add_argument("--max-output-tokens", type=int, default=4096)
++    parser.add_argument(
++        "--no-run-resource-limits", action="store_true",
++        help="diagnostic run without total token/cost/call limits or model/run/HTTP timeouts; "
++             "provider output and individual source-tool limits remain explicit",
++    )
+     parser.add_argument("--max-total-tokens", type=int, default=60000)
+     parser.add_argument("--max-tool-output-chars", type=int, default=16000)
+     parser.add_argument("--timeout-seconds", type=float, default=120)
+@@ -77,6 +82,8 @@ def main(argv: list[str] | None = None) -> int:
+     args = parse_args(argv)
+     model: Model
+     try:
++        if args.no_run_resource_limits and args.max_cost_usd is not None:
++            raise ValueError("--no-run-resource-limits cannot be combined with --max-cost-usd")
+         if args.mode == "live_inference":
+             if args.task_json is not None:
+                 raise ValueError("live inference does not accept --task-json")
+@@ -88,13 +95,18 @@ def main(argv: list[str] | None = None) -> int:
+             from agents.models.openai_responses import OpenAIResponsesModel
+             from openai import AsyncOpenAI, DefaultAsyncHttpxClient
+ 
+-            response_capture = ResponseCapture()
++            response_capture = ResponseCapture(
++                max_body_bytes=None if args.no_run_resource_limits else 2_000_000
++            )
+             http_client = DefaultAsyncHttpxClient(
+                 event_hooks={"response": [response_capture.on_response]}
+             )
+             model = OpenAIResponsesModel(
+                 model=args.model.strip(),
+-                openai_client=AsyncOpenAI(max_retries=0, http_client=http_client),
++                openai_client=AsyncOpenAI(
++                    max_retries=0, http_client=http_client,
++                    timeout=None if args.no_run_resource_limits else http_client.timeout,
++                ),
+             )
+             setattr(model, "response_capture", response_capture)
+             requested_case_id = args.case_id
+@@ -125,12 +137,13 @@ def main(argv: list[str] | None = None) -> int:
+             config=StagedRunConfig(
+                 variant=args.variant, run_mode=args.mode, model_name=model_name,
+                 repository_read=args.repository_read,
++                no_run_resource_limits=args.no_run_resource_limits,
+                 max_model_calls=args.max_model_calls,
+                 max_output_tokens=args.max_output_tokens,
+-                max_total_tokens=args.max_total_tokens,
++                max_total_tokens=None if args.no_run_resource_limits else args.max_total_tokens,
+                 max_tool_output_chars=args.max_tool_output_chars,
+                 repetition_threshold=args.repetition_threshold,
+-                timeout_seconds=args.timeout_seconds,
++                timeout_seconds=None if args.no_run_resource_limits else args.timeout_seconds,
+                 parsing_timeout_seconds=args.parsing_timeout_seconds,
+                 max_cost_usd=args.max_cost_usd,
+                 input_cost_per_million=args.input_cost_per_million,
+diff --git a/experiments/staged-inference/scripted.py b/experiments/staged-inference/scripted.py
+index 6b7c074..20d7f0c 100644
+--- a/experiments/staged-inference/scripted.py
++++ b/experiments/staged-inference/scripted.py
+@@ -278,7 +278,7 @@ def _wire_outputs(outputs: list[dict]) -> list[dict]:
+     for output in rendered:
+         version = output["schema_version"]
+         if version == "staged-extract/v0.1":
+-            output["schema_version"] = "staged-extract/v0.2"
++            output["schema_version"] = "staged-extract/v0.3"
+             output["original_goals"] = [
+                 _source_locator(item) for item in output["original_goals"]
+             ]
+@@ -286,8 +286,21 @@ def _wire_outputs(outputs: list[dict]) -> list[dict]:
+                 candidate["evidence"] = [
+                     _source_locator(item) for item in candidate["evidence"]
+                 ]
++            output["unresolved"] = [{
++                "question": question,
++                "goal_indexes": [0],
++                "impact": (
++                    "Both remain candidates; the ambiguity blocks selection only."
++                    if "cache-hit" in question else
++                    "The missing selection basis prevents choosing either candidate."
++                    if "does not distinguish" in question else
++                    "No safe response constraint can be delivered."
++                    if "no safe response" in question else
++                    "This missing semantic fact may change the dependency behavior needed for the visible goal."
++                ),
++            } for question in output["unresolved"]]
+         elif version == "staged-query/v0.1":
+-            output["schema_version"] = "staged-query/v0.4"
++            output["schema_version"] = "staged-query/v0.6"
+             assessment = output.get("previous_receipt_assessment")
+             if assessment is not None:
+                 assessment.pop("attempt_sequence", None)
+@@ -317,29 +330,93 @@ def _wire_outputs(outputs: list[dict]) -> list[dict]:
+                         # observed behavior affected by the inaccessible gap;
+                         # it does not claim to resolve the blocking question.
+                         "evidence": list(stop["evidence"]),
+-                        "acquisition": "unavailable" if unknown["blocking"] else "not_needed",
+                         "attempted_sequences": [],
+                     })
++                    if unknown["blocking"]:
++                        updates[-1]["acquisition"] = "unavailable"
++                    else:
++                        updates[-1].pop("attempted_sequences")
++                    if question_id is not None:
++                        updates[-1]["question"] = None
++                        updates[-1]["goal_indexes"] = None
++                        updates[-1]["impact"] = None
+                 output["question_updates"] = updates
++                stop.pop("remaining_unknowns")
+             else:
+                 output["question_updates"] = []
+             output["candidate_updates"] = []
+         elif version == "staged-construct/v0.1":
+-            output["schema_version"] = "staged-construct/v0.3"
+-            output["contract"] = _contract_selection(output["contract"])
+-            output.setdefault("investigation_requests", [])
++            _construct_selection(output)
++        elif version == "staged-contrast/v0.3":
++            output["schema_version"] = "staged-contrast/v0.4"
++            output.pop("support", None)
+         elif version == "staged-revise/v0.1":
+-            output["schema_version"] = "staged-revise/v0.2"
++            output["schema_version"] = "staged-revise/v0.3"
++            output.pop("modified_objects", None)
+             revised = output["revised_construct"]
+-            revised["schema_version"] = "staged-construct/v0.3"
+-            revised["contract"] = _contract_selection(revised["contract"])
+-            revised.setdefault("investigation_requests", [])
+-        elif version == "staged-deliver/v0.1":
+-            output["schema_version"] = "staged-deliver/v0.3"
+-            output["contract"] = _contract_selection(output["contract"])
++            _construct_selection(revised)
+     return rendered
+ 
+ 
++def _construct_selection(output: dict) -> None:
++    """Convert legacy fixture artifacts to the current stable-ref wire DTO."""
++    output["schema_version"] = "staged-construct/v0.4"
++    output.pop("claim_basis", None)
++    output.pop("critical_behaviors", None)
++    output.pop("allowed_variations", None)
++    unresolved = output.pop("unresolved", [])
++    nonblocking = output.pop("nonblocking_unknowns", [])
++    output["fallback_unknowns"] = ([
++        {"question": item, "blocking": True} for item in unresolved
++    ] + [
++        {"question": item, "blocking": False} for item in nonblocking
++    ]) if output.get("spec") is None else []
++    output.setdefault("investigation_requests", [])
++    contract = output.get("contract")
++    if contract is None:
++        return
++    output["contract"] = _contract_selection(contract)
++    output["contract"]["schema_version"] = "staged-contract-selection/v0.1"
++    output["contract"].pop("case_id")
++    output["contract"].pop("language")
++    refs: dict[str, list[str]] = {}
++    for key, prefix in (
++        ("test_objectives", "goal"),
++        ("dependency_constraints", "constraint"),
++        ("uncertainty", "uncertainty"),
++    ):
++        refs[key] = []
++        for index, item in enumerate(output["contract"][key]):
++            ref = f"{prefix}-{index + 1}"
++            item["ref"] = ref
++            refs[key].append(ref)
++    spec = output.get("spec")
++    if spec is None:
++        return
++    spec["schema_version"] = "staged-spec-semantics/v0.2"
++    for item in spec["fixed_inputs"]:
++        item["goal_refs"] = [refs["test_objectives"][i] for i in item.pop("goal_indexes")]
++    for item in spec["constraint_basis"]:
++        item["constraint_ref"] = refs["dependency_constraints"][item.pop("constraint_index")]
++    for item in spec["goal_coverage"]:
++        item["goal_ref"] = refs["test_objectives"][item.pop("goal_index")]
++        item["constraint_refs"] = [
++            refs["dependency_constraints"][i] for i in item.pop("constraint_indexes")
++        ]
++    for item in spec["unknowns"]:
++        item["goal_refs"] = [refs["test_objectives"][i] for i in item.pop("goal_indexes")]
++        item["constraint_refs"] = [
++            refs["dependency_constraints"][i] for i in item.pop("constraint_indexes")
++        ]
++        item["formal_uncertainty_refs"] = [
++            refs["uncertainty"][i] for i in item.pop("formal_uncertainty_indexes")
++        ]
++    for item in spec["allowed_variations"]:
++        item["constraint_refs"] = [
++            refs["dependency_constraints"][i] for i in item.pop("constraint_indexes")
++        ]
++
++
+ def _contract(*, ambiguous: bool = False) -> dict:
+     scenario_ids = ["dependency_returns_two"]
+     if ambiguous:
+@@ -608,7 +685,6 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
+         ],
+         "unresolved": construct["unresolved"],
+     }
+-    deliver_construct = construct
+     outputs: list[dict] = [
+         extract,
+         {"schema_version": "staged-query/v0.1", "decision": "finish_queries",
+@@ -640,8 +716,7 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
+     ]
+     if variant == "C":
+         contrast = {
+-            "schema_version": "staged-contrast/v0.2", "status": "proposed",
+-            "execution_status": "not_executed",
++            "schema_version": "staged-contrast/v0.3", "status": "proposed",
+             "alternative": "Mock cache.get('k') to return the asserted record directly.",
+             "bypass_behavior": "The correct return bypasses backend.fetch and cache.set.",
+             "evidence_ids": ["hit_branch", "assertion"] + ([] if ambiguous else ["miss_requirement"]),
+@@ -683,7 +758,6 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
+                 "evidence_ids": ["miss_requirement", "miss_branch", "refill", "assertion"],
+                 "request_another_revision": replay_case == "second_revision",
+             })
+-            deliver_construct = revised
+             if replay_case == "second_revision":
+                 # A request for another semantic pass now re-enters QUERY; it
+                 # is not a protocol error or a fixed one-revision ceiling.
+@@ -696,6 +770,7 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
+                         "alternative": None,
+                         "bypass_behavior": None,
+                         "evidence_ids": [],
++                        "assumption_reason": "No further supported finding was identified after revision.",
+                         "distinguishing_observation": None,
+                         "revision_requested": False,
+                         "revision_reason": None,
+@@ -704,20 +779,17 @@ def _cache_outputs(replay_case: ReplayCase, *, variant: Literal["B", "C"]) -> li
+                         "observation_limits": "No further static counterexample is established by this fixture.",
+                     },
+                 ])
+-    outputs.append({
+-        "schema_version": "staged-deliver/v0.1",
+-        "result_status": deliver_construct["result_status"],
+-        "selected_scenario_id": deliver_construct["selected_scenario_id"],
+-        "contract": deliver_construct["contract"],
+-    })
+     rendered = _wire_outputs(outputs)
+     if replay_case == "second_revision" and variant == "C":
+         query_outputs = [
+             output for output in rendered
+-            if output["schema_version"] == "staged-query/v0.4"
++            if output["schema_version"] == "staged-query/v0.6"
+         ]
+         for update in query_outputs[1]["question_updates"]:
+             update["question_id"] = "q1"
++            update["question"] = None
++            update["goal_indexes"] = None
++            update["impact"] = None
+     return rendered
+ 
+ 
+@@ -819,6 +891,10 @@ def scripted_outputs(
+         "investigation_requests": [],
+         "contract": None if replay_case == "inconclusive" else contract,
+     }
++    if replay_case == "error":
++        # Host DELIVER does not consume a model copy.  Keep the error fixture at
++        # the semantic CONSTRUCT boundary where invalid evidence is rejected.
++        contract["test_objectives"][0]["evidence_ids"] = ["missing"]
+     extract_candidates = [{
+         "scenario_id": "dependency_returns_two",
+         "description": "Dependency returns the value observed by the ordinary oracle.",
+@@ -836,15 +912,6 @@ def scripted_outputs(
+             "Dependency returns float 2.0, also accepted by the ordinary equality."
+         )
+         extract_candidates.append(float_candidate)
+-    deliver = {
+-        "schema_version": "staged-deliver/v0.1", "result_status": result_status,
+-        "selected_scenario_id": selected_scenario_id,
+-        "contract": None if replay_case == "inconclusive" else contract,
+-    }
+-    if replay_case == "error":
+-        forged_contract = deepcopy(contract)
+-        forged_contract["case_id"] = "forged_case_id"
+-        deliver["contract"] = forged_contract
+     outputs: list[dict] = [
+         {
+             "schema_version": "staged-extract/v0.1",
+@@ -886,8 +953,8 @@ def scripted_outputs(
+     ]
+     if variant == "C" and result_status in ("SELECTED", "AMBIGUOUS"):
+         outputs.append({
+-            "schema_version": "staged-contrast/v0.2", "status": "none_identified",
+-            "execution_status": "not_executed", "alternative": None,
++            "schema_version": "staged-contrast/v0.3", "status": "none_identified",
++            "alternative": None,
+             "bypass_behavior": None, "evidence_ids": [],
+             "distinguishing_observation": None, "revision_requested": False,
+             "revision_reason": None,
+@@ -899,7 +966,6 @@ def scripted_outputs(
+             "observation_limits": "The static review does not prove the contract globally correct.",
+             "investigation_requests": [],
+         })
+-    outputs.append(deliver)
+     return _wire_outputs(outputs)
+ 
+ 
+@@ -912,7 +978,8 @@ def query_script(
+     outputs = scripted_outputs(replay_case, variant=variant)
+     final_query = deepcopy(outputs[1])
+     for update in final_query["question_updates"]:
+-        update["attempted_sequences"] = list(range(1, count + 1))
++        if update["state"] == "open":
++            update["attempted_sequences"] = list(range(1, count + 1))
+     queries = []
+     for index in range(count + 1):
+         assessment = None if index == 0 else {
+@@ -932,7 +999,7 @@ def query_script(
+                 "arguments_json": json.dumps(arguments),
+             }
+         queries.append({
+-            "schema_version": "staged-query/v0.4",
++            "schema_version": "staged-query/v0.6",
+             "decision": "finish_queries" if attempt is None else "request_query",
+             "query_attempt": attempt, "previous_receipt_assessment": assessment,
+             "impact": (
+diff --git a/experiments/staged-inference/stage_protocol.py b/experiments/staged-inference/stage_protocol.py
+index 8cdfefb..b48e3ce 100644
+--- a/experiments/staged-inference/stage_protocol.py
++++ b/experiments/staged-inference/stage_protocol.py
+@@ -7,11 +7,17 @@ from typing import Annotated, Any, Literal, TypeVar
+ 
+ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, ValidationError
+ 
+-from mock_spec.scenario import ScenarioContract, validate_contract
++from mock_spec.scenario import (
++    Claim, Hypothesis, Interaction, ScenarioContract, VerificationCandidate,
++    validate_contract,
++)
+ from mock_spec.schemas import UnifiedTask
+ from mock_spec.validation import SourceStore
+ 
+-from specification import SpecSemantics
++from specification import (
++    BranchDecision, Premise, PreservedRealLogic, ReplacementBoundary, SpecConflict,
++    SpecSemantics,
++)
+ 
+ 
+ Text = Annotated[str, StringConstraints(min_length=1, pattern=r"\S")]
+@@ -62,12 +68,18 @@ class CandidateSelection(StageModel):
+     evidence: list[SourceLocator]
+ 
+ 
++class ExtractUnknown(StageModel):
++    question: Text
++    goal_indexes: Annotated[list[Annotated[int, Field(ge=0)]], Field(min_length=1)]
++    impact: Text
++
++
+ class ExtractSelection(StageModel):
+-    schema_version: Literal["staged-extract/v0.2"]
++    schema_version: Literal["staged-extract/v0.3"]
+     result_status: Literal["CONTINUE", "INCONCLUSIVE"] = "CONTINUE"
+     original_goals: list[SourceLocator]
+     candidates: list[CandidateSelection]
+-    unresolved: list[Text]
++    unresolved: list[ExtractUnknown]
+ 
+ 
+ class QueryAssessment(StageModel):
+@@ -98,11 +110,43 @@ class InvestigationRequest(StageModel):
+     impact: Text
+ 
+ 
+-class QuestionUpdate(InvestigationRequest):
+-    question_id: Text | None
+-    state: Literal["open", "resolved", "nonblocking"]
++class QuestionAssessmentBase(StageModel):
+     rationale: Text
+     evidence: list[SourceLocator]
++
++
++class OpenQuestionUpdateSelection(QuestionAssessmentBase):
++    """Existing questions use null immutable fields; new questions provide them."""
++
++    question_id: Text | None
++    question: Text | None
++    goal_indexes: list[Annotated[int, Field(ge=0)]] | None
++    impact: Text | None
++    state: Literal["open"]
++    acquisition: Literal["available", "unavailable"]
++    attempted_sequences: list[Annotated[int, Field(ge=1)]]
++
++
++class ClosedQuestionUpdateSelection(QuestionAssessmentBase):
++    """Model-facing update whose acquisition state is owned by the host."""
++
++    question_id: Text | None
++    question: Text | None
++    goal_indexes: list[Annotated[int, Field(ge=0)]] | None
++    impact: Text | None
++    state: Literal["resolved", "nonblocking"]
++
++
++QuestionUpdateSelection = (
++    OpenQuestionUpdateSelection | ClosedQuestionUpdateSelection
++)
++
++
++class QuestionUpdate(InvestigationRequest, QuestionAssessmentBase):
++    """Host-owned ledger update after projecting the model-facing selection."""
++
++    question_id: Text | None
++    state: Literal["open", "resolved", "nonblocking"]
+     acquisition: Literal["available", "unavailable", "not_needed"]
+     attempted_sequences: list[Annotated[int, Field(ge=1)]]
+ 
+@@ -124,7 +168,6 @@ class ExplorationStopSelection(StageModel):
+     reason: Literal["evidence_sufficient", "unknowns_nonblocking", "no_further_evidence"]
+     rationale: Text
+     evidence: list[SourceLocator]
+-    remaining_unknowns: list[RemainingUnknown]
+ 
+ 
+ class QueryResult(StageModel):
+@@ -137,34 +180,20 @@ class QueryResult(StageModel):
+ 
+ 
+ class QuerySelection(StageModel):
+-    schema_version: Literal["staged-query/v0.4"]
++    schema_version: Literal["staged-query/v0.6"]
+     decision: Literal["request_query", "finish_queries"]
+     query_attempt: QueryAttempt | None
+     previous_receipt_assessment: QueryAssessmentSelection | None
+     impact: Text
+     stop_explanation: ExplorationStopSelection | None
+-    question_updates: list[QuestionUpdate] = Field(default_factory=list)
++    question_updates: list[QuestionUpdateSelection] = Field(default_factory=list)
+     candidate_updates: list[CandidateSelection] = Field(default_factory=list)
+ 
+ 
+-class CriticalBehavior(StageModel):
+-    behavior: Text
+-    observation: Text
+-    evidence_ids: list[Text]
+-    semantic_role: Literal[
+-        "dependency_contract", "mut_path_condition", "test_objective"
+-    ] | None = None
+-    formal_claim_index: Annotated[int, Field(ge=0)] | None = None
+-    support: Literal["evidence", "assumption"] | None = None
+-    assumption_reason: Text | None = None
+-
+-
+ class ConstructContent(StageModel):
+     result_status: Literal["SELECTED", "ALTERNATIVES", "AMBIGUOUS", "INCONCLUSIVE"]
+     selected_scenario_id: Text | None
+     selection_rationale: Text
+-    claim_basis: list["ClaimBasis"]
+-    critical_behaviors: Annotated[list[CriticalBehavior], Field(max_length=3)]
+     allowed_variations: list[Text]
+     unresolved: list[Text]
+     nonblocking_unknowns: list[Text] = Field(default_factory=list)
+@@ -177,37 +206,99 @@ class ConstructResult(ConstructContent):
+     contract: ScenarioContract | None
+ 
+ 
+-class ScenarioContractSelection(ScenarioContract):
+-    """Formal contract wire DTO that changes only evidence representation."""
++class ReferencedClaim(Claim):
++    ref: Text
+ 
+-    evidence: list[EvidenceSelection]  # type: ignore[assignment]
+ 
++class ReferencedContractSelection(StageModel):
++    """Wire contract with stable semantic refs; refs are not published."""
+ 
+-class ConstructSelection(ConstructContent):
+-    schema_version: Literal["staged-construct/v0.3"]
+-    contract: ScenarioContractSelection | None
++    schema_version: Literal["staged-contract-selection/v0.1"]
++    test_objectives: Annotated[list[ReferencedClaim], Field(min_length=1)]
++    scenario_hypotheses: Annotated[list[Hypothesis], Field(min_length=1)]
++    dependency_constraints: list[ReferencedClaim]
++    expected_interactions: list[Interaction]
++    verification_candidates: list[VerificationCandidate]
++    evidence: list[EvidenceSelection]
++    uncertainty: list[ReferencedClaim]
+ 
+ 
+-class ClaimBasis(StageModel):
+-    claim: Text
+-    basis: Literal["task_requirement", "implementation_fact", "scenario_inference"]
+-    target: Literal[
+-        "selection_rationale", "allowed_variation", "unresolved",
+-        "nonblocking_unknown", "formal_claim"
+-    ] | None = None
+-    target_index: Annotated[int, Field(ge=0)] | None = None
+-    semantic_role: Literal[
+-        "dependency_contract", "mut_path_condition", "test_objective"
+-    ] | None = None
+-    evidence_ids: list[Text] = Field(default_factory=list)
+-    support: Literal["evidence", "assumption"] | None = None
+-    assumption_reason: Text | None = None
++class FixedInputSelection(StageModel):
++    statement: Text
++    goal_refs: Annotated[list[Text], Field(min_length=1)]
++    evidence_ids: Annotated[list[Text], Field(min_length=1)]
++
++
++class ConstraintBasisSelection(StageModel):
++    constraint_ref: Text
++    premise_ids: Annotated[list[Text], Field(min_length=1)]
++
++
++class GoalCoverageSelection(StageModel):
++    goal_ref: Text
++    disposition: Literal["constrained", "real_code", "blocked"]
++    constraint_refs: list[Text]
++    unknown_ids: list[Text]
++    rationale: Text
++    evidence_ids: Annotated[list[Text], Field(min_length=1)]
++    premise_ids: list[Text]
++
++
++class SpecUnknownSelection(StageModel):
++    id: Text
++    question: Text
++    impact: Text
++    disposition: Literal["blocking", "nonblocking", "out_of_scope"]
++    goal_refs: list[Text]
++    constraint_refs: list[Text]
++    scenario_ids: list[Text]
++    formal_uncertainty_refs: list[Text]
++    rationale: Text
++
++
++class AllowedVariationSelection(StageModel):
++    id: Text
++    statement: Text
++    scenario_ids: Annotated[list[Text], Field(min_length=1)]
++    constraint_refs: Annotated[list[Text], Field(min_length=1)]
++    evidence_ids: list[Text]
++    premise_ids: list[Text]
++
++
++class SpecSemanticsSelection(StageModel):
++    schema_version: Literal["staged-spec-semantics/v0.2"]
++    delivery_status: Literal["ready", "partial", "conflict"]
++    fixed_inputs: Annotated[list[FixedInputSelection], Field(min_length=1)]
++    replacement_boundary: list[ReplacementBoundary]
++    preserved_real_logic: list[PreservedRealLogic]
++    premises: Annotated[list[Premise], Field(min_length=1)]
++    constraint_basis: list[ConstraintBasisSelection]
++    branches: Annotated[list[BranchDecision], Field(min_length=1)]
++    goal_coverage: list[GoalCoverageSelection]
++    unknowns: list[SpecUnknownSelection]
++    allowed_variations: list[AllowedVariationSelection]
++    conflicts: list[SpecConflict]
++
++
++class ConstructFallbackUnknown(StageModel):
++    question: Text
++    blocking: bool
++
++
++class ConstructSelection(StageModel):
++    schema_version: Literal["staged-construct/v0.4"]
++    result_status: Literal["SELECTED", "ALTERNATIVES", "AMBIGUOUS", "INCONCLUSIVE"]
++    selected_scenario_id: Text | None
++    selection_rationale: Text
++    fallback_unknowns: list[ConstructFallbackUnknown]
++    spec: SpecSemanticsSelection | None = None
++    investigation_requests: list[InvestigationRequest] = Field(default_factory=list)
++    contract: ReferencedContractSelection | None
+ 
+ 
+ class ContrastResult(StageModel):
+-    schema_version: Literal["staged-contrast/v0.2"]
++    schema_version: Literal["staged-contrast/v0.3"]
+     status: Literal["proposed", "none_identified"]
+-    execution_status: Literal["not_executed"]
+     alternative: Text | None
+     bypass_behavior: Text | None
+     evidence_ids: list[Text]
+@@ -225,6 +316,25 @@ class ContrastResult(StageModel):
+     investigation_requests: list[InvestigationRequest] = Field(default_factory=list)
+ 
+ 
++class ContrastSelection(StageModel):
++    schema_version: Literal["staged-contrast/v0.4"]
++    status: Literal["proposed", "none_identified"]
++    alternative: Text | None
++    bypass_behavior: Text | None
++    evidence_ids: list[Text]
++    distinguishing_observation: Text | None
++    revision_requested: bool
++    revision_reason: Text | None
++    assumption_reason: Text | None
++    semantic_role: Literal[
++        "dependency_contract", "mut_path_condition", "test_objective"
++    ] | None = None
++    weakness_review: Text
++    overconstraint_review: Text
++    observation_limits: Text
++    investigation_requests: list[InvestigationRequest] = Field(default_factory=list)
++
++
+ class RevisionResult(StageModel):
+     schema_version: Literal["staged-revise/v0.1"]
+     revised_construct: ConstructResult
+@@ -235,9 +345,8 @@ class RevisionResult(StageModel):
+ 
+ 
+ class RevisionSelection(StageModel):
+-    schema_version: Literal["staged-revise/v0.2"]
++    schema_version: Literal["staged-revise/v0.3"]
+     revised_construct: ConstructSelection
+-    modified_objects: Annotated[list[Text], Field(min_length=1)]
+     evidence_reason: Text
+     evidence_ids: Annotated[list[Text], Field(min_length=1)]
+     request_another_revision: bool = False
+@@ -250,13 +359,6 @@ class DeliverResult(StageModel):
+     contract: ScenarioContract | None
+ 
+ 
+-class DeliverSelection(StageModel):
+-    schema_version: Literal["staged-deliver/v0.3"]
+-    result_status: Literal["SELECTED", "ALTERNATIVES", "AMBIGUOUS", "INCONCLUSIVE"]
+-    selected_scenario_id: Text | None
+-    contract: ScenarioContractSelection | None
+-
+-
+ class CitationMaterializationError(ValueError):
+     def __init__(
+         self, message: str, *, field_path: str, locator: object = None,
+@@ -301,8 +403,6 @@ def materialize_contract(
+ ) -> ScenarioContract | None:
+     if raw is None:
+         return None
+-    if isinstance(raw, ScenarioContractSelection):
+-        raw = raw.model_dump(mode="json")
+     if not isinstance(raw, dict):
+         raise ValueError("contract selection must be an object or null")
+     selected = deepcopy(raw)
+@@ -329,13 +429,75 @@ def materialize_contract(
+     return ScenarioContract.model_validate(selected)
+ 
+ 
+-def contract_selection(contract: ScenarioContract | None) -> dict | None:
+-    if contract is None:
+-        return None
+-    selected = contract.model_dump(mode="json")
+-    for evidence in selected["evidence"]:
+-        evidence.pop("quote")
+-    return selected
++def _ref_indexes(refs: list[str], lookup: dict[str, int], label: str) -> list[int]:
++    if len(refs) != len(set(refs)):
++        raise ValueError(f"{label} contains duplicate stable refs")
++    try:
++        return [lookup[ref] for ref in refs]
++    except KeyError as exc:
++        raise ValueError(f"{label} references unknown stable ref: {exc.args[0]}") from None
++
++
++def _materialize_referenced_contract(
++    raw: ReferencedContractSelection, store: SourceStore, task: UnifiedTask, *, field_path: str,
++) -> tuple[ScenarioContract, dict[str, dict[str, int]]]:
++    selected = raw.model_dump(mode="json")
++    selected["schema_version"] = "mock-spec.scenario/v0.1"
++    selected["case_id"] = task.case_id
++    selected["language"] = task.language
++    refs: dict[str, dict[str, int]] = {}
++    for name, items in (
++        ("goal", selected["test_objectives"]),
++        ("constraint", selected["dependency_constraints"]),
++        ("uncertainty", selected["uncertainty"]),
++    ):
++        mapping: dict[str, int] = {}
++        for index, item in enumerate(items):
++            ref = item.pop("ref")
++            if ref in mapping:
++                raise ValueError(f"duplicate {name} stable ref")
++            mapping[ref] = index
++        refs[name] = mapping
++    contract = materialize_contract(selected, store, field_path=field_path)
++    assert contract is not None
++    return contract, refs
++
++
++def _materialize_spec(
++    raw: SpecSemanticsSelection, refs: dict[str, dict[str, int]],
++) -> SpecSemantics:
++    selected = raw.model_dump(mode="json")
++    selected["schema_version"] = "staged-spec-semantics/v0.1"
++    for item in selected["fixed_inputs"]:
++        item["goal_indexes"] = _ref_indexes(
++            item.pop("goal_refs"), refs["goal"], "fixed input",
++        )
++    for item in selected["constraint_basis"]:
++        item["constraint_index"] = _ref_indexes(
++            [item.pop("constraint_ref")], refs["constraint"], "constraint basis",
++        )[0]
++    for item in selected["goal_coverage"]:
++        item["goal_index"] = _ref_indexes(
++            [item.pop("goal_ref")], refs["goal"], "goal coverage",
++        )[0]
++        item["constraint_indexes"] = _ref_indexes(
++            item.pop("constraint_refs"), refs["constraint"], "goal coverage",
++        )
++    for item in selected["unknowns"]:
++        item["goal_indexes"] = _ref_indexes(
++            item.pop("goal_refs"), refs["goal"], "unknown",
++        )
++        item["constraint_indexes"] = _ref_indexes(
++            item.pop("constraint_refs"), refs["constraint"], "unknown",
++        )
++        item["formal_uncertainty_indexes"] = _ref_indexes(
++            item.pop("formal_uncertainty_refs"), refs["uncertainty"], "unknown",
++        )
++    for item in selected["allowed_variations"]:
++        item["constraint_indexes"] = _ref_indexes(
++            item.pop("constraint_refs"), refs["constraint"], "allowed variation",
++        )
++    return SpecSemantics.model_validate(selected)
+ 
+ 
+ def materialize_extract(wire: ExtractSelection, store: SourceStore) -> ExtractResult:
+@@ -356,7 +518,7 @@ def materialize_extract(wire: ExtractSelection, store: SourceStore) -> ExtractRe
+                 for index, ref in enumerate(item.evidence)
+             ],
+         ) for candidate_index, item in enumerate(wire.candidates)],
+-        unresolved=wire.unresolved,
++        unresolved=[item.question for item in wire.unresolved],
+     )
+ 
+ 
+@@ -374,7 +536,8 @@ def materialize_query(
+                 )
+                 for index, item in enumerate(wire.stop_explanation.evidence)
+             ],
+-            remaining_unknowns=wire.stop_explanation.remaining_unknowns,
++            # Projected from the host question ledger after updates are applied.
++            remaining_unknowns=[],
+         )
+     assessment = None
+     if wire.previous_receipt_assessment is not None:
+@@ -395,46 +558,123 @@ def materialize_query(
+     )
+ 
+ 
++def project_question_updates(
++    updates: list[QuestionUpdateSelection],
++    *, existing_questions: list[dict[str, Any]], attempts: list[dict[str, Any]],
++    store: SourceStore,
++) -> list[QuestionUpdate]:
++    """Restore immutable ledger fields and observed receipt provenance."""
++    existing = {item["question_id"]: item for item in existing_questions}
++    observations = store.observations()
++    projected: list[QuestionUpdate] = []
++    for update in updates:
++        values = update.model_dump(mode="json")
++        question_id = values.get("question_id")
++        prior: dict[str, Any] | None = None
++        if question_id is not None:
++            prior = existing.get(question_id)
++            if prior is None:
++                raise ValueError("question update references an unknown question")
++            if any(values.get(key) is not None for key in ("question", "goal_indexes", "impact")):
++                raise ValueError("existing question update must not repeat immutable fields")
++            values.update(
++                question=prior["question"], goal_indexes=prior["goal_indexes"],
++                impact=prior["impact"],
++            )
++        elif any(values.get(key) is None for key in ("question", "goal_indexes", "impact")):
++            raise ValueError("new question update requires question, goals, and impact")
++        if values["state"] in {"resolved", "nonblocking"}:
++            values["acquisition"] = "not_needed"
++            response_ids = {
++                observation.get("response_id")
++                for locator in update.evidence for observation in observations
++                if observation["source_id"] == locator.source_id
++                and isinstance(observation["start_line"], int)
++                and isinstance(observation["end_line"], int)
++                and observation["start_line"] <= locator.end_line
++                and observation["end_line"] >= locator.start_line
++            }
++            values["attempted_sequences"] = sorted(
++                item["sequence"] for item in attempts
++                if item.get("response_id") in response_ids
++            )
++        if prior is not None:
++            values["attempted_sequences"] = sorted({
++                *prior.get("attempted_sequences", []),
++                *values.get("attempted_sequences", []),
++            })
++        projected.append(QuestionUpdate.model_validate(values))
++    return projected
++
++
+ def materialize_construct(
+-    wire: ConstructSelection, store: SourceStore, *, field_path: str = "",
++    wire: ConstructSelection, store: SourceStore, task: UnifiedTask, *, field_path: str = "",
+ ) -> ConstructResult:
++    contract: ScenarioContract | None = None
++    spec: SpecSemantics | None = None
++    if wire.contract is not None:
++        contract, refs = _materialize_referenced_contract(
++            wire.contract, store, task, field_path=f"{field_path}.contract".lstrip("."),
++        )
++        if wire.spec is not None:
++            spec = _materialize_spec(wire.spec, refs)
++    elif wire.spec is not None:
++        raise ValueError("specification semantics require a formal contract")
++    if wire.spec is not None and wire.fallback_unknowns:
++        raise ValueError("fallback unknowns are only allowed when spec is absent")
++    unresolved = [item.question for item in wire.fallback_unknowns if item.blocking]
++    nonblocking = [item.question for item in wire.fallback_unknowns if not item.blocking]
++    allowed_variations: list[str] = []
++    if spec is not None:
++        unresolved = [
++            item.question for item in spec.unknowns if item.disposition == "blocking"
++        ]
++        nonblocking = [
++            item.question for item in spec.unknowns if item.disposition != "blocking"
++        ]
++        allowed_variations = [item.statement for item in spec.allowed_variations]
+     return ConstructResult(
+         schema_version="staged-construct/v0.1",
+         result_status=wire.result_status,
+         selected_scenario_id=wire.selected_scenario_id,
+         selection_rationale=wire.selection_rationale,
+-        claim_basis=wire.claim_basis,
+-        critical_behaviors=wire.critical_behaviors,
+-        allowed_variations=wire.allowed_variations,
+-        unresolved=wire.unresolved,
+-        nonblocking_unknowns=wire.nonblocking_unknowns,
+-        spec=wire.spec,
++        allowed_variations=allowed_variations,
++        unresolved=unresolved,
++        nonblocking_unknowns=nonblocking,
++        spec=spec,
+         investigation_requests=wire.investigation_requests,
+-        contract=materialize_contract(
+-            wire.contract, store, field_path=f"{field_path}.contract".lstrip("."),
+-        ),
++        contract=contract,
+     )
+ 
+ 
+-def materialize_revision(wire: RevisionSelection, store: SourceStore) -> RevisionResult:
++def materialize_revision(
++    wire: RevisionSelection, store: SourceStore, task: UnifiedTask,
++) -> RevisionResult:
+     return RevisionResult(
+         schema_version="staged-revise/v0.1",
+         revised_construct=materialize_construct(
+-            wire.revised_construct, store, field_path="revised_construct"
++            wire.revised_construct, store, task, field_path="revised_construct"
+         ),
+-        modified_objects=wire.modified_objects,
++        # The host computes exact changed paths after materialization.  A placeholder
++        # is replaced before this object is recorded or consumed.
++        modified_objects=["host_pending_diff"],
+         evidence_reason=wire.evidence_reason,
+         evidence_ids=wire.evidence_ids,
+         request_another_revision=wire.request_another_revision,
+     )
+ 
+ 
+-def materialize_delivery(wire: DeliverSelection, store: SourceStore) -> DeliverResult:
+-    return DeliverResult(
+-        schema_version="staged-deliver/v0.1",
+-        result_status=wire.result_status,
+-        selected_scenario_id=wire.selected_scenario_id,
+-        contract=materialize_contract(wire.contract, store, field_path="contract"),
++def materialize_contrast(wire: ContrastSelection) -> ContrastResult:
++    has_evidence = bool(wire.evidence_ids)
++    has_assumption = wire.assumption_reason is not None
++    if has_evidence == has_assumption:
++        raise ValueError(
++            "contrast requires exactly one of evidence IDs or assumption reason"
++        )
++    return ContrastResult(
++        schema_version="staged-contrast/v0.3",
++        support="evidence" if has_evidence else "assumption",
++        **wire.model_dump(mode="json", exclude={"schema_version"}),
+     )
+ 
+ 
+@@ -460,8 +700,6 @@ def validate_constructed(
+             raise ValueError("selected scenario must have candidate status")
+         if constructed.unresolved:
+             raise ValueError("SELECTED cannot have blocking unresolved items")
+-        if not constructed.claim_basis:
+-            raise ValueError("SELECTED requires claim basis")
+     elif constructed.result_status == "ALTERNATIVES":
+         if contract is None or len(hypotheses) < 2 or constructed.selected_scenario_id is not None:
+             raise ValueError("ALTERNATIVES requires multiple complete branches and no selected ID")
+@@ -488,89 +726,8 @@ def validate_constructed(
+         if not constructed.unresolved:
+             raise ValueError("INCONCLUSIVE must identify missing material and its impact")
+ 
+-    if contract is not None:
+-        evidence_ids = {item.id for item in contract.evidence}
+-        if any(
+-            not set(item.evidence_ids) <= evidence_ids
+-            for item in constructed.critical_behaviors
+-        ):
+-            raise ValueError("critical behavior references unknown evidence")
+-    elif constructed.critical_behaviors:
+-        raise ValueError("critical behaviors require a complete contract")
+-    if any(
+-        not item.evidence_ids and not (
+-            strict_mapping and item.support == "assumption"
+-        )
+-        for item in constructed.critical_behaviors
+-    ):
+-        raise ValueError("critical behavior requires evidence unless explicitly assumed")
+-    if strict_mapping:
+-        assert contract is not None or constructed.result_status == "INCONCLUSIVE"
+-        known_evidence = set() if contract is None else {
+-            item.id for item in contract.evidence
+-        }
+-        role_claims: dict[str, list[Any]] = {
+-            "dependency_contract": [] if contract is None else contract.dependency_constraints,
+-            "mut_path_condition": [] if contract is None else contract.scenario_hypotheses,
+-            "test_objective": [] if contract is None else contract.test_objectives,
+-        }
+-
+-        def check_support(
+-            *, support: str | None, ids: list[str], reason: str | None, label: str
+-        ) -> None:
+-            if support == "evidence":
+-                if not ids or reason is not None:
+-                    raise ValueError(f"{label} evidence support requires only evidence IDs")
+-                if not set(ids) <= known_evidence:
+-                    raise ValueError(f"{label} references unknown evidence")
+-            elif support == "assumption":
+-                if ids or reason is None:
+-                    raise ValueError(f"{label} assumption requires only an explicit reason")
+-            else:
+-                raise ValueError(f"{label} must declare evidence or assumption support")
+-
+-        for index, basis in enumerate(constructed.claim_basis):
+-            if basis.semantic_role is None or basis.target is None:
+-                raise ValueError("claim basis requires semantic role and target mapping")
+-            check_support(
+-                support=basis.support, ids=basis.evidence_ids,
+-                reason=basis.assumption_reason, label=f"claim basis {index}",
+-            )
+-            collection_size = {
+-                "selection_rationale": 1,
+-                "allowed_variation": len(constructed.allowed_variations),
+-                "unresolved": len(constructed.unresolved),
+-                "nonblocking_unknown": len(constructed.nonblocking_unknowns),
+-                "formal_claim": len(role_claims[basis.semantic_role]),
+-            }[basis.target]
+-            if basis.target_index is None or basis.target_index >= collection_size:
+-                raise ValueError("claim basis target index is outside its mapped collection")
+-
+-        mapped = {(item.target, item.target_index) for item in constructed.claim_basis}
+-        required_mappings = {("selection_rationale", 0)}
+-        required_mappings.update(
+-            ("allowed_variation", index)
+-            for index in range(len(constructed.allowed_variations))
+-        )
+-        required_mappings.update(
+-            ("unresolved", index) for index in range(len(constructed.unresolved))
+-        )
+-        required_mappings.update(
+-            ("nonblocking_unknown", index)
+-            for index in range(len(constructed.nonblocking_unknowns))
+-        )
+-        if not required_mappings <= mapped:
+-            raise ValueError("important constructed judgments lack claim-basis mappings")
+-
+-        for index, behavior in enumerate(constructed.critical_behaviors):
+-            if behavior.semantic_role is None or behavior.formal_claim_index is None:
+-                raise ValueError("critical behavior requires a formal claim mapping")
+-            if behavior.formal_claim_index >= len(role_claims[behavior.semantic_role]):
+-                raise ValueError("critical behavior formal claim index is outside its role")
+-            check_support(
+-                support=behavior.support, ids=behavior.evidence_ids,
+-                reason=behavior.assumption_reason, label=f"critical behavior {index}",
+-            )
++    # Evidence/support semantics live in the contract premises and spec.  The v0.4
++    # wire no longer asks the model to maintain parallel claim/critical summaries.
+     return contract
+ 
+ 
+@@ -581,14 +738,16 @@ def validate_contrast(
+     if not set(contrast.evidence_ids) <= evidence_ids:
+         raise ValueError("degeneracy contrast references unknown evidence")
+     if contrast.status == "proposed":
+-        if not all((
+-            contrast.alternative,
+-            contrast.bypass_behavior,
+-            contrast.distinguishing_observation,
+-        )) or not (contrast.evidence_ids or (
++        if not (contrast.evidence_ids or (
+             contrast.support == "assumption" and contrast.assumption_reason
+         )):
+-            raise ValueError("proposed contrast requires an alternative, bypass, evidence, and observation")
++            raise ValueError("proposed contrast requires evidence or an explicit assumption")
++        if any((contrast.alternative, contrast.bypass_behavior,
++                contrast.distinguishing_observation)) and not all((
++                    contrast.alternative, contrast.bypass_behavior,
++                    contrast.distinguishing_observation,
++                )):
++            raise ValueError("an alternative contrast bundle must be complete when present")
+     elif any((
+         contrast.alternative,
+         contrast.bypass_behavior,
+@@ -617,13 +776,14 @@ def validate_contrast(
+ 
+ __all__ = [
+     "CandidateDraft", "CandidateSelection", "CitationMaterializationError",
+-    "ClaimBasis", "ConstructResult", "ConstructSelection", "ContrastResult",
+-    "DeliverResult", "DeliverSelection", "ExplorationStop", "ExtractResult",
++    "ConstructResult", "ConstructSelection", "ContrastResult", "ContrastSelection",
++    "DeliverResult", "ExplorationStop", "ExtractResult",
+     "ExtractSelection", "InvestigationRequest", "QueryAttempt", "QueryResult",
+-    "QuerySelection", "QuestionUpdate", "RevisionResult", "RevisionSelection",
+-    "ScenarioContractSelection", "SourceLocator", "SourceReference", "StageModel",
+-    "StageResult", "check_source_reference", "contract_selection",
+-    "materialize_construct", "materialize_contract", "materialize_delivery",
+-    "materialize_extract", "materialize_query", "materialize_reference",
++    "QuerySelection", "QuestionUpdate", "QuestionUpdateSelection", "RevisionResult", "RevisionSelection",
++    "SourceLocator", "SourceReference", "StageModel",
++    "StageResult", "check_source_reference",
++    "materialize_construct", "materialize_contract",
++    "materialize_contrast", "materialize_extract", "materialize_query", "materialize_reference",
++    "project_question_updates",
+     "materialize_revision", "validate_constructed", "validate_contrast",
+ ]
+diff --git a/src/mock_spec/budget.py b/src/mock_spec/budget.py
+index 3d1ee4d..13b84d6 100644
+--- a/src/mock_spec/budget.py
++++ b/src/mock_spec/budget.py
+@@ -22,7 +22,7 @@ class InferenceBudget:
+     max_tool_calls: int = 8
+     max_repeated_no_progress: int = 2
+     max_output_tokens: int = 4_096
+-    max_total_tokens: int = 24_000
++    max_total_tokens: int | None = 24_000
+     max_tool_output_chars: int = 16_000
+     analysis_timeout_seconds: float = 15
+     max_cost_usd: Decimal | None = None
+@@ -32,12 +32,22 @@ class InferenceBudget:
+     def __post_init__(self) -> None:
+         for name in (
+             "max_turns", "max_tool_calls", "max_repeated_no_progress",
+-            "max_output_tokens", "max_total_tokens",
++            "max_output_tokens",
+         ):
+             value = getattr(self, name)
+             if type(value) is not int or value < 1:
+                 raise InferenceError(f"scenario inference {name} must be a positive integer")
+-        if self.max_output_tokens > self.max_total_tokens:
++        if (
++            self.max_total_tokens is not None
++            and (type(self.max_total_tokens) is not int or self.max_total_tokens < 1)
++        ):
++            raise InferenceError(
++                "scenario inference max_total_tokens must be a positive integer"
++            )
++        if (
++            self.max_total_tokens is not None
++            and self.max_output_tokens > self.max_total_tokens
++        ):
+             raise InferenceError(
+                 "scenario inference max_output_tokens cannot exceed max_total_tokens"
+             )
+@@ -211,7 +221,10 @@ class UsageLedger:
+         self.estimates.append(estimate)
+ 
+         reason = None
+-        if projected_total > self.budget.max_total_tokens:
++        if (
++            self.budget.max_total_tokens is not None
++            and projected_total > self.budget.max_total_tokens
++        ):
+             reason = "projected_token_limit"
+         elif (
+             self.budget.max_cost_usd is not None
+@@ -270,7 +283,11 @@ class UsageLedger:
+         })
+ 
+         reason = None
+-        if known and self.total_tokens > self.budget.max_total_tokens:
++        if (
++            known
++            and self.budget.max_total_tokens is not None
++            and self.total_tokens > self.budget.max_total_tokens
++        ):
+             reason = "actual_token_limit"
+         elif (
+             self.budget.max_cost_usd is not None
+diff --git a/tests/test_budget.py b/tests/test_budget.py
+index c2597fb..47dec20 100644
+--- a/tests/test_budget.py
++++ b/tests/test_budget.py
+@@ -4,6 +4,7 @@ from __future__ import annotations
+ 
+ import asyncio
+ from decimal import Decimal
++from types import SimpleNamespace
+ 
+ import pytest
+ from agents.usage import Usage
+@@ -32,6 +33,63 @@ def test_budget_requires_complete_explicit_prices_for_cost_limit() -> None:
+         inference_v02.InferenceBudget(input_cost_per_million=Decimal("1"))
+ 
+ 
++@pytest.mark.parametrize("value", [0, -1, 1.5, "100"])
++def test_optional_total_token_limit_still_rejects_invalid_values(value) -> None:
++    with pytest.raises(InferenceError, match="max_total_tokens must be a positive integer"):
++        inference_v02.InferenceBudget(max_total_tokens=value)
++
++
++def test_no_total_token_limit_keeps_accounting_and_allows_later_calls(monkeypatch) -> None:
++    budget = inference_v02.InferenceBudget(
++        max_output_tokens=100,
++        max_total_tokens=None,
++    )
++    ledger = UsageLedger(budget)
++    agent = SimpleNamespace(tools=[], output_type=None)
++    monkeypatch.setattr(
++        "mock_spec.budget.estimate_known_request_tokens",
++        lambda **_kwargs: (30_000, 120_000),
++    )
++
++    ledger.before_model_call(system_prompt=None, input_items=[], agent=agent)
++    ledger.after_model_call(SimpleNamespace(
++        usage=Usage(
++            requests=1, input_tokens=30_000, output_tokens=2_000, total_tokens=32_000
++        ),
++        raw_usage={"total_tokens": 32_000},
++    ))
++    ledger.before_model_call(system_prompt=None, input_items=[], agent=agent)
++
++    assert ledger.requests_started == 2
++    assert ledger.total_tokens == 32_000
++    assert ledger.gate_events[-1]["status"] == "allowed"
++
++
++def test_no_total_token_limit_still_enforces_explicit_cost_limit(monkeypatch) -> None:
++    budget = inference_v02.InferenceBudget(
++        max_output_tokens=100,
++        max_total_tokens=None,
++        max_cost_usd=Decimal("0.01"),
++        input_cost_per_million=Decimal("1"),
++        output_cost_per_million=Decimal("1"),
++    )
++    ledger = UsageLedger(budget)
++    monkeypatch.setattr(
++        "mock_spec.budget.estimate_known_request_tokens",
++        lambda **_kwargs: (20_000, 80_000),
++    )
++
++    with pytest.raises(InferenceError) as caught:
++        ledger.before_model_call(
++            system_prompt=None,
++            input_items=[],
++            agent=SimpleNamespace(tools=[], output_type=None),
++        )
++
++    assert caught.value.category == "budget_exhausted"
++    assert ledger.gate_events[-1]["reason"] == "projected_cost_limit"
++
++
+ def test_preflight_token_gate_blocks_before_model_call(monkeypatch) -> None:
+     task = _task()
+     budget = inference_v02.InferenceBudget(
+diff --git a/tests/test_staged_claim_mapping.py b/tests/test_staged_claim_mapping.py
+index 3373942..cfaaaab 100644
+--- a/tests/test_staged_claim_mapping.py
++++ b/tests/test_staged_claim_mapping.py
+@@ -1,8 +1,10 @@
+-"""Strict repository-mode mappings keep research judgments auditable."""
++"""Stable model references keep repository-mode judgments auditable."""
+ 
+ from __future__ import annotations
+ 
+ from copy import deepcopy
++import hashlib
++import os
+ from pathlib import Path
+ import sys
+ 
+@@ -16,66 +18,213 @@ from stage_protocol import (  # noqa: E402
+     ConstructResult,
+     ConstructSelection,
+     ContrastResult,
++    ClosedQuestionUpdateSelection,
++    InvestigationRequest,
+     materialize_construct,
++    project_question_updates,
+     validate_constructed,
+     validate_contrast,
+ )
++from specification import validate_semantics  # noqa: E402
++from investigation import InvestigationLedger  # noqa: E402
+ from scripted import scripted_outputs, synthetic_task  # noqa: E402
+ from mock_spec.schemas import UnifiedTask  # noqa: E402
+ from mock_spec.validation import SourceStore  # noqa: E402
++from mock_spec.source_repository import ReviewedRepository  # noqa: E402
+ 
+ 
+-def _selected() -> tuple[ConstructResult, UnifiedTask, SourceStore]:
+-    raw = scripted_outputs("selected")[2]
++def _context() -> tuple[UnifiedTask, SourceStore]:
+     task = UnifiedTask.from_dict(synthetic_task())
+-    store = SourceStore(task)
+-    return materialize_construct(ConstructSelection.model_validate(raw), store), task, store
++    return task, SourceStore(task)
++
++
++def _construct(raw: dict, task: UnifiedTask, store: SourceStore) -> ConstructResult:
++    return materialize_construct(ConstructSelection.model_validate(raw), store, task)
+ 
+ 
+-def _construct(raw: dict, store: SourceStore) -> ConstructResult:
+-    return materialize_construct(ConstructSelection.model_validate(raw), store)
++def _selected() -> tuple[ConstructResult, UnifiedTask, SourceStore]:
++    task, store = _context()
++    return _construct(scripted_outputs("selected")[2], task, store), task, store
+ 
+ 
+-def test_strict_construct_accepts_evidence_assumption_and_formal_claim_mappings() -> None:
++def test_stable_refs_are_projected_to_consumer_indexes_and_host_identity() -> None:
++    raw = scripted_outputs("selected")[2]
++    assert "case_id" not in raw["contract"]
++    assert "language" not in raw["contract"]
+     constructed, task, store = _selected()
+ 
+-    contract = validate_constructed(
+-        constructed, task, store, strict_mapping=True
+-    )
++    contract = validate_constructed(constructed, task, store, strict_mapping=True)
+ 
+     assert contract is not None
+-    assert constructed.critical_behaviors[0].semantic_role == "dependency_contract"
+-    assert {item.target for item in constructed.claim_basis} >= {
+-        "selection_rationale", "allowed_variation", "formal_claim"
+-    }
++    assert (contract.case_id, contract.language) == (task.case_id, task.language)
++    assert constructed.spec is not None
++    assert constructed.spec.fixed_inputs[0].goal_indexes == [0]
++    assert constructed.spec.constraint_basis[0].constraint_index == 0
++    assert constructed.spec.goal_coverage[0].constraint_indexes == [0]
++    assert constructed.spec.unknowns[0].formal_uncertainty_indexes == [0]
++    assert constructed.spec.allowed_variations[0].constraint_indexes == [0]
+ 
+ 
+ @pytest.mark.parametrize(
+     ("mutation", "message"),
+     [
+-        (lambda value: value["critical_behaviors"][0].update(
+-            formal_claim_index=99
+-        ), "formal claim index"),
+-        (lambda value: value["claim_basis"][2].update(
+-            support="assumption", assumption_reason=None, evidence_ids=[]
+-        ), "assumption requires"),
+-        (lambda value: value.__setitem__(
+-            "claim_basis",
+-            [item for item in value["claim_basis"] if item["target"] != "allowed_variation"],
+-        ), "lack claim-basis mappings"),
++        (
++            lambda value: value["contract"]["test_objectives"].append(
++                deepcopy(value["contract"]["test_objectives"][0])
++            ),
++            "duplicate goal stable ref",
++        ),
++        (
++            lambda value: value["spec"]["constraint_basis"][0].update(
++                constraint_ref="missing-constraint"
++            ),
++            "unknown stable ref",
++        ),
++        (
++            lambda value: value["spec"]["goal_coverage"][0].update(
++                constraint_refs=["constraint-1", "constraint-1"]
++            ),
++            "duplicate stable refs",
++        ),
+     ],
+ )
+-def test_strict_construct_rejects_unreviewable_mapping(mutation, message: str) -> None:
++def test_stable_ref_projection_rejects_duplicate_or_unknown_refs(
++    mutation, message: str,
++) -> None:
+     raw = deepcopy(scripted_outputs("selected")[2])
+     mutation(raw)
+-    task = UnifiedTask.from_dict(synthetic_task())
+-    store = SourceStore(task)
++    task, store = _context()
+ 
+     with pytest.raises(ValueError, match=message):
+-        validate_constructed(
+-            _construct(raw, store), task, store,
+-            strict_mapping=True,
++        _construct(raw, task, store)
++
++
++def test_host_projection_does_not_invent_a_missing_semantic_relation() -> None:
++    raw = deepcopy(scripted_outputs("selected")[2])
++    raw["spec"]["constraint_basis"] = []
++    task, store = _context()
++    constructed = _construct(raw, task, store)
++
++    contract = validate_constructed(constructed, task, store, strict_mapping=True)
++    assert contract is not None and constructed.spec is not None
++    with pytest.raises(ValueError, match="every dependency constraint requires"):
++        validate_semantics(constructed.spec, contract)
++
++
++def test_spec_unknowns_and_variations_are_the_single_model_source() -> None:
++    raw = deepcopy(scripted_outputs("selected")[2])
++    raw["spec"]["unknowns"][0].update(
++        question="Concrete dependency state remains unknown.",
++        impact="It does not affect the selected observable branch.",
++    )
++    task, store = _context()
++    constructed = _construct(raw, task, store)
++
++    assert constructed.unresolved == []
++    assert constructed.nonblocking_unknowns == [
++        "Concrete dependency state remains unknown."
++    ]
++    assert constructed.allowed_variations == [
++        raw["spec"]["allowed_variations"][0]["statement"]
++    ]
++    assert validate_constructed(
++        constructed, task, store, strict_mapping=True
++    ) is not None
++
++
++def test_fallback_unknowns_cannot_silently_compete_with_a_complete_spec() -> None:
++    raw = deepcopy(scripted_outputs("selected")[2])
++    raw["fallback_unknowns"] = [{"question": "Competing unknown", "blocking": False}]
++    task, store = _context()
++
++    with pytest.raises(ValueError, match="only allowed when spec is absent"):
++        _construct(raw, task, store)
++
++
++def test_blocking_unknown_cannot_omit_affected_goal_refs() -> None:
++    raw = deepcopy(scripted_outputs("ambiguous")[2])
++    raw["spec"]["unknowns"][0]["goal_refs"] = []
++    task, store = _context()
++    constructed = _construct(raw, task, store)
++    assert constructed.contract is not None and constructed.spec is not None
++
++    with pytest.raises(ValueError, match="blocked coverage must match"):
++        validate_semantics(constructed.spec, constructed.contract)
++
++
++def test_host_projects_all_receipts_needed_for_combined_dynamic_evidence(
++    tmp_path: Path,
++) -> None:
++    task, _ = _context()
++    root = tmp_path / "snapshot"
++    (root / "tree").mkdir(parents=True)
++    source = b"first line\nsecond line\n"
++    (root / "tree" / "dynamic.py").write_bytes(source)
++    root_fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY)
++    try:
++        repository = ReviewedRepository(
++            root_fd,
++            task=task,
++            snapshot_id="stable-ref-receipts",
++            discovery_root="tree",
++            files_by_logical_path={
++                "dynamic.py": ("tree/dynamic.py", hashlib.sha256(source).hexdigest())
++            },
++        )
++    finally:
++        os.close(root_fd)
++    try:
++        store = SourceStore(task, repository=repository)
++        source_id = repository.source_id_for("dynamic.py")
++        store.record_observation(store.read(source_id, 1, 1), response_id="query:1")
++        store.record_observation(store.read(source_id, 2, 2), response_id="query:2")
++        attempts = [
++            {"sequence": sequence, "status": "ok", "result": {},
++             "response_id": f"query:{sequence}"}
++            for sequence in (1, 2)
++        ]
++        ledger = InvestigationLedger(1, repository_available=True)
++        ledger.register([
++            InvestigationRequest(
++                question="What do both dynamic lines establish?",
++                goal_indexes=[0],
++                impact="Both lines are required to close the original goal question.",
++            )
++        ], origin="EXTRACT")
++        selection = ClosedQuestionUpdateSelection(
++            question_id="q1", question=None, goal_indexes=None, impact=None,
++            state="resolved", rationale="The two observed lines jointly answer it.",
++            evidence=[{"source_id": source_id, "start_line": 1, "end_line": 2}],
++        )
++
++        projected = project_question_updates(
++            [selection], existing_questions=ledger.snapshot(),
++            attempts=attempts, store=store,
++        )
++        assert projected[0].attempted_sequences == [1, 2]
++        ledger.apply_updates(projected, store=store, attempts=attempts, task=task)
++        assert ledger.snapshot()[0]["state"] == "resolved"
++
++        incomplete = project_question_updates(
++            [selection], existing_questions=[{
++                **ledger.snapshot()[0], "state": "open", "attempted_sequences": [],
++            }], attempts=attempts[:1], store=store,
+         )
++        assert incomplete[0].attempted_sequences == [1]
++        incomplete_ledger = InvestigationLedger(1, repository_available=True)
++        incomplete_ledger.register([
++            InvestigationRequest(
++                question="What do both dynamic lines establish?",
++                goal_indexes=[0],
++                impact="Both lines are required to close the original goal question.",
++            )
++        ], origin="EXTRACT")
++        with pytest.raises(ValueError, match="associated with its observed query receipt"):
++            incomplete_ledger.apply_updates(
++                incomplete, store=store, attempts=attempts[:1], task=task,
++            )
++    finally:
++        repository.close()
+ 
+ 
+ def test_strict_contrast_requires_evidence_or_explicit_assumption() -> None:
+@@ -83,9 +232,8 @@ def test_strict_contrast_requires_evidence_or_explicit_assumption() -> None:
+     contract = validate_constructed(constructed, task, store, strict_mapping=True)
+     assert contract is not None
+     raw = {
+-        "schema_version": "staged-contrast/v0.2",
++        "schema_version": "staged-contrast/v0.3",
+         "status": "none_identified",
+-        "execution_status": "not_executed",
+         "alternative": None,
+         "bypass_behavior": None,
+         "evidence_ids": [],
+@@ -100,59 +248,10 @@ def test_strict_contrast_requires_evidence_or_explicit_assumption() -> None:
+         "observation_limits": "This static review does not execute a counterexample.",
+         "investigation_requests": [],
+     }
+-    validate_contrast(
+-        ContrastResult.model_validate(raw), contract, strict_mapping=True
+-    )
++    validate_contrast(ContrastResult.model_validate(raw), contract, strict_mapping=True)
+ 
+     raw["assumption_reason"] = None
+     with pytest.raises(ValueError, match="explicit reason"):
+         validate_contrast(
+             ContrastResult.model_validate(raw), contract, strict_mapping=True
+         )
+-
+-
+-def test_strict_construct_maps_nonblocking_unknowns() -> None:
+-    raw = deepcopy(scripted_outputs("selected")[2])
+-    raw["nonblocking_unknowns"] = ["Concrete dependency state remains unknown."]
+-    task = UnifiedTask.from_dict(synthetic_task())
+-    store = SourceStore(task)
+-    with pytest.raises(ValueError, match="lack claim-basis mappings"):
+-        validate_constructed(
+-            _construct(raw, store), task, store,
+-            strict_mapping=True,
+-        )
+-
+-    raw["claim_basis"].append({
+-        "claim": "concrete dependency state",
+-        "basis": "scenario_inference",
+-        "target": "nonblocking_unknown",
+-        "target_index": 0,
+-        "semantic_role": "dependency_contract",
+-        "evidence_ids": [],
+-        "support": "assumption",
+-        "assumption_reason": "The implementation remains hidden and does not affect selection.",
+-    })
+-    assert validate_constructed(
+-        _construct(raw, store), task, store,
+-        strict_mapping=True,
+-    ) is not None
+-
+-
+-def test_critical_behavior_keeps_legacy_evidence_rule_but_allows_strict_assumption() -> None:
+-    raw = deepcopy(scripted_outputs("selected")[2])
+-    raw["critical_behaviors"][0]["evidence_ids"] = []
+-    task = UnifiedTask.from_dict(synthetic_task())
+-    store = SourceStore(task)
+-    with pytest.raises(ValueError, match="requires evidence"):
+-        validate_constructed(
+-            _construct(raw, store), task, store
+-        )
+-
+-    raw["critical_behaviors"][0].update({
+-        "support": "assumption",
+-        "assumption_reason": "This behavior is retained as an explicit hypothesis.",
+-    })
+-    assert validate_constructed(
+-        _construct(raw, store), task, store,
+-        strict_mapping=True,
+-    ) is not None
+diff --git a/tests/test_staged_contrast.py b/tests/test_staged_contrast.py
+index bdf1d38..db84493 100644
+--- a/tests/test_staged_contrast.py
++++ b/tests/test_staged_contrast.py
+@@ -214,14 +214,14 @@ def test_legal_alternative_can_replace_candidate_without_changing_original_goal(
+     after["spec"]["allowed_variations"][0]["scenario_ids"] = ["equivalent_return"]
+     after["spec"]["unknowns"][0]["scenario_ids"] = ["equivalent_return"]
+     outputs[3] = {
+-        "schema_version": "staged-contrast/v0.2", "status": "proposed",
+-        "execution_status": "not_executed", "alternative": "Return 2.0 rather than integer 2.",
++            "schema_version": "staged-contrast/v0.4", "status": "proposed",
++ "alternative": "Return 2.0 rather than integer 2.",
+         "bypass_behavior": "This challenges the draft's integer construction, not the original equality.",
+         "evidence_ids": ["assertion"],
+         "distinguishing_observation": "A type check would distinguish them, but is not an original goal.",
+         "revision_requested": True,
+         "revision_reason": "The proposed alternative is actually legal under ordinary equality.",
+-        "support": "evidence", "assumption_reason": None,
++            "assumption_reason": None,
+         "semantic_role": "dependency_contract",
+         "weakness_review": "The integer-only draft excludes an equality-compatible value.",
+         "overconstraint_review": "The original objective does not require a concrete numeric type.",
+@@ -229,14 +229,10 @@ def test_legal_alternative_can_replace_candidate_without_changing_original_goal(
+         "investigation_requests": [],
+     }
+     outputs.insert(4, {
+-        "schema_version": "staged-revise/v0.2", "revised_construct": after,
+-        "modified_objects": [
+-            "contract", "selected_scenario_id", "selection_rationale", "spec",
+-        ],
++        "schema_version": "staged-revise/v0.3", "revised_construct": after,
+         "evidence_reason": "The same original equality accepts 2.0; rebind the unchanged goal.",
+         "evidence_ids": ["assertion"], "request_another_revision": False,
+     })
+-    outputs[-1].update(selected_scenario_id="equivalent_return", contract=contract)
+     result = asyncio.run(execute_staged_run(
+         task_for_replay_case("selected"), output_dir=tmp_path / "replacement",
+         model=FixedScriptModel(outputs), config=StagedRunConfig(variant="C"),
+@@ -249,7 +245,7 @@ def test_legal_alternative_can_replace_candidate_without_changing_original_goal(
+     )
+     task = UnifiedTask.from_dict(task_for_replay_case("selected"))
+     expected_before = materialize_construct(
+-        ConstructSelection.model_validate(before), SourceStore(task)
++            ConstructSelection.model_validate(before), SourceStore(task), task,
+     )
+     assert result["record"]["revision_log"][0]["before"]["contract"] == (
+         expected_before.contract.model_dump(mode="json")
+diff --git a/tests/test_staged_format_repair.py b/tests/test_staged_format_repair.py
+index b7ed598..a42a286 100644
+--- a/tests/test_staged_format_repair.py
++++ b/tests/test_staged_format_repair.py
+@@ -14,208 +14,12 @@ from controller import (  # noqa: E402
+     FormatRepairAllowance, StagedInferenceError, StagedRunConfig,
+     _repair_query_output, execute_staged_run,
+ )
+-from stage_protocol import materialize_contract  # noqa: E402
+ from mock_spec.budget import InferenceBudget, UsageLedger  # noqa: E402
+-from scripted import FixedScriptModel, scripted_outputs, synthetic_task  # noqa: E402
++from scripted import FixedScriptModel, synthetic_task  # noqa: E402
+ from mock_spec.schemas import UnifiedTask  # noqa: E402
+ from mock_spec.validation import SourceStore  # noqa: E402
+ 
+ 
+-def run_repair(tmp_path, *, damage, repair=None, max_calls=10):
+-    outputs = [deepcopy(item) for item in scripted_outputs()]
+-    expected = deepcopy(outputs[-1])
+-    damage(outputs[-1])
+-    outputs.append(deepcopy(expected) if repair is None else repair(deepcopy(expected)))
+-    model = FixedScriptModel(outputs)
+-    result = asyncio.run(execute_staged_run(
+-        synthetic_task(), output_dir=tmp_path / "run", model=model,
+-        config=StagedRunConfig(max_model_calls=max_calls),
+-    ))
+-    expected_contract = materialize_contract(
+-        expected["contract"], SourceStore(UnifiedTask.from_dict(synthetic_task()))
+-    )
+-    return result, model, expected_contract
+-
+-
+-@pytest.mark.parametrize("damage", [
+-    lambda value: value.pop("schema_version"),
+-    lambda value: value["contract"].update(schema_version="wrong-envelope"),
+-    lambda value: value["contract"]["evidence"][0].update(start_line="11", end_line="11"),
+-])
+-def test_repair_preserves_contract_selection_and_evidence(tmp_path, damage):
+-    result, model, expected = run_repair(tmp_path, damage=damage)
+-    assert result["record"]["result_status"] == "SELECTED"
+-    assert model.calls == 5
+-    assert result["manifest"]["usage"]["requests_started"] == 5
+-    assert result["contract"] == expected
+-    log = result["record"]["format_repair_log"]
+-    assert len(log) == 1 and log[0]["status"] == "completed"
+-    assert log[0]["semantic_snapshot"] == log[0]["after"]
+-    assert result["record"]["revision_log"] == []
+-
+-
+-@pytest.mark.parametrize("damage", [
+-    lambda value: value.pop("contract"),
+-    lambda value: value["contract"]["evidence"][0].update(quote="invented"),
+-    lambda value: value["contract"]["evidence"][0].update(start_line="10"),
+-    lambda value: value["contract"]["evidence"][0].update(source_id="other:0"),
+-    lambda value: value["contract"]["scenario_hypotheses"][0].update(condition="new condition"),
+-])
+-def test_no_repair_without_unchanged_complete_snapshot(tmp_path, damage):
+-    result, model, _ = run_repair(tmp_path, damage=damage)
+-    assert result["record"]["result_status"] == "ERROR"
+-    assert result["record"]["stop_reason"] == "output_invalid"
+-    assert model.calls == 4
+-    assert not (tmp_path / "run" / "scenario_contract.json").exists()
+-
+-
+-def test_unknown_delivery_locator_is_a_citation_failure_not_a_format_repair(tmp_path):
+-    result, model, _ = run_repair(
+-        tmp_path,
+-        damage=lambda value: value["contract"]["evidence"][0].update(
+-            source_id="unknown:0"
+-        ),
+-    )
+-
+-    assert model.calls == 4
+-    assert result["record"]["format_repair_log"] == []
+-    stage = result["record"]["stages"][-1]
+-    assert stage["stage"] == "DELIVER"
+-    assert stage["result"] is None
+-    assert stage["citation_error"] == {
+-        "field_path": "contract.evidence.0",
+-        "source_id": "unknown:0",
+-        "start_line": 11,
+-        "end_line": 11,
+-        "error": "unknown source_id",
+-    }
+-
+-
+-@pytest.mark.parametrize("field", ["test_objectives", "scenario_hypotheses",
+-                                    "dependency_constraints", "expected_interactions",
+-                                    "verification_candidates", "evidence"])
+-def test_repair_cannot_change_any_contract_semantics(tmp_path, field):
+-    def mutate(value):
+-        if field == "verification_candidates":
+-            claim = deepcopy(value["contract"]["test_objectives"][0])
+-            claim["status"] = "candidate"
+-            value["contract"][field].append(claim)
+-        else:
+-            item = value["contract"][field][0]
+-            key = "rationale" if field == "evidence" else (
+-                "description" if field == "scenario_hypotheses" else "statement"
+-            )
+-            item[key] = "changed semantics"
+-        return value
+-    result, model, _ = run_repair(
+-        tmp_path, damage=lambda value: value.pop("schema_version"), repair=mutate,
+-    )
+-    assert model.calls == 5
+-    assert result["record"]["result_status"] == "ERROR"
+-    assert result["record"]["stop_reason"] == "output_invalid"
+-    assert result["record"]["format_repair_log"][0]["after"] is not None
+-    assert not (tmp_path / "run" / "scenario_contract.json").exists()
+-
+-
+-def test_still_invalid_repair_is_not_retried(tmp_path):
+-    def invalid(value):
+-        value.pop("schema_version")
+-        return value
+-    result, model, _ = run_repair(
+-        tmp_path, damage=lambda value: value.pop("schema_version"), repair=invalid,
+-    )
+-    assert model.calls == 5
+-    assert result["record"]["result_status"] == "ERROR"
+-    assert result["record"]["error_stage"] == "FORMAT_REPAIR"
+-    assert len(result["record"]["format_repair_log"]) == 1
+-
+-
+-def test_shared_budget_does_not_publish_known_invalid_delivery(tmp_path):
+-    result, model, _ = run_repair(
+-        tmp_path, damage=lambda value: value.pop("schema_version"), max_calls=4,
+-    )
+-    assert model.calls == 4
+-    assert result["record"]["result_status"] == "INCONCLUSIVE"
+-    assert result["record"]["stop_reason"] == "budget_exhausted"
+-    assert not (tmp_path / "run" / "scenario_contract.json").exists()
+-
+-
+-def test_malformed_json_cannot_trigger_repair(tmp_path):
+-    from scripted import _response
+-
+-    class BrokenJsonModel(FixedScriptModel):
+-        async def get_response(self, *args, **kwargs):
+-            response = await super().get_response(*args, **kwargs)
+-            if self.calls == 4:
+-                response = _response({})
+-                response.output[0].content[0].text = '{"contract":'
+-            return response
+-
+-    model = BrokenJsonModel()
+-    result = asyncio.run(execute_staged_run(
+-        synthetic_task(), output_dir=tmp_path / "run", model=model, config=StagedRunConfig(),
+-    ))
+-    assert model.calls == 4
+-    assert result["record"]["result_status"] == "ERROR"
+-    assert result["record"]["format_repair_log"] == []
+-    assert result["record"]["query_log"] == []
+-
+-
+-def test_semantic_revision_and_format_repair_have_separate_logs(tmp_path):
+-    from scripted import task_for_replay_case
+-
+-    outputs = [deepcopy(item) for item in scripted_outputs("legal_variation", variant="C")]
+-    repaired = deepcopy(outputs[-1])
+-    outputs[-1].pop("schema_version")
+-    outputs.append(repaired)
+-    model = FixedScriptModel(outputs)
+-    result = asyncio.run(execute_staged_run(
+-        task_for_replay_case("legal_variation"), output_dir=tmp_path / "run", model=model,
+-        config=StagedRunConfig(variant="C"),
+-    ))
+-    record = result["record"]
+-    assert record["result_status"] == "SELECTED"
+-    assert model.calls == result["manifest"]["usage"]["requests_started"] == 7
+-    assert len(record["revision_log"]) == len(record["format_repair_log"]) == 1
+-    final_construct = record["revision_log"][0]["after"]
+-    assert record["allowed_variations"] == final_construct["allowed_variations"]
+-    assert record["critical_behaviors"] == final_construct["critical_behaviors"]
+-    assert result["contract"].model_dump(mode="json") == final_construct["contract"]
+-    assert record["query_log"] == []
+-
+-
+-@pytest.mark.parametrize("invalid", [True, False])
+-def test_actual_token_exhaustion_cannot_hide_invalid_final_response(tmp_path, invalid):
+-    from agents.usage import Usage
+-
+-    class ExcessUsageModel(FixedScriptModel):
+-        async def get_response(self, *args, **kwargs):
+-            response = await super().get_response(*args, **kwargs)
+-            if self.calls == 4:
+-                response.usage = Usage(
+-                    requests=1, input_tokens=100, output_tokens=100000, total_tokens=100100
+-                )
+-            return response
+-
+-    outputs = [deepcopy(item) for item in scripted_outputs()]
+-    if invalid:
+-        outputs[-1].pop("schema_version")
+-    model = ExcessUsageModel(outputs)
+-    result = asyncio.run(execute_staged_run(
+-        synthetic_task(), output_dir=tmp_path / "run", model=model, config=StagedRunConfig(),
+-    ))
+-    assert model.calls == 4
+-    if invalid:
+-        assert result["record"]["result_status"] == "ERROR"
+-        assert result["record"]["stop_reason"] == "output_invalid"
+-        assert result["contract"] is None
+-        assert not (tmp_path / "run" / "scenario_contract.json").exists()
+-    else:
+-        assert result["record"]["result_status"] == "INCONCLUSIVE"
+-        assert result["record"]["stop_reason"] == "budget_exhausted"
+-        assert result["contract"] is None
+-
+-
+ def _query_repair_outputs(*, request_count=1):
+     from scripted import query_script
+ 
+@@ -233,7 +37,7 @@ def test_query_null_extra_repair_preserves_finish_semantics(tmp_path):
+         config=StagedRunConfig(),
+     ))
+     assert result["record"]["result_status"] == "SELECTED"
+-    assert model.calls == result["manifest"]["usage"]["requests_started"] == 6
++    assert model.calls == result["manifest"]["usage"]["requests_started"] == 5
+     log = result["record"]["format_repair_log"][0]
+     assert log["outcome"] == "completed"
+     assert log["original_attempt_sequence"] is None
+@@ -299,23 +103,6 @@ def test_query_repair_rejects_invalid_source_identity_or_initial_range(
+     assert result["record"]["format_repair_log"][0]["outcome"] == "ineligible"
+ 
+ 
+-def test_query_and_delivery_share_one_irreversible_repair_allowance(tmp_path):
+-    outputs = _query_repair_outputs()
+-    expected_delivery = deepcopy(outputs[-1])
+-    outputs[-1].pop("schema_version")
+-    outputs.append(expected_delivery)
+-    model = FixedScriptModel(outputs)
+-    result = asyncio.run(execute_staged_run(
+-        synthetic_task(), output_dir=tmp_path / "run", model=model,
+-        config=StagedRunConfig(),
+-    ))
+-    assert result["record"]["result_status"] == "ERROR"
+-    assert model.calls == 6
+-    logs = result["record"]["format_repair_log"]
+-    assert logs[0]["outcome"] == "completed"
+-    assert logs[1]["status"] == "allowance_exhausted"
+-
+-
+ @pytest.mark.parametrize("field", [
+     "decision", "candidate", "tool", "arguments_json", "assessment_impact",
+     "assessment_rationale", "outer_impact",
+@@ -347,13 +134,9 @@ def test_query_repair_rejects_each_changed_request_field(tmp_path, field):
+     )
+ 
+ 
+-@pytest.mark.parametrize("field", ["stop_evidence", "stop_unknowns"])
+-def test_query_repair_rejects_changed_stop_fields(tmp_path, field):
++def test_query_repair_rejects_changed_stop_evidence(tmp_path):
+     outputs = _query_repair_outputs()
+-    if field == "stop_evidence":
+-        outputs[3]["stop_explanation"]["evidence"][0]["end_line"] = 4
+-    else:
+-        outputs[3]["stop_explanation"]["remaining_unknowns"][0]["impact"] = "changed"
++    outputs[3]["stop_explanation"]["evidence"][0]["end_line"] = 4
+     result = asyncio.run(execute_staged_run(
+         synthetic_task(), output_dir=tmp_path / "run", model=FixedScriptModel(outputs),
+         config=StagedRunConfig(),
+diff --git a/tests/test_staged_inference.py b/tests/test_staged_inference.py
+index 4931e45..65c2b29 100644
+--- a/tests/test_staged_inference.py
++++ b/tests/test_staged_inference.py
+@@ -164,16 +164,20 @@ def test_variant_b_replay_preserves_identity_stages_and_artifact_hashes(tmp_path
+     assert [item["stage"] for item in record["stages"]] == [
+         "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER"
+     ]
+-    assert record["schema_version"] == "scenario-inference-record/v0.4"
++    assert record["schema_version"] == "scenario-inference-record/v0.6"
+     assert record["citation_mode"] == "source_locator_host_materialized_quote/v1"
+     assert manifest["versions"]["citation_mode"] == record["citation_mode"]
+-    assert [item["model_call_sequence"] for item in record["stages"]] == [1, 2, 3, 4]
+-    for stage in record["stages"]:
++    assert [item["model_call_sequence"] for item in record["stages"][:3]] == [1, 2, 3]
++    for stage in record["stages"][:3]:
+         assert stage["citation_mode"] == record["citation_mode"]
+         assert '"quote"' not in json.dumps(stage["wire_result"])
+         assert '"quote"' in json.dumps(stage["result"])
++    assert record["stages"][3]["owner"] == "host"
++    assert record["stages"][3]["action"] == "validate_and_publish"
++    assert "model_call_sequence" not in record["stages"][3]
++    assert "wire_result" not in record["stages"][3]
++    assert '"quote"' in json.dumps(record["stages"][3]["result"])
+     assert record["query_log"] == []
+-    assert 1 <= len(record["critical_behaviors"]) <= 3
+     assert record["unresolved"] == []
+     assert record["revision_log"] == []
+     assert record["degeneracy_contrast"] == {
+@@ -202,15 +206,15 @@ def test_variant_b_replay_preserves_identity_stages_and_artifact_hashes(tmp_path
+     assert result["record"] == record
+     assert result["manifest"]["run_id"] == manifest["run_id"]
+ 
+-    assert model.calls == 4
+-    assert manifest["usage"]["requests_started"] == 4
+-    assert manifest["usage"]["requests_completed"] == 4
+-    assert len(manifest["usage"]["gate_events"]) == 4
++    assert model.calls == 3
++    assert manifest["usage"]["requests_started"] == 3
++    assert manifest["usage"]["requests_completed"] == 3
++    assert len(manifest["usage"]["gate_events"]) == 3
+     assert all(event["status"] == "allowed"
+                for event in manifest["usage"]["gate_events"])
+ 
+     assert [_model_payload(item)["stage"] for item in model.inputs] == [
+-        "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER"
++        "EXTRACT", "QUERY", "CONSTRUCT"
+     ]
+     for model_input in model.inputs:
+         payload = _model_payload(model_input)
+@@ -298,8 +302,14 @@ def _invalid_outputs(kind: str) -> tuple[list[dict], str, int]:
+         construct["contract"]["language"] = "java"
+     elif kind == "unknown_evidence_id":
+         construct["contract"]["test_objectives"][0]["evidence_ids"] = ["missing"]
+-    elif kind == "critical_behavior_unknown_evidence":
+-        construct["critical_behaviors"][0]["evidence_ids"] = ["missing"]
++    elif kind == "duplicate_goal_ref":
++        construct["contract"]["test_objectives"].append(
++            deepcopy(construct["contract"]["test_objectives"][0])
++        )
++    elif kind == "unknown_constraint_ref":
++        construct["spec"]["constraint_basis"][0]["constraint_ref"] = "missing"
++    elif kind == "duplicate_constraint_ref":
++        construct["spec"]["goal_coverage"][0]["constraint_refs"] *= 2
+     elif kind == "selected_not_candidate":
+         construct["selected_scenario_id"] = "missing_candidate"
+     elif kind == "selected_hypothesis_unknown":
+@@ -310,22 +320,12 @@ def _invalid_outputs(kind: str) -> tuple[list[dict], str, int]:
+             candidate["id"] = f"dependency_returns_{suffix}"
+             candidate["description"] = f"A distinct candidate named {suffix}."
+             construct["contract"]["scenario_hypotheses"].append(candidate)
+-    elif kind == "zero_critical_behaviors":
+-        construct["critical_behaviors"] = []
+-        # The self-contained spec must still map every formal dependency constraint.
++    elif kind == "missing_constraint_basis":
+         construct["spec"]["constraint_basis"] = []
+-    elif kind == "four_critical_behaviors":
+-        construct["critical_behaviors"] = construct["critical_behaviors"] * 4
+-    elif kind == "blocking_unresolved":
+-        construct["unresolved"] = ["The selected dependency binding is unresolved."]
+-    elif kind == "deliver_changes_contract":
+-        # scripted_outputs intentionally shares the contract object between stages;
+-        # sever that alias so this mutation exercises DELIVER alone.
+-        outputs[3]["contract"] = deepcopy(outputs[3]["contract"])
+-        outputs[3]["contract"]["evidence"][0]["rationale"] = (
+-            "DELIVER attempted to replace the constructed rationale."
+-        )
+-        return outputs, "DELIVER", 4
++    elif kind == "competing_fallback_unknown":
++        construct["fallback_unknowns"] = [{
++            "question": "A second mechanical source of truth.", "blocking": False,
++        }]
+     else:  # pragma: no cover - protects the test table itself
+         raise AssertionError(kind)
+     return outputs, "CONSTRUCT", 3
+@@ -338,14 +338,14 @@ def _invalid_outputs(kind: str) -> tuple[list[dict], str, int]:
+     "case_id",
+     "language",
+     "unknown_evidence_id",
+-    "critical_behavior_unknown_evidence",
++    "duplicate_goal_ref",
++    "unknown_constraint_ref",
++    "duplicate_constraint_ref",
+     "selected_not_candidate",
+     "selected_hypothesis_unknown",
+     "three_candidates",
+-    "zero_critical_behaviors",
+-    "four_critical_behaviors",
+-    "blocking_unresolved",
+-    "deliver_changes_contract",
++    "missing_constraint_basis",
++    "competing_fallback_unknown",
+ ])
+ def test_invalid_model_claims_leave_error_evidence_without_contract(
+     tmp_path, kind: str
+@@ -400,7 +400,7 @@ def test_invalid_configuration_object_is_rejected_before_model_use() -> None:
+     assert model.calls == 0
+ 
+ 
+-def test_model_call_budget_is_shared_across_stages(tmp_path) -> None:
++def test_three_model_call_budget_covers_all_model_owned_stages(tmp_path) -> None:
+     model = FixedScriptModel()
+     output_dir = tmp_path / "budgeted-run"
+ 
+@@ -410,11 +410,11 @@ def test_model_call_budget_is_shared_across_stages(tmp_path) -> None:
+     ))
+ 
+     assert model.calls == 3
+-    assert result["contract"] is None
+-    assert result["manifest"]["result_status"] == "INCONCLUSIVE"
+-    assert result["manifest"]["stop_reason"] == "budget_exhausted"
++    assert result["contract"] is not None
++    assert result["manifest"]["result_status"] == "SELECTED"
++    assert result["manifest"]["stop_reason"] == "completed"
+     assert result["manifest"]["usage"]["requests_started"] == 3
+-    assert not (output_dir / "scenario_contract.json").exists()
++    assert (output_dir / "scenario_contract.json").exists()
+ 
+ 
+ def test_total_token_gate_blocks_first_request_and_leaves_evidence(tmp_path) -> None:
+@@ -474,9 +474,10 @@ def test_four_results_through_cli(tmp_path, case, status, has_contract) -> None:
+     assert (output_dir / "scenario_contract.json").exists() == has_contract
+     if status != "SELECTED":
+         assert record["selected_scenario_id"] is None
+-    assert [stage["stage"] for stage in record["stages"]] == [
+-        "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER"
+-    ]
++    expected_stages = ["EXTRACT", "QUERY", "CONSTRUCT"]
++    if status != "ERROR":
++        expected_stages.append("DELIVER")
++    assert [stage["stage"] for stage in record["stages"]] == expected_stages
+     if status == "AMBIGUOUS":
+         contract = _read(output_dir / "scenario_contract.json")
+         assert len(contract["scenario_hypotheses"]) == 2
+@@ -487,7 +488,7 @@ def test_four_results_through_cli(tmp_path, case, status, has_contract) -> None:
+         assert manifest["stop_reason"] == "evidence_exhausted"
+     if status == "ERROR":
+         assert record["error"]
+-        assert manifest["error_stage"] == "DELIVER"
++        assert manifest["error_stage"] == "CONSTRUCT"
+ 
+ 
+ @pytest.mark.parametrize("contents", ["{", "[]", '{"case_id":"unreviewed"}'])
+@@ -514,7 +515,7 @@ def test_cli_rejected_input_has_registered_attempt(tmp_path, contents) -> None:
+ 
+ @pytest.mark.parametrize("kind", [
+     "ambiguous_selected", "ambiguous_one", "ambiguous_unknown", "ambiguous_no_contract",
+-    "inconclusive_selected", "inconclusive_no_reason", "deliver_status",
++    "inconclusive_selected", "inconclusive_no_reason",
+     "host_run_id", "host_usage", "host_stop_reason",
+ ])
+ def test_result_invariants_reject_model_forgery(tmp_path, kind) -> None:
+@@ -531,8 +532,6 @@ def test_result_invariants_reject_model_forgery(tmp_path, kind) -> None:
+         construct["contract"] = None
+     elif kind == "inconclusive_no_reason":
+         construct["unresolved"] = []
+-    elif kind == "deliver_status":
+-        outputs[3]["result_status"] = "INCONCLUSIVE"
+     elif kind == "host_run_id":
+         construct["run_id"] = "forged"
+     elif kind == "host_usage":
+@@ -550,9 +549,8 @@ def test_result_invariants_reject_model_forgery(tmp_path, kind) -> None:
+ 
+ def test_inconclusive_can_retain_valid_diagnostic_contract(tmp_path) -> None:
+     outputs = deepcopy(scripted_outputs("ambiguous"))
+-    for output in outputs[2:]:
+-        output["result_status"] = "INCONCLUSIVE"
+-        output["selected_scenario_id"] = None
++    outputs[2]["result_status"] = "INCONCLUSIVE"
++    outputs[2]["selected_scenario_id"] = None
+     result, _, output_dir = _run(tmp_path, outputs)
+     record, manifest = _assert_artifacts(output_dir)
+     assert record["result_status"] == "INCONCLUSIVE"
+@@ -638,14 +636,14 @@ def test_budget_exhaustion_keeps_draft_without_publishing_contract(tmp_path, cas
+     result = asyncio.run(execute_staged_run(
+         synthetic_task(), output_dir=output_dir,
+         model=FixedScriptModel(scripted_outputs(case)),
+-        config=StagedRunConfig(max_model_calls=3),
++        config=StagedRunConfig(max_model_calls=2),
+     ))
+     record, manifest = _assert_artifacts(output_dir)
+     assert record["result_status"] == "INCONCLUSIVE"
+     assert record["selected_scenario_id"] is None
+     assert manifest["stop_reason"] == "budget_exhausted"
+     assert result["contract"] is None
+-    assert any(stage["stage"] == "CONSTRUCT" for stage in record["stages"])
++    assert all(stage["stage"] != "CONSTRUCT" for stage in record["stages"])
+ 
+ 
+ def test_missing_input_file_is_registered_before_read(tmp_path) -> None:
+@@ -665,13 +663,16 @@ def test_missing_input_file_is_registered_before_read(tmp_path) -> None:
+ 
+ def test_selected_allows_explicit_nonblocking_unknowns(tmp_path) -> None:
+     outputs = deepcopy(scripted_outputs())
+-    outputs[2]["nonblocking_unknowns"] = [
++    question = (
+         "Unobserved dependency cache internals are unknown and do not affect the visible result."
+-    ]
++    )
++    impact = "This does not change the selected observable dependency behavior."
++    outputs[1]["question_updates"][0].update(question=question, impact=impact)
++    outputs[2]["spec"]["unknowns"][0].update(question=question, impact=impact)
+     _, _, output_dir = _run(tmp_path, outputs)
+     record, _ = _assert_artifacts(output_dir)
+     assert record["result_status"] == "SELECTED"
+-    assert record["nonblocking_unknowns"] == outputs[2]["nonblocking_unknowns"]
++    assert record["nonblocking_unknowns"] == [question]
+     assert record["unresolved"] == []
+ 
+ 
+@@ -682,10 +683,12 @@ def test_extract_inconclusive_marker_does_not_shrink_later_investigation(tmp_pat
+     })
+     result, model, output_dir = _run(tmp_path, outputs)
+     record, manifest = _assert_artifacts(output_dir)
+-    assert model.calls == 4
++    assert model.calls == 3
+     assert result["contract"] is None
+     assert record["result_status"] == "INCONCLUSIVE"
+-    assert record["unresolved"] == outputs[0]["unresolved"]
++    assert record["unresolved"] == [
++        item["question"] for item in outputs[0]["unresolved"]
++    ]
+     assert [stage["stage"] for stage in record["stages"]] == [
+         "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER",
+     ]
+@@ -738,7 +741,7 @@ def test_query_limits_through_cli(tmp_path, count, seen, status):
+         assert manifest["stop_reason"] == "budget_exhausted"
+         assert manifest["usage"]["requests_started"] == 8
+     else:
+-        assert manifest["usage"]["requests_started"] == 4 + count
++        assert manifest["usage"]["requests_started"] == 3 + count
+ 
+ 
+ def _query_run(tmp_path, outputs, *, model=None, config=None):
+@@ -912,7 +915,7 @@ def test_model_assessments_are_preserved(tmp_path, impact):
+     assert receipt["result"]["text"] == synthetic_task()["mut_source"]["text"]
+ 
+ 
+-@pytest.mark.parametrize("stage_index", [0, 3, 4])
++@pytest.mark.parametrize("stage_index", [0, 3])
+ def test_query_action_outside_query_stage_is_rejected(tmp_path, stage_index, monkeypatch):
+     from scripted import query_script
+     from mock_spec.source_analysis import SourceAnalysis
+diff --git a/tests/test_staged_live.py b/tests/test_staged_live.py
+index fe62877..f08effa 100644
+--- a/tests/test_staged_live.py
++++ b/tests/test_staged_live.py
+@@ -30,6 +30,43 @@ def test_live_configuration_requires_priced_cost_budget() -> None:
+         StagedRunConfig(run_mode="live_inference", model_name="unused-model")
+ 
+ 
++def test_live_diagnostic_cli_disables_http_wait_and_preserves_accounting(monkeypatch, tmp_path) -> None:
++    import openai
++    import run as staged_cli
++
++    clients = []
++    real_client = openai.AsyncOpenAI
++
++    def capture_client(**kwargs):
++        client = real_client(**kwargs)
++        clients.append(client)
++        return client
++
++    async def capture_run(**kwargs):
++        config = kwargs["config"]
++        assert config.no_run_resource_limits is True
++        assert config.max_total_tokens is None
++        assert config.timeout_seconds is None
++        assert config.max_cost_usd is None
++        assert config.max_output_tokens == 393216
++        assert config.input_cost_per_million == Decimal("0.30")
++        assert kwargs["model"].response_capture.max_body_bytes is None
++        assert clients[0].timeout is None
++        await clients[0].close()
++        return {"manifest": {"result_status": "SELECTED"}}
++
++    monkeypatch.setenv("OPENAI_API_KEY", "unused-test-key")
++    monkeypatch.setattr(openai, "AsyncOpenAI", capture_client)
++    monkeypatch.setattr(staged_cli, "execute_staged_run", capture_run)
++    assert staged_cli.main([
++        "--mode", "live_inference", "--variant", "C", "--model", "unused-model",
++        "--snapshot", str(tmp_path), "--case-id", "flask_308", "--repository-read",
++        "--output-dir", str(tmp_path / "run"), "--no-run-resource-limits",
++        "--max-output-tokens", "393216", "--input-cost-per-million", "0.30",
++        "--output-cost-per-million", "1.20",
++    ]) == 0
++
++
+ def test_live_cli_missing_configuration_never_creates_run(tmp_path) -> None:
+     output_dir = tmp_path / "live"
+     env = os.environ.copy()
+diff --git a/tests/test_staged_provider_capture.py b/tests/test_staged_provider_capture.py
+index 4ec596f..54909aa 100644
+--- a/tests/test_staged_provider_capture.py
++++ b/tests/test_staged_provider_capture.py
+@@ -313,7 +313,7 @@ def test_capture_truncation_turns_completed_sdk_response_into_failure() -> None:
+ 
+ def test_call_stage_records_incomplete_response_without_format_repair() -> None:
+     value = {
+-        "schema_version": "staged-query/v0.4",
++        "schema_version": "staged-query/v0.6",
+         "decision": "finish_queries",
+         "query_attempt": None,
+         "previous_receipt_assessment": None,
+diff --git a/tests/test_staged_query_recovery_boundaries.py b/tests/test_staged_query_recovery_boundaries.py
+index 2ea845d..ab3edbf 100644
+--- a/tests/test_staged_query_recovery_boundaries.py
++++ b/tests/test_staged_query_recovery_boundaries.py
+@@ -16,7 +16,7 @@ from controller import _completed_response_json, _query_repair_snapshot  # noqa:
+ 
+ def _query_with_extra(*, extra_name: str = "attempt_sequence_note", value=None) -> dict:
+     return {
+-        "schema_version": "staged-query/v0.4",
++        "schema_version": "staged-query/v0.6",
+         "decision": "request_query",
+         "query_attempt": {
+             "question": "What behavior constrains this candidate?",
+@@ -94,8 +94,8 @@ def test_completed_response_rejects_ambiguous_or_incomplete_output(mutation: str
+ 
+ def test_completed_response_rejects_duplicate_json_keys() -> None:
+     response = _response(
+-        '{"schema_version":"staged-query/v0.4",'
+-        '"schema_version":"staged-query/v0.4"}'
++        '{"schema_version":"staged-query/v0.6",'
++        '"schema_version":"staged-query/v0.6"}'
+     )
+ 
+     with pytest.raises(ValueError):
+diff --git a/tests/test_staged_query_repair_budget.py b/tests/test_staged_query_repair_budget.py
+index 53d10dc..a032b0e 100644
+--- a/tests/test_staged_query_repair_budget.py
++++ b/tests/test_staged_query_repair_budget.py
+@@ -28,7 +28,7 @@ from scripted import FixedScriptModel, synthetic_task  # noqa: E402
+ 
+ def _raw_query() -> dict:
+     return {
+-        "schema_version": "staged-query/v0.4",
++        "schema_version": "staged-query/v0.6",
+         "decision": "request_query",
+         "query_attempt": {
+             "question": "Which exact behavior constrains the candidate?",
+diff --git a/tests/test_staged_query_schema.py b/tests/test_staged_query_schema.py
+index 2824935..bc88e0f 100644
+--- a/tests/test_staged_query_schema.py
++++ b/tests/test_staged_query_schema.py
+@@ -23,7 +23,7 @@ from mock_spec.budget import InferenceBudget, UsageLedger
+ sys.path.insert(0, str(Path(__file__).parents[1] / "experiments" / "staged-inference"))
+ from controller import StagedRunConfig, _StageOutputSchema, _call_stage  # noqa: E402
+ from stage_protocol import (  # noqa: E402
+-    ConstructSelection, DeliverSelection, QuerySelection, RevisionSelection,
++    ConstructSelection, QuerySelection, ReferencedContractSelection, RevisionSelection,
+ )
+ 
+ 
+@@ -31,7 +31,7 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
+     requests: list[dict] = []
+     calls: list[dict] = []
+     result = {
+-        "schema_version": "staged-query/v0.4",
++        "schema_version": "staged-query/v0.6",
+         "decision": "finish_queries",
+         "query_attempt": None,
+         "previous_receipt_assessment": None,
+@@ -88,6 +88,23 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
+     assert calls[0]["requested_output_schema"] == requests[0]["text"]["format"]["schema"]
+ 
+ 
++def test_question_update_schema_assigns_acquisition_only_to_open_questions() -> None:
++    schema = _StageOutputSchema(QuerySelection).json_schema()
++    branches = schema["properties"]["question_updates"]["items"]["anyOf"]
++
++    assert len(branches) == 2
++    assert all(branch["type"] == "object" for branch in branches)
++    assert all(branch["additionalProperties"] is False for branch in branches)
++    open_branch = next(branch for branch in branches
++                       if branch["properties"]["state"].get("const") == "open")
++    closed_branch = next(branch for branch in branches
++                         if branch["properties"]["state"].get("enum") == ["resolved", "nonblocking"])
++    assert open_branch["properties"]["acquisition"]["enum"] == ["available", "unavailable"]
++    assert "acquisition" in open_branch["required"]
++    assert "acquisition" not in closed_branch["properties"]
++    assert "acquisition" not in closed_branch["required"]
++
++
+ @pytest.mark.parametrize("invalid", [
+     {"schema_version": "staged-query/v0.2"},
+     {"previous_receipt_assessment": {"attempt_sequence": 1, "impact": "supports",
+@@ -97,7 +114,7 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
+ ])
+ def test_query_wire_strictly_rejects_legacy_or_unknown_fields(invalid) -> None:
+     value = {
+-        "schema_version": "staged-query/v0.4", "decision": "finish_queries",
++        "schema_version": "staged-query/v0.6", "decision": "finish_queries",
+         "query_attempt": None, "previous_receipt_assessment": None,
+         "impact": "inspect", "stop_explanation": None,
+         "question_updates": [], "candidate_updates": [],
+@@ -109,7 +126,7 @@ def test_query_wire_strictly_rejects_legacy_or_unknown_fields(invalid) -> None:
+ 
+ @pytest.mark.parametrize(
+     "output_type",
+-    [QuerySelection, ConstructSelection, DeliverSelection, RevisionSelection],
++    [QuerySelection, ConstructSelection, RevisionSelection],
+ )
+ def test_nested_nullable_stage_objects_have_explicit_wire_types(output_type) -> None:
+     schema = _StageOutputSchema(output_type)
+@@ -131,13 +148,12 @@ def test_nested_nullable_stage_objects_have_explicit_wire_types(output_type) ->
+ 
+ 
+ def test_contract_selection_schema_strictly_rejects_legacy_quote_and_bad_nested_types() -> None:
+-    schema = _StageOutputSchema(DeliverSelection)
++    schema = _StageOutputSchema(ReferencedContractSelection)
+     contract = {
+-        "schema_version": "mock-spec.scenario/v0.1",
+-        "case_id": "case", "language": "python",
++        "schema_version": "staged-contract-selection/v0.1",
+         "test_objectives": [{
+             "statement": "goal", "status": "required", "scenario_ids": ["s"],
+-            "condition": "always", "evidence_ids": ["e"],
++            "condition": "always", "evidence_ids": ["e"], "ref": "goal-1",
+         }],
+         "scenario_hypotheses": [{
+             "id": "s", "description": "scenario", "condition": "always",
+@@ -151,20 +167,13 @@ def test_contract_selection_schema_strictly_rejects_legacy_quote_and_bad_nested_
+         }],
+         "uncertainty": [],
+     }
+-    output = {
+-        "schema_version": "staged-deliver/v0.3", "result_status": "SELECTED",
+-        "selected_scenario_id": "s", "contract": contract,
+-    }
+-    assert schema.validate_json(json.dumps(output)).contract is not None
++    assert schema.validate_json(json.dumps(contract)).test_objectives
+ 
+     contract["evidence"][0]["quote"] = "legacy"
+     with pytest.raises(ModelBehaviorError):
+-        schema.validate_json(json.dumps(output))
++        schema.validate_json(json.dumps(contract))
+     contract["evidence"][0].pop("quote")
+     contract["test_objectives"][0]["scenario_ids"] = "s"
+     with pytest.raises(ModelBehaviorError):
+-        schema.validate_json(json.dumps(output))
++        schema.validate_json(json.dumps(contract))
+     contract["test_objectives"][0]["scenario_ids"] = ["s"]
+-    contract["scenario_hypotheses"][0]["evidence_ids"] = ["unknown"]
+-    with pytest.raises(ModelBehaviorError):
+-        schema.validate_json(json.dumps(output))
+diff --git a/tests/test_staged_repository_exploration.py b/tests/test_staged_repository_exploration.py
+index 5b5e037..12fdfca 100644
+--- a/tests/test_staged_repository_exploration.py
++++ b/tests/test_staged_repository_exploration.py
+@@ -54,7 +54,7 @@ def test_repair_qualification_allows_future_read_after_disjoint_search_matches(
+         assert [match["start_line"] for match in search["matches"]] == [2, 5]
+         before = store.observations()
+         wire = QuerySelection.model_validate({
+-            "schema_version": "staged-query/v0.4",
++            "schema_version": "staged-query/v0.6",
+             "decision": "request_query",
+             "query_attempt": {
+                 "question": "What do the intervening lines establish?",
+@@ -129,13 +129,11 @@ def _repository_run(tmp_path: Path, *, bad_quote: bool = False, transform=None,
+     if bad_quote:
+         dynamic["quote"] = "wrong"
+     construct = outputs[9]
+-    deliver = outputs[10]
+     construct["contract"] = deepcopy(construct["contract"])
+     construct["contract"]["evidence"].append(dynamic)
+     construct["contract"]["dependency_constraints"][0]["evidence_ids"].append(
+         "dynamic-contract"
+     )
+-    deliver["contract"] = deepcopy(construct["contract"])
+ 
+     if transform is not None:
+         transform(outputs)
+@@ -220,13 +218,11 @@ def _analysis_repository_run(tmp_path: Path) -> dict:
+         "rationale": "The repository observation shows the exact dependency call.",
+     }
+     construct = outputs[6]
+-    deliver = outputs[7]
+     construct["contract"] = deepcopy(construct["contract"])
+     construct["contract"]["evidence"].append(dynamic)
+     construct["contract"]["dependency_constraints"][0]["evidence_ids"].append(
+         "dynamic-call"
+     )
+-    deliver["contract"] = deepcopy(construct["contract"])
+ 
+     return asyncio.run(execute_staged_run(
+         output_dir=tmp_path / "analysis-run",
+@@ -251,7 +247,7 @@ def test_repository_mode_reads_more_than_six_times_and_strictly_cites_observatio
+     assert result["record"]["query_accounting"] == {
+         "observed_attempts": 7, "budgeted_attempts": 7, "limit": None,
+     }
+-    assert len(result["record"]["model_calls"]) == 11
++    assert len(result["record"]["model_calls"]) == 10
+     observations = result["record"]["source_observations"]
+     assert len(observations) == 7
+     assert [item["response_id"] for item in observations] == [
+@@ -286,7 +282,7 @@ def test_repository_binding_is_revalidated_before_materializing_citations(
+     assert stage["stage"] == "EXTRACT"
+     assert stage["citation_mode"] == "source_locator_host_materialized_quote/v1"
+     assert stage["model_call_sequence"] == 1
+-    assert stage["wire_result"]["schema_version"] == "staged-extract/v0.2"
++    assert stage["wire_result"]["schema_version"] == "staged-extract/v0.3"
+     assert stage["result"] is None
+     assert "quote" not in json.dumps(stage["wire_result"])
+     assert str(tmp_path) not in json.dumps(result["record"]["error"])
+diff --git a/tests/test_staged_semantic_loop.py b/tests/test_staged_semantic_loop.py
+index ca170ad..e0ff257 100644
+--- a/tests/test_staged_semantic_loop.py
++++ b/tests/test_staged_semantic_loop.py
+@@ -23,7 +23,7 @@ from controller import StagedRunConfig, execute_staged_run  # noqa: E402
+ from investigation import InvestigationLedger  # noqa: E402
+ from stage_protocol import InvestigationRequest, QuestionUpdate  # noqa: E402
+ from query import QueryExecutor  # noqa: E402
+-from scripted import FixedScriptModel, synthetic_task  # noqa: E402
++from scripted import FixedScriptModel, synthetic_task, _construct_selection  # noqa: E402
+ from mock_spec.schemas import UnifiedTask  # noqa: E402
+ from mock_spec.source_repository import ReviewedRepository  # noqa: E402
+ from mock_spec.validation import SourceStore  # noqa: E402
+@@ -149,7 +149,7 @@ def locator(source, start, end):
+ 
+ 
+ def finish(*, update=None, remaining=None, assessment=None):
+-    return {"schema_version": "staged-query/v0.4", "decision": "finish_queries", "query_attempt": None,
++    return {"schema_version": "staged-query/v0.6", "decision": "finish_queries", "query_attempt": None,
+             "previous_receipt_assessment": assessment, "impact": "Assess the original goal and dependency relation.",
+             "question_updates": [] if update is None else [update], "candidate_updates": [],
+             "stop_explanation": {"reason": "no_further_evidence" if remaining else "evidence_sufficient",
+@@ -158,13 +158,16 @@ def finish(*, update=None, remaining=None, assessment=None):
+ 
+ 
+ def question_update(*, state, evidence, acquisition, sequences=(), question_id="q1"):
+-    return {"question_id": question_id, "question": QUESTION, "goal_indexes": [0], "impact": IMPACT,
++    update = {"question_id": question_id, "question": QUESTION, "goal_indexes": [0], "impact": IMPACT,
+             "state": state, "rationale": "The original result depends on the real transformation.",
+-            "evidence": evidence, "acquisition": acquisition, "attempted_sequences": list(sequences)}
++            "evidence": evidence, "attempted_sequences": list(sequences)}
++    if state == "open":
++        update["acquisition"] = acquisition
++    return update
+ 
+ 
+ def contrast(*, investigate=False):
+-    return {"schema_version": "staged-contrast/v0.2", "status": "none_identified", "execution_status": "not_executed",
++    return {"schema_version": "staged-contrast/v0.3", "status": "none_identified",
+             "alternative": None, "bypass_behavior": None, "evidence_ids": [], "distinguishing_observation": None,
+             "revision_requested": False, "revision_reason": None, "support": "assumption",
+             "assumption_reason": "Static analysis only, no global proof.", "semantic_role": "dependency_contract",
+@@ -180,7 +183,32 @@ def deliver(construct):
+ 
+ 
+ def run(tmp_path, task, outputs, *, repository=None, max_model_calls=20):
+-    model = FixedScriptModel(outputs)
++    current = deepcopy(outputs)
++    current = [item for item in current if item["schema_version"] != "staged-deliver/v0.3"]
++    for item in current:
++        if item["schema_version"] == "staged-extract/v0.2":
++            item["schema_version"] = "staged-extract/v0.3"
++            item["unresolved"] = [{
++                "question": question, "goal_indexes": [0],
++                "impact": "The missing fact may affect the original goal.",
++            } for question in item["unresolved"]]
++        elif item["schema_version"] == "staged-query/v0.6":
++            if item["stop_explanation"] is not None:
++                item["stop_explanation"].pop("remaining_unknowns", None)
++            for update in item["question_updates"]:
++                if update["question_id"] is not None:
++                    if update.get("goal_indexes") == [0]:
++                        update.update(question=None, goal_indexes=None, impact=None)
++                if update["state"] != "open":
++                    update.pop("attempted_sequences", None)
++        elif item["schema_version"] == "staged-construct/v0.3":
++            _construct_selection(item)
++        elif item["schema_version"] == "staged-contrast/v0.3":
++            item["schema_version"] = "staged-contrast/v0.4"
++            item.pop("support", None)
++        elif item["schema_version"] == "staged-revise/v0.3":
++            _construct_selection(item["revised_construct"])
++    model = FixedScriptModel(current)
+     result = asyncio.run(execute_staged_run(
+         task if repository is None else None, output_dir=tmp_path / "run", model=model,
+         config=StagedRunConfig(variant="C", max_model_calls=max_model_calls),
+@@ -206,7 +234,7 @@ def test_zero_query_product_spec_retains_multiple_legal_mocks(tmp_path):
+     assert accepted == {(20, 5), (25, 4)}
+     assert artifact["regression_reference"]["status"] == "reference_only"
+     assert "query_log" not in artifact
+-    assert model.calls == 5
++    assert model.calls == 4
+ 
+ 
+ def test_unavailable_adjust_delivers_partial_without_false_product_equation(tmp_path):
+@@ -262,7 +290,7 @@ def test_material_gap_reopens_queries_and_changes_the_relation(tmp_path, origin)
+         {"operation": "search", "path_pattern": "helper.py"},
+         {"operation": "read", "source_id": dynamic_id, "start_line": 1, "end_line": 2},
+     ]):
+-        outputs.append({"schema_version": "staged-query/v0.4", "decision": "request_query",
++        outputs.append({"schema_version": "staged-query/v0.6", "decision": "request_query",
+                         "query_attempt": {"question": QUESTION, "scenario_id": "original_task",
+                                           "tool": "inspect_source", "arguments_json": json.dumps(args)},
+                         "previous_receipt_assessment": None if index == 0 else assessment,
+@@ -319,13 +347,17 @@ def test_scope_external_unknown_does_not_force_an_irrelevant_query(tmp_path):
+     stopped["question_updates"] = [{
+         "question_id": None, "question": question, "goal_indexes": [0], "impact": impact,
+         "state": "nonblocking", "rationale": "The test's fixed input excludes other keys.",
+-        "evidence": [locator("test:0", 2, 2)], "acquisition": "not_needed", "attempted_sequences": [],
++        "evidence": [locator("test:0", 2, 2)], "attempted_sequences": [],
+     }]
+     result, model = run(tmp_path, task, [extract(constructed), stopped, constructed, contrast(), deliver(constructed)])
+     assert result["record"]["error"] is None
+     assert result["spec"].semantics.delivery_status == "ready"
+-    assert model.calls == 5
++    assert model.calls == 4
+     assert not result["record"]["query_log"]
++    query_stage = result["record"]["stages"][1]
++    assert "acquisition" not in query_stage["wire_result"]["question_updates"][0]
++    assert query_stage["host_question_updates"][0]["acquisition"] == "not_needed"
++    assert query_stage["questions_after"][0]["state"] == "nonblocking"
+ 
+ 
+ def test_supported_alternative_branches_are_not_conjoined_or_ambiguous(tmp_path):
+@@ -389,7 +421,7 @@ def test_supported_alternative_branches_are_not_conjoined_or_ambiguous(tmp_path)
+     assert "returns None" not in constraints[0].statement
+ 
+ 
+-@pytest.mark.parametrize("mutation", ["duplicate", "rebind", "future_receipt", "unavailable_without_basis"])
++@pytest.mark.parametrize("mutation", ["duplicate", "rebind", "unavailable_without_basis"])
+ def test_question_ledger_rejects_explicit_inconsistencies(tmp_path, mutation):
+     task, constructed = product_reference()
+     initial = extract(constructed)
+@@ -399,8 +431,6 @@ def test_question_ledger_rejects_explicit_inconsistencies(tmp_path, mutation):
+         updated["question_id"] = None
+     elif mutation == "rebind":
+         updated["goal_indexes"] = [1]
+-    elif mutation == "future_receipt":
+-        updated["attempted_sequences"] = [1]
+     else:
+         updated.update(state="open", evidence=[], acquisition="unavailable")
+     stopped = finish(update=updated)
+@@ -436,9 +466,7 @@ def test_revision_new_blocking_unknown_reopens_investigation_without_explicit_re
+         support="evidence", assumption_reason=None,
+     )
+     revision = {
+-        "schema_version": "staged-revise/v0.2", "revised_construct": partial,
+-        "modified_objects": ["contract", "spec", "result_status", "selected_scenario_id",
+-                             "unresolved", "allowed_variations", "claim_basis"],
++        "schema_version": "staged-revise/v0.3", "revised_construct": partial,
+         "evidence_reason": "Preserve the unobserved real computation's effect on the original objective.",
+         "evidence_ids": ["mut", "test"], "request_another_revision": False,
+     }
+@@ -472,11 +500,11 @@ def test_question_citing_combined_read_ranges_requires_both_receipts(tmp_path):
+                                  sequences=[1], question_id=None)
+         questions = InvestigationLedger(1, repository_available=True)
+         with pytest.raises(ValueError, match="associated with its observed query receipt"):
+-            questions.apply_updates([QuestionUpdate.model_validate(update)],
++            questions.apply_updates([QuestionUpdate.model_validate({**update, "acquisition": "not_needed"})],
+                                     store=store, attempts=executor.attempts, task=task)
+         assert questions.snapshot() == []
+         update["attempted_sequences"] = [1, 2]
+-        questions.apply_updates([QuestionUpdate.model_validate(update)],
++        questions.apply_updates([QuestionUpdate.model_validate({**update, "acquisition": "not_needed"})],
+                                 store=store, attempts=executor.attempts, task=task)
+         assert questions.snapshot()[0]["state"] == "resolved"
+     finally:
+@@ -493,7 +521,7 @@ def test_reopening_question_cannot_erase_original_association(origin):
+     update = question_update(state="resolved", evidence=[locator("mut:0", 1, 5)],
+                              acquisition="not_needed", sequences=[1], question_id="q1")
+     questions.apply_updates(
+-        [QuestionUpdate.model_validate(update)], store=SourceStore(task), task=task,
++        [QuestionUpdate.model_validate({**update, "acquisition": "not_needed"})], store=SourceStore(task), task=task,
+         attempts=[{"sequence": 1, "status": "ok", "result": {}, "response_id": "read-1"}],
+     )
+     before = questions.snapshot()
+@@ -533,8 +561,12 @@ def test_partial_goal_coverage_and_unknown_impact_must_agree(defect):
+     # Materialize the fixture's source quotes through the stage protocol.
+     from stage_protocol import ConstructSelection, materialize_construct
+     task, _ = product_reference(adjust=True)
+-    contract = materialize_construct(ConstructSelection.model_validate(constructed),
+-                                      SourceStore(UnifiedTask.from_dict(task))).contract
++    wire = deepcopy(constructed)
++    _construct_selection(wire)
++    task_model = UnifiedTask.from_dict(task)
++    contract = materialize_construct(
++        ConstructSelection.model_validate(wire), SourceStore(task_model), task_model,
++    ).contract
+     assert isinstance(contract, ScenarioContract)
+     with pytest.raises(ValueError, match="blocked coverage|affected goal indexes"):
+         validate_semantics(semantics, contract)
+diff --git a/tests/test_staged_stop_protocol.py b/tests/test_staged_stop_protocol.py
+index f2ef77b..3e51965 100644
+--- a/tests/test_staged_stop_protocol.py
++++ b/tests/test_staged_stop_protocol.py
+@@ -16,9 +16,10 @@ def test_agent_stop_preserves_evidence_and_unknown_impact(tmp_path, reason):
+         stop = final_query["stop_explanation"]
+         stop["reason"] = reason
+         if reason == "evidence_sufficient":
+-            stop["remaining_unknowns"] = []
+             for update in final_query["question_updates"]:
+                 update["state"] = "resolved"
++                update.pop("acquisition", None)
++                update.pop("attempted_sequences", None)
+                 update["rationale"] = "The cited evidence closes this fixture question."
+     result = _repository_run(tmp_path, transform=change)
+     assert result["contract"] is not None, result["record"]["error"]
+diff --git a/tests/test_staged_trace.py b/tests/test_staged_trace.py
+index 7cdc679..1bc8aff 100644
+--- a/tests/test_staged_trace.py
++++ b/tests/test_staged_trace.py
+@@ -25,7 +25,7 @@ from controller import (  # noqa: E402
+     StagedInferenceError, StagedRunConfig, _call_stage, execute_staged_run,
+ )
+ from stage_protocol import QueryResult  # noqa: E402
+-from scripted import FixedScriptModel, scripted_outputs, synthetic_task  # noqa: E402
++from scripted import FixedScriptModel, query_script, scripted_outputs, synthetic_task  # noqa: E402
+ def _ledger(config: StagedRunConfig) -> UsageLedger:
+     return UsageLedger(InferenceBudget(
+         max_turns=config.max_model_calls,
+@@ -136,12 +136,12 @@ def test_api_failure_trace_preserves_safe_provider_diagnostics() -> None:
+         "model_request_started": True,
+         "model_name": "scripted-offline",
+         "output_type": "QueryResult",
+-        "prompt_version": "staged-scenario-inference-prompts/v0.4",
++        "prompt_version": "staged-scenario-inference-prompts/v0.6",
+         "payload_bytes": 17,
+     }
+     assert call["payload_sha256"]
+     assert call["payload"] == {"stage": "QUERY"}
+-    assert call["instructions"].startswith("staged-scenario-inference-prompts/v0.4")
++    assert call["instructions"].startswith("staged-scenario-inference-prompts/v0.6")
+     assert call["requested_output_schema"]["title"] == "QueryResult"
+     assert call["request_start_basis"] == "usage_ledger_before_model_call_hook"
+     assert call["timeout_seconds"] == pytest.approx(5, abs=0.1)
+@@ -239,7 +239,7 @@ def test_completed_run_persists_replayable_model_call_trace(tmp_path: Path) -> N
+     calls = result["record"]["model_calls"]
+     assert persisted["model_calls"] == calls
+     assert [call["stage"] for call in calls] == [
+-        "EXTRACT", "QUERY", "CONSTRUCT", "DELIVER"
++        "EXTRACT", "QUERY", "CONSTRUCT"
+     ]
+     assert all(call["status"] == "completed" for call in calls)
+     assert all(call["model_request_started"] is True for call in calls)
+@@ -266,3 +266,33 @@ def test_pre_request_budget_gate_is_distinct_from_provider_failure() -> None:
+     assert calls[0]["model_request_started"] is False
+     assert calls[0]["exception"]["classification"] == "host_budget"
+     assert calls[0]["exception"]["error_code"] == "model_call_limit"
++
++
++@pytest.mark.parametrize("query_count", [0, 1])
++def test_diagnostic_run_has_no_model_wait_or_run_budget_limits(tmp_path: Path, query_count: int) -> None:
++    class SlowScript(FixedScriptModel):
++        async def get_response(self, *args, **kwargs):
++            await asyncio.sleep(0.01)
++            return await super().get_response(*args, **kwargs)
++
++    model = SlowScript(query_script(query_count, "selected", variant="B"))
++    result = asyncio.run(execute_staged_run(
++        synthetic_task(), output_dir=tmp_path / "diagnostic", model=model,
++        config=StagedRunConfig(
++            no_run_resource_limits=True, max_total_tokens=None, timeout_seconds=None,
++            max_model_calls=1, parsing_timeout_seconds=0.001,
++        ),
++    ))
++
++    assert result["record"]["error"] is None
++    assert result["spec"].semantics.delivery_status == "ready"
++    calls = result["record"]["model_calls"]
++    assert len(calls) == 3 + query_count
++    assert all(call["timeout_seconds"] is None for call in calls)
++    manifest = result["manifest"]
++    assert manifest["deadline"]["absolute"] is None
++    assert manifest["deadline"]["wall_clock_deadline_unix"] is None
++    assert manifest["controller_limits"]["model_calls"] is None
++    assert manifest["controller_limits"]["query_attempts"] is None
++    assert manifest["usage"]["requests_completed"] == 3 + query_count
++    assert manifest["usage"]["total_tokens"] > 0

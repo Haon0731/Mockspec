@@ -1,0 +1,750 @@
+{
+  "model": "deepseek-flash",
+  "include": [],
+  "input": [
+    {
+      "content": "{\"capabilities\":{\"access\":\"bound reviewed repository\",\"initial_inventory_is_exhaustive\":false,\"repository_search_and_read\":true,\"source_discovery\":\"inspect_source search then read; analysis alone is not observed evidence\"},\"continuation\":{},\"extract\":{\"candidates\":[{\"description\":\"CloudFoundryApplicationFactory scenario: inject a PathMappedEndpoints stub and default Instance/Server/Management/WebEndpoint properties plus a metadata contributor and empty CloudFoundryApplicationProperties; then set a single URI 'application/Uppercase' and call createApplication, expecting management URL 'http://application/Uppercase/actuator', health URL 'http://application/Uppercase/actuator/health', service URL 'http://application/Uppercase/', name 'test' and metadata 'contributor'='test'. The service base URL comes from the override prepending 'http://' to the first configured URI, so the injected PathMappedEndpoints must be consistent with 'actuator' as the management base path.\",\"evidence\":[{\"end_line\":50,\"quote\":\"    @Override\\n    protected String getServiceBaseUrl() {\\n        if (cfApplicationProperties.getUris().isEmpty()) {\\n            return null;\\n        }\\n\\n        String uri = cfApplicationProperties.getUris().get(0);\\n        return \\\"http://\\\" + uri;\\n    }\",\"source_id\":\"mut\",\"start_line\":42},{\"end_line\":57,\"quote\":\"        // === MOCK-STUB-START ===\\n        // === MOCK-STUB-END ===\\n        CloudFoundryApplicationFactory factory = new CloudFoundryApplicationFactory(instanceProperties, management,\\n            server, pathMappedEndpoints, webEndpoint, () -> singletonMap(\\\"contributor\\\", \\\"test\\\"), cfApplicationProperties);\\n        cfApplicationProperties.setUris(singletonList(\\\"application/Uppercase\\\"));\\n\\n        Application app = factory.createApplication();\\n\\n        assertEquals(\\\"http://application/Uppercase/actuator\\\", app.getManagementUrl());\\n        assertEquals(\\\"http://application/Uppercase/actuator/health\\\", app.getHealthUrl());\\n        assertEquals(\\\"http://application/Uppercase/\\\", app.getServiceUrl());\\n        assertEquals(\\\"test\\\", app.getName());\\n        assertEquals(\\\"test\\\", app.getMetadata().get(\\\"contributor\\\"));\",\"source_id\":\"test\",\"start_line\":45}],\"scenario_id\":\"cloudfoundry_application_uri_base_url\"}],\"original_goals\":[{\"end_line\":44,\"quote\":\"    @Test\\n    public void should_use_application_uri() {\\n        InstanceProperties instanceProperties = new InstanceProperties();\\n        instanceProperties.setName(\\\"test\\\");\\n        ServerProperties server = new ServerProperties();\\n        ManagementServerProperties management = new ManagementServerProperties();\\n        WebEndpointProperties webEndpoint = new WebEndpointProperties();\\n        CloudFoundryApplicationProperties cfApplicationProperties = new CloudFoundryApplicationProperties();\",\"source_id\":\"test\",\"start_line\":37},{\"end_line\":57,\"quote\":\"        CloudFoundryApplicationFactory factory = new CloudFoundryApplicationFactory(instanceProperties, management,\\n            server, pathMappedEndpoints, webEndpoint, () -> singletonMap(\\\"contributor\\\", \\\"test\\\"), cfApplicationProperties);\\n        cfApplicationProperties.setUris(singletonList(\\\"application/Uppercase\\\"));\\n\\n        Application app = factory.createApplication();\\n\\n        assertEquals(\\\"http://application/Uppercase/actuator\\\", app.getManagementUrl());\\n        assertEquals(\\\"http://application/Uppercase/actuator/health\\\", app.getHealthUrl());\\n        assertEquals(\\\"http://application/Uppercase/\\\", app.getServiceUrl());\\n        assertEquals(\\\"test\\\", app.getName());\\n        assertEquals(\\\"test\\\", app.getMetadata().get(\\\"contributor\\\"));\",\"source_id\":\"test\",\"start_line\":47},{\"end_line\":50,\"quote\":\"public class CloudFoundryApplicationFactory extends DefaultApplicationFactory {\\n    private final CloudFoundryApplicationProperties cfApplicationProperties;\\n\\n    public CloudFoundryApplicationFactory(InstanceProperties instance,\\n                                          ManagementServerProperties management,\\n                                          ServerProperties server,\\n                                          PathMappedEndpoints pathMappedEndpoints,\\n                                          WebEndpointProperties webEndpoint,\\n                                          MetadataContributor metadataContributor,\\n                                          CloudFoundryApplicationProperties cfApplicationProperties) {\\n        super(instance, management, server, pathMappedEndpoints, webEndpoint, metadataContributor);\\n        this.cfApplicationProperties = cfApplicationProperties;\\n    }\\n\\n    @Override\\n    protected String getServiceBaseUrl() {\\n        if (cfApplicationProperties.getUris().isEmpty()) {\\n            return null;\\n        }\\n\\n        String uri = cfApplicationProperties.getUris().get(0);\\n        return \\\"http://\\\" + uri;\\n    }\",\"source_id\":\"mut\",\"start_line\":28}],\"result_status\":\"CONTINUE\",\"schema_version\":\"staged-extract/v0.1\",\"unresolved\":[\"What concrete PathMappedEndpoints value is supplied by the masked MOCK-STUB region, and what does the factory require from it to build the asserted management and health URLs?\",\"Does the masked VERIFY region impose an interaction constraint on PathMappedEndpoints or another collaborator, and if so what call or count is required?\",\"Should the empty CloudFoundryApplicationProperties.uris branch, where getServiceBaseUrl returns null, be considered part of the required scenario?\"]},\"query_receipts\":[{\"arguments_json\":\"{\\\"operation\\\":\\\"search\\\",\\\"path_pattern\\\":\\\"**/DefaultApplicationFactory.java\\\"}\",\"assessment\":{\"attempt_sequence\":1,\"impact\":\"no_new_information\",\"rationale\":\"The search only located DefaultApplicationFactory.java and then hit access_denied without returning any source lines. It confirms the relevant production class exists but provides no behavioral evidence about PathMappedEndpoints or URL construction.\"},\"assessment_status\":\"complete\",\"duration_seconds\":0.005916036898270249,\"exploration_progress\":{\"consecutive_no_progress\":0,\"evidence_digest\":\"afcc63e6b7c60afe6edbd1d2c833d5aaeeb20b0fd9e4c02ff7546a47fa185dcc\",\"made_progress\":true,\"new_evidence\":true,\"new_operation_or_position\":true,\"new_question_review\":true,\"operation_digest\":\"746baa470790a4ec2f918eb6bc419f222f3d794b8b0cc1dfe6809acf02bd0dee\",\"termination_initiator\":null,\"termination_reason\":null,\"threshold\":4,\"triggered\":false},\"question\":\"How does DefaultApplicationFactory use PathMappedEndpoints and other collaborator inputs to build management, health, and service URLs, so the hidden PathMappedEndpoints setup can be inferred from production behavior?\",\"raw_request\":{\"arguments_json\":\"{\\\"operation\\\":\\\"search\\\",\\\"path_pattern\\\":\\\"**/DefaultApplicationFactory.java\\\"}\",\"question\":\"How does DefaultApplicationFactory use PathMappedEndpoints and other collaborator inputs to build management, health, and service URLs, so the hidden PathMappedEndpoints setup can be inferred from production behavior?\",\"scenario_id\":\"cloudfoundry_application_uri_base_url\",\"tool\":\"inspect_source\"},\"response_id\":\"query:1\",\"result\":{\"complete\":false,\"error_code\":null,\"limit_reason\":\"access_denied\",\"limits\":{\"max_bytes\":2097152,\"max_entries\":2000,\"max_file_bytes\":262144,\"max_matches\":50,\"timeout_seconds\":2.0},\"matches\":[{\"end_line\":null,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":null,\"text\":null}],\"next_cursor\":null,\"policy_id\":\"reviewed-repository-search/v1\",\"status\":\"incomplete\",\"usage\":{\"bytes\":8280,\"elapsed_seconds\":0.005727330921217799,\"entries\":42,\"excluded\":5}},\"scenario_id\":\"cloudfoundry_application_uri_base_url\",\"semantic_category\":\"scope_limit\",\"sequence\":1,\"status\":\"incomplete\",\"tool\":\"inspect_source\",\"within_budget\":true},{\"arguments_json\":\"{\\\"operation\\\":\\\"read\\\",\\\"source_id\\\":\\\"repository:f1cbe4e7534b595de231fa4a\\\",\\\"start_line\\\":1,\\\"end_line\\\":240}\",\"assessment\":{\"attempt_sequence\":2,\"impact\":\"no_new_information\",\"rationale\":\"The read of the DefaultApplicationFactory source_id returned invalid_source_or_range with no lines, so it yielded no behavioral evidence about how PathMappedEndpoints, WebEndpointProperties, or ManagementServerProperties produce the asserted management and health URLs.\"},\"assessment_status\":\"complete\",\"duration_seconds\":0.00038252107333391905,\"exploration_progress\":{\"consecutive_no_progress\":0,\"evidence_digest\":\"46219f84bc22a4064f07d9343cde3f70cb8ea5be745c7899ac9b7f9ffa0a202b\",\"made_progress\":true,\"new_evidence\":true,\"new_operation_or_position\":true,\"new_question_review\":true,\"operation_digest\":\"c17f52ae009220077f6965a08a6847d1210d895f4d5550f131e0d3fbc3b2853e\",\"termination_initiator\":null,\"termination_reason\":null,\"threshold\":4,\"triggered\":false},\"question\":\"How does DefaultApplicationFactory.createApplication use PathMappedEndpoints, management/server/web endpoint properties, and the overridden getServiceBaseUrl to build management, health, and service URLs, including the management context path and endpoint base path rules?\",\"raw_request\":{\"arguments_json\":\"{\\\"operation\\\":\\\"read\\\",\\\"source_id\\\":\\\"repository:f1cbe4e7534b595de231fa4a\\\",\\\"start_line\\\":1,\\\"end_line\\\":240}\",\"question\":\"How does DefaultApplicationFactory.createApplication use PathMappedEndpoints, management/server/web endpoint properties, and the overridden getServiceBaseUrl to build management, health, and service URLs, including the management context path and endpoint base path rules?\",\"scenario_id\":\"cloudfoundry_application_uri_base_url\",\"tool\":\"inspect_source\"},\"response_id\":\"query:2\",\"result\":{\"diagnostics\":[\"Source unavailable: invalid range, denied path, or frozen identity changed.\"],\"error_code\":\"invalid_source_or_range\",\"status\":\"error\",\"usage\":{\"bytes\":8280,\"elapsed_seconds\":0.0002701670164242387}},\"scenario_id\":\"cloudfoundry_application_uri_base_url\",\"semantic_category\":\"invalid_request\",\"sequence\":2,\"status\":\"error\",\"tool\":\"inspect_source\",\"within_budget\":true},{\"arguments_json\":\"{\\\"operation\\\":\\\"search\\\",\\\"text\\\":\\\"PathMappedEndpoints\\\"}\",\"assessment\":{\"attempt_sequence\":3,\"impact\":\"no_new_information\",\"rationale\":\"The PathMappedEndpoints search returned only import, field-declaration and constructor-parameter lines for DefaultApplicationFactory.java (lines 29, 48, 58) plus similar declaration lines in sibling classes and the test; no method body, branch, or URL-composition logic was returned, and the search was cut off as incomplete. It does, however, newly authorize a text-matched source_id for DefaultApplicationFactory.java that can now be read for behavior.\"},\"assessment_status\":\"complete\",\"duration_seconds\":0.007534887990914285,\"exploration_progress\":{\"consecutive_no_progress\":0,\"evidence_digest\":\"26e6b871be00433c06713a489e5276c44758ed60c50d913f1fa7c55ccc750f53\",\"made_progress\":true,\"new_evidence\":true,\"new_operation_or_position\":true,\"new_question_review\":true,\"operation_digest\":\"7652452da934cb8882c3c7ec6104d5e340aee42891b2d20dd0063bcb99ca52fc\",\"termination_initiator\":null,\"termination_reason\":null,\"threshold\":4,\"triggered\":false},\"question\":\"Do any accessible repository sources (e.g. sibling tests or other registrations code) show how DefaultApplicationFactory derives the health URL from PathMappedEndpoints.getPath(EndpointId.of(\\\"health\\\")) vs. from WebEndpointProperties base path, so the required PathMappedEndpoints stub behavior can be inferred from observable production usage?\",\"raw_request\":{\"arguments_json\":\"{\\\"operation\\\":\\\"search\\\",\\\"text\\\":\\\"PathMappedEndpoints\\\"}\",\"question\":\"Do any accessible repository sources (e.g. sibling tests or other registrations code) show how DefaultApplicationFactory derives the health URL from PathMappedEndpoints.getPath(EndpointId.of(\\\"health\\\")) vs. from WebEndpointProperties base path, so the required PathMappedEndpoints stub behavior can be inferred from observable production usage?\",\"scenario_id\":\"cloudfoundry_application_uri_base_url\",\"tool\":\"inspect_source\"},\"response_id\":\"query:3\",\"result\":{\"complete\":false,\"error_code\":null,\"limit_reason\":\"access_denied\",\"limits\":{\"max_bytes\":2097152,\"max_entries\":2000,\"max_file_bytes\":262144,\"max_matches\":50,\"timeout_seconds\":2.0},\"matches\":[{\"end_line\":35,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/config/SpringBootAdminClientAutoConfiguration.java\",\"source_id\":\"repository:156d466a805e2d645db51522\",\"start_line\":35,\"text\":\"import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\"},{\"end_line\":71,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/config/SpringBootAdminClientAutoConfiguration.java\",\"source_id\":\"repository:156d466a805e2d645db51522\",\"start_line\":71,\"text\":\"                                                     PathMappedEndpoints pathMappedEndpoints,\"},{\"end_line\":95,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/config/SpringBootAdminClientAutoConfiguration.java\",\"source_id\":\"repository:156d466a805e2d645db51522\",\"start_line\":95,\"text\":\"                                                     PathMappedEndpoints pathMappedEndpoints,\"},{\"end_line\":25,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/config/SpringBootAdminClientCloudFoundryAutoConfiguration.java\",\"source_id\":\"repository:0cb10eed153a331695bc34de\",\"start_line\":25,\"text\":\"import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\"},{\"end_line\":55,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/config/SpringBootAdminClientCloudFoundryAutoConfiguration.java\",\"source_id\":\"repository:0cb10eed153a331695bc34de\",\"start_line\":55,\"text\":\"                                                             PathMappedEndpoints pathMappedEndpoints,\"},{\"end_line\":25,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactory.java\",\"source_id\":\"repository:158b90520b72afe3bfd7ae2d\",\"start_line\":25,\"text\":\"import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\"},{\"end_line\":34,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactory.java\",\"source_id\":\"repository:158b90520b72afe3bfd7ae2d\",\"start_line\":34,\"text\":\"                                          PathMappedEndpoints pathMappedEndpoints,\"},{\"end_line\":29,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":29,\"text\":\"import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\"},{\"end_line\":48,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":48,\"text\":\"    private final PathMappedEndpoints pathMappedEndpoints;\"},{\"end_line\":58,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":58,\"text\":\"                                     PathMappedEndpoints pathMappedEndpoints,\"},{\"end_line\":25,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/ServletApplicationFactory.java\",\"source_id\":\"repository:645ddd877524863a056a8201\",\"start_line\":25,\"text\":\"import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\"},{\"end_line\":43,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/ServletApplicationFactory.java\",\"source_id\":\"repository:645ddd877524863a056a8201\",\"start_line\":43,\"text\":\"                                     PathMappedEndpoints pathMappedEndpoints,\"},{\"end_line\":32,\"logical_path\":\"src/test/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactoryTest.java\",\"source_id\":\"repository:d72fe745582b15095fe19cd1\",\"start_line\":32,\"text\":\"import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\"}],\"next_cursor\":null,\"policy_id\":\"reviewed-repository-search/v1\",\"status\":\"incomplete\",\"usage\":{\"bytes\":57098,\"elapsed_seconds\":0.007302370970137417,\"entries\":42,\"excluded\":5}},\"scenario_id\":\"cloudfoundry_application_uri_base_url\",\"semantic_category\":\"scope_limit\",\"sequence\":3,\"status\":\"incomplete\",\"tool\":\"inspect_source\",\"within_budget\":true},{\"arguments_json\":\"{\\\"operation\\\":\\\"read\\\",\\\"source_id\\\":\\\"repository:f1cbe4e7534b595de231fa4a\\\",\\\"start_line\\\":40,\\\"end_line\\\":130}\",\"assessment\":{\"attempt_sequence\":4,\"impact\":\"supports\",\"rationale\":\"Sequence 4 supplied the first readable DefaultApplicationFactory body: createApplication composes health, management, and service URLs; getServiceUrl appends '/' to getServiceBaseUrl, and getManagementUrl appends '/' plus getEndpointsWebPath to getManagementBaseUrl. This supports the candidate's service URL expectation and narrows what remains to the health URL derivation and getEndpointsWebPath behavior.\"},\"assessment_status\":\"complete\",\"duration_seconds\":0.0005063529824838042,\"exploration_progress\":{\"consecutive_no_progress\":0,\"evidence_digest\":\"98f73014d0b6438e4ba2f92e0a9ff164c414693578365351577dc520ee23cb96\",\"made_progress\":true,\"new_evidence\":true,\"new_operation_or_position\":true,\"new_question_review\":true,\"operation_digest\":\"c1b2ce784242fd2b1f1771a2104c239f21e0235081e61213e395c03c467e1392\",\"termination_initiator\":null,\"termination_reason\":null,\"threshold\":4,\"triggered\":false},\"question\":\"Within DefaultApplicationFactory, what exact method bodies build the management URL, health URL, and service URL from PathMappedEndpoints, ManagementServerProperties (context path), WebEndpointProperties (base path) and the overridable getServiceBaseUrl, so the hidden PathMappedEndpoints stub behavior can be inferred?\",\"raw_request\":{\"arguments_json\":\"{\\\"operation\\\":\\\"read\\\",\\\"source_id\\\":\\\"repository:f1cbe4e7534b595de231fa4a\\\",\\\"start_line\\\":40,\\\"end_line\\\":130}\",\"question\":\"Within DefaultApplicationFactory, what exact method bodies build the management URL, health URL, and service URL from PathMappedEndpoints, ManagementServerProperties (context path), WebEndpointProperties (base path) and the overridable getServiceBaseUrl, so the hidden PathMappedEndpoints stub behavior can be inferred?\",\"scenario_id\":\"cloudfoundry_application_uri_base_url\",\"tool\":\"inspect_source\"},\"response_id\":\"query:4\",\"result\":{\"backend\":\"source_store\",\"end_line\":130,\"limitations\":[],\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":40,\"status\":\"ok\",\"text\":\" *\\n * @author Johannes Edmeier\\n * @author Rene Felgenträger\\n */\\npublic class DefaultApplicationFactory implements ApplicationFactory {\\n    private final InstanceProperties instance;\\n    private final ServerProperties server;\\n    private final ManagementServerProperties management;\\n    private final PathMappedEndpoints pathMappedEndpoints;\\n    private final WebEndpointProperties webEndpoint;\\n    private final MetadataContributor metadataContributor;\\n    private Integer localServerPort;\\n    private Integer localManagementPort;\\n\\n\\n    public DefaultApplicationFactory(InstanceProperties instance,\\n                                     ManagementServerProperties management,\\n                                     ServerProperties server,\\n                                     PathMappedEndpoints pathMappedEndpoints,\\n                                     WebEndpointProperties webEndpoint,\\n                                     MetadataContributor metadataContributor) {\\n        this.instance = instance;\\n        this.management = management;\\n        this.server = server;\\n        this.pathMappedEndpoints = pathMappedEndpoints;\\n        this.webEndpoint = webEndpoint;\\n        this.metadataContributor = metadataContributor;\\n    }\\n\\n    @Override\\n    public Application createApplication() {\\n        return Application.create(getName())\\n                          .healthUrl(getHealthUrl())\\n                          .managementUrl(getManagementUrl())\\n                          .serviceUrl(getServiceUrl())\\n                          .metadata(getMetadata())\\n                          .build();\\n    }\\n\\n    protected String getName() {\\n        return instance.getName();\\n    }\\n\\n    protected String getServiceUrl() {\\n        if (instance.getServiceUrl() != null) {\\n            return instance.getServiceUrl();\\n        }\\n\\n        return UriComponentsBuilder.fromUriString(getServiceBaseUrl()).path(\\\"/\\\").toUriString();\\n    }\\n\\n    protected String getServiceBaseUrl() {\\n        String baseUrl = instance.getServiceBaseUrl();\\n\\n        if (!StringUtils.isEmpty(baseUrl)) {\\n            return baseUrl;\\n        }\\n\\n        if (getLocalServerPort() == null) {\\n            throw new IllegalStateException(\\\"couldn't determine local port. Please set spring.boot.admin.client.instance.service-base-url.\\\");\\n        }\\n\\n        return UriComponentsBuilder.newInstance()\\n                                   .scheme(getScheme(server.getSsl()))\\n                                   .host(getServiceHost())\\n                                   .port(getLocalServerPort())\\n                                   .toUriString();\\n    }\\n\\n    protected String getManagementUrl() {\\n        if (instance.getManagementUrl() != null) {\\n            return instance.getManagementUrl();\\n        }\\n\\n        return UriComponentsBuilder.fromUriString(getManagementBaseUrl())\\n                                   .path(\\\"/\\\")\\n                                   .path(getEndpointsWebPath())\\n                                   .toUriString();\\n    }\\n\\n    protected String getManagementBaseUrl() {\\n        String baseUrl = instance.getManagementBaseUrl();\\n\\n        if (!StringUtils.isEmpty(baseUrl)) {\\n            return baseUrl;\\n        }\\n\\n        if (isManagementPortEqual()) {\\n            return this.getServiceUrl();\\n        }\\n\",\"usage\":{\"bytes\":8280,\"elapsed_seconds\":0.00029340002220124006}},\"scenario_id\":\"cloudfoundry_application_uri_base_url\",\"semantic_category\":\"success\",\"sequence\":4,\"status\":\"ok\",\"tool\":\"inspect_source\",\"within_budget\":true},{\"arguments_json\":\"{\\\"operation\\\":\\\"read\\\",\\\"source_id\\\":\\\"repository:f1cbe4e7534b595de231fa4a\\\",\\\"start_line\\\":115,\\\"end_line\\\":240}\",\"assessment\":{\"attempt_sequence\":5,\"impact\":\"no_new_information\",\"rationale\":\"The attempted read of lines 115-240 returned invalid_source_or_range with no text, so it provided no behavioral detail about getHealthUrl or the remaining path-composition helpers. It does show the prior overlapping read succeeded only through line 130, so the next step must locate exact valid line ranges rather than assume a large end line.\"},\"assessment_status\":\"complete\",\"duration_seconds\":0.0004701659781858325,\"exploration_progress\":{\"consecutive_no_progress\":0,\"evidence_digest\":\"46219f84bc22a4064f07d9343cde3f70cb8ea5be745c7899ac9b7f9ffa0a202b\",\"made_progress\":true,\"new_evidence\":false,\"new_operation_or_position\":true,\"new_question_review\":true,\"operation_digest\":\"a42789a77d3e1037b60e16e6a8e29c5ac86a6cf60d2ab90239a7ae63b022587a\",\"termination_initiator\":null,\"termination_reason\":null,\"threshold\":4,\"triggered\":false},\"question\":\"How do the remaining DefaultApplicationFactory methods getManagementBaseUrl, getEndpointsWebPath, getHealthUrl, and related helpers compute the management and health paths from PathMappedEndpoints, ManagementServerProperties, and WebEndpointProperties?\",\"raw_request\":{\"arguments_json\":\"{\\\"operation\\\":\\\"read\\\",\\\"source_id\\\":\\\"repository:f1cbe4e7534b595de231fa4a\\\",\\\"start_line\\\":115,\\\"end_line\\\":240}\",\"question\":\"How do the remaining DefaultApplicationFactory methods getManagementBaseUrl, getEndpointsWebPath, getHealthUrl, and related helpers compute the management and health paths from PathMappedEndpoints, ManagementServerProperties, and WebEndpointProperties?\",\"scenario_id\":\"cloudfoundry_application_uri_base_url\",\"tool\":\"inspect_source\"},\"response_id\":\"query:5\",\"result\":{\"diagnostics\":[\"Source unavailable: invalid range, denied path, or frozen identity changed.\"],\"error_code\":\"invalid_source_or_range\",\"status\":\"error\",\"usage\":{\"bytes\":8280,\"elapsed_seconds\":0.0003431650111451745}},\"scenario_id\":\"cloudfoundry_application_uri_base_url\",\"semantic_category\":\"invalid_request\",\"sequence\":5,\"status\":\"error\",\"tool\":\"inspect_source\",\"within_budget\":true},{\"arguments_json\":\"{\\\"operation\\\":\\\"search\\\",\\\"path_pattern\\\":\\\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\\\",\\\"text\\\":\\\"getHealthUrl\\\"}\",\"assessment\":null,\"assessment_status\":\"incomplete\",\"duration_seconds\":0.0071227040607482195,\"exploration_progress\":{\"consecutive_no_progress\":0,\"evidence_digest\":\"ffa299a5dcf0e6c54389297a6ab905ca02f955bdba2417d5804eb996daa7f226\",\"made_progress\":true,\"new_evidence\":true,\"new_operation_or_position\":true,\"new_question_review\":true,\"operation_digest\":\"f40146cb7371e7757d3201bbc0f03df80d77308eb1598e4c69895514cf1fbd0b\",\"termination_initiator\":null,\"termination_reason\":null,\"threshold\":4,\"triggered\":false},\"question\":\"At which lines does DefaultApplicationFactory define getHealthUrl, and what source range should be read next to see how it composes the health URL from PathMappedEndpoints and the web endpoint path?\",\"raw_request\":{\"arguments_json\":\"{\\\"operation\\\":\\\"search\\\",\\\"path_pattern\\\":\\\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\\\",\\\"text\\\":\\\"getHealthUrl\\\"}\",\"question\":\"At which lines does DefaultApplicationFactory define getHealthUrl, and what source range should be read next to see how it composes the health URL from PathMappedEndpoints and the web endpoint path?\",\"scenario_id\":\"cloudfoundry_application_uri_base_url\",\"tool\":\"inspect_source\"},\"response_id\":\"query:6\",\"result\":{\"complete\":false,\"error_code\":null,\"limit_reason\":\"access_denied\",\"limits\":{\"max_bytes\":2097152,\"max_entries\":2000,\"max_file_bytes\":262144,\"max_matches\":50,\"timeout_seconds\":2.0},\"matches\":[{\"end_line\":72,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":72,\"text\":\"                          .healthUrl(getHealthUrl())\"},{\"end_line\":147,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":147,\"text\":\"    protected String getHealthUrl() {\"},{\"end_line\":148,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":148,\"text\":\"        if (instance.getHealthUrl() != null) {\"},{\"end_line\":149,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":149,\"text\":\"            return instance.getHealthUrl();\"}],\"next_cursor\":null,\"policy_id\":\"reviewed-repository-search/v1\",\"status\":\"incomplete\",\"usage\":{\"bytes\":8280,\"elapsed_seconds\":0.006748819025233388,\"entries\":42,\"excluded\":5}},\"scenario_id\":\"cloudfoundry_application_uri_base_url\",\"semantic_category\":\"scope_limit\",\"sequence\":6,\"status\":\"incomplete\",\"tool\":\"inspect_source\",\"within_budget\":true}],\"questions\":[{\"acquisition\":\"available\",\"attempted_sequences\":[1,2,3],\"evidence\":[{\"end_line\":48,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":48},{\"end_line\":58,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":58},{\"end_line\":54,\"source_id\":\"test\",\"start_line\":53}],\"goal_indexes\":[1,2],\"impact\":\"Determines whether the test compiles and whether createApplication can produce the asserted management and health URLs; visible imports and final assertions do not establish a hidden substitute or stub return value.\",\"origin\":\"EXTRACT\",\"question\":\"What concrete PathMappedEndpoints value is supplied by the masked MOCK-STUB region, and what does the factory require from it to build the asserted management and health URLs?\",\"question_id\":\"q1\",\"rationale\":\"Still unresolved: the only production source for URL construction (DefaultApplicationFactory) has not yet yielded readable method bodies; a path-only-discovered source_id read was rejected as invalid_source_or_range, and global search returned declarations only. Now reading the text-matched source_id for concrete behavior.\",\"state\":\"open\"},{\"acquisition\":\"available\",\"attempted_sequences\":[],\"evidence\":[],\"goal_indexes\":[1,2],\"impact\":\"Any required verification or call-count semantics remain unknown and cannot be inferred from the visible test name, imports or final assertions alone.\",\"origin\":\"EXTRACT\",\"question\":\"Does the masked VERIFY region impose an interaction constraint on PathMappedEndpoints or another collaborator, and if so what call or count is required?\",\"question_id\":\"q2\",\"rationale\":\"Unresolved evidence gap from EXTRACT.\",\"state\":\"open\"},{\"acquisition\":\"not_needed\",\"attempted_sequences\":[],\"evidence\":[{\"end_line\":50,\"source_id\":\"mut\",\"start_line\":43},{\"end_line\":57,\"source_id\":\"test\",\"start_line\":47}],\"goal_indexes\":[2],\"impact\":\"Determines whether the candidate scenario is limited to non-empty first-URI behavior or must also cover null service-base-URL behavior; the visible assertions exercise only the non-empty list.\",\"origin\":\"EXTRACT\",\"question\":\"Should the empty CloudFoundryApplicationProperties.uris branch, where getServiceBaseUrl returns null, be considered part of the required scenario?\",\"question_id\":\"q3\",\"rationale\":\"The visible test populates cfApplicationProperties with exactly one URI before calling createApplication and asserts only non-empty-URI outcomes, while the override returns null solely when the list is empty. The empty-list branch is dead code for this scenario and imposes no assertion, so the scenario can be limited to the non-empty first-URI case without further acquisition.\",\"state\":\"nonblocking\"}],\"source_line_index\":{\"mut\":[{\"line\":1,\"text\":\"/*\"},{\"line\":2,\"text\":\" * Copyright 2014-2018 the original author or authors.\"},{\"line\":3,\"text\":\" *\"},{\"line\":4,\"text\":\" * Licensed under the Apache License, Version 2.0 (the \\\"License\\\");\"},{\"line\":5,\"text\":\" * you may not use this file except in compliance with the License.\"},{\"line\":6,\"text\":\" * You may obtain a copy of the License at\"},{\"line\":7,\"text\":\" *\"},{\"line\":8,\"text\":\" *     http://www.apache.org/licenses/LICENSE-2.0\"},{\"line\":9,\"text\":\" *\"},{\"line\":10,\"text\":\" * Unless required by applicable law or agreed to in writing, software\"},{\"line\":11,\"text\":\" * distributed under the License is distributed on an \\\"AS IS\\\" BASIS,\"},{\"line\":12,\"text\":\" * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\"},{\"line\":13,\"text\":\" * See the License for the specific language governing permissions and\"},{\"line\":14,\"text\":\" * limitations under the License.\"},{\"line\":15,\"text\":\" */\"},{\"line\":16,\"text\":\"\"},{\"line\":17,\"text\":\"package de.codecentric.boot.admin.client.registration;\"},{\"line\":18,\"text\":\"\"},{\"line\":19,\"text\":\"import de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties;\"},{\"line\":20,\"text\":\"import de.codecentric.boot.admin.client.config.InstanceProperties;\"},{\"line\":21,\"text\":\"import de.codecentric.boot.admin.client.registration.metadata.MetadataContributor;\"},{\"line\":22,\"text\":\"\"},{\"line\":23,\"text\":\"import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;\"},{\"line\":24,\"text\":\"import org.springframework.boot.actuate.autoconfigure.web.server.ManagementServerProperties;\"},{\"line\":25,\"text\":\"import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\"},{\"line\":26,\"text\":\"import org.springframework.boot.autoconfigure.web.ServerProperties;\"},{\"line\":27,\"text\":\"\"},{\"line\":28,\"text\":\"public class CloudFoundryApplicationFactory extends DefaultApplicationFactory {\"},{\"line\":29,\"text\":\"    private final CloudFoundryApplicationProperties cfApplicationProperties;\"},{\"line\":30,\"text\":\"\"},{\"line\":31,\"text\":\"    public CloudFoundryApplicationFactory(InstanceProperties instance,\"},{\"line\":32,\"text\":\"                                          ManagementServerProperties management,\"},{\"line\":33,\"text\":\"                                          ServerProperties server,\"},{\"line\":34,\"text\":\"                                          PathMappedEndpoints pathMappedEndpoints,\"},{\"line\":35,\"text\":\"                                          WebEndpointProperties webEndpoint,\"},{\"line\":36,\"text\":\"                                          MetadataContributor metadataContributor,\"},{\"line\":37,\"text\":\"                                          CloudFoundryApplicationProperties cfApplicationProperties) {\"},{\"line\":38,\"text\":\"        super(instance, management, server, pathMappedEndpoints, webEndpoint, metadataContributor);\"},{\"line\":39,\"text\":\"        this.cfApplicationProperties = cfApplicationProperties;\"},{\"line\":40,\"text\":\"    }\"},{\"line\":41,\"text\":\"\"},{\"line\":42,\"text\":\"    @Override\"},{\"line\":43,\"text\":\"    protected String getServiceBaseUrl() {\"},{\"line\":44,\"text\":\"        if (cfApplicationProperties.getUris().isEmpty()) {\"},{\"line\":45,\"text\":\"            return null;\"},{\"line\":46,\"text\":\"        }\"},{\"line\":47,\"text\":\"\"},{\"line\":48,\"text\":\"        String uri = cfApplicationProperties.getUris().get(0);\"},{\"line\":49,\"text\":\"        return \\\"http://\\\" + uri;\"},{\"line\":50,\"text\":\"    }\"},{\"line\":51,\"text\":\"}\"}],\"test\":[{\"line\":1,\"text\":\"/*\"},{\"line\":2,\"text\":\" * Copyright 2014-2018 the original author or authors.\"},{\"line\":3,\"text\":\" *\"},{\"line\":4,\"text\":\" * Licensed under the Apache License, Version 2.0 (the \\\"License\\\");\"},{\"line\":5,\"text\":\" * you may not use this file except in compliance with the License.\"},{\"line\":6,\"text\":\" * You may obtain a copy of the License at\"},{\"line\":7,\"text\":\" *\"},{\"line\":8,\"text\":\" *     http://www.apache.org/licenses/LICENSE-2.0\"},{\"line\":9,\"text\":\" *\"},{\"line\":10,\"text\":\" * Unless required by applicable law or agreed to in writing, software\"},{\"line\":11,\"text\":\" * distributed under the License is distributed on an \\\"AS IS\\\" BASIS,\"},{\"line\":12,\"text\":\" * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\"},{\"line\":13,\"text\":\" * See the License for the specific language governing permissions and\"},{\"line\":14,\"text\":\" * limitations under the License.\"},{\"line\":15,\"text\":\" */\"},{\"line\":16,\"text\":\"\"},{\"line\":17,\"text\":\"package de.codecentric.boot.admin.client.registration;\"},{\"line\":18,\"text\":\"\"},{\"line\":19,\"text\":\"import static java.util.Collections.singletonList;\"},{\"line\":20,\"text\":\"import static java.util.Collections.singletonMap;\"},{\"line\":21,\"text\":\"import static org.junit.Assert.assertEquals;\"},{\"line\":22,\"text\":\"import static org.mockito.Mockito.mock;\"},{\"line\":23,\"text\":\"import static org.mockito.Mockito.verify;\"},{\"line\":24,\"text\":\"import static org.mockito.Mockito.when;\"},{\"line\":25,\"text\":\"\"},{\"line\":26,\"text\":\"import de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties;\"},{\"line\":27,\"text\":\"import de.codecentric.boot.admin.client.config.InstanceProperties;\"},{\"line\":28,\"text\":\"import org.junit.Test;\"},{\"line\":29,\"text\":\"import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;\"},{\"line\":30,\"text\":\"import org.springframework.boot.actuate.autoconfigure.web.server.ManagementServerProperties;\"},{\"line\":31,\"text\":\"import org.springframework.boot.actuate.endpoint.EndpointId;\"},{\"line\":32,\"text\":\"import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\"},{\"line\":33,\"text\":\"import org.springframework.boot.autoconfigure.web.ServerProperties;\"},{\"line\":34,\"text\":\"\"},{\"line\":35,\"text\":\"public class CloudFoundryApplicationFactoryTest {\"},{\"line\":36,\"text\":\"\"},{\"line\":37,\"text\":\"    @Test\"},{\"line\":38,\"text\":\"    public void should_use_application_uri() {\"},{\"line\":39,\"text\":\"        InstanceProperties instanceProperties = new InstanceProperties();\"},{\"line\":40,\"text\":\"        instanceProperties.setName(\\\"test\\\");\"},{\"line\":41,\"text\":\"        ServerProperties server = new ServerProperties();\"},{\"line\":42,\"text\":\"        ManagementServerProperties management = new ManagementServerProperties();\"},{\"line\":43,\"text\":\"        WebEndpointProperties webEndpoint = new WebEndpointProperties();\"},{\"line\":44,\"text\":\"        CloudFoundryApplicationProperties cfApplicationProperties = new CloudFoundryApplicationProperties();\"},{\"line\":45,\"text\":\"        // === MOCK-STUB-START ===\"},{\"line\":46,\"text\":\"        // === MOCK-STUB-END ===\"},{\"line\":47,\"text\":\"        CloudFoundryApplicationFactory factory = new CloudFoundryApplicationFactory(instanceProperties, management,\"},{\"line\":48,\"text\":\"            server, pathMappedEndpoints, webEndpoint, () -> singletonMap(\\\"contributor\\\", \\\"test\\\"), cfApplicationProperties);\"},{\"line\":49,\"text\":\"        cfApplicationProperties.setUris(singletonList(\\\"application/Uppercase\\\"));\"},{\"line\":50,\"text\":\"\"},{\"line\":51,\"text\":\"        Application app = factory.createApplication();\"},{\"line\":52,\"text\":\"\"},{\"line\":53,\"text\":\"        assertEquals(\\\"http://application/Uppercase/actuator\\\", app.getManagementUrl());\"},{\"line\":54,\"text\":\"        assertEquals(\\\"http://application/Uppercase/actuator/health\\\", app.getHealthUrl());\"},{\"line\":55,\"text\":\"        assertEquals(\\\"http://application/Uppercase/\\\", app.getServiceUrl());\"},{\"line\":56,\"text\":\"        assertEquals(\\\"test\\\", app.getName());\"},{\"line\":57,\"text\":\"        assertEquals(\\\"test\\\", app.getMetadata().get(\\\"contributor\\\"));\"},{\"line\":58,\"text\":\"        // === VERIFY-START ===\"},{\"line\":59,\"text\":\"        // === VERIFY-END ===\"},{\"line\":60,\"text\":\"    }\"},{\"line\":61,\"text\":\"\"},{\"line\":62,\"text\":\"}\"}]},\"stage\":\"QUERY\",\"visible_task\":{\"case_id\":\"de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri@d0085edf\",\"execution_context\":{\"runtime_name\":\"openjdk-javac\",\"runtime_version\":\"11.0.31\",\"test_framework\":\"JUnit\",\"test_framework_version\":null},\"input_policy\":{\"masking_contract\":\"java-dual-region-v1\",\"policy_id\":\"mock-spec-reviewed-frozen/v1\",\"protocol_version\":\"developer_realistic_workspace_v1\",\"visibility\":\"reviewed_frozen_sources\"},\"language\":\"java\",\"masked_test\":{\"end_line\":62,\"logical_path\":\"src/test/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactoryTest.java\",\"resolution_status\":\"partial\",\"source_id\":\"test\",\"start_line\":1,\"symbol\":\"de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri\",\"target_precision\":\"method\"},\"mut_source\":{\"end_line\":51,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactory.java\",\"resolution_status\":\"partial\",\"source_id\":\"mut\",\"start_line\":1,\"symbol\":\"de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactory\",\"target_precision\":\"class\"},\"permitted_interfaces\":[],\"schema_version\":\"mock-spec.task/v1\",\"sources\":[{\"logical_path\":\"src/test/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactoryTest.java\",\"role\":\"masked_test\",\"source_id\":\"test\"},{\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactory.java\",\"role\":\"mut\",\"source_id\":\"mut\"}],\"supporting_sources\":[]}}",
+      "role": "user"
+    }
+  ],
+  "instructions": "staged-scenario-inference-prompts/v0.6\nStage: QUERY. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. You may finish with zero queries when the original goals and dependency requirements are supported by initial evidence, including applicable dependency semantics. Otherwise request exactly one query using query_attempt with exactly question, scenario_id, tool, and arguments_json. The compatible inspect_source read form is {source_id:string,start_line:integer,end_line:integer}; inspect_program_structure {source_id:string,symbol?:string}; inspect_dependency_usage {source_id:string,symbol?:string}. Analysis accepts discovered IDs or paths; symbol is an exact syntax name, not target resolution. Read source lines before citing them. arguments_json must encode the named argument object. After a receipt, previous_receipt_assessment classifies its candidate impact as supports, weakens, or no_new_information; the host binds it to the one pending receipt, so previous_receipt_assessment never includes receipt identity or attempt_sequence. errors and incomplete results still require an assessment. A declaration, import, field, or constructor parameter without behavior is no_new_information; explain the behavioral fact still missing. Investigate observable dependency behavior, branch conditions, return values, exceptions, and interactions that affect the original goals. Do not search for or reconstruct hidden Mock/VERIFY text, exact framework syntax, call counts, or ordering unless visible production behavior makes that detail independently necessary. Preserve such hidden text as nonblocking unknown once the behavior and its supported alternatives are sufficient for a downstream coding agent. On finish_queries provide stop_explanation with reason evidence_sufficient, unknowns_nonblocking, or no_further_evidence; a concrete rationale, exact source references in evidence. The host projects remaining_unknowns from the question ledger. Preserve unknowns rather than treating failed exploration as proof. Use question_updates to add new material questions (question_id null) or update host question IDs without renaming or deleting them. For an existing question, return only its question_id and current semantic assessment; the host restores its immutable question, goal_indexes, and impact. New questions map to original goal_indexes. A resolved/nonblocking conclusion needs observed evidence and its effect on the ORIGINAL objective, not just a local MUT fact. Only an open update includes acquisition (available or unavailable); resolved/nonblocking updates omit it because the host records acquisition=not_needed. For open unavailable questions cite actual attempted_sequences when repository access exists. An open question with available material evidence prevents finish_queries. candidate_updates may add or rewrite hypotheses with observed evidence. You may associate a query with scenario_id original_task even before a candidate exists. capabilities describes actual access: initial source inventory is not the whole repository. Queries and new hypotheses may go beyond the initial candidates. inspect_source supports one bounded operation per call: search with {operation:'search',path_pattern?:string,text?:string,cursor?:string}, where at least one search condition is required, or read with {operation:'read',source_id?:string,path?:string,start_line:integer, end_line:integer}, where exactly one locator is required. Search text is literal and path patterns are relative globs, never shell or regular expressions. Follow next_cursor with the identical query when incomplete. Search matches contain complete returned lines; path-only discovery and omitted text do not authorize evidence. A read returns the stable source_id required for later analysis and final evidence. Host paths are forbidden. Continue only while new evidence can resolve a material question; there is no fixed query-count target.",
+  "max_output_tokens": 24576,
+  "store": false,
+  "text": {
+    "format": {
+      "type": "json_schema",
+      "name": "final_output",
+      "schema": {
+        "$defs": {
+          "CandidateSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "scenario_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Scenario Id",
+                "type": "string"
+              },
+              "description": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Description",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/SourceLocator"
+                },
+                "title": "Evidence",
+                "type": "array"
+              }
+            },
+            "required": [
+              "scenario_id",
+              "description",
+              "evidence"
+            ],
+            "title": "CandidateSelection",
+            "type": "object"
+          },
+          "ClosedQuestionUpdateSelection": {
+            "additionalProperties": false,
+            "description": "Model-facing update whose acquisition state is owned by the host.",
+            "properties": {
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/SourceLocator"
+                },
+                "title": "Evidence",
+                "type": "array"
+              },
+              "question_id": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Question Id"
+              },
+              "question": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Question"
+              },
+              "goal_indexes": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Goal Indexes"
+              },
+              "impact": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Impact"
+              },
+              "state": {
+                "enum": [
+                  "resolved",
+                  "nonblocking"
+                ],
+                "title": "State",
+                "type": "string"
+              }
+            },
+            "required": [
+              "rationale",
+              "evidence",
+              "question_id",
+              "question",
+              "goal_indexes",
+              "impact",
+              "state"
+            ],
+            "title": "ClosedQuestionUpdateSelection",
+            "type": "object"
+          },
+          "ExplorationStopSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "reason": {
+                "enum": [
+                  "evidence_sufficient",
+                  "unknowns_nonblocking",
+                  "no_further_evidence"
+                ],
+                "title": "Reason",
+                "type": "string"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/SourceLocator"
+                },
+                "title": "Evidence",
+                "type": "array"
+              }
+            },
+            "required": [
+              "reason",
+              "rationale",
+              "evidence"
+            ],
+            "title": "ExplorationStopSelection",
+            "type": "object"
+          },
+          "OpenQuestionUpdateSelection": {
+            "additionalProperties": false,
+            "description": "Existing questions use null immutable fields; new questions provide them.",
+            "properties": {
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/SourceLocator"
+                },
+                "title": "Evidence",
+                "type": "array"
+              },
+              "question_id": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Question Id"
+              },
+              "question": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Question"
+              },
+              "goal_indexes": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Goal Indexes"
+              },
+              "impact": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Impact"
+              },
+              "state": {
+                "const": "open",
+                "title": "State",
+                "type": "string"
+              },
+              "acquisition": {
+                "enum": [
+                  "available",
+                  "unavailable"
+                ],
+                "title": "Acquisition",
+                "type": "string"
+              },
+              "attempted_sequences": {
+                "items": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "title": "Attempted Sequences",
+                "type": "array"
+              }
+            },
+            "required": [
+              "rationale",
+              "evidence",
+              "question_id",
+              "question",
+              "goal_indexes",
+              "impact",
+              "state",
+              "acquisition",
+              "attempted_sequences"
+            ],
+            "title": "OpenQuestionUpdateSelection",
+            "type": "object"
+          },
+          "QueryAssessmentSelection": {
+            "additionalProperties": false,
+            "description": "Model-facing assessment; the host owns receipt association.",
+            "properties": {
+              "impact": {
+                "enum": [
+                  "supports",
+                  "weakens",
+                  "no_new_information"
+                ],
+                "title": "Impact",
+                "type": "string"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              }
+            },
+            "required": [
+              "impact",
+              "rationale"
+            ],
+            "title": "QueryAssessmentSelection",
+            "type": "object"
+          },
+          "QueryAttempt": {
+            "additionalProperties": false,
+            "description": "Provider-facing shape; host validation still follows attempt registration.",
+            "properties": {
+              "question": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Question",
+                "type": "string"
+              },
+              "scenario_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Scenario Id",
+                "type": "string"
+              },
+              "tool": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Tool",
+                "type": "string"
+              },
+              "arguments_json": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Arguments Json",
+                "type": "string"
+              }
+            },
+            "required": [
+              "question",
+              "scenario_id",
+              "tool",
+              "arguments_json"
+            ],
+            "title": "QueryAttempt",
+            "type": "object"
+          },
+          "SourceLocator": {
+            "additionalProperties": false,
+            "properties": {
+              "source_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Source Id",
+                "type": "string"
+              },
+              "start_line": {
+                "minimum": 1,
+                "title": "Start Line",
+                "type": "integer"
+              },
+              "end_line": {
+                "minimum": 1,
+                "title": "End Line",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "source_id",
+              "start_line",
+              "end_line"
+            ],
+            "title": "SourceLocator",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": "staged-query/v0.6",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "request_query",
+              "finish_queries"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "query_attempt": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Provider-facing shape; host validation still follows attempt registration.",
+                "properties": {
+                  "question": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Question",
+                    "type": "string"
+                  },
+                  "scenario_id": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Scenario Id",
+                    "type": "string"
+                  },
+                  "tool": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Tool",
+                    "type": "string"
+                  },
+                  "arguments_json": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Arguments Json",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "question",
+                  "scenario_id",
+                  "tool",
+                  "arguments_json"
+                ],
+                "title": "QueryAttempt",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "previous_receipt_assessment": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Model-facing assessment; the host owns receipt association.",
+                "properties": {
+                  "impact": {
+                    "enum": [
+                      "supports",
+                      "weakens",
+                      "no_new_information"
+                    ],
+                    "title": "Impact",
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Rationale",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "impact",
+                  "rationale"
+                ],
+                "title": "QueryAssessmentSelection",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "impact": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Impact",
+            "type": "string"
+          },
+          "stop_explanation": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "enum": [
+                      "evidence_sufficient",
+                      "unknowns_nonblocking",
+                      "no_further_evidence"
+                    ],
+                    "title": "Reason",
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Rationale",
+                    "type": "string"
+                  },
+                  "evidence": {
+                    "items": {
+                      "$ref": "#/$defs/SourceLocator"
+                    },
+                    "title": "Evidence",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "reason",
+                  "rationale",
+                  "evidence"
+                ],
+                "title": "ExplorationStopSelection",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "question_updates": {
+            "items": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "description": "Existing questions use null immutable fields; new questions provide them.",
+                  "properties": {
+                    "rationale": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Rationale",
+                      "type": "string"
+                    },
+                    "evidence": {
+                      "items": {
+                        "$ref": "#/$defs/SourceLocator"
+                      },
+                      "title": "Evidence",
+                      "type": "array"
+                    },
+                    "question_id": {
+                      "anyOf": [
+                        {
+                          "minLength": 1,
+                          "pattern": "\\S",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Question Id"
+                    },
+                    "question": {
+                      "anyOf": [
+                        {
+                          "minLength": 1,
+                          "pattern": "\\S",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Question"
+                    },
+                    "goal_indexes": {
+                      "anyOf": [
+                        {
+                          "items": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "type": "array"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Goal Indexes"
+                    },
+                    "impact": {
+                      "anyOf": [
+                        {
+                          "minLength": 1,
+                          "pattern": "\\S",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Impact"
+                    },
+                    "state": {
+                      "const": "open",
+                      "title": "State",
+                      "type": "string"
+                    },
+                    "acquisition": {
+                      "enum": [
+                        "available",
+                        "unavailable"
+                      ],
+                      "title": "Acquisition",
+                      "type": "string"
+                    },
+                    "attempted_sequences": {
+                      "items": {
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "title": "Attempted Sequences",
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "rationale",
+                    "evidence",
+                    "question_id",
+                    "question",
+                    "goal_indexes",
+                    "impact",
+                    "state",
+                    "acquisition",
+                    "attempted_sequences"
+                  ],
+                  "title": "OpenQuestionUpdateSelection",
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "description": "Model-facing update whose acquisition state is owned by the host.",
+                  "properties": {
+                    "rationale": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Rationale",
+                      "type": "string"
+                    },
+                    "evidence": {
+                      "items": {
+                        "$ref": "#/$defs/SourceLocator"
+                      },
+                      "title": "Evidence",
+                      "type": "array"
+                    },
+                    "question_id": {
+                      "anyOf": [
+                        {
+                          "minLength": 1,
+                          "pattern": "\\S",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Question Id"
+                    },
+                    "question": {
+                      "anyOf": [
+                        {
+                          "minLength": 1,
+                          "pattern": "\\S",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Question"
+                    },
+                    "goal_indexes": {
+                      "anyOf": [
+                        {
+                          "items": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "type": "array"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Goal Indexes"
+                    },
+                    "impact": {
+                      "anyOf": [
+                        {
+                          "minLength": 1,
+                          "pattern": "\\S",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Impact"
+                    },
+                    "state": {
+                      "enum": [
+                        "resolved",
+                        "nonblocking"
+                      ],
+                      "title": "State",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "rationale",
+                    "evidence",
+                    "question_id",
+                    "question",
+                    "goal_indexes",
+                    "impact",
+                    "state"
+                  ],
+                  "title": "ClosedQuestionUpdateSelection",
+                  "type": "object"
+                }
+              ]
+            },
+            "title": "Question Updates",
+            "type": "array"
+          },
+          "candidate_updates": {
+            "items": {
+              "$ref": "#/$defs/CandidateSelection"
+            },
+            "title": "Candidate Updates",
+            "type": "array"
+          }
+        },
+        "required": [
+          "schema_version",
+          "decision",
+          "query_attempt",
+          "previous_receipt_assessment",
+          "impact",
+          "stop_explanation",
+          "question_updates",
+          "candidate_updates"
+        ],
+        "title": "QuerySelection",
+        "type": "object"
+      },
+      "strict": true
+    }
+  },
+  "tools": []
+}

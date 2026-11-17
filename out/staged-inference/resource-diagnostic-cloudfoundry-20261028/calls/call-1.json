@@ -1,0 +1,891 @@
+{
+  "sequence": 1,
+  "stage": "EXTRACT",
+  "status": "completed",
+  "model_request_started": true,
+  "request_start_basis": "usage_ledger_before_model_call_hook",
+  "model_name": "deepseek-flash",
+  "output_type": "ExtractSelection",
+  "prompt_version": "staged-scenario-inference-prompts/v0.4",
+  "instructions": "staged-scenario-inference-prompts/v0.4\nStage: EXTRACT. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. Preserve ALL original fixed inputs, assertions and scenario requirements as original_goals source ranges. Candidates are revisable working hypotheses, not the task boundary; list material missing dependency semantics in unresolved. Infer conditional dependency constraints, not hidden Mock setup or hidden verification text. State unconfirmed behavior as an if-then hypothesis and preserve its missing basis in unresolved. Imports, test names, and final assertions alone do not establish a hidden substitute, stub value, or call count.",
+  "requested_output_schema": {
+    "$defs": {
+      "CandidateSelection": {
+        "additionalProperties": false,
+        "properties": {
+          "scenario_id": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Scenario Id",
+            "type": "string"
+          },
+          "description": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Description",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/$defs/SourceLocator"
+            },
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "scenario_id",
+          "description",
+          "evidence"
+        ],
+        "title": "CandidateSelection",
+        "type": "object"
+      },
+      "SourceLocator": {
+        "additionalProperties": false,
+        "properties": {
+          "source_id": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Source Id",
+            "type": "string"
+          },
+          "start_line": {
+            "minimum": 1,
+            "title": "Start Line",
+            "type": "integer"
+          },
+          "end_line": {
+            "minimum": 1,
+            "title": "End Line",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "source_id",
+          "start_line",
+          "end_line"
+        ],
+        "title": "SourceLocator",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "schema_version": {
+        "const": "staged-extract/v0.2",
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "result_status": {
+        "default": "CONTINUE",
+        "enum": [
+          "CONTINUE",
+          "INCONCLUSIVE"
+        ],
+        "title": "Result Status",
+        "type": "string"
+      },
+      "original_goals": {
+        "items": {
+          "$ref": "#/$defs/SourceLocator"
+        },
+        "title": "Original Goals",
+        "type": "array"
+      },
+      "candidates": {
+        "items": {
+          "$ref": "#/$defs/CandidateSelection"
+        },
+        "title": "Candidates",
+        "type": "array"
+      },
+      "unresolved": {
+        "items": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        "title": "Unresolved",
+        "type": "array"
+      }
+    },
+    "required": [
+      "schema_version",
+      "result_status",
+      "original_goals",
+      "candidates",
+      "unresolved"
+    ],
+    "title": "ExtractSelection",
+    "type": "object"
+  },
+  "payload": {
+    "source_line_index": {
+      "mut": [
+        {
+          "line": 1,
+          "text": "/*"
+        },
+        {
+          "line": 2,
+          "text": " * Copyright 2014-2018 the original author or authors."
+        },
+        {
+          "line": 3,
+          "text": " *"
+        },
+        {
+          "line": 4,
+          "text": " * Licensed under the Apache License, Version 2.0 (the \"License\");"
+        },
+        {
+          "line": 5,
+          "text": " * you may not use this file except in compliance with the License."
+        },
+        {
+          "line": 6,
+          "text": " * You may obtain a copy of the License at"
+        },
+        {
+          "line": 7,
+          "text": " *"
+        },
+        {
+          "line": 8,
+          "text": " *     http://www.apache.org/licenses/LICENSE-2.0"
+        },
+        {
+          "line": 9,
+          "text": " *"
+        },
+        {
+          "line": 10,
+          "text": " * Unless required by applicable law or agreed to in writing, software"
+        },
+        {
+          "line": 11,
+          "text": " * distributed under the License is distributed on an \"AS IS\" BASIS,"
+        },
+        {
+          "line": 12,
+          "text": " * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."
+        },
+        {
+          "line": 13,
+          "text": " * See the License for the specific language governing permissions and"
+        },
+        {
+          "line": 14,
+          "text": " * limitations under the License."
+        },
+        {
+          "line": 15,
+          "text": " */"
+        },
+        {
+          "line": 16,
+          "text": ""
+        },
+        {
+          "line": 17,
+          "text": "package de.codecentric.boot.admin.client.registration;"
+        },
+        {
+          "line": 18,
+          "text": ""
+        },
+        {
+          "line": 19,
+          "text": "import de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties;"
+        },
+        {
+          "line": 20,
+          "text": "import de.codecentric.boot.admin.client.config.InstanceProperties;"
+        },
+        {
+          "line": 21,
+          "text": "import de.codecentric.boot.admin.client.registration.metadata.MetadataContributor;"
+        },
+        {
+          "line": 22,
+          "text": ""
+        },
+        {
+          "line": 23,
+          "text": "import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;"
+        },
+        {
+          "line": 24,
+          "text": "import org.springframework.boot.actuate.autoconfigure.web.server.ManagementServerProperties;"
+        },
+        {
+          "line": 25,
+          "text": "import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;"
+        },
+        {
+          "line": 26,
+          "text": "import org.springframework.boot.autoconfigure.web.ServerProperties;"
+        },
+        {
+          "line": 27,
+          "text": ""
+        },
+        {
+          "line": 28,
+          "text": "public class CloudFoundryApplicationFactory extends DefaultApplicationFactory {"
+        },
+        {
+          "line": 29,
+          "text": "    private final CloudFoundryApplicationProperties cfApplicationProperties;"
+        },
+        {
+          "line": 30,
+          "text": ""
+        },
+        {
+          "line": 31,
+          "text": "    public CloudFoundryApplicationFactory(InstanceProperties instance,"
+        },
+        {
+          "line": 32,
+          "text": "                                          ManagementServerProperties management,"
+        },
+        {
+          "line": 33,
+          "text": "                                          ServerProperties server,"
+        },
+        {
+          "line": 34,
+          "text": "                                          PathMappedEndpoints pathMappedEndpoints,"
+        },
+        {
+          "line": 35,
+          "text": "                                          WebEndpointProperties webEndpoint,"
+        },
+        {
+          "line": 36,
+          "text": "                                          MetadataContributor metadataContributor,"
+        },
+        {
+          "line": 37,
+          "text": "                                          CloudFoundryApplicationProperties cfApplicationProperties) {"
+        },
+        {
+          "line": 38,
+          "text": "        super(instance, management, server, pathMappedEndpoints, webEndpoint, metadataContributor);"
+        },
+        {
+          "line": 39,
+          "text": "        this.cfApplicationProperties = cfApplicationProperties;"
+        },
+        {
+          "line": 40,
+          "text": "    }"
+        },
+        {
+          "line": 41,
+          "text": ""
+        },
+        {
+          "line": 42,
+          "text": "    @Override"
+        },
+        {
+          "line": 43,
+          "text": "    protected String getServiceBaseUrl() {"
+        },
+        {
+          "line": 44,
+          "text": "        if (cfApplicationProperties.getUris().isEmpty()) {"
+        },
+        {
+          "line": 45,
+          "text": "            return null;"
+        },
+        {
+          "line": 46,
+          "text": "        }"
+        },
+        {
+          "line": 47,
+          "text": ""
+        },
+        {
+          "line": 48,
+          "text": "        String uri = cfApplicationProperties.getUris().get(0);"
+        },
+        {
+          "line": 49,
+          "text": "        return \"http://\" + uri;"
+        },
+        {
+          "line": 50,
+          "text": "    }"
+        },
+        {
+          "line": 51,
+          "text": "}"
+        }
+      ],
+      "test": [
+        {
+          "line": 1,
+          "text": "/*"
+        },
+        {
+          "line": 2,
+          "text": " * Copyright 2014-2018 the original author or authors."
+        },
+        {
+          "line": 3,
+          "text": " *"
+        },
+        {
+          "line": 4,
+          "text": " * Licensed under the Apache License, Version 2.0 (the \"License\");"
+        },
+        {
+          "line": 5,
+          "text": " * you may not use this file except in compliance with the License."
+        },
+        {
+          "line": 6,
+          "text": " * You may obtain a copy of the License at"
+        },
+        {
+          "line": 7,
+          "text": " *"
+        },
+        {
+          "line": 8,
+          "text": " *     http://www.apache.org/licenses/LICENSE-2.0"
+        },
+        {
+          "line": 9,
+          "text": " *"
+        },
+        {
+          "line": 10,
+          "text": " * Unless required by applicable law or agreed to in writing, software"
+        },
+        {
+          "line": 11,
+          "text": " * distributed under the License is distributed on an \"AS IS\" BASIS,"
+        },
+        {
+          "line": 12,
+          "text": " * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."
+        },
+        {
+          "line": 13,
+          "text": " * See the License for the specific language governing permissions and"
+        },
+        {
+          "line": 14,
+          "text": " * limitations under the License."
+        },
+        {
+          "line": 15,
+          "text": " */"
+        },
+        {
+          "line": 16,
+          "text": ""
+        },
+        {
+          "line": 17,
+          "text": "package de.codecentric.boot.admin.client.registration;"
+        },
+        {
+          "line": 18,
+          "text": ""
+        },
+        {
+          "line": 19,
+          "text": "import static java.util.Collections.singletonList;"
+        },
+        {
+          "line": 20,
+          "text": "import static java.util.Collections.singletonMap;"
+        },
+        {
+          "line": 21,
+          "text": "import static org.junit.Assert.assertEquals;"
+        },
+        {
+          "line": 22,
+          "text": "import static org.mockito.Mockito.mock;"
+        },
+        {
+          "line": 23,
+          "text": "import static org.mockito.Mockito.verify;"
+        },
+        {
+          "line": 24,
+          "text": "import static org.mockito.Mockito.when;"
+        },
+        {
+          "line": 25,
+          "text": ""
+        },
+        {
+          "line": 26,
+          "text": "import de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties;"
+        },
+        {
+          "line": 27,
+          "text": "import de.codecentric.boot.admin.client.config.InstanceProperties;"
+        },
+        {
+          "line": 28,
+          "text": "import org.junit.Test;"
+        },
+        {
+          "line": 29,
+          "text": "import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;"
+        },
+        {
+          "line": 30,
+          "text": "import org.springframework.boot.actuate.autoconfigure.web.server.ManagementServerProperties;"
+        },
+        {
+          "line": 31,
+          "text": "import org.springframework.boot.actuate.endpoint.EndpointId;"
+        },
+        {
+          "line": 32,
+          "text": "import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;"
+        },
+        {
+          "line": 33,
+          "text": "import org.springframework.boot.autoconfigure.web.ServerProperties;"
+        },
+        {
+          "line": 34,
+          "text": ""
+        },
+        {
+          "line": 35,
+          "text": "public class CloudFoundryApplicationFactoryTest {"
+        },
+        {
+          "line": 36,
+          "text": ""
+        },
+        {
+          "line": 37,
+          "text": "    @Test"
+        },
+        {
+          "line": 38,
+          "text": "    public void should_use_application_uri() {"
+        },
+        {
+          "line": 39,
+          "text": "        InstanceProperties instanceProperties = new InstanceProperties();"
+        },
+        {
+          "line": 40,
+          "text": "        instanceProperties.setName(\"test\");"
+        },
+        {
+          "line": 41,
+          "text": "        ServerProperties server = new ServerProperties();"
+        },
+        {
+          "line": 42,
+          "text": "        ManagementServerProperties management = new ManagementServerProperties();"
+        },
+        {
+          "line": 43,
+          "text": "        WebEndpointProperties webEndpoint = new WebEndpointProperties();"
+        },
+        {
+          "line": 44,
+          "text": "        CloudFoundryApplicationProperties cfApplicationProperties = new CloudFoundryApplicationProperties();"
+        },
+        {
+          "line": 45,
+          "text": "        // === MOCK-STUB-START ==="
+        },
+        {
+          "line": 46,
+          "text": "        // === MOCK-STUB-END ==="
+        },
+        {
+          "line": 47,
+          "text": "        CloudFoundryApplicationFactory factory = new CloudFoundryApplicationFactory(instanceProperties, management,"
+        },
+        {
+          "line": 48,
+          "text": "            server, pathMappedEndpoints, webEndpoint, () -> singletonMap(\"contributor\", \"test\"), cfApplicationProperties);"
+        },
+        {
+          "line": 49,
+          "text": "        cfApplicationProperties.setUris(singletonList(\"application/Uppercase\"));"
+        },
+        {
+          "line": 50,
+          "text": ""
+        },
+        {
+          "line": 51,
+          "text": "        Application app = factory.createApplication();"
+        },
+        {
+          "line": 52,
+          "text": ""
+        },
+        {
+          "line": 53,
+          "text": "        assertEquals(\"http://application/Uppercase/actuator\", app.getManagementUrl());"
+        },
+        {
+          "line": 54,
+          "text": "        assertEquals(\"http://application/Uppercase/actuator/health\", app.getHealthUrl());"
+        },
+        {
+          "line": 55,
+          "text": "        assertEquals(\"http://application/Uppercase/\", app.getServiceUrl());"
+        },
+        {
+          "line": 56,
+          "text": "        assertEquals(\"test\", app.getName());"
+        },
+        {
+          "line": 57,
+          "text": "        assertEquals(\"test\", app.getMetadata().get(\"contributor\"));"
+        },
+        {
+          "line": 58,
+          "text": "        // === VERIFY-START ==="
+        },
+        {
+          "line": 59,
+          "text": "        // === VERIFY-END ==="
+        },
+        {
+          "line": 60,
+          "text": "    }"
+        },
+        {
+          "line": 61,
+          "text": ""
+        },
+        {
+          "line": 62,
+          "text": "}"
+        }
+      ]
+    },
+    "stage": "EXTRACT",
+    "visible_task": {
+      "case_id": "de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri@d0085edf",
+      "execution_context": {
+        "runtime_name": "openjdk-javac",
+        "runtime_version": "11.0.31",
+        "test_framework": "JUnit",
+        "test_framework_version": null
+      },
+      "input_policy": {
+        "masking_contract": "java-dual-region-v1",
+        "policy_id": "mock-spec-reviewed-frozen/v1",
+        "protocol_version": "developer_realistic_workspace_v1",
+        "visibility": "reviewed_frozen_sources"
+      },
+      "language": "java",
+      "masked_test": {
+        "end_line": 62,
+        "logical_path": "src/test/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactoryTest.java",
+        "resolution_status": "partial",
+        "source_id": "test",
+        "start_line": 1,
+        "symbol": "de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri",
+        "target_precision": "method"
+      },
+      "mut_source": {
+        "end_line": 51,
+        "logical_path": "src/main/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactory.java",
+        "resolution_status": "partial",
+        "source_id": "mut",
+        "start_line": 1,
+        "symbol": "de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactory",
+        "target_precision": "class"
+      },
+      "permitted_interfaces": [],
+      "schema_version": "mock-spec.task/v1",
+      "sources": [
+        {
+          "logical_path": "src/test/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactoryTest.java",
+          "role": "masked_test",
+          "source_id": "test"
+        },
+        {
+          "logical_path": "src/main/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactory.java",
+          "role": "mut",
+          "source_id": "mut"
+        }
+      ],
+      "supporting_sources": []
+    }
+  },
+  "payload_sha256": "d23b559833a4c713ba8fcf1bf08131d7dad386e7a3ec549dd5e3375dac80c9bd",
+  "payload_bytes": 9339,
+  "context_projection": "initial_source_lines_once/v1",
+  "legacy_payload_bytes": 14820,
+  "max_output_tokens": 393216,
+  "timeout_seconds": null,
+  "elapsed_seconds": 43.676997658010805,
+  "response_refs": [
+    {
+      "response_index": 0,
+      "response_id": "2a62f70d-c36f-4eb6-b913-5c7fd97b200d",
+      "request_id": null,
+      "usage": {
+        "requests": 1,
+        "input_tokens": 3000,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 7944,
+        "output_tokens_details": {
+          "reasoning_tokens": 7299
+        },
+        "total_tokens": 10944,
+        "request_usage_entries": []
+      }
+    }
+  ],
+  "exception": null,
+  "provider_usage": {
+    "input_tokens": {
+      "presence": "reported",
+      "value": 3000
+    },
+    "output_tokens": {
+      "presence": "reported",
+      "value": 7944
+    },
+    "total_tokens": {
+      "presence": "reported",
+      "value": 10944
+    },
+    "reasoning_tokens": {
+      "presence": "reported",
+      "value": 7299
+    }
+  },
+  "provider_responses": [
+    {
+      "call_sequence": 1,
+      "http_status": 200,
+      "request_id": null,
+      "response_id": "2a62f70d-c36f-4eb6-b913-5c7fd97b200d",
+      "body_encoding": "json",
+      "body_truncated": false,
+      "body": {
+        "id": "2a62f70d-c36f-4eb6-b913-5c7fd97b200d",
+        "object": "response",
+        "created_at": 1793176541,
+        "status": "completed",
+        "background": false,
+        "completed_at": 1793176585,
+        "content_filters": null,
+        "error": null,
+        "frequency_penalty": 0.0,
+        "incomplete_details": null,
+        "instructions": "staged-scenario-inference-prompts/v0.4\nStage: EXTRACT. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. Preserve ALL original fixed inputs, assertions and scenario requirements as original_goals source ranges. Candidates are revisable working hypotheses, not the task boundary; list material missing dependency semantics in unresolved. Infer conditional dependency constraints, not hidden Mock setup or hidden verification text. State unconfirmed behavior as an if-then hypothesis and preserve its missing basis in unresolved. Imports, test names, and final assertions alone do not establish a hidden substitute, stub value, or call count.",
+        "max_output_tokens": 393216,
+        "max_tool_calls": null,
+        "model": "deepseek-flash",
+        "moderation": null,
+        "output": [
+          {
+            "type": "reasoning",
+            "id": "fee124ae-5d86-4075-995a-d0025e73139f",
+            "status": "completed",
+            "content": [
+              {
+                "type": "reasoning_text",
+                "text": "We need answer strict JSON only. Need infer scenario candidates? Stage EXTRACT. We have source files, masked test with MOCK-STUB region and VERIFY region. Need select candidates? Need understand task: staged-scenario-inference prompts/v0.4, schema staged-extract/v0.2. We need output JSON with original_goals source locators preserving all original fixed inputs, assertions and scenario requirements. Candidates are revisable working hypotheses. unresolved list material missing dependency semantics. We must infer conditional dependency constraints, not hidden mock setup or hidden verification text. State unconfirmed behavior as if-then hypothesis and preserve missing basis in unresolved.\n\nWe have visible_task with masked_test and mut_source. Need provide original_goals: likely source ranges of fixed test inputs, assertions, scenario requirements. Since fixed inputs are in test lines 37-57 and mut class lines 28-50? Need preserve ALL original fixed inputs, assertions and scenario requirements as original_goals source ranges. We should include test lines 37-57? Need include exact ranges. Could include entire test method lines 37-60? Original goals should include source evidence for fixed inputs/assertions. Need candidates maybe scenario hypotheses. Need infer what hidden mock-stub region likely contains? Wait instruction says \"Infer conditional dependency constraints, not hidden Mock setup or hidden verification text.\" So candidates should not attempt to specify hidden Mock setup or verification text. They are scenarios? Need maybe candidate behavior: CloudFoundryApplicationFactory.getServiceBaseUrl uses first CF URI or null if empty. The test should_use_application_uri sets cfApplicationProperties.setUris(singletonList(\"application/Uppercase\")); expects serviceUrl \"http://application/Uppercase/\". Candidate evidence mut lines 43-49 and test lines 49,51-56. Also test uses pathMappedEndpoints variable in constructor line 48, but not declared in visible test due to MOCK-STUB? Actually line 45-46 empty masked region, likely hidden setup declares/mocks pathMappedEndpoints. Since \"Imports, test names, and final assertions alone do not establish a hidden substitute, stub value, or call count.\" The hidden mock-stub likely declares PathMappedEndpoints pathMappedEndpoints = mock(...), maybe when pathMappedEndpoints.getLinks()? We cannot infer hidden Mock setup. But need candidate list? Maybe candidate scenario is \"application URI is used for service base URL when CF URIs non-empty\" and \"empty CF URIs yields null\" from mut. Need evidence. Another candidate \"metadata contributor maps contributor to test\" because assertion lines 57 and constructor line 48. But hidden? It's visible fixed input. But perhaps candidate should focus on behavior under test. Need include original_goals maybe test lines 38-57, constructor mut lines 31-39 and getServiceBaseUrl lines 43-49.\n\nNeed understand schema exactly. Response must be JSON object:\n{\n \"schema_version\": \"staged-extract/v0.2\",\n \"result_status\": \"CONTINUE\"|\"INCONCLUSIVE\",\n \"original_goals\": [SourceLocator],\n \"candidates\": [CandidateSelection],\n \"unresolved\": [string]\n}\nNo other keys. CandidateSelection: scenario_id, description, evidence array SourceLocator.\nSourceLocator includes source_id, start_line, end_line. No quote.\n\nNeed decide original_goals. The task says \"Preserve ALL original fixed inputs, assertions and scenario requirements as original_goals source ranges.\" So original_goals should include test lines 37-57 (method declaration, inputs, method under test, assertions), perhaps line 58-59 verify markers? Verify region is hidden so no. Include line 47-49 constructor call and cf URI set, line 51 create, lines 53-57 assertions. Also maybe test class line 35? Scenario requirements include method line 37-38 and class line 35? Could include line 35 and 37-57. But \"source ranges\" perhaps contiguous. We can include separate locators. Need not include imports. Need include mut source relevant? Original goals are test fixed inputs/assertions/scenario requirements, not implementation. So test only maybe. But scenario requires behavior in mut? \"original_goals\" could include fixed inputs and assertions from test, and perhaps implementation class signature? Hmm \"Preserve ALL original fixed inputs, assertions and scenario requirements as original_goals source ranges.\" This likely means all given context that defines the scenario, including test method and maybe mut class? The \"original goals\" maybe visible task's fixed source ranges? We can include test method and mut target? Let's parse.\n\nThis is staged scenario inference: given masked test and mut source. We need extract candidates for what hidden region? Wait original goals should preserve original fixed inputs, assertions, scenario requirements. The hidden region is mock-stub and verify. The test code around it has inputs and assertions. We must not infer hidden Mock setup or hidden verification text. Candidates are \"revisable working hypotheses\" about scenario? We need produce candidate selections of source evidence that describe possible hidden code? Hmm \"Candidates\" maybe possible scenario IDs? The stage is EXTRACT: select source evidence only by exact source_id and lines. The host materializes quote. \"Candidates are revisable working hypotheses, not the task boundary; list material missing dependency semantics in unresolved.\" So likely we list candidate scenarios/hypotheses with descriptions and evidence. For this test, candidates could be hypotheses about what hidden MOCK-STUB region needs to provide for test to compile/run. But instruction says \"Infer conditional dependency constraints, not hidden Mock setup or hidden verification text.\" That is, don't guess exact Mockito calls, but infer constraints like \"pathMappedEndpoints must be non-null valid PathMappedEndpoints because passed to constructor and likely used by DefaultApplicationFactory.createApplication\" or \"if pathMappedEndpoints exposes no endpoints, management URL should be ...\" Hmm.\n\nLet's inspect code. Test:\nInstanceProperties instanceProperties = new InstanceProperties(); setName(\"test\");\nServerProperties server = new ServerProperties();\nManagementServerProperties management = new ManagementServerProperties();\nWebEndpointProperties webEndpoint = new WebEndpointProperties();\nCloudFoundryApplicationProperties cfApplicationProperties = new CloudFoundryApplicationProperties();\n// MOCK-STUB\nCloudFoundryApplicationFactory factory = new CloudFoundryApplicationFactory(instanceProperties, management,\n    server, pathMappedEndpoints, webEndpoint, () -> singletonMap(\"contributor\", \"test\"), cfApplicationProperties);\ncfApplicationProperties.setUris(singletonList(\"application/Uppercase\"));\n\nApplication app = factory.createApplication();\n\nassertEquals(\"http://application/Uppercase/actuator\", app.getManagementUrl());\nassertEquals(\"http://application/Uppercase/actuator/health\", app.getHealthUrl());\nassertEquals(\"http://application/Uppercase/\", app.getServiceUrl());\nassertEquals(\"test\", app.getName());\nassertEquals(\"test\", app.getMetadata().get(\"contributor\"));\n// VERIFY\n}\n\npathMappedEndpoints variable is not declared in visible test because hidden mock-stub likely declares it. It must be PathMappedEndpoints. DefaultApplicationFactory likely uses pathMappedEndpoints to determine management context path. Need inspect DefaultApplicationFactory? Not provided. But imports line 31-32 include EndpointId and PathMappedEndpoints. Static import mock, verify, when. Hidden mock-stub likely:\nPathMappedEndpoints pathMappedEndpoints = mock(PathMappedEndpoints.class);\nwhen(pathMappedEndpoints.getPath(EndpointId.of(\"health\"))).thenReturn(\"/actuator/health\");\nmaybe when(pathMappedEndpoints.getPath(EndpointId.of(\"\"))).thenReturn(\"/actuator\");?\nLet's infer from assertions. Management URL expected \"http://application/Uppercase/actuator\". Health \"http://application/Uppercase/actuator/health\". Service base \"http://application/Uppercase/\". These are default endpoints? DefaultApplicationFactory likely:\nprotected String getManagementBaseUrl() {\n String baseUrl = getServiceBaseUrl();\n if (isManagementPortEqual()) {\n    return baseUrl + getManagementContextPath();\n }\n ...\n}\nNeed know Spring Boot Admin client DefaultApplicationFactory. Let's recall code from codecentric spring-boot-admin. There is class DefaultApplicationFactory in de.codecentric.boot.admin.client.registration. It builds Application with managementUrl, healthUrl, serviceUrl, name, metadata. It uses PathMappedEndpoints and WebEndpointProperties. Let's search memory: \npublic class DefaultApplicationFactory implements ApplicationFactory {\n private final InstanceProperties instance;\n private final ManagementServerProperties management;\n private final ServerProperties server;\n private final PathMappedEndpoints pathMappedEndpoints;\n private final WebEndpointProperties webEndpoint;\n private final MetadataContributor metadataContributor;\n ...\n public Application createApplication() {\n   return Application.create(getName())\n     .managementUrl(getManagementUrl())\n     .healthUrl(getHealthUrl())\n     .serviceUrl(getServiceUrl())\n     .metadata(getMetadata())\n     .build();\n }\n protected String getManagementUrl() {\n    return getManagementBaseUrl() + pathMappedEndpoints.getPath(EndpointId.of(\"\"))? \n }\nMaybe default management context path \"/actuator\" from WebEndpointProperties? In Spring Boot 2, WebEndpointProperties.getBasePath() default \"/actuator\". Management URL expected /actuator. Health URL /actuator/health. PathMappedEndpoints maybe used to resolve health path. The hidden stub likely mocks PathMappedEndpoints. Since DefaultApplicationFactory uses pathMappedEndpoints.getPath(EndpointId.of(\"health\")) and maybe getPath(EndpointId.of(\"\"))? Need not infer exact hidden setup. But could list dependency constraints: pathMappedEndpoints must be a non-null PathMappedEndpoints whose path mapping supports health endpoint mapping to \"/health\" or equivalent, because expected health URL includes /actuator/health. But instruction says not hidden Mock setup. A conditional hypothesis: \"If pathMappedEndpoints maps the health endpoint to 'health' under the actuator base path, then expected health URL is ...; exact hidden mapping is unresolved.\" Hmm.\n\nMaybe candidates should be high-level scenario descriptions:\n- scenario_id \"cf-uri-service-base-url\", description \"When CloudFoundryApplicationProperties has first URI 'application/Uppercase', getServiceBaseUrl returns 'http://application/Uppercase' and createApplication uses it for management/health/service URLs.\"\n- scenario_id \"cf-uri-absent-service-base-url\", description \"When CF URIs empty, getServiceBaseUrl returns null (implementation branch) though not exercised by visible test.\"\n- scenario_id \"metadata-contributor-passthrough\", description \"MetadataContributor supplied as singletonMap('contributor','test') is reflected in app metadata.\" But this is visible.\n- scenario_id \"path-mapped-endpoints-dependency\", description \"createApplication requires pathMappedEndpoints to provide endpoint paths; exact hidden value not established.\" Evidence test import and constructor line 47-48 maybe mut constructor line 34/38. But this may be \"conditional dependency constraints\" to list in candidates or unresolved? The instruction says \"Infer conditional dependency constraints, not hidden Mock setup or hidden verification text. State unconfirmed behavior as an if-then hypothesis and preserve its missing basis in unresolved.\" So candidates could include conditional dependency constraints. Need include unresolved for missing basis: hidden MOCK-STUB content, verify content, DefaultApplicationFactory source, PathMappedEndpoints mapping, etc.\n\nNeed decide result_status. Probably CONTINUE because can extract candidates despite unresolved. INCONCLUSIVE if cannot determine? We can continue.\n\nNeed ensure original_goals include all relevant fixed inputs/assertions. Could include:\n- test lines 35-60 (class and method)\n- mut lines 28-50 (target class and getServiceBaseUrl)\nMaybe too broad but preserves all. \"ALL original fixed inputs, assertions and scenario requirements\" maybe test lines 37-57 plus mut lines 43-49. Let's include test 37-57 and mut 43-49. Also include test line 47-49? Already in 37-57. Include line 51 createApplication, 53-57 assertions. Good. Maybe include test line 35 for class declaration? Scenario requirement? Could include 35-59 to cover class and method. But line 58-59 are hidden verify markers not original? They are visible placeholders. We can include 37-57 only. Include mut 43-49 to define getServiceBaseUrl. Maybe include mut 31-39 constructor? Original fixed inputs? The constructor signature and super call are scenario requirement. Could include mut 28-50. Hmm original_goals should be source ranges; no limit. Include test 35-60 and mut 28-50. But line 58-59 are masked verify placeholders; including them as original goal might be okay? They are fixed input placeholders? \"Do not infer hidden verification text\" but original_goals can point to empty markers? Maybe not needed. We can include test lines 37-57, mut lines 28-50. That preserves all visible fixed inputs and target behavior. Maybe include test lines 19-33 imports? Imports alone don't establish hidden substitute; but original fixed inputs include imports? Not necessary. Could include imports to preserve allowed types? But original_goals should not include imports? Hmm \"Preserve ALL original fixed inputs\" might include imports? But imports are not scenario requirements. I think no.\n\nNeed candidate evidence should be exact source ranges. Candidate descriptions must be non-empty strings, scenario_id non-empty. We can make 2-4 candidates. Need not overdo. But ensure no hidden Mock setup or verification text. Let's craft candidates as working hypotheses:\n1. \"cf-uri-first-uri-service-base-url\": \"If CloudFoundryApplicationProperties has a non-empty URI list, getServiceBaseUrl returns 'http://' plus the first URI; createApplication then uses that base for service, management, and health URLs as asserted.\" Evidence mut 43-49 and test 49-56. This is directly supported. It is not hidden mock.\n2. \"cf-uri-empty-null-base-url\": \"If the CF URI list is empty, getServiceBaseUrl returns null; createApplication behavior under null is not exercised by visible assertions.\" Evidence mut 43-46. This is conditional hypothesis. Maybe candidate? It's from implementation, not test. Good.\n3. \"metadata-contributor-passthrough\": \"The MetadataContributor supplied to the factory contributes the 'contributor' metadata value to the created Application.\" Evidence test 47-48, 57 and mut 31-39. Directly supported.\n4. \"path-mapped-endpoints-required-for-actuator-paths\": \"The factory's createApplication path depends on a non-null PathMappedEndpoints instance; exact endpoint path mapping needed for '/actuator' and '/actuator/health' is not established by visible code.\" Evidence test 31-32, 47-54 and mut 31-38. This is a dependency constraint, not hidden Mock setup. But is it a candidate? It might be more of unresolved. Instruction says candidates are revisable working hypotheses; list material missing dependency semantics in unresolved. Could list this candidate and also unresolved \"hidden MOCK-STUB exact declaration and stubbing for pathMappedEndpoints\". Maybe okay.\n\nNeed avoid stating hidden substitute/stub/call count. In candidate description, phrase \"requires a valid PathMappedEndpoints instance\" not \"mock returns X\". That's okay.\n\nNeed maybe candidate about \"management and health URLs derived from service base URL plus actuator base path\". Evidence test lines 53-55. But hidden PathMappedEndpoints mapping. We can phrase conditional: \"If actuator base path is /actuator and health endpoint path resolves to /health, then expected management and health URLs are ...; exact endpoint mapping is unresolved.\" But expected URLs are directly asserted, so behavior is fixed. Candidate description can say \"createApplication composes management URL and health URL from the CF-derived service base URL and actuator endpoint paths.\" Evidence test 49-55 and mut 43-49. This is supported by final assertions, though exact path source hidden. Maybe combine with #1.\n\nLet's think about original goals: Maybe the \"original_goals\" should include all fixed inputs, assertions, scenario requirements exactly. We can include:\n- test 37-57\n- mut 28-50\nCould include test 35-60? Let's include test 35-60 to preserve class/method and placeholders; but line 58-59 are hidden markers, not fixed? They are visible placeholder lines; including them might be considered exposing? No. But \"Do not infer hidden verification text\" doesn't prohibit referencing placeholder lines. However original_goals should be original fixed inputs, assertions and scenario requirements; line 58-59 are not requirements. I'd avoid. Include 37-57.\n- mut 43-49 for getServiceBaseUrl. Also mut 28-39 for constructor? Scenario requires factory constructor takes cfApplicationProperties and super args. Test line 47-48 uses constructor. Original goal could include mut 28-39. Let's include mut 28-39 and 43-49 separately, or 28-50 as one. One range 28-50 includes all implementation. This is okay. But original_goals maybe should not include implementation? It is a source, and scenario requires target behavior. The instruction says \"Preserve ALL original fixed inputs...\" not \"only test\". Include both. Fine.\n\nNeed unresolved strings. Need list material missing dependency semantics. Could include:\n- \"Exact contents of the hidden MOCK-STUB region (lines 45-46) are unavailable; the declaration/stubbing of pathMappedEndpoints and any other fixtures cannot be confirmed.\"\n- \"Exact contents of the hidden VERIFY-START/END region (lines 58-59) are unavailable; no call-count or verification expectations are inferred.\"\n- \"DefaultApplicationFactory implementation is not provided, so how createApplication combines service base URL, management context path, actuator base path, and PathMappedEndpoints into management/health URLs remains a conditional dependency.\"\n- \"The PathMappedEndpoints mappings required to produce '/actuator' and '/actuator/health' are not established by imports or final assertions alone.\"\n- \"Behavior when cfApplicationProperties.getUris() is empty (getServiceBaseUrl returns null) is not exercised by visible test assertions.\"\nMaybe include \"CloudFoundryApplicationProperties default URI list and setter semantics are not shown.\" But test creates new and sets singletonList. Could include.\n\nNeed ensure JSON valid. No markdown. Only JSON.\n\nLet's craft with schema_version etc. original_goals array of SourceLocator. Use source_id \"test\" and \"mut\". Include test 37-57, mut 28-50 maybe. Maybe include test 35-60? Let's decide. The \"scenario requirements\" include class name and method name line 35-38. If we include 37-57 only, class line 35 omitted. Does that matter? Maybe not, but to preserve all, include test 35-60? But lines 58-59 hidden placeholder. Hmm. We can include test 35-57. This includes class declaration and method through assertions. Good. Let's do test 35-57. Also mut 28-50. This preserves class and method plus target. Maybe include test line 19-24 imports? Not necessary. Could include test 19-33 to preserve fixed imports? But instruction \"Imports, test names, and final assertions alone do not establish hidden substitute...\" It doesn't say don't include. But original goals should be scenario requirements, not imports. Avoid.\n\nCandidates:\n1. cf-first-uri-service-base-url\nDescription: \"If CloudFoundryApplicationProperties.getUris() is non-empty, the factory's getServiceBaseUrl returns 'http://' plus the first URI; the visible assertions then expect that base to appear in the created Application's service, management, and health URLs.\"\nEvidence: mut 43-49, test 49-55. Maybe test 47-55 includes constructor. Good.\n2. cf-empty-uri-null-base-url\nDescription: \"If CloudFoundryApplicationProperties.getUris() is empty, getServiceBaseUrl returns null; the resulting createApplication URL composition is not exercised by the visible test.\"\nEvidence: mut 43-46.\n3. metadata-contributor-passthrough\nDescription: \"The MetadataContributor passed to the factory is expected to supply the 'contributor' metadata entry on the created Application.\"\nEvidence: test 47-48, test 57, mut 31-39.\n4. actuator-path-dependency\nDescription: \"If the factory receives a valid PathMappedEndpoints instance, createApplication is expected to use it when composing actuator-based management and health URLs; the exact endpoint mapping needed for '/actuator' and '/actuator/health' is not visible.\"\nEvidence: test 31-32, 47-54; mut 31-38. This is conditional. Is evidence range test 31-32 import only? Imports alone do not establish hidden substitute. Maybe not use import as evidence for candidate? We can use test 47-54 and mut 31-38; include import? The candidate mentions PathMappedEndpoints, and line 47-48 constructor arg pathMappedEndpoints (unresolved declaration). It's okay. Avoid line 31-32 because import alone. Use test 47-54. But evidence for PathMappedEndpoints type is import line 32; maybe include. The instruction says imports alone do not establish hidden substitute; but using import as evidence of type is okay? It says \"Imports, test names, and final assertions alone do not establish a hidden substitute, stub value, or call count.\" We're not using alone. Fine.\n\nMaybe candidate 4 is not a \"scenario\" but dependency. It's okay. Need maybe candidate about management/health URL composition. Could be:\n4. \"actuator-url-composition\": \"Given the CF-derived service base URL and the configured actuator path, createApplication composes management URL as base + '/actuator' and health URL as base + '/actuator/health'.\" Evidence test 49-55, mut 43-49. But exact source of '/actuator' hidden. Still final assertions show. This is directly supported by final assertions. But final assertions alone? It's visible. Good.\nMaybe combine with #1. Then #4 dependency in unresolved. I think candidates should be minimal high-confidence. The schema doesn't require many. We can have 2 candidates:\n- cf-uri-service-base-url\n- metadata-contributor-passthrough\nAnd unresolved covers empty branch and pathMappedEndpoints. But \"Infer conditional dependency constraints\" maybe we should list pathMappedEndpoints as candidate? Hmm.\n\nLet's read prompt again carefully: \n\"Stage: EXTRACT. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. Preserve ALL original fixed inputs, assertions and scenario requirements as original_goals source ranges. Candidates are revisable working hypotheses, not the task boundary; list material missing dependency semantics in unresolved. Infer conditional dependency constraints, not hidden Mock setup or hidden verification text. State unconfirmed behavior as an if-then hypothesis and preserve its missing basis in unresolved. Imports, test names, and final assertions alone do not establish a hidden substitute, stub value, or call count.\"\n\nThis suggests we need produce candidates that are \"revisable working hypotheses\" maybe about hidden code? But \"not hidden Mock setup or hidden verification text.\" The candidates likely represent inferred scenarios about what the hidden mock-stub might do? Wait \"scenario inference\" maybe we are inferring the scenario of the test, i.e., what behavior is being verified, to reconstruct hidden mock code. In EXTRACT stage, we select evidence and list candidate scenarios. We should not infer hidden Mock setup. So candidates should be behavioral scenarios, not hidden code. Yes.\n\n\"Preserve ALL original fixed inputs, assertions and scenario requirements as original_goals source ranges.\" So original_goals likely includes the visible test method (inputs and assertions) and maybe target class. Good.\n\nNeed maybe \"original_goals\" include the masked test start/end given in visible_task: test start 1 end 62, mut start 1 end 51. But \"Preserve ALL original fixed inputs...\" not entire file. If we include entire files, too broad. But maybe original_goals should be exactly the visible_task source ranges: mut 1-51, test 1-62. Hmm \"original_goals source ranges\" could mean the original goal is the entire visible source range? The schema field \"original_goals\" is array of SourceLocator. They might expect the source ranges from visible_task (masked_test and mut_source). But \"Preserve ALL original fixed inputs, assertions and scenario requirements\" suggests not entire file but specific ranges. In previous similar tasks, original_goals likely point to the test method and relevant implementation. The host knows sources. We need be precise.\n\nLet's infer from \"staged-scenario-inference-prompts/v0.4\". Maybe this is a benchmark where we infer hidden test code from masked test. The stage EXTRACT expects original_goals to be the unmasked portions of the test and source. The \"candidates\" are possible hidden mock scenarios. But the prompt explicitly says not hidden Mock setup. So maybe candidates are possible \"scenario\" hypotheses for the test, each with evidence. The unresolved list includes missing hidden setup. Hmm.\n\nCould be they want to reconstruct the hidden mock-stub region and verify region? But \"Do not infer hidden Mock setup or hidden verification text.\" Maybe because this stage is only extracting evidence, not solving. So candidates are possible \"scenario\" IDs like \"cloud-foundry-uri-used\" etc. We'll provide behavioral candidates.\n\nNeed ensure no \"quote\" field. Good.\n\nLet's decide exact JSON.\n\noriginal_goals:\n[\n {\"source_id\":\"test\",\"start_line\":35,\"end_line\":57},\n {\"source_id\":\"mut\",\"start_line\":28,\"end_line\":50}\n]\nMaybe include test line 49? Already. Maybe include mut line 43-49. But 28-50 includes constructor and method. Good.\n\nCandidates:\n[\n {\n  \"scenario_id\":\"cloudfoundry-first-uri-service-base\",\n  \"description\":\"If CloudFoundryApplicationProperties has at least one URI, getServiceBaseUrl returns 'http://' plus the first URI and the created Application uses that base for service, management, and health URLs.\",\n  \"evidence\":[\n    {\"source_id\":\"mut\",\"start_line\":43,\"end_line\":49},\n    {\"source_id\":\"test\",\"start_line\":49,\"end_line\":55}\n  ]\n },\n {\n  \"scenario_id\":\"cloudfoundry-empty-uri-null-base\",\n  \"description\":\"If CloudFoundryApplicationProperties has no URIs, getServiceBaseUrl returns null; createApplication behavior under that null base is not exercised by the visible assertions.\",\n  \"evidence\":[\n    {\"source_id\":\"mut\",\"start_line\":43,\"end_line\":46}\n  ]\n },\n {\n  \"scenario_id\":\"metadata-contributor-passthrough\",\n  \"description\":\"The MetadataContributor supplied to the factory contributes the 'contributor' metadata entry to the created Application.\",\n  \"evidence\":[\n    {\"source_id\":\"mut\",\"start_line\":31,\"end_line\":39},\n    {\"source_id\":\"test\",\"start_line\":47,\"end_line\":48},\n    {\"source_id\":\"test\",\"start_line\":57,\"end_line\":57}\n  ]\n },\n {\n  \"scenario_id\":\"actuator-endpoint-path-dependency\",\n  \"description\":\"If a valid PathMappedEndpoints instance is supplied, createApplication is expected to use actuator endpoint paths when composing the management and health URLs; the exact mapping needed for '/actuator' and '/actuator/health' is not visible.\",\n  \"evidence\":[\n    {\"source_id\":\"mut\",\"start_line\":31,\"end_line\":38},\n    {\"source_id\":\"test\",\"start_line\":47,\"end_line\":54}\n  ]\n }\n]\nBut candidate 4 maybe too speculative. It's conditional and unresolved. It says \"expected to use actuator endpoint paths\" inferred from imports and assertions. Is that hidden mock setup? No, it's dependency. Good.\n\nUnresolved:\n[\n \"Exact hidden MOCK-STUB region (test lines 45-46) is unavailable, so the declaration, initialization, and stubbing of pathMappedEndpoints cannot be confirmed.\",\n \"Exact hidden VERIFY-START/END region (test lines 58-59) is unavailable, so no verification calls or call counts are inferred.\",\n \"DefaultApplicationFactory is not included in the visible sources, so the precise composition of service base URL, management context path, actuator base path, and PathMappedEndpoints into management/health URLs remains conditional.\",\n \"The PathMappedEndpoints mapping required to yield '/actuator' and '/actuator/health' is not established by imports, test name, or final assertions alone.\",\n \"Behavior when CloudFoundryApplicationProperties.getUris() is empty is not exercised by the visible test assertions.\"\n]\nNeed mention missing basis for candidate 4. Good.\n\nCould include unresolved \"The exact default values of ManagementServerProperties/WebEndpointProperties and whether management port equals server port are not shown; they may affect URL composition.\" That's a material missing dependency. Add maybe. But not too many. The instruction says list material missing dependency semantics. Include:\n- \"The visible test does not show whether management.server.port differs from server.port or what management context path defaults apply, so URL-composition dependencies beyond getServiceBaseUrl are not fully established.\"\nThis is relevant. But maybe overkill. We can include.\n\nNeed ensure result_status CONTINUE. Good.\n\nPotential issue: Candidate description \"created Application uses that base for service, management, and health URLs\" is directly asserted by test lines 53-55. It's not a hypothesis? It's a scenario. Fine.\n\nPotential issue: original_goals includes mut lines 28-50, which includes getServiceBaseUrl. The instruction \"Preserve ALL original fixed inputs, assertions and scenario requirements\" maybe original_goals should not include mut implementation because it's not \"original goal\". But it's a source range. The schema calls \"original_goals\" maybe should include the visible task's original source ranges (mut and test). The visible_task gives mut_source start 1 end 51 and masked_test start 1 end 62. Hmm. Let's think: \"original_goals\" might mean the original task goals (the test method) not the mutated source. The user prompt: \"Preserve ALL original fixed inputs, assertions and scenario requirements as original_goals source ranges.\" Original fixed inputs/assertions are in test. Scenario requirements could be in mut? The target behavior is in mut. But \"original_goals\" likely should include the test method and maybe the target class. If we include mut 28-50, that's not \"goal\" but \"target implementation\". Yet the prompt says \"source ranges\" and \"scenario requirements\", which might include implementation. Hmm.\n\nIn previous benchmark tasks, \"original_goals\" often points to lines of the test that contain assertions and setup, not the implementation. Because implementation is the mutable source. But the prompt includes \"mut_source\" in visible_task. The \"original_goals\" maybe should include the original source ranges of the task (both). The host can materialize quotes. I think including both test and mut is safe because it preserves all original fixed inputs and scenario requirements. But could be considered too broad. The schema doesn't penalize extra? Maybe evaluation checks exact? We need be as accurate as possible. The instruction \"Select source evidence only by exact source_id and inclusive start/end lines\" implies we can select multiple ranges. \"Preserve ALL original fixed inputs, assertions and scenario requirements\" means include all relevant. Including target implementation lines 43-49 is relevant to scenario. Including constructor lines 31-39 is relevant. Including 28-50 includes everything. Fine.\n\nMaybe original_goals should include the masked test entire method line 37-60? We include 35-57. We omit lines 58-60 (verify markers and closing brace). No issue. But \"scenario requirements\" include the method signature and class. We include 35-57. Good.\n\nPotential issue: Candidate evidence for metadata contributor includes mut 31-39; that's constructor, not metadata logic. But it establishes metadataContributor field passed to super. The actual metadata logic in DefaultApplicationFactory not visible. Candidate description \"contributes metadata\" is supported by test assertion and constructor. Good.\n\nPotential issue: Candidate 4 evidence includes mut 31-38 (constructor with PathMappedEndpoints) and test 47-54. It doesn't include import line 32. But \"PathMappedEndpoints\" type visible in mut line 34 and test line 47? Test line 47-48 uses variable pathMappedEndpoints without declaration. The type is only import line 32. To evidence that it is PathMappedEndpoints, include test line 31-32? But import alone? We can include line 32. It's okay. Let's include test 31-32 in evidence for candidate 4. The instruction says imports alone don't establish hidden substitute, but here it's type evidence. Fine. But if we include import, maybe they dislike \"Imports... alone do not establish hidden substitute, stub value, or call count.\" We are not claiming substitute. It's okay.\n\nNeed maybe include test line 45-46 in unresolved but not evidence? We can reference unresolved text. Good.\n\nLet's ensure no markdown, no comments. JSON strings escape quotes. Use single quotes? JSON strings double quotes. In descriptions, use 'http://' with single quotes inside string okay. Need escape double quotes if any. Use no double quotes inside strings except maybe none. We'll use single quotes for values. Good.\n\nLet's write final."
+              }
+            ],
+            "summary": [],
+            "encrypted_content": "2a62f70d-c36f-4eb6-b913-5c7fd97b200d-0"
+          },
+          {
+            "type": "message",
+            "id": "bdc13917-7b2c-427a-86a5-5051334c483a",
+            "status": "completed",
+            "content": [
+              {
+                "type": "output_text",
+                "annotations": [],
+                "logprobs": [],
+                "text": "{\"schema_version\":\"staged-extract/v0.2\",\"result_status\":\"CONTINUE\",\"original_goals\":[{\"source_id\":\"test\",\"start_line\":35,\"end_line\":57},{\"source_id\":\"mut\",\"start_line\":28,\"end_line\":50}],\"candidates\":[{\"scenario_id\":\"cloudfoundry-first-uri-service-base\",\"description\":\"If CloudFoundryApplicationProperties has at least one URI, getServiceBaseUrl returns 'http://' plus the first URI and the created Application uses that base for service, management, and health URLs.\",\"evidence\":[{\"source_id\":\"mut\",\"start_line\":43,\"end_line\":49},{\"source_id\":\"test\",\"start_line\":49,\"end_line\":55}]},{\"scenario_id\":\"cloudfoundry-empty-uri-null-base\",\"description\":\"If CloudFoundryApplicationProperties has no URIs, getServiceBaseUrl returns null; createApplication behavior under that null base is not exercised by the visible assertions.\",\"evidence\":[{\"source_id\":\"mut\",\"start_line\":43,\"end_line\":46}]},{\"scenario_id\":\"metadata-contributor-passthrough\",\"description\":\"The MetadataContributor supplied to the factory contributes the 'contributor' metadata entry to the created Application.\",\"evidence\":[{\"source_id\":\"mut\",\"start_line\":31,\"end_line\":39},{\"source_id\":\"test\",\"start_line\":47,\"end_line\":48},{\"source_id\":\"test\",\"start_line\":57,\"end_line\":57}]},{\"scenario_id\":\"actuator-endpoint-path-dependency\",\"description\":\"If a valid PathMappedEndpoints instance is supplied, createApplication is expected to use actuator endpoint paths when composing the management and health URLs; the exact mapping needed for '/actuator' and '/actuator/health' is not visible.\",\"evidence\":[{\"source_id\":\"test\",\"start_line\":31,\"end_line\":32},{\"source_id\":\"mut\",\"start_line\":31,\"end_line\":38},{\"source_id\":\"test\",\"start_line\":47,\"end_line\":54}]}],\"unresolved\":[\"Exact hidden MOCK-STUB region (test lines 45-46) is unavailable, so the declaration, initialization, and stubbing of pathMappedEndpoints cannot be confirmed.\",\"Exact hidden VERIFY-START/END region (test lines 58-59) is unavailable, so no verification calls or call counts are inferred.\",\"DefaultApplicationFactory is not included in the visible sources, so the precise composition of service base URL, management context path, actuator base path, and PathMappedEndpoints into management/health URLs remains conditional.\",\"The PathMappedEndpoints mapping required to yield '/actuator' and '/actuator/health' is not established by imports, test name, or final assertions alone.\",\"The visible test does not show whether management.server.port differs from server.port or what management context path defaults apply, so URL-composition dependencies beyond getServiceBaseUrl are not fully established.\",\"Behavior when CloudFoundryApplicationProperties.getUris() is empty is not exercised by the visible test assertions.\"]}"
+              }
+            ],
+            "phase": "final_answer",
+            "role": "assistant"
+          }
+        ],
+        "parallel_tool_calls": true,
+        "presence_penalty": 0.0,
+        "previous_response_id": null,
+        "prompt_cache_key": null,
+        "prompt_cache_retention": null,
+        "reasoning": {
+          "effort": null,
+          "summary": null
+        },
+        "safety_identifier": null,
+        "service_tier": "default",
+        "store": false,
+        "temperature": 1.0,
+        "text": {
+          "format": {
+            "type": "json_schema",
+            "name": "final_output",
+            "schema": {
+              "$defs": {
+                "CandidateSelection": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "scenario_id": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Scenario Id",
+                      "type": "string"
+                    },
+                    "description": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Description",
+                      "type": "string"
+                    },
+                    "evidence": {
+                      "items": {
+                        "$ref": "#/$defs/SourceLocator"
+                      },
+                      "title": "Evidence",
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "scenario_id",
+                    "description",
+                    "evidence"
+                  ],
+                  "title": "CandidateSelection",
+                  "type": "object"
+                },
+                "SourceLocator": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "source_id": {
+                      "minLength": 1,
+                      "pattern": "\\S",
+                      "title": "Source Id",
+                      "type": "string"
+                    },
+                    "start_line": {
+                      "minimum": 1,
+                      "title": "Start Line",
+                      "type": "integer"
+                    },
+                    "end_line": {
+                      "minimum": 1,
+                      "title": "End Line",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "source_id",
+                    "start_line",
+                    "end_line"
+                  ],
+                  "title": "SourceLocator",
+                  "type": "object"
+                }
+              },
+              "additionalProperties": false,
+              "properties": {
+                "schema_version": {
+                  "const": "staged-extract/v0.2",
+                  "title": "Schema Version",
+                  "type": "string"
+                },
+                "result_status": {
+                  "default": "CONTINUE",
+                  "enum": [
+                    "CONTINUE",
+                    "INCONCLUSIVE"
+                  ],
+                  "title": "Result Status",
+                  "type": "string"
+                },
+                "original_goals": {
+                  "items": {
+                    "$ref": "#/$defs/SourceLocator"
+                  },
+                  "title": "Original Goals",
+                  "type": "array"
+                },
+                "candidates": {
+                  "items": {
+                    "$ref": "#/$defs/CandidateSelection"
+                  },
+                  "title": "Candidates",
+                  "type": "array"
+                },
+                "unresolved": {
+                  "items": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  "title": "Unresolved",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "schema_version",
+                "result_status",
+                "original_goals",
+                "candidates",
+                "unresolved"
+              ],
+              "title": "ExtractSelection",
+              "type": "object"
+            },
+            "description": null,
+            "strict": true
+          },
+          "verbosity": null
+        },
+        "tool_choice": "auto",
+        "tools": [],
+        "top_logprobs": 0,
+        "top_p": 1.0,
+        "truncation": "disabled",
+        "usage": {
+          "input_tokens": 3000,
+          "input_tokens_details": {
+            "cached_tokens": 0
+          },
+          "output_tokens": 7944,
+          "output_tokens_details": {
+            "reasoning_tokens": 7299
+          },
+          "total_tokens": 10944
+        },
+        "user": null,
+        "metadata": {}
+      }
+    }
+  ],
+  "provider_response_capture": "captured",
+  "provider_usage_recovery": "not_needed_sdk_accounted"
+}

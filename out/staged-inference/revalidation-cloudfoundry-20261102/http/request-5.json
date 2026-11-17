@@ -1,0 +1,486 @@
+{
+  "model": "deepseek-flash",
+  "include": [],
+  "input": [
+    {
+      "content": "{\"capabilities\":{\"access\":\"bound reviewed repository\",\"initial_inventory_is_exhaustive\":false,\"repository_search_and_read\":true,\"source_discovery\":\"inspect_source search then read; analysis alone is not observed evidence\"},\"continuation\":{},\"extract\":{\"candidates\":[{\"description\":\"If createApplication queries PathMappedEndpoints for the health endpoint, then the masked verification could check that query in connection with the asserted health URL. Visible imports and assertions alone do not establish the exact method, argument, invocation count, ordering, or that verification is required.\",\"evidence\":[{\"end_line\":24,\"quote\":\"import static org.junit.Assert.assertEquals;\\nimport static org.mockito.Mockito.mock;\\nimport static org.mockito.Mockito.verify;\\nimport static org.mockito.Mockito.when;\",\"source_id\":\"test\",\"start_line\":21},{\"end_line\":32,\"quote\":\"import org.springframework.boot.actuate.endpoint.EndpointId;\\nimport org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\",\"source_id\":\"test\",\"start_line\":31},{\"end_line\":55,\"quote\":\"        CloudFoundryApplicationFactory factory = new CloudFoundryApplicationFactory(instanceProperties, management,\\n            server, pathMappedEndpoints, webEndpoint, () -> singletonMap(\\\"contributor\\\", \\\"test\\\"), cfApplicationProperties);\\n        cfApplicationProperties.setUris(singletonList(\\\"application/Uppercase\\\"));\\n\\n        Application app = factory.createApplication();\\n\\n        assertEquals(\\\"http://application/Uppercase/actuator\\\", app.getManagementUrl());\\n        assertEquals(\\\"http://application/Uppercase/actuator/health\\\", app.getHealthUrl());\\n        assertEquals(\\\"http://application/Uppercase/\\\", app.getServiceUrl());\",\"source_id\":\"test\",\"start_line\":47},{\"end_line\":59,\"quote\":\"        // === VERIFY-START ===\\n        // === VERIFY-END ===\",\"source_id\":\"test\",\"start_line\":58}],\"scenario_id\":\"path_mapped_endpoints_interaction_verification\"},{\"description\":\"DefaultApplicationFactory gets the management URL from webEndpoint.getBasePath() and gets the health URL by querying pathMappedEndpoints.getPath(EndpointId.of(\\\"health\\\")), falling back to the status endpoint. For the asserted URLs, the masked setup must make the management base path resolve to actuator and the pathMappedEndpoints health query return actuator/health.\",\"evidence\":[{\"end_line\":134,\"quote\":\"            return instance.getManagementUrl();\\n        }\\n\\n        return UriComponentsBuilder.fromUriString(getManagementBaseUrl())\\n                                   .path(\\\"/\\\")\\n                                   .path(getEndpointsWebPath())\\n                                   .toUriString();\\n    }\\n\\n    protected String getManagementBaseUrl() {\\n        String baseUrl = instance.getManagementBaseUrl();\\n\\n        if (!StringUtils.isEmpty(baseUrl)) {\\n            return baseUrl;\\n        }\\n\\n        if (isManagementPortEqual()) {\\n            return this.getServiceUrl();\\n        }\\n\\n        Ssl ssl = management.getSsl() != null ? management.getSsl() : server.getSsl();\\n        return UriComponentsBuilder.newInstance()\\n                                   .scheme(getScheme(ssl))\\n                                   .host(getManagementHost())\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":111},{\"end_line\":194,\"quote\":\"            return getHost(address);\\n        }\\n        return getServiceHost();\\n    }\\n\\n    protected InetAddress getLocalHost() {\\n        try {\\n            return InetAddress.getLocalHost();\\n        } catch (UnknownHostException ex) {\\n            throw new IllegalArgumentException(ex.getMessage(), ex);\\n        }\\n    }\\n\\n    protected Integer getLocalServerPort() {\\n        return localServerPort;\\n    }\\n\\n    protected Integer getLocalManagementPort() {\\n        return localManagementPort;\\n    }\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":175},{\"end_line\":54,\"quote\":\"        assertEquals(\\\"http://application/Uppercase/actuator\\\", app.getManagementUrl());\\n        assertEquals(\\\"http://application/Uppercase/actuator/health\\\", app.getHealthUrl());\",\"source_id\":\"test\",\"start_line\":53}],\"scenario_id\":\"path_mapped_endpoints_health_path_dependency\"}],\"original_goals\":[{\"end_line\":60,\"quote\":\"    @Test\\n    public void should_use_application_uri() {\\n        InstanceProperties instanceProperties = new InstanceProperties();\\n        instanceProperties.setName(\\\"test\\\");\\n        ServerProperties server = new ServerProperties();\\n        ManagementServerProperties management = new ManagementServerProperties();\\n        WebEndpointProperties webEndpoint = new WebEndpointProperties();\\n        CloudFoundryApplicationProperties cfApplicationProperties = new CloudFoundryApplicationProperties();\\n        // === MOCK-STUB-START ===\\n        // === MOCK-STUB-END ===\\n        CloudFoundryApplicationFactory factory = new CloudFoundryApplicationFactory(instanceProperties, management,\\n            server, pathMappedEndpoints, webEndpoint, () -> singletonMap(\\\"contributor\\\", \\\"test\\\"), cfApplicationProperties);\\n        cfApplicationProperties.setUris(singletonList(\\\"application/Uppercase\\\"));\\n\\n        Application app = factory.createApplication();\\n\\n        assertEquals(\\\"http://application/Uppercase/actuator\\\", app.getManagementUrl());\\n        assertEquals(\\\"http://application/Uppercase/actuator/health\\\", app.getHealthUrl());\\n        assertEquals(\\\"http://application/Uppercase/\\\", app.getServiceUrl());\\n        assertEquals(\\\"test\\\", app.getName());\\n        assertEquals(\\\"test\\\", app.getMetadata().get(\\\"contributor\\\"));\\n        // === VERIFY-START ===\\n        // === VERIFY-END ===\\n    }\",\"source_id\":\"test\",\"start_line\":37},{\"end_line\":50,\"quote\":\"    protected String getServiceBaseUrl() {\\n        if (cfApplicationProperties.getUris().isEmpty()) {\\n            return null;\\n        }\\n\\n        String uri = cfApplicationProperties.getUris().get(0);\\n        return \\\"http://\\\" + uri;\\n    }\",\"source_id\":\"mut\",\"start_line\":43}],\"result_status\":\"CONTINUE\",\"schema_version\":\"staged-extract/v0.1\",\"unresolved\":[\"The implementation of DefaultApplicationFactory is not provided, so how ManagementServerProperties, WebEndpointProperties, and PathMappedEndpoints combine to produce /actuator and /actuator/health is unconfirmed.\",\"The exact contents of the MOCK-STUB region are unknown; visible code only proves that a pathMappedEndpoints variable must exist before the CloudFoundryApplicationFactory constructor call.\",\"The exact contents of the VERIFY region are unknown; imported verify/when/mock and EndpointId do not establish a specific stubbed value, target method argument, call count, or ordering.\",\"Whether PathMappedEndpoints.getPath is called with EndpointId.of(\\\"health\\\"), a string, or another argument is not confirmed by the visible source.\",\"Whether any additional collaborator or property must be configured in the masked setup to make the expected /actuator health path resolve is unresolved.\",\"Whether the verification block checks a PathMappedEndpoints interaction at all, rather than another dependency, is unconfirmed.\"]},\"query_receipts\":[{\"arguments_json\":\"{\\\"operation\\\":\\\"search\\\",\\\"path_pattern\\\":\\\"**/DefaultApplicationFactory.java\\\",\\\"text\\\":\\\"class DefaultApplicationFactory\\\"}\",\"assessment\":{\"attempt_sequence\":1,\"impact\":\"no_new_information\",\"rationale\":\"The receipt located DefaultApplicationFactory and returned its class declaration, but it did not expose createApplication or URL-building behavior. The behavioral fact still missing is how ManagementServerProperties, WebEndpointProperties, and PathMappedEndpoints combine to produce /actuator and /actuator/health, and whether the health path is obtained through PathMappedEndpoints.\"},\"assessment_status\":\"complete\",\"duration_seconds\":0.006008539930917323,\"exploration_progress\":{\"consecutive_no_progress\":0,\"evidence_digest\":\"bed0d38bc0c9585f9f9df13125a40a8d0592785e8790f70d21d70acd9bbc4a01\",\"made_progress\":true,\"new_evidence\":true,\"new_operation_or_position\":true,\"new_question_review\":true,\"operation_digest\":\"38a58bc61c24cb52fa7b2dd10a4f0e531b85844d07f0541613eede9278e10757\",\"termination_initiator\":null,\"termination_reason\":null,\"threshold\":4,\"triggered\":false},\"question\":\"Where is DefaultApplicationFactory defined, and what does its createApplication or URL-building code do with PathMappedEndpoints to produce the management and health URLs?\",\"raw_request\":{\"arguments_json\":\"{\\\"operation\\\":\\\"search\\\",\\\"path_pattern\\\":\\\"**/DefaultApplicationFactory.java\\\",\\\"text\\\":\\\"class DefaultApplicationFactory\\\"}\",\"question\":\"Where is DefaultApplicationFactory defined, and what does its createApplication or URL-building code do with PathMappedEndpoints to produce the management and health URLs?\",\"scenario_id\":\"original_task\",\"tool\":\"inspect_source\"},\"response_id\":\"query:1\",\"result\":{\"complete\":false,\"error_code\":null,\"limit_reason\":\"access_denied\",\"limits\":{\"max_bytes\":2097152,\"max_entries\":2000,\"max_file_bytes\":262144,\"max_matches\":50,\"timeout_seconds\":2.0},\"matches\":[{\"end_line\":44,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":44,\"text\":\"public class DefaultApplicationFactory implements ApplicationFactory {\"}],\"next_cursor\":null,\"policy_id\":\"reviewed-repository-search/v1\",\"status\":\"incomplete\",\"usage\":{\"bytes\":8280,\"elapsed_seconds\":0.005790552939288318,\"entries\":42,\"excluded\":5}},\"scenario_id\":\"original_task\",\"semantic_category\":\"scope_limit\",\"sequence\":1,\"status\":\"incomplete\",\"tool\":\"inspect_source\",\"within_budget\":true},{\"arguments_json\":\"{\\\"source_id\\\":\\\"repository:f1cbe4e7534b595de231fa4a\\\",\\\"start_line\\\":1,\\\"end_line\\\":220}\",\"assessment\":{\"attempt_sequence\":2,\"impact\":\"supports\",\"rationale\":\"The receipt shows DefaultApplicationFactory.getHealthEndpointPath calls pathMappedEndpoints.getPath(EndpointId.of(\\\"health\\\")) and falls back to EndpointId.of(\\\"status\\\") before throwing. This confirms the health URL path comes from PathMappedEndpoints with the health EndpointId, so the masked setup must stub that interaction to produce the asserted /actuator/health URL.\"},\"assessment_status\":\"complete\",\"duration_seconds\":0.0005046790465712547,\"exploration_progress\":{\"consecutive_no_progress\":0,\"evidence_digest\":\"5e2f14409aeeedf4906f9ecf14bd822edbd8aaac60d415b32febbf9fb9a79b05\",\"made_progress\":true,\"new_evidence\":true,\"new_operation_or_position\":true,\"new_question_review\":true,\"operation_digest\":\"ac4a20d0855398fdd1d65c053513ec7b407dab5de366fc0fa8307b30c0a9928c\",\"termination_initiator\":null,\"termination_reason\":null,\"threshold\":4,\"triggered\":false},\"question\":\"What does DefaultApplicationFactory.createApplication and its URL-building code do with ManagementServerProperties, WebEndpointProperties, and PathMappedEndpoints to produce the management and health URLs?\",\"raw_request\":{\"arguments_json\":\"{\\\"source_id\\\":\\\"repository:f1cbe4e7534b595de231fa4a\\\",\\\"start_line\\\":1,\\\"end_line\\\":220}\",\"question\":\"What does DefaultApplicationFactory.createApplication and its URL-building code do with ManagementServerProperties, WebEndpointProperties, and PathMappedEndpoints to produce the management and health URLs?\",\"scenario_id\":\"original_task\",\"tool\":\"inspect_source\"},\"response_id\":\"query:2\",\"result\":{\"backend\":\"source_store\",\"end_line\":220,\"limitations\":[],\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":1,\"status\":\"ok\",\"text\":\"/*\\n * Copyright 2014-2018 the original author or authors.\\n *\\n * Licensed under the Apache License, Version 2.0 (the \\\"License\\\");\\n * you may not use this file except in compliance with the License.\\n * You may obtain a copy of the License at\\n *\\n *     http://www.apache.org/licenses/LICENSE-2.0\\n *\\n * Unless required by applicable law or agreed to in writing, software\\n * distributed under the License is distributed on an \\\"AS IS\\\" BASIS,\\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\\n * See the License for the specific language governing permissions and\\n * limitations under the License.\\n */\\n\\npackage de.codecentric.boot.admin.client.registration;\\n\\nimport de.codecentric.boot.admin.client.config.InstanceProperties;\\nimport de.codecentric.boot.admin.client.registration.metadata.MetadataContributor;\\n\\nimport java.net.InetAddress;\\nimport java.net.UnknownHostException;\\nimport java.util.LinkedHashMap;\\nimport java.util.Map;\\nimport org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;\\nimport org.springframework.boot.actuate.autoconfigure.web.server.ManagementServerProperties;\\nimport org.springframework.boot.actuate.endpoint.EndpointId;\\nimport org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\\nimport org.springframework.boot.autoconfigure.web.ServerProperties;\\nimport org.springframework.boot.web.context.WebServerInitializedEvent;\\nimport org.springframework.boot.web.server.Ssl;\\nimport org.springframework.context.event.EventListener;\\nimport org.springframework.util.StringUtils;\\nimport org.springframework.web.util.UriComponentsBuilder;\\n\\n/**\\n * Default implementation for creating the {@link Application} instance which gets registered at the\\n * admin server.\\n *\\n * @author Johannes Edmeier\\n * @author Rene Felgenträger\\n */\\npublic class DefaultApplicationFactory implements ApplicationFactory {\\n    private final InstanceProperties instance;\\n    private final ServerProperties server;\\n    private final ManagementServerProperties management;\\n    private final PathMappedEndpoints pathMappedEndpoints;\\n    private final WebEndpointProperties webEndpoint;\\n    private final MetadataContributor metadataContributor;\\n    private Integer localServerPort;\\n    private Integer localManagementPort;\\n\\n\\n    public DefaultApplicationFactory(InstanceProperties instance,\\n                                     ManagementServerProperties management,\\n                                     ServerProperties server,\\n                                     PathMappedEndpoints pathMappedEndpoints,\\n                                     WebEndpointProperties webEndpoint,\\n                                     MetadataContributor metadataContributor) {\\n        this.instance = instance;\\n        this.management = management;\\n        this.server = server;\\n        this.pathMappedEndpoints = pathMappedEndpoints;\\n        this.webEndpoint = webEndpoint;\\n        this.metadataContributor = metadataContributor;\\n    }\\n\\n    @Override\\n    public Application createApplication() {\\n        return Application.create(getName())\\n                          .healthUrl(getHealthUrl())\\n                          .managementUrl(getManagementUrl())\\n                          .serviceUrl(getServiceUrl())\\n                          .metadata(getMetadata())\\n                          .build();\\n    }\\n\\n    protected String getName() {\\n        return instance.getName();\\n    }\\n\\n    protected String getServiceUrl() {\\n        if (instance.getServiceUrl() != null) {\\n            return instance.getServiceUrl();\\n        }\\n\\n        return UriComponentsBuilder.fromUriString(getServiceBaseUrl()).path(\\\"/\\\").toUriString();\\n    }\\n\\n    protected String getServiceBaseUrl() {\\n        String baseUrl = instance.getServiceBaseUrl();\\n\\n        if (!StringUtils.isEmpty(baseUrl)) {\\n            return baseUrl;\\n        }\\n\\n        if (getLocalServerPort() == null) {\\n            throw new IllegalStateException(\\\"couldn't determine local port. Please set spring.boot.admin.client.instance.service-base-url.\\\");\\n        }\\n\\n        return UriComponentsBuilder.newInstance()\\n                                   .scheme(getScheme(server.getSsl()))\\n                                   .host(getServiceHost())\\n                                   .port(getLocalServerPort())\\n                                   .toUriString();\\n    }\\n\\n    protected String getManagementUrl() {\\n        if (instance.getManagementUrl() != null) {\\n            return instance.getManagementUrl();\\n        }\\n\\n        return UriComponentsBuilder.fromUriString(getManagementBaseUrl())\\n                                   .path(\\\"/\\\")\\n                                   .path(getEndpointsWebPath())\\n                                   .toUriString();\\n    }\\n\\n    protected String getManagementBaseUrl() {\\n        String baseUrl = instance.getManagementBaseUrl();\\n\\n        if (!StringUtils.isEmpty(baseUrl)) {\\n            return baseUrl;\\n        }\\n\\n        if (isManagementPortEqual()) {\\n            return this.getServiceUrl();\\n        }\\n\\n        Ssl ssl = management.getSsl() != null ? management.getSsl() : server.getSsl();\\n        return UriComponentsBuilder.newInstance()\\n                                   .scheme(getScheme(ssl))\\n                                   .host(getManagementHost())\\n                                   .port(getLocalManagementPort())\\n                                   .toUriString();\\n    }\\n\\n    protected boolean isManagementPortEqual() {\\n        return getLocalManagementPort() == null || getLocalManagementPort().equals(getLocalServerPort());\\n    }\\n\\n    protected String getEndpointsWebPath() {\\n        return webEndpoint.getBasePath();\\n    }\\n\\n    protected String getHealthUrl() {\\n        if (instance.getHealthUrl() != null) {\\n            return instance.getHealthUrl();\\n        }\\n        return UriComponentsBuilder.fromHttpUrl(getManagementBaseUrl())\\n                                   .path(\\\"/\\\")\\n                                   .path(getHealthEndpointPath())\\n                                   .toUriString();\\n    }\\n\\n    protected Map<String, String> getMetadata() {\\n        Map<String, String> metadata = new LinkedHashMap<>();\\n        metadata.putAll(metadataContributor.getMetadata());\\n        metadata.putAll(instance.getMetadata());\\n        return metadata;\\n    }\\n\\n    protected String getServiceHost() {\\n        InetAddress address = server.getAddress();\\n        if (address == null) {\\n            address = getLocalHost();\\n        }\\n        return getHost(address);\\n    }\\n\\n    protected String getManagementHost() {\\n        InetAddress address = management.getAddress();\\n        if (address != null) {\\n            return getHost(address);\\n        }\\n        return getServiceHost();\\n    }\\n\\n    protected InetAddress getLocalHost() {\\n        try {\\n            return InetAddress.getLocalHost();\\n        } catch (UnknownHostException ex) {\\n            throw new IllegalArgumentException(ex.getMessage(), ex);\\n        }\\n    }\\n\\n    protected Integer getLocalServerPort() {\\n        return localServerPort;\\n    }\\n\\n    protected Integer getLocalManagementPort() {\\n        return localManagementPort;\\n    }\\n\\n    protected String getHealthEndpointPath() {\\n        String health = pathMappedEndpoints.getPath(EndpointId.of(\\\"health\\\"));\\n        if (StringUtils.hasText(health)) {\\n            return health;\\n        }\\n        String status = pathMappedEndpoints.getPath(EndpointId.of(\\\"status\\\"));\\n        if (StringUtils.hasText(status)) {\\n            return status;\\n        }\\n        throw new IllegalStateException(\\\"Either health or status endpoint must be enabled!\\\");\\n    }\\n\\n    protected String getScheme(Ssl ssl) {\\n        return ssl != null && ssl.isEnabled() ? \\\"https\\\" : \\\"http\\\";\\n    }\\n\\n    protected String getHost(InetAddress address) {\\n        return instance.isPreferIp() ? address.getHostAddress() : address.getCanonicalHostName();\\n    }\\n\\n    @EventListener\\n    public void onWebServerInitialized(WebServerInitializedEvent event) {\\n        String name = event.getApplicationContext().getServerNamespace();\\n        if (\\\"server\\\".equals(name) || !StringUtils.hasText(name)) {\\n            localServerPort = event.getWebServer().getPort();\",\"usage\":{\"bytes\":8280,\"elapsed_seconds\":0.00027376890648156404}},\"scenario_id\":\"original_task\",\"semantic_category\":\"success\",\"sequence\":2,\"status\":\"ok\",\"tool\":\"inspect_source\",\"within_budget\":true},{\"arguments_json\":\"{\\\"operation\\\":\\\"search\\\",\\\"path_pattern\\\":\\\"**/*.java\\\",\\\"text\\\":\\\"EndpointId.of(\\\\\\\"health\\\\\\\")\\\"}\",\"assessment\":null,\"assessment_status\":\"incomplete\",\"duration_seconds\":0.0073529049986973405,\"exploration_progress\":{\"consecutive_no_progress\":0,\"evidence_digest\":\"f594f7b7b7ca4e3befe3a702c3cc189658a2f5202e9c4e72f5896476849e8c80\",\"made_progress\":true,\"new_evidence\":true,\"new_operation_or_position\":true,\"new_question_review\":true,\"operation_digest\":\"c2b501faea687817b64069c3a297a8aa2928f35760c58352d3acc38c19e5b8b4\",\"termination_initiator\":null,\"termination_reason\":null,\"threshold\":4,\"triggered\":false},\"question\":\"Which repository Java sources, especially tests, contain the exact health-endpoint ID expression EndpointId.of(\\\"health\\\") and can reveal the intended mock stubbing or verification pattern for CloudFoundryApplicationFactoryTest?\",\"raw_request\":{\"arguments_json\":\"{\\\"operation\\\":\\\"search\\\",\\\"path_pattern\\\":\\\"**/*.java\\\",\\\"text\\\":\\\"EndpointId.of(\\\\\\\"health\\\\\\\")\\\"}\",\"question\":\"Which repository Java sources, especially tests, contain the exact health-endpoint ID expression EndpointId.of(\\\"health\\\") and can reveal the intended mock stubbing or verification pattern for CloudFoundryApplicationFactoryTest?\",\"scenario_id\":\"original_task\",\"tool\":\"inspect_source\"},\"response_id\":\"query:3\",\"result\":{\"complete\":false,\"error_code\":null,\"limit_reason\":\"access_denied\",\"limits\":{\"max_bytes\":2097152,\"max_entries\":2000,\"max_file_bytes\":262144,\"max_matches\":50,\"timeout_seconds\":2.0},\"matches\":[{\"end_line\":197,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/DefaultApplicationFactory.java\",\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":197,\"text\":\"        String health = pathMappedEndpoints.getPath(EndpointId.of(\\\"health\\\"));\"}],\"next_cursor\":null,\"policy_id\":\"reviewed-repository-search/v1\",\"status\":\"incomplete\",\"usage\":{\"bytes\":57098,\"elapsed_seconds\":0.007105377037078142,\"entries\":42,\"excluded\":5}},\"scenario_id\":\"original_task\",\"semantic_category\":\"scope_limit\",\"sequence\":3,\"status\":\"incomplete\",\"tool\":\"inspect_source\",\"within_budget\":true}],\"questions\":[{\"acquisition\":\"available\",\"attempted_sequences\":[2],\"evidence\":[{\"end_line\":134,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":111},{\"end_line\":194,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":175}],\"goal_indexes\":[0,1],\"impact\":\"Unresolved EXTRACT question may change the original goal's dependency requirements.\",\"origin\":\"EXTRACT\",\"question\":\"The implementation of DefaultApplicationFactory is not provided, so how ManagementServerProperties, WebEndpointProperties, and PathMappedEndpoints combine to produce /actuator and /actuator/health is unconfirmed.\",\"question_id\":\"q1\",\"rationale\":\"DefaultApplicationFactory.getManagementUrl appends webEndpoint.getBasePath(), and getHealthUrl uses getManagementBaseUrl plus getHealthEndpointPath, which calls pathMappedEndpoints.getPath(EndpointId.of(\\\"health\\\")) with status fallback. This explains how the asserted URLs are produced.\",\"state\":\"resolved\"},{\"acquisition\":\"available\",\"attempted_sequences\":[],\"evidence\":[],\"goal_indexes\":[0,1],\"impact\":\"Unresolved EXTRACT question may change the original goal's dependency requirements.\",\"origin\":\"EXTRACT\",\"question\":\"The exact contents of the MOCK-STUB region are unknown; visible code only proves that a pathMappedEndpoints variable must exist before the CloudFoundryApplicationFactory constructor call.\",\"question_id\":\"q2\",\"rationale\":\"Unresolved evidence gap from EXTRACT.\",\"state\":\"open\"},{\"acquisition\":\"available\",\"attempted_sequences\":[],\"evidence\":[],\"goal_indexes\":[0,1],\"impact\":\"Unresolved EXTRACT question may change the original goal's dependency requirements.\",\"origin\":\"EXTRACT\",\"question\":\"The exact contents of the VERIFY region are unknown; imported verify/when/mock and EndpointId do not establish a specific stubbed value, target method argument, call count, or ordering.\",\"question_id\":\"q3\",\"rationale\":\"Unresolved evidence gap from EXTRACT.\",\"state\":\"open\"},{\"acquisition\":\"available\",\"attempted_sequences\":[2],\"evidence\":[{\"end_line\":194,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":190}],\"goal_indexes\":[0,1],\"impact\":\"Unresolved EXTRACT question may change the original goal's dependency requirements.\",\"origin\":\"EXTRACT\",\"question\":\"Whether PathMappedEndpoints.getPath is called with EndpointId.of(\\\"health\\\"), a string, or another argument is not confirmed by the visible source.\",\"question_id\":\"q4\",\"rationale\":\"The observed implementation explicitly calls pathMappedEndpoints.getPath(EndpointId.of(\\\"health\\\")), then status as fallback.\",\"state\":\"resolved\"},{\"acquisition\":\"available\",\"attempted_sequences\":[2],\"evidence\":[{\"end_line\":134,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":111},{\"end_line\":184,\"source_id\":\"repository:f1cbe4e7534b595de231fa4a\",\"start_line\":175}],\"goal_indexes\":[0,1],\"impact\":\"Unresolved EXTRACT question may change the original goal's dependency requirements.\",\"origin\":\"EXTRACT\",\"question\":\"Whether any additional collaborator or property must be configured in the masked setup to make the expected /actuator health path resolve is unresolved.\",\"question_id\":\"q5\",\"rationale\":\"DefaultApplicationFactory also depends on webEndpoint.getBasePath() for the management URL, so the exact required PathMappedEndpoints return value and whether any WebEndpointProperties configuration is needed remain unconfirmed.\",\"state\":\"open\"},{\"acquisition\":\"available\",\"attempted_sequences\":[],\"evidence\":[],\"goal_indexes\":[0,1],\"impact\":\"Unresolved EXTRACT question may change the original goal's dependency requirements.\",\"origin\":\"EXTRACT\",\"question\":\"Whether the verification block checks a PathMappedEndpoints interaction at all, rather than another dependency, is unconfirmed.\",\"question_id\":\"q6\",\"rationale\":\"Unresolved evidence gap from EXTRACT.\",\"state\":\"open\"}],\"source_line_index\":{\"mut\":[{\"line\":1,\"text\":\"/*\"},{\"line\":2,\"text\":\" * Copyright 2014-2018 the original author or authors.\"},{\"line\":3,\"text\":\" *\"},{\"line\":4,\"text\":\" * Licensed under the Apache License, Version 2.0 (the \\\"License\\\");\"},{\"line\":5,\"text\":\" * you may not use this file except in compliance with the License.\"},{\"line\":6,\"text\":\" * You may obtain a copy of the License at\"},{\"line\":7,\"text\":\" *\"},{\"line\":8,\"text\":\" *     http://www.apache.org/licenses/LICENSE-2.0\"},{\"line\":9,\"text\":\" *\"},{\"line\":10,\"text\":\" * Unless required by applicable law or agreed to in writing, software\"},{\"line\":11,\"text\":\" * distributed under the License is distributed on an \\\"AS IS\\\" BASIS,\"},{\"line\":12,\"text\":\" * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\"},{\"line\":13,\"text\":\" * See the License for the specific language governing permissions and\"},{\"line\":14,\"text\":\" * limitations under the License.\"},{\"line\":15,\"text\":\" */\"},{\"line\":16,\"text\":\"\"},{\"line\":17,\"text\":\"package de.codecentric.boot.admin.client.registration;\"},{\"line\":18,\"text\":\"\"},{\"line\":19,\"text\":\"import de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties;\"},{\"line\":20,\"text\":\"import de.codecentric.boot.admin.client.config.InstanceProperties;\"},{\"line\":21,\"text\":\"import de.codecentric.boot.admin.client.registration.metadata.MetadataContributor;\"},{\"line\":22,\"text\":\"\"},{\"line\":23,\"text\":\"import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;\"},{\"line\":24,\"text\":\"import org.springframework.boot.actuate.autoconfigure.web.server.ManagementServerProperties;\"},{\"line\":25,\"text\":\"import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\"},{\"line\":26,\"text\":\"import org.springframework.boot.autoconfigure.web.ServerProperties;\"},{\"line\":27,\"text\":\"\"},{\"line\":28,\"text\":\"public class CloudFoundryApplicationFactory extends DefaultApplicationFactory {\"},{\"line\":29,\"text\":\"    private final CloudFoundryApplicationProperties cfApplicationProperties;\"},{\"line\":30,\"text\":\"\"},{\"line\":31,\"text\":\"    public CloudFoundryApplicationFactory(InstanceProperties instance,\"},{\"line\":32,\"text\":\"                                          ManagementServerProperties management,\"},{\"line\":33,\"text\":\"                                          ServerProperties server,\"},{\"line\":34,\"text\":\"                                          PathMappedEndpoints pathMappedEndpoints,\"},{\"line\":35,\"text\":\"                                          WebEndpointProperties webEndpoint,\"},{\"line\":36,\"text\":\"                                          MetadataContributor metadataContributor,\"},{\"line\":37,\"text\":\"                                          CloudFoundryApplicationProperties cfApplicationProperties) {\"},{\"line\":38,\"text\":\"        super(instance, management, server, pathMappedEndpoints, webEndpoint, metadataContributor);\"},{\"line\":39,\"text\":\"        this.cfApplicationProperties = cfApplicationProperties;\"},{\"line\":40,\"text\":\"    }\"},{\"line\":41,\"text\":\"\"},{\"line\":42,\"text\":\"    @Override\"},{\"line\":43,\"text\":\"    protected String getServiceBaseUrl() {\"},{\"line\":44,\"text\":\"        if (cfApplicationProperties.getUris().isEmpty()) {\"},{\"line\":45,\"text\":\"            return null;\"},{\"line\":46,\"text\":\"        }\"},{\"line\":47,\"text\":\"\"},{\"line\":48,\"text\":\"        String uri = cfApplicationProperties.getUris().get(0);\"},{\"line\":49,\"text\":\"        return \\\"http://\\\" + uri;\"},{\"line\":50,\"text\":\"    }\"},{\"line\":51,\"text\":\"}\"}],\"test\":[{\"line\":1,\"text\":\"/*\"},{\"line\":2,\"text\":\" * Copyright 2014-2018 the original author or authors.\"},{\"line\":3,\"text\":\" *\"},{\"line\":4,\"text\":\" * Licensed under the Apache License, Version 2.0 (the \\\"License\\\");\"},{\"line\":5,\"text\":\" * you may not use this file except in compliance with the License.\"},{\"line\":6,\"text\":\" * You may obtain a copy of the License at\"},{\"line\":7,\"text\":\" *\"},{\"line\":8,\"text\":\" *     http://www.apache.org/licenses/LICENSE-2.0\"},{\"line\":9,\"text\":\" *\"},{\"line\":10,\"text\":\" * Unless required by applicable law or agreed to in writing, software\"},{\"line\":11,\"text\":\" * distributed under the License is distributed on an \\\"AS IS\\\" BASIS,\"},{\"line\":12,\"text\":\" * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\"},{\"line\":13,\"text\":\" * See the License for the specific language governing permissions and\"},{\"line\":14,\"text\":\" * limitations under the License.\"},{\"line\":15,\"text\":\" */\"},{\"line\":16,\"text\":\"\"},{\"line\":17,\"text\":\"package de.codecentric.boot.admin.client.registration;\"},{\"line\":18,\"text\":\"\"},{\"line\":19,\"text\":\"import static java.util.Collections.singletonList;\"},{\"line\":20,\"text\":\"import static java.util.Collections.singletonMap;\"},{\"line\":21,\"text\":\"import static org.junit.Assert.assertEquals;\"},{\"line\":22,\"text\":\"import static org.mockito.Mockito.mock;\"},{\"line\":23,\"text\":\"import static org.mockito.Mockito.verify;\"},{\"line\":24,\"text\":\"import static org.mockito.Mockito.when;\"},{\"line\":25,\"text\":\"\"},{\"line\":26,\"text\":\"import de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties;\"},{\"line\":27,\"text\":\"import de.codecentric.boot.admin.client.config.InstanceProperties;\"},{\"line\":28,\"text\":\"import org.junit.Test;\"},{\"line\":29,\"text\":\"import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;\"},{\"line\":30,\"text\":\"import org.springframework.boot.actuate.autoconfigure.web.server.ManagementServerProperties;\"},{\"line\":31,\"text\":\"import org.springframework.boot.actuate.endpoint.EndpointId;\"},{\"line\":32,\"text\":\"import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;\"},{\"line\":33,\"text\":\"import org.springframework.boot.autoconfigure.web.ServerProperties;\"},{\"line\":34,\"text\":\"\"},{\"line\":35,\"text\":\"public class CloudFoundryApplicationFactoryTest {\"},{\"line\":36,\"text\":\"\"},{\"line\":37,\"text\":\"    @Test\"},{\"line\":38,\"text\":\"    public void should_use_application_uri() {\"},{\"line\":39,\"text\":\"        InstanceProperties instanceProperties = new InstanceProperties();\"},{\"line\":40,\"text\":\"        instanceProperties.setName(\\\"test\\\");\"},{\"line\":41,\"text\":\"        ServerProperties server = new ServerProperties();\"},{\"line\":42,\"text\":\"        ManagementServerProperties management = new ManagementServerProperties();\"},{\"line\":43,\"text\":\"        WebEndpointProperties webEndpoint = new WebEndpointProperties();\"},{\"line\":44,\"text\":\"        CloudFoundryApplicationProperties cfApplicationProperties = new CloudFoundryApplicationProperties();\"},{\"line\":45,\"text\":\"        // === MOCK-STUB-START ===\"},{\"line\":46,\"text\":\"        // === MOCK-STUB-END ===\"},{\"line\":47,\"text\":\"        CloudFoundryApplicationFactory factory = new CloudFoundryApplicationFactory(instanceProperties, management,\"},{\"line\":48,\"text\":\"            server, pathMappedEndpoints, webEndpoint, () -> singletonMap(\\\"contributor\\\", \\\"test\\\"), cfApplicationProperties);\"},{\"line\":49,\"text\":\"        cfApplicationProperties.setUris(singletonList(\\\"application/Uppercase\\\"));\"},{\"line\":50,\"text\":\"\"},{\"line\":51,\"text\":\"        Application app = factory.createApplication();\"},{\"line\":52,\"text\":\"\"},{\"line\":53,\"text\":\"        assertEquals(\\\"http://application/Uppercase/actuator\\\", app.getManagementUrl());\"},{\"line\":54,\"text\":\"        assertEquals(\\\"http://application/Uppercase/actuator/health\\\", app.getHealthUrl());\"},{\"line\":55,\"text\":\"        assertEquals(\\\"http://application/Uppercase/\\\", app.getServiceUrl());\"},{\"line\":56,\"text\":\"        assertEquals(\\\"test\\\", app.getName());\"},{\"line\":57,\"text\":\"        assertEquals(\\\"test\\\", app.getMetadata().get(\\\"contributor\\\"));\"},{\"line\":58,\"text\":\"        // === VERIFY-START ===\"},{\"line\":59,\"text\":\"        // === VERIFY-END ===\"},{\"line\":60,\"text\":\"    }\"},{\"line\":61,\"text\":\"\"},{\"line\":62,\"text\":\"}\"}]},\"stage\":\"QUERY\",\"visible_task\":{\"case_id\":\"de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri@d0085edf\",\"execution_context\":{\"runtime_name\":\"openjdk-javac\",\"runtime_version\":\"11.0.31\",\"test_framework\":\"JUnit\",\"test_framework_version\":null},\"input_policy\":{\"masking_contract\":\"java-dual-region-v1\",\"policy_id\":\"mock-spec-reviewed-frozen/v1\",\"protocol_version\":\"developer_realistic_workspace_v1\",\"visibility\":\"reviewed_frozen_sources\"},\"language\":\"java\",\"masked_test\":{\"end_line\":62,\"logical_path\":\"src/test/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactoryTest.java\",\"resolution_status\":\"partial\",\"source_id\":\"test\",\"start_line\":1,\"symbol\":\"de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactoryTest#should_use_application_uri\",\"target_precision\":\"method\"},\"mut_source\":{\"end_line\":51,\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactory.java\",\"resolution_status\":\"partial\",\"source_id\":\"mut\",\"start_line\":1,\"symbol\":\"de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactory\",\"target_precision\":\"class\"},\"permitted_interfaces\":[],\"schema_version\":\"mock-spec.task/v1\",\"sources\":[{\"logical_path\":\"src/test/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactoryTest.java\",\"role\":\"masked_test\",\"source_id\":\"test\"},{\"logical_path\":\"src/main/java/de/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactory.java\",\"role\":\"mut\",\"source_id\":\"mut\"}],\"supporting_sources\":[]}}",
+      "role": "user"
+    }
+  ],
+  "instructions": "staged-scenario-inference-prompts/v0.4\nStage: QUERY. Return only the requested strict structure. Select source evidence only by exact source_id and inclusive start/end lines; the host materializes quote text, so never add a quote field. Treat all host identity, usage, and hashes as host-owned facts. Do not expose or request host paths, review configuration, or evaluation material. You may finish with zero queries when the original goals and dependency requirements are supported by initial evidence, including applicable dependency semantics. Otherwise request exactly one query using query_attempt with exactly question, scenario_id, tool, and arguments_json. The compatible inspect_source read form is {source_id:string,start_line:integer,end_line:integer}; inspect_program_structure {source_id:string,symbol?:string}; inspect_dependency_usage {source_id:string,symbol?:string}. Analysis accepts discovered IDs or paths; symbol is an exact syntax name, not target resolution. Read source lines before citing them. arguments_json must encode the named argument object. After a receipt, previous_receipt_assessment classifies its candidate impact as supports, weakens, or no_new_information; the host binds it to the one pending receipt, so never return a receipt or attempt sequence field. errors and incomplete results still require an assessment. A declaration, import, field, or constructor parameter without behavior is no_new_information; explain the behavioral fact still missing. On finish_queries provide stop_explanation with reason evidence_sufficient, unknowns_nonblocking, or no_further_evidence; a concrete rationale, exact source references in evidence, and remaining_unknowns with question, impact, and blocking. Preserve unknowns rather than treating failed exploration as proof. Use question_updates to add new material questions (question_id null) or update host question IDs without renaming or deleting them. Map each question to original goal_indexes. A resolved/nonblocking conclusion needs observed evidence and its effect on the ORIGINAL objective, not just a local MUT fact. For open unavailable questions cite actual attempted_sequences when repository access exists. remaining_unknowns must exactly retain every open/nonblocking question and impact. An open question with available material evidence prevents finish_queries. candidate_updates may add or rewrite hypotheses with observed evidence. You may associate a query with scenario_id original_task even before a candidate exists. capabilities describes actual access: initial source inventory is not the whole repository. Queries and new hypotheses may go beyond the initial candidates. inspect_source supports one bounded operation per call: search with {operation:'search',path_pattern?:string,text?:string,cursor?:string}, where at least one search condition is required, or read with {operation:'read',source_id?:string,path?:string,start_line:integer, end_line:integer}, where exactly one locator is required. Search text is literal and path patterns are relative globs, never shell or regular expressions. Follow next_cursor with the identical query when incomplete. Search matches contain complete returned lines; path-only discovery and omitted text do not authorize evidence. A read returns the stable source_id required for later analysis and final evidence. Host paths are forbidden. Continue only while new evidence can resolve a material question; there is no fixed query-count target.",
+  "max_output_tokens": 24576,
+  "store": false,
+  "text": {
+    "format": {
+      "type": "json_schema",
+      "name": "final_output",
+      "schema": {
+        "$defs": {
+          "CandidateSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "scenario_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Scenario Id",
+                "type": "string"
+              },
+              "description": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Description",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/SourceLocator"
+                },
+                "title": "Evidence",
+                "type": "array"
+              }
+            },
+            "required": [
+              "scenario_id",
+              "description",
+              "evidence"
+            ],
+            "title": "CandidateSelection",
+            "type": "object"
+          },
+          "ExplorationStopSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "reason": {
+                "enum": [
+                  "evidence_sufficient",
+                  "unknowns_nonblocking",
+                  "no_further_evidence"
+                ],
+                "title": "Reason",
+                "type": "string"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/SourceLocator"
+                },
+                "title": "Evidence",
+                "type": "array"
+              },
+              "remaining_unknowns": {
+                "items": {
+                  "$ref": "#/$defs/RemainingUnknown"
+                },
+                "title": "Remaining Unknowns",
+                "type": "array"
+              }
+            },
+            "required": [
+              "reason",
+              "rationale",
+              "evidence",
+              "remaining_unknowns"
+            ],
+            "title": "ExplorationStopSelection",
+            "type": "object"
+          },
+          "QueryAssessmentSelection": {
+            "additionalProperties": false,
+            "description": "Model-facing assessment; the host owns receipt association.",
+            "properties": {
+              "impact": {
+                "enum": [
+                  "supports",
+                  "weakens",
+                  "no_new_information"
+                ],
+                "title": "Impact",
+                "type": "string"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              }
+            },
+            "required": [
+              "impact",
+              "rationale"
+            ],
+            "title": "QueryAssessmentSelection",
+            "type": "object"
+          },
+          "QueryAttempt": {
+            "additionalProperties": false,
+            "description": "Provider-facing shape; host validation still follows attempt registration.",
+            "properties": {
+              "question": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Question",
+                "type": "string"
+              },
+              "scenario_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Scenario Id",
+                "type": "string"
+              },
+              "tool": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Tool",
+                "type": "string"
+              },
+              "arguments_json": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Arguments Json",
+                "type": "string"
+              }
+            },
+            "required": [
+              "question",
+              "scenario_id",
+              "tool",
+              "arguments_json"
+            ],
+            "title": "QueryAttempt",
+            "type": "object"
+          },
+          "QuestionUpdate": {
+            "additionalProperties": false,
+            "properties": {
+              "question": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Question",
+                "type": "string"
+              },
+              "goal_indexes": {
+                "items": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "minItems": 1,
+                "title": "Goal Indexes",
+                "type": "array"
+              },
+              "impact": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Impact",
+                "type": "string"
+              },
+              "question_id": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Question Id"
+              },
+              "state": {
+                "enum": [
+                  "open",
+                  "resolved",
+                  "nonblocking"
+                ],
+                "title": "State",
+                "type": "string"
+              },
+              "rationale": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Rationale",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/SourceLocator"
+                },
+                "title": "Evidence",
+                "type": "array"
+              },
+              "acquisition": {
+                "enum": [
+                  "available",
+                  "unavailable",
+                  "not_needed"
+                ],
+                "title": "Acquisition",
+                "type": "string"
+              },
+              "attempted_sequences": {
+                "items": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "title": "Attempted Sequences",
+                "type": "array"
+              }
+            },
+            "required": [
+              "question",
+              "goal_indexes",
+              "impact",
+              "question_id",
+              "state",
+              "rationale",
+              "evidence",
+              "acquisition",
+              "attempted_sequences"
+            ],
+            "title": "QuestionUpdate",
+            "type": "object"
+          },
+          "RemainingUnknown": {
+            "additionalProperties": false,
+            "properties": {
+              "question": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Question",
+                "type": "string"
+              },
+              "impact": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Impact",
+                "type": "string"
+              },
+              "blocking": {
+                "title": "Blocking",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "question",
+              "impact",
+              "blocking"
+            ],
+            "title": "RemainingUnknown",
+            "type": "object"
+          },
+          "SourceLocator": {
+            "additionalProperties": false,
+            "properties": {
+              "source_id": {
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Source Id",
+                "type": "string"
+              },
+              "start_line": {
+                "minimum": 1,
+                "title": "Start Line",
+                "type": "integer"
+              },
+              "end_line": {
+                "minimum": 1,
+                "title": "End Line",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "source_id",
+              "start_line",
+              "end_line"
+            ],
+            "title": "SourceLocator",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": "staged-query/v0.4",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "request_query",
+              "finish_queries"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "query_attempt": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Provider-facing shape; host validation still follows attempt registration.",
+                "properties": {
+                  "question": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Question",
+                    "type": "string"
+                  },
+                  "scenario_id": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Scenario Id",
+                    "type": "string"
+                  },
+                  "tool": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Tool",
+                    "type": "string"
+                  },
+                  "arguments_json": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Arguments Json",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "question",
+                  "scenario_id",
+                  "tool",
+                  "arguments_json"
+                ],
+                "title": "QueryAttempt",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "previous_receipt_assessment": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "Model-facing assessment; the host owns receipt association.",
+                "properties": {
+                  "impact": {
+                    "enum": [
+                      "supports",
+                      "weakens",
+                      "no_new_information"
+                    ],
+                    "title": "Impact",
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Rationale",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "impact",
+                  "rationale"
+                ],
+                "title": "QueryAssessmentSelection",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "impact": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Impact",
+            "type": "string"
+          },
+          "stop_explanation": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "enum": [
+                      "evidence_sufficient",
+                      "unknowns_nonblocking",
+                      "no_further_evidence"
+                    ],
+                    "title": "Reason",
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Rationale",
+                    "type": "string"
+                  },
+                  "evidence": {
+                    "items": {
+                      "$ref": "#/$defs/SourceLocator"
+                    },
+                    "title": "Evidence",
+                    "type": "array"
+                  },
+                  "remaining_unknowns": {
+                    "items": {
+                      "$ref": "#/$defs/RemainingUnknown"
+                    },
+                    "title": "Remaining Unknowns",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "reason",
+                  "rationale",
+                  "evidence",
+                  "remaining_unknowns"
+                ],
+                "title": "ExplorationStopSelection",
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "question_updates": {
+            "items": {
+              "$ref": "#/$defs/QuestionUpdate"
+            },
+            "title": "Question Updates",
+            "type": "array"
+          },
+          "candidate_updates": {
+            "items": {
+              "$ref": "#/$defs/CandidateSelection"
+            },
+            "title": "Candidate Updates",
+            "type": "array"
+          }
+        },
+        "required": [
+          "schema_version",
+          "decision",
+          "query_attempt",
+          "previous_receipt_assessment",
+          "impact",
+          "stop_explanation",
+          "question_updates",
+          "candidate_updates"
+        ],
+        "title": "QuerySelection",
+        "type": "object"
+      },
+      "strict": true
+    }
+  },
+  "tools": []
+}
