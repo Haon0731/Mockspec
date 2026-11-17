@@ -31,7 +31,7 @@ def test_build_agent_uses_one_tool_free_structured_configuration() -> None:
 
     for agent in (python_agent, java_agent):
         assert agent.model == "test-model"
-        assert agent.output_type is ScenarioContract
+        assert agent.output_type.output_type is ScenarioContract
         assert agent.tools == []
         assert agent.handoffs == []
         assert agent.model_settings.store is False
@@ -82,7 +82,7 @@ def test_infer_scenario_sends_only_serialized_unified_task(
         task.to_dict(), ensure_ascii=False, separators=(",", ":")
     )
     assert captured["max_turns"] == 1
-    assert captured["agent"].output_type is ScenarioContract
+    assert captured["agent"].output_type.output_type is ScenarioContract
     run_config = captured["run_config"]
     assert run_config.tracing_disabled is True
     assert run_config.trace_include_sensitive_data is False
@@ -174,3 +174,59 @@ def test_infer_scenario_requires_finite_positive_timeout(
                 _task(), model="test-model", timeout_seconds=timeout
             )
         )
+
+
+def test_v01_fenced_contract_uses_native_schema(monkeypatch) -> None:
+    async def run(agent, **kwargs):
+        return SimpleNamespace(final_output=agent.output_type.validate_json(
+            '```json\n' + json.dumps(contract_data()) + '\n```'
+        ))
+
+    monkeypatch.setenv('OPENAI_API_KEY', 'synthetic-key')
+    monkeypatch.setattr(inference.Runner, 'run', run)
+    assert asyncio.run(inference.infer_scenario(_task(), model='test-model')) == _contract()
+
+
+def test_v01_validation_retry_is_bounded_and_preserves_request(monkeypatch) -> None:
+    requests = []
+
+    async def run(agent, **kwargs):
+        requests.append(kwargs['input'])
+        text = '{}' if len(requests) == 1 else json.dumps(contract_data())
+        return SimpleNamespace(final_output=agent.output_type.validate_json(text))
+
+    monkeypatch.setenv('OPENAI_API_KEY', 'synthetic-key')
+    monkeypatch.setattr(inference.Runner, 'run', run)
+    assert asyncio.run(inference.infer_scenario(_task(), model='test-model')) == _contract()
+    assert len(requests) == 2
+    assert requests[1].startswith(requests[0])
+
+    requests.clear()
+
+    async def always_invalid(agent, **kwargs):
+        requests.append(kwargs['input'])
+        return SimpleNamespace(final_output=agent.output_type.validate_json('{}'))
+
+    monkeypatch.setattr(inference.Runner, 'run', always_invalid)
+    with pytest.raises(inference.InferenceError) as caught:
+        asyncio.run(inference.infer_scenario(_task(), model='test-model'))
+    assert caught.value.category == 'structure_error'
+    assert len(requests) == 2
+
+
+def test_v01_evidence_failure_does_not_retry(monkeypatch) -> None:
+    calls = 0
+    data = contract_data()
+    data['evidence'][0]['quote'] = 'fabricated'
+
+    async def run(agent, **kwargs):
+        nonlocal calls
+        calls += 1
+        return SimpleNamespace(final_output=agent.output_type.validate_json(json.dumps(data)))
+
+    monkeypatch.setenv('OPENAI_API_KEY', 'synthetic-key')
+    monkeypatch.setattr(inference.Runner, 'run', run)
+    with pytest.raises(inference.InferenceError) as caught:
+        asyncio.run(inference.infer_scenario(_task(), model='test-model'))
+    assert caught.value.category == 'evidence_error'
+    assert calls == 1

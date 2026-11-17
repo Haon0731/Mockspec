@@ -15,7 +15,12 @@ from agents.usage import Usage
 
 from .scenario import ScenarioContract, validate_contract
 from .schemas import UnifiedTask
-from .validation import decode_json
+from .validation import InputValidationError
+from .structured_output import (
+    PydanticOutputSchema, StructuredOutputEnvelopeError, StructuredOutputValidationError,
+    parse_pydantic_json,
+    retry_validation_errors, validation_error_summary,
+)
 
 
 PROMPT_VERSION: Final = "scenario-inference/v0.1"
@@ -70,7 +75,7 @@ def build_agent(model: str) -> Agent[None]:
         model_settings=ModelSettings(store=False),
         tools=[],
         handoffs=[],
-        output_type=ScenarioContract,
+        output_type=PydanticOutputSchema(ScenarioContract),
     )
 
 
@@ -100,16 +105,38 @@ async def infer_scenario(
         workflow_name=PROMPT_VERSION,
     )
 
+    capture = {} if responses is None else {"hooks": ResponseCapture(responses)}
+    repair_hint = ""
+
+    async def generate(attempt: int) -> ScenarioContract:
+        nonlocal repair_hint
+        request = payload if not attempt else (
+            payload + "\nReturn the same requested contract using the declared schema. "
+            "Correct only output format; do not invent evidence. Validation errors: " + repair_hint
+        )
+        try:
+            result = await Runner.run(
+                agent, input=request, max_turns=1, run_config=run_config, **capture,
+            )
+            output = result.final_output
+            if isinstance(output, ScenarioContract):
+                output = output.model_dump()
+            if isinstance(output, str):
+                return parse_pydantic_json(ScenarioContract, output)
+            return ScenarioContract.model_validate(output)
+        except InputValidationError as exc:
+            raise StructuredOutputEnvelopeError("model output has ambiguous JSON fields") from exc
+        except ValidationError as exc:
+            error = StructuredOutputValidationError(exc)
+            repair_hint = validation_error_summary(error)
+            raise error from exc
+        except StructuredOutputValidationError as exc:
+            repair_hint = validation_error_summary(exc)
+            raise
+
     try:
-        capture = {} if responses is None else {"hooks": ResponseCapture(responses)}
-        result = await asyncio.wait_for(
-            Runner.run(
-                agent,
-                input=payload,
-                max_turns=1,
-                run_config=run_config,
-                **capture,
-            ),
+        contract = await asyncio.wait_for(
+            retry_validation_errors(generate, max_retries=1),
             timeout=float(timeout_seconds),
         )
     except asyncio.TimeoutError:
@@ -122,16 +149,6 @@ async def infer_scenario(
         raise InferenceError("scenario inference model call failed", "model_call_failure",
                              type(exc).__name__) from None
 
-    try:
-        output = result.final_output
-        if isinstance(output, ScenarioContract):
-            output = output.model_dump()
-        if isinstance(output, str):
-            output = decode_json(output)
-        contract = ScenarioContract.model_validate(output)
-    except (ValidationError, ValueError):
-        raise InferenceError("scenario inference returned an invalid contract",
-                             "structure_error") from None
     try:
         return validate_contract(contract, task)
     except (ValueError, KeyError):

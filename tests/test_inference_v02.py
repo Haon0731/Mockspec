@@ -22,6 +22,7 @@ from mock_spec.inference import InferenceError
 from mock_spec.source_analysis import SourceAnalysis
 from mock_spec.scenario import ScenarioContract
 from mock_spec.schemas import UnifiedTask
+from mock_spec.structured_output import PydanticOutputSchema
 from test_scenario import contract_data
 from test_real_data import EXAMPLE_REVIEWS, load_java, load_python, snapshot
 from test_schemas import valid_task_data
@@ -68,10 +69,13 @@ class ScriptedModel(Model):
 
     async def get_response(self, *args, **kwargs):
         self.inputs.append(kwargs["input"])
-        assert [tool.name for tool in kwargs["tools"]] == [
-            "inspect_source",
-            "inspect_program_structure",
-            "inspect_dependency_usage",
+        assert [tool.name for tool in kwargs["tools"]] in [
+            [
+                "inspect_source",
+                "inspect_program_structure",
+                "inspect_dependency_usage",
+            ],
+            [],
         ]
         assert kwargs["handoffs"] == []
         assert kwargs["output_schema"].is_strict_json_schema()
@@ -121,7 +125,8 @@ def test_build_agent_is_task_scoped_and_tool_augmented() -> None:
     agent = inference_v02.build_agent(" test-model ", _task())
 
     assert agent.model == "test-model"
-    assert agent.output_type is ScenarioContract
+    assert isinstance(agent.output_type, PydanticOutputSchema)
+    assert agent.output_type.output_type is ScenarioContract
     assert [tool.name for tool in agent.tools] == [
         "inspect_source",
         "inspect_program_structure",
@@ -187,6 +192,71 @@ def test_sdk_runner_allows_zero_tool_calls(monkeypatch) -> None:
 
     assert contract.case_id == task.case_id
     assert trace == []
+    assert model.calls == 1
+
+
+def test_sdk_runner_retries_one_structurally_invalid_contract(monkeypatch) -> None:
+    task = _task()
+    invalid = _message({
+        "schema_version": "mock-spec.scenario/v0.1",
+        "repair_marker": "malicious-draft-value-" + "x" * 4_000,
+    })
+    invalid.raw_usage = {"total_tokens": 30}
+    model = ScriptedModel(invalid, _message(contract_data()))
+    _install_model(monkeypatch, task, model)
+
+    contract = asyncio.run(inference_v02.infer_scenario(
+        task, model="offline-model"
+    ))
+
+    assert contract.case_id == task.case_id
+    assert model.calls == 2
+    repair_input = _serialized(model.inputs[1])
+    assert "failed the declared output schema" in repair_input
+    assert "host will validate the new candidate independently" in repair_input
+    assert "malicious-draft-value" not in repair_input
+    assert len(repair_input) < 20_000
+
+
+def test_sdk_runner_repair_preserves_tool_results_without_reinvoking_tools(
+    monkeypatch,
+) -> None:
+    task = _task()
+    invalid = _message({"schema_version": "mock-spec.scenario/v0.1"})
+    invalid.raw_usage = {"total_tokens": 30}
+    model = ScriptedModel(
+        _tool_call("source", source_id="mut:0", start_line=10, end_line=10),
+        invalid,
+        _message(contract_data()),
+    )
+    trace = []
+    _install_model(monkeypatch, task, model, tool_trace=trace)
+
+    contract = asyncio.run(inference_v02.infer_scenario(
+        task, model="offline-model", tool_trace=trace
+    ))
+
+    assert contract.case_id == task.case_id
+    assert model.calls == 3
+    assert len(trace) == 1
+    repair_input = _serialized(model.inputs[2])
+    assert "return dependency(value)" in repair_input
+    assert "host will validate the new candidate independently" in repair_input
+
+
+def test_sdk_runner_does_not_format_retry_domain_validation(monkeypatch) -> None:
+    task = _task()
+    invalid = deepcopy(contract_data())
+    invalid["scenario_hypotheses"].append(
+        deepcopy(invalid["scenario_hypotheses"][0])
+    )
+    model = ScriptedModel(_message(invalid), _message(contract_data()))
+    _install_model(monkeypatch, task, model)
+
+    with pytest.raises(InferenceError) as caught:
+        asyncio.run(inference_v02.infer_scenario(task, model="offline-model"))
+
+    assert caught.value.category == "structure_error"
     assert model.calls == 1
 
 

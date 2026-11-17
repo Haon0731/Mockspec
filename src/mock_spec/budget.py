@@ -7,7 +7,7 @@ from decimal import Decimal, InvalidOperation
 import json
 import math
 
-from agents import RunHooks
+from agents import AgentOutputSchemaBase, RunHooks
 from agents.usage import Usage
 from pydantic import TypeAdapter
 
@@ -22,7 +22,7 @@ class InferenceBudget:
     max_tool_calls: int = 8
     max_repeated_no_progress: int = 2
     max_output_tokens: int = 4_096
-    max_total_tokens: int = 24_000
+    max_total_tokens: int | None = 24_000
     max_tool_output_chars: int = 16_000
     analysis_timeout_seconds: float = 15
     max_cost_usd: Decimal | None = None
@@ -32,12 +32,22 @@ class InferenceBudget:
     def __post_init__(self) -> None:
         for name in (
             "max_turns", "max_tool_calls", "max_repeated_no_progress",
-            "max_output_tokens", "max_total_tokens",
+            "max_output_tokens",
         ):
             value = getattr(self, name)
             if type(value) is not int or value < 1:
                 raise InferenceError(f"scenario inference {name} must be a positive integer")
-        if self.max_output_tokens > self.max_total_tokens:
+        if (
+            self.max_total_tokens is not None
+            and (type(self.max_total_tokens) is not int or self.max_total_tokens < 1)
+        ):
+            raise InferenceError(
+                "scenario inference max_total_tokens must be a positive integer"
+            )
+        if (
+            self.max_total_tokens is not None
+            and self.max_output_tokens > self.max_total_tokens
+        ):
             raise InferenceError(
                 "scenario inference max_output_tokens cannot exceed max_total_tokens"
             )
@@ -117,10 +127,14 @@ def estimate_known_request_tokens(
         for tool in agent.tools
     ]
     output_type = agent.output_type
-    output_schema = None
+    output_schema: object = None
     if output_type is not None:
         try:
-            output_schema = TypeAdapter(output_type).json_schema()
+            output_schema = (
+                output_type.json_schema()
+                if isinstance(output_type, AgentOutputSchemaBase)
+                else TypeAdapter(output_type).json_schema()
+            )
         except Exception:
             output_schema = repr(output_type)
     material = {
@@ -211,7 +225,10 @@ class UsageLedger:
         self.estimates.append(estimate)
 
         reason = None
-        if projected_total > self.budget.max_total_tokens:
+        if (
+            self.budget.max_total_tokens is not None
+            and projected_total > self.budget.max_total_tokens
+        ):
             reason = "projected_token_limit"
         elif (
             self.budget.max_cost_usd is not None
@@ -270,7 +287,11 @@ class UsageLedger:
         })
 
         reason = None
-        if known and self.total_tokens > self.budget.max_total_tokens:
+        if (
+            known
+            and self.budget.max_total_tokens is not None
+            and self.total_tokens > self.budget.max_total_tokens
+        ):
             reason = "actual_token_limit"
         elif (
             self.budget.max_cost_usd is not None

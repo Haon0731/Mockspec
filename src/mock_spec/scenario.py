@@ -7,7 +7,8 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
 from .schemas import UnifiedTask
-from .validation import SourceStore, decode_json
+from .validation import SourceStore
+from .structured_output import parse_pydantic_json
 
 
 Text = Annotated[str, StringConstraints(min_length=1, pattern=r"\S")]
@@ -110,8 +111,9 @@ def validate_contract(
         # Revalidate even constructed/mutated model instances.
         output = output.model_dump()
     if isinstance(output, str):
-        output = decode_json(output)
-    contract = ScenarioContract.model_validate(output)
+        contract = parse_pydantic_json(ScenarioContract, output)
+    else:
+        contract = ScenarioContract.model_validate(output)
     if (contract.case_id, contract.language) != (task.case_id, task.language):
         raise ValueError("contract task identity mismatch")
     store = source_store or SourceStore(task)
