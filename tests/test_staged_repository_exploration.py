@@ -54,7 +54,7 @@ def test_repair_qualification_allows_future_read_after_disjoint_search_matches(
         assert [match["start_line"] for match in search["matches"]] == [2, 5]
         before = store.observations()
         wire = QuerySelection.model_validate({
-            "schema_version": "staged-query/v0.4",
+            "schema_version": "staged-query/v0.6",
             "decision": "request_query",
             "query_attempt": {
                 "question": "What do the intervening lines establish?",
@@ -129,13 +129,15 @@ def _repository_run(tmp_path: Path, *, bad_quote: bool = False, transform=None,
     if bad_quote:
         dynamic["quote"] = "wrong"
     construct = outputs[9]
-    deliver = outputs[10]
     construct["contract"] = deepcopy(construct["contract"])
     construct["contract"]["evidence"].append(dynamic)
     construct["contract"]["dependency_constraints"][0]["evidence_ids"].append(
         "dynamic-contract"
     )
-    deliver["contract"] = deepcopy(construct["contract"])
+    if bad_quote:
+        # The legacy model-authored quote is a structural extra. Preserve the
+        # rejection after the one allowed schema-regeneration attempt.
+        outputs.insert(10, deepcopy(construct))
 
     if transform is not None:
         transform(outputs)
@@ -220,13 +222,11 @@ def _analysis_repository_run(tmp_path: Path) -> dict:
         "rationale": "The repository observation shows the exact dependency call.",
     }
     construct = outputs[6]
-    deliver = outputs[7]
     construct["contract"] = deepcopy(construct["contract"])
     construct["contract"]["evidence"].append(dynamic)
     construct["contract"]["dependency_constraints"][0]["evidence_ids"].append(
         "dynamic-call"
     )
-    deliver["contract"] = deepcopy(construct["contract"])
 
     return asyncio.run(execute_staged_run(
         output_dir=tmp_path / "analysis-run",
@@ -251,7 +251,7 @@ def test_repository_mode_reads_more_than_six_times_and_strictly_cites_observatio
     assert result["record"]["query_accounting"] == {
         "observed_attempts": 7, "budgeted_attempts": 7, "limit": None,
     }
-    assert len(result["record"]["model_calls"]) == 11
+    assert len(result["record"]["model_calls"]) == 10
     observations = result["record"]["source_observations"]
     assert len(observations) == 7
     assert [item["response_id"] for item in observations] == [
@@ -286,7 +286,7 @@ def test_repository_binding_is_revalidated_before_materializing_citations(
     assert stage["stage"] == "EXTRACT"
     assert stage["citation_mode"] == "source_locator_host_materialized_quote/v1"
     assert stage["model_call_sequence"] == 1
-    assert stage["wire_result"]["schema_version"] == "staged-extract/v0.2"
+    assert stage["wire_result"]["schema_version"] == "staged-extract/v0.3"
     assert stage["result"] is None
     assert "quote" not in json.dumps(stage["wire_result"])
     assert str(tmp_path) not in json.dumps(result["record"]["error"])

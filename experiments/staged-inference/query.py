@@ -110,7 +110,7 @@ class QueryExecutor:
         max_attempts: int | None,
         max_output_chars: int,
         analysis_timeout_seconds: float,
-        deadline: float,
+        deadline: float | None,
         max_no_progress_attempts: int = 3,
     ) -> None:
         if type(max_no_progress_attempts) is not int or max_no_progress_attempts < 1:
@@ -124,7 +124,8 @@ class QueryExecutor:
         self.max_attempts = max_attempts
         self.deadline = deadline
         self.max_no_progress_attempts = max_no_progress_attempts
-        self.analysis.store.limit_deadline(deadline)
+        if deadline is not None:
+            self.analysis.store.limit_deadline(deadline)
         self.attempts: list[dict[str, Any]] = []
         self._seen_operations: set[str] = set()
         self._seen_evidence: set[str] = set()
@@ -217,8 +218,8 @@ class QueryExecutor:
         assert validated.tool is not None
         assert validated.arguments is not None
 
-        remaining = self.deadline - time.monotonic()
-        if remaining <= 0:
+        remaining = None if self.deadline is None else self.deadline - time.monotonic()
+        if remaining is not None and remaining <= 0:
             return self._finish(
                 record, started, "budget_exhausted",
                 self._error("run_deadline_exhausted", "The shared run deadline is exhausted."),

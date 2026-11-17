@@ -23,7 +23,7 @@ from controller import StagedRunConfig, execute_staged_run  # noqa: E402
 from investigation import InvestigationLedger  # noqa: E402
 from stage_protocol import InvestigationRequest, QuestionUpdate  # noqa: E402
 from query import QueryExecutor  # noqa: E402
-from scripted import FixedScriptModel, synthetic_task  # noqa: E402
+from scripted import FixedScriptModel, synthetic_task, _construct_selection  # noqa: E402
 from mock_spec.schemas import UnifiedTask  # noqa: E402
 from mock_spec.source_repository import ReviewedRepository  # noqa: E402
 from mock_spec.validation import SourceStore  # noqa: E402
@@ -149,7 +149,7 @@ def locator(source, start, end):
 
 
 def finish(*, update=None, remaining=None, assessment=None):
-    return {"schema_version": "staged-query/v0.4", "decision": "finish_queries", "query_attempt": None,
+    return {"schema_version": "staged-query/v0.6", "decision": "finish_queries", "query_attempt": None,
             "previous_receipt_assessment": assessment, "impact": "Assess the original goal and dependency relation.",
             "question_updates": [] if update is None else [update], "candidate_updates": [],
             "stop_explanation": {"reason": "no_further_evidence" if remaining else "evidence_sufficient",
@@ -158,13 +158,16 @@ def finish(*, update=None, remaining=None, assessment=None):
 
 
 def question_update(*, state, evidence, acquisition, sequences=(), question_id="q1"):
-    return {"question_id": question_id, "question": QUESTION, "goal_indexes": [0], "impact": IMPACT,
+    update = {"question_id": question_id, "question": QUESTION, "goal_indexes": [0], "impact": IMPACT,
             "state": state, "rationale": "The original result depends on the real transformation.",
-            "evidence": evidence, "acquisition": acquisition, "attempted_sequences": list(sequences)}
+            "evidence": evidence, "attempted_sequences": list(sequences)}
+    if state == "open":
+        update["acquisition"] = acquisition
+    return update
 
 
 def contrast(*, investigate=False):
-    return {"schema_version": "staged-contrast/v0.2", "status": "none_identified", "execution_status": "not_executed",
+    return {"schema_version": "staged-contrast/v0.3", "status": "none_identified",
             "alternative": None, "bypass_behavior": None, "evidence_ids": [], "distinguishing_observation": None,
             "revision_requested": False, "revision_reason": None, "support": "assumption",
             "assumption_reason": "Static analysis only, no global proof.", "semantic_role": "dependency_contract",
@@ -180,7 +183,32 @@ def deliver(construct):
 
 
 def run(tmp_path, task, outputs, *, repository=None, max_model_calls=20):
-    model = FixedScriptModel(outputs)
+    current = deepcopy(outputs)
+    current = [item for item in current if item["schema_version"] != "staged-deliver/v0.3"]
+    for item in current:
+        if item["schema_version"] == "staged-extract/v0.2":
+            item["schema_version"] = "staged-extract/v0.3"
+            item["unresolved"] = [{
+                "question": question, "goal_indexes": [0],
+                "impact": "The missing fact may affect the original goal.",
+            } for question in item["unresolved"]]
+        elif item["schema_version"] == "staged-query/v0.6":
+            if item["stop_explanation"] is not None:
+                item["stop_explanation"].pop("remaining_unknowns", None)
+            for update in item["question_updates"]:
+                if update["question_id"] is not None:
+                    if update.get("goal_indexes") == [0]:
+                        update.update(question=None, goal_indexes=None, impact=None)
+                if update["state"] != "open":
+                    update.pop("attempted_sequences", None)
+        elif item["schema_version"] == "staged-construct/v0.3":
+            _construct_selection(item)
+        elif item["schema_version"] == "staged-contrast/v0.3":
+            item["schema_version"] = "staged-contrast/v0.4"
+            item.pop("support", None)
+        elif item["schema_version"] == "staged-revise/v0.3":
+            _construct_selection(item["revised_construct"])
+    model = FixedScriptModel(current)
     result = asyncio.run(execute_staged_run(
         task if repository is None else None, output_dir=tmp_path / "run", model=model,
         config=StagedRunConfig(variant="C", max_model_calls=max_model_calls),
@@ -206,7 +234,7 @@ def test_zero_query_product_spec_retains_multiple_legal_mocks(tmp_path):
     assert accepted == {(20, 5), (25, 4)}
     assert artifact["regression_reference"]["status"] == "reference_only"
     assert "query_log" not in artifact
-    assert model.calls == 5
+    assert model.calls == 4
 
 
 def test_unavailable_adjust_delivers_partial_without_false_product_equation(tmp_path):
@@ -262,7 +290,7 @@ def test_material_gap_reopens_queries_and_changes_the_relation(tmp_path, origin)
         {"operation": "search", "path_pattern": "helper.py"},
         {"operation": "read", "source_id": dynamic_id, "start_line": 1, "end_line": 2},
     ]):
-        outputs.append({"schema_version": "staged-query/v0.4", "decision": "request_query",
+        outputs.append({"schema_version": "staged-query/v0.6", "decision": "request_query",
                         "query_attempt": {"question": QUESTION, "scenario_id": "original_task",
                                           "tool": "inspect_source", "arguments_json": json.dumps(args)},
                         "previous_receipt_assessment": None if index == 0 else assessment,
@@ -319,13 +347,17 @@ def test_scope_external_unknown_does_not_force_an_irrelevant_query(tmp_path):
     stopped["question_updates"] = [{
         "question_id": None, "question": question, "goal_indexes": [0], "impact": impact,
         "state": "nonblocking", "rationale": "The test's fixed input excludes other keys.",
-        "evidence": [locator("test:0", 2, 2)], "acquisition": "not_needed", "attempted_sequences": [],
+        "evidence": [locator("test:0", 2, 2)], "attempted_sequences": [],
     }]
     result, model = run(tmp_path, task, [extract(constructed), stopped, constructed, contrast(), deliver(constructed)])
     assert result["record"]["error"] is None
     assert result["spec"].semantics.delivery_status == "ready"
-    assert model.calls == 5
+    assert model.calls == 4
     assert not result["record"]["query_log"]
+    query_stage = result["record"]["stages"][1]
+    assert "acquisition" not in query_stage["wire_result"]["question_updates"][0]
+    assert query_stage["host_question_updates"][0]["acquisition"] == "not_needed"
+    assert query_stage["questions_after"][0]["state"] == "nonblocking"
 
 
 def test_supported_alternative_branches_are_not_conjoined_or_ambiguous(tmp_path):
@@ -389,7 +421,7 @@ def test_supported_alternative_branches_are_not_conjoined_or_ambiguous(tmp_path)
     assert "returns None" not in constraints[0].statement
 
 
-@pytest.mark.parametrize("mutation", ["duplicate", "rebind", "future_receipt", "unavailable_without_basis"])
+@pytest.mark.parametrize("mutation", ["duplicate", "rebind", "unavailable_without_basis"])
 def test_question_ledger_rejects_explicit_inconsistencies(tmp_path, mutation):
     task, constructed = product_reference()
     initial = extract(constructed)
@@ -399,8 +431,6 @@ def test_question_ledger_rejects_explicit_inconsistencies(tmp_path, mutation):
         updated["question_id"] = None
     elif mutation == "rebind":
         updated["goal_indexes"] = [1]
-    elif mutation == "future_receipt":
-        updated["attempted_sequences"] = [1]
     else:
         updated.update(state="open", evidence=[], acquisition="unavailable")
     stopped = finish(update=updated)
@@ -436,9 +466,7 @@ def test_revision_new_blocking_unknown_reopens_investigation_without_explicit_re
         support="evidence", assumption_reason=None,
     )
     revision = {
-        "schema_version": "staged-revise/v0.2", "revised_construct": partial,
-        "modified_objects": ["contract", "spec", "result_status", "selected_scenario_id",
-                             "unresolved", "allowed_variations", "claim_basis"],
+        "schema_version": "staged-revise/v0.3", "revised_construct": partial,
         "evidence_reason": "Preserve the unobserved real computation's effect on the original objective.",
         "evidence_ids": ["mut", "test"], "request_another_revision": False,
     }
@@ -472,11 +500,11 @@ def test_question_citing_combined_read_ranges_requires_both_receipts(tmp_path):
                                  sequences=[1], question_id=None)
         questions = InvestigationLedger(1, repository_available=True)
         with pytest.raises(ValueError, match="associated with its observed query receipt"):
-            questions.apply_updates([QuestionUpdate.model_validate(update)],
+            questions.apply_updates([QuestionUpdate.model_validate({**update, "acquisition": "not_needed"})],
                                     store=store, attempts=executor.attempts, task=task)
         assert questions.snapshot() == []
         update["attempted_sequences"] = [1, 2]
-        questions.apply_updates([QuestionUpdate.model_validate(update)],
+        questions.apply_updates([QuestionUpdate.model_validate({**update, "acquisition": "not_needed"})],
                                 store=store, attempts=executor.attempts, task=task)
         assert questions.snapshot()[0]["state"] == "resolved"
     finally:
@@ -493,7 +521,7 @@ def test_reopening_question_cannot_erase_original_association(origin):
     update = question_update(state="resolved", evidence=[locator("mut:0", 1, 5)],
                              acquisition="not_needed", sequences=[1], question_id="q1")
     questions.apply_updates(
-        [QuestionUpdate.model_validate(update)], store=SourceStore(task), task=task,
+        [QuestionUpdate.model_validate({**update, "acquisition": "not_needed"})], store=SourceStore(task), task=task,
         attempts=[{"sequence": 1, "status": "ok", "result": {}, "response_id": "read-1"}],
     )
     before = questions.snapshot()
@@ -533,8 +561,12 @@ def test_partial_goal_coverage_and_unknown_impact_must_agree(defect):
     # Materialize the fixture's source quotes through the stage protocol.
     from stage_protocol import ConstructSelection, materialize_construct
     task, _ = product_reference(adjust=True)
-    contract = materialize_construct(ConstructSelection.model_validate(constructed),
-                                      SourceStore(UnifiedTask.from_dict(task))).contract
+    wire = deepcopy(constructed)
+    _construct_selection(wire)
+    task_model = UnifiedTask.from_dict(task)
+    contract = materialize_construct(
+        ConstructSelection.model_validate(wire), SourceStore(task_model), task_model,
+    ).contract
     assert isinstance(contract, ScenarioContract)
     with pytest.raises(ValueError, match="blocked coverage|affected goal indexes"):
         validate_semantics(semantics, contract)

@@ -28,7 +28,7 @@ from scripted import FixedScriptModel, synthetic_task  # noqa: E402
 
 def _raw_query() -> dict:
     return {
-        "schema_version": "staged-query/v0.4",
+        "schema_version": "staged-query/v0.6",
         "decision": "request_query",
         "query_attempt": {
             "question": "Which exact behavior constrains the candidate?",

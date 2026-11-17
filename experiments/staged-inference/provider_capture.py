@@ -120,7 +120,7 @@ class ResponseCapture:
     response-hook events.  Request headers and request bodies are never retained.
     """
 
-    max_body_bytes: int = 2_000_000
+    max_body_bytes: int | None = 2_000_000
     _active_sequence: int | None = None
     _captures: dict[int, list[dict[str, object]]] = field(default_factory=dict)
 
@@ -137,7 +137,7 @@ class ResponseCapture:
         if sequence is None:
             raise RuntimeError("provider response arrived without an active model call")
         content = await response.aread()
-        truncated = len(content) > self.max_body_bytes
+        truncated = self.max_body_bytes is not None and len(content) > self.max_body_bytes
         retained = content[: self.max_body_bytes]
         try:
             decoded: object = json.loads(retained)

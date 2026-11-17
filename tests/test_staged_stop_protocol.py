@@ -16,9 +16,10 @@ def test_agent_stop_preserves_evidence_and_unknown_impact(tmp_path, reason):
         stop = final_query["stop_explanation"]
         stop["reason"] = reason
         if reason == "evidence_sufficient":
-            stop["remaining_unknowns"] = []
             for update in final_query["question_updates"]:
                 update["state"] = "resolved"
+                update.pop("acquisition", None)
+                update.pop("attempted_sequences", None)
                 update["rationale"] = "The cited evidence closes this fixture question."
     result = _repository_run(tmp_path, transform=change)
     assert result["contract"] is not None, result["record"]["error"]

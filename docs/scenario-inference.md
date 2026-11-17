@@ -56,13 +56,21 @@ V0.2 的源码工具只补充已有可见输入的事实，不写验证成功状
 正式 Evidence 和以下映射不变，最终契约继续通过原逐字校验；
 原文真实不意味着它支持模型结论，证据相关性仍需独立审查。
 
-QUERY wire 在此基础上使用 `staged-query/v0.4`：模型评估仍仅含 impact/rationale，
+QUERY wire 在此基础上使用 `staged-query/v0.6`：模型评估仍仅含 impact/rationale，
 另用独立字段更新与原目标关联的问题及当前候选；宿主关联唯一 pending receipt 后补入
 内部 v0.1 assessment 的 attempt_sequence。
+开放问题由模型声明证据仍 `available` 或经实际尝试后 `unavailable`；已解决或非阻塞问题
+不再让模型重复填写 acquisition，宿主固定投影为 `not_needed`，并在阶段记录中同时保留
+原始 wire 与 `host_question_updates`。证据、回执关联、原目标绑定和停止充分性校验不变。
+既有问题只回传宿主 `question_id` 与本轮语义判断；question、goal_indexes、impact 由宿主从账本恢复。
+闭合问题的回执序号由已观察证据反推，开放问题的既有尝试历史与本轮相关尝试由宿主做去重并集，
+模型不能通过后续更新抹掉已有 provenance。停止时的 remaining_unknowns 同样从更新后的账本投影。
 原始 wire、宿主关联和宿主 quote 分别留证。未知 null 字段的有限纠正不接受宿主投影为结果；
-模型重发须与比较快照精确一致，且与 DELIVER 共用一次名额。
+模型重发须与比较快照精确一致。DELIVER 为宿主确定性发布，不占用模型或修复名额。
 候选表达有条件的依赖约束；imports、测试名与最终断言不能独自证明隐藏 Mock 配置，
-仅取得声明行且未确定行为时评估为 no_new_information。语义充分性由独立评阅判定。
+仅取得声明行且未确定行为时评估为 no_new_information。QUERY 查询可观察依赖行为及合法替代，
+不会为恢复隐藏 Mock/VERIFY 文本、框架写法或无证据的调用次数继续探索。
+语义充分性由独立评阅判定。
 
 分阶段研究控制器保持正式 `mock-spec.scenario/v0.1` 不变，并在
 `inference_record.json` 保存场景卡所需的研究旁路信息：
@@ -72,18 +80,15 @@ QUERY wire 在此基础上使用 `staged-query/v0.4`：模型评估仍仅含 imp
 | scenario | `scenario_hypotheses` |
 | evidence | 正式 `evidence`；动态引用还须属于本次运行的 observed 范围 |
 | dependency_behavior | `dependency_constraints` |
-| key_behaviors | `critical_behaviors`，最多三项，并用 `semantic_role` 与 `formal_claim_index` 关联正式 Claim |
+| key_behaviors | 正式 `dependency_constraints`、`test_objectives` 与消费规格中的 goal/constraint 关系 |
 | counterfactual / discriminator | `degeneracy_contrast`；`execution_status` 固定为 `not_executed` |
 | allowed_variations | `allowed_variations` |
 | unknowns | 正式 `uncertainty` 加旁路 `unresolved` / `nonblocking_unknowns` |
 
-仓库探索模式下，每项重要旁路判断还记录 `semantic_role`，区分
-`dependency_contract`、`mut_path_condition` 和 `test_objective`。判断须以
-`support=evidence` 关联正式 evidence ID，或以 `support=assumption` 给出明确的
-`assumption_reason`；不能两者混用。`claim_basis` 进一步用 `target` 和
-`target_index` 覆盖选择理由、允许变化、阻塞未知与非阻塞未知；静态反事实也须
-声明 `semantic_role`。上述字段用于复核内容来源，
-不扩展或改写冻结的正式契约 Schema。
+CONSTRUCT wire 不再要求模型维护 `claim_basis`、前三项 `critical_behaviors` 或数组索引。
+模型为正式目标、依赖约束和 uncertainty 声明稳定 ref，并在消费规格中用 ref 表达语义关系；
+宿主只校验唯一性、解析为发布 artifact 的局部索引并从 `spec` 投影允许变化与未知摘要，
+不推断 `semantic_role`、证据蕴含或目标关系。正式契约 Schema 不变。
 
 ## 能证明和不能证明的事项
 

@@ -4,13 +4,20 @@ from __future__ import annotations
 
 import asyncio
 from decimal import Decimal
+from types import SimpleNamespace
 
 import pytest
 from agents.usage import Usage
 
 import mock_spec.inference_v02 as inference_v02
-from mock_spec.budget import InferenceBudget, UsageLedger
+from mock_spec.budget import (
+    InferenceBudget,
+    UsageLedger,
+    estimate_known_request_tokens,
+)
 from mock_spec.inference import InferenceError
+from mock_spec.scenario import ScenarioContract
+from mock_spec.structured_output import PydanticOutputSchema
 from test_inference_v02 import (
     ScriptedModel,
     _install_model,
@@ -25,11 +32,86 @@ def test_budget_remains_available_from_existing_inference_import() -> None:
     assert inference_v02.InferenceBudget is InferenceBudget
 
 
+def test_request_estimate_includes_native_structured_output_schema() -> None:
+    without_schema = estimate_known_request_tokens(
+        system_prompt="prompt",
+        input_items=[],
+        agent=SimpleNamespace(tools=[], output_type=None),
+    )
+    with_schema = estimate_known_request_tokens(
+        system_prompt="prompt",
+        input_items=[],
+        agent=SimpleNamespace(
+            tools=[], output_type=PydanticOutputSchema(ScenarioContract)
+        ),
+    )
+
+    assert with_schema[0] > without_schema[0]
+    assert with_schema[1] > without_schema[1] + 1_000
+
+
 def test_budget_requires_complete_explicit_prices_for_cost_limit() -> None:
     with pytest.raises(InferenceError, match="requires explicit"):
         inference_v02.InferenceBudget(max_cost_usd=Decimal("1"))
     with pytest.raises(InferenceError, match="configured together"):
         inference_v02.InferenceBudget(input_cost_per_million=Decimal("1"))
+
+
+@pytest.mark.parametrize("value", [0, -1, 1.5, "100"])
+def test_optional_total_token_limit_still_rejects_invalid_values(value) -> None:
+    with pytest.raises(InferenceError, match="max_total_tokens must be a positive integer"):
+        inference_v02.InferenceBudget(max_total_tokens=value)
+
+
+def test_no_total_token_limit_keeps_accounting_and_allows_later_calls(monkeypatch) -> None:
+    budget = inference_v02.InferenceBudget(
+        max_output_tokens=100,
+        max_total_tokens=None,
+    )
+    ledger = UsageLedger(budget)
+    agent = SimpleNamespace(tools=[], output_type=None)
+    monkeypatch.setattr(
+        "mock_spec.budget.estimate_known_request_tokens",
+        lambda **_kwargs: (30_000, 120_000),
+    )
+
+    ledger.before_model_call(system_prompt=None, input_items=[], agent=agent)
+    ledger.after_model_call(SimpleNamespace(
+        usage=Usage(
+            requests=1, input_tokens=30_000, output_tokens=2_000, total_tokens=32_000
+        ),
+        raw_usage={"total_tokens": 32_000},
+    ))
+    ledger.before_model_call(system_prompt=None, input_items=[], agent=agent)
+
+    assert ledger.requests_started == 2
+    assert ledger.total_tokens == 32_000
+    assert ledger.gate_events[-1]["status"] == "allowed"
+
+
+def test_no_total_token_limit_still_enforces_explicit_cost_limit(monkeypatch) -> None:
+    budget = inference_v02.InferenceBudget(
+        max_output_tokens=100,
+        max_total_tokens=None,
+        max_cost_usd=Decimal("0.01"),
+        input_cost_per_million=Decimal("1"),
+        output_cost_per_million=Decimal("1"),
+    )
+    ledger = UsageLedger(budget)
+    monkeypatch.setattr(
+        "mock_spec.budget.estimate_known_request_tokens",
+        lambda **_kwargs: (20_000, 80_000),
+    )
+
+    with pytest.raises(InferenceError) as caught:
+        ledger.before_model_call(
+            system_prompt=None,
+            input_items=[],
+            agent=SimpleNamespace(tools=[], output_type=None),
+        )
+
+    assert caught.value.category == "budget_exhausted"
+    assert ledger.gate_events[-1]["reason"] == "projected_cost_limit"
 
 
 def test_preflight_token_gate_blocks_before_model_call(monkeypatch) -> None:

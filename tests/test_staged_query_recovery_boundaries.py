@@ -16,7 +16,7 @@ from controller import _completed_response_json, _query_repair_snapshot  # noqa:
 
 def _query_with_extra(*, extra_name: str = "attempt_sequence_note", value=None) -> dict:
     return {
-        "schema_version": "staged-query/v0.4",
+        "schema_version": "staged-query/v0.6",
         "decision": "request_query",
         "query_attempt": {
             "question": "What behavior constrains this candidate?",
@@ -53,6 +53,21 @@ def test_completed_response_accepts_one_completed_text_plus_reasoning() -> None:
     raw = _query_with_extra()
 
     assert _completed_response_json(_response(json.dumps(raw))) == raw
+
+
+def test_completed_response_accepts_one_outer_json_fence() -> None:
+    raw = _query_with_extra()
+
+    assert _completed_response_json(
+        _response(f"```json\n{json.dumps(raw)}\n```")
+    ) == raw
+
+
+def test_completed_response_does_not_extract_json_from_prose() -> None:
+    raw = _query_with_extra()
+
+    with pytest.raises(ValueError):
+        _completed_response_json(_response(f"result:\n{json.dumps(raw)}"))
 
 
 @pytest.mark.parametrize(
@@ -94,8 +109,8 @@ def test_completed_response_rejects_ambiguous_or_incomplete_output(mutation: str
 
 def test_completed_response_rejects_duplicate_json_keys() -> None:
     response = _response(
-        '{"schema_version":"staged-query/v0.4",'
-        '"schema_version":"staged-query/v0.4"}'
+        '{"schema_version":"staged-query/v0.6",'
+        '"schema_version":"staged-query/v0.6"}'
     )
 
     with pytest.raises(ValueError):

@@ -102,6 +102,7 @@ def _code_hashes() -> dict[str, str]:
         package / "python_analysis_runner.py",
         package / "java_analysis.py",
         package / "scenario.py",
+        package / "structured_output.py",
         package / "schemas.py",
         package / "validation.py",
         package / "experiment_ledger.py",

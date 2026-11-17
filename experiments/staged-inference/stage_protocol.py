@@ -7,11 +7,17 @@ from typing import Annotated, Any, Literal, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, ValidationError
 
-from mock_spec.scenario import ScenarioContract, validate_contract
+from mock_spec.scenario import (
+    Claim, Hypothesis, Interaction, ScenarioContract, VerificationCandidate,
+    validate_contract,
+)
 from mock_spec.schemas import UnifiedTask
 from mock_spec.validation import SourceStore
 
-from specification import SpecSemantics
+from specification import (
+    BranchDecision, Premise, PreservedRealLogic, ReplacementBoundary, SpecConflict,
+    SpecSemantics,
+)
 
 
 Text = Annotated[str, StringConstraints(min_length=1, pattern=r"\S")]
@@ -62,12 +68,18 @@ class CandidateSelection(StageModel):
     evidence: list[SourceLocator]
 
 
+class ExtractUnknown(StageModel):
+    question: Text
+    goal_indexes: Annotated[list[Annotated[int, Field(ge=0)]], Field(min_length=1)]
+    impact: Text
+
+
 class ExtractSelection(StageModel):
-    schema_version: Literal["staged-extract/v0.2"]
+    schema_version: Literal["staged-extract/v0.3"]
     result_status: Literal["CONTINUE", "INCONCLUSIVE"] = "CONTINUE"
     original_goals: list[SourceLocator]
     candidates: list[CandidateSelection]
-    unresolved: list[Text]
+    unresolved: list[ExtractUnknown]
 
 
 class QueryAssessment(StageModel):
@@ -98,11 +110,43 @@ class InvestigationRequest(StageModel):
     impact: Text
 
 
-class QuestionUpdate(InvestigationRequest):
-    question_id: Text | None
-    state: Literal["open", "resolved", "nonblocking"]
+class QuestionAssessmentBase(StageModel):
     rationale: Text
     evidence: list[SourceLocator]
+
+
+class OpenQuestionUpdateSelection(QuestionAssessmentBase):
+    """Existing questions use null immutable fields; new questions provide them."""
+
+    question_id: Text | None
+    question: Text | None
+    goal_indexes: list[Annotated[int, Field(ge=0)]] | None
+    impact: Text | None
+    state: Literal["open"]
+    acquisition: Literal["available", "unavailable"]
+    attempted_sequences: list[Annotated[int, Field(ge=1)]]
+
+
+class ClosedQuestionUpdateSelection(QuestionAssessmentBase):
+    """Model-facing update whose acquisition state is owned by the host."""
+
+    question_id: Text | None
+    question: Text | None
+    goal_indexes: list[Annotated[int, Field(ge=0)]] | None
+    impact: Text | None
+    state: Literal["resolved", "nonblocking"]
+
+
+QuestionUpdateSelection = (
+    OpenQuestionUpdateSelection | ClosedQuestionUpdateSelection
+)
+
+
+class QuestionUpdate(InvestigationRequest, QuestionAssessmentBase):
+    """Host-owned ledger update after projecting the model-facing selection."""
+
+    question_id: Text | None
+    state: Literal["open", "resolved", "nonblocking"]
     acquisition: Literal["available", "unavailable", "not_needed"]
     attempted_sequences: list[Annotated[int, Field(ge=1)]]
 
@@ -124,7 +168,6 @@ class ExplorationStopSelection(StageModel):
     reason: Literal["evidence_sufficient", "unknowns_nonblocking", "no_further_evidence"]
     rationale: Text
     evidence: list[SourceLocator]
-    remaining_unknowns: list[RemainingUnknown]
 
 
 class QueryResult(StageModel):
@@ -137,34 +180,20 @@ class QueryResult(StageModel):
 
 
 class QuerySelection(StageModel):
-    schema_version: Literal["staged-query/v0.4"]
+    schema_version: Literal["staged-query/v0.6"]
     decision: Literal["request_query", "finish_queries"]
     query_attempt: QueryAttempt | None
     previous_receipt_assessment: QueryAssessmentSelection | None
     impact: Text
     stop_explanation: ExplorationStopSelection | None
-    question_updates: list[QuestionUpdate] = Field(default_factory=list)
+    question_updates: list[QuestionUpdateSelection] = Field(default_factory=list)
     candidate_updates: list[CandidateSelection] = Field(default_factory=list)
-
-
-class CriticalBehavior(StageModel):
-    behavior: Text
-    observation: Text
-    evidence_ids: list[Text]
-    semantic_role: Literal[
-        "dependency_contract", "mut_path_condition", "test_objective"
-    ] | None = None
-    formal_claim_index: Annotated[int, Field(ge=0)] | None = None
-    support: Literal["evidence", "assumption"] | None = None
-    assumption_reason: Text | None = None
 
 
 class ConstructContent(StageModel):
     result_status: Literal["SELECTED", "ALTERNATIVES", "AMBIGUOUS", "INCONCLUSIVE"]
     selected_scenario_id: Text | None
     selection_rationale: Text
-    claim_basis: list["ClaimBasis"]
-    critical_behaviors: Annotated[list[CriticalBehavior], Field(max_length=3)]
     allowed_variations: list[Text]
     unresolved: list[Text]
     nonblocking_unknowns: list[Text] = Field(default_factory=list)
@@ -177,37 +206,99 @@ class ConstructResult(ConstructContent):
     contract: ScenarioContract | None
 
 
-class ScenarioContractSelection(ScenarioContract):
-    """Formal contract wire DTO that changes only evidence representation."""
-
-    evidence: list[EvidenceSelection]  # type: ignore[assignment]
+class ReferencedClaim(Claim):
+    ref: Text
 
 
-class ConstructSelection(ConstructContent):
-    schema_version: Literal["staged-construct/v0.3"]
-    contract: ScenarioContractSelection | None
+class ReferencedContractSelection(StageModel):
+    """Wire contract with stable semantic refs; refs are not published."""
+
+    schema_version: Literal["staged-contract-selection/v0.1"]
+    test_objectives: Annotated[list[ReferencedClaim], Field(min_length=1)]
+    scenario_hypotheses: Annotated[list[Hypothesis], Field(min_length=1)]
+    dependency_constraints: list[ReferencedClaim]
+    expected_interactions: list[Interaction]
+    verification_candidates: list[VerificationCandidate]
+    evidence: list[EvidenceSelection]
+    uncertainty: list[ReferencedClaim]
 
 
-class ClaimBasis(StageModel):
-    claim: Text
-    basis: Literal["task_requirement", "implementation_fact", "scenario_inference"]
-    target: Literal[
-        "selection_rationale", "allowed_variation", "unresolved",
-        "nonblocking_unknown", "formal_claim"
-    ] | None = None
-    target_index: Annotated[int, Field(ge=0)] | None = None
-    semantic_role: Literal[
-        "dependency_contract", "mut_path_condition", "test_objective"
-    ] | None = None
-    evidence_ids: list[Text] = Field(default_factory=list)
-    support: Literal["evidence", "assumption"] | None = None
-    assumption_reason: Text | None = None
+class FixedInputSelection(StageModel):
+    statement: Text
+    goal_refs: Annotated[list[Text], Field(min_length=1)]
+    evidence_ids: Annotated[list[Text], Field(min_length=1)]
+
+
+class ConstraintBasisSelection(StageModel):
+    constraint_ref: Text
+    premise_ids: Annotated[list[Text], Field(min_length=1)]
+
+
+class GoalCoverageSelection(StageModel):
+    goal_ref: Text
+    disposition: Literal["constrained", "real_code", "blocked"]
+    constraint_refs: list[Text]
+    unknown_ids: list[Text]
+    rationale: Text
+    evidence_ids: Annotated[list[Text], Field(min_length=1)]
+    premise_ids: list[Text]
+
+
+class SpecUnknownSelection(StageModel):
+    id: Text
+    question: Text
+    impact: Text
+    disposition: Literal["blocking", "nonblocking", "out_of_scope"]
+    goal_refs: list[Text]
+    constraint_refs: list[Text]
+    scenario_ids: list[Text]
+    formal_uncertainty_refs: list[Text]
+    rationale: Text
+
+
+class AllowedVariationSelection(StageModel):
+    id: Text
+    statement: Text
+    scenario_ids: Annotated[list[Text], Field(min_length=1)]
+    constraint_refs: Annotated[list[Text], Field(min_length=1)]
+    evidence_ids: list[Text]
+    premise_ids: list[Text]
+
+
+class SpecSemanticsSelection(StageModel):
+    schema_version: Literal["staged-spec-semantics/v0.2"]
+    delivery_status: Literal["ready", "partial", "conflict"]
+    fixed_inputs: Annotated[list[FixedInputSelection], Field(min_length=1)]
+    replacement_boundary: list[ReplacementBoundary]
+    preserved_real_logic: list[PreservedRealLogic]
+    premises: Annotated[list[Premise], Field(min_length=1)]
+    constraint_basis: list[ConstraintBasisSelection]
+    branches: Annotated[list[BranchDecision], Field(min_length=1)]
+    goal_coverage: list[GoalCoverageSelection]
+    unknowns: list[SpecUnknownSelection]
+    allowed_variations: list[AllowedVariationSelection]
+    conflicts: list[SpecConflict]
+
+
+class ConstructFallbackUnknown(StageModel):
+    question: Text
+    blocking: bool
+
+
+class ConstructSelection(StageModel):
+    schema_version: Literal["staged-construct/v0.4"]
+    result_status: Literal["SELECTED", "ALTERNATIVES", "AMBIGUOUS", "INCONCLUSIVE"]
+    selected_scenario_id: Text | None
+    selection_rationale: Text
+    fallback_unknowns: list[ConstructFallbackUnknown]
+    spec: SpecSemanticsSelection | None = None
+    investigation_requests: list[InvestigationRequest] = Field(default_factory=list)
+    contract: ReferencedContractSelection | None
 
 
 class ContrastResult(StageModel):
-    schema_version: Literal["staged-contrast/v0.2"]
+    schema_version: Literal["staged-contrast/v0.3"]
     status: Literal["proposed", "none_identified"]
-    execution_status: Literal["not_executed"]
     alternative: Text | None
     bypass_behavior: Text | None
     evidence_ids: list[Text]
@@ -216,6 +307,25 @@ class ContrastResult(StageModel):
     revision_reason: Text | None
     support: Literal["evidence", "assumption"] | None = None
     assumption_reason: Text | None = None
+    semantic_role: Literal[
+        "dependency_contract", "mut_path_condition", "test_objective"
+    ] | None = None
+    weakness_review: Text
+    overconstraint_review: Text
+    observation_limits: Text
+    investigation_requests: list[InvestigationRequest] = Field(default_factory=list)
+
+
+class ContrastSelection(StageModel):
+    schema_version: Literal["staged-contrast/v0.4"]
+    status: Literal["proposed", "none_identified"]
+    alternative: Text | None
+    bypass_behavior: Text | None
+    evidence_ids: list[Text]
+    distinguishing_observation: Text | None
+    revision_requested: bool
+    revision_reason: Text | None
+    assumption_reason: Text | None
     semantic_role: Literal[
         "dependency_contract", "mut_path_condition", "test_objective"
     ] | None = None
@@ -235,9 +345,8 @@ class RevisionResult(StageModel):
 
 
 class RevisionSelection(StageModel):
-    schema_version: Literal["staged-revise/v0.2"]
+    schema_version: Literal["staged-revise/v0.3"]
     revised_construct: ConstructSelection
-    modified_objects: Annotated[list[Text], Field(min_length=1)]
     evidence_reason: Text
     evidence_ids: Annotated[list[Text], Field(min_length=1)]
     request_another_revision: bool = False
@@ -248,13 +357,6 @@ class DeliverResult(StageModel):
     result_status: Literal["SELECTED", "ALTERNATIVES", "AMBIGUOUS", "INCONCLUSIVE"]
     selected_scenario_id: Text | None
     contract: ScenarioContract | None
-
-
-class DeliverSelection(StageModel):
-    schema_version: Literal["staged-deliver/v0.3"]
-    result_status: Literal["SELECTED", "ALTERNATIVES", "AMBIGUOUS", "INCONCLUSIVE"]
-    selected_scenario_id: Text | None
-    contract: ScenarioContractSelection | None
 
 
 class CitationMaterializationError(ValueError):
@@ -301,8 +403,6 @@ def materialize_contract(
 ) -> ScenarioContract | None:
     if raw is None:
         return None
-    if isinstance(raw, ScenarioContractSelection):
-        raw = raw.model_dump(mode="json")
     if not isinstance(raw, dict):
         raise ValueError("contract selection must be an object or null")
     selected = deepcopy(raw)
@@ -329,13 +429,75 @@ def materialize_contract(
     return ScenarioContract.model_validate(selected)
 
 
-def contract_selection(contract: ScenarioContract | None) -> dict | None:
-    if contract is None:
-        return None
-    selected = contract.model_dump(mode="json")
-    for evidence in selected["evidence"]:
-        evidence.pop("quote")
-    return selected
+def _ref_indexes(refs: list[str], lookup: dict[str, int], label: str) -> list[int]:
+    if len(refs) != len(set(refs)):
+        raise ValueError(f"{label} contains duplicate stable refs")
+    try:
+        return [lookup[ref] for ref in refs]
+    except KeyError as exc:
+        raise ValueError(f"{label} references unknown stable ref: {exc.args[0]}") from None
+
+
+def _materialize_referenced_contract(
+    raw: ReferencedContractSelection, store: SourceStore, task: UnifiedTask, *, field_path: str,
+) -> tuple[ScenarioContract, dict[str, dict[str, int]]]:
+    selected = raw.model_dump(mode="json")
+    selected["schema_version"] = "mock-spec.scenario/v0.1"
+    selected["case_id"] = task.case_id
+    selected["language"] = task.language
+    refs: dict[str, dict[str, int]] = {}
+    for name, items in (
+        ("goal", selected["test_objectives"]),
+        ("constraint", selected["dependency_constraints"]),
+        ("uncertainty", selected["uncertainty"]),
+    ):
+        mapping: dict[str, int] = {}
+        for index, item in enumerate(items):
+            ref = item.pop("ref")
+            if ref in mapping:
+                raise ValueError(f"duplicate {name} stable ref")
+            mapping[ref] = index
+        refs[name] = mapping
+    contract = materialize_contract(selected, store, field_path=field_path)
+    assert contract is not None
+    return contract, refs
+
+
+def _materialize_spec(
+    raw: SpecSemanticsSelection, refs: dict[str, dict[str, int]],
+) -> SpecSemantics:
+    selected = raw.model_dump(mode="json")
+    selected["schema_version"] = "staged-spec-semantics/v0.1"
+    for item in selected["fixed_inputs"]:
+        item["goal_indexes"] = _ref_indexes(
+            item.pop("goal_refs"), refs["goal"], "fixed input",
+        )
+    for item in selected["constraint_basis"]:
+        item["constraint_index"] = _ref_indexes(
+            [item.pop("constraint_ref")], refs["constraint"], "constraint basis",
+        )[0]
+    for item in selected["goal_coverage"]:
+        item["goal_index"] = _ref_indexes(
+            [item.pop("goal_ref")], refs["goal"], "goal coverage",
+        )[0]
+        item["constraint_indexes"] = _ref_indexes(
+            item.pop("constraint_refs"), refs["constraint"], "goal coverage",
+        )
+    for item in selected["unknowns"]:
+        item["goal_indexes"] = _ref_indexes(
+            item.pop("goal_refs"), refs["goal"], "unknown",
+        )
+        item["constraint_indexes"] = _ref_indexes(
+            item.pop("constraint_refs"), refs["constraint"], "unknown",
+        )
+        item["formal_uncertainty_indexes"] = _ref_indexes(
+            item.pop("formal_uncertainty_refs"), refs["uncertainty"], "unknown",
+        )
+    for item in selected["allowed_variations"]:
+        item["constraint_indexes"] = _ref_indexes(
+            item.pop("constraint_refs"), refs["constraint"], "allowed variation",
+        )
+    return SpecSemantics.model_validate(selected)
 
 
 def materialize_extract(wire: ExtractSelection, store: SourceStore) -> ExtractResult:
@@ -356,7 +518,7 @@ def materialize_extract(wire: ExtractSelection, store: SourceStore) -> ExtractRe
                 for index, ref in enumerate(item.evidence)
             ],
         ) for candidate_index, item in enumerate(wire.candidates)],
-        unresolved=wire.unresolved,
+        unresolved=[item.question for item in wire.unresolved],
     )
 
 
@@ -374,7 +536,8 @@ def materialize_query(
                 )
                 for index, item in enumerate(wire.stop_explanation.evidence)
             ],
-            remaining_unknowns=wire.stop_explanation.remaining_unknowns,
+            # Projected from the host question ledger after updates are applied.
+            remaining_unknowns=[],
         )
     assessment = None
     if wire.previous_receipt_assessment is not None:
@@ -395,46 +558,123 @@ def materialize_query(
     )
 
 
+def project_question_updates(
+    updates: list[QuestionUpdateSelection],
+    *, existing_questions: list[dict[str, Any]], attempts: list[dict[str, Any]],
+    store: SourceStore,
+) -> list[QuestionUpdate]:
+    """Restore immutable ledger fields and observed receipt provenance."""
+    existing = {item["question_id"]: item for item in existing_questions}
+    observations = store.observations()
+    projected: list[QuestionUpdate] = []
+    for update in updates:
+        values = update.model_dump(mode="json")
+        question_id = values.get("question_id")
+        prior: dict[str, Any] | None = None
+        if question_id is not None:
+            prior = existing.get(question_id)
+            if prior is None:
+                raise ValueError("question update references an unknown question")
+            if any(values.get(key) is not None for key in ("question", "goal_indexes", "impact")):
+                raise ValueError("existing question update must not repeat immutable fields")
+            values.update(
+                question=prior["question"], goal_indexes=prior["goal_indexes"],
+                impact=prior["impact"],
+            )
+        elif any(values.get(key) is None for key in ("question", "goal_indexes", "impact")):
+            raise ValueError("new question update requires question, goals, and impact")
+        if values["state"] in {"resolved", "nonblocking"}:
+            values["acquisition"] = "not_needed"
+            response_ids = {
+                observation.get("response_id")
+                for locator in update.evidence for observation in observations
+                if observation["source_id"] == locator.source_id
+                and isinstance(observation["start_line"], int)
+                and isinstance(observation["end_line"], int)
+                and observation["start_line"] <= locator.end_line
+                and observation["end_line"] >= locator.start_line
+            }
+            values["attempted_sequences"] = sorted(
+                item["sequence"] for item in attempts
+                if item.get("response_id") in response_ids
+            )
+        if prior is not None:
+            values["attempted_sequences"] = sorted({
+                *prior.get("attempted_sequences", []),
+                *values.get("attempted_sequences", []),
+            })
+        projected.append(QuestionUpdate.model_validate(values))
+    return projected
+
+
 def materialize_construct(
-    wire: ConstructSelection, store: SourceStore, *, field_path: str = "",
+    wire: ConstructSelection, store: SourceStore, task: UnifiedTask, *, field_path: str = "",
 ) -> ConstructResult:
+    contract: ScenarioContract | None = None
+    spec: SpecSemantics | None = None
+    if wire.contract is not None:
+        contract, refs = _materialize_referenced_contract(
+            wire.contract, store, task, field_path=f"{field_path}.contract".lstrip("."),
+        )
+        if wire.spec is not None:
+            spec = _materialize_spec(wire.spec, refs)
+    elif wire.spec is not None:
+        raise ValueError("specification semantics require a formal contract")
+    if wire.spec is not None and wire.fallback_unknowns:
+        raise ValueError("fallback unknowns are only allowed when spec is absent")
+    unresolved = [item.question for item in wire.fallback_unknowns if item.blocking]
+    nonblocking = [item.question for item in wire.fallback_unknowns if not item.blocking]
+    allowed_variations: list[str] = []
+    if spec is not None:
+        unresolved = [
+            item.question for item in spec.unknowns if item.disposition == "blocking"
+        ]
+        nonblocking = [
+            item.question for item in spec.unknowns if item.disposition != "blocking"
+        ]
+        allowed_variations = [item.statement for item in spec.allowed_variations]
     return ConstructResult(
         schema_version="staged-construct/v0.1",
         result_status=wire.result_status,
         selected_scenario_id=wire.selected_scenario_id,
         selection_rationale=wire.selection_rationale,
-        claim_basis=wire.claim_basis,
-        critical_behaviors=wire.critical_behaviors,
-        allowed_variations=wire.allowed_variations,
-        unresolved=wire.unresolved,
-        nonblocking_unknowns=wire.nonblocking_unknowns,
-        spec=wire.spec,
+        allowed_variations=allowed_variations,
+        unresolved=unresolved,
+        nonblocking_unknowns=nonblocking,
+        spec=spec,
         investigation_requests=wire.investigation_requests,
-        contract=materialize_contract(
-            wire.contract, store, field_path=f"{field_path}.contract".lstrip("."),
-        ),
+        contract=contract,
     )
 
 
-def materialize_revision(wire: RevisionSelection, store: SourceStore) -> RevisionResult:
+def materialize_revision(
+    wire: RevisionSelection, store: SourceStore, task: UnifiedTask,
+) -> RevisionResult:
     return RevisionResult(
         schema_version="staged-revise/v0.1",
         revised_construct=materialize_construct(
-            wire.revised_construct, store, field_path="revised_construct"
+            wire.revised_construct, store, task, field_path="revised_construct"
         ),
-        modified_objects=wire.modified_objects,
+        # The host computes exact changed paths after materialization.  A placeholder
+        # is replaced before this object is recorded or consumed.
+        modified_objects=["host_pending_diff"],
         evidence_reason=wire.evidence_reason,
         evidence_ids=wire.evidence_ids,
         request_another_revision=wire.request_another_revision,
     )
 
 
-def materialize_delivery(wire: DeliverSelection, store: SourceStore) -> DeliverResult:
-    return DeliverResult(
-        schema_version="staged-deliver/v0.1",
-        result_status=wire.result_status,
-        selected_scenario_id=wire.selected_scenario_id,
-        contract=materialize_contract(wire.contract, store, field_path="contract"),
+def materialize_contrast(wire: ContrastSelection) -> ContrastResult:
+    has_evidence = bool(wire.evidence_ids)
+    has_assumption = wire.assumption_reason is not None
+    if has_evidence == has_assumption:
+        raise ValueError(
+            "contrast requires exactly one of evidence IDs or assumption reason"
+        )
+    return ContrastResult(
+        schema_version="staged-contrast/v0.3",
+        support="evidence" if has_evidence else "assumption",
+        **wire.model_dump(mode="json", exclude={"schema_version"}),
     )
 
 
@@ -460,8 +700,6 @@ def validate_constructed(
             raise ValueError("selected scenario must have candidate status")
         if constructed.unresolved:
             raise ValueError("SELECTED cannot have blocking unresolved items")
-        if not constructed.claim_basis:
-            raise ValueError("SELECTED requires claim basis")
     elif constructed.result_status == "ALTERNATIVES":
         if contract is None or len(hypotheses) < 2 or constructed.selected_scenario_id is not None:
             raise ValueError("ALTERNATIVES requires multiple complete branches and no selected ID")
@@ -488,89 +726,8 @@ def validate_constructed(
         if not constructed.unresolved:
             raise ValueError("INCONCLUSIVE must identify missing material and its impact")
 
-    if contract is not None:
-        evidence_ids = {item.id for item in contract.evidence}
-        if any(
-            not set(item.evidence_ids) <= evidence_ids
-            for item in constructed.critical_behaviors
-        ):
-            raise ValueError("critical behavior references unknown evidence")
-    elif constructed.critical_behaviors:
-        raise ValueError("critical behaviors require a complete contract")
-    if any(
-        not item.evidence_ids and not (
-            strict_mapping and item.support == "assumption"
-        )
-        for item in constructed.critical_behaviors
-    ):
-        raise ValueError("critical behavior requires evidence unless explicitly assumed")
-    if strict_mapping:
-        assert contract is not None or constructed.result_status == "INCONCLUSIVE"
-        known_evidence = set() if contract is None else {
-            item.id for item in contract.evidence
-        }
-        role_claims: dict[str, list[Any]] = {
-            "dependency_contract": [] if contract is None else contract.dependency_constraints,
-            "mut_path_condition": [] if contract is None else contract.scenario_hypotheses,
-            "test_objective": [] if contract is None else contract.test_objectives,
-        }
-
-        def check_support(
-            *, support: str | None, ids: list[str], reason: str | None, label: str
-        ) -> None:
-            if support == "evidence":
-                if not ids or reason is not None:
-                    raise ValueError(f"{label} evidence support requires only evidence IDs")
-                if not set(ids) <= known_evidence:
-                    raise ValueError(f"{label} references unknown evidence")
-            elif support == "assumption":
-                if ids or reason is None:
-                    raise ValueError(f"{label} assumption requires only an explicit reason")
-            else:
-                raise ValueError(f"{label} must declare evidence or assumption support")
-
-        for index, basis in enumerate(constructed.claim_basis):
-            if basis.semantic_role is None or basis.target is None:
-                raise ValueError("claim basis requires semantic role and target mapping")
-            check_support(
-                support=basis.support, ids=basis.evidence_ids,
-                reason=basis.assumption_reason, label=f"claim basis {index}",
-            )
-            collection_size = {
-                "selection_rationale": 1,
-                "allowed_variation": len(constructed.allowed_variations),
-                "unresolved": len(constructed.unresolved),
-                "nonblocking_unknown": len(constructed.nonblocking_unknowns),
-                "formal_claim": len(role_claims[basis.semantic_role]),
-            }[basis.target]
-            if basis.target_index is None or basis.target_index >= collection_size:
-                raise ValueError("claim basis target index is outside its mapped collection")
-
-        mapped = {(item.target, item.target_index) for item in constructed.claim_basis}
-        required_mappings = {("selection_rationale", 0)}
-        required_mappings.update(
-            ("allowed_variation", index)
-            for index in range(len(constructed.allowed_variations))
-        )
-        required_mappings.update(
-            ("unresolved", index) for index in range(len(constructed.unresolved))
-        )
-        required_mappings.update(
-            ("nonblocking_unknown", index)
-            for index in range(len(constructed.nonblocking_unknowns))
-        )
-        if not required_mappings <= mapped:
-            raise ValueError("important constructed judgments lack claim-basis mappings")
-
-        for index, behavior in enumerate(constructed.critical_behaviors):
-            if behavior.semantic_role is None or behavior.formal_claim_index is None:
-                raise ValueError("critical behavior requires a formal claim mapping")
-            if behavior.formal_claim_index >= len(role_claims[behavior.semantic_role]):
-                raise ValueError("critical behavior formal claim index is outside its role")
-            check_support(
-                support=behavior.support, ids=behavior.evidence_ids,
-                reason=behavior.assumption_reason, label=f"critical behavior {index}",
-            )
+    # Evidence/support semantics live in the contract premises and spec.  The v0.4
+    # wire no longer asks the model to maintain parallel claim/critical summaries.
     return contract
 
 
@@ -581,14 +738,16 @@ def validate_contrast(
     if not set(contrast.evidence_ids) <= evidence_ids:
         raise ValueError("degeneracy contrast references unknown evidence")
     if contrast.status == "proposed":
-        if not all((
-            contrast.alternative,
-            contrast.bypass_behavior,
-            contrast.distinguishing_observation,
-        )) or not (contrast.evidence_ids or (
+        if not (contrast.evidence_ids or (
             contrast.support == "assumption" and contrast.assumption_reason
         )):
-            raise ValueError("proposed contrast requires an alternative, bypass, evidence, and observation")
+            raise ValueError("proposed contrast requires evidence or an explicit assumption")
+        if any((contrast.alternative, contrast.bypass_behavior,
+                contrast.distinguishing_observation)) and not all((
+                    contrast.alternative, contrast.bypass_behavior,
+                    contrast.distinguishing_observation,
+                )):
+            raise ValueError("an alternative contrast bundle must be complete when present")
     elif any((
         contrast.alternative,
         contrast.bypass_behavior,
@@ -617,13 +776,14 @@ def validate_contrast(
 
 __all__ = [
     "CandidateDraft", "CandidateSelection", "CitationMaterializationError",
-    "ClaimBasis", "ConstructResult", "ConstructSelection", "ContrastResult",
-    "DeliverResult", "DeliverSelection", "ExplorationStop", "ExtractResult",
+    "ConstructResult", "ConstructSelection", "ContrastResult", "ContrastSelection",
+    "DeliverResult", "ExplorationStop", "ExtractResult",
     "ExtractSelection", "InvestigationRequest", "QueryAttempt", "QueryResult",
-    "QuerySelection", "QuestionUpdate", "RevisionResult", "RevisionSelection",
-    "ScenarioContractSelection", "SourceLocator", "SourceReference", "StageModel",
-    "StageResult", "check_source_reference", "contract_selection",
-    "materialize_construct", "materialize_contract", "materialize_delivery",
-    "materialize_extract", "materialize_query", "materialize_reference",
+    "QuerySelection", "QuestionUpdate", "QuestionUpdateSelection", "RevisionResult", "RevisionSelection",
+    "SourceLocator", "SourceReference", "StageModel",
+    "StageResult", "check_source_reference",
+    "materialize_construct", "materialize_contract",
+    "materialize_contrast", "materialize_extract", "materialize_query", "materialize_reference",
+    "project_question_updates",
     "materialize_revision", "validate_constructed", "validate_contrast",
 ]

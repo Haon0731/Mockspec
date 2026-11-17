@@ -183,17 +183,15 @@ M2接入后，总模型预算覆盖推断、生成及修复。M1阶段推断预�
 
 | 字段 | 内容 |
 |---|---|
-| `schema_version` | 当前研究记录版本 `scenario-inference-record/v0.4`；历史运行按各自产物中的版本解释 |
+| `schema_version` | 当前研究记录版本 `scenario-inference-record/v0.6`；历史运行按各自产物中的版本解释 |
 | `run_id, case_id, input_hash` | 与运行清单及输入快照一致 |
 | `result_status` | SELECTED / ALTERNATIVES / AMBIGUOUS / INCONCLUSIVE / ERROR |
 | `selected_scenario_id` | 仅SELECTED时必填，其余为null |
 | `selection_rationale` | 选择或不选择的原因，关联证据与候选 |
-| `claim_basis` | 相关命题的任务要求/实现事实/场景推断分类及引用 |
 | `query_log` | 轮次、问题、候选、工具参数、返回引用、影响 |
-| `critical_behaviors` | 行为描述、场景id、目标/证据关联、观察方式；每次构造最多突出3项，不替代完整依赖约束 |
 | `allowed_variations` | 可变值/构造/次数等；若无已知变化可列，显式说明未识别，不推断唯一 |
 | `degeneracy_contrast` | 状态、替代Mock方案、绕过行为、依据、预期区分观察；执行状态固定为not_executed |
-| `revision_log` | 修改对象、前后内容、证据原因；未修订为空数组 |
+| `revision_log` | 宿主计算的实际修改路径、前后内容、模型给出的证据原因；未修订为空数组 |
 | `unresolved` | 未决问题、影响与所需信息 |
 
 每条依赖关系必须能读出目标接口或调用位置、适用条件、参数关联、允许返回/异常，以及相关状态影响；无关的状态字段可写不涉及。符号无法解析且影响实现时标为关键未决，不能编造具体调用绑定。

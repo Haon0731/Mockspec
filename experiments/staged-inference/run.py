@@ -63,6 +63,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--repetition-threshold", type=int, default=4,
                         help="consecutive repeated queries without new evidence before protection")
     parser.add_argument("--max-output-tokens", type=int, default=4096)
+    parser.add_argument(
+        "--no-run-resource-limits", action="store_true",
+        help="diagnostic run without total token/cost/call limits or model/run/HTTP timeouts; "
+             "provider output and individual source-tool limits remain explicit",
+    )
     parser.add_argument("--max-total-tokens", type=int, default=60000)
     parser.add_argument("--max-tool-output-chars", type=int, default=16000)
     parser.add_argument("--timeout-seconds", type=float, default=120)
@@ -77,6 +82,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     model: Model
     try:
+        if args.no_run_resource_limits and args.max_cost_usd is not None:
+            raise ValueError("--no-run-resource-limits cannot be combined with --max-cost-usd")
         if args.mode == "live_inference":
             if args.task_json is not None:
                 raise ValueError("live inference does not accept --task-json")
@@ -88,13 +95,18 @@ def main(argv: list[str] | None = None) -> int:
             from agents.models.openai_responses import OpenAIResponsesModel
             from openai import AsyncOpenAI, DefaultAsyncHttpxClient
 
-            response_capture = ResponseCapture()
+            response_capture = ResponseCapture(
+                max_body_bytes=None if args.no_run_resource_limits else 2_000_000
+            )
             http_client = DefaultAsyncHttpxClient(
                 event_hooks={"response": [response_capture.on_response]}
             )
             model = OpenAIResponsesModel(
                 model=args.model.strip(),
-                openai_client=AsyncOpenAI(max_retries=0, http_client=http_client),
+                openai_client=AsyncOpenAI(
+                    max_retries=0, http_client=http_client,
+                    timeout=None if args.no_run_resource_limits else http_client.timeout,
+                ),
             )
             setattr(model, "response_capture", response_capture)
             requested_case_id = args.case_id
@@ -125,12 +137,13 @@ def main(argv: list[str] | None = None) -> int:
             config=StagedRunConfig(
                 variant=args.variant, run_mode=args.mode, model_name=model_name,
                 repository_read=args.repository_read,
+                no_run_resource_limits=args.no_run_resource_limits,
                 max_model_calls=args.max_model_calls,
                 max_output_tokens=args.max_output_tokens,
-                max_total_tokens=args.max_total_tokens,
+                max_total_tokens=None if args.no_run_resource_limits else args.max_total_tokens,
                 max_tool_output_chars=args.max_tool_output_chars,
                 repetition_threshold=args.repetition_threshold,
-                timeout_seconds=args.timeout_seconds,
+                timeout_seconds=None if args.no_run_resource_limits else args.timeout_seconds,
                 parsing_timeout_seconds=args.parsing_timeout_seconds,
                 max_cost_usd=args.max_cost_usd,
                 input_cost_per_million=args.input_cost_per_million,

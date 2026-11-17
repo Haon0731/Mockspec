@@ -7,12 +7,13 @@ import json
 from pathlib import Path
 import sys
 import time
+from typing import Literal
 
 import httpx2
 import pytest
 from agents import ModelBehaviorError
 from openai import BadRequestError
-from pydantic import ValidationError
+from pydantic import ValidationError, model_validator
 from openai.types.responses import Response
 from types import SimpleNamespace
 from agents.models.openai_responses import OpenAIResponsesModel
@@ -21,17 +22,32 @@ from mock_spec.budget import InferenceBudget, UsageLedger
 
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "experiments" / "staged-inference"))
-from controller import StagedRunConfig, _StageOutputSchema, _call_stage  # noqa: E402
-from stage_protocol import (  # noqa: E402
-    ConstructSelection, DeliverSelection, QuerySelection, RevisionSelection,
+from controller import (  # noqa: E402
+    StagedInferenceError, StagedRunConfig, _StageOutputSchema, _call_stage,
 )
+from scripted import FixedScriptModel  # noqa: E402
+from stage_protocol import (  # noqa: E402
+    ConstructSelection, ExtractSelection, QuerySelection, ReferencedContractSelection,
+    RevisionSelection, StageModel,
+)
+
+
+class _SemanticSelection(StageModel):
+    schema_version: Literal["semantic-test/v0.1"]
+    decision: str
+
+    @model_validator(mode="after")
+    def require_supported_decision(self):
+        if self.decision != "supported":
+            raise ValueError("decision lacks semantic support")
+        return self
 
 
 def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -> None:
     requests: list[dict] = []
     calls: list[dict] = []
     result = {
-        "schema_version": "staged-query/v0.4",
+        "schema_version": "staged-query/v0.6",
         "decision": "finish_queries",
         "query_attempt": None,
         "previous_receipt_assessment": None,
@@ -88,6 +104,128 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
     assert calls[0]["requested_output_schema"] == requests[0]["text"]["format"]["schema"]
 
 
+def _call_scripted_stage(stage, output_type, outputs):
+    model = FixedScriptModel(outputs)
+    calls: list[dict] = []
+    responses: list[dict] = []
+    ledger = UsageLedger(InferenceBudget(max_total_tokens=10_000))
+
+    async def run():
+        result = await _call_stage(
+            stage, output_type, {"stage": stage}, model=model,
+            config=StagedRunConfig(), ledger=ledger, responses=responses,
+            model_calls=calls, deadline=time.monotonic() + 10,
+        )
+        return result
+
+    return run, model, calls, responses, ledger
+
+
+def test_non_query_structure_error_retries_once_and_retains_both_attempts() -> None:
+    valid = {
+        "schema_version": "staged-extract/v0.3", "result_status": "CONTINUE",
+        "original_goals": [], "candidates": [], "unresolved": [],
+    }
+    run, model, calls, responses, ledger = _call_scripted_stage(
+        "EXTRACT", ExtractSelection, [{"schema_version": "staged-extract/v0.3"}, valid]
+    )
+
+    result = asyncio.run(run())
+
+    assert result.model_dump(mode="json") == valid
+    assert model.calls == ledger.requests_started == ledger.requests_completed == 2
+    assert len(responses) == len(calls) == 2
+    assert calls[0]["status"] == "failed"
+    assert calls[0]["structured_output_attempt"] == 1
+    assert calls[1]["status"] == "completed"
+    assert calls[1]["structured_output_attempt"] == 2
+    assert calls[1]["retry_of_model_call_sequence"] == calls[0]["sequence"]
+    retry_input = model.inputs[1]
+    if isinstance(retry_input, list):
+        assert len(retry_input) == 1
+        retry_input = retry_input[0]["content"]
+    assert isinstance(retry_input, str)
+    retry_payload = json.loads(retry_input)
+    assert retry_payload["structured_output_retry"] == {
+        "attempt": 2,
+        "validation_error": (
+            "original_goals: missing; candidates: missing; unresolved: missing"
+        ),
+        "instruction": (
+            "Regenerate the same stage result under the declared schema. "
+            "Do not treat this format retry as new program evidence."
+        ),
+    }
+
+
+def test_non_query_structure_retry_exhaustion_stops_after_two_attempts() -> None:
+    invalid = {"schema_version": "staged-extract/v0.3"}
+    run, model, calls, responses, ledger = _call_scripted_stage(
+        "EXTRACT", ExtractSelection, [invalid, invalid]
+    )
+
+    with pytest.raises(StagedInferenceError) as caught:
+        asyncio.run(run())
+
+    assert caught.value.stop_reason == "output_invalid"
+    assert model.calls == ledger.requests_started == ledger.requests_completed == 2
+    assert len(responses) == len(calls) == 2
+    assert [call["status"] for call in calls] == ["failed", "failed"]
+
+
+def test_query_structure_error_does_not_use_generic_retry() -> None:
+    valid = {
+        "schema_version": "staged-query/v0.6", "decision": "finish_queries",
+        "query_attempt": None, "previous_receipt_assessment": None,
+        "impact": "done", "stop_explanation": None,
+        "question_updates": [], "candidate_updates": [],
+    }
+    run, model, calls, responses, ledger = _call_scripted_stage(
+        "QUERY", QuerySelection, [{"schema_version": "staged-query/v0.6"}, valid]
+    )
+
+    with pytest.raises(StagedInferenceError) as caught:
+        asyncio.run(run())
+
+    assert caught.value.stop_reason == "output_invalid"
+    assert model.calls == ledger.requests_started == ledger.requests_completed == 1
+    assert len(responses) == len(calls) == 1
+
+
+def test_non_query_semantic_value_error_is_not_retried() -> None:
+    run, model, calls, responses, ledger = _call_scripted_stage(
+        "CONSTRUCT", _SemanticSelection,
+        [
+            {"schema_version": "semantic-test/v0.1", "decision": "guessed"},
+            {"schema_version": "semantic-test/v0.1", "decision": "supported"},
+        ],
+    )
+
+    with pytest.raises(StagedInferenceError) as caught:
+        asyncio.run(run())
+
+    assert caught.value.stop_reason == "output_invalid"
+    assert model.calls == ledger.requests_started == ledger.requests_completed == 1
+    assert len(responses) == len(calls) == 1
+
+
+def test_question_update_schema_assigns_acquisition_only_to_open_questions() -> None:
+    schema = _StageOutputSchema(QuerySelection).json_schema()
+    branches = schema["properties"]["question_updates"]["items"]["anyOf"]
+
+    assert len(branches) == 2
+    assert all(branch["type"] == "object" for branch in branches)
+    assert all(branch["additionalProperties"] is False for branch in branches)
+    open_branch = next(branch for branch in branches
+                       if branch["properties"]["state"].get("const") == "open")
+    closed_branch = next(branch for branch in branches
+                         if branch["properties"]["state"].get("enum") == ["resolved", "nonblocking"])
+    assert open_branch["properties"]["acquisition"]["enum"] == ["available", "unavailable"]
+    assert "acquisition" in open_branch["required"]
+    assert "acquisition" not in closed_branch["properties"]
+    assert "acquisition" not in closed_branch["required"]
+
+
 @pytest.mark.parametrize("invalid", [
     {"schema_version": "staged-query/v0.2"},
     {"previous_receipt_assessment": {"attempt_sequence": 1, "impact": "supports",
@@ -97,7 +235,7 @@ def test_query_schema_is_accepted_by_provider_without_untyped_union_branches() -
 ])
 def test_query_wire_strictly_rejects_legacy_or_unknown_fields(invalid) -> None:
     value = {
-        "schema_version": "staged-query/v0.4", "decision": "finish_queries",
+        "schema_version": "staged-query/v0.6", "decision": "finish_queries",
         "query_attempt": None, "previous_receipt_assessment": None,
         "impact": "inspect", "stop_explanation": None,
         "question_updates": [], "candidate_updates": [],
@@ -109,7 +247,7 @@ def test_query_wire_strictly_rejects_legacy_or_unknown_fields(invalid) -> None:
 
 @pytest.mark.parametrize(
     "output_type",
-    [QuerySelection, ConstructSelection, DeliverSelection, RevisionSelection],
+    [QuerySelection, ConstructSelection, RevisionSelection],
 )
 def test_nested_nullable_stage_objects_have_explicit_wire_types(output_type) -> None:
     schema = _StageOutputSchema(output_type)
@@ -131,13 +269,12 @@ def test_nested_nullable_stage_objects_have_explicit_wire_types(output_type) -> 
 
 
 def test_contract_selection_schema_strictly_rejects_legacy_quote_and_bad_nested_types() -> None:
-    schema = _StageOutputSchema(DeliverSelection)
+    schema = _StageOutputSchema(ReferencedContractSelection)
     contract = {
-        "schema_version": "mock-spec.scenario/v0.1",
-        "case_id": "case", "language": "python",
+        "schema_version": "staged-contract-selection/v0.1",
         "test_objectives": [{
             "statement": "goal", "status": "required", "scenario_ids": ["s"],
-            "condition": "always", "evidence_ids": ["e"],
+            "condition": "always", "evidence_ids": ["e"], "ref": "goal-1",
         }],
         "scenario_hypotheses": [{
             "id": "s", "description": "scenario", "condition": "always",
@@ -151,20 +288,13 @@ def test_contract_selection_schema_strictly_rejects_legacy_quote_and_bad_nested_
         }],
         "uncertainty": [],
     }
-    output = {
-        "schema_version": "staged-deliver/v0.3", "result_status": "SELECTED",
-        "selected_scenario_id": "s", "contract": contract,
-    }
-    assert schema.validate_json(json.dumps(output)).contract is not None
+    assert schema.validate_json(json.dumps(contract)).test_objectives
 
     contract["evidence"][0]["quote"] = "legacy"
     with pytest.raises(ModelBehaviorError):
-        schema.validate_json(json.dumps(output))
+        schema.validate_json(json.dumps(contract))
     contract["evidence"][0].pop("quote")
     contract["test_objectives"][0]["scenario_ids"] = "s"
     with pytest.raises(ModelBehaviorError):
-        schema.validate_json(json.dumps(output))
+        schema.validate_json(json.dumps(contract))
     contract["test_objectives"][0]["scenario_ids"] = ["s"]
-    contract["scenario_hypotheses"][0]["evidence_ids"] = ["unknown"]
-    with pytest.raises(ModelBehaviorError):
-        schema.validate_json(json.dumps(output))
