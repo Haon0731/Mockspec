@@ -1,0 +1,1066 @@
+{
+  "schema_version": "mock-spec.local-constraint-replay/v1",
+  "identity": {
+    "case_id": "flask_301",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "c453c24d83b12ba90fa4ca4f38b149166d417b1ad04fcd778ff6ad93fe764c44",
+    "inventory_revision": "0759c27f3d4cc7257d78d9ac2ced70089aedc60fb8d0f562b63cc8f750d7e8dc"
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_301make_response.py",
+      "sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+      "start_line": 1,
+      "end_line": 125
+    },
+    {
+      "source_id": "source:f249c086e235096e",
+      "logical_path": "src/src/flask/helpers.py",
+      "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+      "start_line": 1,
+      "end_line": 635
+    }
+  ],
+  "binding": {
+    "origin": "task_provided",
+    "product_function": "make_response",
+    "product_line": 138,
+    "test_call_line": 89,
+    "limitation": "not a new automatic import/call binding capability"
+  },
+  "baseline": {
+    "sha256": "b6775ca8a0f07e25b7b98b26e8349669d8423cfc38b057fa20412ef3cce5a751",
+    "observation_ids": [
+      "criterion:0",
+      "criterion:1",
+      "criterion:2"
+    ],
+    "return_candidates": [
+      {
+        "source": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 181,
+          "end_line": 181
+        },
+        "observation_ids": [
+          "criterion:0"
+        ]
+      },
+      {
+        "source": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 181,
+          "end_line": 181
+        },
+        "observation_ids": [
+          "criterion:1"
+        ]
+      },
+      {
+        "source": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 181,
+          "end_line": 181
+        },
+        "observation_ids": [
+          "criterion:2"
+        ]
+      },
+      {
+        "source": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 184,
+          "end_line": 184
+        },
+        "observation_ids": [
+          "criterion:0"
+        ]
+      },
+      {
+        "source": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 184,
+          "end_line": 184
+        },
+        "observation_ids": [
+          "criterion:1"
+        ]
+      },
+      {
+        "source": {
+          "logical_path": "src/src/flask/helpers.py",
+          "start_line": 184,
+          "end_line": 184
+        },
+        "observation_ids": [
+          "criterion:2"
+        ]
+      }
+    ],
+    "semantic_validation": {
+      "status": "not_evaluated",
+      "reviewer": null,
+      "evidence": [],
+      "notes": "relations are backend candidates; no case-specific gold or review used"
+    }
+  },
+  "observation_identity_mapping": {
+    "assert:92:4": "criterion:0",
+    "assert:93:4": "criterion:1",
+    "assert:94:4": "criterion:2"
+  },
+  "analysis": {
+    "schema_version": "mock-spec.local-conditional-constraints/v1",
+    "analysis_kind": "restricted_local_ast_constraint_projection",
+    "binding": {
+      "origin": "task_provided",
+      "test_function": "test_make_response_various_scenarios",
+      "test_function_location": {
+        "start_line": 37,
+        "start_column": 0,
+        "end_line": 124,
+        "end_column": 12
+      },
+      "product_function": "make_response",
+      "product_function_location": {
+        "start_line": 138,
+        "start_column": 0,
+        "end_line": 184,
+        "end_column": 42
+      },
+      "call_location": {
+        "start_line": 89,
+        "start_column": 4,
+        "end_line": 89,
+        "end_column": 39
+      }
+    },
+    "observations": [
+      {
+        "observation_id": "criterion:0",
+        "expression": "result is not None",
+        "location": {
+          "start_line": 92,
+          "start_column": 4,
+          "end_line": 92,
+          "end_column": 29
+        },
+        "result_version": "selected_call",
+        "projection": "return_shape_requirement",
+        "local_observation_id": "assert:92:4"
+      },
+      {
+        "observation_id": "criterion:1",
+        "expression": "hasattr(result, 'headers')",
+        "location": {
+          "start_line": 93,
+          "start_column": 4,
+          "end_line": 93,
+          "end_column": 37
+        },
+        "result_version": "selected_call",
+        "projection": "return_shape_requirement",
+        "local_observation_id": "assert:93:4"
+      },
+      {
+        "observation_id": "criterion:2",
+        "expression": "hasattr(result, 'status_code')",
+        "location": {
+          "start_line": 94,
+          "start_column": 4,
+          "end_line": 94,
+          "end_column": 41
+        },
+        "result_version": "selected_call",
+        "projection": "return_shape_requirement",
+        "local_observation_id": "assert:94:4"
+      }
+    ],
+    "branches": [
+      {
+        "branch_id": "row:0:empty_args",
+        "parameter_row": {
+          "scenario": "empty_args",
+          "args_input": [],
+          "expected_calls": {
+            "response_class_called": true,
+            "make_response_called": false
+          },
+          "setup_response": {
+            "status": "empty",
+            "body": ""
+          }
+        },
+        "parameter_row_literals": {
+          "scenario": {
+            "kind": "str",
+            "value": "empty_args"
+          },
+          "args_input": {
+            "kind": "tuple",
+            "items": []
+          },
+          "expected_calls": {
+            "kind": "dict",
+            "entries": [
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "response_class_called"
+                },
+                "value": {
+                  "kind": "bool",
+                  "value": true
+                }
+              },
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "make_response_called"
+                },
+                "value": {
+                  "kind": "bool",
+                  "value": false
+                }
+              }
+            ]
+          },
+          "setup_response": {
+            "kind": "dict",
+            "entries": [
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "status"
+                },
+                "value": {
+                  "kind": "str",
+                  "value": "empty"
+                }
+              },
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "body"
+                },
+                "value": {
+                  "kind": "str",
+                  "value": ""
+                }
+              }
+            ]
+          }
+        },
+        "normalized_call": {
+          "target": "make_response",
+          "actual_variadic_arguments": [],
+          "actual_variadic_arguments_literal": {
+            "kind": "tuple",
+            "items": []
+          },
+          "location": {
+            "start_line": 89,
+            "start_column": 13,
+            "end_line": 89,
+            "end_column": 39
+          },
+          "binding_origin": "task_provided",
+          "argument_status": "implementation_derived_path_fact_not_test_requirement"
+        },
+        "conditions": [
+          {
+            "expression": "not args",
+            "polarity": true,
+            "location": {
+              "start_line": 180,
+              "start_column": 7,
+              "end_line": 180,
+              "end_column": 15
+            },
+            "evaluation": "safe_static_subset"
+          }
+        ],
+        "return_site": {
+          "start_line": 181,
+          "start_column": 8,
+          "end_line": 181,
+          "end_column": 43
+        },
+        "boundary_return": {
+          "kind": "opaque_external_call_return",
+          "target_expression": "current_app.response_class",
+          "arguments": [],
+          "argument_literals": [],
+          "keyword_arguments": {},
+          "argument_status": "implementation_derived_path_fact_not_test_requirement",
+          "call_location": {
+            "start_line": 181,
+            "start_column": 15,
+            "end_line": 181,
+            "end_column": 43
+          },
+          "requirements": [
+            {
+              "kind": "return_non_null",
+              "observation_id": "criterion:0"
+            },
+            {
+              "kind": "return_has_attribute",
+              "attribute": "headers",
+              "observation_id": "criterion:1"
+            },
+            {
+              "kind": "return_has_attribute",
+              "attribute": "status_code",
+              "observation_id": "criterion:2"
+            }
+          ],
+          "authorization": "not_established",
+          "unknown_effects": [
+            "exception",
+            "state_change",
+            "runtime_dispatch",
+            "concrete_return"
+          ]
+        },
+        "status": {
+          "explanation": "partial",
+          "support": "conditional",
+          "realization": "conditional_only"
+        },
+        "blockers": []
+      },
+      {
+        "branch_id": "row:1:single_string_arg",
+        "parameter_row": {
+          "scenario": "single_string_arg",
+          "args_input": [
+            "Hello World"
+          ],
+          "expected_calls": {
+            "response_class_called": false,
+            "make_response_called": true
+          },
+          "setup_response": {
+            "status": "ok",
+            "body": "Hello World"
+          }
+        },
+        "parameter_row_literals": {
+          "scenario": {
+            "kind": "str",
+            "value": "single_string_arg"
+          },
+          "args_input": {
+            "kind": "tuple",
+            "items": [
+              {
+                "kind": "str",
+                "value": "Hello World"
+              }
+            ]
+          },
+          "expected_calls": {
+            "kind": "dict",
+            "entries": [
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "response_class_called"
+                },
+                "value": {
+                  "kind": "bool",
+                  "value": false
+                }
+              },
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "make_response_called"
+                },
+                "value": {
+                  "kind": "bool",
+                  "value": true
+                }
+              }
+            ]
+          },
+          "setup_response": {
+            "kind": "dict",
+            "entries": [
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "status"
+                },
+                "value": {
+                  "kind": "str",
+                  "value": "ok"
+                }
+              },
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "body"
+                },
+                "value": {
+                  "kind": "str",
+                  "value": "Hello World"
+                }
+              }
+            ]
+          }
+        },
+        "normalized_call": {
+          "target": "make_response",
+          "actual_variadic_arguments": [
+            "Hello World"
+          ],
+          "actual_variadic_arguments_literal": {
+            "kind": "tuple",
+            "items": [
+              {
+                "kind": "str",
+                "value": "Hello World"
+              }
+            ]
+          },
+          "location": {
+            "start_line": 89,
+            "start_column": 13,
+            "end_line": 89,
+            "end_column": 39
+          },
+          "binding_origin": "task_provided",
+          "argument_status": "implementation_derived_path_fact_not_test_requirement"
+        },
+        "conditions": [
+          {
+            "expression": "not args",
+            "polarity": false,
+            "location": {
+              "start_line": 180,
+              "start_column": 7,
+              "end_line": 180,
+              "end_column": 15
+            },
+            "evaluation": "safe_static_subset"
+          },
+          {
+            "expression": "len(args) == 1",
+            "polarity": true,
+            "location": {
+              "start_line": 182,
+              "start_column": 7,
+              "end_line": 182,
+              "end_column": 21
+            },
+            "evaluation": "safe_static_subset"
+          }
+        ],
+        "return_site": {
+          "start_line": 184,
+          "start_column": 4,
+          "end_line": 184,
+          "end_column": 42
+        },
+        "boundary_return": {
+          "kind": "opaque_external_call_return",
+          "target_expression": "current_app.make_response",
+          "arguments": [
+            "Hello World"
+          ],
+          "argument_literals": [
+            {
+              "kind": "str",
+              "value": "Hello World"
+            }
+          ],
+          "keyword_arguments": {},
+          "argument_status": "implementation_derived_path_fact_not_test_requirement",
+          "call_location": {
+            "start_line": 184,
+            "start_column": 11,
+            "end_line": 184,
+            "end_column": 42
+          },
+          "requirements": [
+            {
+              "kind": "return_non_null",
+              "observation_id": "criterion:0"
+            },
+            {
+              "kind": "return_has_attribute",
+              "attribute": "headers",
+              "observation_id": "criterion:1"
+            },
+            {
+              "kind": "return_has_attribute",
+              "attribute": "status_code",
+              "observation_id": "criterion:2"
+            }
+          ],
+          "authorization": "not_established",
+          "unknown_effects": [
+            "exception",
+            "state_change",
+            "runtime_dispatch",
+            "concrete_return"
+          ]
+        },
+        "status": {
+          "explanation": "partial",
+          "support": "conditional",
+          "realization": "conditional_only"
+        },
+        "blockers": []
+      },
+      {
+        "branch_id": "row:2:single_tuple_arg",
+        "parameter_row": {
+          "scenario": "single_tuple_arg",
+          "args_input": [
+            [
+              "Success",
+              200
+            ]
+          ],
+          "expected_calls": {
+            "response_class_called": false,
+            "make_response_called": true
+          },
+          "setup_response": {
+            "status": "ok",
+            "body": "Success",
+            "code": 200
+          }
+        },
+        "parameter_row_literals": {
+          "scenario": {
+            "kind": "str",
+            "value": "single_tuple_arg"
+          },
+          "args_input": {
+            "kind": "tuple",
+            "items": [
+              {
+                "kind": "tuple",
+                "items": [
+                  {
+                    "kind": "str",
+                    "value": "Success"
+                  },
+                  {
+                    "kind": "int",
+                    "value": 200
+                  }
+                ]
+              }
+            ]
+          },
+          "expected_calls": {
+            "kind": "dict",
+            "entries": [
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "response_class_called"
+                },
+                "value": {
+                  "kind": "bool",
+                  "value": false
+                }
+              },
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "make_response_called"
+                },
+                "value": {
+                  "kind": "bool",
+                  "value": true
+                }
+              }
+            ]
+          },
+          "setup_response": {
+            "kind": "dict",
+            "entries": [
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "status"
+                },
+                "value": {
+                  "kind": "str",
+                  "value": "ok"
+                }
+              },
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "body"
+                },
+                "value": {
+                  "kind": "str",
+                  "value": "Success"
+                }
+              },
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "code"
+                },
+                "value": {
+                  "kind": "int",
+                  "value": 200
+                }
+              }
+            ]
+          }
+        },
+        "normalized_call": {
+          "target": "make_response",
+          "actual_variadic_arguments": [
+            [
+              "Success",
+              200
+            ]
+          ],
+          "actual_variadic_arguments_literal": {
+            "kind": "tuple",
+            "items": [
+              {
+                "kind": "tuple",
+                "items": [
+                  {
+                    "kind": "str",
+                    "value": "Success"
+                  },
+                  {
+                    "kind": "int",
+                    "value": 200
+                  }
+                ]
+              }
+            ]
+          },
+          "location": {
+            "start_line": 89,
+            "start_column": 13,
+            "end_line": 89,
+            "end_column": 39
+          },
+          "binding_origin": "task_provided",
+          "argument_status": "implementation_derived_path_fact_not_test_requirement"
+        },
+        "conditions": [
+          {
+            "expression": "not args",
+            "polarity": false,
+            "location": {
+              "start_line": 180,
+              "start_column": 7,
+              "end_line": 180,
+              "end_column": 15
+            },
+            "evaluation": "safe_static_subset"
+          },
+          {
+            "expression": "len(args) == 1",
+            "polarity": true,
+            "location": {
+              "start_line": 182,
+              "start_column": 7,
+              "end_line": 182,
+              "end_column": 21
+            },
+            "evaluation": "safe_static_subset"
+          }
+        ],
+        "return_site": {
+          "start_line": 184,
+          "start_column": 4,
+          "end_line": 184,
+          "end_column": 42
+        },
+        "boundary_return": {
+          "kind": "opaque_external_call_return",
+          "target_expression": "current_app.make_response",
+          "arguments": [
+            [
+              "Success",
+              200
+            ]
+          ],
+          "argument_literals": [
+            {
+              "kind": "tuple",
+              "items": [
+                {
+                  "kind": "str",
+                  "value": "Success"
+                },
+                {
+                  "kind": "int",
+                  "value": 200
+                }
+              ]
+            }
+          ],
+          "keyword_arguments": {},
+          "argument_status": "implementation_derived_path_fact_not_test_requirement",
+          "call_location": {
+            "start_line": 184,
+            "start_column": 11,
+            "end_line": 184,
+            "end_column": 42
+          },
+          "requirements": [
+            {
+              "kind": "return_non_null",
+              "observation_id": "criterion:0"
+            },
+            {
+              "kind": "return_has_attribute",
+              "attribute": "headers",
+              "observation_id": "criterion:1"
+            },
+            {
+              "kind": "return_has_attribute",
+              "attribute": "status_code",
+              "observation_id": "criterion:2"
+            }
+          ],
+          "authorization": "not_established",
+          "unknown_effects": [
+            "exception",
+            "state_change",
+            "runtime_dispatch",
+            "concrete_return"
+          ]
+        },
+        "status": {
+          "explanation": "partial",
+          "support": "conditional",
+          "realization": "conditional_only"
+        },
+        "blockers": []
+      },
+      {
+        "branch_id": "row:3:multiple_args",
+        "parameter_row": {
+          "scenario": "multiple_args",
+          "args_input": [
+            "Not Found",
+            404
+          ],
+          "expected_calls": {
+            "response_class_called": false,
+            "make_response_called": true
+          },
+          "setup_response": {
+            "status": "not_found",
+            "body": "Not Found",
+            "code": 404
+          }
+        },
+        "parameter_row_literals": {
+          "scenario": {
+            "kind": "str",
+            "value": "multiple_args"
+          },
+          "args_input": {
+            "kind": "tuple",
+            "items": [
+              {
+                "kind": "str",
+                "value": "Not Found"
+              },
+              {
+                "kind": "int",
+                "value": 404
+              }
+            ]
+          },
+          "expected_calls": {
+            "kind": "dict",
+            "entries": [
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "response_class_called"
+                },
+                "value": {
+                  "kind": "bool",
+                  "value": false
+                }
+              },
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "make_response_called"
+                },
+                "value": {
+                  "kind": "bool",
+                  "value": true
+                }
+              }
+            ]
+          },
+          "setup_response": {
+            "kind": "dict",
+            "entries": [
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "status"
+                },
+                "value": {
+                  "kind": "str",
+                  "value": "not_found"
+                }
+              },
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "body"
+                },
+                "value": {
+                  "kind": "str",
+                  "value": "Not Found"
+                }
+              },
+              {
+                "key": {
+                  "kind": "str",
+                  "value": "code"
+                },
+                "value": {
+                  "kind": "int",
+                  "value": 404
+                }
+              }
+            ]
+          }
+        },
+        "normalized_call": {
+          "target": "make_response",
+          "actual_variadic_arguments": [
+            "Not Found",
+            404
+          ],
+          "actual_variadic_arguments_literal": {
+            "kind": "tuple",
+            "items": [
+              {
+                "kind": "str",
+                "value": "Not Found"
+              },
+              {
+                "kind": "int",
+                "value": 404
+              }
+            ]
+          },
+          "location": {
+            "start_line": 89,
+            "start_column": 13,
+            "end_line": 89,
+            "end_column": 39
+          },
+          "binding_origin": "task_provided",
+          "argument_status": "implementation_derived_path_fact_not_test_requirement"
+        },
+        "conditions": [
+          {
+            "expression": "not args",
+            "polarity": false,
+            "location": {
+              "start_line": 180,
+              "start_column": 7,
+              "end_line": 180,
+              "end_column": 15
+            },
+            "evaluation": "safe_static_subset"
+          },
+          {
+            "expression": "len(args) == 1",
+            "polarity": false,
+            "location": {
+              "start_line": 182,
+              "start_column": 7,
+              "end_line": 182,
+              "end_column": 21
+            },
+            "evaluation": "safe_static_subset"
+          }
+        ],
+        "return_site": {
+          "start_line": 184,
+          "start_column": 4,
+          "end_line": 184,
+          "end_column": 42
+        },
+        "boundary_return": {
+          "kind": "opaque_external_call_return",
+          "target_expression": "current_app.make_response",
+          "arguments": [
+            [
+              "Not Found",
+              404
+            ]
+          ],
+          "argument_literals": [
+            {
+              "kind": "tuple",
+              "items": [
+                {
+                  "kind": "str",
+                  "value": "Not Found"
+                },
+                {
+                  "kind": "int",
+                  "value": 404
+                }
+              ]
+            }
+          ],
+          "keyword_arguments": {},
+          "argument_status": "implementation_derived_path_fact_not_test_requirement",
+          "call_location": {
+            "start_line": 184,
+            "start_column": 11,
+            "end_line": 184,
+            "end_column": 42
+          },
+          "requirements": [
+            {
+              "kind": "return_non_null",
+              "observation_id": "criterion:0"
+            },
+            {
+              "kind": "return_has_attribute",
+              "attribute": "headers",
+              "observation_id": "criterion:1"
+            },
+            {
+              "kind": "return_has_attribute",
+              "attribute": "status_code",
+              "observation_id": "criterion:2"
+            }
+          ],
+          "authorization": "not_established",
+          "unknown_effects": [
+            "exception",
+            "state_change",
+            "runtime_dispatch",
+            "concrete_return"
+          ]
+        },
+        "status": {
+          "explanation": "partial",
+          "support": "conditional",
+          "realization": "conditional_only"
+        },
+        "blockers": []
+      }
+    ],
+    "common_constraints": [],
+    "unknowns": [
+      {
+        "kind": "unanalysed_test_setup_assignment",
+        "location": {
+          "start_line": 61,
+          "start_column": 4,
+          "end_line": 61,
+          "end_column": 63
+        },
+        "impact": "not_used_as_constraint_evidence"
+      },
+      {
+        "kind": "unanalysed_test_setup_assignment",
+        "location": {
+          "start_line": 62,
+          "start_column": 4,
+          "end_line": 62,
+          "end_column": 64
+        },
+        "impact": "not_used_as_constraint_evidence"
+      },
+      {
+        "kind": "unanalysed_test_setup_assignment",
+        "location": {
+          "start_line": 63,
+          "start_column": 4,
+          "end_line": 63,
+          "end_column": 30
+        },
+        "impact": "not_used_as_constraint_evidence"
+      },
+      {
+        "kind": "unanalysed_test_setup_branch",
+        "location": {
+          "start_line": 78,
+          "start_column": 4,
+          "end_line": 84,
+          "end_column": 12
+        },
+        "impact": "assumed_not_to_rebind_selected_call_inputs_or_result"
+      },
+      {
+        "kind": "post_observation_test_behavior_unanalysed",
+        "location": {
+          "start_line": 97,
+          "start_column": 4,
+          "end_line": 103,
+          "end_column": 12
+        },
+        "impact": "does_not_change_earlier_obligations"
+      },
+      {
+        "kind": "post_observation_test_behavior_unanalysed",
+        "location": {
+          "start_line": 106,
+          "start_column": 4,
+          "end_line": 124,
+          "end_column": 12
+        },
+        "impact": "does_not_change_earlier_obligations"
+      },
+      {
+        "kind": "external_call_runtime_behavior_not_modelled"
+      },
+      {
+        "kind": "call_binding_not_automatically_recovered"
+      }
+    ],
+    "coverage": {
+      "status": "partial",
+      "scope": "literal_parametrize_rows_and_selected_local_functions",
+      "unanalysed": [
+        "runtime_dispatch",
+        "exceptions",
+        "state_effects",
+        "aliases",
+        "loops",
+        "async",
+        "nonliteral_inputs",
+        "path_completeness"
+      ]
+    }
+  },
+  "cost": {
+    "wall_seconds": 0.012575841043144464,
+    "includes": "admission, two selected source checks, AST analysis, baseline comparison",
+    "backend_rebuilt": false,
+    "model_requests": 0,
+    "target_executions": 0
+  },
+  "implementation_sha256": {
+    "experiments/backward-slicing/python-backend-pilot/run_local_constraints.py": "5ec981c744af0a283c10f8ed3115f99e7dc5a5b89e38d15dc974103ee8536c58",
+    "experiments/backward-slicing/python-backend-pilot/local_constraints.py": "20af436bb8e874864b1c5ef535dc2f6402d82f693700c9b6def5f09fd9419dcd"
+  }
+}

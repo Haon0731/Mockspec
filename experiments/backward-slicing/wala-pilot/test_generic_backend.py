@@ -202,11 +202,11 @@ def test_typed_product_path_requires_homogeneous_sdg_labels():
         "slice_statements": [
             {"method": "p.Product.value()I", "line": 7},
             {"method": "p.Product.value()I", "line": 8},
-            {"method": "p.Test.test()V", "line": 20},
+            {"method": "p.Product.value()I", "line": 20},
         ],
         "slice_edges": [
             {"from": 0, "to": 1, "labels": ["DATA_DEP"]},
-            {"from": 1, "to": 2, "labels": ["HEAP_DATA_DEP"]},
+            {"from": 1, "to": 2, "labels": ["DATA_DEP"]},
         ],
     }
     paths, suppressed = subject._typed_product_paths(
@@ -227,7 +227,7 @@ def test_typed_product_path_through_opaque_placeholder_is_suppressed():
         "slice_statements": [
             {"method": "p.Product.value()I", "line": 7},
             {"method": "p.Product.placeholder()I", "line": 12},
-            {"method": "p.Test.test()V", "line": 20},
+            {"method": "p.Product.value()I", "line": 20},
         ],
         "slice_edges": [
             {"from": 0, "to": 1, "labels": ["DATA_DEP"]},
@@ -287,7 +287,7 @@ def test_product_body_paths_require_typed_segments_and_keep_state_write_boundary
             {"method": "p.Product.value()I", "context": "C", "instruction_index": 2, "line": 8},
             {"method": "p.Product.value()I", "context": "C", "instruction_index": 3, "line": 9},
             {"method": "p.Product.value()I", "context": "C", "instruction_index": 4, "line": 10},
-            {"method": "p.Test.test()V", "context": "C", "instruction_index": 5, "line": 20},
+            {"method": "p.Product.value()I", "context": "C", "instruction_index": 5, "line": 20},
         ],
         "slice_edges": [
             {"from": 0, "to": 1, "labels": ["CONTROL_DEP"]},
@@ -327,8 +327,10 @@ def test_product_body_paths_reject_self_guard_and_reconverged_branch():
              "instruction_index": 1, "retained_instruction_index": 2, "line": 7},
         ],
     }
-    assert subject._product_body_paths(
-        raw, {"p.Product": "src/main/java/p/Product.java"}) == ([], [])
+    paths, boundaries = subject._product_body_paths(
+        raw, {"p.Product": "src/main/java/p/Product.java"})
+    assert paths == []
+    assert boundaries[0]["reason"] == "no_authenticated_matched_call_return_path"
 
 
 def test_probe_and_driver_share_base_graph_then_isolate_demanded_effect_roots():
@@ -703,7 +705,7 @@ def test_large_path_projection_builds_indexes_once_and_honors_edge_budget(monkey
         "slice_statements": [
             {"method": "p.Product.value()I", "line": index + 1}
             for index in range(count - 1)
-        ] + [{"method": "p.Test.test()V", "line": count}],
+        ] + [{"method": "p.Product.value()I", "line": count}],
         "slice_edges": [
             {"from": index, "to": index + 1, "labels": ["DATA_DEP"]}
             for index in range(count - 1)

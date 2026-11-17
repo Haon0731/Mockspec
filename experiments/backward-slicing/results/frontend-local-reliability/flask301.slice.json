@@ -1,0 +1,1886 @@
+{
+  "schema_version": "mock-spec.slice-evidence/v1",
+  "identity": {
+    "case_id": "flask_301",
+    "dataset": "python-benchmark-new",
+    "language": "python",
+    "snapshot_id": "c453c24d83b12ba90fa4ca4f38b149166d417b1ad04fcd778ff6ad93fe764c44",
+    "entry_source": "task_provided",
+    "analysis_version": "restricted-local-ast/v1"
+  },
+  "sources": [
+    {
+      "source_id": "test",
+      "logical_path": "tests/test_301make_response.py",
+      "sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+      "start_line": 1,
+      "end_line": 125
+    },
+    {
+      "source_id": "source:f249c086e235096e",
+      "logical_path": "src/src/flask/helpers.py",
+      "sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+      "start_line": 1,
+      "end_line": 635
+    }
+  ],
+  "contexts": [
+    {
+      "context_id": "row:0:empty_args",
+      "label": "empty_args",
+      "input_facts": {
+        "actual_variadic_arguments_literal": {
+          "kind": "tuple",
+          "items": []
+        }
+      },
+      "evidence_ids": [
+        "src:test:14:8-14:10",
+        "rule:local-ast"
+      ]
+    },
+    {
+      "context_id": "row:1:single_string_arg",
+      "label": "single_string_arg",
+      "input_facts": {
+        "actual_variadic_arguments_literal": {
+          "kind": "tuple",
+          "items": [
+            {
+              "kind": "str",
+              "value": "Hello World"
+            }
+          ]
+        }
+      },
+      "evidence_ids": [
+        "src:test:20:8-20:24",
+        "rule:local-ast"
+      ]
+    },
+    {
+      "context_id": "row:2:single_tuple_arg",
+      "label": "single_tuple_arg",
+      "input_facts": {
+        "actual_variadic_arguments_literal": {
+          "kind": "tuple",
+          "items": [
+            {
+              "kind": "tuple",
+              "items": [
+                {
+                  "kind": "str",
+                  "value": "Success"
+                },
+                {
+                  "kind": "int",
+                  "value": 200
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "evidence_ids": [
+        "src:test:26:8-26:27",
+        "rule:local-ast"
+      ]
+    },
+    {
+      "context_id": "row:3:multiple_args",
+      "label": "multiple_args",
+      "input_facts": {
+        "actual_variadic_arguments_literal": {
+          "kind": "tuple",
+          "items": [
+            {
+              "kind": "str",
+              "value": "Not Found"
+            },
+            {
+              "kind": "int",
+              "value": 404
+            }
+          ]
+        }
+      },
+      "evidence_ids": [
+        "src:test:32:8-32:26",
+        "rule:local-ast"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "rule:local-ast",
+      "kind": "rule",
+      "source": null,
+      "rule": "restricted local AST parameter, assignment, branch and return propagation",
+      "provenance": "python-backend-pilot/local_constraints.py"
+    },
+    {
+      "evidence_id": "binding:task-provided",
+      "kind": "binding",
+      "source": null,
+      "rule": "caller supplied the test call and product function binding",
+      "provenance": "projection input; automatic binding not evaluated"
+    },
+    {
+      "evidence_id": "src:test:14:8-14:10",
+      "kind": "source",
+      "source": {
+        "source_id": "test",
+        "source_sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+        "start_line": 14,
+        "start_column": 8,
+        "end_line": 14,
+        "end_column": 10,
+        "quote": "()"
+      },
+      "rule": null,
+      "provenance": "literal variadic input for parameter row"
+    },
+    {
+      "evidence_id": "src:test:20:8-20:24",
+      "kind": "source",
+      "source": {
+        "source_id": "test",
+        "source_sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+        "start_line": 20,
+        "start_column": 8,
+        "end_line": 20,
+        "end_column": 24,
+        "quote": "(\"Hello World\",)"
+      },
+      "rule": null,
+      "provenance": "literal variadic input for parameter row"
+    },
+    {
+      "evidence_id": "src:test:26:8-26:27",
+      "kind": "source",
+      "source": {
+        "source_id": "test",
+        "source_sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+        "start_line": 26,
+        "start_column": 8,
+        "end_line": 26,
+        "end_column": 27,
+        "quote": "((\"Success\", 200),)"
+      },
+      "rule": null,
+      "provenance": "literal variadic input for parameter row"
+    },
+    {
+      "evidence_id": "src:test:32:8-32:26",
+      "kind": "source",
+      "source": {
+        "source_id": "test",
+        "source_sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+        "start_line": 32,
+        "start_column": 8,
+        "end_line": 32,
+        "end_column": 26,
+        "quote": "(\"Not Found\", 404)"
+      },
+      "rule": null,
+      "provenance": "literal variadic input for parameter row"
+    },
+    {
+      "evidence_id": "src:test:92:4-92:29",
+      "kind": "source",
+      "source": {
+        "source_id": "test",
+        "source_sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+        "start_line": 92,
+        "start_column": 4,
+        "end_line": 92,
+        "end_column": 29,
+        "quote": "assert result is not None"
+      },
+      "rule": null,
+      "provenance": "original test observation"
+    },
+    {
+      "evidence_id": "src:test:93:4-93:37",
+      "kind": "source",
+      "source": {
+        "source_id": "test",
+        "source_sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+        "start_line": 93,
+        "start_column": 4,
+        "end_line": 93,
+        "end_column": 37,
+        "quote": "assert hasattr(result, 'headers')"
+      },
+      "rule": null,
+      "provenance": "original test observation"
+    },
+    {
+      "evidence_id": "src:test:94:4-94:41",
+      "kind": "source",
+      "source": {
+        "source_id": "test",
+        "source_sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+        "start_line": 94,
+        "start_column": 4,
+        "end_line": 94,
+        "end_column": 41,
+        "quote": "assert hasattr(result, 'status_code')"
+      },
+      "rule": null,
+      "provenance": "original test observation"
+    },
+    {
+      "evidence_id": "src:test:89:4-89:39",
+      "kind": "source",
+      "source": {
+        "source_id": "test",
+        "source_sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+        "start_line": 89,
+        "start_column": 4,
+        "end_line": 89,
+        "end_column": 39,
+        "quote": "result = make_response(*args_input)"
+      },
+      "rule": null,
+      "provenance": "selected test call"
+    },
+    {
+      "evidence_id": "src:source:f249c086e235096e:138:0-138:44",
+      "kind": "source",
+      "source": {
+        "source_id": "source:f249c086e235096e",
+        "source_sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+        "start_line": 138,
+        "start_column": 0,
+        "end_line": 138,
+        "end_column": 44,
+        "quote": "def make_response(*args: t.Any) -> Response:"
+      },
+      "rule": null,
+      "provenance": "selected product declaration"
+    },
+    {
+      "evidence_id": "src:source:f249c086e235096e:180:7-180:15",
+      "kind": "source",
+      "source": {
+        "source_id": "source:f249c086e235096e",
+        "source_sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+        "start_line": 180,
+        "start_column": 7,
+        "end_line": 180,
+        "end_column": 15,
+        "quote": "not args"
+      },
+      "rule": null,
+      "provenance": "evaluated local condition"
+    },
+    {
+      "evidence_id": "src:source:f249c086e235096e:181:8-181:43",
+      "kind": "source",
+      "source": {
+        "source_id": "source:f249c086e235096e",
+        "source_sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+        "start_line": 181,
+        "start_column": 8,
+        "end_line": 181,
+        "end_column": 43,
+        "quote": "return current_app.response_class()"
+      },
+      "rule": null,
+      "provenance": "selected return statement"
+    },
+    {
+      "evidence_id": "src:source:f249c086e235096e:181:15-181:43",
+      "kind": "source",
+      "source": {
+        "source_id": "source:f249c086e235096e",
+        "source_sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+        "start_line": 181,
+        "start_column": 15,
+        "end_line": 181,
+        "end_column": 43,
+        "quote": "current_app.response_class()"
+      },
+      "rule": null,
+      "provenance": "opaque call directly returned by product"
+    },
+    {
+      "evidence_id": "src:source:f249c086e235096e:182:7-182:21",
+      "kind": "source",
+      "source": {
+        "source_id": "source:f249c086e235096e",
+        "source_sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+        "start_line": 182,
+        "start_column": 7,
+        "end_line": 182,
+        "end_column": 21,
+        "quote": "len(args) == 1"
+      },
+      "rule": null,
+      "provenance": "evaluated local condition"
+    },
+    {
+      "evidence_id": "src:source:f249c086e235096e:184:4-184:42",
+      "kind": "source",
+      "source": {
+        "source_id": "source:f249c086e235096e",
+        "source_sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+        "start_line": 184,
+        "start_column": 4,
+        "end_line": 184,
+        "end_column": 42,
+        "quote": "return current_app.make_response(args)"
+      },
+      "rule": null,
+      "provenance": "selected return statement"
+    },
+    {
+      "evidence_id": "src:source:f249c086e235096e:184:11-184:42",
+      "kind": "source",
+      "source": {
+        "source_id": "source:f249c086e235096e",
+        "source_sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+        "start_line": 184,
+        "start_column": 11,
+        "end_line": 184,
+        "end_column": 42,
+        "quote": "current_app.make_response(args)"
+      },
+      "rule": null,
+      "provenance": "opaque call directly returned by product"
+    },
+    {
+      "evidence_id": "src:source:f249c086e235096e:183:8-183:22",
+      "kind": "source",
+      "source": {
+        "source_id": "source:f249c086e235096e",
+        "source_sha256": "3939be44fe5455d5c10b0400038d89f17fb5fdbaed67ac35d250a60399d603c9",
+        "start_line": 183,
+        "start_column": 8,
+        "end_line": 183,
+        "end_column": 22,
+        "quote": "args = args[0]"
+      },
+      "rule": null,
+      "provenance": "backward-relevant executed local assignment"
+    },
+    {
+      "evidence_id": "src:test:61:4-61:63",
+      "kind": "source",
+      "source": {
+        "source_id": "test",
+        "source_sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+        "start_line": 61,
+        "start_column": 4,
+        "end_line": 61,
+        "end_column": 63,
+        "quote": "mock_response.status_code = setup_response.get(\"code\", 200)"
+      },
+      "rule": null,
+      "provenance": "visible unanalysed test region"
+    },
+    {
+      "evidence_id": "src:test:62:4-62:64",
+      "kind": "source",
+      "source": {
+        "source_id": "test",
+        "source_sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+        "start_line": 62,
+        "start_column": 4,
+        "end_line": 62,
+        "end_column": 64,
+        "quote": "mock_response.data = setup_response.get(\"body\", \"\").encode()"
+      },
+      "rule": null,
+      "provenance": "visible unanalysed test region"
+    },
+    {
+      "evidence_id": "src:test:63:4-63:30",
+      "kind": "source",
+      "source": {
+        "source_id": "test",
+        "source_sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+        "start_line": 63,
+        "start_column": 4,
+        "end_line": 63,
+        "end_column": 30,
+        "quote": "mock_response.headers = {}"
+      },
+      "rule": null,
+      "provenance": "visible unanalysed test region"
+    },
+    {
+      "evidence_id": "src:test:78:4-84:12",
+      "kind": "source",
+      "source": {
+        "source_id": "test",
+        "source_sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+        "start_line": 78,
+        "start_column": 4,
+        "end_line": 84,
+        "end_column": 12,
+        "quote": "if scenario == \"empty_args\":\n        # === PY-SLOT-START:mock_stub_005 ===\n        pass\n        # === PY-SLOT-END:mock_stub_005 ===\n    else:\n        # === PY-SLOT-START:mock_stub_006 ===\n        pass"
+      },
+      "rule": null,
+      "provenance": "visible unanalysed test region"
+    },
+    {
+      "evidence_id": "src:test:97:4-103:12",
+      "kind": "source",
+      "source": {
+        "source_id": "test",
+        "source_sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+        "start_line": 97,
+        "start_column": 4,
+        "end_line": 103,
+        "end_column": 12,
+        "quote": "if expected_calls[\"response_class_called\"]:\n        # === PY-SLOT-START:verify_001 ===\n        pass\n        # === PY-SLOT-END:verify_001 ===\n    else:\n        # === PY-SLOT-START:verify_002 ===\n        pass"
+      },
+      "rule": null,
+      "provenance": "visible unanalysed test region"
+    },
+    {
+      "evidence_id": "src:test:106:4-124:12",
+      "kind": "source",
+      "source": {
+        "source_id": "test",
+        "source_sha256": "9f0ef26744df86420e7e435d2a11dd1eaaa92e823f0f10a28fa3a75919f440e3",
+        "start_line": 106,
+        "start_column": 4,
+        "end_line": 124,
+        "end_column": 12,
+        "quote": "if expected_calls[\"make_response_called\"]:\n        if scenario == \"single_tuple_arg\":\n                                   \n            # === PY-SLOT-START:verify_003 ===\n            pass\n            # === PY-SLOT-END:verify_003 ===\n        elif scenario == \"multiple_args\":\n                        \n            # === PY-SLOT-START:verify_004 ===\n            pass\n            # === PY-SLOT-END:verify_004 ===\n        else:\n                      \n            # === PY-SLOT-START:verify_005 ===\n            pass\n            # === PY-SLOT-END:verify_005 ===\n    else:\n        # === PY-SLOT-START:verify_006 ===\n        pass"
+      },
+      "rule": null,
+      "provenance": "visible unanalysed test region"
+    }
+  ],
+  "observations": [
+    {
+      "observation_id": "criterion:0",
+      "kind": "value",
+      "expression": "result is not None",
+      "evidence_id": "src:test:92:4-92:29"
+    },
+    {
+      "observation_id": "criterion:1",
+      "kind": "value",
+      "expression": "hasattr(result, 'headers')",
+      "evidence_id": "src:test:93:4-93:37"
+    },
+    {
+      "observation_id": "criterion:2",
+      "kind": "value",
+      "expression": "hasattr(result, 'status_code')",
+      "evidence_id": "src:test:94:4-94:41"
+    }
+  ],
+  "slice_nodes": [
+    {
+      "node_id": "node:observation:criterion:0",
+      "kind": "observation",
+      "context_ids": [
+        "row:0:empty_args",
+        "row:1:single_string_arg",
+        "row:2:single_tuple_arg",
+        "row:3:multiple_args"
+      ],
+      "evidence_id": "src:test:92:4-92:29",
+      "relevance": "criterion"
+    },
+    {
+      "node_id": "node:observation:criterion:1",
+      "kind": "observation",
+      "context_ids": [
+        "row:0:empty_args",
+        "row:1:single_string_arg",
+        "row:2:single_tuple_arg",
+        "row:3:multiple_args"
+      ],
+      "evidence_id": "src:test:93:4-93:37",
+      "relevance": "criterion"
+    },
+    {
+      "node_id": "node:observation:criterion:2",
+      "kind": "observation",
+      "context_ids": [
+        "row:0:empty_args",
+        "row:1:single_string_arg",
+        "row:2:single_tuple_arg",
+        "row:3:multiple_args"
+      ],
+      "evidence_id": "src:test:94:4-94:41",
+      "relevance": "criterion"
+    },
+    {
+      "node_id": "node:test-call",
+      "kind": "call",
+      "context_ids": [
+        "row:0:empty_args",
+        "row:1:single_string_arg",
+        "row:2:single_tuple_arg",
+        "row:3:multiple_args"
+      ],
+      "evidence_id": "src:test:89:4-89:39",
+      "relevance": "call_boundary"
+    },
+    {
+      "node_id": "node:product-entry",
+      "kind": "statement",
+      "context_ids": [
+        "row:0:empty_args",
+        "row:1:single_string_arg",
+        "row:2:single_tuple_arg",
+        "row:3:multiple_args"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:138:0-138:44",
+      "relevance": "value_source"
+    },
+    {
+      "node_id": "node:row:0:empty_args:condition:0",
+      "kind": "condition",
+      "context_ids": [
+        "row:0:empty_args"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:180:7-180:15",
+      "relevance": "control_guard"
+    },
+    {
+      "node_id": "node:row:0:empty_args:return",
+      "kind": "return",
+      "context_ids": [
+        "row:0:empty_args"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:181:8-181:43",
+      "relevance": "value_source"
+    },
+    {
+      "node_id": "node:row:0:empty_args:boundary-call",
+      "kind": "call",
+      "context_ids": [
+        "row:0:empty_args"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:181:15-181:43",
+      "relevance": "call_boundary"
+    },
+    {
+      "node_id": "node:row:1:single_string_arg:condition:0",
+      "kind": "condition",
+      "context_ids": [
+        "row:1:single_string_arg"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:180:7-180:15",
+      "relevance": "control_guard"
+    },
+    {
+      "node_id": "node:row:1:single_string_arg:condition:1",
+      "kind": "condition",
+      "context_ids": [
+        "row:1:single_string_arg"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:182:7-182:21",
+      "relevance": "control_guard"
+    },
+    {
+      "node_id": "node:row:1:single_string_arg:return",
+      "kind": "return",
+      "context_ids": [
+        "row:1:single_string_arg"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:184:4-184:42",
+      "relevance": "value_source"
+    },
+    {
+      "node_id": "node:row:1:single_string_arg:boundary-call",
+      "kind": "call",
+      "context_ids": [
+        "row:1:single_string_arg"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:184:11-184:42",
+      "relevance": "call_boundary"
+    },
+    {
+      "node_id": "node:row:1:single_string_arg:assignment:183",
+      "kind": "statement",
+      "context_ids": [
+        "row:1:single_string_arg"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:183:8-183:22",
+      "relevance": "value_source"
+    },
+    {
+      "node_id": "node:row:2:single_tuple_arg:condition:0",
+      "kind": "condition",
+      "context_ids": [
+        "row:2:single_tuple_arg"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:180:7-180:15",
+      "relevance": "control_guard"
+    },
+    {
+      "node_id": "node:row:2:single_tuple_arg:condition:1",
+      "kind": "condition",
+      "context_ids": [
+        "row:2:single_tuple_arg"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:182:7-182:21",
+      "relevance": "control_guard"
+    },
+    {
+      "node_id": "node:row:2:single_tuple_arg:return",
+      "kind": "return",
+      "context_ids": [
+        "row:2:single_tuple_arg"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:184:4-184:42",
+      "relevance": "value_source"
+    },
+    {
+      "node_id": "node:row:2:single_tuple_arg:boundary-call",
+      "kind": "call",
+      "context_ids": [
+        "row:2:single_tuple_arg"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:184:11-184:42",
+      "relevance": "call_boundary"
+    },
+    {
+      "node_id": "node:row:2:single_tuple_arg:assignment:183",
+      "kind": "statement",
+      "context_ids": [
+        "row:2:single_tuple_arg"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:183:8-183:22",
+      "relevance": "value_source"
+    },
+    {
+      "node_id": "node:row:3:multiple_args:condition:0",
+      "kind": "condition",
+      "context_ids": [
+        "row:3:multiple_args"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:180:7-180:15",
+      "relevance": "control_guard"
+    },
+    {
+      "node_id": "node:row:3:multiple_args:condition:1",
+      "kind": "condition",
+      "context_ids": [
+        "row:3:multiple_args"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:182:7-182:21",
+      "relevance": "control_guard"
+    },
+    {
+      "node_id": "node:row:3:multiple_args:return",
+      "kind": "return",
+      "context_ids": [
+        "row:3:multiple_args"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:184:4-184:42",
+      "relevance": "value_source"
+    },
+    {
+      "node_id": "node:row:3:multiple_args:boundary-call",
+      "kind": "call",
+      "context_ids": [
+        "row:3:multiple_args"
+      ],
+      "evidence_id": "src:source:f249c086e235096e:184:11-184:42",
+      "relevance": "call_boundary"
+    }
+  ],
+  "premises": [
+    {
+      "premise_id": "premise:task-binding",
+      "kind": "binding",
+      "expression": "selected test call resolves to selected product function",
+      "polarity": null,
+      "context_ids": [
+        "row:0:empty_args",
+        "row:1:single_string_arg",
+        "row:2:single_tuple_arg",
+        "row:3:multiple_args"
+      ],
+      "evidence_ids": [
+        "binding:task-provided",
+        "src:test:89:4-89:39",
+        "src:source:f249c086e235096e:138:0-138:44"
+      ],
+      "status": "conditional"
+    },
+    {
+      "premise_id": "premise:row:0:empty_args:argument-binding",
+      "kind": "binding",
+      "expression": "authenticated parameter literal binds to product variadic formal",
+      "polarity": null,
+      "context_ids": [
+        "row:0:empty_args"
+      ],
+      "evidence_ids": [
+        "src:test:14:8-14:10",
+        "src:test:89:4-89:39",
+        "src:source:f249c086e235096e:138:0-138:44",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "premise_id": "premise:row:0:empty_args:condition:0",
+      "kind": "condition",
+      "expression": "not args",
+      "polarity": true,
+      "context_ids": [
+        "row:0:empty_args"
+      ],
+      "evidence_ids": [
+        "src:test:14:8-14:10",
+        "src:source:f249c086e235096e:180:7-180:15",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "premise_id": "premise:row:0:empty_args:normal-completion",
+      "kind": "normal_completion",
+      "expression": "current_app.response_class completes normally",
+      "polarity": null,
+      "context_ids": [
+        "row:0:empty_args"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:181:15-181:43"
+      ],
+      "status": "conditional"
+    },
+    {
+      "premise_id": "premise:row:1:single_string_arg:argument-binding",
+      "kind": "binding",
+      "expression": "authenticated parameter literal binds to product variadic formal",
+      "polarity": null,
+      "context_ids": [
+        "row:1:single_string_arg"
+      ],
+      "evidence_ids": [
+        "src:test:20:8-20:24",
+        "src:test:89:4-89:39",
+        "src:source:f249c086e235096e:138:0-138:44",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "premise_id": "premise:row:1:single_string_arg:condition:0",
+      "kind": "condition",
+      "expression": "not args",
+      "polarity": false,
+      "context_ids": [
+        "row:1:single_string_arg"
+      ],
+      "evidence_ids": [
+        "src:test:20:8-20:24",
+        "src:source:f249c086e235096e:180:7-180:15",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "premise_id": "premise:row:1:single_string_arg:condition:1",
+      "kind": "condition",
+      "expression": "len(args) == 1",
+      "polarity": true,
+      "context_ids": [
+        "row:1:single_string_arg"
+      ],
+      "evidence_ids": [
+        "src:test:20:8-20:24",
+        "src:source:f249c086e235096e:182:7-182:21",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "premise_id": "premise:row:1:single_string_arg:normal-completion",
+      "kind": "normal_completion",
+      "expression": "current_app.make_response completes normally",
+      "polarity": null,
+      "context_ids": [
+        "row:1:single_string_arg"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:11-184:42"
+      ],
+      "status": "conditional"
+    },
+    {
+      "premise_id": "premise:row:2:single_tuple_arg:argument-binding",
+      "kind": "binding",
+      "expression": "authenticated parameter literal binds to product variadic formal",
+      "polarity": null,
+      "context_ids": [
+        "row:2:single_tuple_arg"
+      ],
+      "evidence_ids": [
+        "src:test:26:8-26:27",
+        "src:test:89:4-89:39",
+        "src:source:f249c086e235096e:138:0-138:44",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "premise_id": "premise:row:2:single_tuple_arg:condition:0",
+      "kind": "condition",
+      "expression": "not args",
+      "polarity": false,
+      "context_ids": [
+        "row:2:single_tuple_arg"
+      ],
+      "evidence_ids": [
+        "src:test:26:8-26:27",
+        "src:source:f249c086e235096e:180:7-180:15",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "premise_id": "premise:row:2:single_tuple_arg:condition:1",
+      "kind": "condition",
+      "expression": "len(args) == 1",
+      "polarity": true,
+      "context_ids": [
+        "row:2:single_tuple_arg"
+      ],
+      "evidence_ids": [
+        "src:test:26:8-26:27",
+        "src:source:f249c086e235096e:182:7-182:21",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "premise_id": "premise:row:2:single_tuple_arg:normal-completion",
+      "kind": "normal_completion",
+      "expression": "current_app.make_response completes normally",
+      "polarity": null,
+      "context_ids": [
+        "row:2:single_tuple_arg"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:11-184:42"
+      ],
+      "status": "conditional"
+    },
+    {
+      "premise_id": "premise:row:3:multiple_args:argument-binding",
+      "kind": "binding",
+      "expression": "authenticated parameter literal binds to product variadic formal",
+      "polarity": null,
+      "context_ids": [
+        "row:3:multiple_args"
+      ],
+      "evidence_ids": [
+        "src:test:32:8-32:26",
+        "src:test:89:4-89:39",
+        "src:source:f249c086e235096e:138:0-138:44",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "premise_id": "premise:row:3:multiple_args:condition:0",
+      "kind": "condition",
+      "expression": "not args",
+      "polarity": false,
+      "context_ids": [
+        "row:3:multiple_args"
+      ],
+      "evidence_ids": [
+        "src:test:32:8-32:26",
+        "src:source:f249c086e235096e:180:7-180:15",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "premise_id": "premise:row:3:multiple_args:condition:1",
+      "kind": "condition",
+      "expression": "len(args) == 1",
+      "polarity": false,
+      "context_ids": [
+        "row:3:multiple_args"
+      ],
+      "evidence_ids": [
+        "src:test:32:8-32:26",
+        "src:source:f249c086e235096e:182:7-182:21",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "premise_id": "premise:row:3:multiple_args:normal-completion",
+      "kind": "normal_completion",
+      "expression": "current_app.make_response completes normally",
+      "polarity": null,
+      "context_ids": [
+        "row:3:multiple_args"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:11-184:42"
+      ],
+      "status": "conditional"
+    }
+  ],
+  "relations": [
+    {
+      "relation_id": "relation:row:0:empty_args:call-binding",
+      "kind": "call",
+      "from_node_id": "node:test-call",
+      "to_node_id": "node:product-entry",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:0:empty_args",
+      "premise_ids": [
+        "premise:task-binding"
+      ],
+      "evidence_ids": [
+        "src:test:89:4-89:39",
+        "src:source:f249c086e235096e:138:0-138:44",
+        "binding:task-provided"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:0:empty_args:control-return:0",
+      "kind": "control",
+      "from_node_id": "node:row:0:empty_args:condition:0",
+      "to_node_id": "node:row:0:empty_args:return",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:0:empty_args",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:0:empty_args:argument-binding",
+        "premise:row:0:empty_args:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:180:7-180:15",
+        "src:source:f249c086e235096e:181:8-181:43",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:0:empty_args:call-result-return",
+      "kind": "data",
+      "from_node_id": "node:row:0:empty_args:boundary-call",
+      "to_node_id": "node:row:0:empty_args:return",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:0:empty_args",
+      "premise_ids": [
+        "premise:row:0:empty_args:normal-completion",
+        "premise:row:0:empty_args:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:181:15-181:43",
+        "src:source:f249c086e235096e:181:8-181:43",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:0:empty_args:to:criterion:0",
+      "kind": "data",
+      "from_node_id": "node:row:0:empty_args:return",
+      "to_node_id": "node:observation:criterion:0",
+      "observation_ids": [
+        "criterion:0"
+      ],
+      "context_id": "row:0:empty_args",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:0:empty_args:normal-completion",
+        "premise:row:0:empty_args:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:181:8-181:43",
+        "src:test:92:4-92:29",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:0:empty_args:to:criterion:1",
+      "kind": "data",
+      "from_node_id": "node:row:0:empty_args:return",
+      "to_node_id": "node:observation:criterion:1",
+      "observation_ids": [
+        "criterion:1"
+      ],
+      "context_id": "row:0:empty_args",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:0:empty_args:normal-completion",
+        "premise:row:0:empty_args:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:181:8-181:43",
+        "src:test:93:4-93:37",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:0:empty_args:to:criterion:2",
+      "kind": "data",
+      "from_node_id": "node:row:0:empty_args:return",
+      "to_node_id": "node:observation:criterion:2",
+      "observation_ids": [
+        "criterion:2"
+      ],
+      "context_id": "row:0:empty_args",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:0:empty_args:normal-completion",
+        "premise:row:0:empty_args:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:181:8-181:43",
+        "src:test:94:4-94:41",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:1:single_string_arg:control-assignment:183",
+      "kind": "control",
+      "from_node_id": "node:row:1:single_string_arg:condition:1",
+      "to_node_id": "node:row:1:single_string_arg:assignment:183",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:1:single_string_arg",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:1:single_string_arg:argument-binding",
+        "premise:row:1:single_string_arg:condition:1"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:182:7-182:21",
+        "src:source:f249c086e235096e:183:8-183:22",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:1:single_string_arg:call-binding",
+      "kind": "call",
+      "from_node_id": "node:test-call",
+      "to_node_id": "node:product-entry",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:1:single_string_arg",
+      "premise_ids": [
+        "premise:task-binding"
+      ],
+      "evidence_ids": [
+        "src:test:89:4-89:39",
+        "src:source:f249c086e235096e:138:0-138:44",
+        "binding:task-provided"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:1:single_string_arg:control-return:0",
+      "kind": "control",
+      "from_node_id": "node:row:1:single_string_arg:condition:0",
+      "to_node_id": "node:row:1:single_string_arg:return",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:1:single_string_arg",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:1:single_string_arg:argument-binding",
+        "premise:row:1:single_string_arg:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:180:7-180:15",
+        "src:source:f249c086e235096e:184:4-184:42",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:1:single_string_arg:argument-flow:0",
+      "kind": "data",
+      "from_node_id": "node:test-call",
+      "to_node_id": "node:row:1:single_string_arg:assignment:183",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:1:single_string_arg",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:1:single_string_arg:argument-binding",
+        "premise:row:1:single_string_arg:condition:0",
+        "premise:row:1:single_string_arg:condition:1"
+      ],
+      "evidence_ids": [
+        "src:test:89:4-89:39",
+        "src:source:f249c086e235096e:183:8-183:22",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:1:single_string_arg:argument-flow:1",
+      "kind": "data",
+      "from_node_id": "node:row:1:single_string_arg:assignment:183",
+      "to_node_id": "node:row:1:single_string_arg:boundary-call",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:1:single_string_arg",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:1:single_string_arg:argument-binding",
+        "premise:row:1:single_string_arg:condition:0",
+        "premise:row:1:single_string_arg:condition:1"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:183:8-183:22",
+        "src:source:f249c086e235096e:184:11-184:42",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:1:single_string_arg:call-result-return",
+      "kind": "data",
+      "from_node_id": "node:row:1:single_string_arg:boundary-call",
+      "to_node_id": "node:row:1:single_string_arg:return",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:1:single_string_arg",
+      "premise_ids": [
+        "premise:row:1:single_string_arg:normal-completion",
+        "premise:row:1:single_string_arg:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:11-184:42",
+        "src:source:f249c086e235096e:184:4-184:42",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:1:single_string_arg:to:criterion:0",
+      "kind": "data",
+      "from_node_id": "node:row:1:single_string_arg:return",
+      "to_node_id": "node:observation:criterion:0",
+      "observation_ids": [
+        "criterion:0"
+      ],
+      "context_id": "row:1:single_string_arg",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:1:single_string_arg:normal-completion",
+        "premise:row:1:single_string_arg:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:4-184:42",
+        "src:test:92:4-92:29",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:1:single_string_arg:to:criterion:1",
+      "kind": "data",
+      "from_node_id": "node:row:1:single_string_arg:return",
+      "to_node_id": "node:observation:criterion:1",
+      "observation_ids": [
+        "criterion:1"
+      ],
+      "context_id": "row:1:single_string_arg",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:1:single_string_arg:normal-completion",
+        "premise:row:1:single_string_arg:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:4-184:42",
+        "src:test:93:4-93:37",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:1:single_string_arg:to:criterion:2",
+      "kind": "data",
+      "from_node_id": "node:row:1:single_string_arg:return",
+      "to_node_id": "node:observation:criterion:2",
+      "observation_ids": [
+        "criterion:2"
+      ],
+      "context_id": "row:1:single_string_arg",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:1:single_string_arg:normal-completion",
+        "premise:row:1:single_string_arg:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:4-184:42",
+        "src:test:94:4-94:41",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:2:single_tuple_arg:control-assignment:183",
+      "kind": "control",
+      "from_node_id": "node:row:2:single_tuple_arg:condition:1",
+      "to_node_id": "node:row:2:single_tuple_arg:assignment:183",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:2:single_tuple_arg",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:2:single_tuple_arg:argument-binding",
+        "premise:row:2:single_tuple_arg:condition:1"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:182:7-182:21",
+        "src:source:f249c086e235096e:183:8-183:22",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:2:single_tuple_arg:call-binding",
+      "kind": "call",
+      "from_node_id": "node:test-call",
+      "to_node_id": "node:product-entry",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:2:single_tuple_arg",
+      "premise_ids": [
+        "premise:task-binding"
+      ],
+      "evidence_ids": [
+        "src:test:89:4-89:39",
+        "src:source:f249c086e235096e:138:0-138:44",
+        "binding:task-provided"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:2:single_tuple_arg:control-return:0",
+      "kind": "control",
+      "from_node_id": "node:row:2:single_tuple_arg:condition:0",
+      "to_node_id": "node:row:2:single_tuple_arg:return",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:2:single_tuple_arg",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:2:single_tuple_arg:argument-binding",
+        "premise:row:2:single_tuple_arg:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:180:7-180:15",
+        "src:source:f249c086e235096e:184:4-184:42",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:2:single_tuple_arg:argument-flow:0",
+      "kind": "data",
+      "from_node_id": "node:test-call",
+      "to_node_id": "node:row:2:single_tuple_arg:assignment:183",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:2:single_tuple_arg",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:2:single_tuple_arg:argument-binding",
+        "premise:row:2:single_tuple_arg:condition:0",
+        "premise:row:2:single_tuple_arg:condition:1"
+      ],
+      "evidence_ids": [
+        "src:test:89:4-89:39",
+        "src:source:f249c086e235096e:183:8-183:22",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:2:single_tuple_arg:argument-flow:1",
+      "kind": "data",
+      "from_node_id": "node:row:2:single_tuple_arg:assignment:183",
+      "to_node_id": "node:row:2:single_tuple_arg:boundary-call",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:2:single_tuple_arg",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:2:single_tuple_arg:argument-binding",
+        "premise:row:2:single_tuple_arg:condition:0",
+        "premise:row:2:single_tuple_arg:condition:1"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:183:8-183:22",
+        "src:source:f249c086e235096e:184:11-184:42",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:2:single_tuple_arg:call-result-return",
+      "kind": "data",
+      "from_node_id": "node:row:2:single_tuple_arg:boundary-call",
+      "to_node_id": "node:row:2:single_tuple_arg:return",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:2:single_tuple_arg",
+      "premise_ids": [
+        "premise:row:2:single_tuple_arg:normal-completion",
+        "premise:row:2:single_tuple_arg:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:11-184:42",
+        "src:source:f249c086e235096e:184:4-184:42",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:2:single_tuple_arg:to:criterion:0",
+      "kind": "data",
+      "from_node_id": "node:row:2:single_tuple_arg:return",
+      "to_node_id": "node:observation:criterion:0",
+      "observation_ids": [
+        "criterion:0"
+      ],
+      "context_id": "row:2:single_tuple_arg",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:2:single_tuple_arg:normal-completion",
+        "premise:row:2:single_tuple_arg:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:4-184:42",
+        "src:test:92:4-92:29",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:2:single_tuple_arg:to:criterion:1",
+      "kind": "data",
+      "from_node_id": "node:row:2:single_tuple_arg:return",
+      "to_node_id": "node:observation:criterion:1",
+      "observation_ids": [
+        "criterion:1"
+      ],
+      "context_id": "row:2:single_tuple_arg",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:2:single_tuple_arg:normal-completion",
+        "premise:row:2:single_tuple_arg:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:4-184:42",
+        "src:test:93:4-93:37",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:2:single_tuple_arg:to:criterion:2",
+      "kind": "data",
+      "from_node_id": "node:row:2:single_tuple_arg:return",
+      "to_node_id": "node:observation:criterion:2",
+      "observation_ids": [
+        "criterion:2"
+      ],
+      "context_id": "row:2:single_tuple_arg",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:2:single_tuple_arg:normal-completion",
+        "premise:row:2:single_tuple_arg:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:4-184:42",
+        "src:test:94:4-94:41",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:3:multiple_args:call-binding",
+      "kind": "call",
+      "from_node_id": "node:test-call",
+      "to_node_id": "node:product-entry",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:3:multiple_args",
+      "premise_ids": [
+        "premise:task-binding"
+      ],
+      "evidence_ids": [
+        "src:test:89:4-89:39",
+        "src:source:f249c086e235096e:138:0-138:44",
+        "binding:task-provided"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:3:multiple_args:control-return:0",
+      "kind": "control",
+      "from_node_id": "node:row:3:multiple_args:condition:0",
+      "to_node_id": "node:row:3:multiple_args:return",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:3:multiple_args",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:3:multiple_args:argument-binding",
+        "premise:row:3:multiple_args:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:180:7-180:15",
+        "src:source:f249c086e235096e:184:4-184:42",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:3:multiple_args:argument-flow:0",
+      "kind": "data",
+      "from_node_id": "node:test-call",
+      "to_node_id": "node:row:3:multiple_args:boundary-call",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:3:multiple_args",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:3:multiple_args:argument-binding",
+        "premise:row:3:multiple_args:condition:0",
+        "premise:row:3:multiple_args:condition:1"
+      ],
+      "evidence_ids": [
+        "src:test:89:4-89:39",
+        "src:source:f249c086e235096e:184:11-184:42",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:3:multiple_args:call-result-return",
+      "kind": "data",
+      "from_node_id": "node:row:3:multiple_args:boundary-call",
+      "to_node_id": "node:row:3:multiple_args:return",
+      "observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_id": "row:3:multiple_args",
+      "premise_ids": [
+        "premise:row:3:multiple_args:normal-completion",
+        "premise:row:3:multiple_args:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:11-184:42",
+        "src:source:f249c086e235096e:184:4-184:42",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:3:multiple_args:to:criterion:0",
+      "kind": "data",
+      "from_node_id": "node:row:3:multiple_args:return",
+      "to_node_id": "node:observation:criterion:0",
+      "observation_ids": [
+        "criterion:0"
+      ],
+      "context_id": "row:3:multiple_args",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:3:multiple_args:normal-completion",
+        "premise:row:3:multiple_args:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:4-184:42",
+        "src:test:92:4-92:29",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:3:multiple_args:to:criterion:1",
+      "kind": "data",
+      "from_node_id": "node:row:3:multiple_args:return",
+      "to_node_id": "node:observation:criterion:1",
+      "observation_ids": [
+        "criterion:1"
+      ],
+      "context_id": "row:3:multiple_args",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:3:multiple_args:normal-completion",
+        "premise:row:3:multiple_args:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:4-184:42",
+        "src:test:93:4-93:37",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    },
+    {
+      "relation_id": "relation:row:3:multiple_args:to:criterion:2",
+      "kind": "data",
+      "from_node_id": "node:row:3:multiple_args:return",
+      "to_node_id": "node:observation:criterion:2",
+      "observation_ids": [
+        "criterion:2"
+      ],
+      "context_id": "row:3:multiple_args",
+      "premise_ids": [
+        "premise:task-binding",
+        "premise:row:3:multiple_args:normal-completion",
+        "premise:row:3:multiple_args:condition:0"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:4-184:42",
+        "src:test:94:4-94:41",
+        "rule:local-ast"
+      ],
+      "status": "conditional"
+    }
+  ],
+  "unknowns": [
+    {
+      "unknown_id": "unknown:row:0:empty_args:external-effects",
+      "kind": "external_call_effects",
+      "description": "runtime dispatch, exceptions, state changes and concrete return are unknown",
+      "affects_observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_ids": [
+        "row:0:empty_args"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:181:15-181:43"
+      ]
+    },
+    {
+      "unknown_id": "unknown:row:1:single_string_arg:external-effects",
+      "kind": "external_call_effects",
+      "description": "runtime dispatch, exceptions, state changes and concrete return are unknown",
+      "affects_observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_ids": [
+        "row:1:single_string_arg"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:11-184:42"
+      ]
+    },
+    {
+      "unknown_id": "unknown:row:2:single_tuple_arg:external-effects",
+      "kind": "external_call_effects",
+      "description": "runtime dispatch, exceptions, state changes and concrete return are unknown",
+      "affects_observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_ids": [
+        "row:2:single_tuple_arg"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:11-184:42"
+      ]
+    },
+    {
+      "unknown_id": "unknown:row:3:multiple_args:external-effects",
+      "kind": "external_call_effects",
+      "description": "runtime dispatch, exceptions, state changes and concrete return are unknown",
+      "affects_observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_ids": [
+        "row:3:multiple_args"
+      ],
+      "evidence_ids": [
+        "src:source:f249c086e235096e:184:11-184:42"
+      ]
+    },
+    {
+      "unknown_id": "unknown:analysis:0",
+      "kind": "unanalysed_test_setup_assignment",
+      "description": "not_used_as_constraint_evidence",
+      "affects_observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_ids": [
+        "row:0:empty_args",
+        "row:1:single_string_arg",
+        "row:2:single_tuple_arg",
+        "row:3:multiple_args"
+      ],
+      "evidence_ids": [
+        "src:test:61:4-61:63"
+      ]
+    },
+    {
+      "unknown_id": "unknown:analysis:1",
+      "kind": "unanalysed_test_setup_assignment",
+      "description": "not_used_as_constraint_evidence",
+      "affects_observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_ids": [
+        "row:0:empty_args",
+        "row:1:single_string_arg",
+        "row:2:single_tuple_arg",
+        "row:3:multiple_args"
+      ],
+      "evidence_ids": [
+        "src:test:62:4-62:64"
+      ]
+    },
+    {
+      "unknown_id": "unknown:analysis:2",
+      "kind": "unanalysed_test_setup_assignment",
+      "description": "not_used_as_constraint_evidence",
+      "affects_observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_ids": [
+        "row:0:empty_args",
+        "row:1:single_string_arg",
+        "row:2:single_tuple_arg",
+        "row:3:multiple_args"
+      ],
+      "evidence_ids": [
+        "src:test:63:4-63:30"
+      ]
+    },
+    {
+      "unknown_id": "unknown:analysis:3",
+      "kind": "unanalysed_test_setup_branch",
+      "description": "assumed_not_to_rebind_selected_call_inputs_or_result",
+      "affects_observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_ids": [
+        "row:0:empty_args",
+        "row:1:single_string_arg",
+        "row:2:single_tuple_arg",
+        "row:3:multiple_args"
+      ],
+      "evidence_ids": [
+        "src:test:78:4-84:12"
+      ]
+    },
+    {
+      "unknown_id": "unknown:analysis:4",
+      "kind": "post_observation_test_behavior_unanalysed",
+      "description": "does_not_change_earlier_obligations",
+      "affects_observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_ids": [
+        "row:0:empty_args",
+        "row:1:single_string_arg",
+        "row:2:single_tuple_arg",
+        "row:3:multiple_args"
+      ],
+      "evidence_ids": [
+        "src:test:97:4-103:12"
+      ]
+    },
+    {
+      "unknown_id": "unknown:analysis:5",
+      "kind": "post_observation_test_behavior_unanalysed",
+      "description": "does_not_change_earlier_obligations",
+      "affects_observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_ids": [
+        "row:0:empty_args",
+        "row:1:single_string_arg",
+        "row:2:single_tuple_arg",
+        "row:3:multiple_args"
+      ],
+      "evidence_ids": [
+        "src:test:106:4-124:12"
+      ]
+    },
+    {
+      "unknown_id": "unknown:analysis:6",
+      "kind": "external_call_runtime_behavior_not_modelled",
+      "description": "outside declared local scope",
+      "affects_observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_ids": [
+        "row:0:empty_args",
+        "row:1:single_string_arg",
+        "row:2:single_tuple_arg",
+        "row:3:multiple_args"
+      ],
+      "evidence_ids": [
+        "rule:local-ast"
+      ]
+    },
+    {
+      "unknown_id": "unknown:analysis:7",
+      "kind": "call_binding_not_automatically_recovered",
+      "description": "outside declared local scope",
+      "affects_observation_ids": [
+        "criterion:0",
+        "criterion:1",
+        "criterion:2"
+      ],
+      "context_ids": [
+        "row:0:empty_args",
+        "row:1:single_string_arg",
+        "row:2:single_tuple_arg",
+        "row:3:multiple_args"
+      ],
+      "evidence_ids": [
+        "rule:local-ast"
+      ]
+    }
+  ],
+  "exclusions": [
+    {
+      "exclusion_id": "exclusion:mock-behavior",
+      "kind": "unsupported_inference",
+      "description": "no concrete return, Mock identity, patch target, verification or cardinality",
+      "evidence_ids": [
+        "rule:local-ast"
+      ]
+    },
+    {
+      "exclusion_id": "exclusion:semantic-proof",
+      "kind": "contract_limit",
+      "description": "well-formed clues do not prove chronology, feasibility or completeness",
+      "evidence_ids": [
+        "rule:local-ast"
+      ]
+    }
+  ],
+  "coverage": {
+    "status": "partial",
+    "declared_scope": "literal parameter rows and task-provided local direct return",
+    "included_context_ids": [
+      "row:0:empty_args",
+      "row:1:single_string_arg",
+      "row:2:single_tuple_arg",
+      "row:3:multiple_args"
+    ],
+    "unknown_ids": [
+      "unknown:row:0:empty_args:external-effects",
+      "unknown:row:1:single_string_arg:external-effects",
+      "unknown:row:2:single_tuple_arg:external-effects",
+      "unknown:row:3:multiple_args:external-effects",
+      "unknown:analysis:0",
+      "unknown:analysis:1",
+      "unknown:analysis:2",
+      "unknown:analysis:3",
+      "unknown:analysis:4",
+      "unknown:analysis:5",
+      "unknown:analysis:6",
+      "unknown:analysis:7"
+    ]
+  },
+  "cost": {
+    "wall_seconds": 0.012575841043144464,
+    "model_requests": 0,
+    "target_executions": 0,
+    "note": "projection only; no backend rebuild, model request or target execution"
+  },
+  "semantic_claim": "clues_only_not_semantic_proof"
+}

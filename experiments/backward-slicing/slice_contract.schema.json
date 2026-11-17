@@ -1,0 +1,818 @@
+{
+  "$defs": {
+    "Context": {
+      "additionalProperties": false,
+      "properties": {
+        "context_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Context Id",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "input_facts": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Input Facts",
+          "type": "object"
+        },
+        "label": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "context_id",
+        "label",
+        "input_facts",
+        "evidence_ids"
+      ],
+      "title": "Context",
+      "type": "object"
+    },
+    "Cost": {
+      "additionalProperties": false,
+      "properties": {
+        "model_requests": {
+          "minimum": 0,
+          "title": "Model Requests",
+          "type": "integer"
+        },
+        "note": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Note",
+          "type": "string"
+        },
+        "target_executions": {
+          "minimum": 0,
+          "title": "Target Executions",
+          "type": "integer"
+        },
+        "wall_seconds": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Wall Seconds"
+        }
+      },
+      "required": [
+        "wall_seconds",
+        "model_requests",
+        "target_executions",
+        "note"
+      ],
+      "title": "Cost",
+      "type": "object"
+    },
+    "Coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "declared_scope": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Declared Scope",
+          "type": "string"
+        },
+        "included_context_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Included Context Ids",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "partial",
+            "closed_for_declared_scope"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "unknown_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Unknown Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "status",
+        "declared_scope",
+        "included_context_ids",
+        "unknown_ids"
+      ],
+      "title": "Coverage",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "source",
+            "rule",
+            "binding"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "provenance": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Provenance",
+          "type": "string"
+        },
+        "rule": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rule"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceReference"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "evidence_id",
+        "kind",
+        "provenance"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "Exclusion": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Description",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "exclusion_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Exclusion Id",
+          "type": "string"
+        },
+        "kind": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "exclusion_id",
+        "kind",
+        "description",
+        "evidence_ids"
+      ],
+      "title": "Exclusion",
+      "type": "object"
+    },
+    "Identity": {
+      "additionalProperties": false,
+      "properties": {
+        "analysis_version": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Analysis Version",
+          "type": "string"
+        },
+        "case_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "dataset": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Dataset",
+          "type": "string"
+        },
+        "entry_source": {
+          "enum": [
+            "automatic",
+            "task_provided",
+            "diagnostic_override"
+          ],
+          "title": "Entry Source",
+          "type": "string"
+        },
+        "language": {
+          "enum": [
+            "python",
+            "java"
+          ],
+          "title": "Language",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Snapshot Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "case_id",
+        "dataset",
+        "language",
+        "snapshot_id",
+        "entry_source",
+        "analysis_version"
+      ],
+      "title": "Identity",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "Observation": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "expression": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Expression",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "value",
+            "exception",
+            "interaction",
+            "state"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "observation_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Observation Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "observation_id",
+        "kind",
+        "expression",
+        "evidence_id"
+      ],
+      "title": "Observation",
+      "type": "object"
+    },
+    "Premise": {
+      "additionalProperties": false,
+      "properties": {
+        "context_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Context Ids",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "expression": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Expression",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "condition",
+            "binding",
+            "normal_completion",
+            "object_identity"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "polarity": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Polarity"
+        },
+        "premise_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Premise Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "grounded",
+            "conditional"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "premise_id",
+        "kind",
+        "expression",
+        "polarity",
+        "context_ids",
+        "evidence_ids",
+        "status"
+      ],
+      "title": "Premise",
+      "type": "object"
+    },
+    "Relation": {
+      "additionalProperties": false,
+      "properties": {
+        "context_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Context Id",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "from_node_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "From Node Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "data",
+            "control",
+            "call",
+            "state"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "observation_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Observation Ids",
+          "type": "array"
+        },
+        "premise_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Premise Ids",
+          "type": "array"
+        },
+        "relation_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Relation Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "grounded",
+            "conditional"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "to_node_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "To Node Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "relation_id",
+        "kind",
+        "from_node_id",
+        "to_node_id",
+        "observation_ids",
+        "context_id",
+        "premise_ids",
+        "evidence_ids",
+        "status"
+      ],
+      "title": "Relation",
+      "type": "object"
+    },
+    "SliceNode": {
+      "additionalProperties": false,
+      "properties": {
+        "context_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Context Ids",
+          "type": "array"
+        },
+        "evidence_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "statement",
+            "condition",
+            "call",
+            "return",
+            "observation"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "node_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Node Id",
+          "type": "string"
+        },
+        "relevance": {
+          "enum": [
+            "criterion",
+            "value_source",
+            "control_guard",
+            "call_boundary",
+            "state_effect"
+          ],
+          "title": "Relevance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "node_id",
+        "kind",
+        "context_ids",
+        "evidence_id",
+        "relevance"
+      ],
+      "title": "SliceNode",
+      "type": "object"
+    },
+    "SourceIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "end_line": {
+          "minimum": 1,
+          "title": "End Line",
+          "type": "integer"
+        },
+        "logical_path": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Logical Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "source_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "start_line": {
+          "minimum": 1,
+          "title": "Start Line",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "source_id",
+        "logical_path",
+        "sha256",
+        "start_line",
+        "end_line"
+      ],
+      "title": "SourceIdentity",
+      "type": "object"
+    },
+    "SourceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "end_column": {
+          "minimum": 0,
+          "title": "End Column",
+          "type": "integer"
+        },
+        "end_line": {
+          "minimum": 1,
+          "title": "End Line",
+          "type": "integer"
+        },
+        "quote": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Quote",
+          "type": "string"
+        },
+        "source_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "start_column": {
+          "minimum": 0,
+          "title": "Start Column",
+          "type": "integer"
+        },
+        "start_line": {
+          "minimum": 1,
+          "title": "Start Line",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "source_id",
+        "source_sha256",
+        "start_line",
+        "start_column",
+        "end_line",
+        "end_column",
+        "quote"
+      ],
+      "title": "SourceReference",
+      "type": "object"
+    },
+    "UnknownBoundary": {
+      "additionalProperties": false,
+      "properties": {
+        "affects_observation_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Affects Observation Ids",
+          "type": "array"
+        },
+        "context_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Context Ids",
+          "type": "array"
+        },
+        "description": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Description",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "kind": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Kind",
+          "type": "string"
+        },
+        "unknown_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Unknown Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "unknown_id",
+        "kind",
+        "description",
+        "affects_observation_ids",
+        "context_ids",
+        "evidence_ids"
+      ],
+      "title": "UnknownBoundary",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contexts": {
+      "items": {
+        "$ref": "#/$defs/Context"
+      },
+      "minItems": 1,
+      "title": "Contexts",
+      "type": "array"
+    },
+    "cost": {
+      "$ref": "#/$defs/Cost"
+    },
+    "coverage": {
+      "$ref": "#/$defs/Coverage"
+    },
+    "evidence": {
+      "items": {
+        "$ref": "#/$defs/Evidence"
+      },
+      "minItems": 1,
+      "title": "Evidence",
+      "type": "array"
+    },
+    "exclusions": {
+      "items": {
+        "$ref": "#/$defs/Exclusion"
+      },
+      "title": "Exclusions",
+      "type": "array"
+    },
+    "identity": {
+      "$ref": "#/$defs/Identity"
+    },
+    "observations": {
+      "items": {
+        "$ref": "#/$defs/Observation"
+      },
+      "minItems": 1,
+      "title": "Observations",
+      "type": "array"
+    },
+    "premises": {
+      "items": {
+        "$ref": "#/$defs/Premise"
+      },
+      "title": "Premises",
+      "type": "array"
+    },
+    "relations": {
+      "items": {
+        "$ref": "#/$defs/Relation"
+      },
+      "title": "Relations",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "mock-spec.slice-evidence/v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "semantic_claim": {
+      "const": "clues_only_not_semantic_proof",
+      "title": "Semantic Claim",
+      "type": "string"
+    },
+    "slice_nodes": {
+      "items": {
+        "$ref": "#/$defs/SliceNode"
+      },
+      "minItems": 1,
+      "title": "Slice Nodes",
+      "type": "array"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/SourceIdentity"
+      },
+      "minItems": 1,
+      "title": "Sources",
+      "type": "array"
+    },
+    "unknowns": {
+      "items": {
+        "$ref": "#/$defs/UnknownBoundary"
+      },
+      "title": "Unknowns",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "identity",
+    "sources",
+    "contexts",
+    "evidence",
+    "observations",
+    "slice_nodes",
+    "premises",
+    "relations",
+    "unknowns",
+    "exclusions",
+    "coverage",
+    "cost",
+    "semantic_claim"
+  ],
+  "title": "SliceClueContract",
+  "type": "object"
+}

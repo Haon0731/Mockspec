@@ -388,6 +388,19 @@ experiments/dependency-witness/
 研究 live 的精确案例白名单由 `controller.REVIEWED_LIVE_CASES` 统一维护，CLI 复用。
 Python/Java 各走原审核 Adapter，不能以手工 task 或任意目录绕过准入；接通 Java 不改变五步推断协议。
 
+研究分支的 `experiments/backward-slicing/python-backend-pilot/local_constraints.py` 是受限局部约束投影，
+职责与后端关系查询分开：字面量测试参数 → 明确任务提供的函数入口 → 局部分支与赋值 →
+直接返回值观察要求。`run_local_constraints.py` 负责单案例冻结输入核验、历史身份比对及产物写入；
+人工参照不进入分析算法。这个原型未接入生产 Agent 或全量批处理，已知未知不会转换成 Mock 行为。
+范围与复现见[首例记录](../experiments/backward-slicing/results/flask301-local-constraints/report.md)。
+
+当前消费边界为研究模块 `slice_contract.py` 定义的 `mock-spec.slice-evidence/v1`。
+`python-backend-pilot/slice_projection.py` 将经过源码复核的局部事实投影为切片线索；
+`wala-pilot/project_jib_slice_contract.py` 从已认证的历史 WALA 原始证据投影 Jib 的有限关系，
+明确标注 reviewed replay。两者保留原观察、源码位置、关系前提及 UNKNOWN，不输出 Mock 要求。
+`results/frontend-local-reliability/gate.json` 管理原局部7例的独立语义验收状态。
+只有门禁通过的消费物才允许进入 `slice-ab-pilot/` 的配对生成研究；这不改变生产 Agent 的职责。
+
 ## 验证能说明什么
 
 - 输入与契约测试保护准入、字段、引用和原文匹配。

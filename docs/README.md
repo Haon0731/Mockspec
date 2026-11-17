@@ -13,10 +13,14 @@
 
 ## 独立研究验证
 
-研究方向：[后向分析与条件化 Mock 行为规格](adr/0002-mock-oriented-backward-evidence.md)。
-本轮从观察—依赖链与近似符号分析形成共同约束、条件化分支规格和证据／不确定性；Mock 代码生成、Agent 对照及缺陷实验留到后续。
+研究方向：[后向切片线索与 Agent 生成边界](adr/0002-mock-oriented-backward-evidence.md)。
+当前前端只交付观察相关切片、数据／控制／状态关系、前提、证据与 UNKNOWN，不承担完整执行解释或 Mock 规格推导。
+局部可靠性门禁通过后才启动 [DeepSeek 配对试跑](../experiments/backward-slicing/slice-ab-pilot/protocol.md)，每例 A/B 各一次，不加入变异反馈。
 实施依据：[输出契约与验收规格](backward-analysis-spec.md)、[案例验收清单](../experiments/backward-slicing/spec-acceptance.md)、[实现差距表](../experiments/backward-slicing/spec-gaps.md)。
-这些是后续实施的要求，不代表现有分析器已满足。
+受限首例：[flask_301 局部约束闭环与人工参照](../experiments/backward-slicing/results/flask301-local-constraints/report.md)。
+当前机器契约见 [slice-evidence Schema](../experiments/backward-slicing/slice_contract.schema.json)，
+7例状态见 [局部门禁台账](../experiments/backward-slicing/results/frontend-local-reliability/gate.json)。
+实现和结构校验通过不等于语义验收通过；台账中的 UNKNOWN 和未通过案例仍保留在分母内。
 
 [#32 通用成熟后端接入全量报告](https://github.com/Haon0731/Mockspec/blob/41e4fab/out/mockbench-study/generic-entry-full165-20261111-r1/report.md)
 已保留原165例：124例驱动完成、120例全部原观察映射、26例有观察关联跨源候选，

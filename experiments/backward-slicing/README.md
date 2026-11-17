@@ -2,7 +2,25 @@
 
 当前方法与实施依据见[后向分析输出契约](../../docs/backward-analysis-spec.md)、
 [真实案例与反例验收清单](spec-acceptance.md)和[实现差距表](spec-gaps.md)。
-当前目标是有证据分级和覆盖边界的条件化规格，本轮不生成 Mock。
+
+## 首个局部约束闭环（2026-11-17）
+
+`python-backend-pilot/local_constraints.py` 在明确任务提供入口的条件下，用受限 AST 规则展开
+字面量参数行、选择局部正常返回分支，再把直接返回值的原始观察传递到依赖边界。
+`run_local_constraints.py` 通过原 FrozenDataset 校验一个案例及选中源码，对照历史结果；
+不重建 CodeQL/WALA、不执行被测代码、不调用模型。该层独立于既有后端，不能把它的结果
+当作自动入口绑定或完整后向切片能力。
+
+首例 `flask_301` 的人工参照、逐例产物和复现命令见
+[首例记录](results/flask301-local-constraints/report.md)。
+返回非空和属性存在要求来自原断言；实参归一化是当前实现事实，不能升级为新交互断言。
+不支持的控制流、输入与对象效果保留为阻塞或未知；共同约束不自动推广到未探索路径。
+
+当前目标已收敛为有前提、证据与 UNKNOWN 的切片线索，见
+[机器契约](slice_contract.schema.json)和[7例门禁台账](results/frontend-local-reliability/gate.json)。
+Python 消费投影入口是 `python-backend-pilot/run_slice_projection.py`；Java 入口是
+`wala-pilot/project_jib_slice_contract.py`，Java 当前仅复用明确认证的历史证据，不代表新全量后端成功。
+局部可靠性验收通过后，按 [A/B 协议](slice-ab-pilot/protocol.md)进入 DeepSeek 配对生成试跑。
 下列运行与能力描述按各历史版本解释；特别是通用 Java 图路径不能自动认证跨过程依赖，
 已否定的关系见[全量r5路径审查](../../out/mockbench-study/entry-repair-20261111/verification/java-exception-route-review-r5.md)。
 旧自动修复与批运行保持暂停，不能用历史门禁替新规格背书。

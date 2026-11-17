@@ -1,3 +1,5 @@
+> 2026-11-17 范围更新：当前前端仅交付切片代码、依赖、前提、证据和 UNKNOWN，见[当前规格](../../docs/backward-analysis-spec.md)。下文是此前完整规格设计的差距分析，仍可用于定位错误，但“完整解释/共同约束/Mock规格组合层”不再是本轮必须补齐的前端能力。
+
 # 条件化 Mock 行为规格：现有实现差距表
 
 本文面向 [ADR-0002](../../docs/adr/0002-mock-oriented-backward-evidence.md) 约定的方法：从测试目标出发，通过后向切片和近似符号分析形成共同约束、条件化分支规格、证据与不确定性，并报告全局路径覆盖信息。输出语义以[主规格](../../docs/backward-analysis-spec.md)为准；本次交付是文档，不实现 LLM 约束推理、Mock 代码生成或执行验证。
@@ -8,6 +10,12 @@
 - 当前 [结果契约](result_contract.py) 明确只记录分析报告，不能将候选图自动升级为语义证据。其 `semantic_validation` 默认仍是 `not_evaluated`。
 - Python 的查询与状态投影已经能产生观察关联的值、控制、返回、异常未知、状态候选和排除记录；这些是规格推导的原料，不是已经组合好的执行解释。
 - Java 的已发布通用投影仍建立在上下文未匹配的前驱路径上。Hadoop 与 Jib 的真实反例已经否定了其中部分异常／控制关系，详见 [Java 路径独立审查](../../out/mockbench-study/entry-repair-20261111/verification/java-exception-route-review-r5.md)。
+
+## 2026-11-17 局部增量
+
+[flask_301 首例](results/flask301-local-constraints/report.md)增加受限的参数行特化、局部实参归一化和直接返回观察传递。
+这是在人工明确提供入口后的独立规则原型，不修改下表的通用后端能力判断。
+它没有实现完整候选解释、通用跨方法/状态分析或全局共同约束；原 Java 反例与 WIP 门禁仍未解决。
 
 ## 总体判断
 
