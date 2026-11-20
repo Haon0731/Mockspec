@@ -33,7 +33,7 @@ SDK 轮数上限，由运行超时与共享用量账本停止。
 
 ## 后向切片的事实导航与代码槽位
 
-生产包提供两个离线接口。宿主先审核冻结身份、masking 和可见源码，再将静态后端结果交给 `mock_spec.navigation_facts.project_navigation_facts(case_result, visible_sources)`。它校验版本化切片契约，为 Java 和 Python 输出相同的 `mock-spec.navigation-facts/v2`。只有方法符号的端点保留符号，未解析的入口保留状态和已有观察，证据不足的返回值或异常通道记为 `null`。宿主保存完整投影后，`build_bounded_navigation_view` 依据归档哈希与定位生成独立交付视图；按实际序列化结果检查 token 预算，并记录各类省略数。切片驱动、165 例编排与统计仍归研究目录所有。[有界视图](../src/mock_spec/bounded_navigation_view.py) · [投影器](../src/mock_spec/navigation_facts.py) · [切片结果契约](../src/mock_spec/backward_result.py)
+生产包提供两个离线接口。宿主先审核冻结身份、masking 和可见源码，再将静态后端结果交给 `mock_spec.navigation_facts.project_navigation_facts(case_result, visible_sources)`。它校验版本化切片契约，为 Java 和 Python 输出相同的 `mock-spec.navigation-facts/v2`。只有方法符号的端点保留符号，未解析的入口保留状态和已有观察，证据不足的返回值或异常通道记为 `null`。宿主保存完整投影后，`build_bounded_navigation_view` 在裁剪前校验 v2 版本、冻结身份、绑定状态、分析边界、事实表的行 ID 和引用，再依据归档哈希与定位生成独立交付视图；按实际序列化结果检查 token 预算，并记录各类省略数。相同 ID 且完整 JSON 内容相同的 relation 按一条事实计数，归档摘要仍绑定原文件；同 ID 异内容或其余五表 ID 重复时拒绝输入。切片驱动、165 例编排与统计仍归研究目录所有。[有界视图](../src/mock_spec/bounded_navigation_view.py) · [投影器](../src/mock_spec/navigation_facts.py) · [切片结果契约](../src/mock_spec/backward_result.py)
 
 下游宿主可用 `mock_spec.tagged_slots` 从有序槽位名生成交付约束。收到回复后，`parse_tagged_candidate` 按标签提取源码，返回旧评估器接受的 `{"slots": ..., "rationale": []}`。边界换行由协议消费，槽内的缩进和空行属于源码。两个接口都可直接调用，不需要供应商、凭据或 Agent 运行时。[槽位协议](../src/mock_spec/tagged_slots.py)
 

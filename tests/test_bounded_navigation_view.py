@@ -13,8 +13,17 @@ from mock_spec.bounded_navigation_view import (
 def _facts() -> dict:
     return {
         "schema_version": "mock-spec.navigation-facts/v2",
-        "identity": {"case_id": "case", "language": "python"},
-        "entry_binding": {"status": "unique", "candidates": []},
+        "identity": {
+            "case_id": "case",
+            "dataset": "python-benchmark-new",
+            "language": "python",
+            "snapshot_id": "a" * 64,
+        },
+        "entry_binding": {
+            "origin": "automatic",
+            "status": "unique",
+            "candidates": [],
+        },
         "observations": [
             {
                 "observation_id": "o:1",
@@ -27,9 +36,13 @@ def _facts() -> dict:
                 "location": {"logical_path": "test.py", "start_line": 20},
             },
         ],
-        "analysis_boundaries": [
-            {"kind": "unknown", "reason": "dynamic dispatch", "status": "Unknown"}
-        ],
+        "analysis_boundaries": {
+            "assumptions": [],
+            "unknown_effects": [
+                {"reason": "dynamic dispatch", "scope": "dependency call"}
+            ],
+            "unanalysed_regions": [],
+        },
         "calls": [
             {
                 "call_id": "c:1",
@@ -135,7 +148,9 @@ def test_bounded_view_is_deterministic_and_keeps_mandatory_semantics() -> None:
         }
         for item in facts["observations"]
     ]
-    assert first["analysis_boundaries"][0]["status"] == "Unknown"
+    assert first["analysis_boundaries"]["unknown_effects"]["rows"] == [
+        ["dynamic dispatch", ["dependency call"], [0]]
+    ]
     assert first["omissions"]["semantic"] == "budget_omission_is_not_semantic_absence"
     assert first["archive"]["sha256"] == archive
     assert first["archive"]["locator"] == "cases/case.facts.json"
@@ -265,6 +280,144 @@ def test_counter_rejects_negative_and_non_integer_results(invalid: object) -> No
 @pytest.mark.parametrize(
     ("mutation", "message"),
     [
+        (lambda facts: facts.pop("schema_version"), "schema_version"),
+        (
+            lambda facts: facts.update(schema_version="mock-spec.navigation-facts/v1"),
+            "schema_version",
+        ),
+        (lambda facts: facts["identity"].pop("dataset"), "identity.dataset"),
+        (lambda facts: facts["identity"].update(language="ruby"), "identity.language"),
+        (
+            lambda facts: facts["entry_binding"].pop("origin"),
+            "entry_binding.origin",
+        ),
+        (
+            lambda facts: facts["entry_binding"].update(status="Unknown"),
+            "entry_binding.status",
+        ),
+        (
+            lambda facts: facts["analysis_boundaries"].pop("unknown_effects"),
+            "analysis_boundaries.unknown_effects",
+        ),
+        (lambda facts: facts.pop("calls"), "calls"),
+        (lambda facts: facts.update(relations={}), "relations"),
+        (lambda facts: facts.update(projection=[]), "projection"),
+    ],
+)
+def test_invalid_required_navigation_fields_are_rejected_with_paths(
+    mutation, message: str
+) -> None:
+    facts = _facts()
+    mutation(facts)
+
+    with pytest.raises(ValueError, match=message):
+        build_bounded_navigation_view(facts)
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
+        (
+            lambda facts: facts["observations"].append(
+                deepcopy(facts["observations"][0])
+            ),
+            r"observations\[2\].observation_id",
+        ),
+        (
+            lambda facts: facts["calls"].append(deepcopy(facts["calls"][0])),
+            r"calls\[2\].call_id",
+        ),
+        (
+            lambda facts: facts["relations"].append(
+                {**facts["relations"][0], "modality": "different"}
+            ),
+            r"relations\[2\].fact_id",
+        ),
+        (
+            lambda facts: facts["calls"][0]["effects"][0].update(
+                observation_ids=["o:missing"]
+            ),
+            r"calls\[0\].effects\[0\].observation_ids\[0\]",
+        ),
+        (
+            lambda facts: facts["relations"][0].update(
+                observation_ids=["o:missing"]
+            ),
+            r"relations\[0\].observation_ids\[0\]",
+        ),
+    ],
+)
+def test_duplicate_ids_and_dangling_observations_are_rejected_before_budgeting(
+    mutation, message: str
+) -> None:
+    facts = _facts()
+    mutation(facts)
+
+    with pytest.raises(ValueError, match=message):
+        build_bounded_navigation_view(facts, max_tokens=1)
+
+
+def test_identical_relation_rows_share_one_fact_and_keep_original_archive_hash() -> None:
+    facts = _facts()
+    facts["relations"].append(dict(reversed(list(facts["relations"][0].items()))))
+    archive_hash = hashlib.sha256(serialize_bounded_navigation_view(facts) + b"\n").hexdigest()
+
+    view = build_bounded_navigation_view(facts)
+
+    assert len(facts["relations"]) == 3
+    assert len(view["relations"]) == 2
+    counts = view["omissions"]["categories"]["relations"]
+    assert (counts["total"], counts["included"], counts["omitted"]) == (2, 2, 0)
+    assert view["archive"]["sha256"] == archive_hash
+
+
+def test_duplicate_relation_requires_identical_json_types() -> None:
+    facts = _facts()
+    facts["relations"][0]["extension"] = True
+    facts["relations"].append({**facts["relations"][0], "extension": 1})
+
+    with pytest.raises(ValueError, match=r"relations\[2\].fact_id"):
+        build_bounded_navigation_view(facts)
+
+
+def test_unresolved_entry_with_empty_fact_tables_is_valid() -> None:
+    facts = _facts()
+    facts["entry_binding"].update(status="unresolved", candidates=[])
+    facts["observations"] = []
+    facts["calls"] = []
+    facts["guards"] = []
+    facts["relations"] = []
+    facts["endpoints"] = []
+    facts["evidence_sources"] = []
+    facts["analysis_boundaries"]["unknown_effects"] = [
+        {"reason": "receiver target is Unknown", "scope": "dependency call"}
+    ]
+
+    view = build_bounded_navigation_view(facts)
+
+    assert view["entry_binding"]["status"] == "unresolved"
+    assert view["calls"] == []
+    assert view["relations"] == []
+    assert view["analysis_boundaries"]["unknown_effects"]["rows"] == [
+        ["receiver target is Unknown", ["dependency call"], [0]]
+    ]
+
+
+def test_null_reachability_and_budget_omission_remain_valid() -> None:
+    facts = _facts()
+    facts["calls"][0]["effects"][0]["reaches_assertion"] = None
+    full = build_bounded_navigation_view(facts, max_tokens=8_192)
+    constrained_budget = len(serialize_bounded_navigation_view(full)) - 1
+
+    view = build_bounded_navigation_view(facts, max_tokens=constrained_budget)
+
+    assert view["omissions"]["truncated"] is True
+    assert view["omissions"]["semantic"] == "budget_omission_is_not_semantic_absence"
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
         (lambda facts: facts["calls"][0].update(fact_refs=["r:missing"]), "fact_ref"),
         (lambda facts: facts["relations"][0].update(from_ref="e:missing"), "endpoint"),
         (lambda facts: facts["relations"][0].update(source_ref="s:missing"), "source_ref"),
@@ -295,7 +448,9 @@ def test_hadoop_shaped_long_tail_facts_fit_default_budget() -> None:
     facts = _facts()
     facts["observations"] = [
         {
-            "observation_id": f"criterion:{number}",
+            "observation_id": (
+                f"o:{number + 1}" if number < 2 else f"criterion:{number}"
+            ),
             "kind": "candidate_event",
             "origin": "candidate",
             "location": {
@@ -323,6 +478,8 @@ def test_hadoop_shaped_long_tail_facts_fit_default_budget() -> None:
             for number in range(34)
         ],
     }
+    for call in facts["calls"]:
+        call["padding"] = "x" * 10_000
     for source in facts["evidence_sources"]:
         source["provenance"]["dependency_path"] = ["edge" * 10] * 6_000
 
@@ -331,4 +488,4 @@ def test_hadoop_shaped_long_tail_facts_fit_default_budget() -> None:
     encoded = serialize_bounded_navigation_view(view)
     assert len(encoded) <= 8_192
     assert view["omissions"]["truncated"] is True
-    assert view["omissions"]["categories"]["relations"]["omitted"] > 0
+    assert view["omissions"]["categories"]["calls"]["omitted"] > 0

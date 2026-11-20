@@ -15,6 +15,9 @@ from collections.abc import Callable, Iterable
 from copy import deepcopy
 from typing import Any
 
+from .backward_result import BINDING_ORIGINS, BINDING_STATUSES
+from .navigation_facts import SCHEMA_VERSION as FACTS_VERSION
+
 
 SCHEMA_VERSION = "mock-spec.navigation-facts-bounded/v1"
 DEFAULT_MAX_TOKENS = 8_192
@@ -231,7 +234,7 @@ def _ordered_candidates(
 ) -> list[tuple[str, dict[str, Any]]]:
     observation_order = [
         item["observation_id"]
-        for item in facts.get("observations", [])
+        for item in facts["observations"]
         if isinstance(item, dict) and isinstance(item.get("observation_id"), str)
     ]
     buckets: dict[str, list[tuple[str, dict[str, Any]]]] = defaultdict(list)
@@ -319,32 +322,92 @@ def measure_bounded_navigation_view(
     }
 
 
-def _validate_references(
-    facts: dict[str, Any],
-    relations: dict[str, dict[str, Any]],
-    endpoints: dict[str, dict[str, Any]],
-    sources: dict[str, dict[str, Any]],
-) -> None:
-    for relation_id, relation in relations.items():
-        for field in ("from_ref", "to_ref"):
-            reference = relation.get(field)
-            if reference not in endpoints:
-                raise ValueError(
-                    f"relation {relation_id} has dangling endpoint {field}={reference!r}"
-                )
-        source_reference = relation.get("source_ref")
-        if source_reference not in sources:
-            raise ValueError(
-                f"relation {relation_id} has dangling source_ref={source_reference!r}"
-            )
-    relation_ids = set(relations)
-    for category in ("calls", "guards"):
-        for item in facts.get(category, []):
-            missing = _fact_references(item) - relation_ids
-            if missing:
-                raise ValueError(
-                    f"{category} card has dangling fact_ref values: {sorted(missing)!r}"
-                )
+_TABLE_IDS = {
+    "observations": "observation_id",
+    "calls": "call_id",
+    "guards": "guard_id",
+    "relations": "fact_id",
+    "endpoints": "endpoint_id",
+    "evidence_sources": "source_id",
+}
+
+
+def _require_shape(value: Any, expected: type, path: str) -> None:
+    if not isinstance(value, expected):
+        raise ValueError(f"{path} must be a {expected.__name__}")
+
+
+def _require_id(value: Any, path: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{path} must be a non-empty string")
+    return value
+
+
+def _check_reference(value: Any, path: str, table: dict, name: str) -> None:
+    if _require_id(value, path) not in table:
+        raise ValueError(f"{path} refers to missing {name} ID {value!r}")
+
+
+def _check_card_references(value: Any, path: str, tables: dict) -> None:
+    if isinstance(value, list):
+        for i, item in enumerate(value):
+            _check_card_references(item, f"{path}[{i}]", tables)
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            field = f"{path}.{key}"
+            if key == "fact_ref":
+                _check_reference(item, field, tables["relations"], "relations")
+            elif key in ("fact_refs", "observation_ids"):
+                name = "relations" if key == "fact_refs" else "observations"
+                _require_shape(item, list, field)
+                for i, ref in enumerate(item):
+                    _check_reference(ref, f"{field}[{i}]", tables[name], name)
+            else:
+                _check_card_references(item, field, tables)
+
+
+def _validated_tables(facts: dict[str, Any]) -> dict[str, dict[str, dict]]:
+    _require_shape(facts, dict, "facts")
+    if facts.get("schema_version") != FACTS_VERSION:
+        raise ValueError(f"schema_version must be {FACTS_VERSION}")
+    for field in ("identity", "entry_binding", "analysis_boundaries", "projection"):
+        _require_shape(facts.get(field), dict, field)
+    for key in ("dataset", "case_id", "snapshot_id", "language"):
+        _require_id(facts["identity"].get(key), f"identity.{key}")
+    if facts["identity"]["language"] not in ("python", "java"):
+        raise ValueError("identity.language must be python or java")
+    for key, choices in (("origin", BINDING_ORIGINS), ("status", BINDING_STATUSES)):
+        value = _require_id(facts["entry_binding"].get(key), f"entry_binding.{key}")
+        if value not in choices:
+            raise ValueError(f"entry_binding.{key} is invalid")
+    for key in ("assumptions", "unknown_effects", "unanalysed_regions"):
+        _require_shape(facts["analysis_boundaries"].get(key), list, f"analysis_boundaries.{key}")
+
+    tables: dict[str, dict[str, dict]] = {}
+    for name, key in _TABLE_IDS.items():
+        _require_shape(facts.get(name), list, name)
+        index: dict[str, dict] = {}
+        for i, row in enumerate(facts[name]):
+            path = f"{name}[{i}]"
+            _require_shape(row, dict, path)
+            row_id = _require_id(row.get(key), f"{path}.{key}")
+            if row_id in index:
+                # Canonical JSON distinguishes true from 1 and ignores key order.
+                if name == "relations" and _encoded(row) == _encoded(index[row_id]):
+                    continue
+                raise ValueError(f"{path}.{key} duplicates {row_id!r}")
+            index[row_id] = row
+        tables[name] = index
+
+    for name in ("calls", "guards", "relations"):
+        for i, row in enumerate(facts[name]):
+            path = f"{name}[{i}]"
+            _check_card_references(row, path, tables)
+            if name == "relations":
+                for key, target in (("from_ref", "endpoints"), ("to_ref", "endpoints"),
+                                    ("source_ref", "evidence_sources")):
+                    _check_reference(row.get(key), f"{path}.{key}", tables[target], target)
+    return tables
 
 
 def _add_relation_closure(
@@ -391,13 +454,7 @@ def _add_candidate(
     else:
         _add_relation_closure(view, item["fact_id"], relations, endpoints, sources)
     for name in ("calls", "guards", "relations", "endpoints", "evidence_sources"):
-        key = {
-            "calls": "call_id",
-            "guards": "guard_id",
-            "relations": "fact_id",
-            "endpoints": "endpoint_id",
-            "evidence_sources": "source_id",
-        }[name]
+        key = _TABLE_IDS[name]
         view[name].sort(key=lambda row: str(row[key]))
 
 
@@ -423,18 +480,20 @@ def build_bounded_navigation_view(
         raise ValueError("token_counter_name is required with a custom token_counter")
     if token_counter is None and token_counter_name is not None:
         raise ValueError("token_counter is required with a custom token_counter_name")
+    tables = _validated_tables(facts)
     canonical_sha256 = _canonical_file_sha256(facts)
     archive_sha = archive_sha256 or canonical_sha256
 
-    source_rows = facts.get("evidence_sources", [])
+    source_rows = facts["evidence_sources"]
     compact_sources = {
         source["source_id"]: _compact_source(source, index, archive_sha)
         for index, source in enumerate(source_rows)
     }
-    relation_rows = {item["fact_id"]: item for item in facts.get("relations", [])}
-    endpoint_rows = {item["endpoint_id"]: item for item in facts.get("endpoints", [])}
-    original_sources = {source.get("source_id"): source for source in source_rows}
-    _validate_references(facts, relation_rows, endpoint_rows, original_sources)
+    relation_rows = tables["relations"]
+    if len(relation_rows) != len(facts["relations"]):
+        facts = {**facts, "relations": list(relation_rows.values())}
+    endpoint_rows = tables["endpoints"]
+    original_sources = tables["evidence_sources"]
     view: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
         "archive": {
@@ -446,10 +505,10 @@ def build_bounded_navigation_view(
             ),
             "locator": archive_locator,
         },
-        "identity": deepcopy(facts.get("identity", {})),
-        "entry_binding": deepcopy(facts.get("entry_binding", {})),
-        "observations": _compact_observations(facts.get("observations", [])),
-        "analysis_boundaries": _compact_boundaries(facts.get("analysis_boundaries", {})),
+        "identity": deepcopy(facts["identity"]),
+        "entry_binding": deepcopy(facts["entry_binding"]),
+        "observations": _compact_observations(facts["observations"]),
+        "analysis_boundaries": _compact_boundaries(facts["analysis_boundaries"]),
         "calls": [],
         "guards": [],
         "relations": [],
@@ -470,7 +529,7 @@ def build_bounded_navigation_view(
         raise ValueError("mandatory navigation fields exceed the token budget")
 
     relation_sources: dict[str, dict[str, Any]] = {
-        relation_id: original_sources.get(row.get("source_ref"), {})
+        relation_id: original_sources[row["source_ref"]]
         for relation_id, row in relation_rows.items()
     }
     for category, item in _ordered_candidates(facts, relation_sources):
