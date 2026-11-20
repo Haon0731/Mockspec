@@ -189,6 +189,215 @@ def loader_facts(sources: list[dict[str, Any]], selection: dict[str, Any],
     return [row for row in facts if counts[(row[0], row[1])] == 1]
 
 
+def _module_matches_path(module: str, logical_path: str) -> bool:
+    suffix = module.replace(".", "/")
+    return logical_path == f"{suffix}.py" or logical_path.endswith(f"/{suffix}.py") \
+        or logical_path == f"{suffix}/__init__.py" \
+        or logical_path.endswith(f"/{suffix}/__init__.py")
+
+
+def _lexical_nodes(statements: list[ast.stmt]) -> list[ast.AST]:
+    """Return nodes in one lexical scope, excluding nested function and class bodies."""
+    nodes: list[ast.AST] = []
+
+    class Visitor(ast.NodeVisitor):
+        def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+            nodes.append(node)
+
+        def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+            nodes.append(node)
+
+        def visit_ClassDef(self, node: ast.ClassDef) -> None:
+            nodes.append(node)
+
+        def visit_Lambda(self, node: ast.Lambda) -> None:
+            return
+
+        def generic_visit(self, node: ast.AST) -> None:
+            nodes.append(node)
+            super().generic_visit(node)
+
+    visitor = Visitor()
+    for statement in statements:
+        visitor.visit(statement)
+    return nodes
+
+
+def _attribute_parts(node: ast.AST) -> list[str] | None:
+    if isinstance(node, ast.Name):
+        return [node.id]
+    if isinstance(node, ast.Attribute):
+        prefix = _attribute_parts(node.value)
+        return None if prefix is None else [*prefix, node.attr]
+    return None
+
+
+def _argument_names(function: ast.FunctionDef | ast.AsyncFunctionDef) -> set[str]:
+    arguments = function.args
+    names = {argument.arg for argument in (
+        *arguments.posonlyargs, *arguments.args, *arguments.kwonlyargs,
+    )}
+    if arguments.vararg:
+        names.add(arguments.vararg.arg)
+    if arguments.kwarg:
+        names.add(arguments.kwarg.arg)
+    return names
+
+
+def _import_bound_names(node: ast.Import | ast.ImportFrom) -> set[str]:
+    if isinstance(node, ast.Import):
+        return {alias.asname or alias.name.split(".", 1)[0] for alias in node.names}
+    return {alias.asname or alias.name for alias in node.names if alias.name != "*"}
+
+
+def _patched_symbol(nodes: list[ast.AST], module: str, function_name: str,
+                    module_prefix: tuple[str, ...]) -> bool:
+    qualified = f"{module}.{function_name}"
+    for node in nodes:
+        if not isinstance(node, ast.Call):
+            continue
+        call_name = _attribute_parts(node.func) or []
+        if call_name and call_name[-1] in {"patch", "setattr"} and any(
+                isinstance(argument, ast.Constant) and argument.value == qualified
+                for argument in node.args):
+            return True
+        if call_name and call_name[-1] in {"object", "setattr"} and len(node.args) >= 2:
+            target = _attribute_parts(node.args[0])
+            name = node.args[1]
+            if target == list(module_prefix) and isinstance(name, ast.Constant) \
+                    and name.value == function_name:
+                return True
+    return False
+
+
+def import_facts(sources: list[dict[str, Any]], scope: dict[str, Any]) -> list[list[Any]]:
+    """Bind direct calls through unshadowed explicit imports to unique visible definitions."""
+    test = next(source for source in sources if source["source_id"] == "test")
+    tree = ast.parse(test["text"])
+    targets = [node for node in ast.walk(tree)
+               if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+               and node.lineno == scope["start_line"] and node.name == scope["symbol"]]
+    supported_scopes = [*tree.body, *(member for stmt in tree.body if isinstance(stmt, ast.ClassDef)
+                                      for member in stmt.body)]
+    if len(targets) != 1 or targets[0] not in supported_scopes:
+        return []
+    target = targets[0]
+    target_nodes = _lexical_nodes(target.body)
+
+    # Imports at module scope and in the selected test are visible candidates.
+    imports = [node for node in tree.body if isinstance(node, (ast.Import, ast.ImportFrom))]
+    imports.extend(node for node in target.body if isinstance(node, (ast.Import, ast.ImportFrom)))
+    candidates: list[tuple[str, str, str, tuple[str, ...], ast.Import | ast.ImportFrom]] = []
+    for imported in imports:
+        if isinstance(imported, ast.ImportFrom) and imported.module and imported.level == 0:
+            for alias in imported.names:
+                if alias.name != "*":
+                    candidates.append((alias.asname or alias.name, imported.module,
+                                       alias.name, (), imported))
+        elif isinstance(imported, ast.Import):
+            for alias in imported.names:
+                prefix = (alias.asname,) if alias.asname else tuple(alias.name.split("."))
+                candidates.append((alias.asname or prefix[0], alias.name, "", prefix,
+                                   imported))
+
+    facts: list[list[Any]] = []
+    for bound_name, module, imported_name, module_prefix, import_node in candidates:
+        same_binding = [item for item in candidates if item[0] == bound_name]
+        if len(same_binding) != 1:
+            continue
+        calls: list[tuple[ast.Call, str]] = []
+        for node in target_nodes:
+            if not isinstance(node, ast.Call) or node.lineno <= import_node.lineno:
+                continue
+            if imported_name and isinstance(node.func, ast.Name) and node.func.id == bound_name:
+                calls.append((node, imported_name))
+            elif not imported_name:
+                parts = _attribute_parts(node.func)
+                if parts and tuple(parts[:-1]) == module_prefix:
+                    calls.append((node, parts[-1]))
+        if not calls:
+            continue
+        if import_node in target_nodes:
+            search_nodes = target_nodes
+        else:
+            search_nodes = [*target_nodes, *_lexical_nodes(tree.body)]
+        if bound_name in _argument_names(target) or any(
+                (isinstance(node, ast.Name) and node.id == bound_name
+                 and isinstance(node.ctx, (ast.Store, ast.Del)))
+                or (isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                    and node.name == bound_name)
+                or (isinstance(node, (ast.ExceptHandler, ast.MatchAs, ast.MatchStar))
+                    and node.name == bound_name)
+                or (isinstance(node, ast.MatchMapping) and node.rest == bound_name)
+                or (isinstance(node, (ast.Import, ast.ImportFrom)) and node is not import_node
+                    and (bound_name in _import_bound_names(node)
+                         or any(alias.name == "*" for alias in node.names)))
+                or (isinstance(node, (ast.Global, ast.Nonlocal)) and bound_name in node.names)
+                or (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+                    and node.func.id == "exec")
+                for node in search_nodes):
+            continue
+        for call, function_name in calls:
+            callable_parts = (*module_prefix, function_name) if not imported_name else ()
+            if callable_parts and any(
+                    isinstance(node, ast.Attribute) and isinstance(node.ctx, (ast.Store, ast.Del))
+                    and _attribute_parts(node) in [list(callable_parts[:i]) for i in range(1, len(callable_parts)+1)] for node in search_nodes):
+                continue
+            patch_nodes = [*search_nodes, *target.decorator_list]
+            if _patched_symbol(patch_nodes, module, function_name, module_prefix):
+                continue
+            matching_sources = [source for source in sources if source["source_id"] != "test"
+                                and _module_matches_path(module, source["logical_path"])]
+            if len(matching_sources) != 1:
+                continue
+            source = matching_sources[0]
+            try:
+                product_tree = ast.parse(source["text"])
+            except SyntaxError:
+                continue
+            definitions = [node for node in product_tree.body
+                           if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+                           and node.name == function_name]
+            if len(definitions) != 1:
+                continue
+            definition = definitions[0]
+            if definition.decorator_list:
+                continue
+            product_nodes = _lexical_nodes(product_tree.body)
+            if any(
+                    isinstance(node, ast.Name) and node.id == function_name
+                    and isinstance(node.ctx, (ast.Store, ast.Del))
+                    or isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                    and node.name == function_name and node is not definition
+                    or isinstance(node, ast.ExceptHandler) and node.name == function_name
+                    or isinstance(node, (ast.Import, ast.ImportFrom))
+                    and function_name in _import_bound_names(node)
+                    or isinstance(node, ast.ImportFrom)
+                    and any(alias.name == "*" for alias in node.names)
+                    for node in product_nodes):
+                continue
+            facts.append([call.lineno, function_name, source["logical_path"], definition.lineno,
+                          definition.name, getattr(definition, "end_lineno", definition.lineno)])
+    counts = Counter((row[0], row[1]) for row in facts)
+    return [row for row in facts if counts[(row[0], row[1])] == 1]
+
+
+def authenticated_binding_rows(test_path: str, facts: list[list[Any]], origin: str) -> list[dict[str, str]]:
+    """Turn authenticated selector coordinates into entry-only relation rows."""
+    return [{
+        "relation": origin,
+        "sourcePath": test_path,
+        "sourceLine": str(row[0]),
+        "sourceEndLine": str(row[0]),
+        "targetPath": row[2],
+        "targetLine": str(row[3]),
+        "targetEndLine": str(row[5]),
+        "observationLine": "0",
+        "argumentIndex": "-1",
+        "detail": row[4],
+    } for row in facts]
+
+
 def summarize_entry_evidence(criteria: list[dict[str, Any]], rows: list[dict[str, str]]) -> dict[str, Any]:
     mapped_counts = Counter(int(row["observationLine"]) for row in rows
                             if row["relation"] == "observation")
@@ -199,7 +408,8 @@ def summarize_entry_evidence(criteria: list[dict[str, Any]], rows: list[dict[str
     for criterion in criteria:
         observations_by_line.setdefault(criterion["line"], []).append(criterion["criterion_id"])
     product_call_bindings = sum(row["relation"] in {
-        "resolved_test_product_call", "visible_loader_product_call"} for row in rows)
+        "resolved_test_product_call", "visible_loader_product_call",
+        "authenticated_loader_product_call", "authenticated_import_product_call"} for row in rows)
     cross_source_relations = sum(
         row["relation"] != "observation" and row["sourcePath"] != row["targetPath"]
         for row in rows
@@ -260,16 +470,28 @@ def build_contract(entry: dict[str, Any], context: dict[str, Any], sources: list
         source_line, source_end = int(row["sourceLine"]), int(row["sourceEndLine"])
         target_line, target_end = int(row["targetLine"]), int(row["targetEndLine"])
         refs = list(observation_ids.get(int(row["observationLine"]), []))
+        authenticated_selector = kind in {
+            "authenticated_loader_product_call", "authenticated_import_product_call",
+        }
+        provenance = ({
+            "backend": "static selector frontend", "selector_relation": kind,
+            "selector_detail": row["detail"],
+            "selector_facts_sha256": context.get("selector_facts_sha256"),
+        } if authenticated_selector else {
+            "backend": "CodeQL 2.27.4", "query_relation": kind,
+            "query_detail": row["detail"], "query_sha256": sha256_bytes(QUERY.read_bytes()),
+        })
         common = {
             "from": endpoint(row["sourcePath"], source_line, source_end),
             "to": endpoint(row["targetPath"], target_line, target_end),
-            "provenance": {"backend": "CodeQL 2.27.4", "query_relation": kind,
-                           "query_detail": row["detail"],
-                           "query_sha256": sha256_bytes(QUERY.read_bytes())},
-            "precision": "generic bounded CodeQL relation; semantic correctness not independently reviewed",
+            "provenance": provenance,
+            "precision": ("authenticated visible selector binding; downstream effects not inferred"
+                          if authenticated_selector else
+                          "generic bounded CodeQL relation; semantic correctness not independently reviewed"),
             "observation_ids": refs, "assumptions": [],
         }
-        if kind in {"resolved_test_product_call", "visible_loader_product_call"}:
+        if kind in {"resolved_test_product_call", "visible_loader_product_call",
+                    "authenticated_loader_product_call", "authenticated_import_product_call"}:
             relations.append({"kind": "call_binding", "modality": "analysis_may", **common})
             key = (row["targetPath"], target_line, row["detail"])
             candidates[key] = {"logical_path": key[0], "start_line": key[1], "symbol": key[2],
@@ -278,7 +500,9 @@ def build_contract(entry: dict[str, Any], context: dict[str, Any], sources: list
                 "boundary_id": f"call:{row['sourcePath']}:{source_line}",
                 "effect": "return_exception_and_reachable_state_effects_not_fully_modelled",
                 "scope": common["from"], "provenance": (
-                    "authenticated visible-loader frontend" if kind == "visible_loader_product_call"
+                    "authenticated visible-loader frontend" if kind in {
+                        "visible_loader_product_call", "authenticated_loader_product_call"}
+                    else "authenticated explicit-import frontend" if kind == "authenticated_import_product_call"
                     else "generic CodeQL resolved call"),
                 "precision": "unknown_effect", "assumptions": [],
             }
@@ -301,11 +525,17 @@ def build_contract(entry: dict[str, Any], context: dict[str, Any], sources: list
     if evidence["ambiguous_observation_lines"]:
         failure_categories.append("observation_mapping_ambiguous")
     for relation in relations:
-        origin = relation["provenance"]["query_relation"]
-        if origin in {"visible_loader_product_call", "loader_product_result_to_observation"}:
+        origin = relation["provenance"].get(
+            "query_relation", relation["provenance"].get("selector_relation")
+        )
+        if origin in {"visible_loader_product_call", "authenticated_loader_product_call",
+                      "loader_product_result_to_observation"}:
             relation["provenance"]["binding_origin"] = "authenticated_visible_loader_frontend"
             relation["provenance"]["selector_facts_sha256"] = context.get("selector_facts_sha256")
             relation["assumptions"] = ["visible loader namespace and runtime imports retain their shown bindings"]
+        elif origin == "authenticated_import_product_call":
+            relation["provenance"]["binding_origin"] = "authenticated_explicit_import_frontend"
+            relation["provenance"]["selector_facts_sha256"] = context.get("selector_facts_sha256")
         if origin in {"resolved_product_result_to_observation", "loader_product_result_to_observation"}:
             relation["precision"] = "composed function binding and CodeQL test-local result flow; function span is provenance scope, not an internal return-site edge"
     contract = {
@@ -411,13 +641,16 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, codeql: Pa
                 destination.write_text(source["text"])
             shutil.copy2(QLPACK, query_root / "qlpack.yml")
             query_text = QUERY.read_text()
+            visible_loader_bindings = loader_facts(selected, selection, context["target_scope"][0])
+            explicit_import_bindings = import_facts(selected, context["target_scope"][0])
             selector_facts = {
                 "test_path": test_source["logical_path"],
                 "test_function": case.target_selector.rsplit("::", 1)[-1],
                 "observations": [{"observation_id": criterion["criterion_id"],
                                   "line": criterion["line"]} for criterion in criteria],
                 "observation_expressions": selector_locations(selected[0]["text"], criteria),
-                "visible_loader_bindings": loader_facts(selected, selection, context["target_scope"][0]),
+                "visible_loader_bindings": visible_loader_bindings,
+                "explicit_import_bindings": explicit_import_bindings,
             }
             write_json(output / "selector-facts.json", selector_facts)
             context["selector_facts_sha256"] = sha256_bytes((output / "selector-facts.json").read_bytes())
@@ -470,6 +703,23 @@ def execute(entry: dict[str, Any], registry_root: Path, output: Path, codeql: Pa
                 raise RuntimeError("generic CodeQL result decode failed")
             with csv_path.open(newline="") as stream:
                 rows = list(csv.DictReader(stream))
+            # These bindings have already been authenticated against the selected
+            # test scope and exact visible product coordinates. Preserve them even
+            # when CodeQL cannot join an extracted callable to the selector row.
+            existing = {(row["sourcePath"], row["sourceLine"], row["targetPath"],
+                         row["targetLine"]) for row in rows if row["relation"] in {
+                             "resolved_test_product_call", "visible_loader_product_call",
+                         }}
+            selector_rows = authenticated_binding_rows(
+                test_source["logical_path"], visible_loader_bindings,
+                "authenticated_loader_product_call",
+            ) + authenticated_binding_rows(
+                test_source["logical_path"], explicit_import_bindings,
+                "authenticated_import_product_call",
+            )
+            rows.extend(row for row in selector_rows if (
+                row["sourcePath"], row["sourceLine"], row["targetPath"], row["targetLine"],
+            ) not in existing)
         entry_evidence.update(summarize_entry_evidence(criteria, rows))
         entry_evidence["current_stage"] = "mapped"
         source_records = [{key: row[key] for key in ("source_id", "logical_path", "sha256", "bytes")}

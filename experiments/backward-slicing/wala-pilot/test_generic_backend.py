@@ -47,6 +47,153 @@ def test_structural_harness_rejects_unconstrained_compile_failure():
     assert len(recorded[-1]) == 2
 
 
+def test_missing_variable_diagnostics_do_not_cross_blocks():
+    stderr = (
+        "/work/Product.java:9: error: cannot find symbol\n"
+        "  symbol: class MissingProductType\n"
+        "/work/SelectedTest.java:41: error: cannot find symbol\n"
+        "    consume(dependency);\n"
+        "            ^\n"
+        "  symbol:   variable dependency\n"
+        "  location: class SelectedTest\n"
+    )
+    assert subject._missing_variables(
+        stderr, test_path="SelectedTest.java", start_line=40, end_line=42
+    ) == ["dependency"]
+    assert subject._missing_variables(
+        stderr, test_path="Product.java", start_line=1, end_line=20
+    ) == []
+
+
+def test_type_update_accepts_tab_indented_caret_and_wildcard():
+    stderr = (
+        "SelectedTest.java:20: error: incompatible types: Object cannot be converted to Invoker<?>\n"
+        "\tfilter.invoke(invoker, invocation);\n"
+        "\t              ^\n"
+    )
+    assert subject._type_updates(stderr, ["invoker"]) == {"invoker": "Invoker<?>"}
+
+
+def test_type_update_filters_diagnostic_path_and_range():
+    stderr = (
+        "/work/Product.java:20: error: incompatible types: Object cannot be converted to Service\n"
+        "    consume(dependency);\n"
+        "            ^\n"
+        "/work/SelectedTest.java:80: error: incompatible types: Object cannot be converted to Service\n"
+        "    consume(dependency);\n"
+        "            ^\n"
+    )
+    assert subject._type_updates(
+        stderr, ["dependency"], test_path="SelectedTest.java", start_line=40, end_line=60
+    ) == {}
+
+
+def test_type_update_does_not_guess_when_caret_misses_the_only_name():
+    stderr = (
+        "SelectedTest.java:20: error: incompatible types: Object cannot be converted to Service\n"
+        "    consume(dependency);\n"
+        "    ^\n"
+    )
+    assert subject._type_updates(stderr, ["dependency"]) == {}
+
+
+def test_type_update_uses_unique_literal_compatible_overload():
+    stderr = (
+        "SelectedTest.java:36: error: no suitable method found for getResult(Object,String)\n"
+        "    assertEquals(expected, handler.getResult(rs, \"column\"));\n"
+        "                                  ^\n"
+        "    method TypeHandler.getResult(ResultSet,String) is not applicable\n"
+        "      (argument mismatch; Object cannot be converted to ResultSet)\n"
+        "    method TypeHandler.getResult(ResultSet,int) is not applicable\n"
+        "      (argument mismatch; Object cannot be converted to ResultSet)\n"
+        "    method TypeHandler.getResult(CallableStatement,int) is not applicable\n"
+        "      (argument mismatch; Object cannot be converted to CallableStatement)\n"
+    )
+    assert subject._type_updates(stderr, ["rs"]) == {"rs": "ResultSet"}
+
+
+def test_type_update_preserves_integer_overload_ambiguity():
+    stderr = (
+        "SelectedTest.java:36: error: no suitable method found for getResult(Object,int)\n"
+        "    assertEquals(expected, handler.getResult(statement, 1));\n"
+        "                                  ^\n"
+        "    method TypeHandler.getResult(ResultSet,String) is not applicable\n"
+        "      (argument mismatch; Object cannot be converted to ResultSet)\n"
+        "    method TypeHandler.getResult(ResultSet,int) is not applicable\n"
+        "      (argument mismatch; Object cannot be converted to ResultSet)\n"
+        "    method TypeHandler.getResult(CallableStatement,int) is not applicable\n"
+        "      (argument mismatch; Object cannot be converted to CallableStatement)\n"
+    )
+    assert subject._type_updates(stderr, ["statement"]) == {}
+
+
+def test_overload_filter_retains_reference_supertypes_and_numeric_widening():
+    assert subject._literal_compatible('"column"', "Serializable")
+    assert subject._literal_compatible("1", "long")
+    stderr = (
+        "SelectedTest.java:36: error: no suitable method found for getResult(Object,String)\n"
+        "    handler.getResult(rs, \"column\");\n"
+        "            ^\n"
+        "    method Handler.getResult(ResultSet,String) is not applicable\n"
+        "      (argument mismatch; Object cannot be converted to ResultSet)\n"
+        "    method Handler.getResult(CallableStatement,Serializable) is not applicable\n"
+        "      (argument mismatch; Object cannot be converted to CallableStatement)\n"
+    )
+    assert subject._type_updates(stderr, ["rs"]) == {}
+
+
+def test_overload_update_requires_one_signature_and_rejects_varargs():
+    duplicate = (
+        "SelectedTest.java:36: error: no suitable method found for consume(Object,String)\n"
+        "    consume(dependency, \"value\");\n"
+        "    ^\n"
+        "    method First.consume(Service,String) is not applicable\n"
+        "    method Second.consume(Service,String) is not applicable\n"
+    )
+    assert subject._type_updates(duplicate, ["dependency"]) == {}
+
+    varargs = (
+        "SelectedTest.java:36: error: no suitable method found for consume(Object,String)\n"
+        "    consume(dependency, \"value\");\n"
+        "    ^\n"
+        "    method First.consume(Service,String...) is not applicable\n"
+    )
+    assert subject._type_updates(varargs, ["dependency"]) == {}
+
+
+def test_type_update_recovers_single_required_signature_but_rejects_type_variable():
+    wildcard = (
+        "SelectedTest.java:54: error: method invoke cannot be applied to given types;\n"
+        "    filter.invoke(invoker, invocation);\n"
+        "          ^\n"
+        "  required: Invoker<?>,Invocation\n"
+        "  found: Object,Invocation\n"
+    )
+    assert subject._type_updates(wildcard, ["invoker"]) == {"invoker": "Invoker<?>"}
+
+    free_type_variable = (
+        "SelectedTest.java:43: error: method shouldMigrate in class Comparator cannot be applied to given types;\n"
+        "    comparator.shouldMigrate(newInvoker, oldInvoker, rule);\n"
+        "              ^\n"
+        "  required: ClusterInvoker<T>,ClusterInvoker<T>,MigrationRule\n"
+        "  found: Object,Object,Object\n"
+    )
+    assert subject._type_updates(
+        free_type_variable, ["newInvoker", "oldInvoker", "rule"]
+    ) == {}
+
+    named_type_variable = (
+        "SelectedTest.java:43: error: method convert cannot be applied to given types;\n"
+        "    convert(value);\n"
+        "    ^\n"
+        "  required: VALUE\n"
+        "  found: Object\n"
+        "  where VALUE is a type-variable:\n"
+        "    VALUE extends Object declared in method <VALUE>convert(VALUE)\n"
+    )
+    assert subject._type_updates(named_type_variable, ["value"]) == {}
+
+
 def test_observation_requires_one_assertion_on_source_line():
     assert subject._assertion_fragment("assertEquals(1, actual);", 1) == ".assertEquals("
     with pytest.raises(ValueError, match="one assertion"):
@@ -137,3 +284,17 @@ def test_typed_product_path_through_opaque_placeholder_is_suppressed():
         raw, {"p.Product": "src/main/java/p/Product.java"}, opaque)
     assert paths == []
     assert suppressed[0]["opaque_hits"][0]["name"] == "placeholder"
+
+
+def test_unparsed_or_generic_overload_keeps_competing_signature_unknown():
+    text = (
+        "SelectedTest.java:10: error: no suitable method found for consume(Object,String)\n"
+        '    consume(dep, "value");\n    ^\n'
+        "    method First.consume(Service,String) is not applicable\n"
+    )
+    for competing in (
+        "    method Other.consume(Other,String...) is not applicable\n",
+        "    method Other.<T>consume(T,String) is not applicable\n",
+        "    method Other.consume(Other,List<?>) is not applicable\n",
+    ):
+        assert subject._type_updates(text + competing, ["dep"]) == {}

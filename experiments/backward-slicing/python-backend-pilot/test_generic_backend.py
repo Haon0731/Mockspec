@@ -121,3 +121,192 @@ def test_exact_call_root_and_same_line_loader_rebinding_are_rejected():
         "function_definition": {"source_id": "s", "logical_path": "x.py", "name": "f", "start_line": 1, "end_line": 2},
         "test_bindings": [{"name": "f", "line": 4}], "call_sites": [{"name": "f", "line": 5}]}]}
     assert backend.loader_facts(sources, selection, {"symbol": "test_x", "start_line": 3}) == []
+
+
+def test_import_facts_bind_unique_direct_import_and_module_alias():
+    sources = [
+        {"source_id": "test", "logical_path": "tests/test_termui.py", "text":
+         "from click.termui import launch as open_url\n"
+         "import click.helpers as helpers\n\n"
+         "def test_x():\n"
+         "    first = open_url('https://example.test')\n"
+         "    second = helpers.abort(404)\n"
+         "    assert first == second\n"},
+        {"source_id": "source:1", "logical_path": "src/click/termui.py", "text":
+         "def launch(url):\n    return url\n"},
+        {"source_id": "source:2", "logical_path": "src/click/helpers.py", "text":
+         "def abort(code):\n    raise RuntimeError(code)\n"},
+    ]
+    facts = backend.import_facts(sources, {"symbol": "test_x", "start_line": 4})
+    assert facts == [
+        [5, "launch", "src/click/termui.py", 1, "launch", 2],
+        [6, "abort", "src/click/helpers.py", 1, "abort", 2],
+    ]
+
+
+def test_import_facts_bind_unaliased_module_and_dotted_module_calls():
+    sources = [
+        {"source_id": "test", "logical_path": "tests/test_x.py", "text":
+         "import standalone\n"
+         "import pkg.mod\n\n"
+         "def test_x():\n"
+         "    standalone.first()\n"
+         "    pkg.mod.second()\n"},
+        {"source_id": "source:1", "logical_path": "src/standalone.py", "text":
+         "def first():\n    return 1\n"},
+        {"source_id": "source:2", "logical_path": "src/pkg/mod.py", "text":
+         "def second():\n    return 2\n"},
+    ]
+    assert backend.import_facts(sources, {"symbol": "test_x", "start_line": 4}) == [
+        [5, "first", "src/standalone.py", 1, "first", 2],
+        [6, "second", "src/pkg/mod.py", 1, "second", 2],
+    ]
+
+
+def test_import_facts_reject_shadowing_decorators_and_ambiguous_modules():
+    test = {"source_id": "test", "logical_path": "tests/test_x.py", "text":
+            "from pkg.mod import target\n\n"
+            "def test_x():\n"
+            "    target = replacement\n"
+            "    target()\n"}
+    product = {"source_id": "source:1", "logical_path": "src/pkg/mod.py", "text":
+               "def target():\n    return 1\n"}
+    scope = {"symbol": "test_x", "start_line": 3}
+    assert backend.import_facts([test, product], scope) == []
+
+    test["text"] = test["text"].replace("    target = replacement\n", "")
+    product["text"] = "@wrapper\ndef target():\n    return 1\n"
+    assert backend.import_facts([test, product], scope) == []
+
+    product["text"] = "def target():\n    return 1\n"
+    duplicate = {**product, "source_id": "source:2", "logical_path": "vendor/pkg/mod.py"}
+    assert backend.import_facts([test, product, duplicate], scope) == []
+
+
+def test_import_facts_reject_lexical_bindings_and_conditional_or_star_imports():
+    product = {"source_id": "source:1", "logical_path": "src/pkg/mod.py", "text":
+               "def target():\n    return 1\n"}
+    tests = [
+        "import pkg.mod as dependency\n\ndef test_x(dependency):\n    dependency.target()\n",
+        "import pkg.mod as dependency\ndef dependency():\n    pass\n"
+        "def test_x():\n    dependency.target()\n",
+        "import pkg.mod as dependency\nclass dependency:\n    pass\n"
+        "def test_x():\n    dependency.target()\n",
+        "flag = True\nif flag:\n    import pkg.mod as dependency\n"
+        "def test_x():\n    dependency.target()\n",
+        "import pkg.mod as dependency\ndef test_x():\n    try:\n        pass\n"
+        "    except Exception as dependency:\n        pass\n    dependency.target()\n",
+        "from pkg.mod import *\ndef test_x():\n    target()\n",
+        "from pkg.mod import target\nfrom extension import *\n"
+        "def test_x():\n    target()\n",
+    ]
+    for text in tests:
+        test = {"source_id": "test", "logical_path": "tests/test_x.py", "text": text}
+        tree = backend.ast.parse(text)
+        target = next(node for node in backend.ast.walk(tree)
+                      if isinstance(node, backend.ast.FunctionDef) and node.name == "test_x")
+        assert backend.import_facts([test, product], {
+            "symbol": "test_x", "start_line": target.lineno,
+        }) == []
+
+
+def test_import_facts_ignore_calls_in_nested_functions_and_class_methods():
+    test = {"source_id": "test", "logical_path": "tests/test_x.py", "text":
+            "import pkg.mod\n\n"
+            "def test_x():\n"
+            "    def nested():\n        pkg.mod.target()\n"
+            "    class Nested:\n        def method(self):\n            pkg.mod.target()\n"
+            "    assert nested\n"}
+    product = {"source_id": "source:1", "logical_path": "src/pkg/mod.py", "text":
+               "def target():\n    return 1\n"}
+    assert backend.import_facts([test, product], {"symbol": "test_x", "start_line": 3}) == []
+
+
+def test_import_facts_reject_product_rebinding_module_rewrite_and_patch():
+    base_product = {"source_id": "source:1", "logical_path": "src/pkg/mod.py", "text":
+                    "def target():\n    return 1\n"}
+    scope = {"symbol": "test_x", "start_line": 3}
+    test_variants = [
+        "import pkg.mod\n\ndef test_x():\n    pkg.mod.target = replacement\n"
+        "    pkg.mod.target()\n",
+        "import pkg.mod\n\ndef test_x():\n    mock.patch('pkg.mod.target')\n"
+        "    pkg.mod.target()\n",
+        "import pkg.mod\n\ndef test_x():\n    mock.patch.object(pkg.mod, 'target')\n"
+        "    pkg.mod.target()\n",
+        "import pkg.mod\n\n@mock.patch('pkg.mod.target')\n"
+        "def test_x(mock_target):\n    pkg.mod.target()\n",
+    ]
+    for text in test_variants:
+        test = {"source_id": "test", "logical_path": "tests/test_x.py", "text": text}
+        tree = backend.ast.parse(text)
+        target = next(node for node in backend.ast.walk(tree)
+                      if isinstance(node, backend.ast.FunctionDef) and node.name == "test_x")
+        assert backend.import_facts([test, base_product], {
+            "symbol": "test_x", "start_line": target.lineno,
+        }) == []
+
+    product_variants = [
+        "def target():\n    return 1\ntarget = replacement\n",
+        "def target():\n    return 1\nclass target:\n    pass\n",
+        "def target():\n    return 1\nfrom extension import target\n",
+        "def target():\n    return 1\nfrom extension import *\n",
+    ]
+    test = {"source_id": "test", "logical_path": "tests/test_x.py", "text":
+            "from pkg.mod import target\n\ndef test_x():\n    target()\n"}
+    for text in product_variants:
+        product = {**base_product, "text": text}
+        assert backend.import_facts([test, product], scope) == []
+
+
+def test_authenticated_loader_coordinates_become_entry_only_relations():
+    rows = backend.authenticated_binding_rows(
+        "tests/test_x.py", [[12, "target", "src/x.py", 4, "target", 8]],
+        "authenticated_loader_product_call",
+    )
+    assert rows == [{
+        "relation": "authenticated_loader_product_call",
+        "sourcePath": "tests/test_x.py", "sourceLine": "12", "sourceEndLine": "12",
+        "targetPath": "src/x.py", "targetLine": "4", "targetEndLine": "8",
+        "observationLine": "0", "argumentIndex": "-1", "detail": "target",
+    }]
+    evidence = backend.summarize_entry_evidence([{"criterion_id": "c", "line": 14}], rows)
+    assert evidence["product_call_bindings"] == 1
+    assert evidence["observation_linked_cross_source_relations"] == 0
+    assert evidence["analysis_entry_status"] == "product_call_binding_only"
+    entry = {"case_id": "case", "dataset": "dataset", "snapshot_id": "snapshot"}
+    context = {"masking_contract": "python-slot-v1", "masked_test_sha256": "a" * 64,
+               "target_selector": "tests/test_x.py::test_x", "selector_facts_sha256": "b" * 64,
+               "target_scope": [{"symbol": "test_x", "start_line": 1, "end_line": 14}]}
+    sources = [
+        {"source_id": "test", "logical_path": "tests/test_x.py", "sha256": "a" * 64,
+         "bytes": 5},
+        {"source_id": "source:1", "logical_path": "src/x.py", "sha256": "b" * 64,
+         "bytes": 5},
+    ]
+    criteria = [{"criterion_id": "c", "line": 14, "kind": "value_assertion",
+                 "confidence": "explicit", "reason": "assertion"}]
+    contract = backend.build_contract(entry, context, sources, criteria, rows, costs(), [])
+    assert contract["entry_point"]["mut_binding"]["status"] == "unique"
+    assert [relation["kind"] for relation in contract["relations"]] == ["call_binding"]
+    assert contract["relations"][0]["provenance"]["binding_origin"] \
+        == "authenticated_visible_loader_frontend"
+    assert contract["relations"][0]["provenance"]["selector_facts_sha256"] == "b" * 64
+    assert "query_relation" not in contract["relations"][0]["provenance"]
+    assert "query_sha256" not in contract["relations"][0]["provenance"]
+
+
+def test_import_binding_requires_unique_scope_and_module():
+    product = {"source_id": "p1", "logical_path": "src/pkg/m.py", "text": "def f(): pass"}
+    for text in (
+        "from pkg.m import f\ndef test_x():\n    if flag: from fallback import f\n    f()",
+        "from pkg.m import f\ndef outer(f):\n    def test_x(): f()",
+        "import pkg.m\ndef test_x():\n    pkg.m = other\n    pkg.m.f()",
+        "from pkg.m import f\ndef test_x():\n    match obj:\n        case {'v': f}: f()",
+    ):
+        node = next(n for n in backend.ast.walk(backend.ast.parse(text))
+                    if isinstance(n, backend.ast.FunctionDef) and n.name == "test_x")
+        assert backend.import_facts([{"source_id": "test", "text": text}, product],
+                                    {"symbol": "test_x", "start_line": node.lineno}) == []
+    test = {"source_id": "test", "text": "from pkg.m import f\ndef test_x(): f()"}
+    other = {"source_id": "p2", "logical_path": "other/pkg/m.py", "text": "pass"}
+    assert backend.import_facts([test, product, other], {"symbol": "test_x", "start_line": 2}) == []
