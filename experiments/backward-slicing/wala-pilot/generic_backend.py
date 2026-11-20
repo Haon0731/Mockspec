@@ -832,8 +832,15 @@ def _authenticated_dependency_path(
     control_flows = {row.get("caller_cfg_id"): row
                      for row in raw.get("call_control_flows", [])
                      if isinstance(row, dict) and isinstance(row.get("caller_cfg_id"), str)}
-    State = tuple[int, tuple[str, ...], tuple[Any, ...] | None, bool]
-    initial: State = (start, (), None, False)
+    # A WALA callee-return node is a boundary, not an SSA instruction. Its
+    # witness belongs to this path state, never to all visits of the node.
+    normal_returns = {
+        (row.get("method"), row.get("context"), row.get("instruction_index"))
+        for row in raw.get("product_body_evidence", [])
+        if row.get("kind") == "value_return" and type(row.get("instruction_index")) is int
+    }
+    State = tuple[int, tuple[str, ...], tuple[Any, ...] | None, bool, bool]
+    initial: State = (start, (), None, False, False)
     queue: list[State] = [initial]
     parents: dict[State, tuple[State, dict[str, Any]]] = {}
     depths: dict[State, int] = {initial: 0}
@@ -842,6 +849,7 @@ def _authenticated_dependency_path(
     pruned_transition = 0
     pruned_cfg = 0
     pruned_ambiguous = 0
+    pruned_boundary = 0
 
     def statement_identity(index: int) -> tuple[Any, Any]:
         item = statements[index]
@@ -862,7 +870,7 @@ def _authenticated_dependency_path(
                    for row in cfg.get("exceptional_catches", []))
 
     for state in queue:
-        current, stack, pending, saw_exception = state
+        current, stack, pending, saw_exception, boundary_witness = state
         current_statement = statements[current]
         current_identity = statement_identity(current)
         if pending is not None and current_identity == (pending[0], pending[1]):
@@ -876,7 +884,7 @@ def _authenticated_dependency_path(
                     and basic_block not in pending[5]):
                 pruned_cfg += 1
                 continue
-            if instruction_index is None and basic_block is None:
+            if instruction_index is None and basic_block is None and not boundary_witness:
                 pruned_cfg += 1
                 continue
             if (pending[2] == "exceptional" and type(instruction_index) is int
@@ -894,7 +902,7 @@ def _authenticated_dependency_path(
                 "reason": "authenticated_path", "exhaustive": True,
                 "searched_states": len(seen), "pruned_depth": pruned_depth,
                 "pruned_transition": pruned_transition, "pruned_cfg": pruned_cfg,
-                "pruned_ambiguous": pruned_ambiguous,
+                "pruned_ambiguous": pruned_ambiguous, "pruned_boundary": pruned_boundary,
             }
         for edge in sorted(outgoing.get(current, []),
                            key=lambda item: (int(item["to"]), tuple(item.get("labels", [])))):
@@ -971,7 +979,29 @@ def _authenticated_dependency_path(
                     pruned_transition += 1
                     continue
 
-            next_state: State = (reached, next_stack, next_pending, next_saw_exception)
+            next_boundary_witness = False
+            if (next_pending is not None
+                    and next_identity == (next_pending[0], next_pending[1])
+                    and next_statement.get("instruction_index") is None
+                    and next_statement.get("basic_block") is None
+                    and next_statement.get("kind") == "NORMAL_RET_CALLEE"):
+                # Validate before enqueue/dedup: a different incoming path must
+                # not borrow a return witness or block a later valid arrival.
+                # The current instruction has already passed pending CFG checks.
+                next_boundary_witness = (
+                    next_pending[2] == "normal"
+                    and current_identity == next_identity
+                    and current_statement.get("kind") == "NORMAL"
+                    and "DATA_DEP" in edge.get("labels", [])
+                    and (*current_identity, current_statement.get("instruction_index"))
+                    in normal_returns
+                )
+                if not next_boundary_witness:
+                    pruned_boundary += 1
+                    continue
+
+            next_state: State = (reached, next_stack, next_pending,
+                                 next_saw_exception, next_boundary_witness)
             if next_state in seen:
                 continue
             # Bound path length independently from graph-state count. Keeping
@@ -987,16 +1017,22 @@ def _authenticated_dependency_path(
                     "searched_states": len(seen), "state_limit": max_states,
                     "pruned_depth": pruned_depth, "pruned_transition": pruned_transition,
                     "pruned_cfg": pruned_cfg, "pruned_ambiguous": pruned_ambiguous,
+                    "pruned_boundary": pruned_boundary,
                 }
             seen.add(next_state)
             parents[next_state] = (state, edge)
             depths[next_state] = next_depth
             queue.append(next_state)
+    reason = "no_authenticated_matched_call_return_path"
+    if pruned_boundary:
+        reason = "return_boundary_evidence_unavailable"
+    if pruned_depth:
+        reason = "realizable_path_search_frontier"
     return None, {
-        "reason": "no_authenticated_matched_call_return_path", "exhaustive": True,
+        "reason": reason, "exhaustive": not (pruned_depth or pruned_boundary),
         "searched_states": len(seen), "pruned_depth": pruned_depth,
         "pruned_transition": pruned_transition, "pruned_cfg": pruned_cfg,
-        "pruned_ambiguous": pruned_ambiguous,
+        "pruned_ambiguous": pruned_ambiguous, "pruned_boundary": pruned_boundary,
     }
 
 

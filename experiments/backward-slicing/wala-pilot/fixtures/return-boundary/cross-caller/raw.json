@@ -1,0 +1,1424 @@
+{
+  "schema_version": "mockspec.wala-capability/v2",
+  "wala_version": "1.7.2",
+  "configuration": {
+    "call_graph": "0-1-CFA",
+    "data_dependence": "NO_HEAP",
+    "control_dependence": "FULL",
+    "traversal": "hash_backed_unmatched_context_predecessors",
+    "reflection": "NONE",
+    "opaque_effect_model": "bounded-effect-token-v1",
+    "observation_effects": false,
+    "observation_effect_scan": false,
+    "heap_effect_analysis_demanded": false,
+    "observation_effect_demand_scope": "direct instance SSAGet definitions of exact original observation seed uses only; static/global fields, getter returns, phi chains and indirect reads remain unsupported",
+    "entry_origin": "explicit_diagnostic",
+    "opaque_summary_mode": false
+  },
+  "opaque_effects": [],
+  "opaque_effect_model_scope": {
+    "unknown": [
+      "opaque calls are not summarized"
+    ],
+    "modeled": []
+  },
+  "application": "/tmp/mockspec-wala-boundary-a8oar71c/fixture.jar",
+  "library_count": 0,
+  "entry": "sample.Entry.observe(II)V",
+  "class_hierarchy_classes": 30554,
+  "unresolved_classes": [
+    "<Primordial,Lcom/ibm/wala/FakeRootClass>"
+  ],
+  "call_graph_nodes": 9,
+  "application_call_graph_nodes": 5,
+  "call_graph_contexts": 1,
+  "pointer_instance_keys": 0,
+  "entry_local_points_to": [],
+  "entry_instruction_effects": [
+    {
+      "instruction_index": 1,
+      "instruction": "5 = invokestatic < Application, Lsample/Cut, first(I)I > 1 @1 exception:4",
+      "uses": [
+        1
+      ],
+      "definitions": [
+        5,
+        4
+      ],
+      "mod_regions": [],
+      "ref_regions": []
+    },
+    {
+      "instruction_index": 4,
+      "instruction": "7 = invokestatic < Application, Lsample/Cut, second(I)I > 2 @6 exception:6",
+      "uses": [
+        2
+      ],
+      "definitions": [
+        7,
+        6
+      ],
+      "mod_regions": [],
+      "ref_regions": []
+    },
+    {
+      "instruction_index": 7,
+      "instruction": "invokestatic < Application, Lsample/Entry, observeValue(I)V > 7 @11 exception:8",
+      "uses": [
+        7
+      ],
+      "definitions": [
+        8
+      ],
+      "mod_regions": [],
+      "ref_regions": []
+    }
+  ],
+  "entry_control_flow": [
+    {
+      "caller": "sample.Entry.observe(II)V",
+      "caller_context": "Everywhere",
+      "instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Cut, first(I)I >@1",
+      "declared_target": "sample.Cut.first(I)I",
+      "call_block": 1,
+      "normal_successor_blocks": [
+        2
+      ],
+      "exceptional_successor_blocks": [
+        5
+      ],
+      "normal_reachable": [
+        {
+          "instruction": "7 = invokestatic < Application, Lsample/Cut, second(I)I > 2 @6 exception:6",
+          "instruction_index": 4,
+          "basic_block": 2
+        },
+        {
+          "instruction": "invokestatic < Application, Lsample/Entry, observeValue(I)V > 7 @11 exception:8",
+          "instruction_index": 7,
+          "basic_block": 3
+        },
+        {
+          "instruction": "return",
+          "instruction_index": 8,
+          "basic_block": 4
+        }
+      ],
+      "exceptional_reachable": []
+    },
+    {
+      "caller": "sample.Entry.observe(II)V",
+      "caller_context": "Everywhere",
+      "instruction_index": 4,
+      "call_site": "invokestatic < Application, Lsample/Cut, second(I)I >@6",
+      "declared_target": "sample.Cut.second(I)I",
+      "call_block": 2,
+      "normal_successor_blocks": [
+        3
+      ],
+      "exceptional_successor_blocks": [
+        5
+      ],
+      "normal_reachable": [
+        {
+          "instruction": "invokestatic < Application, Lsample/Entry, observeValue(I)V > 7 @11 exception:8",
+          "instruction_index": 7,
+          "basic_block": 3
+        },
+        {
+          "instruction": "return",
+          "instruction_index": 8,
+          "basic_block": 4
+        }
+      ],
+      "exceptional_reachable": []
+    },
+    {
+      "caller": "sample.Entry.observe(II)V",
+      "caller_context": "Everywhere",
+      "instruction_index": 7,
+      "call_site": "invokestatic < Application, Lsample/Entry, observeValue(I)V >@11",
+      "declared_target": "sample.Entry.observeValue(I)V",
+      "call_block": 3,
+      "normal_successor_blocks": [
+        4
+      ],
+      "exceptional_successor_blocks": [
+        5
+      ],
+      "normal_reachable": [
+        {
+          "instruction": "return",
+          "instruction_index": 8,
+          "basic_block": 4
+        }
+      ],
+      "exceptional_reachable": []
+    }
+  ],
+  "summary_targets": [],
+  "configured_summaries": [],
+  "timings_millis": {
+    "scope": 49,
+    "class_hierarchy_and_entry": 1784,
+    "call_graph_and_pointer": 206,
+    "sdg_initialization": 3,
+    "total": 2182
+  },
+  "limitations": [
+    "A slice member is a possible dependence under this call graph, not proof of path feasibility.",
+    "Fresh and compatible-argument return alternatives exist in IR, but type-based PA may merge their regions; null and other return sources remain outside the model.",
+    "The bounded probe covers visible direct int fields on concrete receivers and reference arguments, one reference-field hop to int fields, and Application static/static-reachable int regions.",
+    "Reference-field replacement, deeper heap paths, arrays/collections, library/runtime globals, unbounded escaped regions, null, and arbitrary exception types remain unknown.",
+    "The RuntimeException branch is a fixture mechanism probe, not a complete nondeterministic exception model.",
+    "Bytecode line tables may not map synthetic or library statements to reviewed source."
+  ],
+  "generic_mode_boundary": "Heap dependence is omitted and legacy summary forward-slice diagnostics are skipped. FULL control/exception dependence is retained, but hash-backed predecessor traversal does not enforce matched call/return contexts, so retained paths are context-insensitive may evidence. Visible state writes are witnesses only when their exact SSA instruction is retained; other reachable state effects remain unknown.",
+  "criterion": {
+    "query": "SOURCE_LINE:7:-1:.observeValue(",
+    "seed": {
+      "kind": "NORMAL",
+      "method": "sample.Entry.observe(II)V",
+      "context": "Everywhere",
+      "instruction": "invokestatic < Application, Lsample/Entry, observeValue(I)V > 7 @11 exception:8",
+      "instruction_index": 7,
+      "line": 7,
+      "basic_block": 3,
+      "statement_text": "NORMAL observe:invokestatic < Application, Lsample/Entry, observeValue(I)V > 7 @11 exception:8 Node: < Application, Lsample/Entry, observe(II)V > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": 7,
+      "call_site": "invokestatic < Application, Lsample/Entry, observeValue(I)V >@11",
+      "declared_target": "sample.Entry.observeValue(I)V"
+    }
+  },
+  "effect_forward_slices": [],
+  "product_body_evidence": [
+    {
+      "kind": "control_guard",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction_index": 5,
+      "retained_instruction_index": 8,
+      "line": 10,
+      "instruction": "conditional branch(ge, to iindex=10) 4,5",
+      "precision": "same-method homogeneous CONTROL_DEP path to retained observation-slice instruction"
+    },
+    {
+      "kind": "control_guard",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction_index": 5,
+      "retained_instruction_index": 9,
+      "line": 10,
+      "instruction": "conditional branch(ge, to iindex=10) 4,5",
+      "precision": "same-method homogeneous CONTROL_DEP path to retained observation-slice instruction"
+    },
+    {
+      "kind": "control_guard",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction_index": 5,
+      "retained_instruction_index": 12,
+      "line": 10,
+      "instruction": "conditional branch(ge, to iindex=10) 4,5",
+      "precision": "same-method homogeneous CONTROL_DEP path to retained observation-slice instruction"
+    },
+    {
+      "kind": "control_guard",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction_index": 5,
+      "retained_instruction_index": 13,
+      "line": 10,
+      "instruction": "conditional branch(ge, to iindex=10) 4,5",
+      "precision": "same-method homogeneous CONTROL_DEP path to retained observation-slice instruction"
+    },
+    {
+      "kind": "value_return",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction_index": 9,
+      "retained_instruction_index": 9,
+      "line": 11,
+      "instruction": "return 8",
+      "precision": "exact instruction retained in observation-directed backward slice"
+    },
+    {
+      "kind": "value_return",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction_index": 13,
+      "retained_instruction_index": 13,
+      "line": 13,
+      "instruction": "return 7",
+      "precision": "exact instruction retained in observation-directed backward slice"
+    },
+    {
+      "kind": "value_return",
+      "method": "sample.Relay.relay(I)I",
+      "context": "Everywhere",
+      "instruction_index": 1,
+      "retained_instruction_index": 1,
+      "line": 5,
+      "instruction": "return 1",
+      "precision": "exact instruction retained in observation-directed backward slice"
+    }
+  ],
+  "observation_effect_evidence": [],
+  "observation_effect_demand": {
+    "scope": "direct SSAGet definitions of exact original observation seed uses",
+    "unsupported": [
+      "static/global fields",
+      "getter-return reads",
+      "phi-mediated reads",
+      "indirect object-state observations"
+    ],
+    "status": "not_scanned",
+    "instance_read_count": 0,
+    "static_read_count": 0
+  },
+  "lazy_sdg_nodes_after_slice": 56,
+  "slice_statements": [
+    {
+      "kind": "NORMAL",
+      "method": "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+      "context": "Everywhere",
+      "instruction": "invokestatic < Application, Lsample/Entry, observe(II)V > 3,4 @1 exception:5",
+      "instruction_index": 1,
+      "line": null,
+      "basic_block": 1,
+      "statement_text": "NORMAL fakeRootMethod:invokestatic < Application, Lsample/Entry, observe(II)V > 3,4 @1 exception:5 Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Entry, observe(II)V >@1",
+      "declared_target": "sample.Entry.observe(II)V"
+    },
+    {
+      "kind": "PARAM_CALLER",
+      "method": "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+      "context": "Everywhere",
+      "instruction": "invokestatic < Application, Lsample/Entry, observe(II)V > 3,4 @1 exception:5",
+      "instruction_index": 1,
+      "line": null,
+      "basic_block": 1,
+      "statement_text": "PARAM_CALLER:Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere[1]invokestatic < Application, Lsample/Entry, observe(II)V > 3,4 @1 exception:5 v3",
+      "heap_location": null,
+      "call_instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Entry, observe(II)V >@1",
+      "declared_target": "sample.Entry.observe(II)V"
+    },
+    {
+      "kind": "PARAM_CALLER",
+      "method": "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+      "context": "Everywhere",
+      "instruction": "invokestatic < Application, Lsample/Entry, observe(II)V > 3,4 @1 exception:5",
+      "instruction_index": 1,
+      "line": null,
+      "basic_block": 1,
+      "statement_text": "PARAM_CALLER:Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere[1]invokestatic < Application, Lsample/Entry, observe(II)V > 3,4 @1 exception:5 v4",
+      "heap_location": null,
+      "call_instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Entry, observe(II)V >@1",
+      "declared_target": "sample.Entry.observe(II)V"
+    },
+    {
+      "kind": "METHOD_ENTRY",
+      "method": "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+      "context": "Everywhere",
+      "instruction": null,
+      "instruction_index": null,
+      "line": null,
+      "basic_block": null,
+      "statement_text": "METHOD_ENTRY:Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "NORMAL",
+      "method": "sample.Cut.first(I)I",
+      "context": "Everywhere",
+      "instruction": "4 = invokestatic < Application, Lsample/Relay, relay(I)I > 1 @1 exception:3",
+      "instruction_index": 1,
+      "line": 5,
+      "basic_block": 1,
+      "statement_text": "NORMAL first:4 = invokestatic < Application, Lsample/Relay, relay(I)I > 1 @1 exception:3 Node: < Application, Lsample/Cut, first(I)I > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "declared_target": "sample.Relay.relay(I)I"
+    },
+    {
+      "kind": "PARAM_CALLER",
+      "method": "sample.Cut.first(I)I",
+      "context": "Everywhere",
+      "instruction": "4 = invokestatic < Application, Lsample/Relay, relay(I)I > 1 @1 exception:3",
+      "instruction_index": 1,
+      "line": 5,
+      "basic_block": 1,
+      "statement_text": "PARAM_CALLER:Node: < Application, Lsample/Cut, first(I)I > Context: Everywhere[1]4 = invokestatic < Application, Lsample/Relay, relay(I)I > 1 @1 exception:3 v1",
+      "heap_location": null,
+      "call_instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "declared_target": "sample.Relay.relay(I)I"
+    },
+    {
+      "kind": "PARAM_CALLEE",
+      "method": "sample.Cut.first(I)I",
+      "context": "Everywhere",
+      "instruction": null,
+      "instruction_index": null,
+      "line": null,
+      "basic_block": null,
+      "statement_text": "PARAM_CALLEE:Node: < Application, Lsample/Cut, first(I)I > Context: Everywhere v1",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "METHOD_ENTRY",
+      "method": "sample.Cut.first(I)I",
+      "context": "Everywhere",
+      "instruction": null,
+      "instruction_index": null,
+      "line": null,
+      "basic_block": null,
+      "statement_text": "METHOD_ENTRY:Node: < Application, Lsample/Cut, first(I)I > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "NORMAL",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction": "4 = invokestatic < Application, Lsample/Relay, relay(I)I > 1 @1 exception:3",
+      "instruction_index": 1,
+      "line": 9,
+      "basic_block": 1,
+      "statement_text": "NORMAL second:4 = invokestatic < Application, Lsample/Relay, relay(I)I > 1 @1 exception:3 Node: < Application, Lsample/Cut, second(I)I > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "declared_target": "sample.Relay.relay(I)I"
+    },
+    {
+      "kind": "NORMAL",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction": "7 = binaryop(sub) 4 , 6",
+      "instruction_index": 12,
+      "line": 13,
+      "basic_block": 4,
+      "statement_text": "NORMAL second:7 = binaryop(sub) 4 , 6 Node: < Application, Lsample/Cut, second(I)I > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "NORMAL",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction": "8 = binaryop(add) 4 , 6",
+      "instruction_index": 8,
+      "line": 11,
+      "basic_block": 3,
+      "statement_text": "NORMAL second:8 = binaryop(add) 4 , 6 Node: < Application, Lsample/Cut, second(I)I > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "NORMAL",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction": "conditional branch(ge, to iindex=10) 4,5",
+      "instruction_index": 5,
+      "line": 10,
+      "basic_block": 2,
+      "statement_text": "NORMAL second:conditional branch(ge, to iindex=10) 4,5 Node: < Application, Lsample/Cut, second(I)I > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "NORMAL",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction": "return 7",
+      "instruction_index": 13,
+      "line": 13,
+      "basic_block": 4,
+      "statement_text": "NORMAL second:return 7 Node: < Application, Lsample/Cut, second(I)I > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "NORMAL",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction": "return 8",
+      "instruction_index": 9,
+      "line": 11,
+      "basic_block": 3,
+      "statement_text": "NORMAL second:return 8 Node: < Application, Lsample/Cut, second(I)I > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "PARAM_CALLER",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction": "4 = invokestatic < Application, Lsample/Relay, relay(I)I > 1 @1 exception:3",
+      "instruction_index": 1,
+      "line": 9,
+      "basic_block": 1,
+      "statement_text": "PARAM_CALLER:Node: < Application, Lsample/Cut, second(I)I > Context: Everywhere[1]4 = invokestatic < Application, Lsample/Relay, relay(I)I > 1 @1 exception:3 v1",
+      "heap_location": null,
+      "call_instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "declared_target": "sample.Relay.relay(I)I"
+    },
+    {
+      "kind": "PARAM_CALLEE",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction": null,
+      "instruction_index": null,
+      "line": null,
+      "basic_block": null,
+      "statement_text": "PARAM_CALLEE:Node: < Application, Lsample/Cut, second(I)I > Context: Everywhere v1",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "NORMAL_RET_CALLER",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction": "4 = invokestatic < Application, Lsample/Relay, relay(I)I > 1 @1 exception:3",
+      "instruction_index": 1,
+      "line": 9,
+      "basic_block": 1,
+      "statement_text": "NORMAL_RET_CALLER:Node: < Application, Lsample/Cut, second(I)I > Context: Everywhere[1]4 = invokestatic < Application, Lsample/Relay, relay(I)I > 1 @1 exception:3",
+      "heap_location": null,
+      "call_instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "declared_target": "sample.Relay.relay(I)I"
+    },
+    {
+      "kind": "NORMAL_RET_CALLEE",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction": null,
+      "instruction_index": null,
+      "line": null,
+      "basic_block": null,
+      "statement_text": "NORMAL_RET_CALLEE:Node: < Application, Lsample/Cut, second(I)I > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "METHOD_ENTRY",
+      "method": "sample.Cut.second(I)I",
+      "context": "Everywhere",
+      "instruction": null,
+      "instruction_index": null,
+      "line": null,
+      "basic_block": null,
+      "statement_text": "METHOD_ENTRY:Node: < Application, Lsample/Cut, second(I)I > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "NORMAL",
+      "method": "sample.Entry.observe(II)V",
+      "context": "Everywhere",
+      "instruction": "5 = invokestatic < Application, Lsample/Cut, first(I)I > 1 @1 exception:4",
+      "instruction_index": 1,
+      "line": 5,
+      "basic_block": 1,
+      "statement_text": "NORMAL observe:5 = invokestatic < Application, Lsample/Cut, first(I)I > 1 @1 exception:4 Node: < Application, Lsample/Entry, observe(II)V > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Cut, first(I)I >@1",
+      "declared_target": "sample.Cut.first(I)I"
+    },
+    {
+      "kind": "NORMAL",
+      "method": "sample.Entry.observe(II)V",
+      "context": "Everywhere",
+      "instruction": "7 = invokestatic < Application, Lsample/Cut, second(I)I > 2 @6 exception:6",
+      "instruction_index": 4,
+      "line": 6,
+      "basic_block": 2,
+      "statement_text": "NORMAL observe:7 = invokestatic < Application, Lsample/Cut, second(I)I > 2 @6 exception:6 Node: < Application, Lsample/Entry, observe(II)V > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": 4,
+      "call_site": "invokestatic < Application, Lsample/Cut, second(I)I >@6",
+      "declared_target": "sample.Cut.second(I)I"
+    },
+    {
+      "kind": "NORMAL",
+      "method": "sample.Entry.observe(II)V",
+      "context": "Everywhere",
+      "instruction": "invokestatic < Application, Lsample/Entry, observeValue(I)V > 7 @11 exception:8",
+      "instruction_index": 7,
+      "line": 7,
+      "basic_block": 3,
+      "statement_text": "NORMAL observe:invokestatic < Application, Lsample/Entry, observeValue(I)V > 7 @11 exception:8 Node: < Application, Lsample/Entry, observe(II)V > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": 7,
+      "call_site": "invokestatic < Application, Lsample/Entry, observeValue(I)V >@11",
+      "declared_target": "sample.Entry.observeValue(I)V"
+    },
+    {
+      "kind": "PARAM_CALLER",
+      "method": "sample.Entry.observe(II)V",
+      "context": "Everywhere",
+      "instruction": "5 = invokestatic < Application, Lsample/Cut, first(I)I > 1 @1 exception:4",
+      "instruction_index": 1,
+      "line": 5,
+      "basic_block": 1,
+      "statement_text": "PARAM_CALLER:Node: < Application, Lsample/Entry, observe(II)V > Context: Everywhere[1]5 = invokestatic < Application, Lsample/Cut, first(I)I > 1 @1 exception:4 v1",
+      "heap_location": null,
+      "call_instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Cut, first(I)I >@1",
+      "declared_target": "sample.Cut.first(I)I"
+    },
+    {
+      "kind": "PARAM_CALLER",
+      "method": "sample.Entry.observe(II)V",
+      "context": "Everywhere",
+      "instruction": "7 = invokestatic < Application, Lsample/Cut, second(I)I > 2 @6 exception:6",
+      "instruction_index": 4,
+      "line": 6,
+      "basic_block": 2,
+      "statement_text": "PARAM_CALLER:Node: < Application, Lsample/Entry, observe(II)V > Context: Everywhere[4]7 = invokestatic < Application, Lsample/Cut, second(I)I > 2 @6 exception:6 v2",
+      "heap_location": null,
+      "call_instruction_index": 4,
+      "call_site": "invokestatic < Application, Lsample/Cut, second(I)I >@6",
+      "declared_target": "sample.Cut.second(I)I"
+    },
+    {
+      "kind": "PARAM_CALLEE",
+      "method": "sample.Entry.observe(II)V",
+      "context": "Everywhere",
+      "instruction": null,
+      "instruction_index": null,
+      "line": null,
+      "basic_block": null,
+      "statement_text": "PARAM_CALLEE:Node: < Application, Lsample/Entry, observe(II)V > Context: Everywhere v1",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "PARAM_CALLEE",
+      "method": "sample.Entry.observe(II)V",
+      "context": "Everywhere",
+      "instruction": null,
+      "instruction_index": null,
+      "line": null,
+      "basic_block": null,
+      "statement_text": "PARAM_CALLEE:Node: < Application, Lsample/Entry, observe(II)V > Context: Everywhere v2",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "NORMAL_RET_CALLER",
+      "method": "sample.Entry.observe(II)V",
+      "context": "Everywhere",
+      "instruction": "7 = invokestatic < Application, Lsample/Cut, second(I)I > 2 @6 exception:6",
+      "instruction_index": 4,
+      "line": 6,
+      "basic_block": 2,
+      "statement_text": "NORMAL_RET_CALLER:Node: < Application, Lsample/Entry, observe(II)V > Context: Everywhere[4]7 = invokestatic < Application, Lsample/Cut, second(I)I > 2 @6 exception:6",
+      "heap_location": null,
+      "call_instruction_index": 4,
+      "call_site": "invokestatic < Application, Lsample/Cut, second(I)I >@6",
+      "declared_target": "sample.Cut.second(I)I"
+    },
+    {
+      "kind": "METHOD_ENTRY",
+      "method": "sample.Entry.observe(II)V",
+      "context": "Everywhere",
+      "instruction": null,
+      "instruction_index": null,
+      "line": null,
+      "basic_block": null,
+      "statement_text": "METHOD_ENTRY:Node: < Application, Lsample/Entry, observe(II)V > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "NORMAL",
+      "method": "sample.Relay.relay(I)I",
+      "context": "Everywhere",
+      "instruction": "return 1",
+      "instruction_index": 1,
+      "line": 5,
+      "basic_block": 1,
+      "statement_text": "NORMAL relay:return 1 Node: < Application, Lsample/Relay, relay(I)I > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "PARAM_CALLEE",
+      "method": "sample.Relay.relay(I)I",
+      "context": "Everywhere",
+      "instruction": null,
+      "instruction_index": null,
+      "line": null,
+      "basic_block": null,
+      "statement_text": "PARAM_CALLEE:Node: < Application, Lsample/Relay, relay(I)I > Context: Everywhere v1",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "NORMAL_RET_CALLEE",
+      "method": "sample.Relay.relay(I)I",
+      "context": "Everywhere",
+      "instruction": null,
+      "instruction_index": null,
+      "line": null,
+      "basic_block": null,
+      "statement_text": "NORMAL_RET_CALLEE:Node: < Application, Lsample/Relay, relay(I)I > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    },
+    {
+      "kind": "METHOD_ENTRY",
+      "method": "sample.Relay.relay(I)I",
+      "context": "Everywhere",
+      "instruction": null,
+      "instruction_index": null,
+      "line": null,
+      "basic_block": null,
+      "statement_text": "METHOD_ENTRY:Node: < Application, Lsample/Relay, relay(I)I > Context: Everywhere",
+      "heap_location": null,
+      "call_instruction_index": null,
+      "call_site": null,
+      "declared_target": null
+    }
+  ],
+  "seed_index": 21,
+  "traversal_truncated": false,
+  "traversal_frontier_count": 0,
+  "slice_statement_count": 32,
+  "slice_edge_count": 43,
+  "slice_edge_labels": {
+    "CONTROL_DEP": 17,
+    "DATA_DEP": 26
+  },
+  "slice_edges": [
+    {
+      "from": 0,
+      "to": 27,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 1,
+      "to": 24,
+      "labels": [
+        "DATA_DEP"
+      ],
+      "interprocedural_transition_id": "call com.ibm.wala.FakeRootClass.fakeRootMethod()V @ Everywhere #1 invokestatic < Application, Lsample/Entry, observe(II)V >@1 -> sample.Entry.observe(II)V @ Everywhere"
+    },
+    {
+      "from": 2,
+      "to": 25,
+      "labels": [
+        "DATA_DEP"
+      ],
+      "interprocedural_transition_id": "call com.ibm.wala.FakeRootClass.fakeRootMethod()V @ Everywhere #1 invokestatic < Application, Lsample/Entry, observe(II)V >@1 -> sample.Entry.observe(II)V @ Everywhere"
+    },
+    {
+      "from": 3,
+      "to": 0,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 4,
+      "to": 31,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 5,
+      "to": 29,
+      "labels": [
+        "DATA_DEP"
+      ],
+      "interprocedural_transition_id": "call sample.Cut.first(I)I @ Everywhere #1 invokestatic < Application, Lsample/Relay, relay(I)I >@1 -> sample.Relay.relay(I)I @ Everywhere"
+    },
+    {
+      "from": 6,
+      "to": 4,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 6,
+      "to": 5,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 7,
+      "to": 4,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 8,
+      "to": 31,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 8,
+      "to": 11,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 9,
+      "to": 12,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 10,
+      "to": 13,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 11,
+      "to": 10,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 11,
+      "to": 13,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 11,
+      "to": 9,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 11,
+      "to": 12,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 12,
+      "to": 17,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 13,
+      "to": 17,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 14,
+      "to": 29,
+      "labels": [
+        "DATA_DEP"
+      ],
+      "interprocedural_transition_id": "call sample.Cut.second(I)I @ Everywhere #1 invokestatic < Application, Lsample/Relay, relay(I)I >@1 -> sample.Relay.relay(I)I @ Everywhere"
+    },
+    {
+      "from": 15,
+      "to": 8,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 15,
+      "to": 14,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 16,
+      "to": 11,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 16,
+      "to": 10,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 16,
+      "to": 9,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 17,
+      "to": 26,
+      "labels": [
+        "DATA_DEP"
+      ],
+      "interprocedural_transition_id": "normal_return sample.Entry.observe(II)V @ Everywhere #4 invokestatic < Application, Lsample/Cut, second(I)I >@6 -> sample.Cut.second(I)I @ Everywhere"
+    },
+    {
+      "from": 18,
+      "to": 8,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 19,
+      "to": 7,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 19,
+      "to": 20,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 20,
+      "to": 18,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 20,
+      "to": 21,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 22,
+      "to": 6,
+      "labels": [
+        "DATA_DEP"
+      ],
+      "interprocedural_transition_id": "call sample.Entry.observe(II)V @ Everywhere #1 invokestatic < Application, Lsample/Cut, first(I)I >@1 -> sample.Cut.first(I)I @ Everywhere"
+    },
+    {
+      "from": 23,
+      "to": 15,
+      "labels": [
+        "DATA_DEP"
+      ],
+      "interprocedural_transition_id": "call sample.Entry.observe(II)V @ Everywhere #4 invokestatic < Application, Lsample/Cut, second(I)I >@6 -> sample.Cut.second(I)I @ Everywhere"
+    },
+    {
+      "from": 24,
+      "to": 19,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 24,
+      "to": 22,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 25,
+      "to": 20,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 25,
+      "to": 23,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 26,
+      "to": 21,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 27,
+      "to": 19,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    },
+    {
+      "from": 28,
+      "to": 30,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 29,
+      "to": 28,
+      "labels": [
+        "DATA_DEP"
+      ]
+    },
+    {
+      "from": 30,
+      "to": 16,
+      "labels": [
+        "DATA_DEP"
+      ],
+      "interprocedural_transition_id": "normal_return sample.Cut.second(I)I @ Everywhere #1 invokestatic < Application, Lsample/Relay, relay(I)I >@1 -> sample.Relay.relay(I)I @ Everywhere"
+    },
+    {
+      "from": 31,
+      "to": 28,
+      "labels": [
+        "CONTROL_DEP"
+      ]
+    }
+  ],
+  "interprocedural_transitions": [
+    {
+      "modality": "call",
+      "direction": "caller_to_callee",
+      "caller": "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+      "caller_context": "Everywhere",
+      "instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Entry, observe(II)V >@1",
+      "declared_target": "sample.Entry.observe(II)V",
+      "callee": "sample.Entry.observe(II)V",
+      "callee_context": "Everywhere",
+      "exact_call_graph_target": true,
+      "possible_target_nodes": [
+        {
+          "context": "Everywhere",
+          "method": "sample.Entry.observe(II)V"
+        }
+      ],
+      "call_identity": "com.ibm.wala.FakeRootClass.fakeRootMethod()V @ Everywhere #1 invokestatic < Application, Lsample/Entry, observe(II)V >@1 -> sample.Entry.observe(II)V @ Everywhere",
+      "caller_cfg_id": "com.ibm.wala.FakeRootClass.fakeRootMethod()V @ Everywhere #1 invokestatic < Application, Lsample/Entry, observe(II)V >@1",
+      "transition_id": "call com.ibm.wala.FakeRootClass.fakeRootMethod()V @ Everywhere #1 invokestatic < Application, Lsample/Entry, observe(II)V >@1 -> sample.Entry.observe(II)V @ Everywhere"
+    },
+    {
+      "modality": "call",
+      "direction": "caller_to_callee",
+      "caller": "sample.Cut.first(I)I",
+      "caller_context": "Everywhere",
+      "instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "declared_target": "sample.Relay.relay(I)I",
+      "callee": "sample.Relay.relay(I)I",
+      "callee_context": "Everywhere",
+      "exact_call_graph_target": true,
+      "possible_target_nodes": [
+        {
+          "context": "Everywhere",
+          "method": "sample.Relay.relay(I)I"
+        }
+      ],
+      "call_identity": "sample.Cut.first(I)I @ Everywhere #1 invokestatic < Application, Lsample/Relay, relay(I)I >@1 -> sample.Relay.relay(I)I @ Everywhere",
+      "caller_cfg_id": "sample.Cut.first(I)I @ Everywhere #1 invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "transition_id": "call sample.Cut.first(I)I @ Everywhere #1 invokestatic < Application, Lsample/Relay, relay(I)I >@1 -> sample.Relay.relay(I)I @ Everywhere"
+    },
+    {
+      "modality": "call",
+      "direction": "caller_to_callee",
+      "caller": "sample.Cut.second(I)I",
+      "caller_context": "Everywhere",
+      "instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "declared_target": "sample.Relay.relay(I)I",
+      "callee": "sample.Relay.relay(I)I",
+      "callee_context": "Everywhere",
+      "exact_call_graph_target": true,
+      "possible_target_nodes": [
+        {
+          "context": "Everywhere",
+          "method": "sample.Relay.relay(I)I"
+        }
+      ],
+      "call_identity": "sample.Cut.second(I)I @ Everywhere #1 invokestatic < Application, Lsample/Relay, relay(I)I >@1 -> sample.Relay.relay(I)I @ Everywhere",
+      "caller_cfg_id": "sample.Cut.second(I)I @ Everywhere #1 invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "transition_id": "call sample.Cut.second(I)I @ Everywhere #1 invokestatic < Application, Lsample/Relay, relay(I)I >@1 -> sample.Relay.relay(I)I @ Everywhere"
+    },
+    {
+      "modality": "normal_return",
+      "direction": "callee_to_caller",
+      "caller": "sample.Entry.observe(II)V",
+      "caller_context": "Everywhere",
+      "instruction_index": 4,
+      "call_site": "invokestatic < Application, Lsample/Cut, second(I)I >@6",
+      "declared_target": "sample.Cut.second(I)I",
+      "callee": "sample.Cut.second(I)I",
+      "callee_context": "Everywhere",
+      "exact_call_graph_target": true,
+      "possible_target_nodes": [
+        {
+          "context": "Everywhere",
+          "method": "sample.Cut.second(I)I"
+        }
+      ],
+      "call_identity": "sample.Entry.observe(II)V @ Everywhere #4 invokestatic < Application, Lsample/Cut, second(I)I >@6 -> sample.Cut.second(I)I @ Everywhere",
+      "caller_cfg_id": "sample.Entry.observe(II)V @ Everywhere #4 invokestatic < Application, Lsample/Cut, second(I)I >@6",
+      "transition_id": "normal_return sample.Entry.observe(II)V @ Everywhere #4 invokestatic < Application, Lsample/Cut, second(I)I >@6 -> sample.Cut.second(I)I @ Everywhere"
+    },
+    {
+      "modality": "call",
+      "direction": "caller_to_callee",
+      "caller": "sample.Entry.observe(II)V",
+      "caller_context": "Everywhere",
+      "instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Cut, first(I)I >@1",
+      "declared_target": "sample.Cut.first(I)I",
+      "callee": "sample.Cut.first(I)I",
+      "callee_context": "Everywhere",
+      "exact_call_graph_target": true,
+      "possible_target_nodes": [
+        {
+          "context": "Everywhere",
+          "method": "sample.Cut.first(I)I"
+        }
+      ],
+      "call_identity": "sample.Entry.observe(II)V @ Everywhere #1 invokestatic < Application, Lsample/Cut, first(I)I >@1 -> sample.Cut.first(I)I @ Everywhere",
+      "caller_cfg_id": "sample.Entry.observe(II)V @ Everywhere #1 invokestatic < Application, Lsample/Cut, first(I)I >@1",
+      "transition_id": "call sample.Entry.observe(II)V @ Everywhere #1 invokestatic < Application, Lsample/Cut, first(I)I >@1 -> sample.Cut.first(I)I @ Everywhere"
+    },
+    {
+      "modality": "call",
+      "direction": "caller_to_callee",
+      "caller": "sample.Entry.observe(II)V",
+      "caller_context": "Everywhere",
+      "instruction_index": 4,
+      "call_site": "invokestatic < Application, Lsample/Cut, second(I)I >@6",
+      "declared_target": "sample.Cut.second(I)I",
+      "callee": "sample.Cut.second(I)I",
+      "callee_context": "Everywhere",
+      "exact_call_graph_target": true,
+      "possible_target_nodes": [
+        {
+          "context": "Everywhere",
+          "method": "sample.Cut.second(I)I"
+        }
+      ],
+      "call_identity": "sample.Entry.observe(II)V @ Everywhere #4 invokestatic < Application, Lsample/Cut, second(I)I >@6 -> sample.Cut.second(I)I @ Everywhere",
+      "caller_cfg_id": "sample.Entry.observe(II)V @ Everywhere #4 invokestatic < Application, Lsample/Cut, second(I)I >@6",
+      "transition_id": "call sample.Entry.observe(II)V @ Everywhere #4 invokestatic < Application, Lsample/Cut, second(I)I >@6 -> sample.Cut.second(I)I @ Everywhere"
+    },
+    {
+      "modality": "normal_return",
+      "direction": "callee_to_caller",
+      "caller": "sample.Cut.second(I)I",
+      "caller_context": "Everywhere",
+      "instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "declared_target": "sample.Relay.relay(I)I",
+      "callee": "sample.Relay.relay(I)I",
+      "callee_context": "Everywhere",
+      "exact_call_graph_target": true,
+      "possible_target_nodes": [
+        {
+          "context": "Everywhere",
+          "method": "sample.Relay.relay(I)I"
+        }
+      ],
+      "call_identity": "sample.Cut.second(I)I @ Everywhere #1 invokestatic < Application, Lsample/Relay, relay(I)I >@1 -> sample.Relay.relay(I)I @ Everywhere",
+      "caller_cfg_id": "sample.Cut.second(I)I @ Everywhere #1 invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "transition_id": "normal_return sample.Cut.second(I)I @ Everywhere #1 invokestatic < Application, Lsample/Relay, relay(I)I >@1 -> sample.Relay.relay(I)I @ Everywhere"
+    }
+  ],
+  "call_control_flows": [
+    {
+      "status": "available",
+      "caller": "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+      "caller_context": "Everywhere",
+      "instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Entry, observe(II)V >@1",
+      "caller_cfg_id": "com.ibm.wala.FakeRootClass.fakeRootMethod()V @ Everywhere #1 invokestatic < Application, Lsample/Entry, observe(II)V >@1",
+      "call_block": 1,
+      "normal_successor_blocks": [
+        2
+      ],
+      "exceptional_successor_blocks": [
+        2
+      ],
+      "exceptional_catches": [],
+      "normal_reachable": [],
+      "exceptional_reachable": []
+    },
+    {
+      "status": "available",
+      "caller": "sample.Cut.first(I)I",
+      "caller_context": "Everywhere",
+      "instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "caller_cfg_id": "sample.Cut.first(I)I @ Everywhere #1 invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "call_block": 1,
+      "normal_successor_blocks": [
+        2
+      ],
+      "exceptional_successor_blocks": [
+        3
+      ],
+      "exceptional_catches": [],
+      "normal_reachable": [
+        {
+          "instruction": "return 4",
+          "instruction_index": 2,
+          "basic_block": 2
+        }
+      ],
+      "exceptional_reachable": []
+    },
+    {
+      "status": "available",
+      "caller": "sample.Cut.second(I)I",
+      "caller_context": "Everywhere",
+      "instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "caller_cfg_id": "sample.Cut.second(I)I @ Everywhere #1 invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "call_block": 1,
+      "normal_successor_blocks": [
+        2
+      ],
+      "exceptional_successor_blocks": [
+        5
+      ],
+      "exceptional_catches": [],
+      "normal_reachable": [
+        {
+          "instruction": "conditional branch(ge, to iindex=10) 4,5",
+          "instruction_index": 5,
+          "basic_block": 2
+        },
+        {
+          "instruction": "8 = binaryop(add) 4 , 6",
+          "instruction_index": 8,
+          "basic_block": 3
+        },
+        {
+          "instruction": "return 8",
+          "instruction_index": 9,
+          "basic_block": 3
+        },
+        {
+          "instruction": "7 = binaryop(sub) 4 , 6",
+          "instruction_index": 12,
+          "basic_block": 4
+        },
+        {
+          "instruction": "return 7",
+          "instruction_index": 13,
+          "basic_block": 4
+        }
+      ],
+      "exceptional_reachable": []
+    },
+    {
+      "status": "available",
+      "caller": "sample.Entry.observe(II)V",
+      "caller_context": "Everywhere",
+      "instruction_index": 4,
+      "call_site": "invokestatic < Application, Lsample/Cut, second(I)I >@6",
+      "caller_cfg_id": "sample.Entry.observe(II)V @ Everywhere #4 invokestatic < Application, Lsample/Cut, second(I)I >@6",
+      "call_block": 2,
+      "normal_successor_blocks": [
+        3
+      ],
+      "exceptional_successor_blocks": [
+        5
+      ],
+      "exceptional_catches": [],
+      "normal_reachable": [
+        {
+          "instruction": "invokestatic < Application, Lsample/Entry, observeValue(I)V > 7 @11 exception:8",
+          "instruction_index": 7,
+          "basic_block": 3
+        },
+        {
+          "instruction": "return",
+          "instruction_index": 8,
+          "basic_block": 4
+        }
+      ],
+      "exceptional_reachable": []
+    },
+    {
+      "status": "available",
+      "caller": "sample.Entry.observe(II)V",
+      "caller_context": "Everywhere",
+      "instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Cut, first(I)I >@1",
+      "caller_cfg_id": "sample.Entry.observe(II)V @ Everywhere #1 invokestatic < Application, Lsample/Cut, first(I)I >@1",
+      "call_block": 1,
+      "normal_successor_blocks": [
+        2
+      ],
+      "exceptional_successor_blocks": [
+        5
+      ],
+      "exceptional_catches": [],
+      "normal_reachable": [
+        {
+          "instruction": "7 = invokestatic < Application, Lsample/Cut, second(I)I > 2 @6 exception:6",
+          "instruction_index": 4,
+          "basic_block": 2
+        },
+        {
+          "instruction": "invokestatic < Application, Lsample/Entry, observeValue(I)V > 7 @11 exception:8",
+          "instruction_index": 7,
+          "basic_block": 3
+        },
+        {
+          "instruction": "return",
+          "instruction_index": 8,
+          "basic_block": 4
+        }
+      ],
+      "exceptional_reachable": []
+    }
+  ],
+  "call_bindings": [
+    {
+      "caller": "com.ibm.wala.FakeRootClass.fakeRootMethod()V",
+      "caller_context": "Everywhere",
+      "instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Entry, observe(II)V >@1",
+      "declared_target": "sample.Entry.observe(II)V",
+      "possible_targets": [
+        "sample.Entry.observe(II)V"
+      ],
+      "status": "resolved_candidates"
+    },
+    {
+      "caller": "sample.Cut.first(I)I",
+      "caller_context": "Everywhere",
+      "instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "declared_target": "sample.Relay.relay(I)I",
+      "possible_targets": [
+        "sample.Relay.relay(I)I"
+      ],
+      "status": "resolved_candidates"
+    },
+    {
+      "caller": "sample.Cut.second(I)I",
+      "caller_context": "Everywhere",
+      "instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Relay, relay(I)I >@1",
+      "declared_target": "sample.Relay.relay(I)I",
+      "possible_targets": [
+        "sample.Relay.relay(I)I"
+      ],
+      "status": "resolved_candidates"
+    },
+    {
+      "caller": "sample.Entry.observe(II)V",
+      "caller_context": "Everywhere",
+      "instruction_index": 1,
+      "call_site": "invokestatic < Application, Lsample/Cut, first(I)I >@1",
+      "declared_target": "sample.Cut.first(I)I",
+      "possible_targets": [
+        "sample.Cut.first(I)I"
+      ],
+      "status": "resolved_candidates"
+    },
+    {
+      "caller": "sample.Entry.observe(II)V",
+      "caller_context": "Everywhere",
+      "instruction_index": 4,
+      "call_site": "invokestatic < Application, Lsample/Cut, second(I)I >@6",
+      "declared_target": "sample.Cut.second(I)I",
+      "possible_targets": [
+        "sample.Cut.second(I)I"
+      ],
+      "status": "resolved_candidates"
+    },
+    {
+      "caller": "sample.Entry.observe(II)V",
+      "caller_context": "Everywhere",
+      "instruction_index": 7,
+      "call_site": "invokestatic < Application, Lsample/Entry, observeValue(I)V >@11",
+      "declared_target": "sample.Entry.observeValue(I)V",
+      "possible_targets": [
+        "sample.Entry.observeValue(I)V"
+      ],
+      "status": "resolved_candidates"
+    }
+  ],
+  "root_timings_millis": {
+    "backward_slice": 19,
+    "source_mapping": 34
+  }
+}

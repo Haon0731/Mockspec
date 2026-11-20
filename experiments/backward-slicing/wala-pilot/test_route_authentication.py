@@ -224,3 +224,56 @@ def test_authenticated_search_state_cap_is_an_explicit_frontier():
     assert evidence["exhaustive"] is False
     assert evidence["searched_states"] == 2
     assert evidence["state_limit"] == 2
+
+
+def two_call_value_route(wrong_return):
+    """Six-node call/return fixture: enter call 10, return via 10 or 20."""
+    caller, callee, test = "p.Cut.run()I", "p.Helper.relay(I)I", "p.Test.observe()V"
+    returned_call = 20 if wrong_return else 10
+    raw = {
+        "seed_index": 5,
+        "slice_statements": [
+            {"kind": "PARAM_CALLER", "method": caller, "context": "C",
+             "instruction_index": 10, "line": 10},
+            {"kind": "PARAM_CALLEE", "method": callee, "context": "C"},
+            {"kind": "NORMAL_RET_CALLEE", "method": callee, "context": "C"},
+            {"kind": "NORMAL_RET_CALLER", "method": caller, "context": "C",
+             "instruction_index": returned_call},
+            {"kind": "NORMAL_RET_CALLEE", "method": caller, "context": "C",
+             "basic_block": 25},
+            {"kind": "NORMAL_RET_CALLER", "method": test, "context": "C",
+             "instruction_index": 30},
+        ],
+        "slice_edges": [
+            {"from": 0, "to": 1, "labels": ["DATA_DEP"],
+             "interprocedural_transition": transition("call", caller, callee, 10)},
+            {"from": 1, "to": 2, "labels": ["DATA_DEP"]},
+            {"from": 2, "to": 3, "labels": ["DATA_DEP"],
+             "interprocedural_transition": transition(
+                 "normal_return", caller, callee, returned_call, normal=(25,))},
+            {"from": 3, "to": 4, "labels": ["DATA_DEP"]},
+            {"from": 4, "to": 5, "labels": ["DATA_DEP"],
+             "interprocedural_transition": transition("normal_return", test, caller, 30)},
+        ],
+    }
+    return raw, {"p.Cut": "src/main/java/p/Cut.java"}
+
+
+def test_typed_value_chain_preserves_matched_call_return():
+    raw, classes = two_call_value_route(False)
+    paths, _ = subject._typed_product_paths(raw, classes, {})
+    assert any(path["source_statement"] == 0 for path in paths)
+
+
+def test_typed_value_chain_rejects_return_to_other_call_site():
+    raw, classes = two_call_value_route(True)
+    paths, _ = subject._typed_product_paths(raw, classes, {})
+    assert not any(path["source_statement"] == 0 for path in paths)
+
+
+def test_typed_value_chain_requires_every_edge():
+    raw, classes = two_call_value_route(False)
+    for index in range(len(raw["slice_edges"])):
+        cut = {**raw, "slice_edges": raw["slice_edges"][:index] + raw["slice_edges"][index + 1:]}
+        paths, _ = subject._typed_product_paths(cut, classes, {})
+        assert not any(path["source_statement"] == 0 for path in paths)
