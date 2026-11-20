@@ -305,6 +305,34 @@ with dataset.load_case("flask_308") as case:
 .venv/bin/python -m pytest -q tests/test_frozen_dataset.py tests/test_mask_policy.py tests/test_mockbench_inventory.py tests/test_mockbench_intake.py tests/test_mockbench_batch.py
 ```
 
+### v2 事实投影和源码槽位
+
+输入为宿主已核验的切片结果与同一案例的可见源码。源码表以 source ID 为键，记录 `logical_path`、起始行及文本。可用以下接口分别构造导航和解包标签回复：
+
+```python
+from mock_spec.navigation_facts import project_navigation_facts
+from mock_spec.tagged_slots import parse_tagged_candidate, tagged_instruction
+
+facts = project_navigation_facts(case_result, visible_sources)
+required_slots = ["mock_stub_001", "verify_001"]
+instruction = tagged_instruction(required_slots)
+candidate = parse_tagged_candidate(raw_reply, required_slots)
+```
+
+`candidate["slots"]` 可直接交给按 marker 相对缩进工作的注入器。按字面匹配标签，保留源码内容，缺失、重复或乱序的槽位会导致解析失败。
+
+复现体检时，按上文 #32 命令在新目录运行 `--backend-mode generic`，将 `SLICE_DIR` 指向这一轮的输出。r2 使用 `--java-observation-seconds 480`；r1 使用默认 180 秒。该选项仅调整 Java 单个观察点的时限，正式注册清单记录取值，WALA 依赖配置沿用 r1。以下命令使用本轮保存的清单和 165 份切片结果，逐例核对冻结源码后投影：
+
+```bash
+PYTHONPATH=src .venv/bin/python experiments/backward-slicing/navigation-v2/health165.py \
+    --results "$SLICE_DIR/results.json" --inventory "$SLICE_DIR/inventory.json" \
+    --slice-provenance fresh_run --tokenizer o200k_base --output "$SLICE_DIR/health"
+```
+
+每例同时写入完整的 `cases/*.facts.json` 与可独立交付的 `cases/*.view.json`。默认预算为 8,192 tokens。上例需要可本地读取 o200k_base 词表的 tiktoken 环境；省去 `--tokenizer` 时按每个 UTF-8 字节一个单位保守计数。manifest 记录两份文件的 SHA-256、实际字节数与指定计数器的实测 token 数。视图中的归档定位相对于视图文件。
+
+`health/report.md` 提供逐语言统计，`health/summary.json` 保留逐例诊断。重放历史切片时使用 `--slice-provenance replayed_receipt`。
+
 ## Schema
 
 `UnifiedTask` 使用不可变 dataclass；`from_dict()` 对每一层实施严格字段白名单、

@@ -13,6 +13,8 @@
 
 ## 独立研究验证
 
+生产 v2 投影器的 165 例静态体检保留了 Java/Python 的入口绑定、后端错误、事实体积和守卫分布。逐例 JSON 记录含冻结身份、facts 路径和 SHA-256。[体检报告](../out/mockbench-study/navigation-v2-health165-20261119-r1/report.md) · [机器可读汇总](../out/mockbench-study/navigation-v2-health165-20261119-r1/summary.json)
+
 [#32 通用成熟后端完整165例结果](../out/mockbench-study/generic-entry-full165-20261111-r1/report.md)已完成接入验收：
 按语言分派而非三个 Case ID 白名单；123例建库／图、120例映射全部原观察、24例产品绑定、26例观察关联跨源影响。
 41例失败及预算／未知边界保留，165例新关系均未核验；不计入生产能力或完整切片成功率。

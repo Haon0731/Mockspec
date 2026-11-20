@@ -31,9 +31,15 @@ budget.py                  inference_v02.py               source_tools.py
 SDK 轮数上限，由运行超时与共享用量账本停止。
 `InferenceBudget` 定义在 `budget.py`，原 `inference_v02.InferenceBudget` 导入仍可用。
 
+## 后向切片的事实导航与代码槽位
+
+生产包提供两个离线接口。宿主先审核冻结身份、masking 和可见源码，再将静态后端结果交给 `mock_spec.navigation_facts.project_navigation_facts(case_result, visible_sources)`。它校验版本化切片契约，为 Java 和 Python 输出相同的 `mock-spec.navigation-facts/v2`。只有方法符号的端点保留符号，未解析的入口保留状态和已有观察，证据不足的返回值或异常通道记为 `null`。宿主保存完整投影后，`build_bounded_navigation_view` 依据归档哈希与定位生成独立交付视图；按实际序列化结果检查 token 预算，并记录各类省略数。切片驱动、165 例编排与统计仍归研究目录所有。[有界视图](../src/mock_spec/bounded_navigation_view.py) · [投影器](../src/mock_spec/navigation_facts.py) · [切片结果契约](../src/mock_spec/backward_result.py)
+
+下游宿主可用 `mock_spec.tagged_slots` 从有序槽位名生成交付约束。收到回复后，`parse_tagged_candidate` 按标签提取源码，返回旧评估器接受的 `{"slots": ..., "rationale": []}`。边界换行由协议消费，槽内的缩进和空行属于源码。两个接口都可直接调用，不需要供应商、凭据或 Agent 运行时。[槽位协议](../src/mock_spec/tagged_slots.py)
+
 ## LLM 结构化输出边界
 
-所有活动的 LLM 契约和阶段诊断正文统一经过
+Scenario 推断的 LLM 契约和阶段诊断正文统一经过
 [`structured_output.py`](../src/mock_spec/structured_output.py)：通过 Agents SDK 的严格输出 Schema
 发送供应商原生约束，正文用 Pydantic `model_validate_json` 校验。正则只剥离完整包裹正文的
 ` ```json ` 围栏，不截取说明文字中的 JSON，不用裸 `json.loads` 接受模型正文。
@@ -102,6 +108,7 @@ flowchart TD
 | SDK 工具接入 | [source_tools.py](../src/mock_spec/source_tools.py) | 核对模型可见工具定义、任务级调用限额、轨迹与取消行为时 |
 | 宿主文件绑定 | [source_repository.py](../src/mock_spec/source_repository.py) | 描述符相对读取、有界搜索、访问策略、分页及文件身份核验；绑定不进入 UnifiedTask |
 | 源码工具 | [source_analysis.py](../src/mock_spec/source_analysis.py)、[python_analysis.py](../src/mock_spec/python_analysis.py)、[java_analysis.py](../src/mock_spec/java_analysis.py) | 核对可见源码与语法事实时 |
+| 后向事实导航 | [backward_result.py](../src/mock_spec/backward_result.py)、[navigation_facts.py](../src/mock_spec/navigation_facts.py) | 校验冻结后向分析结果，并投影为不含 Mock 编写建议的 `navigation-facts/v2` |
 | 解析进程 | [analysis_process.py](../src/mock_spec/analysis_process.py)、[python_analysis_runner.py](../src/mock_spec/python_analysis_runner.py)、[tools/](../src/mock_spec/tools/) | 检查超时、取消、隔离与 Java helper 时 |
 | 运行入口 | [cli.py](../src/mock_spec/cli.py)、[live.py](../src/mock_spec/live.py)、[audited_run.py](../src/mock_spec/audited_run.py) | 启动推断或选择留证方式时 |
 | 执行元数据 | [execution_metadata.py](../src/mock_spec/execution_metadata.py) | 核对代码版本、指纹、运行环境及不可用状态时 |
@@ -198,8 +205,8 @@ Jib历史描述身份到FrozenCase身份的投影单列收据，不在汇总时�
 通用接入研究由同一入口的 `--backend-mode generic` 分派到两种语言的
 `generic_backend.py`，使用原冻结清单而不通过三例 Case ID 白名单。候选诊断仍单独保留。
 Python 的固定 CodeQL 查询接收原观察位置和审核来源事实；可证明的同步 loader 绑定
-属于前端证据，与后端测试内值流组合时明确标注来源，不执行 loader。Java 编译禁用注解
-处理器，缺失声明以受可见类型约束的未知入口参数表达。通用 WALA 模式明确关闭
+属于前端证据。显式导入的直接调用与已认证的 loader 坐标可独立形成入口导航；收据指向 `selector-facts.json`，原始 `relations.csv` 保留 CodeQL 解码结果。观察值流仍需独立证据。Java 编译禁用注解
+处理器，逐块核对 javac 的文件、范围、caret 和可见签名。缺失声明以受可见类型约束的未知入口参数表达；重载仍有歧义或涉及自由类型变量时保留诊断。通用 WALA 模式明确关闭
 heap／控制依赖，保留有类型路径的 may 数据证据与未完成前沿；占位方法影响保持未知。输入准备、数据库／调用图、
 观察映射、产品绑定及观察关联的跨源影响分开统计；新关系保持未核验。
 完整165例的接入验收与逐阶段证据见[通用接入结果](../out/mockbench-study/generic-entry-full165-20261111-r1/report.md)。
