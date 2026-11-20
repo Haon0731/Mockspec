@@ -154,16 +154,8 @@ Python 使用 `experiments/backward-slicing/python-backend-pilot/run_pilot.sh`�
 具体工具版本、预算、已核验范围见[单案例报告](../out/mockbench-study/python-observation-integration-20261111-r3/report.md)
 与[最新根因和修复验证](../out/mockbench-study/root-cause-repair-20261111/report.md)。
 
-Jib 分阶段规模诊断入口为
-`experiments/backward-slicing/wala-pilot/run_scale_diagnostic.py --help`。
-只使用已准备的结构骨架、已选依赖和显式诊断入口，输出目录必须新建；
-`--entry-scope` 与 `--runtime-region` 是分别记录的研究配置。
-已完成的Jib规模诊断使用 `--entry-scope --ci-heap`，保留原始堆位置，不加
-`--runtime-region`。`--ci-heap` 的底层SDG不构造堆参数，但CISlicer仍以Mod/Ref加入
-堆may-dependence；其上下文和覆盖写精度低于FULL SDG，结果明确保留边界。
-该轮依赖选择遗漏冻结的`jib-build-plan-0.4.0.jar`；#25需补齐转换实现后重新验证，
-旧耗时不能代表补齐依赖后的成本。这些结果不能代替原测试观察验收，
-也不启动165例正式复跑。
+Jib 的早期规模诊断遗漏了冻结 build-plan 依赖，已被后续逐观察入口和 #25 验收取代。
+旧诊断仅保留为成本归因记录；当前复验使用下文的 `run_jib_observations.py` 和限定验收材料。
 
 WALA #23最低能力门的当前收尾证据为
 `out/mockbench-study/issue23-capability-closure-20261111-r4/`。
@@ -177,7 +169,7 @@ WALA #23最低能力门的当前收尾证据为
 ```
 
 该检查核对预登记身份、当前模型的机制正反例与真实输入接入证据；
-通过不代表#25原始Jib逐断言验收完成。
+它只复核 #23 能力门，不能替代下文独立的 #25 逐观察验收。
 
 Python当前联合验收证据为
 `out/mockbench-study/python-issue26-27-20261111-r12/`，复现沿用
@@ -332,6 +324,12 @@ PYTHONPATH=src .venv/bin/python experiments/backward-slicing/navigation-v2/healt
 每例同时写入完整的 `cases/*.facts.json` 与可独立交付的 `cases/*.view.json`。默认预算为 8,192 tokens。上例需要可本地读取 o200k_base 词表的 tiktoken 环境；省去 `--tokenizer` 时按每个 UTF-8 字节一个单位保守计数。manifest 记录两份文件的 SHA-256、实际字节数与指定计数器的实测 token 数。视图中的归档定位相对于视图文件。
 
 `health/report.md` 提供逐语言统计，`health/summary.json` 保留逐例诊断。重放历史切片时使用 `--slice-provenance replayed_receipt`。
+
+### MockBench-165 配对实验预检
+
+Base / Base + navigation-v2 对照复用冻结案例、获准 CUT、输出协议和预算，v2 仅增加同快照的有界视图。
+离线入口见[预检协议](../experiments/backward-slicing/navigation-v2/preflight165-protocol.md)，最终配置与结论见
+[#37](https://github.com/Haon0731/Mockspec/issues/37)。机器可读收据随本地研究归档保存；预检不调用模型或目标测试。
 
 ## Schema
 

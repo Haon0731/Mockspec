@@ -1,6 +1,6 @@
 import pytest
 
-from tagged_transport import build_tagged_prompt, parse_tagged_slots, tagged_instruction
+from mock_spec.tagged_slots import build_tagged_prompt, parse_tagged_slots, tagged_instruction
 
 
 def test_dynamic_tags_preserve_python_relative_indentation_exactly():

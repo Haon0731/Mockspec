@@ -2,13 +2,17 @@ import copy
 import json
 from pathlib import Path
 
-import facts
+from mock_spec.navigation_facts import SCHEMA_VERSION, project_navigation_facts
 import inputs
 import navigation
 from study import case_data
 
 
 ROOT = Path(__file__).resolve().parents[3]
+
+
+def _json_bytes(value):
+    return len(json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode())
 
 
 def _all_keys(value):
@@ -36,11 +40,11 @@ def _effect(call, name):
 def test_real_jib_is_compact_and_contains_source_grounded_dependency_calls():
     contract, sources = inputs.load_case("jib")
 
-    projected = facts.format_facts(contract, sources)
+    projected = project_navigation_facts(contract, sources)
     v1 = navigation.format_navigation(contract, sources)
 
-    assert projected["schema_version"] == facts.SCHEMA_VERSION
-    assert len(facts._encoded(projected)) < len(facts._encoded(v1)) * 0.8
+    assert projected["schema_version"] == SCHEMA_VERSION
+    assert _json_bytes(projected) < _json_bytes(v1) * 0.8
     assert any(call["structural_role"] == "entry_call" for call in projected["calls"])
     processor = _call(projected, "ArtifactProcessor.createLayers")
     assert processor["structural_role"] == "outbound_call"
@@ -58,7 +62,7 @@ def test_real_jib_is_compact_and_contains_source_grounded_dependency_calls():
 def test_call_binding_and_non_value_relations_do_not_upgrade_return_reachability():
     contract, sources = inputs.load_case("jib")
 
-    projected = facts.format_facts(contract, sources)
+    projected = project_navigation_facts(contract, sources)
 
     entry = next(
         call for call in projected["calls"] if call["structural_role"] == "entry_call"
@@ -83,7 +87,7 @@ def test_call_binding_and_non_value_relations_do_not_upgrade_return_reachability
 def test_real_flask_keeps_dynamic_boundaries_guards_and_channel_precision():
     contract, sources, _, _ = case_data("flask_308")
 
-    projected = facts.format_facts(contract, sources)
+    projected = project_navigation_facts(contract, sources)
 
     assert _call(projected, "abort")["structural_role"] == "entry_call"
     context_get = _call(projected, "_cv_app.get")
@@ -169,7 +173,7 @@ def test_multiple_python_calls_on_one_line_do_not_share_an_endpoint_effect():
         }
     }
 
-    projected = facts.format_facts(modified, sources)
+    projected = project_navigation_facts(modified, sources)
 
     calls = [call for call in projected["calls"] if call["display"] == "left"]
     assert len(calls) == 2
@@ -182,7 +186,7 @@ def test_multiple_python_calls_on_one_line_do_not_share_an_endpoint_effect():
 
 def test_all_frozen_cases_project_and_preserve_thin_evidence_boundaries():
     projected = {
-        case: facts.format_facts(*inputs.load_case(case)) for case in inputs.case_keys()
+        case: project_navigation_facts(*inputs.load_case(case)) for case in inputs.case_keys()
     }
 
     zipkin = projected["zipkin"]
@@ -239,8 +243,8 @@ def test_projection_has_no_test_decision_labels_and_is_order_stable():
     reversed_contract = copy.deepcopy(contract)
     reversed_contract["relations"].reverse()
 
-    first = facts.format_facts(contract, sources)
-    second = facts.format_facts(
+    first = project_navigation_facts(contract, sources)
+    second = project_navigation_facts(
         reversed_contract, dict(reversed(list(sources.items())))
     )
 

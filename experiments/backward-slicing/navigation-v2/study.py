@@ -3,7 +3,6 @@
 import argparse
 import asyncio
 from collections import Counter
-import copy
 import json
 import os
 from pathlib import Path
@@ -18,6 +17,7 @@ sys.path.insert(0, str(ROOT / "issue35"))
 from issue34 import prepare_inputs as flask
 from issue34 import source_tool
 from issue35 import generate as gen
+from mock_spec.navigation_facts import project_navigation_facts
 from mock_spec.validation import SourceStore
 
 ARMS = ("v1", "ablation", "v2")
@@ -126,18 +126,6 @@ def _base_payload(contract, sources, initial, slots):
     }
 
 
-def evidence_arms(contract, sources):
-    from facts import format_facts
-
-    original = gen.format_navigation(contract, sources)
-    original.pop("projection")
-    ablated = copy.deepcopy(original)
-    assert (
-        ablated["interpretation"].pop("call_binding_is_interaction_candidate") is True
-    )
-    return {"v1": original, "ablation": ablated, "v2": format_facts(contract, sources)}
-
-
 def prepare(out):
     """Replay the immutable two-case JSON-transport input package."""
     shutil.copytree(LEGACY_INPUTS, out)
@@ -145,7 +133,6 @@ def prepare(out):
 
 def prepare_tagged(out):
     """Freeze seven-case Base/v2 inputs using the shared source-slot transport."""
-    from facts import format_facts
     from mock_spec.tagged_slots import build_tagged_prompt
 
     out.mkdir(parents=True, exist_ok=False)
@@ -154,7 +141,7 @@ def prepare_tagged(out):
         contract, sources, initial, snapshot = case_data(case)
         slots = gen.slot_ids(contract, sources["test"]["text"])
         base = _base_payload(contract, sources, initial, slots)
-        facts = format_facts(contract, sources)
+        facts = project_navigation_facts(contract, sources)
         case_dir = out / case
         case_dir.mkdir()
         gen.save(case_dir / "facts.json", facts)
@@ -308,12 +295,10 @@ if __name__ == "__main__":
         else:
             blind(out)
     elif args.command == "facts":
-        from facts import format_facts
-
         if not args.case:
             parser.error("facts requires --case")
         c, sources, _, _ = case_data(args.case)
-        print(json.dumps(format_facts(c, sources), ensure_ascii=False, indent=2))
+        print(json.dumps(project_navigation_facts(c, sources), ensure_ascii=False, indent=2))
     elif args.command == "prepare":
         prepare_tagged(args.inputs or HERE / "inputs")
     else:

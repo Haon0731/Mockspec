@@ -46,13 +46,6 @@ def _java_navigation_id(row: dict[str, str]) -> str:
     return f'{row["test_class"]}#{row["test_method"]}@{commit}'
 
 
-def _mutants_by_case(rows: list[dict[str, str]]) -> dict[str, list[str]]:
-    result: dict[str, list[str]] = defaultdict(list)
-    for row in rows:
-        result[row["case_id"]].append(row["mutant_id"])
-    return {case_id: sorted(ids) for case_id, ids in result.items()}
-
-
 def _manifest_entries(path: Path, prefix: str = "repo/") -> dict[str, tuple[str, int, str]]:
     manifest = _read_json(path)
     return {
