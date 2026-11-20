@@ -105,9 +105,15 @@ def merge_semantic_result(result: dict, semantic: dict, identity: dict) -> None:
 
 async def run_semantic_backend(entry: dict, result: dict, *, registry_root: str,
                                output: Path, codeql: Path | None, seconds: float,
-                               backend_mode: str = "registered") -> dict:
+                               backend_mode: str = "registered",
+                               java_observation_seconds: int | None = None) -> dict:
     if backend_mode not in {"registered", "generic"}:
         raise ValueError("unknown semantic backend mode")
+    if java_observation_seconds is not None:
+        if type(java_observation_seconds) is not int or java_observation_seconds < 1:
+            raise ValueError("Java observation deadline must be a positive integer")
+        if backend_mode != "generic":
+            raise ValueError("Java observation deadline is available only in generic mode")
     token = hashlib.sha256((entry["dataset"] + "\0" + entry["case_id"]).encode()).hexdigest()[:20]
     request = output / (token + "-request.json")
     write(request, {**entry, **result.get("input_context", {}),
@@ -119,6 +125,9 @@ async def run_semantic_backend(entry: dict, result: dict, *, registry_root: str,
                "--entry", str(request), "--registry-root", registry_root, "--output", str(destination)]
     if (entry["language"] == "python" or backend_mode == "generic") and codeql is not None:
         command += ["--codeql", str(codeql)]
+    if (entry["language"] == "java" and backend_mode == "generic"
+            and java_observation_seconds is not None):
+        command += ["--analysis-timeout", str(java_observation_seconds)]
     started = time.monotonic()
     try:
         code, stdout, stderr = await communicate(command, input_bytes=None, cwd=str(HERE.parents[1]),
@@ -351,7 +360,8 @@ async def run(inventory: dict, output: Path, *, seconds: float = 30,
               case_ids: list[str] | None = None, workers: int = 1,
               semantic_gate: Path | None = None, baseline: Path | None = None,
               codeql: Path | None = None, semantic_seconds: float = 1200,
-              backend_mode: str = "registered") -> dict:
+              backend_mode: str = "registered",
+              java_observation_seconds: int | None = None) -> dict:
     batch_started = time.monotonic()
     if inventory.get("input_policy") != "frozen-agent":
         raise ValueError("requires frozen-agent inventory")
@@ -361,6 +371,11 @@ async def run(inventory: dict, output: Path, *, seconds: float = 30,
         raise ValueError("workers must be a positive integer")
     if backend_mode not in {"registered", "generic"}:
         raise ValueError("unknown semantic backend mode")
+    if java_observation_seconds is not None:
+        if type(java_observation_seconds) is not int or java_observation_seconds < 1:
+            raise ValueError("Java observation deadline must be a positive integer")
+        if backend_mode != "generic":
+            raise ValueError("Java observation deadline is available only in generic mode")
     if backend_mode == "generic" and semantic_gate is None:
         raise ValueError("generic backend execution requires explicit semantic study registration")
     entries = inventory["cases"]
@@ -414,6 +429,8 @@ async def run(inventory: dict, output: Path, *, seconds: float = 30,
         manifest["configuration"].update(semantic_timeout_seconds=semantic_seconds,
                                           codeql=str(codeql), semantic_cache="new per supported case",
                                           semantic_workers=2, backend_mode=backend_mode)
+        if java_observation_seconds is not None:
+            manifest["configuration"]["java_observation_seconds"] = java_observation_seconds
         manifest["semantic_support_scope"] = {
             "java": "authenticated Jib JarFiles observation adapter and prepared application only",
             "python": "authenticated flask_308 and langflow_189 adapters only",
@@ -493,7 +510,8 @@ async def run(inventory: dict, output: Path, *, seconds: float = 30,
                         semantic = await run_semantic_backend(
                             entry, result, registry_root=inventory["registry_root"],
                             output=output / "semantic", codeql=codeql, seconds=semantic_seconds,
-                            backend_mode=backend_mode)
+                            backend_mode=backend_mode,
+                            java_observation_seconds=java_observation_seconds)
                 try:
                     merge_semantic_result(result, semantic, identity)
                 except Exception as exc:
@@ -553,6 +571,8 @@ if __name__ == "__main__":
     parser.add_argument("--codeql", type=Path)
     parser.add_argument("--semantic-seconds", type=float, default=1200)
     parser.add_argument("--backend-mode", choices=("registered", "generic"), default="registered")
+    parser.add_argument("--java-observation-seconds", type=int,
+                        help="generic Java WALA observation deadline; backend default remains unchanged when omitted")
     args = parser.parse_args()
     inventory = decode_json(args.inventory.read_text())
     if not isinstance(inventory, dict):
@@ -562,5 +582,6 @@ if __name__ == "__main__":
                               max_bytes=args.max_bytes, case_ids=args.case_id, workers=args.workers,
                               semantic_gate=args.semantic_gate, baseline=args.baseline,
                               codeql=args.codeql, semantic_seconds=args.semantic_seconds,
-                              backend_mode=args.backend_mode))
+                              backend_mode=args.backend_mode,
+                              java_observation_seconds=args.java_observation_seconds))
     print(json.dumps(summary, ensure_ascii=False, indent=2))

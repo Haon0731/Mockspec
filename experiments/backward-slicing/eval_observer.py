@@ -3,12 +3,39 @@ import __future__
 import json
 import os
 from pathlib import Path
+import time
 import types
 
 import pytest
 
 CURRENT = None
 FACTS = {'phases': [], 'identity': [], 'post_call_identity': [], 'mutant': os.environ.get('SLICE_MUTANT', 'original')}
+PARTIAL = Path('/outputs/execution.partial.json')
+
+
+def persist_partial():
+    temporary = PARTIAL.with_name(f'.{PARTIAL.name}.tmp')
+    temporary.write_text(json.dumps(FACTS, indent=2) + '\n')
+    temporary.replace(PARTIAL)
+
+
+def pytest_configure(config):
+    FACTS['pytest_started_at'] = time.time()
+    persist_partial()
+
+
+def pytest_runtest_logstart(nodeid, location):
+    FACTS.setdefault('row_events', []).append({
+        'nodeid': nodeid, 'event': 'started', 'at': time.time(),
+    })
+    persist_partial()
+
+
+def pytest_runtest_logfinish(nodeid, location):
+    FACTS.setdefault('row_events', []).append({
+        'nodeid': nodeid, 'event': 'finished', 'at': time.time(),
+    })
+    persist_partial()
 
 
 def code_facts(code):
@@ -69,10 +96,15 @@ def pytest_runtest_makereport(item, call):
     entry = {'nodeid': report.nodeid, 'when': report.when, 'outcome': report.outcome}
     if report.failed:
         entry['failure'] = str(getattr(report.longrepr, 'reprcrash', 'failure'))
+        if call.excinfo is not None:
+            entry['exception_type'] = call.excinfo.type.__name__
     FACTS['phases'].append(entry)
+    persist_partial()
 
 
 def pytest_sessionfinish(session, exitstatus):
     FACTS['exitstatus'] = int(exitstatus)
     FACTS['collected'] = session.testscollected
+    FACTS['pytest_finished_at'] = time.time()
+    persist_partial()
     Path('/outputs/execution.json').write_text(json.dumps(FACTS, indent=2) + '\n')

@@ -2,6 +2,7 @@ import asyncio
 import copy
 from contextlib import contextmanager
 import json
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -180,10 +181,68 @@ def test_generic_dispatch_does_not_route_new_cases_through_registered_case_allow
     assert result["reason"] == "real backend mechanism failure, not case admission"
 
 
+@pytest.mark.parametrize("language, expected", [("java", True), ("python", False)])
+def test_generic_java_observation_timeout_is_passed_only_to_java(monkeypatch, tmp_path,
+                                                                 language, expected):
+    commands = []
+
+    async def invoke(command, **kwargs):
+        commands.append(command)
+        output = Path(command[command.index("--output") + 1])
+        output.mkdir()
+        (output / "batch-result.json").write_text(json.dumps({"status": "failed"}))
+        return 1, b"", b""
+
+    monkeypatch.setattr(batch_slice, "communicate", invoke)
+    result = asyncio.run(batch_slice.run_semantic_backend(
+        {"case_id": "case", "dataset": "frozen", "language": language}, {},
+        registry_root="/frozen", output=tmp_path, codeql=tmp_path / "codeql",
+        seconds=30, backend_mode="generic", java_observation_seconds=480))
+    assert result["status"] == "failed"
+    assert ("--analysis-timeout" in commands[0]) is expected
+    if expected:
+        assert commands[0][commands[0].index("--analysis-timeout") + 1] == "480"
+
+
+def test_default_generic_dispatch_keeps_backend_default_analysis_timeout(monkeypatch, tmp_path):
+    commands = []
+
+    async def invoke(command, **kwargs):
+        commands.append(command)
+        output = Path(command[command.index("--output") + 1])
+        output.mkdir()
+        (output / "batch-result.json").write_text(json.dumps({"status": "failed"}))
+        return 1, b"", b""
+
+    monkeypatch.setattr(batch_slice, "communicate", invoke)
+    asyncio.run(batch_slice.run_semantic_backend(
+        {"case_id": "case", "dataset": "frozen", "language": "java"}, {},
+        registry_root="/frozen", output=tmp_path, codeql=None, seconds=30,
+        backend_mode="generic"))
+    assert "--analysis-timeout" not in commands[0]
+
+
 def test_generic_backend_cannot_silently_run_candidate_only(tmp_path):
     with pytest.raises(ValueError, match="explicit semantic"):
         asyncio.run(batch_slice.run({"input_policy": "frozen-agent"}, tmp_path / "run",
                                    backend_mode="generic"))
+    assert not (tmp_path / "run").exists()
+
+
+@pytest.mark.parametrize("value", [0, -1, 1.5, True])
+def test_java_observation_timeout_requires_a_positive_integer(tmp_path, value):
+    with pytest.raises(ValueError, match="Java observation"):
+        asyncio.run(batch_slice.run(
+            {"input_policy": "frozen-agent"}, tmp_path / "run",
+            backend_mode="generic", java_observation_seconds=value))
+    assert not (tmp_path / "run").exists()
+
+
+def test_java_observation_timeout_requires_generic_mode(tmp_path):
+    with pytest.raises(ValueError, match="generic"):
+        asyncio.run(batch_slice.run(
+            {"input_policy": "frozen-agent"}, tmp_path / "run",
+            java_observation_seconds=480))
     assert not (tmp_path / "run").exists()
 
 
@@ -264,9 +323,12 @@ def test_semantic_rejection_isolated_and_later_case_still_recorded(monkeypatch, 
     codeql.chmod(0o700)
     summary = asyncio.run(batch_slice.run(inventory, output, workers=2,
                                          semantic_gate=tmp_path / "gate", baseline=tmp_path / "baseline",
-                                         codeql=codeql))
+                                         codeql=codeql, backend_mode="generic",
+                                         java_observation_seconds=480))
     rows = json.loads((output / "results.json").read_text())["cases"]
     assert [row["status"] for row in rows] == ["failed", "unsupported"]
     assert all(row["result_contract"]["identity"]["snapshot_id"] == "s" for row in rows)
     assert summary["semantic_backend_status"] == {"failed": 1, "unsupported": 1}
     assert (output / "semantic" / "1-rejected-result.json").exists()
+    assert json.loads((output / "pre-registration.json").read_text())["configuration"][
+        "java_observation_seconds"] == 480

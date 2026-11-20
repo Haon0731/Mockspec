@@ -95,43 +95,197 @@ def _replace_entry(test: str, method: str, parameters: list[tuple[str, str]]) ->
 def _missing_variables(stderr: str, *, test_path: str | None = None,
                        start_line: int | None = None, end_line: int | None = None) -> list[str]:
     values: list[str] = []
-    pattern = re.compile(
-        r"(?ms)^([^\n]+):(\d+): error: cannot find symbol\n.*?"
-        r"^\s*symbol:\s+variable\s+([A-Za-z_$][\w$]*)\s*$"
-    )
-    for path, line_text, name in pattern.findall(stderr):
-        line = int(line_text)
-        if test_path is not None and not path.endswith(test_path):
+    for path, line, severity, message, body in _diagnostic_blocks(stderr):
+        if severity != "error" or message != "cannot find symbol":
+            continue
+        if test_path is not None and path != test_path and not path.endswith("/" + test_path):
             continue
         if start_line is not None and line < start_line:
             continue
         if end_line is not None and line > end_line:
             continue
-        if name not in values:
-            values.append(name)
+        match = re.search(r"(?m)^\s*symbol:\s+variable\s+([A-Za-z_$][\w$]*)\s*$", body)
+        if match and match.group(1) not in values:
+            values.append(match.group(1))
     return values
 
 
-def _type_updates(stderr: str, missing: list[str]) -> dict[str, str]:
+def _diagnostic_blocks(stderr: str) -> list[tuple[str, int, str, str, str]]:
+    """Split javac output before interpreting diagnostic-local detail lines."""
+    header = re.compile(r"(?m)^(.*):(\d+): (error|warning): ([^\n]+)$")
+    matches = list(header.finditer(stderr))
+    return [
+        (match.group(1), int(match.group(2)), match.group(3), match.group(4).strip(),
+         stderr[match.end() + 1:matches[index + 1].start() if index + 1 < len(matches) else len(stderr)])
+        for index, match in enumerate(matches)
+    ]
+
+
+def _split_java_list(value: str) -> list[str]:
+    parts: list[str] = []
+    start = 0
+    angle_depth = 0
+    quoted: str | None = None
+    escaped = False
+    for index, char in enumerate(value):
+        if quoted:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quoted:
+                quoted = None
+        elif char in {'"', "'"}:
+            quoted = char
+        elif char == "<":
+            angle_depth += 1
+        elif char == ">":
+            angle_depth = max(0, angle_depth - 1)
+        elif char == "," and angle_depth == 0:
+            parts.append(value[start:index].strip())
+            start = index + 1
+    parts.append(value[start:].strip())
+    return parts
+
+
+def _source_line(body: str) -> str | None:
+    lines = body.splitlines()
+    for index in range(len(lines) - 1):
+        if re.fullmatch(r"[ \t]*\^[ \t]*", lines[index + 1]):
+            return lines[index]
+    return None
+
+
+def _call_arguments(source_line: str, method: str) -> list[str] | None:
+    calls = re.findall(rf"\b{re.escape(method)}\s*\(([^()]*)\)", source_line)
+    if len(calls) != 1:
+        return None
+    return _split_java_list(calls[0])
+
+
+def _literal_compatible(argument: str, required: str) -> bool:
+    argument = argument.strip()
+    simple = required.rsplit(".", 1)[-1]
+    primitives = {"boolean", "byte", "short", "char", "int", "long", "float", "double"}
+    if re.fullmatch(r'"(?:\\.|[^"\\])*"', argument):
+        return simple not in primitives
+    if re.fullmatch(r"'(?:\\.|[^'\\])'", argument):
+        return simple not in primitives or simple in {"char", "int", "long", "float", "double"}
+    if argument in {"true", "false"}:
+        return simple not in primitives or simple == "boolean"
+    if re.fullmatch(r"[+-]?(?:0[xX][0-9a-fA-F]+|\d+)[lL]?", argument):
+        return simple not in primitives or simple in {"byte", "short", "int", "long", "float", "double"}
+    return True
+
+
+def _recoverable_type(type_name: str, free_type_variables: set[str] | None = None) -> bool:
+    if free_type_variables and type_name.removesuffix("[]") in free_type_variables:
+        return False
+    simple = r"[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*(?:\[\])?"
+    if re.fullmatch(simple, type_name):
+        return True
+    return bool(re.fullmatch(simple.removesuffix(r"(?:\[\])?") + r"<\?>", type_name))
+
+
+def _free_type_variables(body: str) -> set[str]:
+    return set(re.findall(
+        r"(?m)^\s*([A-Za-z_$][\w$]*) extends .* declared in (?:method|class|interface)\b", body
+    ))
+
+
+def _supported_formal_type(type_name: str, free_type_variables: set[str]) -> bool:
+    primitives = {"boolean", "byte", "short", "char", "int", "long", "float", "double"}
+    return type_name in primitives or _recoverable_type(type_name, free_type_variables)
+
+
+def _required_signature_update(message: str, body: str, missing: list[str]) -> dict[str, str]:
+    method_match = re.match(
+        r"method\s+([A-Za-z_$][\w$]*)(?: in [^;]+)? cannot be applied", message
+    )
+    source = _source_line(body)
+    required_match = re.search(r"(?m)^\s*required:\s*(.+)$", body)
+    if not (method_match and source and required_match):
+        return {}
+    arguments = _call_arguments(source, method_match.group(1))
+    required = _split_java_list(required_match.group(1))
+    free_type_variables = _free_type_variables(body)
+    if (arguments is None or len(arguments) != len(required)
+            or not all(_supported_formal_type(type_name, free_type_variables)
+                       for type_name in required)):
+        return {}
+    return {argument: type_name for argument, type_name in zip(arguments, required)
+            if argument in missing and _recoverable_type(type_name, free_type_variables)}
+
+
+def _overload_update(message: str, body: str, missing: list[str]) -> dict[str, str]:
+    method_match = re.match(r"no suitable method found for ([A-Za-z_$][\w$]*)\(", message)
+    source = _source_line(body)
+    if not (method_match and source):
+        return {}
+    arguments = _call_arguments(source, method_match.group(1))
+    if arguments is None:
+        return {}
+    signatures = re.findall(
+        rf"(?m)^\s*method\s+\S+\.{re.escape(method_match.group(1))}\(([^\n()]*)\) is not applicable$",
+        body,
+    )
+    if len(signatures) != len(re.findall(r"(?m)^\s*method\s+", body)):
+        return {}
+    candidates = [_split_java_list(signature) for signature in signatures]
+    free = _free_type_variables(body)
+    if any(not _supported_formal_type(formal, free) for signature in candidates
+           for formal in signature):
+        return {}
+    compatible = [signature for signature in candidates if len(signature) == len(arguments)
+                  and all(_literal_compatible(arg, formal)
+                          for arg, formal in zip(arguments, signature))]
+    if len(compatible) != 1:
+        return {}
+    updates: dict[str, str] = {}
+    for argument, formal in zip(arguments, compatible[0]):
+        if argument in missing:
+            if argument in updates and updates[argument] != formal:
+                return {}
+            updates[argument] = formal
+    return updates
+
+
+def _type_updates(stderr: str, missing: list[str], *, test_path: str | None = None,
+                  start_line: int | None = None, end_line: int | None = None) -> dict[str, str]:
     """Recover only javac constraints whose caret identifies one missing name."""
     updates: dict[str, str] = {}
-    pattern = re.compile(
-        r"(?m)^.*?:(\d+): error: incompatible types: .*? cannot be converted to ([^\n]+)\n"
-        r"([^\n]*)\n([ ]*)\^"
-    )
-    for match in pattern.finditer(stderr):
-        required = match.group(2).strip()
-        source_line, caret = match.group(3), len(match.group(4))
+    for path, line, severity, message, body in _diagnostic_blocks(stderr):
+        if severity != "error":
+            continue
+        if test_path is not None and path != test_path and not path.endswith("/" + test_path):
+            continue
+        if start_line is not None and line < start_line:
+            continue
+        if end_line is not None and line > end_line:
+            continue
+        required_match = re.match(r"incompatible types: .* cannot be converted to (.+)", message)
+        source_line = _source_line(body)
+        caret_match = re.search(r"(?m)^([ \t]*)\^[ \t]*$", body)
+        if required_match and source_line and caret_match:
+            required = required_match.group(1).strip()
+            caret = len(caret_match.group(1).expandtabs(8))
+        else:
+            for name, required in {
+                **_required_signature_update(message, body, missing),
+                **_overload_update(message, body, missing),
+            }.items():
+                if name in updates and updates[name] != required:
+                    raise ValueError(f"conflicting visible type constraints for {name}")
+                updates[name] = required
+            continue
         candidates = []
         for name in missing:
             for occurrence in re.finditer(rf"\b{re.escape(name)}\b", source_line):
-                if occurrence.start() <= caret <= occurrence.end():
+                start = len(source_line[:occurrence.start()].expandtabs(8))
+                end = len(source_line[:occurrence.end()].expandtabs(8))
+                if start <= caret < end:
                     candidates.append(name)
-        if not candidates:
-            present = [name for name in missing if re.search(rf"\b{re.escape(name)}\b", source_line)]
-            if len(present) == 1:
-                candidates = present
-        if len(set(candidates)) == 1 and re.fullmatch(r"[A-Za-z_$][\w$]*(?:\[\])?", required):
+        if len(set(candidates)) == 1 and _recoverable_type(required, _free_type_variables(body)):
             name = candidates[0]
             if name in updates and updates[name] != required:
                 raise ValueError(f"conflicting visible type constraints for {name}")
@@ -181,7 +335,8 @@ def _prepare_harness(test_text: str, method: str, write_test, compile_once,
             record_attempts(attempts)
         if result.returncode == 0:
             return harness, attempts[-1]["parameters"], attempts
-        updates = _type_updates(result.stderr, missing)
+        updates = _type_updates(result.stderr, missing, test_path=test_path,
+                                start_line=start_line, end_line=end_line)
         changed = {name: required for name, required in updates.items() if types[name] != required}
         if not changed:
             raise ValueError("deleted Java declaration types are not uniquely constrained by visible usage")
